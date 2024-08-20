@@ -21,7 +21,6 @@ namespace MigrationTools.Tools.Infrastructure
         /// <summary>
         /// If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
         /// </summary>
-
         [JsonIgnore]
         public bool Enabled { get; set; }
         public List<string> ApplyTo { get; set; }

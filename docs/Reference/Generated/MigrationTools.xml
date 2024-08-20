@@ -190,6 +190,11 @@
             If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
             </summary>
         </member>
+        <member name="P:MigrationTools.Tools.Infrastructure.IFieldMapOptions.ApplyTo">
+            <summary>
+            A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
+            </summary>
+        </member>
         <member name="M:MigrationTools.Tools.Infrastructure.EmbededImagesRepairToolBase`1.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
             from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
         </member>
@@ -279,27 +284,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"487bb1ec"
+            => @"135efcc7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"487bb1ecd841a6400e2c524680b9cffb01aeefbc"
+            => @"135efcc7b38ddb8b719d457531bfe18db9aeed77"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-20T22:03:22+01:00"
+            => @"2024-08-20T22:09:53+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"143"
+            => @"144"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-143-g487bb1ec"
+            => @"v15.1.8-Preview.9-144-g135efcc7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -334,7 +339,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"151"
+            => @"152"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
