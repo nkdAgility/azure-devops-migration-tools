@@ -234,7 +234,7 @@ function Update-ReleaseGroups-MinorSummaries {
             $minorReleaseJson = $minorRelease.Releases | ConvertTo-Json -Depth 10
 
             # Generate a summary for this minor release using OpenAI
-            $prompt = "Provide a summary of the following changes for version $($minorRelease.Major).$($minorRelease.Minor). Concentrate on user-impacting changes like new features, improvements, and bug fixes. Create as a short paragraph Use the following json: `n`````n$minorReleaseJson`n````"
+            $prompt = "Provide a summary of the following changes for version $($minorRelease.Major).$($minorRelease.Minor). Concentrate on user-impacting changes like new features, improvements, and bug fixes. This shoudl be a short paragraph that explains the changes, and should not include the version number. Use the following json: `n`````n$minorReleaseJson`n````"
             $minorSummary = Get-OpenAIResponse -system "Create a release summary" -prompt $prompt -OPEN_AI_KEY $Env:OPEN_AI_KEY
 
             # Add the summary to the minor release
@@ -310,6 +310,7 @@ function Update-ReleaseGroups-Major {
         if (-not $existingMinorGroup) {
             $newMinorGroup = [PSCustomObject]@{
                 MinorVersion = $minorVersion
+                LatestTagName = $minorRelease.LatestTagName
                 Summary = $minorRelease.Summary
             }
             $groupedMajorReleases[$major].Releases += $newMinorGroup
@@ -372,20 +373,22 @@ function Update-ReleaseGroups-MajorSummaries {
     foreach ($majorRelease in $groupedReleases) {
         Write-Host "Processing Major Version $($majorRelease.Major)..."
 
-        if (-not $majorRelease.PSObject.Properties['summary']) {
+        # Check if the summary for this major release is missing or empty
+        if (-not $majorRelease.PSObject.Properties['Summary'] -or [string]::IsNullOrEmpty($majorRelease.Summary)) {
+            
             # Combine summaries of all minor releases in this major version
             $majorReleaseJson = $majorRelease.Releases | ConvertTo-Json -Depth 10
 
             # Generate a summary for this major release using OpenAI
-            $prompt = "Provide a summary of the following changes for major version $($majorRelease.Major). Concentrate on user-impacting changes like new features, improvements, and bug fixes. Use the following json: `n`````n$majorReleaseJson`n````"
+            $prompt = "Provide a summary of the following changes for major version $($majorRelease.Major). Concentrate on user-impacting changes like new features, improvements, and bug fixes. Do not use phrases from this prompt. This shoudl be a short paragraph that explains the changes, and should not include the version number. Use the following json: `n`````n$majorReleaseJson`n````"
             $majorSummary = Get-OpenAIResponse -system "Create a release summary" -prompt $prompt -OPEN_AI_KEY $Env:OPEN_AI_KEY
 
-            # Add the summary to the major release
-            $majorRelease | Add-Member -MemberType NoteProperty -Name summary -Value $majorSummary -Force
+            # Add or update the summary in the major release
+            $majorRelease.Summary = $majorSummary
 
             Write-Host "Summary for Major Version $($majorRelease.Major) added."
 
-            # Save the updated grouped releases with summaries
+            # Save the updated grouped releases with summaries after each major release is processed
             $groupedReleasesJson = $groupedReleases | ConvertTo-Json -Depth 10
             Set-Content -Path $outputFilePath -Value $groupedReleasesJson
 
@@ -394,7 +397,6 @@ function Update-ReleaseGroups-MajorSummaries {
         }
     }
 
-
-
     Write-Host "Updated major release summaries have been saved to $outputFilePath"
 }
+

@@ -25,7 +25,6 @@ Update-ReleaseGroups-Major
 Update-ReleaseGroups-MajorSummaries 
 
 
-
 #==============================================================================
 
 # Function to generate change log markdown
