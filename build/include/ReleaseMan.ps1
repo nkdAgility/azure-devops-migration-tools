@@ -126,17 +126,19 @@ function Parse-Version {
     }
 }
 
+
 # Function to update and return the release groups
-function Update-ReleaseGroups {
+
+function Update-ReleaseGroups-Minor {
     param (
-        [string]$releaseFilePath,
-        [string]$outputFilePath = "./releases-grouped.json"
+        [string]$releaseFilePath = "./releases.json",
+        [string]$outputFilePath = "./releases-grouped-minor.json"
     )
     
-    # Load the original releases JSON file
+    # Load the releases from releases.json
     $releases = Get-Content -Raw -Path $releaseFilePath | ConvertFrom-Json
 
-    # Load the existing grouped releases from the output file if it exists
+    # Load the existing grouped minor releases from the output file if it exists
     if (Test-Path $outputFilePath) {
         $existingGroupedReleases = Get-Content -Raw -Path $outputFilePath | ConvertFrom-Json
     } else {
@@ -145,11 +147,12 @@ function Update-ReleaseGroups {
 
     # Convert the existing grouped releases to a hashtable for easier updates
     $groupedReleases = @{}
-    foreach ($majorRelease in $existingGroupedReleases) {
-        $groupedReleases[$majorRelease.Major] = @{
-            Major = $majorRelease.Major
-            Releases = $majorRelease.Releases
-            Summary = $majorRelease.Summary
+    foreach ($minorRelease in $existingGroupedReleases) {
+        $key = "$($minorRelease.Major).$($minorRelease.Minor)"
+        $groupedReleases[$key] = @{
+            Major = $minorRelease.Major
+            Minor = $minorRelease.Minor
+            Releases = $minorRelease.Releases
         }
     }
 
@@ -158,140 +161,167 @@ function Update-ReleaseGroups {
         $versionInfo = Parse-Version -version $_.version
         $major = $versionInfo.Major
         $minor = $versionInfo.Minor
+        $key = "$major.$minor"
         
-        # Check if the major version exists in the grouped releases
-        if (-not $groupedReleases.ContainsKey($major)) {
-            $groupedReleases[$major] = @{
+        # Ensure minor version exists under the major version
+        if (-not $groupedReleases.ContainsKey($key)) {
+            $groupedReleases[$key] = @{
                 Major = $major
-                Releases = @()
-                Summary = $null # Placeholder for summary
-            }
-        }
-
-        # Check if the minor version exists under the major version
-        $minorGroup = $groupedReleases[$major].Releases | Where-Object { $_.Minor -eq $minor }
-        if (-not $minorGroup) {
-            $minorGroup = [PSCustomObject]@{
                 Minor = $minor
                 Releases = @()
-                Summary = $null # Placeholder for summary
             }
-            $groupedReleases[$major].Releases += $minorGroup
-        } else {
-            # Preserve the existing summary and description
-            $existingSummary = $minorGroup.Summary
-            $minorGroup = $groupedReleases[$major].Releases | Where-Object { $_.Minor -eq $minor }
-            $minorGroup.Summary = $existingSummary
         }
 
-        # Check if the release already exists in the minor release group
-        $existingRelease = $minorGroup.Releases | Where-Object { $_.tagName -eq $_.tagName }
-        if ($existingRelease) {
-            # If it exists, ensure its description is retained
-            if ($existingRelease.description) {
-                $_.description = $existingRelease.description
-            }
-        } else {
-            # Add the release to the appropriate minor release group
-            $minorGroup.Releases += ,$_
+        # Check if this release already exists in the minor group
+        $existingRelease = $groupedReleases[$key].Releases | Where-Object { $_.tagName -eq $_.tagName }
+        if (-not $existingRelease) {
+            # Add the release if it does not already exist
+            $groupedReleases[$key].Releases += ,$_
         }
     }
 
-    # Convert the grouped releases hashtable back to a list of PSCustomObjects
+    # Convert the grouped releases hashtable back to a list
     $finalGroupedReleases = $groupedReleases.GetEnumerator() | Sort-Object -Property Key | ForEach-Object {
         [PSCustomObject]@{
             Major = $_.Value.Major
-            Releases = ($_.Value.Releases | Sort-Object -Property Minor)
-            Summary = $_.Value.Summary
+            Minor = $_.Value.Minor
+            Releases = $_.Value.Releases
         }
     }
 
-    # Set a higher depth for JSON serialization
+    # Save the updated grouped releases to the output file
     $groupedJson = $finalGroupedReleases | ConvertTo-Json -Depth 10
-
-    # Save the updated JSON to the output file
     Set-Content -Path $outputFilePath -Value $groupedJson
 
-    Write-Host "Grouped releases have been updated and saved to $outputFilePath"
-
-    # Return the grouped releases object
-    return $finalGroupedReleases
+    Write-Host "Grouped minor releases have been updated and saved to $outputFilePath"
 }
 
 
 
 
-
-function Generate-ReleaseSummaries {
+function Update-ReleaseGroups-MinorSummaries {
     param (
-        [Parameter(Mandatory = $true)]
-        [array]$groupedReleases,
-        
-        [Parameter(Mandatory = $true)]
-        [string]$outputFilePath
+        [string]$inputFilePath = "./releases-grouped-minor.json",
+        [string]$outputFilePath = "./releases-grouped-minor.json"
     )
 
-    # Function to check if a summary exists
-    function Summary-Exists {
-        param (
-            [Parameter(Mandatory = $false)]
-            [object]$summary
-        )
-        
-        # Check if the summary is not null, empty, or missing entirely
-        return $null -ne $summary -and -not [string]::IsNullOrEmpty($summary)
+    # Load the grouped minor releases
+    $groupedReleases = Get-Content -Raw -Path $inputFilePath | ConvertFrom-Json
+
+    # Iterate through each minor release to create summaries
+    foreach ($minorRelease in $groupedReleases) {
+        Write-Host "Processing Minor Version $($minorRelease.Major).$($minorRelease.Minor)..."
+
+        if (-not $minorRelease.PSObject.Properties['summary']) {
+            # Combine descriptions of all sub-releases in this minor version
+            $minorReleaseJson = $minorRelease.Releases | ConvertTo-Json -Depth 10
+
+            # Generate a summary for this minor release using OpenAI
+            $prompt = "Provide a summary of the following changes for version $($minorRelease.Major).$($minorRelease.Minor). Concentrate on user-impacting changes like new features, improvements, and bug fixes. Create as a short paragraph Use the following json: `n`````n$minorReleaseJson`n````"
+            $minorSummary = Get-OpenAIResponse -system "Create a release summary" -prompt $prompt -OPEN_AI_KEY $Env:OPEN_AI_KEY
+
+            # Add the summary to the minor release
+            $minorRelease | Add-Member -MemberType NoteProperty -Name summary -Value $minorSummary -Force
+
+            Write-Host "Summary for Minor Version $($minorRelease.Major).$($minorRelease.Minor) added."
+            # Save the updated grouped releases with summaries
+            $groupedReleasesJson = $groupedReleases | ConvertTo-Json -Depth 10
+            Set-Content -Path $outputFilePath -Value $groupedReleasesJson
+        } else {
+            Write-Host "Summary for Minor Version $($minorRelease.Major).$($minorRelease.Minor) already exists. Skipping."
+        }
     }
+
+    Write-Host "Updated minor release summaries have been saved to $outputFilePath"
+}
+
+
+
+
+function Update-ReleaseGroups-Major {
+    param (
+        [string]$inputFilePath = "./releases-grouped-minor.json",
+        [string]$outputFilePath = "./releases-grouped-major.json"
+    )
+
+    # Load the grouped minor releases
+    $groupedMinorReleases = Get-Content -Raw -Path $inputFilePath | ConvertFrom-Json
+
+    # Initialize a hashtable to group by major versions
+    $groupedMajorReleases = @{}
+
+    # Group by major versions and include minor summaries
+    foreach ($minorRelease in $groupedMinorReleases) {
+        $major = $minorRelease.Major
+        
+        # Ensure major version exists in the grouped releases
+        if (-not $groupedMajorReleases.ContainsKey($major)) {
+            $groupedMajorReleases[$major] = @{
+                Major = $major
+                Releases = @()
+            }
+        }
+
+        # Add the minor release to the major release group
+        $groupedMajorReleases[$major].Releases += @{
+            Minor = $minorRelease.Minor
+            Summary = $minorRelease.Summary
+            Releases = @($minorRelease.Releases)
+        }
+    }
+
+    # Convert the grouped major releases hashtable to a list
+    $finalGroupedReleases = $groupedMajorReleases.GetEnumerator() | Sort-Object -Property Key | ForEach-Object {
+        [PSCustomObject]@{
+            Major = $_.Value.Major
+            Releases = $_.Value.Releases | Sort-Object -Property Minor
+        }
+    }
+
+    # Save the grouped major releases to the output file
+    $groupedJson = $finalGroupedReleases | ConvertTo-Json -Depth 10
+    Set-Content -Path $outputFilePath -Value $groupedJson
+
+    Write-Host "Grouped major releases have been saved to $outputFilePath"
+}
+
+
+function Update-ReleaseGroups-MajorSummaries {
+    param (
+        [string]$inputFilePath = "./releases-grouped-major.json",
+        [string]$outputFilePath = "./releases-grouped-major.json"
+    )
+
+    # Load the grouped major releases
+    $groupedReleases = Get-Content -Raw -Path $inputFilePath | ConvertFrom-Json
 
     # Iterate through each major release to create summaries
     foreach ($majorRelease in $groupedReleases) {
         Write-Host "Processing Major Version $($majorRelease.Major)..."
 
-        $minorSummaryGenerated = $false
-
-        foreach ($minorRelease in $majorRelease.Releases) {
-            Write-Host "  Processing Minor Version $($minorRelease.Minor)..."
-
-            if (-not (Summary-Exists -summary ($minorRelease.PSObject.Properties['summary']?.Value))) {
-                # Combine descriptions of all releases in this minor version
-                $minorReleaseJson = $minorRelease.Releases | ConvertTo-Json -Depth 10
-
-                # Generate a summary for this minor release using OpenAI
-                $prompt = "Provide a summary of the following changes that were introduced in version $($majorRelease.Major).$($minorRelease.Minor). Concentrate on changes that impact users, such as new features, improvements, and bug fixes. Keep it short and do not mention the release or the version number. Should be a single short paragraph. Use the following json: `n`````n$minorReleaseJson`n````"
-                $minorSummary = Get-OpenAIResponse -system "Create a release summary" -prompt $prompt -OPEN_AI_KEY $Env:OPEN_AI_KEY
-
-                # Add the summary to the minor release
-                $minorRelease | Add-Member -MemberType NoteProperty -Name summary -Value $minorSummary -Force
-
-                Write-Host "    Summary for Minor Version $($minorRelease.Minor) added."
-
-                # Mark that at least one minor summary was generated
-                $minorSummaryGenerated = $true
-            } else {
-                Write-Host "    Summary for Minor Version $($minorRelease.Minor) already exists. Skipping summary generation."
-            }
-        }
-
-        # Only generate a major summary if one doesn't exist, or if any minor summaries were newly generated
-        if (-not (Summary-Exists -summary ($majorRelease.PSObject.Properties['summary']?.Value)) -or $minorSummaryGenerated) {
-            # Combine all minor summaries to create a major summary
+        if (-not $majorRelease.PSObject.Properties['summary']) {
+            # Combine summaries of all minor releases in this major version
             $majorReleaseJson = $majorRelease.Releases | ConvertTo-Json -Depth 10
 
             # Generate a summary for this major release using OpenAI
-            $prompt = "Provide a summary of the following changes that were introduced in the major version $($majorRelease.Major). Concentrate on changes that impact users, such as new features, improvements, and bug fixes. Keep it short and do not mention the release or the version number. Should be a single short paragraph. Use the following json: `n`````n$majorReleaseJson`n````"
+            $prompt = "Provide a summary of the following changes for major version $($majorRelease.Major). Concentrate on user-impacting changes like new features, improvements, and bug fixes. Use the following json: `n`````n$majorReleaseJson`n````"
             $majorSummary = Get-OpenAIResponse -system "Create a release summary" -prompt $prompt -OPEN_AI_KEY $Env:OPEN_AI_KEY
 
             # Add the summary to the major release
             $majorRelease | Add-Member -MemberType NoteProperty -Name summary -Value $majorSummary -Force
 
             Write-Host "Summary for Major Version $($majorRelease.Major) added."
-        } else {
-            Write-Host "Summary for Major Version $($majorRelease.Major) already exists and no new minor summaries were added. Skipping summary generation."
-        }
 
-        # Save the updated grouped releases to the output file after each major summary is processed
-        $groupedReleasesJson = $groupedReleases | ConvertTo-Json -Depth 10
-        Set-Content -Path $outputFilePath -Value $groupedReleasesJson
+            # Save the updated grouped releases with summaries
+            $groupedReleasesJson = $groupedReleases | ConvertTo-Json -Depth 10
+            Set-Content -Path $outputFilePath -Value $groupedReleasesJson
+
+        } else {
+            Write-Host "Summary for Major Version $($majorRelease.Major) already exists. Skipping."
+        }
     }
 
-    return $groupedReleases
+
+
+    Write-Host "Updated major release summaries have been saved to $outputFilePath"
 }

@@ -17,10 +17,14 @@ $updatedReleases = Update-ReleaseDescriptions -updatedReleases $updatedReleases 
 Write-Host "Total of $($updatedReleases.Count) releases found and processed."
 
 # Step 3: Group releases by major and minor versions
-$groupedReleases = Update-ReleaseGroups -releaseFilePath $releaseFilePath -outputFilePath $outputFilePath
 
-# Step 4: Generate summaries for releases and save results
-$groupedReleases = Generate-ReleaseSummaries -groupedReleases $groupedReleases -outputFilePath $outputFilePath
+
+Update-ReleaseGroups-Minor
+Update-ReleaseGroups-MinorSummaries
+Update-ReleaseGroups-Major
+Update-ReleaseGroups-MajorSummaries
+
+
 
 #==============================================================================
 
