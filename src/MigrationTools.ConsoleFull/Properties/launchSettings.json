@@ -21,11 +21,7 @@
     },
     "init Options-Basic": {
       "commandName": "Project",
-      "commandLineArgs": "init --options Basic"
-    },
-    "init Options-Fullv2": {
-      "commandName": "Project",
-      "commandLineArgs": "init -c configuration2.json --options Fullv2"
+      "commandLineArgs": "init --options Basic --overwrite"
     },
     "Execute Classic": {
       "commandName": "Project",
@@ -38,6 +34,10 @@
     "Config": {
       "commandName": "Project",
       "commandLineArgs": "config -c \"configuration.json\""
+    },
+    "init Options-Reference": {
+      "commandName": "Project",
+      "commandLineArgs": "init --options Reference"
     }
   }
 }

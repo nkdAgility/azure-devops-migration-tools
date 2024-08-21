@@ -7,7 +7,7 @@ using MigrationTools.Processors.Infrastructure;
 namespace MigrationTools.Processors
 {
 
-    public class WorkItemMigrationProcessorOptions : ProcessorOptions,  IWorkItemProcessorConfig
+    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions,  IWorkItemProcessorConfig
     {
 
 
@@ -100,7 +100,7 @@ namespace MigrationTools.Processors
         /// <summary>
         /// Creates a new workitemmigrationconfig with default values
         /// </summary>
-        public WorkItemMigrationProcessorOptions()
+        public TfsWorkItemMigrationProcessorOptions()
         {
             Enabled = false;
             WorkItemCreateRetryLimit = 5;

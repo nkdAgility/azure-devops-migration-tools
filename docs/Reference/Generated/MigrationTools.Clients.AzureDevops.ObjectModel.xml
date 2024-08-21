@@ -299,7 +299,7 @@
             <status>ready</status>
             <processingtarget>WorkItem</processingtarget>
         </member>
-        <member name="T:MigrationTools.Processors.WorkItemMigrationProcessor">
+        <member name="T:MigrationTools.Processors.TfsWorkItemMigrationProcessor">
             <summary>
             WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
             Use `WorkItemMigrationConfig` to configure.
@@ -307,7 +307,7 @@
             <status>ready</status>
             <processingtarget>Work Items</processingtarget>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.UpdateCreatedDate">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.UpdateCreatedDate">
             <summary>
             If this is enabled the creation process on the target project will create the items with the original creation date.
             (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
@@ -315,7 +315,7 @@
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.UpdateCreatedBy">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.UpdateCreatedBy">
             <summary>
             If this is enabled the creation process on the target project will create the items with the original creation date.
             (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
@@ -323,13 +323,13 @@
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.WIQLQuery">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.WIQLQuery">
             <summary>
             A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
             </summary>
             <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.FixHtmlAttachmentLinks">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.FixHtmlAttachmentLinks">
             <summary>
             **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
             fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;
@@ -337,62 +337,62 @@
             </summary>
             <default>?</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.WorkItemCreateRetryLimit">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.WorkItemCreateRetryLimit">
             <summary>
             **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
             This allows for periodic network glitches not to end the process.
             </summary>
             <default>5</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.FilterWorkItemsThatAlreadyExistInTarget">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.FilterWorkItemsThatAlreadyExistInTarget">
             <summary>
             This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
             While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
             </summary>
             <default>true</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.PauseAfterEachWorkItem">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.PauseAfterEachWorkItem">
             <summary>
             Pause after each work item is migrated
             </summary>
             <default>false</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.AttachRevisionHistory">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.AttachRevisionHistory">
             <summary>
             This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
             </summary>
             <default>?</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.GenerateMigrationComment">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.GenerateMigrationComment">
             <summary>
             If enabled, adds a comment recording the migration
             </summary>
             <default>false</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.WorkItemIDs">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.WorkItemIDs">
             <summary>
             A list of work items to import
             </summary>
             <default>[]</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.MaxGracefulFailures">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.MaxGracefulFailures">
             <summary>
             The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
             continue until the number of failed items reaches the configured value, after which the migration fails.
             </summary>
             <default>0</default>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.SkipRevisionWithInvalidIterationPath">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.SkipRevisionWithInvalidIterationPath">
             <summary>
             This will skip a revision if the source iteration has not been migrated i.e. it was deleted
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.WorkItemMigrationProcessorOptions.SkipRevisionWithInvalidAreaPath">
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.SkipRevisionWithInvalidAreaPath">
             <summary>
             When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
             </summary>
         </member>
-        <member name="M:MigrationTools.Processors.WorkItemMigrationProcessorOptions.#ctor">
+        <member name="M:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.#ctor">
             <summary>
             Creates a new workitemmigrationconfig with default values
             </summary>

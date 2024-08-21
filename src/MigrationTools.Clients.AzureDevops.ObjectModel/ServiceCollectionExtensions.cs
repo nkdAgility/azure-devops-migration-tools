@@ -63,7 +63,7 @@ namespace MigrationTools
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
         public static void AddMigrationToolServicesForClientLegacyCore(this IServiceCollection context)
         {
-            context.AddSingleton<WorkItemMigrationProcessor>();
+            context.AddSingleton<TfsWorkItemMigrationProcessor>();
             context.AddSingleton<TestConfigurationsMigrationProcessor>();
             context.AddSingleton<TestPlansAndSuitesMigrationProcessor>();
             context.AddSingleton<TestVariablesMigrationProcessor>();

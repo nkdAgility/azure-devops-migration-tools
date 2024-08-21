@@ -52,129 +52,120 @@ namespace MigrationTools.Host.Commands
         {
             int _exitCode;
 
-      
-            var writableOptions = _services.GetRequiredService<IWritableOptions<ProcessorContainerOptions>>();
-            writableOptions.Update(options =>
+            try
             {
-                // Modify options as needed, e.g., add a new processor
-                options.Processors.Add(new WorkItemTrackingProcessorOptions() { /* Set properties here */ });
-            });
+                Telemetery.TrackEvent(new EventTelemetry("MigrationConfigCommand"));
+                string configFile = settings.ConfigFile;
+                if (string.IsNullOrEmpty(configFile))
+                {
+                    configFile = "configuration.json";
+                }
+                _logger.LogInformation("ConfigFile: {configFile}", configFile);
 
-            _exitCode = 1;
+                // Load configuration
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
+                    .Build();
 
-            //try
-            //{
-            //    Telemetery.TrackEvent(new EventTelemetry("MigrationConfigCommand"));
-            //    string configFile = settings.ConfigFile;
-            //    if (string.IsNullOrEmpty(configFile))
-            //    {
-            //        configFile = "configuration.json";
-            //    }
-            //    _logger.LogInformation("ConfigFile: {configFile}", configFile);
-
-            //    // Load configuration
-            //    var configuration = new ConfigurationBuilder()
-            //        .SetBasePath(Directory.GetCurrentDirectory())
-            //        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            //        .AddJsonFile(configFile, optional: true, reloadOnChange: true)
-            //        .Build();
-
-            //    var json = File.ReadAllText(configFile);
-            //    var jsonObj = JObject.Parse(json);
+                var json = File.ReadAllText(configFile);
+                var jsonObj = JObject.Parse(json);
 
 
-            //    var configurationEditorOptions = new[]
-            //    {
-            //        "Source", "Target", "CommonEnrichers",
-            //        "Processors",
-            //        "Save & Exit",
-            //        "Exit"
-            //    };
+                var configurationEditorOptions = new[]
+                {
+                    "Templates",
+                    "Save & Exit",
+                    "Exit"
+                };
 
-            //    // Prompt the user to select processors
-            //    bool shouldExit = false;
-            //    while (!shouldExit)
-            //    {
-            //       var selectedOption = AnsiConsole.Prompt(
-            //            new SelectionPrompt<string>()
-            //                .Title("Select a configuration section to edit:")
-            //                .PageSize(10)
-            //                .AddChoices(configurationEditorOptions));
+                // Prompt the user to select processors
+                bool shouldExit = false;
+                while (!shouldExit)
+                {
+                    var selectedOption = AnsiConsole.Prompt(
+                         new SelectionPrompt<string>()
+                             .Title("Select a configuration section to edit:")
+                             .PageSize(10)
+                             .AddChoices(configurationEditorOptions));
 
-            //        Console.WriteLine($"Selected option: {selectedOption}");
+                    Console.WriteLine($"Selected option: {selectedOption}");
 
-            //        switch (selectedOption)
-            //        {
-            //            case "Source":
-            //                break;
-            //            case "Target":
-            //                break;
-            //            case "CommonEnrichers":
-            //                break;
-            //            case "Processors":
-            //                EditProcessors();
-            //                break;
-            //            case "Save & Exit":
-            //                shouldExit = true;
-            //                break;
-            //            case "Exit":
-            //                shouldExit = true;
-            //                break;
-            //            default:
-            //                Console.WriteLine("Unknown Option");
-            //                break;
-            //        }
-            //    }
+                    switch (selectedOption)
+                    {
+                        case "Apply Templates":
+                            SelectTemplateToApply();
+                            break;
+                        case "Save & Exit":
+                            shouldExit = true;
+                            break;
+                        case "Exit":
+                            shouldExit = true;
+                            break;
+                        default:
+                            Console.WriteLine("Unknown Option");
+                            break;
+                    }
+                }
 
 
-            //    _exitCode = 0;
-            //}
-            //catch (Exception ex)
-            //{
-            //    Telemetery.TrackException(ex, null, null);
-            //    _logger.LogError(ex, "Unhandled exception!");
-            //    _exitCode = 1;
-            //}
-            //finally
-            //{
-            //    // Stop the application once the work is done
-            //    _appLifetime.StopApplication();
-            //}
+                _exitCode = 0;
+            }
+            catch (Exception ex)
+            {
+                Telemetery.TrackException(ex, null, null);
+                _logger.LogError(ex, "Unhandled exception!");
+                _exitCode = 1;
+            }
+            finally
+            {
+                // Stop the application once the work is done
+                _appLifetime.StopApplication();
+            }
             return _exitCode;
         }
 
-        //private void EditProcessors()
-        //{
-        //    Console.Clear();
-        //    bool shouldExit = false;
-        //    while (!shouldExit)
-        //    {
-        //        var options = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessor>().Select(c => c.Name.ToString()).OrderBy(c=> c).ToList();
-        //        options.AddRange(new[] { "Save & Exit", "Exit" });
-        //        var selectedOption = AnsiConsole.Prompt(
-        //             new SelectionPrompt<string>()
-        //                 .Title("Select a configuration section to edit:")
-        //                 .PageSize(10)
-        //                 .AddChoices(options));
+        private void SelectTemplateToApply()
+        {
+            Console.Clear();
+            bool shouldExit = false;
+            while (!shouldExit)
+            {
+                var options = new[]
+                {
+                    "Work Item Migration",
+                    "Save & Exit",
+                    "Exit"
+                };
+                options.AddRange(new[] { "Save & Exit", "Exit" });
+                var selectedOption = AnsiConsole.Prompt(
+                     new SelectionPrompt<string>()
+                         .Title("Select a Template to apply to your config:")
+                         .PageSize(10)
+                         .AddChoices(options));
 
-        //        switch (selectedOption)
-        //        {
-        //            case "Save & Exit":
-        //                shouldExit = true;
-        //                break;
-        //            case "Exit":
-        //                shouldExit = true;
-        //                break;
-        //            default:
-        //                Console.WriteLine($"Selected option: {selectedOption}");
-        //                break;
-        //        }
-        //    }
+                switch (selectedOption)
+                {
+                    case "Work Item Migration":
+                        ApplyTemplate("WorkItemMigration");
+                        break;
+                    case "Save & Exit":
+                        shouldExit = true;
+                        break;
+                    case "Exit":
+                        shouldExit = true;
+                        break;
+                    default:
+                        Console.WriteLine($"Selected option: {selectedOption}");
+                        break;
+                }
+            }
+        }
 
-        //    AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessor>().ToList().ForEach(x =>
-        //    {
-        //        Console.WriteLine(x.Name);
-        //    });
-        //}
+        private void ApplyTemplate(string v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -9,14 +9,18 @@ namespace MigrationTools.Host.Commands
         [CommandOption("--outputMode|--options")]
         [DefaultValue(OptionsMode.WorkItemTracking)]
         public OptionsMode Options { get; set; }
+
+        [Description("Add to overwirte the existing file.")]
+        [CommandOption("--overwrite")]
+        [DefaultValue(false)]
+        public bool Overwrite { get; set; }
+
     }
 
     public enum OptionsMode
     {
         Reference = 0,
         WorkItemTracking = 1,
-        Fullv2 = 2,
-        WorkItemTrackingv2 = 3,
         Basic = 4
     }
 }
