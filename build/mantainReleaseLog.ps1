@@ -56,5 +56,4 @@ foreach ($majorRelease in $groupedReleases) {
 $groupedReleasesJson = $groupedReleases | ConvertTo-Json -Depth 4
 Set-Content -Path $outputFilePath -Value $groupedReleasesJson
 
-# Output the grouped releases object with summaries
 $groupedReleases

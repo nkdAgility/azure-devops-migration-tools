@@ -4,6 +4,7 @@
     Some notes.
 #>
 # Helpers
+. ./build/include/OpenAI.ps1
 enum ExecutionMode {
     log = 0
     diff = 1
