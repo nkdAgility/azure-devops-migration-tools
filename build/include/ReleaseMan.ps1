@@ -498,3 +498,38 @@ function Get-ChangeLogLightMarkdown {
 
     Write-Host "Change log markdown has been generated and saved to $outputFilePath"
 }
+
+function Get-ChangeLogLightMarkdownToReadme {
+    param (
+        [string]$changeLogFilePath = "./change-log.md",
+        [string]$readmeFilePath = "./readme.md"
+    )
+
+    # Load the contents of the change-log.md file
+    $changeLogContent = Get-Content -Raw -Path $changeLogFilePath
+
+    # Load the contents of the readme.md file
+    $readmeContent = Get-Content -Raw -Path $readmeFilePath
+
+    # Find the position of the "## Change Log" title
+    $changeLogPosition = $readmeContent.IndexOf("## Change Log")
+
+    if ($changeLogPosition -lt 0) {
+        Write-Host "The '## Change Log' title was not found in $readmeFilePath."
+        return
+    }
+
+    # Extract the part of the readme up to and including the "## Change Log" title
+    $changeLogEndPosition = $changeLogPosition + ("## Change Log").Length
+    $readmeUpToChangeLog = $readmeContent.Substring(0, $changeLogEndPosition)
+
+    # Combine the readme content up to the "## Change Log" with a newline and the new change log content
+    $updatedReadmeContent = $readmeUpToChangeLog + "`n`n" + $changeLogContent
+
+    # Save the updated content back to the readme.md file
+    Set-Content -Path $readmeFilePath -Value $updatedReadmeContent
+
+    Write-Host "Change log has been updated in $readmeFilePath."
+}
+
+

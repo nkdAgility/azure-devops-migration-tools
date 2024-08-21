@@ -25,4 +25,8 @@ Update-ReleaseGroups-Major
 Update-ReleaseGroups-MajorSummaries 
 Get-ChangeLogMarkdown
 Get-ChangeLogLightMarkdown
+Get-ChangeLogLightMarkdownToReadme
+
+
+
 #==============================================================================
