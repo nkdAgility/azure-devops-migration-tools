@@ -22,7 +22,7 @@ Write-Host "Total of $($updatedReleases.Count) releases found and processed."
 Update-ReleaseGroups-Minor
 Update-ReleaseGroups-MinorSummaries
 Update-ReleaseGroups-Major
-Update-ReleaseGroups-MajorSummaries
+Update-ReleaseGroups-MajorSummaries 
 
 
 

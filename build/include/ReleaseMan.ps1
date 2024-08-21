@@ -276,10 +276,11 @@ function Update-ReleaseGroups-Major {
     foreach ($majorRelease in $existingGroupedMajorReleases) {
         $groupedMajorReleases[$majorRelease.Major] = @{
             Major = $majorRelease.Major
-            Releases = @($majorRelease.Releases)  # Ensure this is a list
+            Releases = $majorRelease.Releases
+            LatestVersion = $majorRelease.LatestVersion
+            LatestTagName = $majorRelease.LatestTagName
+            LatestMinor = $majorRelease.LatestMinor
             Summary = $majorRelease.Summary
-            HighestMinorTag = $majorRelease.HighestMinorTag
-            HighestReleaseTag = $majorRelease.HighestReleaseTag
         }
     }
 
@@ -290,35 +291,36 @@ function Update-ReleaseGroups-Major {
     foreach ($minorRelease in $groupedMinorReleases) {
         $major = $minorRelease.Major
         $minor = $minorRelease.Minor
-        
+        $minorVersion = "$($major).$($minor)"
+
         # Ensure major version exists in the grouped releases
         if (-not $groupedMajorReleases.ContainsKey($major)) {
             $groupedMajorReleases[$major] = @{
                 Major = $major
                 Releases = @()  # Initialize as an empty list
+                LatestVersion = $null
+                LatestTagName = $null
+                LatestMinor = $null
                 Summary = $null  # Initially set to null; can be updated later
-                HighestMinorTag = $null
-                HighestReleaseTag = $null
             }
         }
 
         # Ensure the minor release is listed under the major version
-        $existingMinorGroup = $groupedMajorReleases[$major].Releases | Where-Object { $_.Minor -eq $minor }
+        $existingMinorGroup = $groupedMajorReleases[$major].Releases | Where-Object { $_.MinorVersion -eq $minorVersion }
         if (-not $existingMinorGroup) {
             $newMinorGroup = [PSCustomObject]@{
-                Minor = $minor
+                MinorVersion = $minorVersion
                 Summary = $minorRelease.Summary
-                LatestVersion = $minorRelease.LatestVersion
-                LatestTagName = $minorRelease.LatestTagName
             }
             $groupedMajorReleases[$major].Releases += $newMinorGroup
             $newMinorAdded = $true
         }
 
-        # Sort the minor releases by LatestVersion and update the HighestMinorTag and HighestReleaseTag
-        $highestMinorRelease = $groupedMajorReleases[$major].Releases | Sort-Object -Property { [version]$_.LatestVersion } -Descending | Select-Object -First 1
-        $groupedMajorReleases[$major].HighestMinorTag = $highestMinorRelease.Minor
-        $groupedMajorReleases[$major].HighestReleaseTag = $highestMinorRelease.LatestTagName
+        # Update LatestVersion, LatestTagName, and LatestMinor for the major version based on the newest minor
+        $latestMinorRelease = $groupedMajorReleases[$major].Releases | Sort-Object -Property { [version]$_.MinorVersion } -Descending | Select-Object -First 1
+        $groupedMajorReleases[$major].LatestVersion = $minorRelease.LatestVersion
+        $groupedMajorReleases[$major].LatestTagName = $minorRelease.LatestTagName
+        $groupedMajorReleases[$major].LatestMinor = $latestMinorRelease.MinorVersion
     }
 
     # Blank the major summary if new minor releases were added
@@ -332,10 +334,11 @@ function Update-ReleaseGroups-Major {
     $finalGroupedReleases = $groupedMajorReleases.GetEnumerator() | Sort-Object -Property Key | ForEach-Object {
         [PSCustomObject]@{
             Major = $_.Value.Major
-            Releases = $_.Value.Releases | Sort-Object -Property Minor
+            Releases = $_.Value.Releases | Sort-Object -Property MinorVersion
+            LatestVersion = $_.Value.LatestVersion
+            LatestTagName = $_.Value.LatestTagName
+            LatestMinor = $_.Value.LatestMinor
             Summary = $_.Value.Summary
-            HighestMinorTag = $_.Value.HighestMinorTag
-            HighestReleaseTag = $_.Value.HighestReleaseTag
         }
     }
 
@@ -345,6 +348,8 @@ function Update-ReleaseGroups-Major {
 
     Write-Host "Grouped major releases have been updated and saved to $outputFilePath"
 }
+
+
 
 
 
