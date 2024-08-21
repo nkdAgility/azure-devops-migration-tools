@@ -428,6 +428,9 @@ function Get-ChangeLogMarkdown {
         ""
     )
 
+    # Reverse the order of the grouped major releases
+    $groupedReleases = $groupedReleases | Sort-Object -Property Major -Descending
+
     # Iterate through each major release
     foreach ($majorRelease in $groupedReleases) {
         $majorReleaseMajor = $majorRelease.Major
@@ -438,16 +441,53 @@ function Get-ChangeLogMarkdown {
         $majorLine = "- [v$majorReleaseMajor.0](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/$majorReleaseLatestTagName) - $majorReleaseSummary"
         $markdownLines += $majorLine
 
+        # Reverse the order of the grouped major releases
+        $minorReleases = $majorRelease.Releases | Sort-Object -Property MinorVersion -Descending
+
         # Iterate through the minor releases under this major release
-        foreach ($minorRelease in $majorRelease.Releases) {
+        foreach ($minorRelease in $minorReleases) {
             $minorLatestTagName = $minorRelease.LatestTagName
             $minorSummary = $minorRelease.Summary
             $minorReleaseMinor = $minorRelease.Minor
 
             # Generate the minor release markdown
-            $minorLine = "  - [v$minorReleaseMinor](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/$minorLatestTagName) - $minorSummary"
+            $minorLine = "  - [$minorLatestTagName](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/$minorLatestTagName) - $minorSummary"
             $markdownLines += $minorLine
         }
+    }
+
+    # Combine the markdown lines into a single string
+    $markdownContent = $markdownLines -join "`n"
+
+    # Save the markdown content to the output file
+    Set-Content -Path $outputFilePath -Value $markdownContent
+
+    Write-Host "Change log markdown has been generated and saved to $outputFilePath"
+}
+
+function Get-ChangeLogLightMarkdown {
+    param (
+        [string]$inputFilePath = "./docs/_data/releases-grouped-major.json",
+        [string]$outputFilePath = "./change-log.md"
+    )
+
+    $markdownLines = @()
+    # Load the grouped major releases
+    $groupedReleases = Get-Content -Raw -Path $inputFilePath | ConvertFrom-Json
+
+    # Reverse the order of the grouped major releases
+    $groupedReleases = $groupedReleases | Sort-Object -Property Major -Descending
+
+    # Iterate through each major release
+    foreach ($majorRelease in $groupedReleases) {
+        $majorReleaseMajor = $majorRelease.Major
+        $majorReleaseLatestTagName = $majorRelease.LatestTagName
+        $majorReleaseSummary = $majorRelease.Summary
+
+        # Generate the major release markdown
+        $majorLine = "- [$majorReleaseLatestTagName](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/$majorReleaseLatestTagName) - $majorReleaseSummary"
+        $markdownLines += $majorLine
+
     }
 
     # Combine the markdown lines into a single string
