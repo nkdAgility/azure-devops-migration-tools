@@ -19,41 +19,58 @@ Write-Host "Total of $($updatedReleases.Count) releases found and processed."
 # Step 3: Group releases by major and minor versions
 $groupedReleases = Update-ReleaseGroups -releaseFilePath $releaseFilePath -outputFilePath $outputFilePath
 
-# Step 4: Iterate through each major release to create summaries
-foreach ($majorRelease in $groupedReleases) {
-    Write-Host "Processing Major Version $($majorRelease.Major)..."
+# Step 4: Generate summaries for releases and save results
+$groupedReleases = Generate-ReleaseSummaries -groupedReleases $groupedReleases -outputFilePath $outputFilePath
 
-    foreach ($minorRelease in $majorRelease.Releases) {
-        Write-Host "  Processing Minor Version $($minorRelease.Minor)..."
+#==============================================================================
 
-        # Combine descriptions of all releases in this minor version
-        $minorReleaseJson = $minorRelease.Releases | ConvertTo-Json -Depth 4
+# Function to generate change log markdown
+function Generate-ChangeLog {
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]$groupedReleases,
+        
+        [Parameter(Mandatory = $true)]
+        [string]$outputFilePath
+    )
 
-        # Generate a summary for this minor release using OpenAI
-        $prompt = "Provide a summary of the following changes that were introduced in version $($majorRelease.Major).$($minorRelease.Minor). Concentrate on changes that impact users, such as new features, improvements, and bug fixes. use the following json: `n`````n$minorReleaseJson`n````"
-        $minorSummary = Get-OpenAIResponse -system "Create a release summary" -prompt $prompt -OPEN_AI_KEY $Env:OPEN_AI_KEY
+    # Initialize an array to hold the markdown lines
+    $markdownLines = @("## Change Log")
 
-        # Add the summary to the minor release
-        $minorRelease | Add-Member -MemberType NoteProperty -Name summary -Value $minorSummary
+    # Iterate through each major release
+    foreach ($majorRelease in $groupedReleases) {
+        $majorVersion = $majorRelease.Major
+        $majorSummary = $majorRelease.summary
 
-        Write-Host "    Summary for Minor Version $($minorRelease.Minor) added."
+        # Add major release summary to markdown
+        $markdownLines += "- v$majorVersion - $majorSummary"
+
+        # Get minor releases for the major version
+        $minorReleases = $majorRelease.Releases
+
+        # Filter out minor releases with a single entry or no summary
+        if ($minorReleases.Count -gt 1) {
+            foreach ($minorRelease in $minorReleases) {
+                $minorVersion = $minorRelease.Minor
+                $minorSummary = $minorRelease.summary
+
+                # Add minor release summary to markdown
+                $markdownLines += "  - v$majorVersion.$minorVersion - $minorSummary"
+            }
+        }
     }
 
-    # Combine all minor summaries to create a major summary
-    $majorReleaseJson = $majorRelease.Releases | ConvertTo-Json -Depth 4
+    # Save the markdown content to the output file
+    $markdownContent = $markdownLines -join "`n"
+    Set-Content -Path $outputFilePath -Value $markdownContent
 
-    # Generate a summary for this major release using OpenAI
-    $prompt = "Provide a summary of the following changes that were introduced in the major version $($majorRelease.Major). Concentrate on changes that impact users, such as new features, improvements, and bug fixes. use the following json:  `n`````n$majorReleaseJson`n````"
-    $majorSummary = Get-OpenAIResponse -system "Create a release summary" -prompt $prompt -OPEN_AI_KEY $Env:OPEN_AI_KEY
-
-    # Add the summary to the major release
-    $majorRelease | Add-Member -MemberType NoteProperty -Name summary -Value $majorSummary
-
-    Write-Host "Summary for Major Version $($majorRelease.Major) added."
+    Write-Host "Change log saved to $outputFilePath"
 }
 
-# Save the updated grouped releases to the output file
-$groupedReleasesJson = $groupedReleases | ConvertTo-Json -Depth 4
-Set-Content -Path $outputFilePath -Value $groupedReleasesJson
+# Define file path for the change log
+$changeLogFilePath = "./change-log.md"
+
+# Generate the change log and save it
+Generate-ChangeLog -groupedReleases $groupedReleases -outputFilePath $changeLogFilePath
 
 $groupedReleases
