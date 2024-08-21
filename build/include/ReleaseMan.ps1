@@ -400,3 +400,41 @@ function Update-ReleaseGroups-MajorSummaries {
     Write-Host "Updated major release summaries have been saved to $outputFilePath"
 }
 
+
+function Get-ChangeLogMarkdown {
+    param (
+        [string]$inputFilePath = "./releases-grouped-major.json",
+        [string]$outputFilePath = "./change-log.md"
+    )
+
+    # Load the grouped major releases
+    $groupedReleases = Get-Content -Raw -Path $inputFilePath | ConvertFrom-Json
+
+    # Initialize an array to hold the markdown lines
+    $markdownLines = @()
+
+    # Iterate through each major release
+    foreach ($majorRelease in $groupedReleases) {
+        # Generate the major release markdown
+        $majorLine = "- [${majorRelease.LatestMinor}](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/${majorRelease.LatestTagName}) - ${majorRelease.Summary}"
+        $markdownLines += $majorLine
+
+        # Iterate through the minor releases under this major release
+        foreach ($minorRelease in $majorRelease.Releases) {
+            # Generate the minor release markdown
+            $minorLine = "  - [${minorRelease.Minor}](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/${minorRelease.LatestTagName}) - ${minorRelease.Summary}"
+            $markdownLines += $minorLine
+        }
+    }
+
+    # Combine the markdown lines into a single string
+    $markdownContent = $markdownLines -join "`n"
+
+    # Save the markdown content to the output file
+    Set-Content -Path $outputFilePath -Value $markdownContent
+
+    Write-Host "Change log markdown has been generated and saved to $outputFilePath"
+}
+
+# Call the function to generate the markdown
+Get-ChangeLogMarkdown

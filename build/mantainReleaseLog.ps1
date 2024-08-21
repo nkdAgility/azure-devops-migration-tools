@@ -23,7 +23,7 @@ Update-ReleaseGroups-Minor
 Update-ReleaseGroups-MinorSummaries
 Update-ReleaseGroups-Major
 Update-ReleaseGroups-MajorSummaries 
-
+Get-ChangeLogMarkdown
 
 #==============================================================================
 
