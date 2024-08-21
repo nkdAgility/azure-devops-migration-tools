@@ -132,7 +132,7 @@ function Update-ReleaseGroups {
         [string]$releaseFilePath,
         [string]$outputFilePath = "./releases-grouped.json"
     )
-
+    
     # Load the original releases JSON file
     $releases = Get-Content -Raw -Path $releaseFilePath | ConvertFrom-Json
 
@@ -149,6 +149,7 @@ function Update-ReleaseGroups {
         $groupedReleases[$majorRelease.Major] = @{
             Major = $majorRelease.Major
             Releases = $majorRelease.Releases
+            Summary = $majorRelease.Summary
         }
     }
 
@@ -163,6 +164,7 @@ function Update-ReleaseGroups {
             $groupedReleases[$major] = @{
                 Major = $major
                 Releases = @()
+                Summary = $null # Placeholder for summary
             }
         }
 
@@ -172,13 +174,24 @@ function Update-ReleaseGroups {
             $minorGroup = [PSCustomObject]@{
                 Minor = $minor
                 Releases = @()
+                Summary = $null # Placeholder for summary
             }
             $groupedReleases[$major].Releases += $minorGroup
+        } else {
+            # Preserve the existing summary and description
+            $existingSummary = $minorGroup.Summary
+            $minorGroup = $groupedReleases[$major].Releases | Where-Object { $_.Minor -eq $minor }
+            $minorGroup.Summary = $existingSummary
         }
 
         # Check if the release already exists in the minor release group
         $existingRelease = $minorGroup.Releases | Where-Object { $_.tagName -eq $_.tagName }
-        if (-not $existingRelease) {
+        if ($existingRelease) {
+            # If it exists, ensure its description is retained
+            if ($existingRelease.description) {
+                $_.description = $existingRelease.description
+            }
+        } else {
             # Add the release to the appropriate minor release group
             $minorGroup.Releases += ,$_
         }
@@ -189,6 +202,7 @@ function Update-ReleaseGroups {
         [PSCustomObject]@{
             Major = $_.Value.Major
             Releases = ($_.Value.Releases | Sort-Object -Property Minor)
+            Summary = $_.Value.Summary
         }
     }
 
@@ -203,6 +217,8 @@ function Update-ReleaseGroups {
     # Return the grouped releases object
     return $finalGroupedReleases
 }
+
+
 
 
 
