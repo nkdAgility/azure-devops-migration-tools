@@ -119,11 +119,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/WorkItemPostProcessingProcessor-notes.md
+  path: /docs/Reference/Processors/WorkItemPostProcessingProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/WorkItemPostProcessingProcessor-introduction.md
+  path: /docs/Reference/Processors/WorkItemPostProcessingProcessor-introduction.md
   exists: false
   markdown: ''
 

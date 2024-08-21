@@ -119,11 +119,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/TfsTeamSettingsProcessor-notes.md
+  path: /docs/Reference/Processors/TfsTeamSettingsProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/TfsTeamSettingsProcessor-introduction.md
+  path: /docs/Reference/Processors/TfsTeamSettingsProcessor-introduction.md
   exists: false
   markdown: ''
 

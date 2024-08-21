@@ -83,11 +83,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/FieldSkipMap-notes.md
+  path: /docs/Reference/FieldMaps/FieldSkipMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/FieldSkipMap-introduction.md
+  path: /docs/Reference/FieldMaps/FieldSkipMap-introduction.md
   exists: false
   markdown: ''
 

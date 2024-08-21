@@ -89,11 +89,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsTeamSettingsTool-notes.md
+  path: /docs/Reference/Tools/TfsTeamSettingsTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsTeamSettingsTool-introduction.md
+  path: /docs/Reference/Tools/TfsTeamSettingsTool-introduction.md
   exists: false
   markdown: ''
 

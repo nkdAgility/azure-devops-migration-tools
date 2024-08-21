@@ -96,11 +96,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsUserMappingTool-notes.md
+  path: /docs/Reference/Tools/TfsUserMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsUserMappingTool-introduction.md
+  path: /docs/Reference/Tools/TfsUserMappingTool-introduction.md
   exists: false
   markdown: ''
 

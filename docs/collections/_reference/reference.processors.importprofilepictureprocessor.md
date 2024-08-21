@@ -89,11 +89,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/ImportProfilePictureProcessor-notes.md
+  path: /docs/Reference/Processors/ImportProfilePictureProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/ImportProfilePictureProcessor-introduction.md
+  path: /docs/Reference/Processors/ImportProfilePictureProcessor-introduction.md
   exists: false
   markdown: ''
 

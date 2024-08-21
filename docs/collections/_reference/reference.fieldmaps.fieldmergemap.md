@@ -86,11 +86,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/FieldMergeMap-notes.md
+  path: /docs/Reference/FieldMaps/FieldMergeMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/FieldMergeMap-introduction.md
+  path: /docs/Reference/FieldMaps/FieldMergeMap-introduction.md
   exists: false
   markdown: ''
 

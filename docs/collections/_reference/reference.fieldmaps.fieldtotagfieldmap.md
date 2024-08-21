@@ -94,11 +94,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/FieldToTagFieldMap-notes.md
+  path: /docs/Reference/FieldMaps/FieldToTagFieldMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/FieldToTagFieldMap-introduction.md
+  path: /docs/Reference/FieldMaps/FieldToTagFieldMap-introduction.md
   exists: false
   markdown: ''
 

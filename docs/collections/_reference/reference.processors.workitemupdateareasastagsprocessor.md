@@ -95,11 +95,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/WorkItemUpdateAreasAsTagsProcessor-notes.md
+  path: /docs/Reference/Processors/WorkItemUpdateAreasAsTagsProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/WorkItemUpdateAreasAsTagsProcessor-introduction.md
+  path: /docs/Reference/Processors/WorkItemUpdateAreasAsTagsProcessor-introduction.md
   exists: false
   markdown: ''
 

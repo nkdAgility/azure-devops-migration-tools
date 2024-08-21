@@ -59,11 +59,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsValidateRequiredFieldTool-notes.md
+  path: /docs/Reference/Tools/TfsValidateRequiredFieldTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsValidateRequiredFieldTool-introduction.md
+  path: /docs/Reference/Tools/TfsValidateRequiredFieldTool-introduction.md
   exists: false
   markdown: ''
 

@@ -68,11 +68,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsChangeSetMappingTool-notes.md
+  path: /docs/Reference/Tools/TfsChangeSetMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsChangeSetMappingTool-introduction.md
+  path: /docs/Reference/Tools/TfsChangeSetMappingTool-introduction.md
   exists: false
   markdown: ''
 

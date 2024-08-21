@@ -75,11 +75,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsRevisionManagerTool-notes.md
+  path: /docs/Reference/Tools/TfsRevisionManagerTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsRevisionManagerTool-introduction.md
+  path: /docs/Reference/Tools/TfsRevisionManagerTool-introduction.md
   exists: false
   markdown: ''
 

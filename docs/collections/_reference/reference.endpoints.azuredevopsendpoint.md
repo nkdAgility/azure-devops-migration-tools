@@ -106,11 +106,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Endpoints/AzureDevOpsEndpoint-notes.md
+  path: /docs/Reference/Endpoints/AzureDevOpsEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Endpoints/AzureDevOpsEndpoint-introduction.md
+  path: /docs/Reference/Endpoints/AzureDevOpsEndpoint-introduction.md
   exists: false
   markdown: ''
 

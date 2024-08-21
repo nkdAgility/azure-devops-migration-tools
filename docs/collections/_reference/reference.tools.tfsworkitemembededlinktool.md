@@ -61,11 +61,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsWorkItemEmbededLinkTool-notes.md
+  path: /docs/Reference/Tools/TfsWorkItemEmbededLinkTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsWorkItemEmbededLinkTool-introduction.md
+  path: /docs/Reference/Tools/TfsWorkItemEmbededLinkTool-introduction.md
   exists: false
   markdown: ''
 

@@ -89,11 +89,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/TestConfigurationsMigrationProcessor-notes.md
+  path: /docs/Reference/Processors/TestConfigurationsMigrationProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/TestConfigurationsMigrationProcessor-introduction.md
+  path: /docs/Reference/Processors/TestConfigurationsMigrationProcessor-introduction.md
   exists: false
   markdown: ''
 

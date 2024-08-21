@@ -76,11 +76,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsAttachmentTool-notes.md
+  path: /docs/Reference/Tools/TfsAttachmentTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsAttachmentTool-introduction.md
+  path: /docs/Reference/Tools/TfsAttachmentTool-introduction.md
   exists: false
   markdown: ''
 

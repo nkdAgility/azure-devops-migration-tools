@@ -101,11 +101,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/FixGitCommitLinksProcessor-notes.md
+  path: /docs/Reference/Processors/FixGitCommitLinksProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/FixGitCommitLinksProcessor-introduction.md
+  path: /docs/Reference/Processors/FixGitCommitLinksProcessor-introduction.md
   exists: false
   markdown: ''
 

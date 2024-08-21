@@ -75,11 +75,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/WorkItemTypeMappingTool-notes.md
+  path: /docs/Reference/Tools/WorkItemTypeMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/WorkItemTypeMappingTool-introduction.md
+  path: /docs/Reference/Tools/WorkItemTypeMappingTool-introduction.md
   exists: false
   markdown: ''
 

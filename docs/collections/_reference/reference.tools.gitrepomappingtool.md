@@ -75,11 +75,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/GitRepoMappingTool-notes.md
+  path: /docs/Reference/Tools/GitRepoMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/GitRepoMappingTool-introduction.md
+  path: /docs/Reference/Tools/GitRepoMappingTool-introduction.md
   exists: false
   markdown: ''
 

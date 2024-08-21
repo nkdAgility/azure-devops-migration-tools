@@ -80,11 +80,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/FieldLiteralMap-notes.md
+  path: /docs/Reference/FieldMaps/FieldLiteralMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/FieldLiteralMap-introduction.md
+  path: /docs/Reference/FieldMaps/FieldLiteralMap-introduction.md
   exists: false
   markdown: ''
 

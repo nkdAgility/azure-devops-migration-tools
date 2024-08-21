@@ -61,11 +61,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsEmbededImagesTool-notes.md
+  path: /docs/Reference/Tools/TfsEmbededImagesTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsEmbededImagesTool-introduction.md
+  path: /docs/Reference/Tools/TfsEmbededImagesTool-introduction.md
   exists: false
   markdown: ''
 

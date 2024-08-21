@@ -160,11 +160,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/FieldMappingTool-notes.md
+  path: /docs/Reference/Tools/FieldMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/FieldMappingTool-introduction.md
+  path: /docs/Reference/Tools/FieldMappingTool-introduction.md
   exists: false
   markdown: ''
 

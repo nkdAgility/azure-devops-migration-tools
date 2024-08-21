@@ -112,11 +112,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Endpoints/TfsEndpoint-notes.md
+  path: /docs/Reference/Endpoints/TfsEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Endpoints/TfsEndpoint-introduction.md
+  path: /docs/Reference/Endpoints/TfsEndpoint-introduction.md
   exists: false
   markdown: ''
 

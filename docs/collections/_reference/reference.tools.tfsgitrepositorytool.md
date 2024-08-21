@@ -59,11 +59,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Tools/TfsGitRepositoryTool-notes.md
+  path: /docs/Reference/Tools/TfsGitRepositoryTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Tools/TfsGitRepositoryTool-introduction.md
+  path: /docs/Reference/Tools/TfsGitRepositoryTool-introduction.md
   exists: false
   markdown: ''
 

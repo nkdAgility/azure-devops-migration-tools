@@ -96,11 +96,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/FieldToFieldMultiMap-notes.md
+  path: /docs/Reference/FieldMaps/FieldToFieldMultiMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/FieldToFieldMultiMap-introduction.md
+  path: /docs/Reference/FieldMaps/FieldToFieldMultiMap-introduction.md
   exists: false
   markdown: ''
 

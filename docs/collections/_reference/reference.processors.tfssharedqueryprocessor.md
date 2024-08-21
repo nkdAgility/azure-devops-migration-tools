@@ -107,11 +107,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/TfsSharedQueryProcessor-notes.md
+  path: /docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/TfsSharedQueryProcessor-introduction.md
+  path: /docs/Reference/Processors/TfsSharedQueryProcessor-introduction.md
   exists: false
   markdown: ''
 

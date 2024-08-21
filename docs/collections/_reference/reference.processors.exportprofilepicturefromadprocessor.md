@@ -113,11 +113,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/ExportProfilePictureFromADProcessor-notes.md
+  path: /docs/Reference/Processors/ExportProfilePictureFromADProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/ExportProfilePictureFromADProcessor-introduction.md
+  path: /docs/Reference/Processors/ExportProfilePictureFromADProcessor-introduction.md
   exists: false
   markdown: ''
 

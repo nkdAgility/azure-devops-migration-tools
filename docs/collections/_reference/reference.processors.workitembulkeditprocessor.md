@@ -125,11 +125,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/WorkItemBulkEditProcessor-notes.md
+  path: /docs/Reference/Processors/WorkItemBulkEditProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/WorkItemBulkEditProcessor-introduction.md
+  path: /docs/Reference/Processors/WorkItemBulkEditProcessor-introduction.md
   exists: false
   markdown: ''
 

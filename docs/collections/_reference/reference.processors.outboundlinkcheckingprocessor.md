@@ -101,11 +101,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/OutboundLinkCheckingProcessor-notes.md
+  path: /docs/Reference/Processors/OutboundLinkCheckingProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/OutboundLinkCheckingProcessor-introduction.md
+  path: /docs/Reference/Processors/OutboundLinkCheckingProcessor-introduction.md
   exists: false
   markdown: ''
 

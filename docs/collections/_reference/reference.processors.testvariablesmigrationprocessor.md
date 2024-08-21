@@ -95,11 +95,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/TestVariablesMigrationProcessor-notes.md
+  path: /docs/Reference/Processors/TestVariablesMigrationProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/TestVariablesMigrationProcessor-introduction.md
+  path: /docs/Reference/Processors/TestVariablesMigrationProcessor-introduction.md
   exists: false
   markdown: ''
 

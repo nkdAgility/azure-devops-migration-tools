@@ -69,11 +69,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /ProcessorEnrichers/PauseAfterEachItem-notes.md
+  path: /docs/Reference/ProcessorEnrichers/PauseAfterEachItem-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /ProcessorEnrichers/PauseAfterEachItem-introduction.md
+  path: /docs/Reference/ProcessorEnrichers/PauseAfterEachItem-introduction.md
   exists: false
   markdown: ''
 

@@ -110,11 +110,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/MultiValueConditionalMap-notes.md
+  path: /docs/Reference/FieldMaps/MultiValueConditionalMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/MultiValueConditionalMap-introduction.md
+  path: /docs/Reference/FieldMaps/MultiValueConditionalMap-introduction.md
   exists: false
   markdown: ''
 

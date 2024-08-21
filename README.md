@@ -44,61 +44,39 @@ Exceptions shipped to Application Insights and [Elmah.io](https://elmah.io) for 
 
 ## What can you do with this tool?
 
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Team Project` to another
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Organization` to another
-- Bulk edit of `Work Items` across an entire `Project`.
+- Migrate `Work Items`, `Test Plans & Suites`, `Teams`, `Shared Queries`, `Pipelines`, and `Processes` between different `Team Projects` or `Organizations`.
+- Perform bulk edits on `Work Items` across an entire `Project`.
 
-**WARNING: This tool is not designed for a novice. This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
-**Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) ; Paid support is available through our [recommended consultants](https://nkdagility.com/docs/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
+**Important:** This tool is intended for experienced users familiar with TFS/Azure DevOps object models and debugging in Visual Studio. It was developed by over 30 contributors from the Azure DevOps community to handle various scenarios and edge cases. 
+
+**Support Options:** Community support is available on [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions). For paid support, consider our [Azure DevOps Migration Services](https://nkdagility.com/capabilities/azure-devops-migration-services/).
 
 ### What versions of Azure DevOps & TFS do you support?
 
-- Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
-- You can move from any Tfs/AzureDevOps source to any Tfs/AzureDevOps target.
-- Process Template migration only supports XML based Projects
+- Supports all versions of TFS 2013+ and all versions of Azure DevOps.
+- You can migrate from any TFS/Azure DevOps source to any TFS/Azure DevOps target.
 
 ### Typical Uses of this tool
 
-- Merge many projects into a single project
-- Split one project into many projects
-- Assistance in changing Process Templates
-- Bulk edit of Work Items
-- Migration of Test Suites & Test Plans
-- _new_ Migration of Builds & Pipelines
-- Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)1.34
-- _new_  Migration of Processes
+- Merge multiple projects into a single project.
+- Split one project into several projects.
+- Change Process Templates.
+- Bulk edit Work Items.
+- Migrate Test Suites & Test Plans.
+- Migrate Builds & Pipelines (new).
+- Migrate between different language versions of TFS/Azure DevOps (new in v9.0).
+- Migrate Processes.
 
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
+**Note:** If you're migrating an entire collection to Azure DevOps Services, consider using Microsoft's [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/). If you need to change the Process Template, do so before moving to Azure DevOps Services.
 
 ## Quick Links
 
  - [Video Overview](https://www.youtube.com/watch?v=RCJsST0xBCE)
- - [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started.html)
+ - [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started/)
+ - [Installing](https://nkdagility.com/learn/azure-devops-migration-tools/installation/)
+
  - [Documentation](https://nkdagility.com/learn/azure-devops-migration-tools/)
  - [Questions on Usage](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
-
-## Installing and running the tools
-
-These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.
-For a more detailed getting started guide please see the [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/getting-started.html).
-
-### Option 1: Winget
-
-We use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) to host the tools, and you can use the command `winget install nkdAgility.AzureDevOpsMigrationTools` to install them on Windows 10 and Windows 11. 
-
-The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devopsmigration.exe` that lets you run it from anywhere using `devopsmigration init`.
-
-**NOTE: Do not install using an elevated command prompt!**
-
-### Option 2: Chocolatey
-
-We also deploy to [Chocolatey](https://chocolatey.org/packages/nkdagility.azuredevopsmigrationtools) and you can use the command `choco install vsts-sync-migrator` to install them on Windows Server. 
-
-The tools will be installed to `C:\Tools\MigrationTools\` which should be added to the path. You can run `devopsmigration.exe`
-
-### Option 3: Manual
-
-You can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
 ## Minimum Permission Requirements
 

@@ -119,11 +119,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/WorkItemDeleteProcessor-notes.md
+  path: /docs/Reference/Processors/WorkItemDeleteProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/WorkItemDeleteProcessor-introduction.md
+  path: /docs/Reference/Processors/WorkItemDeleteProcessor-introduction.md
   exists: false
   markdown: ''
 

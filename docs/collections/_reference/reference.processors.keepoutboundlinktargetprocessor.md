@@ -13,7 +13,7 @@ configurationSamples:
             "Enabled": false,
             "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
             "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-            "TargetLinksToKeepProject": "f93e29ba-0d3b-4b6f-81c0-ed3a0e38d10d",
+            "TargetLinksToKeepProject": "9ee7a377-75fb-41dc-9023-4c68d72991e6",
             "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
             "PrependCommand": "start",
             "DryRun": true,
@@ -46,7 +46,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "f93e29ba-0d3b-4b6f-81c0-ed3a0e38d10d",
+      "TargetLinksToKeepProject": "9ee7a377-75fb-41dc-9023-4c68d72991e6",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
@@ -125,11 +125,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /Processors/KeepOutboundLinkTargetProcessor-notes.md
+  path: /docs/Reference/Processors/KeepOutboundLinkTargetProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /Processors/KeepOutboundLinkTargetProcessor-introduction.md
+  path: /docs/Reference/Processors/KeepOutboundLinkTargetProcessor-introduction.md
   exists: false
   markdown: ''
 

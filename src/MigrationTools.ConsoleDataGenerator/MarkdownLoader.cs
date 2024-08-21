@@ -35,7 +35,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
         public string GetMarkdownTopicPath(ClassData classData, string topic)
         {
-            return Path.Combine(markdownPath, $"/{classData.TypeName}/{classData.ClassName}-{topic}.md");
+            return Path.Combine(markdownPath, $"{classData.TypeName}/{classData.ClassName}-{topic}.md");
         }
 
         public string LoadMarkdown(string path)

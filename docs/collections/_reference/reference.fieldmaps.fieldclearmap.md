@@ -74,11 +74,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /FieldMaps/FieldClearMap-notes.md
+  path: /docs/Reference/FieldMaps/FieldClearMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /FieldMaps/FieldClearMap-introduction.md
+  path: /docs/Reference/FieldMaps/FieldClearMap-introduction.md
   exists: false
   markdown: ''
 
