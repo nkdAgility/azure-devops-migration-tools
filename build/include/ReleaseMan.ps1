@@ -128,7 +128,6 @@ function Parse-Version {
 
 
 # Function to update and return the release groups
-
 function Update-ReleaseGroups-Minor {
     param (
         [string]$releaseFilePath = "./releases.json",
@@ -153,6 +152,9 @@ function Update-ReleaseGroups-Minor {
             Major = $minorRelease.Major
             Minor = $minorRelease.Minor
             Releases = $minorRelease.Releases
+            LatestVersion = $minorRelease.LatestVersion
+            LatestTagName = $minorRelease.LatestTagName
+            Summary = $minorRelease.Summary
         }
     }
 
@@ -169,6 +171,9 @@ function Update-ReleaseGroups-Minor {
                 Major = $major
                 Minor = $minor
                 Releases = @()
+                LatestVersion = $_.version
+                LatestTagName = $_.tagName
+                Summary = $null
             }
         }
 
@@ -178,6 +183,12 @@ function Update-ReleaseGroups-Minor {
             # Add the release if it does not already exist
             $groupedReleases[$key].Releases += ,$_
         }
+
+        # Order the releases by version and update the LatestVersion and LatestTagName
+        $orderedReleases = $groupedReleases[$key].Releases | Sort-Object -Property { [version]$_.version } -Descending
+        $latestRelease = $orderedReleases | Select-Object -First 1
+        $groupedReleases[$key].LatestVersion = $latestRelease.version
+        $groupedReleases[$key].LatestTagName = $latestRelease.tagName
     }
 
     # Convert the grouped releases hashtable back to a list
@@ -186,6 +197,9 @@ function Update-ReleaseGroups-Minor {
             Major = $_.Value.Major
             Minor = $_.Value.Minor
             Releases = $_.Value.Releases
+            LatestVersion = $_.Value.LatestVersion
+            LatestTagName = $_.Value.LatestTagName
+            Summary = $_.Value.Summary
         }
     }
 
@@ -195,6 +209,9 @@ function Update-ReleaseGroups-Minor {
 
     Write-Host "Grouped minor releases have been updated and saved to $outputFilePath"
 }
+
+
+
 
 
 
@@ -291,16 +308,17 @@ function Update-ReleaseGroups-Major {
             $newMinorGroup = [PSCustomObject]@{
                 Minor = $minor
                 Summary = $minorRelease.Summary
-                HighestReleaseTag = ($minorRelease.Releases | Sort-Object -Property { [version]$_.version } -Descending | Select-Object -First 1).tagName
+                LatestVersion = $minorRelease.LatestVersion
+                LatestTagName = $minorRelease.LatestTagName
             }
             $groupedMajorReleases[$major].Releases += $newMinorGroup
             $newMinorAdded = $true
-
-            # Update the highest minor tag and highest release tag for the major version
-            $highestMinorTag = $groupedMajorReleases[$major].Releases | Sort-Object -Property Minor -Descending | Select-Object -First 1
-            $groupedMajorReleases[$major].HighestMinorTag = $highestMinorTag.Minor
-            $groupedMajorReleases[$major].HighestReleaseTag = $highestMinorTag.HighestReleaseTag
         }
+
+        # Sort the minor releases by LatestVersion and update the HighestMinorTag and HighestReleaseTag
+        $highestMinorRelease = $groupedMajorReleases[$major].Releases | Sort-Object -Property { [version]$_.LatestVersion } -Descending | Select-Object -First 1
+        $groupedMajorReleases[$major].HighestMinorTag = $highestMinorRelease.Minor
+        $groupedMajorReleases[$major].HighestReleaseTag = $highestMinorRelease.LatestTagName
     }
 
     # Blank the major summary if new minor releases were added
@@ -327,6 +345,7 @@ function Update-ReleaseGroups-Major {
 
     Write-Host "Grouped major releases have been updated and saved to $outputFilePath"
 }
+
 
 
 
