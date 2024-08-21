@@ -247,26 +247,44 @@ function Update-ReleaseGroups-Major {
     # Load the grouped minor releases
     $groupedMinorReleases = Get-Content -Raw -Path $inputFilePath | ConvertFrom-Json
 
-    # Initialize a hashtable to group by major versions
-    $groupedMajorReleases = @{}
+    # Load the existing grouped major releases from the output file if it exists
+    if (Test-Path $outputFilePath) {
+        $existingGroupedMajorReleases = Get-Content -Raw -Path $outputFilePath | ConvertFrom-Json
+    } else {
+        $existingGroupedMajorReleases = @()
+    }
 
-    # Group by major versions and include minor summaries
+    # Convert the existing grouped major releases to a hashtable for easier updates
+    $groupedMajorReleases = @{}
+    foreach ($majorRelease in $existingGroupedMajorReleases) {
+        $groupedMajorReleases[$majorRelease.Major] = @{
+            Major = $majorRelease.Major
+            Releases = $majorRelease.Releases
+            Summary = $majorRelease.Summary
+        }
+    }
+
+    # Group by major versions and include minor summaries without the actual releases
     foreach ($minorRelease in $groupedMinorReleases) {
         $major = $minorRelease.Major
+        $minor = $minorRelease.Minor
         
         # Ensure major version exists in the grouped releases
         if (-not $groupedMajorReleases.ContainsKey($major)) {
             $groupedMajorReleases[$major] = @{
                 Major = $major
                 Releases = @()
+                Summary = $null  # Initially set to null; can be updated later
             }
         }
 
-        # Add the minor release to the major release group
-        $groupedMajorReleases[$major].Releases += @{
-            Minor = $minorRelease.Minor
-            Summary = $minorRelease.Summary
-            Releases = @($minorRelease.Releases)
+        # Ensure the minor release is listed under the major version
+        $existingMinorGroup = $groupedMajorReleases[$major].Releases | Where-Object { $_.Minor -eq $minor }
+        if (-not $existingMinorGroup) {
+            $groupedMajorReleases[$major].Releases += [PSCustomObject]@{
+                Minor = $minor
+                Summary = $minorRelease.Summary
+            }
         }
     }
 
@@ -275,15 +293,20 @@ function Update-ReleaseGroups-Major {
         [PSCustomObject]@{
             Major = $_.Value.Major
             Releases = $_.Value.Releases | Sort-Object -Property Minor
+            Summary = $_.Value.Summary
         }
     }
 
-    # Save the grouped major releases to the output file
+    # Save the updated grouped major releases to the output file
     $groupedJson = $finalGroupedReleases | ConvertTo-Json -Depth 10
     Set-Content -Path $outputFilePath -Value $groupedJson
 
-    Write-Host "Grouped major releases have been saved to $outputFilePath"
+    Write-Host "Grouped major releases have been updated and saved to $outputFilePath"
 }
+
+
+
+
 
 
 function Update-ReleaseGroups-MajorSummaries {

@@ -1,0 +1,114 @@
+[
+  {
+    "Major": 0,
+    "Releases": {
+      "Summary": "Version 0.5.1 introduces several user-impacting changes, including new features, improvements, and bug fixes. Users can expect enhanced performance and stability, along with the addition of new functionalities that streamline their experience. This update also addresses various bugs reported in previous versions, ensuring a smoother and more reliable operation. Overall, version 0.5.1 aims to provide a more efficient and user-friendly environment.",
+      "Minor": 5
+    },
+    "Summary": null
+  },
+  {
+    "Major": 3,
+    "Releases": {
+      "Summary": "Version 3.0 introduces several impactful changes aimed at enhancing user experience and functionality. Key features include new configuration files for the VSTS Data Bulk Editor, allowing for customized migration processes, and the introduction of classes for team migration, which facilitate team settings management. Users can now specify additional query criteria for attachment exports and customize employee picture URL formats. The update also streamlines work item saving processes, improves telemetry tracking for better monitoring, and enhances error tracking capabilities. Notably, the assembly versioning scheme has been updated, and various configuration options have been added or improved, providing users with greater control and flexibility in their migration tasks.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 4,
+    "Releases": {
+      "Summary": "Version 4.0.0.2 introduces a significant enhancement with the new configuration option, `PrefixProjectToNodes`, in the `WorkItemMigrationConfig` class. This feature allows users to customize whether the project name is prefixed to area and iteration paths during work item migration, providing greater flexibility in managing project structures. Additionally, the migration logic has been updated to support this new option, ensuring that area and iteration paths are constructed according to the user's preferences.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 5,
+    "Releases": {
+      "Summary": "Version 5.0 introduces significant user-impacting changes, including a rebranding from \"VSTS Bulk Data Editor & Migrator\" to \"VSTS Sync Migration Tools\" and a streamlined command name change from `vstssyncmigration` to `vsts-sm` for installation and uninstallation. The update also features the new `MultiValueConditionalMapConfig` class, which enhances field mapping flexibility by allowing complex configurations with multiple source and target field values. Additionally, comprehensive new documentation has been provided to assist users with configuration and usage, reflecting updated command structures and new options for processing work items and links.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 6,
+    "Releases": {
+      "Summary": "Version 6.0 introduces significant user-impacting changes, including a complete rebranding of the command-line tool from `vsts-sm` to `vstssyncmigrator`, which is reflected in updated documentation to guide users on the correct commands for setup and execution. The versioning has been updated in the GitVersion configuration, and the Chocolatey installation script has been modified to accommodate the new package name. Additionally, the release includes adjustments to attachment export and import migration contexts, enhancing the formatting of reflected IDs. Users should also note the restructuring of project organization, with various classes and namespaces renamed, which may require updates in their project references.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 7,
+    "Releases": {
+      "Summary": "Version 7.0 introduces several user-impacting changes, including a significant upgrade to the target framework from v4.5 to v4.6.2, enhancing overall application performance and compatibility. The update also includes dependency upgrades, notably `Newtonsoft.Json` to version 9.0.1 and `Microsoft.ApplicationInsights` to version 2.2.0, which may improve functionality and security. Subsequent releases, 7.0.1 and 7.0.2, further refine the user experience by implementing an online status check for version updates in the `VstsSyncMigrator.Console` application, ensuring users receive timely notifications only when connected to the internet. Additionally, version 7.0.2 comments out the conditional trace listener initialization in the telemetry logging, which may alter how telemetry data is captured during application execution.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 8,
+    "Releases": {
+      "Summary": "Version 8.0 introduces significant user-impacting changes, including enhanced configuration options for the `init` command, allowing users to specify custom configuration file paths and choose between `Full` and `WorkItemTracking` modes. The migration process has been improved with new parameters for handling attachments and links, as well as options for retrying failed work item creations. Users will benefit from updated documentation paths and improved error handling during attachment processing. Additionally, the removal of certain configuration options may affect users relying on those features, while new command-line options for TFS instance credentials enhance security and flexibility. Overall, these updates aim to improve the migration experience and streamline user interactions with the tool.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 9,
+    "Releases": {
+      "Summary": "Version 9.0 introduces significant user-impacting changes, including the addition of multi-language support for migrating between different language versions of Azure DevOps, enhancing user flexibility. The configuration documentation has been improved to include new fields for language mapping of Area and Iteration paths, allowing users to specify these mappings for both source and target projects. Additionally, version 9.0.1 brings a new funding configuration file, deprecates the `doneMatch` property in the `FieldMergeMapConfig` class, improves error handling to prevent matching source and target fields, and enhances merging logic for better field updates. Users will also notice a change in the URI for the getting started guide in the extension's configuration.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 10,
+    "Releases": {
+      "Summary": "Version 10.0 of the Migration Tools suite brings significant user-impacting changes, including the introduction of new projects like \"MigrationTools.Sinks.AzureDevOps\" and enhancements to the console UI for better integration with Azure DevOps. Users will benefit from improved configuration management, allowing for JSON file loading and new settings for telemetry and application insights. The migration engine has been streamlined with new interfaces for better work item handling, while logging has been enhanced for clarity. Additionally, users must update their configuration files due to a namespace change and the introduction of new parameters for work item migration, ensuring greater flexibility and control in their migration processes.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 11,
+    "Releases": {
+      "Summary": "Version 11.0 introduces significant user-impacting changes, including a shift in project naming from \"VstsSyncMigrator\" to \"MigrationTools,\" enhancing clarity for Azure DevOps and File System clients. The update streamlines configuration options and removes obsolete projects, improving usability for developers. Additionally, error handling in migration operations has been enhanced, providing better logging and exception management. The introduction of C# 9.0 support and new project references further optimizes the application's performance and configuration management, ensuring a smoother user experience.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 12,
+    "Releases": {
+      "Summary": "Version 12.0 introduces significant enhancements and features aimed at improving user experience and migration processes. Key updates include the introduction of new configuration options for migration processors, such as `TestPlanQueryBit` and `UseCommonNodeStructureEnricherConfig`, which enhance flexibility in migrating test plans and suites. Users can now define custom remapping rules for area and iteration paths using `AreaMaps` and `IterationMaps`. Additionally, the migration tools have seen improvements in field mapping configurations, including a new Azure DevOps consultant in the documentation, and enhancements to the mapping display name functionality. The release also addresses various bugs and usability issues, such as improved error handling during work item migrations and refined documentation for better clarity. Overall, these updates aim to streamline the migration process and provide users with more control and flexibility.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 13,
+    "Releases": {
+      "Summary": "Version 13.0 introduces several user-impacting changes, including the new `WorkItemMigrationContext` processor that enhances the migration of work items, their history, attachments, and metadata between Azure DevOps instances. Users will benefit from improved documentation clarity, with updates to the TfsWorkItemEndpoint and migration tool instructions. A new configuration file, `configuration2-wit.json`, has been added to streamline work item type and field mappings. Additionally, enhancements to the handling of service connections during pipeline creation and the introduction of a bug report template in the GitHub repository aim to improve user experience and support. Overall, these updates enhance functionality, flexibility, and clarity for users engaging with the migration tools and documentation.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 14,
+    "Releases": {
+      "Summary": "Version 14.0 introduces significant user-impacting changes, including a shift to Winget as the primary installation method, enhancing accessibility for users. The main executable has been renamed to `devopsmigration.exe`, streamlining command execution. New configuration options, such as `ShouldCreateMissingRevisionPaths` and the `MigrationTools.lutconfig` file, allow for improved customization, including parallel builds and test case timeouts. The command for creating default configurations has been updated to `devopsmigration init`, with added flexibility through the `--options` parameter. Additionally, logging improvements provide better context during migration operations, ensuring users have detailed insights into package management and version detection.",
+      "Minor": 0
+    },
+    "Summary": null
+  },
+  {
+    "Major": 15,
+    "Releases": {
+      "Summary": "Version 15.0 introduces significant enhancements and fixes to the Azure DevOps Migration Tools, focusing on user experience and configuration flexibility. Key updates include the introduction of a new GitHub Actions workflow for automatic pull request title updates, improved management of area and iteration paths through regex mapping, and a streamlined query format for migration configurations. Users can now configure attachment processing more flexibly with options for export paths and maximum sizes directly through the TfsAttachmentEnricherOptions. Additionally, authentication methods have been updated, and enhanced logging for user retrieval processes has been implemented. Various bug fixes and adjustments have also been made to improve overall functionality and user experience.",
+      "Minor": 0
+    },
+    "Summary": null
+  }
+]
