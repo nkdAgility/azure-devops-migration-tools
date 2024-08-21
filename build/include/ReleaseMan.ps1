@@ -259,10 +259,15 @@ function Update-ReleaseGroups-Major {
     foreach ($majorRelease in $existingGroupedMajorReleases) {
         $groupedMajorReleases[$majorRelease.Major] = @{
             Major = $majorRelease.Major
-            Releases = $majorRelease.Releases
+            Releases = @($majorRelease.Releases)  # Ensure this is a list
             Summary = $majorRelease.Summary
+            HighestMinorTag = $majorRelease.HighestMinorTag
+            HighestReleaseTag = $majorRelease.HighestReleaseTag
         }
     }
+
+    # Flag to check if any new minor releases were added
+    $newMinorAdded = $false
 
     # Group by major versions and include minor summaries without the actual releases
     foreach ($minorRelease in $groupedMinorReleases) {
@@ -273,18 +278,35 @@ function Update-ReleaseGroups-Major {
         if (-not $groupedMajorReleases.ContainsKey($major)) {
             $groupedMajorReleases[$major] = @{
                 Major = $major
-                Releases = @()
+                Releases = @()  # Initialize as an empty list
                 Summary = $null  # Initially set to null; can be updated later
+                HighestMinorTag = $null
+                HighestReleaseTag = $null
             }
         }
 
         # Ensure the minor release is listed under the major version
         $existingMinorGroup = $groupedMajorReleases[$major].Releases | Where-Object { $_.Minor -eq $minor }
         if (-not $existingMinorGroup) {
-            $groupedMajorReleases[$major].Releases += [PSCustomObject]@{
+            $newMinorGroup = [PSCustomObject]@{
                 Minor = $minor
                 Summary = $minorRelease.Summary
+                HighestReleaseTag = ($minorRelease.Releases | Sort-Object -Property { [version]$_.version } -Descending | Select-Object -First 1).tagName
             }
+            $groupedMajorReleases[$major].Releases += $newMinorGroup
+            $newMinorAdded = $true
+
+            # Update the highest minor tag and highest release tag for the major version
+            $highestMinorTag = $groupedMajorReleases[$major].Releases | Sort-Object -Property Minor -Descending | Select-Object -First 1
+            $groupedMajorReleases[$major].HighestMinorTag = $highestMinorTag.Minor
+            $groupedMajorReleases[$major].HighestReleaseTag = $highestMinorTag.HighestReleaseTag
+        }
+    }
+
+    # Blank the major summary if new minor releases were added
+    if ($newMinorAdded) {
+        foreach ($major in $groupedMajorReleases.Keys) {
+            $groupedMajorReleases[$major].Summary = $null
         }
     }
 
@@ -294,6 +316,8 @@ function Update-ReleaseGroups-Major {
             Major = $_.Value.Major
             Releases = $_.Value.Releases | Sort-Object -Property Minor
             Summary = $_.Value.Summary
+            HighestMinorTag = $_.Value.HighestMinorTag
+            HighestReleaseTag = $_.Value.HighestReleaseTag
         }
     }
 
@@ -303,6 +327,8 @@ function Update-ReleaseGroups-Major {
 
     Write-Host "Grouped major releases have been updated and saved to $outputFilePath"
 }
+
+
 
 
 
