@@ -1,6 +1,6 @@
 function Update-Releases {
     param (
-        [string]$releaseFilePath = "./releases.json",
+        [string]$releaseFilePath = "./docs/_data/releases.json",
         [int]$limit = 10
     )
 
@@ -130,8 +130,8 @@ function Parse-Version {
 # Function to update and return the release groups
 function Update-ReleaseGroups-Minor {
     param (
-        [string]$releaseFilePath = "./releases.json",
-        [string]$outputFilePath = "./releases-grouped-minor.json"
+        [string]$releaseFilePath = "./docs/_data/releases.json",
+        [string]$outputFilePath = "./docs/_data/releases-grouped-minor.json"
     )
     
     # Load the releases from releases.json
@@ -218,8 +218,8 @@ function Update-ReleaseGroups-Minor {
 
 function Update-ReleaseGroups-MinorSummaries {
     param (
-        [string]$inputFilePath = "./releases-grouped-minor.json",
-        [string]$outputFilePath = "./releases-grouped-minor.json"
+        [string]$inputFilePath = "./docs/_data/releases-grouped-minor.json",
+        [string]$outputFilePath = "./docs/_data/releases-grouped-minor.json"
     )
 
     # Load the grouped minor releases
@@ -257,8 +257,8 @@ function Update-ReleaseGroups-MinorSummaries {
 
 function Update-ReleaseGroups-Major {
     param (
-        [string]$inputFilePath = "./releases-grouped-minor.json",
-        [string]$outputFilePath = "./releases-grouped-major.json"
+        [string]$inputFilePath = "./docs/_data/releases-grouped-minor.json",
+        [string]$outputFilePath = "./docs/_data/releases-grouped-major.json"
     )
 
     # Load the grouped minor releases
@@ -362,8 +362,8 @@ function Update-ReleaseGroups-Major {
 
 function Update-ReleaseGroups-MajorSummaries {
     param (
-        [string]$inputFilePath = "./releases-grouped-major.json",
-        [string]$outputFilePath = "./releases-grouped-major.json"
+        [string]$inputFilePath = "./docs/_data/releases-grouped-major.json",
+        [string]$outputFilePath = "./docs/_data/releases-grouped-major.json"
     )
 
     # Load the grouped major releases
@@ -401,28 +401,51 @@ function Update-ReleaseGroups-MajorSummaries {
 }
 
 
+
 function Get-ChangeLogMarkdown {
     param (
-        [string]$inputFilePath = "./releases-grouped-major.json",
-        [string]$outputFilePath = "./change-log.md"
+        [string]$inputFilePath = "./docs/_data/releases-grouped-major.json",
+        [string]$outputFilePath = "./docs/change-log.md"
     )
 
     # Load the grouped major releases
     $groupedReleases = Get-Content -Raw -Path $inputFilePath | ConvertFrom-Json
 
-    # Initialize an array to hold the markdown lines
-    $markdownLines = @()
+    # Initialize an array to hold the markdown lines, starting with the header
+    $markdownLines = @(
+        "---",
+        "title: Change Log",
+        "layout: page",
+        "template: default",
+        "pageType: index",
+        "toc: true",
+        "pageStatus: published",
+        "discussionId: ",
+        "redirect_from: /change-log.html",
+        "---",
+        "",
+        "## Change Log",
+        ""
+    )
 
     # Iterate through each major release
     foreach ($majorRelease in $groupedReleases) {
+        $majorReleaseMajor = $majorRelease.Major
+        $majorReleaseLatestTagName = $majorRelease.LatestTagName
+        $majorReleaseSummary = $majorRelease.Summary
+
         # Generate the major release markdown
-        $majorLine = "- [${majorRelease.LatestMinor}](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/${majorRelease.LatestTagName}) - ${majorRelease.Summary}"
+        $majorLine = "- [v$majorReleaseMajor.0](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/$majorReleaseLatestTagName) - $majorReleaseSummary"
         $markdownLines += $majorLine
 
         # Iterate through the minor releases under this major release
         foreach ($minorRelease in $majorRelease.Releases) {
+            $minorLatestTagName = $minorRelease.LatestTagName
+            $minorSummary = $minorRelease.Summary
+            $minorReleaseMinor = $minorRelease.Minor
+
             # Generate the minor release markdown
-            $minorLine = "  - [${minorRelease.Minor}](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/${minorRelease.LatestTagName}) - ${minorRelease.Summary}"
+            $minorLine = "  - [v$minorReleaseMinor](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/$minorLatestTagName) - $minorSummary"
             $markdownLines += $minorLine
         }
     }
@@ -435,6 +458,3 @@ function Get-ChangeLogMarkdown {
 
     Write-Host "Change log markdown has been generated and saved to $outputFilePath"
 }
-
-# Call the function to generate the markdown
-Get-ChangeLogMarkdown
