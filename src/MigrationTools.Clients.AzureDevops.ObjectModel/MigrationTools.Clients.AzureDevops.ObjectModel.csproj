@@ -11,6 +11,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EndpointEnrichers\**" />
+    <Compile Remove="Enrichers\**" />
+    <Compile Remove="ProcessorEnrichers\**" />
+    <EmbeddedResource Remove="EndpointEnrichers\**" />
+    <EmbeddedResource Remove="Enrichers\**" />
+    <EmbeddedResource Remove="ProcessorEnrichers\**" />
+    <None Remove="EndpointEnrichers\**" />
+    <None Remove="Enrichers\**" />
+    <None Remove="ProcessorEnrichers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\..\GlobalUsings.cs" Link="GlobalUsings.cs" />
   </ItemGroup>
 
@@ -37,9 +49,6 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <Folder Include="EndpointEnrichers\" />
-    <Folder Include="Enrichers\" />
-    <Folder Include="ProcessorEnrichers\" />
     <Folder Include="Tools\FieldMappingTool\" />
   </ItemGroup>
 </Project>

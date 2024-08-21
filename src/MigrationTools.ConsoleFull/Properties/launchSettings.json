@@ -37,7 +37,7 @@
     },
     "init Options-Reference": {
       "commandName": "Project",
-      "commandLineArgs": "init --options Reference"
+      "commandLineArgs": "init --options Reference -c configuration-ref.json"
     }
   }
 }
