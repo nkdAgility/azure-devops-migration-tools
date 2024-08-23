@@ -68,7 +68,6 @@ namespace MigrationTools
             context.AddSingleton<TestPlansAndSuitesMigrationProcessor>();
             context.AddSingleton<TestVariablesMigrationProcessor>();
             context.AddSingleton<WorkItemPostProcessingProcessor>();
-            context.AddSingleton<WorkItemPostProcessingProcessor>();
             context.AddSingleton<ExportUsersForMappingProcessor>();
             context.AddSingleton<CreateTeamFolders>();
             context.AddSingleton<ExportProfilePictureFromADProcessor>();
