@@ -485,9 +485,9 @@
             <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
             <exception cref="T:System.NotImplementedException"></exception>
         </member>
-        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.NodeBasePaths">
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.Filters">
             <summary>
-            The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
+            Using the Glob format you can specify a list of nodes that you want to match. This can be used to filter the main migration of current nodes. note: This does not negate the nees for all nodes in the history of a work item in scope for the migration MUST exist for the system to run, and this will be validated before the migration. 
             </summary>
             <default>["/"]</default>
         </member>

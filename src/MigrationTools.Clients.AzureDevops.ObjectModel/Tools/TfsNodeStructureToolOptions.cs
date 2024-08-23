@@ -15,10 +15,10 @@ namespace MigrationTools.Tools
 
 
         /// <summary>
-        /// The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
+        /// Using the Glob format you can specify a list of nodes that you want to match. This can be used to filter the main migration of current nodes. note: This does not negate the nees for all nodes in the history of a work item in scope for the migration MUST exist for the system to run, and this will be validated before the migration. 
         /// </summary>
         /// <default>["/"]</default>
-        public string[] NodeBasePaths { get; set; }
+        public string[] Filters { get; set; }
 
         /// <summary>
         /// Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
@@ -43,7 +43,7 @@ namespace MigrationTools.Tools
 
     public interface ITfsNodeStructureToolOptions
     {
-        public string[] NodeBasePaths { get; set; }
+        public string[] Filters { get; set; }
         public Dictionary<string, string> AreaMaps { get; set; }
         public Dictionary<string, string> IterationMaps { get; set; }
     }

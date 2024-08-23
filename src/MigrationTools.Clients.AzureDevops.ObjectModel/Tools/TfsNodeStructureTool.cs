@@ -47,7 +47,6 @@ namespace MigrationTools.Tools
     public class TfsNodeStructureTool : Tool<TfsNodeStructureToolOptions>
     {
         private readonly Dictionary<string, NodeInfo> _pathToKnownNodeMap = new Dictionary<string, NodeInfo>();
-        private string[] _nodeBasePaths;
 
         private ICommonStructureService4 _sourceCommonStructureService;
 
@@ -417,9 +416,7 @@ namespace MigrationTools.Tools
 
         private void MigrateAllNodeStructures()
         {
-            _nodeBasePaths = Options.NodeBasePaths;
-
-            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({nodeBasePaths}, {areaMaps}, {iterationMaps})", _nodeBasePaths, Options.AreaMaps, Options.IterationMaps);
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({nodeBasePaths}, {areaMaps}, {iterationMaps})", Options.Filters, Options.AreaMaps, Options.IterationMaps);
             //////////////////////////////////////////////////
             ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _targetLanguageMaps.AreaPath, _targetProjectName, TfsNodeStructureType.Area);
             //////////////////////////////////////////////////
@@ -500,14 +497,14 @@ namespace MigrationTools.Tools
         /// <returns>true/false</returns>
         private bool ShouldCreateNode(string userFriendlyPath)
         {
-            if (_nodeBasePaths == null || _nodeBasePaths.Length == 0)
+            if (Options.Filters == null || Options.Filters.Length == 0)
             {
                 return true;
             }
 
             var invertedPath = "!" + userFriendlyPath;
-            var exclusionPatterns = _nodeBasePaths.Where(oneBasePath => oneBasePath.StartsWith("!", StringComparison.InvariantCulture));
-            if (_nodeBasePaths.Any(oneBasePath => userFriendlyPath.StartsWith(oneBasePath)) &&
+            var exclusionPatterns = Options.Filters.Where(oneBasePath => oneBasePath.StartsWith("!", StringComparison.InvariantCulture));
+            if (Options.Filters.Any(oneBasePath => userFriendlyPath.StartsWith(oneBasePath)) &&
                 !exclusionPatterns.Any(oneBasePath => invertedPath.StartsWith(oneBasePath)))
             {
                 return true;
@@ -525,7 +522,7 @@ namespace MigrationTools.Tools
         /// <exception cref="NotImplementedException"></exception>
         private bool CheckIsParentOfSelectedBasePath(string userFriendlyPath)
         {
-            return _nodeBasePaths != null ? _nodeBasePaths.Where(onePath => !onePath.StartsWith("!"))
+            return Options.Filters != null ? Options.Filters.Where(onePath => !onePath.StartsWith("!"))
                                  .Any(onePath => onePath.StartsWith(userFriendlyPath)) : false;
         }
 

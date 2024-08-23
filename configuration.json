@@ -4,8 +4,8 @@
   },
   "MigrationTools": {
     "Version": "16.0",
-    "Source": [
-      {
+    "Source": {
+      "TfsTeamProject": {
         "EndpointType": "TfsTeamProject",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
@@ -15,12 +15,11 @@
         "LanguageMaps": {
           "AreaPath": "Area",
           "IterationPath": "Iteration"
-
         }
       }
-    ],
-    "Target": [
-      {
+    },
+    "Target": {
+      "TfsTeamProject": {
         "EndpointType": "TfsTeamProject",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationTest5",
@@ -34,7 +33,7 @@
           "IterationPath": "Iteration"
         }
       }
-    ],
+    },
     "CommonTools": {
       "WorkItemTypeMappingTool": {
         "Enabled": true,
@@ -119,7 +118,7 @@
     },
     "Processors": [
       {
-        "ProcessorType": "WorkItemMigrationProcessor",
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
         "Enabled": true,
         "UpdateCreatedDate": true,
         "UpdateCreatedBy": true,

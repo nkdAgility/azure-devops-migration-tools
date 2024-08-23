@@ -35,7 +35,7 @@ namespace MigrationTools.Processors.Infrastructure
                             // Bind enrichers for each processor
                             var enrichersSection = _configuration.GetSection($"MigrationTools:Processors:{options.Processors.IndexOf(processor)}:Enrichers");
                             var enrichers = enrichersSection?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorEnricher>("EnricherType"));
-                            if (processor.Enrichers != null)
+                            if (processor.Enrichers == null)
                             {
                                 processor.Enrichers = new List<IProcessorEnricher>();
                             }
