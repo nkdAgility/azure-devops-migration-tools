@@ -2,27 +2,6 @@
 optionsClassName: ExportUsersForMappingProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "ExportUsersForMappingProcessor",
-            "Enabled": false,
-            "WIQLQuery": null,
-            "OnlyListUsersInWorkItems": true,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -34,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "ExportUsersForMappingProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -45,7 +35,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 description: ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.

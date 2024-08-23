@@ -2,25 +2,6 @@
 optionsClassName: FieldClearMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldClearMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldClearMap",
-                "targetField": null,
-                "ApplyTo": []
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldClearMapOptions
 - name: defaults
   description: 
   code: >-
@@ -36,7 +17,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "FieldClearMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldClearMapOptions
+- name: classic
   description: 
   code: >-
     {

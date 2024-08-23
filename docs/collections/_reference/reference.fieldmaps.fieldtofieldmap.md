@@ -2,29 +2,6 @@
 optionsClassName: FieldToFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldToFieldMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldToFieldMap",
-                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-                "targetField": "Microsoft.VSTS.Common.StackRank",
-                "defaultValue": "42",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 - name: defaults
   description: 
   code: >-
@@ -47,7 +24,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "FieldToFieldMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
+- name: classic
   description: 
   code: >-
     {

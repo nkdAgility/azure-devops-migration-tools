@@ -2,19 +2,6 @@
 optionsClassName: TfsWorkItemEmbededLinkToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsWorkItemEmbededLinkTool": {
-            "Enabled": true
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 - name: defaults
   description: 
   code: >-
@@ -28,7 +15,20 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsWorkItemEmbededLinkTool": {
+            "Enabled": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
+- name: classic
   description: 
   code: >-
     {

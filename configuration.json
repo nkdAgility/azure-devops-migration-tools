@@ -5,30 +5,30 @@
   "MigrationTools": {
     "Version": "16.0",
     "Source": {
-        "EndpointType": "TfsTeamProject",
-        "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "migrationSource1",
-        "AllowCrossProjectLinking": false,
-        "AuthenticationMode": "AccessToken",
-        "PersonalAccessToken": "",
-        "LanguageMaps": {
-          "AreaPath": "Area",
-          "IterationPath": "Iteration"
-        }
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationSource1",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "AccessToken",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
     },
     "Target": {
-        "EndpointType": "TfsTeamProject",
-        "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "migrationTest5",
-        "TfsVersion": "AzureDevOps",
-        "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-        "AllowCrossProjectLinking": false,
-        "AuthenticationMode": "AccessToken",
-        "PersonalAccessToken": "",
-        "LanguageMaps": {
-          "AreaPath": "Area",
-          "IterationPath": "Iteration"
-        }
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationTest5",
+      "TfsVersion": "AzureDevOps",
+      "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "AccessToken",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
 
     },
     "CommonTools": {
@@ -105,19 +105,19 @@
         "ShouldCreateMissingRevisionPaths": true,
         "ReplicateAllExistingNodes": true
       },
-        "TfsRevisionManagerTool": {
-          "Enabled": true,
-          "ReplayRevisions": true,
-          "MaxRevisions": 0
-        },
-        "TfsTeamSettingsTool": {
-          "Enabled": true,
-          "MigrateTeamSettings": true,
-          "UpdateTeamSettings": true,
-          "MigrateTeamCapacities": true,
-          "Teams": null
-        }
+      "TfsRevisionManagerTool": {
+        "Enabled": true,
+        "ReplayRevisions": true,
+        "MaxRevisions": 0
       },
+      "TfsTeamSettingsTool": {
+        "Enabled": true,
+        "MigrateTeamSettings": true,
+        "UpdateTeamSettings": true,
+        "MigrateTeamCapacities": true,
+        "Teams": [ "Team 1", "Team 2" ]
+      }
+    },
     "Processors": [
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",

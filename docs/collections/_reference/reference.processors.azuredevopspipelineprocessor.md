@@ -2,33 +2,6 @@
 optionsClassName: AzureDevOpsPipelineProcessorOptions
 optionsClassFullName: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "AzureDevOpsPipelineProcessor",
-            "Enabled": false,
-            "MigrateBuildPipelines": true,
-            "MigrateReleasePipelines": true,
-            "MigrateTaskGroups": true,
-            "MigrateVariableGroups": true,
-            "MigrateServiceConnections": true,
-            "BuildPipelines": null,
-            "ReleasePipelines": null,
-            "RepositoryNameMaps": null,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": "sourceName",
-            "TargetName": "targetName",
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -51,7 +24,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "AzureDevOpsPipelineProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -68,7 +52,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": "sourceName",
-      "TargetName": "targetName"
+      "TargetName": "targetName",
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 description: Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.

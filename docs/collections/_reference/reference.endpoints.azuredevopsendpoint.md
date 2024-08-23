@@ -2,31 +2,6 @@
 optionsClassName: AzureDevOpsEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "*": {
-            "AzureDevOpsEndpoint": [
-              {
-                "EndpointType": "AzureDevOpsEndpoint",
-                "Enabled": false,
-                "AuthenticationMode": 0,
-                "AccessToken": null,
-                "Organisation": null,
-                "Project": null,
-                "ReflectedWorkItemIdField": null,
-                "Name": null,
-                "EndpointEnrichers": null
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: defaults
   description: 
   code: >-
@@ -38,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "EndpointSamples": {
+          "AzureDevOpsEndpoint": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+- name: classic
   description: 
   code: >-
     {

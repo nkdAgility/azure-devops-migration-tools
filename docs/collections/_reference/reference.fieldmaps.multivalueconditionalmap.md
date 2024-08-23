@@ -2,34 +2,6 @@
 optionsClassName: MultiValueConditionalMapOptions
 optionsClassFullName: MigrationTools.Tools.MultiValueConditionalMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "MultiValueConditionalMap",
-                "sourceFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                },
-                "targetFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                },
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 - name: defaults
   description: 
   code: >-
@@ -57,18 +29,31 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "MultiValueConditionalMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
+- name: classic
   description: 
   code: >-
     {
       "$type": "MultiValueConditionalMapOptions",
       "sourceFieldsAndValues": {
-        "$type": "Dictionary`2",
         "Field1": "Value1",
         "Field2": "Value2"
       },
       "targetFieldsAndValues": {
-        "$type": "Dictionary`2",
         "Field1": "Value1",
         "Field2": "Value2"
       },

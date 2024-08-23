@@ -1,26 +1,6 @@
 optionsClassName: TreeToTagFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.TreeToTagFieldMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "TreeToTagFieldMap",
-                "toSkip": 0,
-                "timeTravel": 0,
-                "ApplyTo": []
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 - name: defaults
   description: 
   code: >-
@@ -36,7 +16,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "TreeToTagFieldMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
+- name: classic
   description: 
   code: >-
     {

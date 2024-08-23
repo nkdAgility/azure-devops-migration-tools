@@ -2,28 +2,6 @@
 optionsClassName: WorkItemTrackingProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "WorkItemTrackingProcessor",
-            "Enabled": false,
-            "ReplayRevisions": false,
-            "CollapseRevisions": false,
-            "WorkItemCreateRetryLimit": 0,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -35,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "WorkItemTrackingProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -47,7 +36,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 description: This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).

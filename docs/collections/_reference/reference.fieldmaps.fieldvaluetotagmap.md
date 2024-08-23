@@ -2,29 +2,6 @@
 optionsClassName: FieldValuetoTagMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldValuetoTagMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldValuetoTagMap",
-                "sourceField": "Microsoft.VSTS.CMMI.Blocked",
-                "pattern": "Yes",
-                "formatExpression": "{0}",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldValuetoTagMapOptions
 - name: defaults
   description: 
   code: >-
@@ -47,7 +24,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldValuetoTagMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "FieldValuetoTagMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldValuetoTagMapOptions
+- name: classic
   description: 
   code: >-
     {

@@ -2,19 +2,6 @@
 optionsClassName: TfsGitRepositoryToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsGitRepositoryToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsGitRepositoryTool": {
-            "Enabled": false
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 - name: defaults
   description: 
   code: >-
@@ -26,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsGitRepositoryTool": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
+- name: classic
   description: 
   code: >-
     {

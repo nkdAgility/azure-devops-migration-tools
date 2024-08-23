@@ -1,31 +1,6 @@
 optionsClassName: KeepOutboundLinkTargetProcessorOptions
 optionsClassFullName: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "KeepOutboundLinkTargetProcessor",
-            "Enabled": false,
-            "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
-            "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-            "TargetLinksToKeepProject": "d940252f-43d7-4f6c-b5a0-c4b713d7903e",
-            "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
-            "PrependCommand": "start",
-            "DryRun": true,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -37,7 +12,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "KeepOutboundLinkTargetProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -45,14 +31,15 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "d940252f-43d7-4f6c-b5a0-c4b713d7903e",
+      "TargetLinksToKeepProject": "058371f1-0b7c-4674-bb52-fe5ff063c52e",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
 description: missng XML code comments

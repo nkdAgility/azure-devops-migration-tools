@@ -2,31 +2,6 @@
 optionsClassName: FieldToFieldMultiMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldToFieldMultiMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldToFieldMultiMap",
-                "SourceToTargetMappings": {
-                  "SourceField1": "TargetField1",
-                  "SourceField2": "TargetField2"
-                },
-                "ApplyTo": [
-                  "SomeWorkItemType",
-                  "SomeOtherWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 - name: defaults
   description: 
   code: >-
@@ -51,13 +26,27 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "FieldToFieldMultiMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
+- name: classic
   description: 
   code: >-
     {
       "$type": "FieldToFieldMultiMapOptions",
       "SourceToTargetMappings": {
-        "$type": "Dictionary`2",
         "SourceField1": "TargetField1",
         "SourceField2": "TargetField2"
       },

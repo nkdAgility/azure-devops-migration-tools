@@ -2,30 +2,6 @@
 optionsClassName: WorkItemDeleteProcessorOptions
 optionsClassFullName: MigrationTools.Processors.WorkItemDeleteProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "WorkItemDeleteProcessor",
-            "Enabled": false,
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-            "WorkItemIDs": null,
-            "FilterWorkItemsThatAlreadyExistInTarget": false,
-            "PauseAfterEachWorkItem": false,
-            "WorkItemCreateRetryLimit": 0,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -37,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "WorkItemDeleteProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -51,7 +38,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
 description: The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.

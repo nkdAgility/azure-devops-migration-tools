@@ -15,7 +15,7 @@ namespace MigrationTools.Tools.Infrastructure
         [JsonIgnore]
         public string ConfigurationObjectName => $"ToolType";
         [JsonIgnore]
-        public string ConfigurationSamplePath => $"MigrationTools:CommonToolsSample:{ConfigurationOptionFor}";
+        public string ConfigurationSamplePath => $"MigrationTools:CommonToolsSamples:{ConfigurationOptionFor}";
         [JsonIgnore]
         public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 

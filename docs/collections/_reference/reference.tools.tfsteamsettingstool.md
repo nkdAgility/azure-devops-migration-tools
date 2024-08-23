@@ -2,23 +2,6 @@
 optionsClassName: TfsTeamSettingsToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsTeamSettingsToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsTeamSettingsTool": {
-            "Enabled": true,
-            "MigrateTeamSettings": true,
-            "UpdateTeamSettings": true,
-            "MigrateTeamCapacities": true,
-            "Teams": null
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 - name: defaults
   description: 
   code: >-
@@ -36,7 +19,27 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsTeamSettingsTool": {
+            "Enabled": "True",
+            "MigrateTeamCapacities": "True",
+            "MigrateTeamSettings": "True",
+            "Teams": [
+              "Team 1",
+              "Team 2"
+            ],
+            "UpdateTeamSettings": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
+- name: classic
   description: 
   code: >-
     {
@@ -45,7 +48,10 @@ configurationSamples:
       "MigrateTeamSettings": true,
       "UpdateTeamSettings": true,
       "MigrateTeamCapacities": true,
-      "Teams": null
+      "Teams": [
+        "Team 1",
+        "Team 2"
+      ]
     }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.

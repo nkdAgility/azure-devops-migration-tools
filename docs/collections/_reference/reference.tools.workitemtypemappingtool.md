@@ -2,22 +2,6 @@
 optionsClassName: WorkItemTypeMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "WorkItemTypeMappingTool": {
-            "Enabled": false,
-            "Mappings": {
-              "Source Work Item Type Name": "Target Work Item Type Name"
-            }
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 - name: defaults
   description: 
   code: >-
@@ -34,14 +18,31 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "WorkItemTypeMappingTool": {
+            "Enabled": "True",
+            "Mappings": {
+              "User Story": "Product Backlog Item"
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
+- name: classic
   description: 
   code: >-
     {
       "$type": "WorkItemTypeMappingToolOptions",
-      "Enabled": false,
+      "Enabled": true,
       "Mappings": {
-        "Source Work Item Type Name": "Target Work Item Type Name"
+        "Source Work Item Type Name": "Target Work Item Type Name",
+        "User Story": "Product Backlog Item"
       }
     }
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions

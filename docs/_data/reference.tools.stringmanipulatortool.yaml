@@ -1,28 +1,6 @@
 optionsClassName: StringManipulatorToolOptions
 optionsClassFullName: MigrationTools.Tools.StringManipulatorToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "StringManipulatorTool": {
-            "Enabled": true,
-            "MaxStringLength": 1000000,
-            "Manipulators": [
-              {
-                "Enabled": true,
-                "Pattern": "[^( -~)\n\r\t]+",
-                "Replacement": "",
-                "Description": "Remove invalid characters from the end of the string"
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 - name: defaults
   description: 
   code: >-
@@ -46,7 +24,30 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "StringManipulatorTool": {
+            "Enabled": "True",
+            "Manipulators": [
+              {
+                "$type": "RegexStringManipulator",
+                "Description": "Remove invalid characters from the end of the string",
+                "Enabled": "True",
+                "Pattern": "[^( -~)\n\r\t]+",
+                "Replacement": ""
+              }
+            ],
+            "MaxStringLength": "1000000"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
+- name: classic
   description: 
   code: >-
     {
@@ -54,6 +55,12 @@ configurationSamples:
       "Enabled": true,
       "MaxStringLength": 1000000,
       "Manipulators": [
+        {
+          "Enabled": true,
+          "Pattern": "[^( -~)\n\r\t]+",
+          "Replacement": "",
+          "Description": "Remove invalid characters from the end of the string"
+        },
         {
           "Enabled": true,
           "Pattern": "[^( -~)\n\r\t]+",

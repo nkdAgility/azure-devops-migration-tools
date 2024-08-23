@@ -2,32 +2,6 @@
 optionsClassName: FieldValueMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldValueMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldValueMap",
-                "sourceField": "System.State",
-                "targetField": "System.State",
-                "defaultValue": "StateB",
-                "valueMapping": {
-                  "StateA": "StateB"
-                },
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: defaults
   description: 
   code: >-
@@ -53,7 +27,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "FieldValueMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldValueMapOptions
+- name: classic
   description: 
   code: >-
     {
@@ -62,7 +51,6 @@ configurationSamples:
       "targetField": "System.State",
       "defaultValue": "StateB",
       "valueMapping": {
-        "$type": "Dictionary`2",
         "StateA": "StateB"
       },
       "ApplyTo": [

@@ -2,25 +2,6 @@
 optionsClassName: ImportProfilePictureProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ImportProfilePictureProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "ImportProfilePictureProcessor",
-            "Enabled": false,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -32,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "ImportProfilePictureProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -41,7 +33,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
 description: Downloads corporate images and updates TFS/Azure DevOps profiles

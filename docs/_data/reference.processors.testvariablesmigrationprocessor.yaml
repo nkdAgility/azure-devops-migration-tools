@@ -1,26 +1,6 @@
 optionsClassName: TestVariablesMigrationProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "TestVariablesMigrationProcessor",
-            "Enabled": false,
-            "Enrichers": null,
-            "Processor": "TestVariablesMigrationContext",
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -32,7 +12,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "TestVariablesMigrationProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -42,7 +33,8 @@ configurationSamples:
       "Processor": "TestVariablesMigrationContext",
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
 description: This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.

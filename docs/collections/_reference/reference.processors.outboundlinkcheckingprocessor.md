@@ -2,27 +2,6 @@
 optionsClassName: OutboundLinkCheckingProcessorOptions
 optionsClassFullName: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "OutboundLinkCheckingProcessor",
-            "Enabled": false,
-            "WIQLQuery": null,
-            "ResultFileName": null,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -34,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "OutboundLinkCheckingProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -45,7 +35,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
 description: missng XML code comments

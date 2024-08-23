@@ -1,20 +1,6 @@
 optionsClassName: FieldMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.FieldMappingToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "Enabled": false,
-            "FieldMaps": []
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldMappingToolOptions
 - name: defaults
   description: 
   code: >-
@@ -139,12 +125,147 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "FieldMappingTool": {
+            "Enabled": "True",
+            "FieldMaps": [
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "FieldMergeMap",
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "FieldLiteralMap",
+                "targetField": "Custom.SomeField",
+                "value": "New field value"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "MultiValueConditionalMap",
+                "sourceFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "targetFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                }
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "FieldSkipMap",
+                "targetField": "Custom.ReflectedWorkItemId"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "StateB",
+                "FieldMapType": "FieldValueMap",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "StateA": "StateB"
+                }
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "42",
+                "FieldMapType": "FieldToFieldMap",
+                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+                "targetField": "Microsoft.VSTS.Common.StackRank"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType",
+                  "SomeOtherWorkItemType"
+                ],
+                "FieldMapType": "FieldToFieldMultiMap",
+                "SourceToTargetMappings": {
+                  "SourceField1": "TargetField1",
+                  "SourceField2": "TargetField2"
+                }
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "FieldToTagMap",
+                "formatExpression": "ScrumState:{0}",
+                "sourceField": "System.State"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "FieldToTagFieldMap",
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "sourceFields": [
+                  "System.Description",
+                  "Microsoft.VSTS.Common.AcceptanceCriteria"
+                ],
+                "targetField": "System.Description"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "RegexFieldMap",
+                "pattern": "PRODUCT \\d{4}.(\\d{1})",
+                "replacement": "$1",
+                "sourceField": "COMPANY.PRODUCT.Release",
+                "targetField": "COMPANY.DEVISION.MinorReleaseVersion"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "FieldValueToTagMap",
+                "formatExpression": "{0}",
+                "pattern": "Yes",
+                "sourceField": "Microsoft.VSTS.CMMI.Blocked"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "TreeToTagMap",
+                "timeTravel": "1",
+                "toSkip": "3"
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldMappingToolOptions
+- name: classic
   description: 
   code: >-
     {
       "$type": "FieldMappingToolOptions",
-      "Enabled": false,
+      "Enabled": true,
       "FieldMaps": []
     }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions

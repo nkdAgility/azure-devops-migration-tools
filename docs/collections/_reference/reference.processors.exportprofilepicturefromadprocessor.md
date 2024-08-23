@@ -2,29 +2,6 @@
 optionsClassName: ExportProfilePictureFromADProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "ExportProfilePictureFromADProcessor",
-            "Enabled": false,
-            "Domain": null,
-            "Username": null,
-            "Password": null,
-            "PictureEmpIDFormat": null,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -36,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "ExportProfilePictureFromADProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -49,7 +37,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
 description: Downloads corporate images and updates TFS/Azure DevOps profiles

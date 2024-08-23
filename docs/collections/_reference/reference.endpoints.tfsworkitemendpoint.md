@@ -2,33 +2,6 @@
 optionsClassName: TfsWorkItemEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "*": {
-            "TfsWorkItemEndpoint": [
-              {
-                "EndpointType": "TfsWorkItemEndpoint",
-                "Organisation": null,
-                "Project": null,
-                "Enabled": false,
-                "Query": null,
-                "AuthenticationMode": "AccessToken",
-                "AccessToken": null,
-                "ReflectedWorkItemIdField": null,
-                "LanguageMaps": null,
-                "Name": null,
-                "EndpointEnrichers": null
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
 - name: defaults
   description: 
   code: >-
@@ -40,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "EndpointSamples": {
+          "TfsWorkItemEndpoint": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
+- name: classic
   description: 
   code: >-
     {

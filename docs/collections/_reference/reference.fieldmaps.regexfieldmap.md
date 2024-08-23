@@ -2,30 +2,6 @@
 optionsClassName: RegexFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.RegexFieldMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "RegexFieldMap",
-                "sourceField": "COMPANY.PRODUCT.Release",
-                "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
-                "pattern": "PRODUCT \\d{4}.(\\d{1})",
-                "replacement": "$1",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 - name: defaults
   description: 
   code: >-
@@ -49,7 +25,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "RegexFieldMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.RegexFieldMapOptions
+- name: classic
   description: 
   code: >-
     {

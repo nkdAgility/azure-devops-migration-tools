@@ -2,27 +2,6 @@
 optionsClassName: FixGitCommitLinksProcessorOptions
 optionsClassFullName: MigrationTools.Processors.FixGitCommitLinksProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "FixGitCommitLinksProcessor",
-            "Enabled": false,
-            "TargetRepository": null,
-            "Query": null,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.FixGitCommitLinksProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -34,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.FixGitCommitLinksProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "FixGitCommitLinksProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.FixGitCommitLinksProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -45,7 +35,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.FixGitCommitLinksProcessorOptions
 description: missng XML code comments

@@ -2,20 +2,6 @@
 optionsClassName: TfsChangeSetMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsChangeSetMappingTool": {
-            "Enabled": false,
-            "ChangeSetMappingFile": null
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 - name: defaults
   description: 
   code: >-
@@ -30,12 +16,26 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsChangeSetMappingTool": {
+            "Enabled": "True",
+            "File": "c:\\changesetmappings.json"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
+- name: classic
   description: 
   code: >-
     {
       "$type": "TfsChangeSetMappingToolOptions",
-      "Enabled": false,
+      "Enabled": true,
       "ChangeSetMappingFile": null
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions

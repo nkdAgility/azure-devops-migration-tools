@@ -2,28 +2,6 @@
 optionsClassName: TfsNodeStructureToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsNodeStructureToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsNodeStructureTool": {
-            "Enabled": true,
-            "Areas": {
-              "Filters": null,
-              "Mappings": {
-                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-              }
-            },
-            "Iterations": null,
-            "ShouldCreateMissingRevisionPaths": true,
-            "ReplicateAllExistingNodes": true
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: defaults
   description: 
   code: >-
@@ -51,16 +29,54 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsNodeStructureTool": {
+            "Areas": {
+              "Filters": [
+                "*\\Team 1,*\\Team 1\\**"
+              ],
+              "Mappings": {
+                "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+                "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
+              }
+            },
+            "Enabled": "True",
+            "Iteration": {
+              "Filters": [
+                "*\\Sprint*",
+                "*\\Sprint*\\**"
+              ],
+              "Mappings": {
+                "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+                "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
+              }
+            },
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+- name: classic
   description: 
   code: >-
     {
       "$type": "TfsNodeStructureToolOptions",
       "Enabled": true,
       "Areas": {
-        "Filters": null,
+        "Filters": [
+          "*\\Team 1,*\\Team 1\\**"
+        ],
         "Mappings": {
-          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
         }
       },
       "Iterations": null,

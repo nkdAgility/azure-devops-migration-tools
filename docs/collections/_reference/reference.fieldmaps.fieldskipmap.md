@@ -2,27 +2,6 @@
 optionsClassName: FieldSkipMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldSkipMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldSkipMap",
-                "targetField": "Custom.ReflectedWorkItemId",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 - name: defaults
   description: 
   code: >-
@@ -43,7 +22,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "FieldSkipMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldSkipMapOptions
+- name: classic
   description: 
   code: >-
     {

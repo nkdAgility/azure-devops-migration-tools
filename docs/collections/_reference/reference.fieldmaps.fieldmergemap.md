@@ -2,27 +2,6 @@
 optionsClassName: FieldMergeMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldMergeMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldMergeMap",
-                "sourceFields": null,
-                "targetField": null,
-                "formatExpression": null,
-                "ApplyTo": []
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: defaults
   description: 
   code: >-
@@ -31,6 +10,31 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
+              "FieldMergeMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              }
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldMergeMapOptions
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
               "FieldMergeMap": []
             }
           }
@@ -38,15 +42,20 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
-- name: Classic
+- name: classic
   description: 
   code: >-
     {
       "$type": "FieldMergeMapOptions",
-      "sourceFields": null,
-      "targetField": null,
-      "formatExpression": null,
-      "ApplyTo": []
+      "sourceFields": [
+        "Custom.FieldA",
+        "Custom.FieldB"
+      ],
+      "targetField": "Custom.FieldC",
+      "formatExpression": "{0} \n {1}",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 description: missng XML code comments

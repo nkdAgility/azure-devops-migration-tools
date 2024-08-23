@@ -2,19 +2,6 @@
 optionsClassName: TfsEmbededImagesToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsEmbededImagesToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsEmbededImagesTool": {
-            "Enabled": true
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
 - name: defaults
   description: 
   code: >-
@@ -28,7 +15,20 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsEmbededImagesTool": {
+            "Enabled": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
+- name: classic
   description: 
   code: >-
     {

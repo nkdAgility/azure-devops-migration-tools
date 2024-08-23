@@ -1,26 +1,6 @@
 optionsClassName: FieldLiteralMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldLiteralMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldLiteralMap",
-                "targetField": null,
-                "value": null,
-                "ApplyTo": []
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 - name: defaults
   description: 
   code: >-
@@ -29,6 +9,27 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
+              "FieldLiteralMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.SomeField",
+                "value": "New field value"
+              }
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
               "FieldLiteralMap": []
             }
           }
@@ -36,14 +37,16 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
-- name: Classic
+- name: classic
   description: 
   code: >-
     {
       "$type": "FieldLiteralMapOptions",
-      "targetField": null,
-      "value": null,
-      "ApplyTo": []
+      "targetField": "Custom.SomeField",
+      "value": "New field value",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 description: missng XML code comments

@@ -2,27 +2,6 @@
 optionsClassName: FileSystemWorkItemEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "*": {
-            "FileSystemWorkItemEndpoint": [
-              {
-                "EndpointType": "FileSystemWorkItemEndpoint",
-                "Enabled": false,
-                "FileStore": null,
-                "Name": null,
-                "EndpointEnrichers": null
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 - name: defaults
   description: 
   code: >-
@@ -34,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "EndpointSamples": {
+          "FileSystemWorkItemEndpoint": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
+- name: classic
   description: 
   code: >-
     {

@@ -1,25 +1,6 @@
 optionsClassName: TestConfigurationsMigrationProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "TestConfigurationsMigrationProcessor",
-            "Enabled": false,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -31,7 +12,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "TestConfigurationsMigrationProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -40,7 +32,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
 description: This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.

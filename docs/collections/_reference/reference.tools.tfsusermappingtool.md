@@ -2,28 +2,6 @@
 optionsClassName: TfsUserMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsUserMappingToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsUserMappingTool": {
-            "Enabled": false,
-            "IdentityFieldsToCheck": [
-              "System.AssignedTo",
-              "System.ChangedBy",
-              "System.CreatedBy",
-              "Microsoft.VSTS.Common.ActivatedBy",
-              "Microsoft.VSTS.Common.ResolvedBy",
-              "Microsoft.VSTS.Common.ClosedBy"
-            ],
-            "UserMappingFile": "C:\\temp\\userExport.json"
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 - name: defaults
   description: 
   code: >-
@@ -46,13 +24,41 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsUserMappingTool": {
+            "Enabled": "True",
+            "IdentityFieldsToCheck": [
+              "System.AssignedTo",
+              "System.ChangedBy",
+              "System.CreatedBy",
+              "Microsoft.VSTS.Common.ActivatedBy",
+              "Microsoft.VSTS.Common.ResolvedBy",
+              "Microsoft.VSTS.Common.ClosedBy"
+            ],
+            "UserMappingFile": "C:\\temp\\userExport.json"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
+- name: classic
   description: 
   code: >-
     {
       "$type": "TfsUserMappingToolOptions",
-      "Enabled": false,
+      "Enabled": true,
       "IdentityFieldsToCheck": [
+        "System.AssignedTo",
+        "System.ChangedBy",
+        "System.CreatedBy",
+        "Microsoft.VSTS.Common.ActivatedBy",
+        "Microsoft.VSTS.Common.ResolvedBy",
+        "Microsoft.VSTS.Common.ClosedBy",
         "System.AssignedTo",
         "System.ChangedBy",
         "System.CreatedBy",

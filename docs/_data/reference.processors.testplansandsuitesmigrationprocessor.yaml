@@ -1,31 +1,6 @@
 optionsClassName: TestPlansAndSuitesMigrationProcessorOptions
 optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "TestPlansAndSuitesMigrationProcessor",
-            "Enabled": false,
-            "OnlyElementsWithTag": null,
-            "TestPlanQuery": null,
-            "RemoveAllLinks": false,
-            "MigrationDelay": 0,
-            "RemoveInvalidTestSuiteLinks": false,
-            "FilterCompleted": false,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -37,7 +12,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "TestPlansAndSuitesMigrationProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -52,7 +38,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
 description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration

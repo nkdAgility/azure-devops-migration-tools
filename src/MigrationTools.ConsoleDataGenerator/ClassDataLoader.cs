@@ -31,23 +31,6 @@ namespace MigrationTools.ConsoleDataGenerator
             this.configuration = configuration;
         }
 
-        public List<ClassData> GetClassData(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
-        {
-            Console.WriteLine();
-            Console.WriteLine($"ClassDataLoader::populateClassData:: {dataTypeName}");
-            List<ClassData> data = new List<ClassData>();
-            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
-            Console.WriteLine($"ClassDataLoader::populateClassData:: ----------- Found {founds.Count}");
-            // Each File
-            foreach (var item in founds)
-            {
-                Console.WriteLine($"ClassDataLoader::populateClassData::-PROCESS {item.Name}");
-                data.Add(CreateClassData(targetTypes, allTypes, type, apiVersion, dataTypeName, item, findConfig, configEnd));
-            }
-            Console.WriteLine("ClassDataLoader::populateClassData:: -----------");
-            return data;
-        }
-
         public List<ClassData> GetClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName)
             where TOptionsInterface : IOptions
         {
@@ -100,23 +83,29 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassFullName = optionInFocus.FullName;
                 data.OptionsClassName = optionInFocus.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
-                if (!string.IsNullOrEmpty(oConfig.SectionPath))
+                ///bind Item or Defaults
+                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationSectionPath))
                 {
+                    IConfigurationSection mainOrDefaultSection;
                     Console.WriteLine("Processing as ConfigurationSectionName");
-                    var section = configuration.GetSection(oConfig.SectionPath);
-                    section.Bind(instanceOfOption);
-
-                    string jsonCollection = Options.OptionsManager.CreateNewConfigurationJson(instanceOfOption, !string.IsNullOrEmpty(instanceOfOption.ConfigurationCollectionPath));
-
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "confinguration.json", SampleFor = data.OptionsClassFullName, Code = jsonCollection });
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, section).Trim() });
-
+                    mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationSectionPath);
+                    mainOrDefaultSection.Bind(instanceOfOption);
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection).Trim() });
                 }
-
-                Console.WriteLine("targetItem");
-                JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
-                data.Options = populateOptions(instanceOfOption, joptions);
-                data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "Classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
+                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationSamplePath))
+                {
+                    Console.WriteLine("targetItem");
+                    IConfigurationSection sampleSection = configuration.GetSection(instanceOfOption.ConfigurationSamplePath);
+                    sampleSection.Bind(instanceOfOption);
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, sampleSection).Trim() });
+                   
+                }
+                data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
+                if (instanceOfOption != null)
+                {
+                    JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
+                    data.Options = populateOptions(instanceOfOption, joptions);
+                }
             }
             else
             {

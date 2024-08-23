@@ -2,32 +2,6 @@
 optionsClassName: TfsTeamSettingsEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "*": {
-            "TfsTeamSettingsEndpoint": [
-              {
-                "EndpointType": "TfsTeamSettingsEndpoint",
-                "Organisation": null,
-                "Project": null,
-                "Enabled": false,
-                "AuthenticationMode": "AccessToken",
-                "AccessToken": null,
-                "ReflectedWorkItemIdField": null,
-                "LanguageMaps": null,
-                "Name": null,
-                "EndpointEnrichers": null
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions
 - name: defaults
   description: 
   code: >-
@@ -39,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "EndpointSamples": {
+          "TfsTeamSettingsEndpoint": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions
+- name: classic
   description: 
   code: >-
     {

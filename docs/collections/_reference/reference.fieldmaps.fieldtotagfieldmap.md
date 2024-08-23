@@ -2,28 +2,6 @@
 optionsClassName: FieldToTagFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldToTagFieldMapOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldToTagFieldMap",
-                "sourceField": null,
-                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 - name: defaults
   description: 
   code: >-
@@ -49,7 +27,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMapSamples": {
+              "FieldToTagFieldMap": []
+            }
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
+- name: classic
   description: 
   code: >-
     {

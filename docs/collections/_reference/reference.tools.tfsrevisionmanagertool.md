@@ -2,21 +2,6 @@
 optionsClassName: TfsRevisionManagerToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsRevisionManagerToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsRevisionManagerTool": {
-            "Enabled": true,
-            "ReplayRevisions": true,
-            "MaxRevisions": 0
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions
 - name: defaults
   description: 
   code: >-
@@ -32,7 +17,22 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsRevisionManagerTool": {
+            "Enabled": "True",
+            "MaxRevisions": "0",
+            "ReplayRevisions": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions
+- name: classic
   description: 
   code: >-
     {

@@ -2,29 +2,6 @@
 optionsClassName: ProcessDefinitionProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "ProcessDefinitionProcessor",
-            "Enabled": false,
-            "Processes": null,
-            "ProcessMaps": null,
-            "UpdateProcessDetails": false,
-            "MaxDegreeOfParallelism": 0,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 - name: defaults
   description: 
   code: >-
@@ -36,7 +13,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "ProcessorSamples": {
+          "ProcessDefinitionProcessor": []
+        }
+      }
+    }
+  sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
+- name: classic
   description: 
   code: >-
     {
@@ -49,7 +37,8 @@ configurationSamples:
       "Enrichers": null,
       "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
   sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 description: Process definition processor used to keep processes between two orgs in sync

@@ -2,21 +2,6 @@
 optionsClassName: TfsAttachmentToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsAttachmentToolOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "TfsAttachmentTool": {
-            "Enabled": true,
-            "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-            "MaxAttachmentSize": 480000000
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 - name: defaults
   description: 
   code: >-
@@ -33,7 +18,23 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
-- name: Classic
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonToolsSamples": {
+          "TfsAttachmentTool": {
+            "Enabled": "True",
+            "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+            "MaxAttachmentSize": "480000000",
+            "RefName": "TfsAttachmentTool"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
+- name: classic
   description: 
   code: >-
     {
