@@ -11,16 +11,12 @@ configurationSamples:
           "TfsNodeStructureTool": {
             "Areas": {
               "Filters": null,
-              "Mappings": {
-                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-              }
+              "Mappings": null
             },
             "Enabled": "True",
-            "Iteration": {
+            "Iterations": {
               "Filters": null,
-              "Mappings": {
-                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-              }
+              "Mappings": null
             },
             "ReplicateAllExistingNodes": "True",
             "ShouldCreateMissingRevisionPaths": "True"
@@ -42,17 +38,19 @@ configurationSamples:
               ],
               "Mappings": {
                 "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
                 "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
               }
             },
             "Enabled": "True",
-            "Iteration": {
+            "Iterations": {
               "Filters": [
                 "*\\Sprint*",
                 "*\\Sprint*\\**"
               ],
               "Mappings": {
                 "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
                 "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
               }
             },
@@ -74,12 +72,22 @@ configurationSamples:
           "*\\Team 1,*\\Team 1\\**"
         ],
         "Mappings": {
-          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
           "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
           "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
         }
       },
-      "Iterations": null,
+      "Iterations": {
+        "Filters": [
+          "*\\Sprint*",
+          "*\\Sprint*\\**"
+        ],
+        "Mappings": {
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
+        }
+      },
       "ShouldCreateMissingRevisionPaths": true,
       "ReplicateAllExistingNodes": true
     }

@@ -8,12 +8,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "CommonTools": {
-          "GitRepoMappingTool": {
-            "Enabled": "True",
-            "Mappings": {
-              "Source Repo Name": "Target Repo Name"
-            }
-          }
+          "GitRepoMappingTool": []
         }
       }
     }
@@ -24,12 +19,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "CommonTools": {
-          "GitRepoMappingTool": {
-            "Enabled": "True",
-            "Mappings": {
-              "Repo1": "Repo2"
-            }
-          }
+          "GitRepoMappingTool": []
         }
       }
     }
@@ -39,11 +29,8 @@ configurationSamples:
   code: >-
     {
       "$type": "GitRepoMappingToolOptions",
-      "Enabled": true,
-      "Mappings": {
-        "Source Repo Name": "Target Repo Name",
-        "Repo1": "Repo2"
-      }
+      "Enabled": false,
+      "Mappings": null
     }
   sampleFor: MigrationTools.Tools.GitRepoMappingToolOptions
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.

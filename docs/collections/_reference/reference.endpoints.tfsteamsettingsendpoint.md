@@ -29,9 +29,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamSettingsEndpointOptions",
+      "Enabled": false,
       "Organisation": null,
       "Project": null,
-      "Enabled": false,
       "AuthenticationMode": "AccessToken",
       "AccessToken": null,
       "ReflectedWorkItemIdField": null,

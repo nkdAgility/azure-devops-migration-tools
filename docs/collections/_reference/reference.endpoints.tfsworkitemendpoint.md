@@ -29,9 +29,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsWorkItemEndpointOptions",
+      "Enabled": false,
       "Organisation": null,
       "Project": null,
-      "Enabled": false,
       "Query": null,
       "AuthenticationMode": "AccessToken",
       "AccessToken": null,

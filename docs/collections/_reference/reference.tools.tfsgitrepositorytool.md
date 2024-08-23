@@ -8,7 +8,10 @@ configurationSamples:
     {
       "MigrationTools": {
         "CommonTools": {
-          "TfsGitRepositoryTool": []
+          "TfsGitRepositoryTool": {
+            "Enabled": "True",
+            "Mappings": null
+          }
         }
       }
     }
@@ -19,7 +22,12 @@ configurationSamples:
     {
       "MigrationTools": {
         "CommonTools": {
-          "TfsGitRepositoryTool": []
+          "TfsGitRepositoryTool": {
+            "Enabled": "True",
+            "Mappings": {
+              "Repo1": "Repo2"
+            }
+          }
         }
       }
     }
@@ -29,7 +37,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsGitRepositoryToolOptions",
-      "Enabled": false
+      "Enabled": true
     }
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 description: missng XML code comments
