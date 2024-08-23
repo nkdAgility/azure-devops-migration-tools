@@ -9,4 +9,5 @@ namespace MigrationTools.Endpoints
         //void SetDefaults();
         public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }
     }
+
 }

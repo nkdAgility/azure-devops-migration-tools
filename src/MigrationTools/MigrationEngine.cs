@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
+using MigrationTools.Endpoints;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
@@ -115,7 +116,7 @@ namespace MigrationTools
             return ps;
         }
 
-        private IMigrationClient GetMigrationClient(IMigrationClientConfig config, Credentials networkCredentials)
+        private IMigrationClient GetMigrationClient(IEndpointOptions config, Credentials networkCredentials)
         {
             var credentials = CheckForNetworkCredentials(networkCredentials);
             var client = _services.GetRequiredService<IMigrationClient>();

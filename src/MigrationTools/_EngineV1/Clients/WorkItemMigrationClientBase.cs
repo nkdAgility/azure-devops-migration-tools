@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 
 namespace MigrationTools._EngineV1.Clients
 {
@@ -15,7 +16,7 @@ namespace MigrationTools._EngineV1.Clients
             Telemetry = telemetry;
         }
 
-        public abstract IMigrationClientConfig Config { get; }
+        public abstract IEndpointOptions Config { get; }
         public abstract ProjectData Project { get; }
         protected IMigrationClient MigrationClient { get; private set; }
         protected ITelemetryLogger Telemetry { get; }

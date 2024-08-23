@@ -14,7 +14,7 @@ namespace MigrationTools._EngineV1.Clients
 {
     public class TfsMigrationClient : IMigrationClient
     {
-        private TfsTeamProjectConfig _config;
+        private TfsTeamProjectEndpointOptions _config;
         private TfsTeamProjectCollection _collection;
         private VssCredentials _vssCredentials;
         private NetworkCredential _credentials;
@@ -24,7 +24,7 @@ namespace MigrationTools._EngineV1.Clients
         private readonly IServiceProvider _Services;
         private readonly ITelemetryLogger _Telemetry;
 
-        public TfsTeamProjectConfig TfsConfig
+        public TfsTeamProjectEndpointOptions TfsConfig
         {
             get
             {
@@ -32,7 +32,7 @@ namespace MigrationTools._EngineV1.Clients
             }
         }
 
-        public IMigrationClientConfig Config
+        public IEndpointOptions Config
         {
             get
             {
@@ -67,18 +67,18 @@ namespace MigrationTools._EngineV1.Clients
             _Telemetry = telemetry;
         }
 
-        public void Configure(IMigrationClientConfig config, NetworkCredential credentials = null)
+        public void Configure(IEndpointOptions config, NetworkCredential credentials = null)
         {
             if (config is null)
             {
                 throw new ArgumentNullException(nameof(config));
             }
-            if (!(config is TfsTeamProjectConfig))
+            if (!(config is TfsTeamProjectEndpointOptions))
             {
-                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(TfsTeamProjectConfig)));
+                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(TfsTeamProjectEndpointOptions)));
             }
 
-            _config = (TfsTeamProjectConfig)config;
+            _config = (TfsTeamProjectEndpointOptions)config;
             _credentials = credentials;
             EnsureCollection();
             _workItemClient.Configure(this);

@@ -1,7 +1,7 @@
 {
   "ChangeSetMappingFile": null,
   "Source": {
-    "$type": "TfsTeamProjectConfig",
+    "$type": "TfsTeamProjectEndpointOptions",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
@@ -16,7 +16,7 @@
     "CollectionName": "https://dev.azure.com/nkdagility-preview/"
   },
   "Target": {
-    "$type": "TfsTeamProjectConfig",
+    "$type": "TfsTeamProjectEndpointOptions",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTest5",
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",

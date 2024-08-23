@@ -1,6 +1,6 @@
 {
   "Serilog": {
-    "MinimumLevel": "Information"
+    "MinimumLevel": "Debug"
   },
   "MigrationTools": {
     "Version": "16.0",
@@ -95,7 +95,7 @@
             "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
           }
         },
-        "Iteration": {
+        "Iterations": {
           "Filters": [],
           "Mappings": {
             "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",

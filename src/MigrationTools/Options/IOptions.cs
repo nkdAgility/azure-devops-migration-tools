@@ -36,7 +36,7 @@ namespace MigrationTools.Options
         /// <summary>
         /// Will be used if enabled
         /// </summary>
-        [JsonProperty(Order = -2)]
+        [JsonProperty(Order = -200)]
         bool Enabled { get; set; }
 
         //public void SetExampleConfigSimple();

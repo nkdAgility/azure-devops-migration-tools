@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Endpoints;
 
 namespace MigrationTools.Tests.Core.Clients
 {
@@ -16,7 +17,7 @@ namespace MigrationTools.Tests.Core.Clients
             this.workItemMigrationClient = workItemMigrationClient;
         }
 
-        public IMigrationClientConfig Config => throw new NotImplementedException();
+        public IEndpointOptions Config => throw new NotImplementedException();
 
         public object InternalCollection => throw new NotImplementedException();
 
@@ -26,7 +27,7 @@ namespace MigrationTools.Tests.Core.Clients
 
         public VssCredentials Credentials => throw new NotImplementedException();
 
-        public void Configure(IMigrationClientConfig config, NetworkCredential credentials = null)
+        public void Configure(IEndpointOptions config, NetworkCredential credentials = null)
         {
         }
 

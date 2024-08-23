@@ -14,6 +14,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
@@ -27,7 +28,7 @@ namespace MigrationTools.Tools
         private const string TargetDummyWorkItemTitle = "***** DELETE THIS - Migration Tool Generated Dummy Work Item For TfsEmbededImagesTool *****";
 
         private readonly Project _targetProject;
-        private readonly TfsTeamProjectConfig _targetConfig;
+        private readonly TfsTeamProjectEndpointOptions _targetConfig;
 
         private readonly IDictionary<string, string> _cachedUploadedUrisBySourceValue;
 

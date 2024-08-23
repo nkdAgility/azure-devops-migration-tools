@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using TfsUrlParser;
 
-namespace MigrationTools._EngineV1.Configuration
+namespace MigrationTools.Endpoints
 {
-    public class TfsTeamProjectConfig : IMigrationClientConfig
+    public class TfsTeamProjectEndpointOptions : EndpointOptions
     {
         public Uri Collection { get; set; }
         public string Project { get; set; }
@@ -22,19 +22,6 @@ namespace MigrationTools._EngineV1.Configuration
 
         public string CollectionName { get { return GetCollectionName(); } }
 
-        public IMigrationClientConfig PopulateWithDefault()
-        {
-            Project = "myProjectName";
-            AllowCrossProjectLinking = false;
-            Collection = new Uri("https://dev.azure.com/nkdagility-preview/");
-            ReflectedWorkItemIDFieldName = "Custom.ReflectedWorkItemId";
-            PersonalAccessToken = "";
-            PersonalAccessTokenVariableName = "";
-            AuthenticationMode = AuthenticationMode.Prompt;
-            LanguageMaps = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" };
-            return this;
-        }
-
         public string GetCollectionName()
         {
             //var repositoryDescription =  new RepositoryDescription(Collection);
@@ -43,9 +30,5 @@ namespace MigrationTools._EngineV1.Configuration
             return Collection.ToString();
         }
 
-        public override string ToString()
-        {
-            return string.Format("{0}/{1}", Collection, Project);
-        }
     }
 }

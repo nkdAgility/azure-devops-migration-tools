@@ -256,9 +256,9 @@ namespace MigrationTools.Tools
             switch (nodeStructureType)
             {
                 case TfsNodeStructureType.Area:
-                    return Options.Areas.Mappings;
+                    return Options.Areas != null ? Options.Areas.Mappings : new Dictionary<string, string>();
                 case TfsNodeStructureType.Iteration:
-                    return Options.Iterations.Mappings;
+                    return Options.Iterations != null ?  Options.Iterations.Mappings : new Dictionary<string, string>();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(nodeStructureType), nodeStructureType, null);
             }
@@ -501,7 +501,7 @@ namespace MigrationTools.Tools
         {
             var nodeOptions = nodeStructureType == TfsNodeStructureType.Area ? Options.Areas : Options.Iterations;
 
-            if (nodeOptions.Filters == null || nodeOptions.Filters.Count == 0)
+            if (nodeOptions?.Filters == null || nodeOptions.Filters.Count == 0)
             {
                 return true;
             }

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.Endpoints;
 
 namespace MigrationTools._EngineV1.Clients
 {
     public class TfsTestPlanMigrationClient : ITestPlanMigrationClient
     {
-        public IMigrationClientConfig Config => throw new NotImplementedException();
+        public IEndpointOptions Config => throw new NotImplementedException();
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {

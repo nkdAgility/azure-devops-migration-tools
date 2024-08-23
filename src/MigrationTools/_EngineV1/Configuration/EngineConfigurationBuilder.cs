@@ -261,17 +261,17 @@ namespace MigrationTools._EngineV1.Configuration
             //});
         }
 
-        private IMigrationClientConfig GetMigrationConfigDefault()
+        private IEndpointOptions GetMigrationConfigDefault()
         {
             Type type = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
-                .Where(x => typeof(IMigrationClientConfig).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Where(x => typeof(IEndpointOptions).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
                 .FirstOrDefault();
             if (type.BaseType == null)
             {
                 throw new InvalidOperationException("No IMigrationClientConfig instance found in scope. Please make sure that you have implemented one!");
             }
-            IMigrationClientConfig result = (IMigrationClientConfig)Activator.CreateInstance(type);
-            result.PopulateWithDefault();
+            IEndpointOptions result = (IEndpointOptions)Activator.CreateInstance(type);
+            //result.PopulateWithDefault(); TODO
             return result;
         }
 

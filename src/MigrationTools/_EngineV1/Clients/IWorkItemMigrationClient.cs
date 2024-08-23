@@ -2,12 +2,13 @@
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 
 namespace MigrationTools._EngineV1.Clients
 {
     public interface IWorkItemMigrationClient
     {
-        IMigrationClientConfig Config { get; }
+        IEndpointOptions Config { get; }
         ProjectData Project { get; }
 
         void Configure(IMigrationClient migrationClient, bool bypassRules = true);

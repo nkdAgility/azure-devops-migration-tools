@@ -9,6 +9,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
 using Serilog;
 using static Microsoft.TeamFoundation.Client.CommandLine.Options;
 
@@ -19,7 +20,7 @@ namespace MigrationTools._EngineV1.Clients
         private ITelemetryLogger _telemetry;
         private readonly IWorkItemQueryBuilderFactory _workItemQueryBuilderFactory;
         private WorkItemStoreFlags _bypassRules;
-        private IMigrationClientConfig _config;
+        private IEndpointOptions _config;
         private ProjectData _project;
         private WorkItemStore _wistore;
 
@@ -30,7 +31,7 @@ namespace MigrationTools._EngineV1.Clients
             _workItemQueryBuilderFactory = workItemQueryBuilderFactory;
         }
 
-        public override IMigrationClientConfig Config => _config;
+        public override IEndpointOptions Config => _config;
         public override ProjectData Project { get { return _project; } }
         public WorkItemStore Store { get { return _wistore; } }
 
