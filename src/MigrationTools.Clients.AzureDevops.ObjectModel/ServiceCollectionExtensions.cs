@@ -73,7 +73,6 @@ namespace MigrationTools
             context.AddSingleton<CreateTeamFolders>();
             context.AddSingleton<ExportProfilePictureFromADProcessor>();
             context.AddSingleton<ExportTeamListProcessor>();
-            context.AddSingleton<FixGitCommitLinksProcessor>();
             context.AddSingleton<ImportProfilePictureProcessor>();
             context.AddSingleton<WorkItemDeleteProcessor>();
             context.AddSingleton<WorkItemBulkEditProcessor>();

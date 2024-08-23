@@ -269,7 +269,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"true"
+            => @"false"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -284,27 +284,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"eb5c8c08"
+            => @"8776d52c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"eb5c8c0892edb3bdba26b64e7c614ebec6e481fa"
+            => @"8776d52c40bbd52160f6f00ac7d8e197e85537ce"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-23T11:45:54+01:00"
+            => @"2024-08-23T12:25:08+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"169"
+            => @"172"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-169-geb5c8c08"
+            => @"v15.1.8-Preview.9-172-g8776d52c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -339,7 +339,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"177"
+            => @"180"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
