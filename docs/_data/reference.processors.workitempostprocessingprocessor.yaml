@@ -17,7 +17,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorSamples": {
+        "ProcessorDefaults": {
           "WorkItemPostProcessingProcessor": []
         }
       }

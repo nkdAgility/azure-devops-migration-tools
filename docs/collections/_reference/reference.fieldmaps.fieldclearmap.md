@@ -24,7 +24,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapSamples": {
+            "FieldMapDefaults": {
               "FieldClearMap": []
             }
           }

@@ -24,7 +24,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsTeamSettingsTool": {
             "Enabled": "True",
             "MigrateTeamCapacities": "True",

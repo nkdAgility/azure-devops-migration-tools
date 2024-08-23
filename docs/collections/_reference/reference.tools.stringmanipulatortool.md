@@ -30,7 +30,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "StringManipulatorTool": {
             "Enabled": "True",
             "Manipulators": [

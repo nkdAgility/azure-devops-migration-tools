@@ -30,7 +30,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapSamples": {
+            "FieldMapDefaults": {
               "FieldToFieldMap": []
             }
           }

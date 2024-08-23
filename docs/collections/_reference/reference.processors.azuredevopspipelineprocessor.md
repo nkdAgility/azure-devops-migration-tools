@@ -29,7 +29,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorSamples": {
+        "ProcessorDefaults": {
           "AzureDevOpsPipelineProcessor": []
         }
       }

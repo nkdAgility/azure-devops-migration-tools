@@ -21,7 +21,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsChangeSetMappingTool": {
             "Enabled": "True",
             "File": "c:\\changesetmappings.json"

@@ -34,7 +34,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsNodeStructureTool": {
             "Areas": {
               "Filters": [

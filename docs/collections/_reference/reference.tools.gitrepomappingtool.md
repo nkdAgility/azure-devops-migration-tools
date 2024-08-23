@@ -23,7 +23,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "GitRepoMappingTool": {
             "Enabled": "True",
             "Mappings": {

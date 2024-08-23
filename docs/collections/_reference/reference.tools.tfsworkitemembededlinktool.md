@@ -20,7 +20,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsWorkItemEmbededLinkTool": {
             "Enabled": "True"
           }

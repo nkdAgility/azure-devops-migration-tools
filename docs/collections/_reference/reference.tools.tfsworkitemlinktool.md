@@ -22,7 +22,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsWorkItemLinkTool": {
             "Enabled": "True",
             "FilterIfLinkCountMatches": "True",

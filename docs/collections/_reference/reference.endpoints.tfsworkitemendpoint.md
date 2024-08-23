@@ -18,7 +18,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointSamples": {
+        "EndpointDefaults": {
           "TfsWorkItemEndpoint": []
         }
       }

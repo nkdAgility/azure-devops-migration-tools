@@ -29,7 +29,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsUserMappingTool": {
             "Enabled": "True",
             "IdentityFieldsToCheck": [

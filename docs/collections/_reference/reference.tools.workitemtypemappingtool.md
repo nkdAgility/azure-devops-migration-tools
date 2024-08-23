@@ -23,7 +23,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "WorkItemTypeMappingTool": {
             "Enabled": "True",
             "Mappings": {

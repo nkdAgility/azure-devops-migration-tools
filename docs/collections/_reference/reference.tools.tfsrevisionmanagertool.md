@@ -22,7 +22,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsRevisionManagerTool": {
             "Enabled": "True",
             "MaxRevisions": "0",

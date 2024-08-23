@@ -34,7 +34,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapSamples": {
+            "FieldMapDefaults": {
               "FieldMergeMap": []
             }
           }

@@ -23,7 +23,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "TfsAttachmentTool": {
             "Enabled": "True",
             "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",

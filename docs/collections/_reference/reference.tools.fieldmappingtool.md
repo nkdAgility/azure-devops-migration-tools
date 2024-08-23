@@ -131,7 +131,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "CommonToolsSamples": {
+        "CommonTools": {
           "FieldMappingTool": {
             "Enabled": "True",
             "FieldMaps": [
