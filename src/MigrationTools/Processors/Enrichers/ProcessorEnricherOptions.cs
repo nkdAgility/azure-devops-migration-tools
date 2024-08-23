@@ -9,6 +9,7 @@ namespace MigrationTools.Enrichers
         public virtual string ConfigurationCollectionPath => $"MigrationTools:Processors:*:Enrichers";
         public virtual string ConfigurationObjectName => $"ProcessorEnricherType";
         public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
+        public string ConfigurationSamplePath => $"MigrationTools:ProcessorEnricherSamples:{ConfigurationOptionFor}";
 
         /// <summary>
         /// If enabled this will run this migrator

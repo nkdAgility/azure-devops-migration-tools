@@ -8,7 +8,6 @@ namespace MigrationTools.Tools
 {
     public class TfsGitRepositoryToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsGitRepositoryTool";
      
     }
 }

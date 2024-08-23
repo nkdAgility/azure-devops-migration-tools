@@ -8,8 +8,6 @@ namespace MigrationTools.Tools
 {
     public class StringManipulatorToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:StringManipulatorTool";
-        //public const string ConfigurationSectionName_clasic = "MigrationTools:CommonTools:StringManipulatorTool";
 
         /// <summary>
         /// Max number of chars in a string. Applied last, and set to 1000000 by default.

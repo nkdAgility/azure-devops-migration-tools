@@ -41,7 +41,6 @@ configurationSamples:
       "$type": "WorkItemTypeMappingToolOptions",
       "Enabled": false,
       "Mappings": {
-        "$type": "Dictionary`2",
         "Source Work Item Type Name": "Target Work Item Type Name"
       }
     }

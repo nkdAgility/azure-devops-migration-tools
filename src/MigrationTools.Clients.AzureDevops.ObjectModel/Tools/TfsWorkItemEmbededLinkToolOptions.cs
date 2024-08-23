@@ -8,7 +8,6 @@ namespace MigrationTools.Tools
 {
     public class TfsWorkItemEmbededLinkToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsWorkItemEmbededLinkTool";
 
 
     }

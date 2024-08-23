@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
@@ -92,15 +93,14 @@ namespace MigrationTools
 
     public static partial class ConfigurationExtensions
     {
-       
 
-        public static TEnricherOptions GetSectionCommonEnrichers_v15<TEnricherOptions>(this IConfiguration configuration, string defaults) where TEnricherOptions : IOptions, new()
+        public static TOptions GetSectionCommonEnrichers_v15<TOptions>(this IConfiguration configuration) where TOptions : IOptions, new()
         {
-            var options_default = configuration.GetSection(defaults);
-            var optionsclass = typeof(TEnricherOptions).Name;
+            TOptions options = Activator.CreateInstance<TOptions>();
+            var options_default = configuration.GetSection(options.ConfigurationSectionPath);
+            var optionsclass = typeof(TOptions).Name;
             var options_v15 = configuration.GetSection("CommonEnrichersConfig").GetChildren().Where(x => x.GetValue<string>("$type") == optionsclass).FirstOrDefault();
 
-            var options = new TEnricherOptions();
             if (options_default.Exists())
             {
                 options_default.Bind(options);
@@ -112,10 +112,8 @@ namespace MigrationTools
                 options_v15.Bind(options);
             }
 
-
             return options;
         }
-
 
     }
 }

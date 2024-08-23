@@ -22,38 +22,38 @@ namespace MigrationTools
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
             {
                 case MigrationConfigSchema.v1:
-                    context.AddSingleton<TfsAttachmentTool>().AddSingleton<IOptions<TfsAttachmentToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentToolOptions>(TfsAttachmentToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsAttachmentTool>().AddSingleton<IOptions<TfsAttachmentToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentToolOptions>()));
 
-                    context.AddSingleton<TfsUserMappingTool>().AddSingleton<IOptions<TfsUserMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingToolOptions>(TfsUserMappingToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsUserMappingTool>().AddSingleton<IOptions<TfsUserMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingToolOptions>()));
 
-                    context.AddSingleton<TfsValidateRequiredFieldTool>().AddSingleton<IOptions<TfsValidateRequiredFieldToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsValidateRequiredFieldToolOptions>(TfsValidateRequiredFieldToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsValidateRequiredFieldTool>().AddSingleton<IOptions<TfsValidateRequiredFieldToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsValidateRequiredFieldToolOptions>()));
 
-                    context.AddSingleton<TfsWorkItemLinkTool>().AddSingleton<IOptions<TfsWorkItemLinkToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemLinkToolOptions>(TfsWorkItemLinkToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsWorkItemLinkTool>().AddSingleton<IOptions<TfsWorkItemLinkToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemLinkToolOptions>()));
 
-                    context.AddSingleton<TfsWorkItemEmbededLinkTool>().AddSingleton<IOptions<TfsWorkItemEmbededLinkToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemEmbededLinkToolOptions>(TfsWorkItemEmbededLinkToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsWorkItemEmbededLinkTool>().AddSingleton<IOptions<TfsWorkItemEmbededLinkToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemEmbededLinkToolOptions>()));
 
-                    context.AddSingleton<TfsEmbededImagesTool>().AddSingleton<IOptions<TfsEmbededImagesToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsEmbededImagesToolOptions>(TfsEmbededImagesToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsEmbededImagesTool>().AddSingleton<IOptions<TfsEmbededImagesToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsEmbededImagesToolOptions>()));
 
-                    context.AddSingleton<TfsGitRepositoryTool>().AddSingleton<IOptions<TfsGitRepositoryToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsGitRepositoryToolOptions>(TfsGitRepositoryToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsGitRepositoryTool>().AddSingleton<IOptions<TfsGitRepositoryToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsGitRepositoryToolOptions>()));
 
-                    context.AddSingleton<TfsNodeStructureTool>().AddSingleton<IOptions<TfsNodeStructureToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsNodeStructureToolOptions>(TfsNodeStructureToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsNodeStructureTool>().AddSingleton<IOptions<TfsNodeStructureToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsNodeStructureToolOptions>()));
 
-                    context.AddSingleton<TfsRevisionManagerTool>().AddSingleton<IOptions<TfsRevisionManagerToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsRevisionManagerToolOptions>(TfsRevisionManagerToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsRevisionManagerTool>().AddSingleton<IOptions<TfsRevisionManagerToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsRevisionManagerToolOptions>()));
 
-                    context.AddSingleton<TfsTeamSettingsTool>().AddSingleton<IOptions<TfsTeamSettingsToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsTeamSettingsToolOptions>(TfsTeamSettingsToolOptions.ConfigurationSectionName)));
+                    context.AddSingleton<TfsTeamSettingsTool>().AddSingleton<IOptions<TfsTeamSettingsToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsTeamSettingsToolOptions>()));
 
                     break;
                 case MigrationConfigSchema.v160:
-                    context.AddSingleton<TfsAttachmentTool>().AddOptions<TfsAttachmentToolOptions>().Bind(configuration.GetSection(TfsAttachmentToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsUserMappingTool>().AddOptions<TfsUserMappingToolOptions>().Bind(configuration.GetSection(TfsUserMappingToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsValidateRequiredFieldTool>().AddOptions<TfsValidateRequiredFieldToolOptions>().Bind(configuration.GetSection(TfsValidateRequiredFieldToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsWorkItemLinkTool>().AddOptions<TfsWorkItemLinkToolOptions>().Bind(configuration.GetSection(TfsWorkItemLinkToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsWorkItemEmbededLinkTool>().AddOptions<TfsWorkItemEmbededLinkToolOptions>().Bind(configuration.GetSection(TfsWorkItemEmbededLinkToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsEmbededImagesTool>().AddOptions<TfsEmbededImagesToolOptions>().Bind(configuration.GetSection(TfsEmbededImagesToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsGitRepositoryTool>().AddOptions<TfsGitRepositoryToolOptions>().Bind(configuration.GetSection(TfsGitRepositoryToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsNodeStructureTool>().AddOptions<TfsNodeStructureToolOptions>().Bind(configuration.GetSection(TfsNodeStructureToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsRevisionManagerTool>().AddOptions<TfsRevisionManagerToolOptions>().Bind(configuration.GetSection(TfsRevisionManagerToolOptions.ConfigurationSectionName));
-                    context.AddSingleton<TfsTeamSettingsTool>().AddOptions<TfsTeamSettingsToolOptions>().Bind(configuration.GetSection(TfsTeamSettingsToolOptions.ConfigurationSectionName));
+                    context.AddSingleton<TfsAttachmentTool>().AddMigrationToolsOptions<TfsAttachmentToolOptions>(configuration);
+                    context.AddSingleton<TfsUserMappingTool>().AddMigrationToolsOptions<TfsUserMappingToolOptions>(configuration);
+                    context.AddSingleton<TfsValidateRequiredFieldTool>().AddMigrationToolsOptions<TfsValidateRequiredFieldToolOptions>(configuration);
+                    context.AddSingleton<TfsWorkItemLinkTool>().AddMigrationToolsOptions<TfsWorkItemLinkToolOptions>(configuration);
+                    context.AddSingleton<TfsWorkItemEmbededLinkTool>().AddMigrationToolsOptions<TfsWorkItemEmbededLinkToolOptions>(configuration);
+                    context.AddSingleton<TfsEmbededImagesTool>().AddMigrationToolsOptions<TfsEmbededImagesToolOptions>(configuration);
+                    context.AddSingleton<TfsGitRepositoryTool>().AddMigrationToolsOptions<TfsGitRepositoryToolOptions>(configuration);
+                    context.AddSingleton<TfsNodeStructureTool>().AddMigrationToolsOptions<TfsNodeStructureToolOptions>(configuration);
+                    context.AddSingleton<TfsRevisionManagerTool>().AddMigrationToolsOptions<TfsRevisionManagerToolOptions>(configuration);
+                    context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
                     break;
             }
 

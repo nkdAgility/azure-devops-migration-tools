@@ -10,8 +10,6 @@ namespace MigrationTools.Tools
     public class TfsAttachmentToolOptions : ToolOptions, ITfsAttachmentToolOptions
     {
 
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsAttachmentTool";
-
         /// <summary>
         /// `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
         /// </summary>

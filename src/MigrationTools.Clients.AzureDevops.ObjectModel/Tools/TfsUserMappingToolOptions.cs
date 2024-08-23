@@ -9,8 +9,6 @@ namespace MigrationTools.Tools
     public class TfsUserMappingToolOptions : ToolOptions, ITfsUserMappingToolOptions
     {
 
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsUserMappingTool";
-
         /// <summary>
         /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
         /// </summary>

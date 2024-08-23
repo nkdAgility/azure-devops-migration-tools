@@ -10,13 +10,13 @@ configurationSamples:
         "CommonTools": {
           "TfsNodeStructureTool": {
             "Enabled": true,
-            "NodeBasePaths": null,
-            "AreaMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            "Areas": {
+              "Filters": null,
+              "Mappings": {
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+              }
             },
-            "IterationMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-            },
+            "Iterations": null,
             "ShouldCreateMissingRevisionPaths": true,
             "ReplicateAllExistingNodes": true
           }
@@ -31,14 +31,19 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsNodeStructureTool": {
-            "AreaMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            "Areas": {
+              "Filters": null,
+              "Mappings": {
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+              }
             },
             "Enabled": "True",
-            "IterationMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            "Iteration": {
+              "Filters": null,
+              "Mappings": {
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+              }
             },
-            "NodeBasePaths": null,
             "ReplicateAllExistingNodes": "True",
             "ShouldCreateMissingRevisionPaths": "True"
           }
@@ -52,15 +57,13 @@ configurationSamples:
     {
       "$type": "TfsNodeStructureToolOptions",
       "Enabled": true,
-      "NodeBasePaths": null,
-      "AreaMaps": {
-        "$type": "Dictionary`2",
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+      "Areas": {
+        "Filters": null,
+        "Mappings": {
+          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+        }
       },
-      "IterationMaps": {
-        "$type": "Dictionary`2",
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-      },
+      "Iterations": null,
       "ShouldCreateMissingRevisionPaths": true,
       "ReplicateAllExistingNodes": true
     }
@@ -70,22 +73,18 @@ className: TfsNodeStructureTool
 typeName: Tools
 architecture: 
 options:
-- parameterName: AreaMaps
-  type: Dictionary
-  description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-  defaultValue: '{}'
+- parameterName: Areas
+  type: NodeOptions
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
-- parameterName: IterationMaps
-  type: Dictionary
-  description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-  defaultValue: '{}'
-- parameterName: NodeBasePaths
-  type: String[]
-  description: The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-  defaultValue: '["/"]'
+- parameterName: Iterations
+  type: NodeOptions
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
 - parameterName: ReplicateAllExistingNodes
   type: Boolean
   description: missng XML code comments
@@ -112,7 +111,7 @@ topics:
 - topic: notes
   path: /docs/Reference/Tools/TfsNodeStructureTool-notes.md
   exists: true
-  markdown: >2-
+  markdown: >2+
 
 
 
@@ -402,7 +401,7 @@ topics:
     ```
 
 
-    ## <a name="NodeBasePath"></a>NodeBasePath Configuration
+    ## <a name="Filters"></a>Filters
 
     The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
 
@@ -411,7 +410,8 @@ topics:
        - SourceProj
        - SourceProj\Team 1
        - SourceProj\Team 2
-       - SourceProj\Team 2\Sub-Area
+       - SourceProj\Team 2\Sub-Area 1
+       - SourceProj\Team 2\Sub-Area 2
        - SourceProj\Team 3
     - IterationPath
        - SourceProj
@@ -429,41 +429,76 @@ topics:
 
     | Intention    | Migrate all areas and iterations and all Work Items
 
-    | NodeBasePath | `[]`
+    | Filters | `[]`
 
-    | Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths
+    | Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths. <br/> This will be affected by the `AreaMaps` and `IterationMaps` settings.
 
     ||
 
     | Intention    | Only migrate area path `Team 2` and it associated Work Items, but all iteration paths
 
-    | NodeBasePath | `["Team 2", "Sprint"]`
+    | NodeBasePath | `["*\\Team 2", "*\\Sprint*"]`
 
-    | Comment      | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQueryBit` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source
-
-    ||
-
-    | Intention    | Only migrate iterations structure
-
-    | NodeBasePath | `["Sprint"]`
-
-    | Comment      | Only the area path ending `Team 2` will be migrated<br>All the iteration paths will be migrated. <br> The migrated WI will have the default area path of `TargetProj` as their source area path was not migrated i.e. `TargetProj`<br> The migrated WI will have an iteration path match the sprint name on the source
+    | Comment      | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQuery` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source
 
     ||
 
-    | Intention    | Move all WI to the existing area and iteration paths on the targetProj
+    | Intention    | Move the `Team 2` area, including its `Sub-Area`, and any others at the same level
 
-    | NodeBasePath | `["DUMMY VALUE"]`
+    | NodeBasePath | `["*\\Team 2", "Team 2\\*"]`
 
-    | Comment      | As the `NodeBasePath` does not match any source area or iteration path no nodes are migrated. <br>Migrated WI will be assigned to any matching area or iteration paths. If no matching ones can be found they will default to the respective root values
+    | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migratin will fail
 
     ||
 
     | Intention    | Move the `Team 2` area, but not its `Sub-Area`
 
-    | NodeBasePath | `["Team 2", "!Team 2\\SubArea"]`
+    | NodeBasePath | `["*\\Team 2", "!Team 2\\SubArea"]`
 
     | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migratin will fail
+
+
+    # Patterns
+
+
+    The following patterns are supported:
+
+    > 
+
+    | Wildcard  | Description | Example | Matches | Does not match |
+
+    | --------  | ----------- | ------- | ------- | -------------- |
+
+    | \* |  matches any number of any characters including none	| Law\*| Law, Laws, or Lawyer	|
+
+    | ?	| matches any single character	| ?at	| Cat, cat, Bat or bat	| at |
+
+    | [abc] |	matches one character given in the bracket |	[CB]at |	Cat or Bat	| cat or bat |
+
+    | [a-z] |	matches one character from the range given in the bracket	| Letter[0-9]	| Letter0, Letter1, Letter2 up to Letter9	| Letters, Letter or Letter10 |
+
+    | [!abc] | matches one character that is not given in the bracket | [!C]at | Bat, bat, or cat | Cat |
+
+    | [!a-z] | matches one character that is not from the range given in the bracket | Letter[!3-5] | Letter1, Letter2, Letter6 up to Letter9 and Letterx etc. | Letter3, Letter4, Letter5 or Letterxx |
+
+
+    In addition, Glob also supports:
+
+
+    | Wildcard  | Description | Example | Matches | Does not match |
+
+    | --------  | ----------- | ------- | ------- | -------------- |
+
+    | `**` |  matches any number of path / directory segments. When used must be the only contents of a segment. | /\*\*/some.\* | /foo/bar/bah/some.txt, /some.txt, or /foo/some.txt	|
+
+
+
+    # Escaping special characters
+
+
+    Wrap special characters `?, *, [` in square brackets in order to escape them.
+
+    You can also use negation when doing this.
 - topic: introduction
   path: /docs/Reference/Tools/TfsNodeStructureTool-introduction.md
   exists: true

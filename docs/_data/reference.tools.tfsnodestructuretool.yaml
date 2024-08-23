@@ -9,13 +9,13 @@ configurationSamples:
         "CommonTools": {
           "TfsNodeStructureTool": {
             "Enabled": true,
-            "NodeBasePaths": null,
-            "AreaMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            "Areas": {
+              "Filters": null,
+              "Mappings": {
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+              }
             },
-            "IterationMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-            },
+            "Iterations": null,
             "ShouldCreateMissingRevisionPaths": true,
             "ReplicateAllExistingNodes": true
           }
@@ -30,14 +30,19 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "TfsNodeStructureTool": {
-            "AreaMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            "Areas": {
+              "Filters": null,
+              "Mappings": {
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+              }
             },
             "Enabled": "True",
-            "IterationMaps": {
-              "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+            "Iteration": {
+              "Filters": null,
+              "Mappings": {
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+              }
             },
-            "NodeBasePaths": null,
             "ReplicateAllExistingNodes": "True",
             "ShouldCreateMissingRevisionPaths": "True"
           }
@@ -51,15 +56,13 @@ configurationSamples:
     {
       "$type": "TfsNodeStructureToolOptions",
       "Enabled": true,
-      "NodeBasePaths": null,
-      "AreaMaps": {
-        "$type": "Dictionary`2",
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+      "Areas": {
+        "Filters": null,
+        "Mappings": {
+          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
+        }
       },
-      "IterationMaps": {
-        "$type": "Dictionary`2",
-        "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1"
-      },
+      "Iterations": null,
       "ShouldCreateMissingRevisionPaths": true,
       "ReplicateAllExistingNodes": true
     }
@@ -69,22 +72,18 @@ className: TfsNodeStructureTool
 typeName: Tools
 architecture: 
 options:
-- parameterName: AreaMaps
-  type: Dictionary
-  description: Remapping rules for area paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-  defaultValue: '{}'
+- parameterName: Areas
+  type: NodeOptions
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
-- parameterName: IterationMaps
-  type: Dictionary
-  description: Remapping rules for iteration paths, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`, that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
-  defaultValue: '{}'
-- parameterName: NodeBasePaths
-  type: String[]
-  description: The root paths of the Ares / Iterations you want migrate. See [NodeBasePath Configuration](#nodebasepath-configuration)
-  defaultValue: '["/"]'
+- parameterName: Iterations
+  type: NodeOptions
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
 - parameterName: ReplicateAllExistingNodes
   type: Boolean
   description: missng XML code comments

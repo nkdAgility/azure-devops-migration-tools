@@ -8,7 +8,6 @@ namespace MigrationTools.Tools
 {
     public class TfsWorkItemLinkToolOptions : ToolOptions, ITfsWorkItemLinkToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsWorkItemLinkTool";
 
         /// <summary>
         /// Skip validating links if the number of links in the source and the target matches!

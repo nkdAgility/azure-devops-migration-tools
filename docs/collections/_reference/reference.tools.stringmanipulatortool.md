@@ -56,7 +56,6 @@ configurationSamples:
       "MaxStringLength": 1000000,
       "Manipulators": [
         {
-          "$type": "RegexStringManipulator",
           "Enabled": true,
           "Pattern": "[^( -~)\n\r\t]+",
           "Replacement": "",

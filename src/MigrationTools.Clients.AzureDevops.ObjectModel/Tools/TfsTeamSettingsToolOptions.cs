@@ -9,8 +9,6 @@ namespace MigrationTools.Tools
     public class TfsTeamSettingsToolOptions : ToolOptions, ITfsTeamSettingsToolOptions
     {
 
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsTeamSettingsTool";
-
         /// <summary>
         /// Migrate original team settings after their creation on target team project
         /// </summary>

@@ -6,7 +6,6 @@ namespace MigrationTools.Tools
 {
     public class TfsRevisionManagerToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsRevisionManagerTool";
 
         /// <summary>
         /// You can choose to migrate the tip only (a single write) or all of the revisions (many writes).

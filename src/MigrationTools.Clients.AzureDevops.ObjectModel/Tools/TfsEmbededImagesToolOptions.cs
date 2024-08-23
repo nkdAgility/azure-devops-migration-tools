@@ -8,8 +8,6 @@ namespace MigrationTools.Tools
 {
     public class TfsEmbededImagesToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsEmbededImagesTool";
-
         
     }
 }

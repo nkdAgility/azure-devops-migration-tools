@@ -6,7 +6,6 @@ namespace MigrationTools.Tools
 {
     public class TfsValidateRequiredFieldToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsValidateRequiredFieldTool";
 
     }
 }

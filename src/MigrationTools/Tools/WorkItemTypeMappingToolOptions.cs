@@ -8,7 +8,6 @@ namespace MigrationTools.Tools
 {
     public class WorkItemTypeMappingToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:WorkItemTypeMappingTool";
 
         /// <summary>
         /// List of work item mappings. 

@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Options
@@ -23,6 +27,8 @@ namespace MigrationTools.Options
         [JsonIgnore]
         public string ConfigurationSectionPath { get; }
         [JsonIgnore]
+        public string ConfigurationSamplePath { get; }
+        [JsonIgnore]
         public string ConfigurationCollectionPath { get; }
         [JsonIgnore]
         public string ConfigurationObjectName { get; }
@@ -37,4 +43,5 @@ namespace MigrationTools.Options
         //public void SetExampleConfigFull();
 
     }
+
 }

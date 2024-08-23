@@ -25,6 +25,24 @@ configurationSamples:
           "FieldMappingTool": {
             "Enabled": "False",
             "FieldMapDefaults": {
+              "FieldLiteralMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.SomeField",
+                "value": "New field value"
+              },
+              "FieldMergeMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              },
               "FieldSkipMap": {
                 "ApplyTo": [
                   "SomeWorkItemType"

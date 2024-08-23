@@ -11,8 +11,6 @@ namespace MigrationTools.Tools
 
     public sealed class TfsNodeStructureToolOptions : ToolOptions, ITfsNodeStructureToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:TfsNodeStructureTool";
-
         /// <summary>
         /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
         /// </summary>

@@ -16,6 +16,7 @@ namespace MigrationTools.Tools.Infrastructure
         public string ConfigurationSectionPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults:{ConfigurationOptionFor}";
         public string ConfigurationCollectionPath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps";
         public string ConfigurationObjectName => $"FieldMapType";
+        public string ConfigurationSamplePath => $"MigrationTools:CommonTools:FieldMappingTool:FieldMapSamples:{ConfigurationOptionFor}";
 
         public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
         /// <summary>

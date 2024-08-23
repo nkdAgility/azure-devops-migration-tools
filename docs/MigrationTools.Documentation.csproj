@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <BuildProject>false</BuildProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="**\*.md" />
+    <None Include="*.md" />
+  </ItemGroup>
+
+</Project>

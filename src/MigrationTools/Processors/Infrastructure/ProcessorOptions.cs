@@ -13,6 +13,7 @@ namespace MigrationTools.Processors.Infrastructure
         public string ConfigurationCollectionPath => $"MigrationTools:Processors";
         public string ConfigurationObjectName => $"ProcessorType";
         public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
+        public string ConfigurationSamplePath => $"MigrationTools:ProcessorSamples:{ConfigurationOptionFor}";
 
         /// <summary>
         /// If set to `true` then the processor will run. Set to `false` and the processor will not run.

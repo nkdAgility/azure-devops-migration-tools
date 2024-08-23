@@ -8,7 +8,6 @@ namespace MigrationTools.Tools
 {
     public class GitRepoMappingToolOptions : ToolOptions
     {
-        public const string ConfigurationSectionName = "MigrationTools:CommonTools:GitRepoMappingTool";
 
         /// <summary>
         /// List of work item mappings. 

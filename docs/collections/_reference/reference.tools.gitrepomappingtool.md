@@ -41,7 +41,6 @@ configurationSamples:
       "$type": "GitRepoMappingToolOptions",
       "Enabled": true,
       "Mappings": {
-        "$type": "Dictionary`2",
         "Source Repo Name": "Target Repo Name"
       }
     }
