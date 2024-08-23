@@ -20,7 +20,13 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new TfsNodeStructureToolOptions();
             options.Enabled = true;
-            options.AreaMaps = new Dictionary<string, string>() { { @"^SourceProject\\PUL", "TargetProject\\test\\PUL" } } ;
+            options.Areas = new NodeOptions()
+            {
+                Mappings = new Dictionary<string, string>()
+                {
+                    { @"^SourceProject\\PUL", "TargetProject\\test\\PUL" }
+                }
+            };
             var nodeStructure = GetTfsNodeStructureTool(options);
 
             nodeStructure.ApplySettings(new TfsNodeStructureToolSettings
@@ -74,13 +80,20 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new TfsNodeStructureToolOptions();
             options.Enabled = true;
-            options.AreaMaps = new Dictionary<string, string>()
+            options.Areas = new NodeOptions()
+            {
+                Mappings = new Dictionary<string, string>()
                 {
                     { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
-                };
-            options.IterationMaps = new Dictionary<string, string>(){
-                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
-                };
+                }
+            };
+            options.Iterations = new NodeOptions()
+            {
+                Mappings = new Dictionary<string, string>()
+                            {
+                                { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
+                            }
+            };
             var nodeStructure = GetTfsNodeStructureTool(options);
 
             string WIQLQueryBit = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] = 'SourceServer\Area\Path1' AND   [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
@@ -109,13 +122,21 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new TfsNodeStructureToolOptions();
             options.Enabled = true;
-            options.AreaMaps = new Dictionary<string, string>()
+            options.Areas = new NodeOptions()
+            {
+                Mappings = new Dictionary<string, string>()
                 {
                     { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
-                };
-            options.IterationMaps = new Dictionary<string, string>(){
+                }
+            };
+
+            options.Iterations = new NodeOptions()
+            {
+                Mappings = new Dictionary<string, string>()
+                {
                     { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
-                };
+                }
+            };
             var settings = new TfsNodeStructureToolSettings() { SourceProjectName = "Source Project", TargetProjectName = "Target Project", FoundNodes = new Dictionary<string, bool>() };
             var nodeStructure = GetTfsNodeStructureTool(options, settings);
 
@@ -204,7 +225,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
         private static TfsNodeStructureTool GetTfsNodeStructureTool()
         {
-            var options = new TfsNodeStructureToolOptions() { Enabled = true, AreaMaps = new Dictionary<string, string>(), IterationMaps = new Dictionary<string, string>() };
+            var options = new TfsNodeStructureToolOptions() { Enabled = true, Areas = new NodeOptions { Mappings = new Dictionary<string, string>() }, Iterations = new NodeOptions { Mappings = new Dictionary<string, string>() } };
             var settings = new TfsNodeStructureToolSettings() { SourceProjectName = "SourceServer", TargetProjectName = "TargetServer", FoundNodes = new Dictionary<string, bool>() };
             return GetTfsNodeStructureTool(options, settings);
         }
@@ -217,8 +238,8 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             services.Configure<TfsNodeStructureToolOptions>(o =>
             {
                 o.Enabled = options.Enabled;
-                o.AreaMaps = options.AreaMaps;
-                o.IterationMaps = options.IterationMaps;
+                o.Areas = options.Areas;
+                o.Iterations = options.Iterations;
             });
 
             var nodeStructure = services.BuildServiceProvider().GetService<TfsNodeStructureTool>();

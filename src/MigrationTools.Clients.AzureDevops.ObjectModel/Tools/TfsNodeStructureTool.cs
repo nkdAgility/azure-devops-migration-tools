@@ -256,9 +256,9 @@ namespace MigrationTools.Tools
             switch (nodeStructureType)
             {
                 case TfsNodeStructureType.Area:
-                    return Options.AreaMaps;
+                    return Options.Areas.Mappings;
                 case TfsNodeStructureType.Iteration:
-                    return Options.IterationMaps;
+                    return Options.Iterations.Mappings;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(nodeStructureType), nodeStructureType, null);
             }
@@ -343,7 +343,7 @@ namespace MigrationTools.Tools
                 // We work on the system paths, but user-friendly paths are used in maps
                 var userFriendlyPath = GetUserFriendlyPath(item.Attributes["Path"].Value);
 
-                var shouldCreateNode = ShouldCreateNode(userFriendlyPath);
+                var shouldCreateNode = ShouldCreateNode(userFriendlyPath, nodeStructureType);
                 var isParentOfSelectedBasePath = CheckIsParentOfSelectedBasePath(userFriendlyPath);
                 if (!shouldCreateNode && !isParentOfSelectedBasePath)
                 {
@@ -416,7 +416,7 @@ namespace MigrationTools.Tools
 
         private void MigrateAllNodeStructures()
         {
-            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({nodeBasePaths}, {areaMaps}, {iterationMaps})", Options.Filters, Options.AreaMaps, Options.IterationMaps);
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures(@{areaMaps}, @{iterationMaps})", Options.Areas, Options.Iterations);
             //////////////////////////////////////////////////
             ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _targetLanguageMaps.AreaPath, _targetProjectName, TfsNodeStructureType.Area);
             //////////////////////////////////////////////////
@@ -490,27 +490,37 @@ namespace MigrationTools.Tools
             }
         }
 
+        private List<string> _matchedPath = new List<string>();
+
         /// <summary>
         /// Checks node-to-be-created with allowed BasePath's
         /// </summary>
         /// <param name="userFriendlyPath">The user-friendly path of the source node</param>
         /// <returns>true/false</returns>
-        private bool ShouldCreateNode(string userFriendlyPath)
+        private bool ShouldCreateNode(string userFriendlyPath, TfsNodeStructureType nodeStructureType)
         {
-            if (Options.Filters == null || Options.Filters.Length == 0)
+            var nodeOptions = nodeStructureType == TfsNodeStructureType.Area ? Options.Areas : Options.Iterations;
+
+            if (nodeOptions.Filters == null || nodeOptions.Filters.Count == 0)
             {
                 return true;
             }
+            List<string> allFilters = nodeOptions.Filters
+            .SelectMany(entry => entry.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            .ToList();
 
-            var invertedPath = "!" + userFriendlyPath;
-            var exclusionPatterns = Options.Filters.Where(oneBasePath => oneBasePath.StartsWith("!", StringComparison.InvariantCulture));
-            if (Options.Filters.Any(oneBasePath => userFriendlyPath.StartsWith(oneBasePath)) &&
-                !exclusionPatterns.Any(oneBasePath => invertedPath.StartsWith(oneBasePath)))
+            foreach (var filter in allFilters)
             {
-                return true;
+                if (DotNet.Globbing.Glob.Parse(filter).IsMatch(userFriendlyPath))
+                {
+                    if (!_matchedPath.Contains(userFriendlyPath))
+                    { 
+                        _matchedPath.Add(userFriendlyPath);
+                        return true;
+                    }
+                }
             }
-
-            Log.LogWarning("The node {nodePath} is being excluded due to your basePath setting. ", userFriendlyPath);
+            Log.LogWarning("The node {nodePath} is being excluded due to your Filters setting on TfsNodeStructureToolOptions. ", userFriendlyPath);
             return false;
         }
 
@@ -522,7 +532,7 @@ namespace MigrationTools.Tools
         /// <exception cref="NotImplementedException"></exception>
         private bool CheckIsParentOfSelectedBasePath(string userFriendlyPath)
         {
-            return Options.Filters != null ? Options.Filters.Where(onePath => !onePath.StartsWith("!"))
+            return _matchedPath != null ? _matchedPath.Where(onePath => !onePath.StartsWith("!"))
                                  .Any(onePath => onePath.StartsWith(userFriendlyPath)) : false;
         }
 
@@ -598,7 +608,7 @@ namespace MigrationTools.Tools
                     catch
                     {
                          Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::NOTFOUND:{targetSystemPath}", missingItem.targetSystemPath);
-                        if (Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.targetSystemPath))
+                        if (Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.targetSystemPath, nodeType))
                         {
 
                             GetOrCreateNode(missingItem.targetSystemPath, missingItem.startDate, missingItem.finishDate);

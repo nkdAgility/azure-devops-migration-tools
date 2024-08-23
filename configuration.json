@@ -5,7 +5,6 @@
   "MigrationTools": {
     "Version": "16.0",
     "Source": {
-      "TfsTeamProject": {
         "EndpointType": "TfsTeamProject",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
@@ -16,10 +15,8 @@
           "AreaPath": "Area",
           "IterationPath": "Iteration"
         }
-      }
     },
     "Target": {
-      "TfsTeamProject": {
         "EndpointType": "TfsTeamProject",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationTest5",
@@ -32,7 +29,7 @@
           "AreaPath": "Area",
           "IterationPath": "Iteration"
         }
-      }
+
     },
     "CommonTools": {
       "WorkItemTypeMappingTool": {
@@ -91,31 +88,36 @@
       },
       "TfsNodeStructureTool": {
         "Enabled": true,
-        "NodeBasePaths": [],
-        "AreaMaps": {
-          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
-          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+        "Areas": {
+          "Filters": [ " *\\Team 1,*\\Team 1\\**" ],
+          "Mappings": {
+            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+          }
         },
-        "IterationMaps": {
-          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
-          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+        "Iteration": {
+          "Filters": [],
+          "Mappings": {
+            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+          }
         },
         "ShouldCreateMissingRevisionPaths": true,
         "ReplicateAllExistingNodes": true
       },
-      "TfsRevisionManagerTool": {
-        "Enabled": true,
-        "ReplayRevisions": true,
-        "MaxRevisions": 0
+        "TfsRevisionManagerTool": {
+          "Enabled": true,
+          "ReplayRevisions": true,
+          "MaxRevisions": 0
+        },
+        "TfsTeamSettingsTool": {
+          "Enabled": true,
+          "MigrateTeamSettings": true,
+          "UpdateTeamSettings": true,
+          "MigrateTeamCapacities": true,
+          "Teams": null
+        }
       },
-      "TfsTeamSettingsTool": {
-        "Enabled": true,
-        "MigrateTeamSettings": true,
-        "UpdateTeamSettings": true,
-        "MigrateTeamCapacities": true,
-        "Teams": null
-      }
-    },
     "Processors": [
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",

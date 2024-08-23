@@ -108,8 +108,8 @@ namespace MigrationTools.Host
                                break;
                            case MigrationConfigSchema.v160:
                                // This code Converts the new config format to the v1 and v2 runtme format.
-                               options.Source = configuration.GetSection("MigrationTools:Source:TfsTeamProject")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
-                               options.Target = configuration.GetSection("MigrationTools:Target:TfsTeamProject")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                               options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
+                               options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IMigrationClientConfig>("EndpointType");
                                break;
                            default:
                                logger.LogCritical("The config file {ConfigFile} is not of the correct format. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
