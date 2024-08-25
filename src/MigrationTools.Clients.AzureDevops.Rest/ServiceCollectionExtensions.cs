@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using MigrationTools.Clients.AzureDevops.Rest.Processors;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors;
@@ -11,7 +13,7 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientAzureDevopsRest(this IServiceCollection context, IConfiguration configuration)
         {
-            context.AddMigrationToolsEndPoints<AzureDevOpsEndpointOptions, AzureDevOpsEndpoint>(configuration, "AzureDevOpsEndpoints");
+            context.AddConfiguredEndpoints(configuration);
 
             //TfsPipelines
             context.AddTransient<AzureDevOpsPipelineProcessor>();

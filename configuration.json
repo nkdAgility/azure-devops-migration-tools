@@ -4,32 +4,43 @@
   },
   "MigrationTools": {
     "Version": "16.0",
-    "Source": {
-      "EndpointType": "TfsTeamProject",
-      "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "migrationSource1",
-      "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": "",
-      "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "AllowCrossProjectLinking": false,
+        "NetworkCredentials": {
+          "UserName": "",
+          "Password": "",
+            "Domain": ""
+        },
+        "AuthenticationMode": "AccessToken",
+        "PersonalAccessToken": "",
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "TfsVersion": "AzureDevOps",
+        "NetworkCredentials": {
+          "UserName": "",
+          "Password": "",
+          "Domain": ""
+        },
+        "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "AuthenticationMode": "AccessToken",
+        "PersonalAccessToken": "",
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
       }
-    },
-    "Target": {
-      "EndpointType": "TfsTeamProject",
-      "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "migrationTest5",
-      "TfsVersion": "AzureDevOps",
-      "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-      "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": "",
-      "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
-      }
-
     },
     "CommonTools": {
       "WorkItemTypeMappingTool": {
@@ -122,6 +133,8 @@
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",
         "Enabled": true,
+        "SourceName": "MySource1",
+        "TargetName": "MyTarget1",
         "UpdateCreatedDate": true,
         "UpdateCreatedBy": true,
         "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",

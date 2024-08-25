@@ -13,6 +13,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using Newtonsoft.Json;
 using MigrationTools.Processors.Infrastructure;
+using Microsoft.Extensions.Options;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {
@@ -21,29 +22,19 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         private KeepOutboundLinkTargetProcessorOptions _options;
 
         public KeepOutboundLinkTargetProcessor(
+                    IOptions<KeepOutboundLinkTargetProcessorOptions> options,
                     ProcessorEnricherContainer processorEnrichers,
-                    IEndpointFactory endpointFactory,
                     IServiceProvider services,
                     ITelemetryLogger telemetry,
                     ILogger<KeepOutboundLinkTargetProcessor> logger)
-            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
+            : base(options, processorEnrichers, services, telemetry, logger)
         {
         }
 
+        public new KeepOutboundLinkTargetProcessorOptions Options => (KeepOutboundLinkTargetProcessorOptions)base.Options;
         public new AzureDevOpsEndpoint Source => (AzureDevOpsEndpoint)base.Source;
 
         public new AzureDevOpsEndpoint Target => (AzureDevOpsEndpoint)base.Target;
-
-        public override void Configure(IProcessorOptions options)
-        {
-            base.Configure(options);
-            Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
-            _options = (KeepOutboundLinkTargetProcessorOptions)options;
-            if (string.IsNullOrEmpty(_options.WIQLQuery))
-            {
-                throw new Exception($"The {nameof(_options.WIQLQuery)} needs to be set");
-            }
-        }
 
         protected override void InternalExecute()
         {

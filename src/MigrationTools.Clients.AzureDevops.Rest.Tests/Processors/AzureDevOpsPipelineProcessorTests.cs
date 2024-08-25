@@ -28,8 +28,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<AzureDevOpsPipelineProcessor>(Services, y);
             Assert.IsNotNull(x);
         }
 
@@ -42,8 +41,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<AzureDevOpsPipelineProcessor>(Services, y);
             Assert.IsNotNull(x);
         }
 
@@ -52,8 +50,7 @@ namespace MigrationTools.Processors.Tests
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
             var migrationConfig = GetAzureDevOpsPipelineProcessorOptions();
-            var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            processor.Configure(migrationConfig);
+            var processor = ActivatorUtilities.CreateInstance<AzureDevOpsPipelineProcessor>(Services, migrationConfig);
             processor.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }
@@ -69,8 +66,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target",
             };
-            var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            processor.Configure(config);
+            var processor = ActivatorUtilities.CreateInstance<AzureDevOpsPipelineProcessor>(Services, config);
 
             processor.Execute();
 
@@ -101,8 +97,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target",
             };
-            var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            processor.Configure(config);
+            var processor = ActivatorUtilities.CreateInstance<AzureDevOpsPipelineProcessor>(Services, config);
 
             processor.Execute();
 

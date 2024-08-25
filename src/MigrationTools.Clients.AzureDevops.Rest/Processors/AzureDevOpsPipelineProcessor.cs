@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
@@ -19,28 +20,24 @@ namespace MigrationTools.Processors
     /// <processingtarget>Pipelines</processingtarget>
     public partial class AzureDevOpsPipelineProcessor : Processor
     {
-        private AzureDevOpsPipelineProcessorOptions _Options;
 
         public AzureDevOpsPipelineProcessor(
+                    IOptions<AzureDevOpsPipelineProcessorOptions> options,
                     ProcessorEnricherContainer processorEnrichers,
-                    IEndpointFactory endpointFactory,
                     IServiceProvider services,
                     ITelemetryLogger telemetry,
                     ILogger<Processor> logger)
-            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
+            : base(options, processorEnrichers, services, telemetry, logger)
         {
+
         }
+
+        public new AzureDevOpsPipelineProcessorOptions Options => (AzureDevOpsPipelineProcessorOptions)base.Options;
 
         public new AzureDevOpsEndpoint Source => (AzureDevOpsEndpoint)base.Source;
 
         public new AzureDevOpsEndpoint Target => (AzureDevOpsEndpoint)base.Target;
 
-        public override void Configure(IProcessorOptions options)
-        {
-            base.Configure(options);
-            Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
-            _Options = (AzureDevOpsPipelineProcessorOptions)options;
-        }
 
         protected override void InternalExecute()
         {
@@ -55,7 +52,7 @@ namespace MigrationTools.Processors
         private void EnsureConfigured()
         {
             Log.LogInformation("Processor::EnsureConfigured");
-            if (_Options == null)
+            if (Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
@@ -79,24 +76,24 @@ namespace MigrationTools.Processors
             IEnumerable<Mapping> serviceConnectionMappings = null;
             IEnumerable<Mapping> taskGroupMappings = null;
             IEnumerable<Mapping> variableGroupMappings = null;
-            if (_Options.MigrateServiceConnections)
+            if (Options.MigrateServiceConnections)
             {
                 serviceConnectionMappings = await CreateServiceConnectionsAsync();
             }
-            if (_Options.MigrateVariableGroups)
+            if (Options.MigrateVariableGroups)
             {
                 variableGroupMappings = await CreateVariableGroupDefinitionsAsync();
             }
-            if (_Options.MigrateTaskGroups)
+            if (Options.MigrateTaskGroups)
             {
                 taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
             }
-            if (_Options.MigrateBuildPipelines)
+            if (Options.MigrateBuildPipelines)
             {
                 await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings);
             }
 
-            if (_Options.MigrateReleasePipelines)
+            if (Options.MigrateReleasePipelines)
             {
                 await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings);
             }
@@ -290,8 +287,8 @@ namespace MigrationTools.Processors
         {
             Log.LogInformation("Processing Build Pipelines..");
 
-            var sourceDefinitions = await GetSelectedDefinitionsFromEndpointAsync<BuildDefinition>(Source, _Options.BuildPipelines);
-            var targetDefinitions = await GetSelectedDefinitionsFromEndpointAsync<BuildDefinition>(Target, _Options.BuildPipelines);
+            var sourceDefinitions = await GetSelectedDefinitionsFromEndpointAsync<BuildDefinition>(Source, Options.BuildPipelines);
+            var targetDefinitions = await GetSelectedDefinitionsFromEndpointAsync<BuildDefinition>(Target, Options.BuildPipelines);
             var availableTasks = await Target.GetApiDefinitionsAsync<TaskDefinition>(queryForDetails: false);
             var sourceServiceConnections = await Source.GetApiDefinitionsAsync<ServiceConnection>();
             var targetServiceConnections = await Target.GetApiDefinitionsAsync<ServiceConnection>();
@@ -393,9 +390,9 @@ namespace MigrationTools.Processors
             string sourceRepositoryName = sourceRepositories.FirstOrDefault(s => s.Id == sourceRepoId)?.Name ?? string.Empty;
             string targetRepoId;
 
-            if (_Options.RepositoryNameMaps.ContainsKey(sourceRepositoryName))  //Map repository name if configured
+            if (Options.RepositoryNameMaps.ContainsKey(sourceRepositoryName))  //Map repository name if configured
             {
-                targetRepoId = targetRepositories.FirstOrDefault(r => _Options.RepositoryNameMaps[sourceRepositoryName] == r.Name)?.Id;
+                targetRepoId = targetRepositories.FirstOrDefault(r => Options.RepositoryNameMaps[sourceRepositoryName] == r.Name)?.Id;
             }
             else
             {
@@ -443,8 +440,8 @@ namespace MigrationTools.Processors
         {
             Log.LogInformation($"Processing Release Pipelines..");
 
-            var sourceDefinitions = await GetSelectedDefinitionsFromEndpointAsync<ReleaseDefinition>(Source, _Options.ReleasePipelines);
-            var targetDefinitions = await GetSelectedDefinitionsFromEndpointAsync<ReleaseDefinition>(Target, _Options.ReleasePipelines);
+            var sourceDefinitions = await GetSelectedDefinitionsFromEndpointAsync<ReleaseDefinition>(Source, Options.ReleasePipelines);
+            var targetDefinitions = await GetSelectedDefinitionsFromEndpointAsync<ReleaseDefinition>(Target, Options.ReleasePipelines);
 
             var agentPoolMappings = await CreatePoolMappingsAsync<TaskAgentPool>();
             var deploymentGroupMappings = await CreatePoolMappingsAsync<DeploymentGroup>();

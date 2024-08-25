@@ -27,8 +27,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<TfsSharedQueryProcessor>(Services, y);
             Assert.IsNotNull(x);
         }
 
@@ -42,8 +41,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<TfsSharedQueryProcessor>(Services, y);
             Assert.IsNotNull(x);
         }
 
@@ -52,8 +50,7 @@ namespace MigrationTools.Processors.Tests
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
             var migrationConfig = GetTfsSharedQueryProcessorOptions();
-            var processor = Services.GetRequiredService<TfsSharedQueryProcessor>();
-            processor.Configure(migrationConfig);
+            var processor = ActivatorUtilities.CreateInstance<TfsSharedQueryProcessor>(Services, migrationConfig);
             processor.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }

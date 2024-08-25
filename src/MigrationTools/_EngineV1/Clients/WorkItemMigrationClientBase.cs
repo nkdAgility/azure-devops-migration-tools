@@ -4,6 +4,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools._EngineV1.Clients
 {
@@ -11,25 +12,16 @@ namespace MigrationTools._EngineV1.Clients
     {
         private Dictionary<string, WorkItemData> _Cache = new Dictionary<string, WorkItemData>();
 
-        public WorkItemMigrationClientBase(ITelemetryLogger telemetry)
+        public WorkItemMigrationClientBase(IMigrationClient migrationClient, ITelemetryLogger telemetry)
         {
             Telemetry = telemetry;
+            MigrationClient = migrationClient;
         }
 
-        public abstract IEndpointOptions Config { get; }
+        public IEndpointOptions Options { get; private set; }
         public abstract ProjectData Project { get; }
         protected IMigrationClient MigrationClient { get; private set; }
         protected ITelemetryLogger Telemetry { get; }
-
-        public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
-        {
-            if (migrationClient is null)
-            {
-                throw new ArgumentNullException(nameof(migrationClient));
-            }
-            MigrationClient = migrationClient;
-            InnerConfigure(migrationClient, bypassRules);
-        }
 
         public abstract ReflectedWorkItemId CreateReflectedWorkItemId(WorkItemData workItem);
 
@@ -57,7 +49,6 @@ namespace MigrationTools._EngineV1.Clients
 
         public abstract List<WorkItemData> GetWorkItems(IWorkItemQueryBuilder queryBuilder);
 
-        protected abstract void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true);
 
         public abstract WorkItemData PersistWorkItem(WorkItemData workItem);
 

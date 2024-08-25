@@ -27,7 +27,7 @@ namespace MigrationTools
 
         public static void AddMigrationToolServices(this IServiceCollection context, IConfiguration configuration, string configFile = "configuration.json")
         {
-            context.AddMigrationToolsEndpoint();
+            context.AddConfiguredEndpoints(configuration);
             //Containers
             context.AddTransient<ProcessorEnricherContainer>();
             context.AddTransient<EndpointEnricherContainer>();
@@ -37,7 +37,6 @@ namespace MigrationTools
             //context.AddTransient<AppendMigrationToolSignatureFooter>();
             //context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             //context.AddTransient<SkipToFinalRevisedWorkItemType>();
-
 
 
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)

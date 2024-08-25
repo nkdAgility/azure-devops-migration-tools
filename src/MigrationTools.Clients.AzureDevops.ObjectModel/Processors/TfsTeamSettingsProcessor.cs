@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Core.WebApi.Types;
 using Microsoft.TeamFoundation.Framework.Client;
@@ -11,6 +12,7 @@ using Microsoft.TeamFoundation.Work.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
@@ -27,12 +29,11 @@ namespace MigrationTools.Processors
 
         private TfsTeamSettingsProcessorOptions _Options;
 
-        public TfsTeamSettingsProcessor(ProcessorEnricherContainer processorEnrichers,
-                                        IEndpointFactory endpointFactory,
+        public TfsTeamSettingsProcessor(IOptions<TfsTeamSettingsProcessorOptions> options, ProcessorEnricherContainer processorEnrichers,
                                         IServiceProvider services,
                                         ITelemetryLogger telemetry,
                                         ILogger<Processor> logger)
-            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
+            : base(options, processorEnrichers, services, telemetry, logger)
         {
             _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
             {
@@ -53,16 +54,11 @@ namespace MigrationTools.Processors
             });
         }
 
+        public new TfsTeamSettingsProcessorOptions Options => (TfsTeamSettingsProcessorOptions)base.Options;
+
         public new TfsTeamSettingsEndpoint Source => (TfsTeamSettingsEndpoint)base.Source;
 
         public new TfsTeamSettingsEndpoint Target => (TfsTeamSettingsEndpoint)base.Target;
-
-        public override void Configure(IProcessorOptions options)
-        {
-            base.Configure(options);
-            Log.LogInformation("TfsTeamSettingsProcessor::Configure");
-            _Options = (TfsTeamSettingsProcessorOptions)options;
-        }
 
         protected override void InternalExecute()
         {

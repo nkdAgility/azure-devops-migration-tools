@@ -1,6 +1,7 @@
 ﻿using System;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Containers;
+using MigrationTools.Endpoints;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 
@@ -10,8 +11,8 @@ namespace MigrationTools
     {
         ProcessingStatus Run();
 
-        IMigrationClient Source { get; }
+        IEndpoint Source { get; }
 
-        IMigrationClient Target { get; }
+        IEndpoint Target { get; }
     }
 }

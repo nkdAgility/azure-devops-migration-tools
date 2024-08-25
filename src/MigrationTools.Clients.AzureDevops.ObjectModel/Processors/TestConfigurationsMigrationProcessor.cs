@@ -15,7 +15,7 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestConfigurationsMigrationProcessor : TfsMigrationProcessorBase
+    public class TestConfigurationsMigrationProcessor : TfsProcessor
     {
         public TestConfigurationsMigrationProcessor(IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
         {

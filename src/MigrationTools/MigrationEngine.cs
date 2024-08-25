@@ -9,9 +9,11 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+
 
 namespace MigrationTools
 {
@@ -19,15 +21,13 @@ namespace MigrationTools
     {
         private readonly ILogger<MigrationEngine> _logger;
         private readonly IServiceProvider _services;
-        private IMigrationClient _source;
-        private IMigrationClient _target;
-        private NetworkCredentialsOptions _networkCredentials;
+        private IEndpoint _source;
+        private IEndpoint _target;
         private ITelemetryLogger _telemetryLogger;
         private EngineConfiguration _engineConfiguration;
 
         public MigrationEngine(
             IServiceProvider services,
-            IOptions<NetworkCredentialsOptions> networkCredentials,
             IOptions<EngineConfiguration> config,
             ProcessorContainer processors,
             ITelemetryLogger telemetry,
@@ -36,7 +36,6 @@ namespace MigrationTools
             _logger = logger;
             _logger.LogInformation("Creating Migration Engine {SessionId}", telemetry.SessionId);
             _services = services;
-            _networkCredentials = networkCredentials.Value;
             Processors = processors;
             _telemetryLogger = telemetry;
             _engineConfiguration = config.Value;
@@ -45,25 +44,25 @@ namespace MigrationTools
 
         public ProcessorContainer Processors { get; }
 
-        public IMigrationClient Source
+        public IEndpoint Source
         {
             get
             {
                 if (_source is null)
                 {
-                    _source = GetMigrationClient(_engineConfiguration.Source, _networkCredentials.Source);
+                    _source = _services.GetKeyedService<IEndpoint>("Source"); 
                 }
                 return _source;
             }
         }
 
-        public IMigrationClient Target
+        public IEndpoint Target
         {
             get
             {
                 if (_target is null)
                 {
-                    _target = GetMigrationClient(_engineConfiguration.Target, _networkCredentials.Target);
+                    _target = _services.GetKeyedService<IEndpoint>("Target");
                 }
                 return _target;
             }
@@ -116,15 +115,7 @@ namespace MigrationTools
             return ps;
         }
 
-        private IMigrationClient GetMigrationClient(IEndpointOptions config, Credentials networkCredentials)
-        {
-            var credentials = CheckForNetworkCredentials(networkCredentials);
-            var client = _services.GetRequiredService<IMigrationClient>();
-            client.Configure(config, credentials);
-            return client;
-        }
-
-        private NetworkCredential CheckForNetworkCredentials(Credentials credentials)
+        private NetworkCredential CheckForNetworkCredentials(NetworkCredentials credentials)
         {
             NetworkCredential networkCredentials = null;
             if (!string.IsNullOrWhiteSpace(credentials?.UserName) && !string.IsNullOrWhiteSpace(credentials?.Password))

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Helpers.Tests;
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
@@ -33,11 +35,10 @@ namespace MigrationTools.Tests
 
         private static void AddEndpoint(IServiceCollection services, string name, string project)
         {
-            services.AddMigrationToolsEndpoint(name, (provider) =>
+            services.AddKeyedSingleton(typeof(IEndpoint), name, (sp, key) =>
             {
                 var options = GetTfsWorkItemEndPointOptions(project);
-                var endpoint = provider.GetRequiredService<TfsWorkItemEndpoint>();
-                endpoint.Configure(options);
+                var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(TfsWorkItemEndpoint), options) ;
                 return endpoint;
             });
         }

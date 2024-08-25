@@ -1,5 +1,7 @@
 ﻿using System;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using TfsUrlParser;
@@ -20,6 +22,8 @@ namespace MigrationTools.Endpoints
         public string PersonalAccessTokenVariableName { get; set; }
         public TfsLanguageMapOptions LanguageMaps { get; set; }
 
+        public NetworkCredentials NetworkCredentials { get; set; }
+
         public string CollectionName { get { return GetCollectionName(); } }
 
         public string GetCollectionName()
@@ -27,7 +31,7 @@ namespace MigrationTools.Endpoints
             //var repositoryDescription =  new RepositoryDescription(Collection);
             //return repositoryDescription.CollectionName;
             // Pending fix from https://github.com/bbtsoftware/TfsUrlParser
-            return Collection.ToString();
+            return Collection != null ? Collection.ToString() : "https://dev.azure.com/sampleAccount";
         }
 
     }

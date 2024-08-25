@@ -29,11 +29,10 @@ namespace MigrationTools.Tests
 
         private static void AddEndpoint(IServiceCollection services, string name, string project)
         {
-            services.AddMigrationToolsEndpoint(name, (provider) =>
+            services.AddKeyedSingleton(typeof(IEndpoint), name, (sp, key) =>
             {
                 var options = GetAzureDevOpsEndpointOptions(project);
-                var endpoint = provider.GetRequiredService<AzureDevOpsEndpoint>();
-                endpoint.Configure(options);
+                var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(AzureDevOpsEndpoint), options);
                 return endpoint;
             });
         }

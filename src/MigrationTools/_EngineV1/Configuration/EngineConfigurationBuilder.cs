@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Helpers;
 using MigrationTools.Options;
 using Newtonsoft.Json;

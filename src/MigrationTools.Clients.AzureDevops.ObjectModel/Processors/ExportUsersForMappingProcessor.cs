@@ -25,7 +25,7 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class ExportUsersForMappingProcessor : TfsMigrationProcessorBase
+    public class ExportUsersForMappingProcessor : TfsProcessor
     {
         private ExportUsersForMappingProcessorOptions _config;
         private TfsUserMappingTool _TfsUserMappingTool;

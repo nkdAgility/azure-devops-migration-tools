@@ -24,6 +24,7 @@ using System.Data;
 using static MigrationTools.ConfigurationExtensions;
 using MigrationTools.Options;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.Host
 {

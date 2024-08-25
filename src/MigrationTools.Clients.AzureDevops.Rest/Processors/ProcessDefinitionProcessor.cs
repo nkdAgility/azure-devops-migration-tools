@@ -13,6 +13,8 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using Task = System.Threading.Tasks.Task;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Options;
+using Microsoft.Extensions.Options;
 
 namespace MigrationTools.Processors
 {
@@ -68,28 +70,22 @@ namespace MigrationTools.Processors
 
         private WorkItemLayout TargetLayout { get; set; }
 
-        public ProcessDefinitionProcessor(
+        public ProcessDefinitionProcessor(IOptions<ProcessDefinitionProcessorOptions> options,
                     ProcessorEnricherContainer processorEnrichers,
-                    IEndpointFactory endpointFactory,
                     IServiceProvider services,
                     ITelemetryLogger telemetry,
                     ILogger<Processor> logger)
-            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
+            : base(options, processorEnrichers, services, telemetry, logger)
         {
             SourceModel = new ProcessorModel();
             TargetModel = new ProcessorModel();
         }
 
+        public new ProcessDefinitionProcessorOptions Options => (ProcessDefinitionProcessorOptions)base.Options;
+
         public new AzureDevOpsEndpoint Source => (AzureDevOpsEndpoint)base.Source;
 
         public new AzureDevOpsEndpoint Target => (AzureDevOpsEndpoint)base.Target;
-
-        public override void Configure(IProcessorOptions options)
-        {
-            base.Configure(options);
-            Log.LogInformation("ProcessDefinitionProcessor::Configure");
-            _Options = (ProcessDefinitionProcessorOptions)options;
-        }
 
         protected override void InternalExecute()
         {

@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using System.Net;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Options;
 using Serilog;
 
 namespace MigrationTools._EngineV1.Clients
 {
-    public class TfsMigrationClient : IMigrationClient
+    public class TfsTeamProjectEndpoint : Endpoint<TfsTeamProjectEndpointOptions>, IMigrationClient // TODO: Rename IMigrationClient to ITfsTeamProjectEndpoint
     {
         private TfsTeamProjectEndpointOptions _config;
         private TfsTeamProjectCollection _collection;
@@ -21,24 +27,21 @@ namespace MigrationTools._EngineV1.Clients
         private IWorkItemMigrationClient _workItemClient;
         private ITestPlanMigrationClient _testPlanClient;
 
-        private readonly IServiceProvider _Services;
-        private readonly ITelemetryLogger _Telemetry;
-
-        public TfsTeamProjectEndpointOptions TfsConfig
+        public TfsTeamProjectEndpoint(
+            IOptions<TfsTeamProjectEndpointOptions> options,
+            EndpointEnricherContainer endpointEnrichers,
+            ITelemetryLogger telemetry,
+            ILogger<Endpoint<TfsTeamProjectEndpointOptions>> logger,
+            IServiceProvider Services
+            ) : base(options, endpointEnrichers, Services, telemetry, logger)
         {
-            get
-            {
-                return _config;
-            }
+            _testPlanClient = ActivatorUtilities.CreateInstance<ITestPlanMigrationClient>(Services, options);
+            _workItemClient = ActivatorUtilities.CreateInstance< IWorkItemMigrationClient>(Services, options);
+            //networkCredentials IOptions<NetworkCredentialsOptions> networkCredentials,
         }
 
-        public IEndpointOptions Config
-        {
-            get
-            {
-                return _config;
-            }
-        }
+        public override int Count => 0;
+
 
         public IWorkItemMigrationClient WorkItems
         {
@@ -58,36 +61,12 @@ namespace MigrationTools._EngineV1.Clients
 
         public VssCredentials Credentials => _vssCredentials ??= new VssCredentials();
 
-        public TfsMigrationClient()
-        {
 
-        }
-
-        // if you add Migration Engine in here you will have to fix the infinate loop
-        public TfsMigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
-        {
-            _testPlanClient = testPlanClient;
-            _workItemClient = workItemClient;
-            _Services = services;
-            _Telemetry = telemetry;
-        }
 
         public void Configure(IEndpointOptions config, NetworkCredential credentials = null)
         {
-            if (config is null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-            if (!(config is TfsTeamProjectEndpointOptions))
-            {
-                throw new ArgumentOutOfRangeException(string.Format("{0} needs to be of type {1}", nameof(config), nameof(TfsTeamProjectEndpointOptions)));
-            }
-
-            _config = (TfsTeamProjectEndpointOptions)config;
             _credentials = credentials;
             EnsureCollection();
-            _workItemClient.Configure(this);
-            _testPlanClient.Configure(this);
         }
 
         public object InternalCollection
@@ -102,12 +81,12 @@ namespace MigrationTools._EngineV1.Clients
         {
             if (_collection == null)
             {
-                _Telemetry.TrackEvent("TeamProjectContext.EnsureCollection",
+                Telemetry.TrackEvent("TeamProjectContext.EnsureCollection",
                     new Dictionary<string, string> {
-                          { "Name", TfsConfig.Project},
-                          { "Target Project", TfsConfig.Project},
-                          { "Target Collection",TfsConfig.Collection.ToString() },
-                           { "ReflectedWorkItemID Field Name",TfsConfig.ReflectedWorkItemIDFieldName }
+                          { "Name", Options.Project},
+                          { "Target Project", Options.Project},
+                          { "Target Collection",Options.Collection.ToString() },
+                           { "ReflectedWorkItemID Field Name",Options.ReflectedWorkItemIDFieldName }
                     }, null);
                 _collection = GetDependantTfsCollection(_credentials);
             }
@@ -120,71 +99,71 @@ namespace MigrationTools._EngineV1.Clients
             TfsTeamProjectCollection y = null;
             try
             {
-                Log.Debug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
+                Log.LogDebug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
                 switch (_config.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
-                        Log.Information("Connecting with AccessToken ");
-                        var pat = TfsConfig.PersonalAccessToken;
-                        if (!string.IsNullOrEmpty(TfsConfig.PersonalAccessTokenVariableName))
+                        Log.LogInformation("Connecting with AccessToken ");
+                        var pat = Options.PersonalAccessToken;
+                        if (!string.IsNullOrEmpty(Options.PersonalAccessTokenVariableName))
                         {
-                            pat = Environment.GetEnvironmentVariable(TfsConfig.PersonalAccessTokenVariableName);
+                            pat = Environment.GetEnvironmentVariable(Options.PersonalAccessTokenVariableName);
                         }
                         _vssCredentials = new VssBasicCredential(string.Empty, pat);
-                        y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
+                        y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
                         break;
 
                     case AuthenticationMode.Windows:
-                        Log.Information("Connecting with NetworkCredential passes on CommandLine ");
+                        Log.LogInformation("Connecting with NetworkCredential passes on CommandLine ");
                         if (credentials is null)
                         {
                             throw new InvalidOperationException("If AuthenticationMode = Windows then you must pass credentails on the command line.");
                         }
                         _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
-                        y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
+                        y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
                         break;
 
                     case AuthenticationMode.Prompt:
-                        Log.Information("Prompting for credentials ");
-                        y = new TfsTeamProjectCollection(TfsConfig.Collection);
+                        Log.LogInformation("Prompting for credentials ");
+                        y = new TfsTeamProjectCollection(Options.Collection);
                         break;
 
                     default:
-                        Log.Information("Setting _vssCredentials to Null ");
-                        y = new TfsTeamProjectCollection(TfsConfig.Collection);
+                        Log.LogInformation("Setting _vssCredentials to Null ");
+                        y = new TfsTeamProjectCollection(Options.Collection);
                         break;
                 }
-                Log.Debug("MigrationClient: Connecting to {CollectionUrl} ", TfsConfig.Collection);
-                Log.Verbose("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
+                Log.LogDebug("MigrationClient: Connecting to {CollectionUrl} ", Options.Collection);
+                Log.LogTrace("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
                 timer.Stop();
-                Log.Information("Access granted to {CollectionUrl} for {Name} ({Account})", TfsConfig.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
-                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", TfsConfig.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
+                Log.LogInformation("Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
             }
             catch (TeamFoundationServerUnauthorizedException ex)
             {
                 timer.Stop();
-                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", TfsConfig.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "401", false));
-                Log.Error(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", _config.AuthenticationMode);
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "401", false));
+                Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", _config.AuthenticationMode);
                 Environment.Exit(-1);
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                _Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", TfsConfig.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
-                _Telemetry.TrackException(ex,
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
-                            { "CollectionUrl", TfsConfig.Collection.ToString() },
-                            { "TeamProjectName",  TfsConfig.Project}
+                            { "CollectionUrl", Options.Collection.ToString() },
+                            { "TeamProjectName",  Options.Project}
                        },
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.Error("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, _config.AuthenticationMode);
+                Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, _config.AuthenticationMode);
                 switch (_config.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
-                        Log.Error("The PAT MUST be 'full access' for it to work with the Object Model API.");
+                        Log.LogError("The PAT MUST be 'full access' for it to work with the Object Model API.");
                         break;
                     default:
                         break;

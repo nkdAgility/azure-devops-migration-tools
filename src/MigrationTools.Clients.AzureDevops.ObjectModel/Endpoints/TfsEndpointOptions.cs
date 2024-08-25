@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MigrationTools.Endpoints.Infrastructure;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints

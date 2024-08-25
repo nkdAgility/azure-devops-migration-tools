@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 
@@ -16,6 +17,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             PrependCommand = "start";
         }
 
+        [Required]
         public string WIQLQuery { get; set; }
 
         public string TargetLinksToKeepOrganization { get; set; }

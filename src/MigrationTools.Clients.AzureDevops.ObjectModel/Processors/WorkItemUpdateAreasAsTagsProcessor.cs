@@ -13,6 +13,7 @@ using MigrationTools.DataContracts;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
@@ -21,22 +22,20 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Work Item</processingtarget>
-    public class WorkItemUpdateAreasAsTagsProcessor : TfsStaticProcessorBase
+    public class WorkItemUpdateAreasAsTagsProcessor : TfsProcessor
     {
         private WorkItemUpdateAreasAsTagsProcessorOptions _config;
 
-        public WorkItemUpdateAreasAsTagsProcessor(IOptions<WorkItemUpdateAreasAsTagsProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemUpdateAreasAsTagsProcessor(IOptions<WorkItemUpdateAreasAsTagsProcessorOptions> options, TfsStaticTools tfsStaticTools, StaticTools staticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsStaticTools, staticTools, processorEnrichers, services, telemetry, logger)
         {
-            _config = options.Value;
+          
         }
 
-        public override string Name
-        {
-            get
-            {
-                return typeof(WorkItemUpdateAreasAsTagsProcessor).Name;
-            }
-        }
+        new WorkItemUpdateAreasAsTagsProcessorOptions Options => (WorkItemUpdateAreasAsTagsProcessorOptions)base.Options;
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
         protected override void InternalExecute()
         {
@@ -46,7 +45,7 @@ namespace MigrationTools.Processors
             IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
             wiqb.AddParameter("AreaPath", _config.AreaIterationPath);
             wiqb.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
-            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(wiqb);
+            List<WorkItemData> workitems = Target.WorkItems.GetWorkItems(wiqb);
             Log.LogInformation("Update {0} work items?", workitems.Count);
             //////////////////////////////////////////////////
             int current = workitems.Count;

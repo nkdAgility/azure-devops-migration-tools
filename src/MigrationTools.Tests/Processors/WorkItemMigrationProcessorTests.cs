@@ -30,8 +30,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<WorkItemTrackingProcessor>(Services, y);
             Assert.IsNotNull(x);
         }
 
@@ -48,8 +47,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<WorkItemTrackingProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<WorkItemTrackingProcessor>(Services, y);
             x.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, x.Status);
         }

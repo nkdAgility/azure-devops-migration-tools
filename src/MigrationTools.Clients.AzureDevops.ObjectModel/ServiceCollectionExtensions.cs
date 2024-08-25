@@ -22,6 +22,9 @@ namespace MigrationTools
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
             {
                 case MigrationConfigSchema.v1:
+
+
+
                     context.AddSingleton<TfsAttachmentTool>().AddSingleton<IOptions<TfsAttachmentToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentToolOptions>()));
 
                     context.AddSingleton<TfsUserMappingTool>().AddSingleton<IOptions<TfsUserMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingToolOptions>()));
@@ -44,6 +47,7 @@ namespace MigrationTools
 
                     break;
                 case MigrationConfigSchema.v160:
+                    context.AddConfiguredEndpoints(configuration);
                     context.AddSingleton<TfsAttachmentTool>().AddMigrationToolsOptions<TfsAttachmentToolOptions>(configuration);
                     context.AddSingleton<TfsUserMappingTool>().AddMigrationToolsOptions<TfsUserMappingToolOptions>(configuration);
                     context.AddSingleton<TfsValidateRequiredFieldTool>().AddMigrationToolsOptions<TfsValidateRequiredFieldToolOptions>(configuration);
@@ -58,6 +62,7 @@ namespace MigrationTools
             }
 
             context.AddSingleton<TfsStaticTools>();
+            
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
@@ -82,9 +87,9 @@ namespace MigrationTools
 
         public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context, IConfiguration configuration)
         {
-            context.AddMigrationToolsEndPoints<TfsEndpointOptions, TfsEndpoint>(configuration, "TfsEndpoints");
-            context.AddMigrationToolsEndPoints<TfsWorkItemEndpointOptions, TfsWorkItemEndpoint>(configuration, "TfsWorkItemEndpoints");
-            context.AddMigrationToolsEndPoints<TfsTeamSettingsEndpointOptions, TfsTeamSettingsEndpoint>(configuration, "TfsTeamSettingsEndpoints");
+            //context.AddMigrationToolsEndPoints<TfsEndpointOptions, TfsEndpoint>(configuration, "TfsEndpoints");
+            //context.AddMigrationToolsEndPoints<TfsWorkItemEndpointOptions, TfsWorkItemEndpoint>(configuration, "TfsWorkItemEndpoints");
+            //context.AddMigrationToolsEndPoints<TfsTeamSettingsEndpointOptions, TfsTeamSettingsEndpoint>(configuration, "TfsTeamSettingsEndpoints");
 
             //Processors
             context.AddTransient<TfsTeamSettingsProcessor>();
@@ -114,7 +119,7 @@ namespace MigrationTools
             context.AddTransient< TreeToTagFieldMap>();
             
             // Core
-            context.AddTransient<IMigrationClient, TfsMigrationClient>();
+            context.AddTransient<IMigrationClient, TfsTeamProjectEndpoint>();
             context.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
             context.AddTransient<ITestPlanMigrationClient, TfsTestPlanMigrationClient>();
             context.AddTransient<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();

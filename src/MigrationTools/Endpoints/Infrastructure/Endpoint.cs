@@ -1,19 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Options;
 
 namespace MigrationTools.Endpoints
 {
     public abstract class Endpoint<TOptions> : ISourceEndPoint, ITargetEndPoint
-        where TOptions : IEndpointOptions
+        where TOptions : class, IEndpointOptions
     {
         private List<IEndpointEnricher> _EndpointEnrichers;
 
-        public Endpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<Endpoint<TOptions>> logger)
+        public Endpoint(
+            IOptions<TOptions> options,
+            EndpointEnricherContainer endpointEnrichers,
+            IServiceProvider serviceProvider,
+            ITelemetryLogger telemetry,
+            ILogger<Endpoint<TOptions>> logger)
         {
+            Options = options.Value;    
             EndpointEnrichers = endpointEnrichers;
             Telemetry = telemetry;
+            Services = serviceProvider;
             Log = logger;
             _EndpointEnrichers = new List<IEndpointEnricher>();
         }
@@ -23,26 +34,22 @@ namespace MigrationTools.Endpoints
         public IEnumerable<IEndpointSourceEnricher> SourceEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointSourceEnricher))).Select(e => (IEndpointSourceEnricher)e);
         public IEnumerable<IEndpointTargetEnricher> TargetEnrichers => _EndpointEnrichers.Where(e => e.GetType().IsAssignableFrom(typeof(IEndpointTargetEnricher))).Select(e => (IEndpointTargetEnricher)e);
 
+        protected IServiceProvider Services { get; }
+
         protected ITelemetryLogger Telemetry { get; }
         protected ILogger<Endpoint<TOptions>> Log { get; }
 
         public TOptions Options { get; private set; }
 
+        [Obsolete("Dont know what this is for")]
         public abstract int Count { get; }
 
-        public virtual void Configure(TOptions options)
-        {
-            Log.LogDebug("Endpoint::Configure");
-            Options = options;
-            EndpointEnrichers.ConfigureEnrichers(Options.EndpointEnrichers);
-        }
+        //public virtual void Configure(TOptions options)
+        //{
+        //    Log.LogDebug("Endpoint::Configure");
+        //    Options = options;
+        //    EndpointEnrichers.ConfigureEnrichers(Options.EndpointEnrichers); TODO.. do we lazy load this?
+        //}
 
-        //public abstract void Filter(IEnumerable<WorkItemData> workItems);
-
-        //public abstract IEnumerable<WorkItemData> GetWorkItems();
-
-        //public abstract IEnumerable<WorkItemData> GetWorkItems(QueryOptions query);
-
-        //public abstract void PersistWorkItem(WorkItemData sourceWorkItem);
     }
 }

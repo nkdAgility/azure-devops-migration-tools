@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Enrichers;
 
 namespace MigrationTools._EngineV1.Configuration

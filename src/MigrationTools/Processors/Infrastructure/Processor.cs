@@ -2,34 +2,45 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Enrichers;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class Processor : IProcessor
     {
         private bool _ProcessorConfigured;
-        private IEndpointFactory _endpointFactory;
+        private IEndpoint _source;
+        private IEndpoint _target;
 
         public Processor(
+            IOptions<ProcessorOptions> options,
+            StaticTools staticTools,
             ProcessorEnricherContainer processorEnrichers,
-            IEndpointFactory endpointFactory,
             IServiceProvider services,
             ITelemetryLogger telemetry,
             ILogger<Processor> logger)
         {
+            Options = options.Value;
             Services = services;
             Telemetry = telemetry;
             Log = logger;
             ProcessorEnrichers = processorEnrichers;
-            _endpointFactory = endpointFactory;
+            StaticTools = staticTools;
         }
 
-        public IEndpoint Source { get; private set; }
-        public IEndpoint Target { get; private set; }
+        public StaticTools StaticTools { get; private set; }
+
+        public IProcessorOptions Options { get; private set; }
+
+        public IEndpoint Source { get { if (_source == null) { _source = Services.GetKeyedService<IEndpoint>(Options.SourceName); } return _source; } }
+        public IEndpoint Target { get { if (_target == null) { _target = Services.GetKeyedService<IEndpoint>(Options.TargetName); } return _target; } }
 
         public ProcessorEnricherContainer ProcessorEnrichers { get; }
 
@@ -43,49 +54,6 @@ namespace MigrationTools.Processors.Infrastructure
         public bool SupportsProcessorEnrichers => false;
 
         public virtual ProcessorType Type => ProcessorType.AddHock;
-
-        public virtual void Configure(IProcessorOptions options)
-        {
-            Log.LogInformation("Processor::Configure");
-            Log.LogInformation("Processor::Configure Processor Type {Name}", Name);
-            try
-            {
-                Source = _endpointFactory.CreateEndpoint(options.SourceName);
-            }
-            catch (ArgumentNullException)
-            {
-                Log.LogError("In the Processor configuration, specify the SourceName, for example \"SourceName\" : \"mySourceName\" and make sure there's an EndPoint with that name");
-                throw;
-            }
-            catch (InvalidOperationException)
-            {
-                Log.LogError("Couldn't find a Source EndPoint with SourceName [{0}]", options.SourceName);
-                throw;
-            }
-
-            try
-            {
-                Target = _endpointFactory.CreateEndpoint(options.TargetName);
-            }
-            catch (ArgumentNullException)
-            {
-                Log.LogError("In the Processor configuration, specify the TargetName, for example \"TargetName\" : \"myTargetName\" and make sure there's an EndPoint with that name");
-                throw;
-            }
-            catch (InvalidOperationException)
-            {
-                Log.LogError("Couldn't find a Target EndPoint with TargetName [{0}]", options.TargetName);
-                throw;
-            }
-            //Endpoints.ConfigureEndpoints(source, target);
-            ProcessorEnrichers.ConfigureEnrichers(options.ProcessorEnrichers);
-            _ProcessorConfigured = true;
-        }
-
-        public void Configure(IProcessorConfig config)
-        {
-            Configure((IProcessorOptions)config);
-        }
 
         public void Execute()
         {
@@ -149,6 +117,16 @@ namespace MigrationTools.Processors.Infrastructure
                 throw e;
             }
             return type;
+        }
+
+        protected static void AddMetric(string name, IDictionary<string, double> store, double value)
+        {
+            if (!store.ContainsKey(name)) store.Add(name, value);
+        }
+
+        protected static void AddParameter(string name, IDictionary<string, string> store, string value)
+        {
+            if (!store.ContainsKey(name)) store.Add(name, value);
         }
     }
 }

@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.Tools.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program

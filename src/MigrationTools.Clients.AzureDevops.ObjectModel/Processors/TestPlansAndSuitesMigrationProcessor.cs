@@ -34,7 +34,7 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestPlansAndSuitesMigrationProcessor : TfsMigrationProcessorBase
+    public class TestPlansAndSuitesMigrationProcessor : TfsProcessor
     {
         private int __currentSuite = 0;
         private int __totalSuites = 0;

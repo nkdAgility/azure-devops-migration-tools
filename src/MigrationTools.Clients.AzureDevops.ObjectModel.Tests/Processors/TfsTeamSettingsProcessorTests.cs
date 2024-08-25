@@ -26,8 +26,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "TfsTeamSettingsSource",
                 TargetName = "TfsTeamSettingsTarget"
             };
-            var x = Services.GetRequiredService<TfsTeamSettingsProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<TfsTeamSettingsProcessor>(Services, y);
             Assert.IsNotNull(x);
         }
 
@@ -43,8 +42,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "TfsTeamSettingsSource",
                 TargetName = "TfsTeamSettingsTarget"
             };
-            var x = Services.GetRequiredService<TfsTeamSettingsProcessor>();
-            x.Configure(y);
+            var x = ActivatorUtilities.CreateInstance<TfsTeamSettingsProcessor>(Services, y);
             Assert.IsNotNull(x);
         }
 
@@ -53,8 +51,7 @@ namespace MigrationTools.Processors.Tests
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
             var migrationConfig = GetTfsTeamSettingsProcessorOptions();
-            var processor = Services.GetRequiredService<TfsTeamSettingsProcessor>();
-            processor.Configure(migrationConfig);
+            var processor = ActivatorUtilities.CreateInstance<TfsTeamSettingsProcessor>(Services, migrationConfig);
             processor.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }

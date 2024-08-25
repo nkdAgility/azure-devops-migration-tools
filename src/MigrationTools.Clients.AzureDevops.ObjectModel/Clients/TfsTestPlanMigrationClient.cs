@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Options;
 
 namespace MigrationTools._EngineV1.Clients
 {
     public class TfsTestPlanMigrationClient : ITestPlanMigrationClient
     {
-        public IEndpointOptions Config => throw new NotImplementedException();
+     
 
-        public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
+        public TfsTestPlanMigrationClient(IOptions<TfsTeamProjectEndpointOptions> options)
         {
-            // No current config
+            Options = options.Value;
         }
+
+        public IEndpointOptions Options { get; set ; }
 
         public TestPlanData CreateTestPlan()
         {

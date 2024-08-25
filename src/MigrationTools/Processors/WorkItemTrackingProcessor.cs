@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -19,20 +22,15 @@ namespace MigrationTools.Processors
         public override ProcessorType Type => ProcessorType.Integrated;
 
         public WorkItemTrackingProcessor(
+                    IOptions<WorkItemTrackingProcessorOptions> options,
+                    StaticTools staticTools,
                     ProcessorEnricherContainer processorEnricherContainer,
-                    IEndpointFactory endpointFactory,
                     IServiceProvider services,
                     ITelemetryLogger telemetry,
                     ILogger<Processor> logger)
-            : base(processorEnricherContainer, endpointFactory, services, telemetry, logger)
+            : base(options, staticTools, processorEnricherContainer, services, telemetry, logger)
         {
-        }
-
-        public override void Configure(IProcessorOptions options)
-        {
-            base.Configure(options);
-            Log.LogInformation("WorkItemTrackingProcessor::Configure");
-            _config = (WorkItemTrackingProcessorOptions)options;
+            _config = options.Value;    
         }
 
         protected override void InternalExecute()

@@ -23,7 +23,7 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class WorkItemPostProcessingProcessor : TfsMigrationProcessorBase
+    public class WorkItemPostProcessingProcessor : TfsProcessor
     {
         private WorkItemPostProcessingProcessorOptions _config;
 

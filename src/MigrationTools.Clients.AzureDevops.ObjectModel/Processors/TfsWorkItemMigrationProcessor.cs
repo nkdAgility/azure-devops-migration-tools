@@ -45,7 +45,7 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class TfsWorkItemMigrationProcessor : TfsMigrationProcessorBase
+    public class TfsWorkItemMigrationProcessor : TfsProcessor
     {
 
         private static int _count = 0;

@@ -2,9 +2,11 @@
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Options;
 using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
@@ -23,24 +25,20 @@ namespace MigrationTools.Processors
         private int _totalQueriesMigrated;
         private int _totalQueryFailed;
 
+        public new TfsSharedQueryProcessorOptions Options => (TfsSharedQueryProcessorOptions)base.Options;
+
         public new TfsEndpoint Source => (TfsEndpoint)base.Source;
 
         public new TfsEndpoint Target => (TfsEndpoint)base.Target;
 
-        public TfsSharedQueryProcessor(ProcessorEnricherContainer processorEnrichers,
-                                       IEndpointFactory endpointFactory,
+        public TfsSharedQueryProcessor(
+            IOptions<TfsSharedQueryProcessorOptions> options,
+            ProcessorEnricherContainer processorEnrichers,
                                        IServiceProvider services,
                                        ITelemetryLogger telemetry,
                                        ILogger<Processor> logger)
-            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
+            : base(options, processorEnrichers, services, telemetry, logger)
         {
-        }
-
-        public override void Configure(IProcessorOptions options)
-        {
-            base.Configure(options);
-            Log.LogInformation("TfsSharedQueryProcessor::Configure");
-            _options = (TfsSharedQueryProcessorOptions)options;
         }
 
         protected override void InternalExecute()

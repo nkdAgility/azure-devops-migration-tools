@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.Tests.Core.Clients
 {
