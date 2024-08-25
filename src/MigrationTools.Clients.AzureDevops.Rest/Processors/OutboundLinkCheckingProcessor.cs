@@ -19,7 +19,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
     {
         private OutboundLinkCheckingProcessorOptions _options;
 
-        public OutboundLinkCheckingProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        public OutboundLinkCheckingProcessor(IOptions<OutboundLinkCheckingProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

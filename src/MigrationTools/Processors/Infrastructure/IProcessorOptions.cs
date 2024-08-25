@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
@@ -10,11 +11,13 @@ namespace MigrationTools.Processors.Infrastructure
         /// <summary>
         /// This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
         /// </summary>
+        [Required]
         public string SourceName { get; }
 
         /// <summary>
         /// This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
         /// </summary>
+        [Required]
         public string TargetName { get; }
 
         /// <summary>

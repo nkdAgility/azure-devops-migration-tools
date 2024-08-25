@@ -21,7 +21,7 @@ namespace MigrationTools.Processors
     /// <processingtarget>Pipelines</processingtarget>
     public partial class AzureDevOpsPipelineProcessor : Processor
     {
-        public AzureDevOpsPipelineProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        public AzureDevOpsPipelineProcessor(IOptions<AzureDevOpsPipelineProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

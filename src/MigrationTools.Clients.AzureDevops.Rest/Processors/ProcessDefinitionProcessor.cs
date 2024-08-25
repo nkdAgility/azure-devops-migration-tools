@@ -69,7 +69,7 @@ namespace MigrationTools.Processors
 
         private Dictionary<string, WorkItemField> TargetFields = new Dictionary<string, WorkItemField>();
 
-        public ProcessDefinitionProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        public ProcessDefinitionProcessor(IOptions<ProcessDefinitionProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
             SourceModel = new ProcessorModel();
             TargetModel = new ProcessorModel();

@@ -63,8 +63,9 @@ namespace MigrationTools.Processors
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
-        public TfsWorkItemMigrationProcessor(IOptions<ProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
+
         }
 
         new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;

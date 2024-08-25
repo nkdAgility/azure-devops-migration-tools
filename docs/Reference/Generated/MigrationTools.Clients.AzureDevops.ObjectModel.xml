@@ -378,11 +378,6 @@
             When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
             </summary>
         </member>
-        <member name="M:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.#ctor">
-            <summary>
-            Creates a new workitemmigrationconfig with default values
-            </summary>
-        </member>
         <member name="T:MigrationTools.Processors.WorkItemBulkEditProcessor">
             <summary>
             This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.

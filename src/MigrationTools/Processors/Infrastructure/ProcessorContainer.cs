@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,15 +22,15 @@ namespace MigrationTools.Processors.Infrastructure
         private ILogger<ProcessorContainer> _logger;
         private ProcessorContainerOptions _Options;
 
-        private readonly Lazy<List<IOldProcessor>> _processorsLazy;
+        private readonly Lazy<List<IProcessor>> _processorsLazy;
 
         public int Count { get { return _processorsLazy.Value.Count; } }
 
-        public ReadOnlyCollection<IOldProcessor> Processors
+        public ReadOnlyCollection<IProcessor> Processors
         {
             get
             {
-                return new ReadOnlyCollection<IOldProcessor>(_processorsLazy.Value);
+                return new ReadOnlyCollection<IProcessor>(_processorsLazy.Value);
             }
         }
 
@@ -40,41 +41,59 @@ namespace MigrationTools.Processors.Infrastructure
             _logger = logger;
             _Options = options.Value;
             // Initialize the lazy processor list
-            _processorsLazy = new Lazy<List<IOldProcessor>>(() => LoadProcessorsfromOptions(_Options));
+            _processorsLazy = new Lazy<List<IProcessor>>(() => LoadProcessorsfromOptions(_Options));
         }
 
-        private List<IOldProcessor> LoadProcessorsfromOptions(ProcessorContainerOptions options)
+        private List<IProcessor> LoadProcessorsfromOptions(ProcessorContainerOptions options)
         {
-            var processors = new List<IOldProcessor>();
+            var processors = new List<IProcessor>();
             if (options.Processors != null)
             {
                 var enabledProcessors = options.Processors.Where(x => x.Enabled).ToList();
                 _logger.LogInformation("ProcessorContainer: Of {ProcessorCount} configured Processors only {EnabledProcessorCount} are enabled", options.Processors.Count, enabledProcessors.Count);
-                var allTypes = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOldProcessor>().ToList();
+                var allTypes = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessor>().ToList();
 
-                foreach (IProcessorConfig processorConfig in enabledProcessors)
+                foreach (IProcessorOptions processorOption in enabledProcessors)
                 {
-                    if (processorConfig.IsProcessorCompatible(enabledProcessors))
+                    if (processorOption.IsProcessorCompatible(enabledProcessors))
                     {
-                        _logger.LogInformation("ProcessorContainer: Adding Processor {ProcessorName}", processorConfig.ConfigurationOptionFor);
+                        _logger.LogInformation("ProcessorContainer: Adding Processor {ProcessorName}", processorOption.ConfigurationOptionFor);
 
 
                         Type type = allTypes
-                              .FirstOrDefault(t => t.Name.Equals(processorConfig.ConfigurationOptionFor));
+                              .FirstOrDefault(t => t.Name.Equals(processorOption.ConfigurationOptionFor));
 
                         if (type == null)
                         {
-                            _logger.LogError("Type " + processorConfig.ConfigurationOptionFor + " not found.", processorConfig.ConfigurationOptionFor);
-                            throw new Exception("Type " + processorConfig.ConfigurationOptionFor + " not found.");
+                            _logger.LogError("Type " + processorOption.ConfigurationOptionFor + " not found.", processorOption.ConfigurationOptionFor);
+                            throw new Exception("Type " + processorOption.ConfigurationOptionFor + " not found.");
                         }
-                        IOldProcessor pc = (IOldProcessor)ActivatorUtilities.CreateInstance(_services, type);
+
+                        var constructors = type.GetConstructors();
+                        foreach (var constructor in constructors)
+                        {
+                            var parameters = constructor.GetParameters();
+                            _logger.LogInformation("Constructor found: {Constructor}", string.Join(", ", parameters.Select(p => p.ParameterType.Name)));
+                        }
+
+                        _logger.LogInformation("Attempting to pass parameters: {Parameters}", string.Join(", ", new object[] { Microsoft.Extensions.Options.Options.Create(processorOption) }.Select(p => p.GetType().Name)));
+
+
+                        //var optionsWrapperType = typeof(IOptions<>).MakeGenericType(processorOption.GetType());
+                        //var optionsWrapper = Activator.CreateInstance(optionsWrapperType, processorOption);
+
+                        var optionsWrapper = typeof(Microsoft.Extensions.Options.Options).GetMethod("Create")
+                        .MakeGenericMethod(processorOption.GetType())
+                        .Invoke(null, new object[] { processorOption });
+
+                        IProcessor pc = (IProcessor)ActivatorUtilities.CreateInstance(_services, type, optionsWrapper);
                         processors.Add(pc);
                     }
                     else
                     {
                         var message = "ProcessorContainer: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
-                        _logger.LogError(message, processorConfig.ConfigurationOptionFor);
-                        throw new InvalidOperationException(string.Format(message, processorConfig.ConfigurationOptionFor, "ProcessorContainer"));
+                        _logger.LogError(message, processorOption.ConfigurationOptionFor);
+                        throw new InvalidOperationException(string.Format(message, processorOption.ConfigurationOptionFor, "ProcessorContainer"));
                     }
                 }
             }

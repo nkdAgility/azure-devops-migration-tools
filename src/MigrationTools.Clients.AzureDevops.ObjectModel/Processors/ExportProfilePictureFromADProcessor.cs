@@ -30,7 +30,7 @@ namespace MigrationTools.Processors
     {
         private IIdentityManagementService2 ims2;
 
-        public ExportProfilePictureFromADProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        public ExportProfilePictureFromADProcessor(IOptions<ExportProfilePictureFromADProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = Target.GetService<IIdentityManagementService2>();

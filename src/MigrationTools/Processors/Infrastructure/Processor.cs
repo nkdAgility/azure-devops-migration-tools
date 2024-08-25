@@ -15,12 +15,11 @@ namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class Processor : IProcessor
     {
-        private bool _ProcessorConfigured;
         private IEndpoint _source;
         private IEndpoint _target;
 
         public Processor(
-            IOptions<ProcessorOptions> options,
+            IOptions<IProcessorOptions> options,
             CommonTools commonTools,
             ProcessorEnricherContainer processorEnrichers,
             IServiceProvider services,
@@ -39,8 +38,8 @@ namespace MigrationTools.Processors.Infrastructure
 
         public IProcessorOptions Options { get; private set; }
 
-        public IEndpoint Source { get { if (_source == null) { _source = Services.GetKeyedService<IEndpoint>(Options.SourceName); } return _source; } }
-        public IEndpoint Target { get { if (_target == null) { _target = Services.GetKeyedService<IEndpoint>(Options.TargetName); } return _target; } }
+        public IEndpoint Source { get { if (_source == null) { _source = Services.GetRequiredKeyedService<IEndpoint>(Options.SourceName); } return _source; } }
+        public IEndpoint Target { get { if (_target == null) { _target = Services.GetRequiredKeyedService<IEndpoint>(Options.TargetName); } return _target; } }
 
         public ProcessorEnricherContainer ProcessorEnrichers { get; }
 
@@ -64,10 +63,15 @@ namespace MigrationTools.Processors.Infrastructure
             //////////////////////////////////////////////////
             try
             {
-                if (!_ProcessorConfigured)
+                if (Options == null)
                 {
-                    Log.LogError("Processor::Execute: Processer base has not been configured.");
+                    Log.LogError("Processor::Execute: Processer base has not been configured. Options does not exist!");
                     throw new InvalidOperationException("Processer base has not been configured.");
+                }
+                if (string.IsNullOrEmpty(Options.SourceName) || string.IsNullOrEmpty(Options.SourceName))
+                {
+                   Log.LogCritical("Processor::Execute: Processer base has not been configured. Source or Target is null! You need to set both 'SourceName' and 'TargetName' on the processer to a valid 'Endpoint' entry.");
+                   Environment.Exit(-200);
                 }
                 Status = ProcessingStatus.Running;
                 InternalExecute();

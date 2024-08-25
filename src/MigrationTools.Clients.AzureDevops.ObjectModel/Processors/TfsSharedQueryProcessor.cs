@@ -26,7 +26,7 @@ namespace MigrationTools.Processors
         private int _totalQueriesMigrated;
         private int _totalQueryFailed;
 
-        public TfsSharedQueryProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        public TfsSharedQueryProcessor(IOptions<TfsSharedQueryProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

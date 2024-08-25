@@ -25,7 +25,7 @@ namespace MigrationTools.Processors
     /// <processingtarget>Shared Queries</processingtarget>
     public class CreateTeamFolders : TfsProcessor
     {
-        public CreateTeamFolders(IOptions<ProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public CreateTeamFolders(IOptions<EmptyProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

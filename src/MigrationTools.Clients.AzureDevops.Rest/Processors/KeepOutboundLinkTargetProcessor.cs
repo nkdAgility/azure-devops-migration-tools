@@ -22,7 +22,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
     {
         private KeepOutboundLinkTargetProcessorOptions _options;
 
-        public KeepOutboundLinkTargetProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        public KeepOutboundLinkTargetProcessor(IOptions<KeepOutboundLinkTargetProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
