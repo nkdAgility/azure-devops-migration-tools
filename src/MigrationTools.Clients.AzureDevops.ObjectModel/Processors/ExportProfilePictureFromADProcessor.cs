@@ -16,6 +16,8 @@ using MigrationTools._EngineV1.Configuration.Processing;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
@@ -24,25 +26,21 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Profiles</processingtarget>
-    public class ExportProfilePictureFromADProcessor : TfsStaticProcessorBase
+    public class ExportProfilePictureFromADProcessor : Processor
     {
         private IIdentityManagementService2 ims2;
-        private ExportProfilePictureFromADProcessorOptions _config;
 
-        public ExportProfilePictureFromADProcessor(IOptions<ExportProfilePictureFromADProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ExportProfilePictureFromADProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
-            _config = options.Value;
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
-            ims2 = Engine.Target.GetService<IIdentityManagementService2>();
+            ims2 = Target.GetService<IIdentityManagementService2>();
         }
 
-        public override string Name
-        {
-            get
-            {
-                return "ExportProfilePictureFromADProcessor";
-            }
-        }
+        new ExportProfilePictureFromADProcessorOptions Options => (ExportProfilePictureFromADProcessorOptions)base.Options;
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
         protected override void InternalExecute()
         {
@@ -68,7 +66,7 @@ namespace MigrationTools.Processors
             }
             var folks = (from IdentityDescriptor id in SIDS.Members where id.IdentityType == "System.Security.Principal.WindowsIdentity" select id);
 
-            DirectoryContext objContext = new DirectoryContext(DirectoryContextType.Domain, _config.Domain, _config.Username, _config.Password);
+            DirectoryContext objContext = new DirectoryContext(DirectoryContextType.Domain, Options.Domain, Options.Username, Options.Password);
             Domain objDomain = Domain.GetDomain(objContext);
             string ldapName = string.Format("LDAP://{0}", objDomain.Name);
 
@@ -80,7 +78,7 @@ namespace MigrationTools.Processors
                     TeamFoundationIdentity i = ims2.ReadIdentity(IdentitySearchFactor.Identifier, id.Identifier, MembershipQuery.Direct, ReadIdentityOptions.None);
                     if (!(i == null) && i.IsContainer == false)
                     {
-                        DirectoryEntry d = new DirectoryEntry(ldapName, _config.Username, _config.Password);
+                        DirectoryEntry d = new DirectoryEntry(ldapName, Options.Username, Options.Password);
                         DirectorySearcher dssearch = new DirectorySearcher(d)
                         {
                             Filter = string.Format("(sAMAccountName={0})", i.UniqueName.Split(char.Parse(@"\"))[1])
@@ -95,9 +93,9 @@ namespace MigrationTools.Processors
                             string newImage = Path.Combine(exportPath, string.Format("{0}.jpg", i.UniqueName.Replace(@"\", "-")));
                             if (!File.Exists(newImage))
                             {
-                                DirectoryEntry deUser = new DirectoryEntry(sresult.Path, _config.Username, _config.Password);
+                                DirectoryEntry deUser = new DirectoryEntry(sresult.Path, Options.Username, Options.Password);
                                 Log.LogInformation("{0} [PROCESS] {1}: {2}", current, deUser.Name, newImage);
-                                string empPic = string.Format(_config.PictureEmpIDFormat, deUser.Properties["employeeNumber"].Value);
+                                string empPic = string.Format(Options.PictureEmpIDFormat, deUser.Properties["employeeNumber"].Value);
                                 try
                                 {
                                     webClient.DownloadFile(empPic, newImage);

@@ -23,7 +23,7 @@ namespace MigrationTools.Processors
 
         public WorkItemTrackingProcessor(
                     IOptions<WorkItemTrackingProcessorOptions> options,
-                    StaticTools staticTools,
+                    CommonTools staticTools,
                     ProcessorEnricherContainer processorEnricherContainer,
                     IServiceProvider services,
                     ITelemetryLogger telemetry,

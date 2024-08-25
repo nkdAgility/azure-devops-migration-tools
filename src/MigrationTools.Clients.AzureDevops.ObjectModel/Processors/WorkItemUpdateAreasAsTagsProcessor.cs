@@ -26,7 +26,7 @@ namespace MigrationTools.Processors
     {
         private WorkItemUpdateAreasAsTagsProcessorOptions _config;
 
-        public WorkItemUpdateAreasAsTagsProcessor(IOptions<WorkItemUpdateAreasAsTagsProcessorOptions> options, TfsStaticTools tfsStaticTools, StaticTools staticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsStaticTools, staticTools, processorEnrichers, services, telemetry, logger)
+        public WorkItemUpdateAreasAsTagsProcessor(IOptions<WorkItemUpdateAreasAsTagsProcessorOptions> options, TfsCommonTools tfsStaticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsStaticTools, processorEnrichers, services, telemetry, logger)
         {
           
         }

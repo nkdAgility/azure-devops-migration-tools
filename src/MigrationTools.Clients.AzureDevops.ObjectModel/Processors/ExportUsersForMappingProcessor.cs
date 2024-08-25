@@ -6,12 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 
 using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Process;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 using Newtonsoft.Json;
@@ -27,33 +29,22 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Items</processingtarget>
     public class ExportUsersForMappingProcessor : TfsProcessor
     {
-        private ExportUsersForMappingProcessorOptions _config;
-        private TfsUserMappingTool _TfsUserMappingTool;
-
-        public override string Name
+        public ExportUsersForMappingProcessor(IOptions<ExportUsersForMappingProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
-            get
-            {
-                return "ExportUsersForMappingProcessor";
-            }
         }
 
-        public ILogger<ExportUsersForMappingProcessor> Logger { get; }
 
-        private EngineConfiguration _engineConfig;
+        new ExportUsersForMappingProcessorOptions Options => (ExportUsersForMappingProcessorOptions)base.Options;
 
-        public ExportUsersForMappingProcessor(IOptions<ExportUsersForMappingProcessorOptions> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingProcessor> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
-        {
-            Logger = logger;
-            _engineConfig =  engineConfig.Value;
-            _config = options.Value;
-        }
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            if(string.IsNullOrEmpty(_TfsUserMappingTool.Options.UserMappingFile))
+            if(string.IsNullOrEmpty(CommonTools.UserMapping.Options.UserMappingFile))
             {
                 Log.LogError("UserMappingFile is not set");
 
@@ -61,27 +52,27 @@ namespace MigrationTools.Processors
                        }
          
             List<IdentityMapData> usersToMap = new List<IdentityMapData>();
-            if (_config.OnlyListUsersInWorkItems)
+            if (Options.OnlyListUsersInWorkItems)
             {
                 Log.LogInformation("OnlyListUsersInWorkItems is true, only users in work items will be listed");
-                List<WorkItemData> sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(_config.WIQLQuery);
+                List<WorkItemData> sourceWorkItems = Source.WorkItems.GetWorkItems(Options.WIQLQuery);
                 Log.LogInformation("Processed {0} work items from Source", sourceWorkItems.Count);
 
-                usersToMap = _TfsUserMappingTool.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
+                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
                 Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
             }
             else
             {
                 Log.LogInformation("OnlyListUsersInWorkItems is false, all users will be listed");
-                usersToMap = _TfsUserMappingTool.GetUsersInSourceMappedToTarget();
+                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTarget();
                 Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
             }
 
             usersToMap = usersToMap.Where(x => x.Source.FriendlyName != x.target?.FriendlyName).ToList();
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
             Dictionary<string, string> usermappings = usersToMap.ToDictionary(x => x.Source.FriendlyName, x => x.target?.FriendlyName);
-            System.IO.File.WriteAllText(_TfsUserMappingTool.Options.UserMappingFile, Newtonsoft.Json.JsonConvert.SerializeObject(usermappings, Formatting.Indented));
-            Log.LogInformation("Writen to: {LocalExportJsonFile}", _TfsUserMappingTool.Options.UserMappingFile);
+            System.IO.File.WriteAllText(CommonTools.UserMapping.Options.UserMappingFile, Newtonsoft.Json.JsonConvert.SerializeObject(usermappings, Formatting.Indented));
+            Log.LogInformation("Writen to: {LocalExportJsonFile}", CommonTools.UserMapping.Options.UserMappingFile);
             //////////////////////////////////////////////////
             stopwatch.Stop();
             Log.LogInformation("DONE in {Elapsed} seconds");

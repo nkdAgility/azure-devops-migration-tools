@@ -9,6 +9,8 @@ using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
 using Microsoft.Extensions.Options;
+using MigrationTools.Enrichers;
+using MigrationTools._EngineV1.Clients;
 
 
 namespace MigrationTools.Processors
@@ -18,16 +20,17 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestVariablesMigrationProcessor : MigrationProcessorBase
+    public class TestVariablesMigrationProcessor : Processor
     {
-        public TestVariablesMigrationProcessor(IOptions<TestVariablesMigrationProcessorOptions> options, IMigrationEngine engine, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
+        public TestVariablesMigrationProcessor(IOptions<TestVariablesMigrationProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
-        public override string Name
-        {
-            get { return typeof(TestVariablesMigrationProcessor).Name; }
-        }
+        new TestVariablesMigrationProcessorOptions Options => (TestVariablesMigrationProcessorOptions)base.Options;
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
         internal ITestVariableValue GetVal(ITestVariable targetVar, string valueToFind)
         {
@@ -47,8 +50,8 @@ namespace MigrationTools.Processors
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
         protected override void InternalExecute()
         {
-            TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
-            TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
+            TestManagementContext SourceTmc = new TestManagementContext(Source);
+            TestManagementContext targetTmc = new TestManagementContext(Target);
             List<ITestVariable> sourceVars = SourceTmc.Project.TestVariables.Query().ToList();
             Log.LogInformation("Plan to copy {0} Veriables?", sourceVars.Count);
 

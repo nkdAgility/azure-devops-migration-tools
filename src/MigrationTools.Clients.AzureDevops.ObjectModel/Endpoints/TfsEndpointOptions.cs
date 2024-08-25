@@ -1,4 +1,5 @@
-﻿using MigrationTools.Endpoints.Infrastructure;
+﻿using System.ComponentModel.DataAnnotations;
+using MigrationTools.Endpoints.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -7,17 +8,23 @@ namespace MigrationTools.Endpoints
     public class TfsEndpointOptions : EndpointOptions
     {
         [JsonConverter(typeof(StringEnumConverter))]
+        [Required]
         public AuthenticationMode AuthenticationMode { get; set; }
 
+        [Required]
         public string AccessToken { get; set; }
         [JsonProperty(Order = -3)]
+        [Required]
         public string Organisation { get; set; }
         [JsonProperty(Order = -2)]
+        [Required]
         public string Project { get; set; }
 
         [JsonProperty(Order = -1)]
+        [Required]
         public string ReflectedWorkItemIdField { get; set; }
 
+        [Required]
         public TfsLanguageMapOptions LanguageMaps { get; set; }
 
 

@@ -8,6 +8,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -18,12 +19,16 @@ namespace MigrationTools.Processors
     /// <processingtarget>Queries</processingtarget>
     public class TfsSharedQueryProcessor : Processor
     {
-        private TfsSharedQueryProcessorOptions _options;
+
         private int _totalFoldersAttempted;
         private int _totalQueriesAttempted;
         private int _totalQueriesSkipped;
         private int _totalQueriesMigrated;
         private int _totalQueryFailed;
+
+        public TfsSharedQueryProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        {
+        }
 
         public new TfsSharedQueryProcessorOptions Options => (TfsSharedQueryProcessorOptions)base.Options;
 
@@ -31,15 +36,7 @@ namespace MigrationTools.Processors
 
         public new TfsEndpoint Target => (TfsEndpoint)base.Target;
 
-        public TfsSharedQueryProcessor(
-            IOptions<TfsSharedQueryProcessorOptions> options,
-            ProcessorEnricherContainer processorEnrichers,
-                                       IServiceProvider services,
-                                       ITelemetryLogger telemetry,
-                                       ILogger<Processor> logger)
-            : base(options, processorEnrichers, services, telemetry, logger)
-        {
-        }
+
 
         protected override void InternalExecute()
         {
@@ -84,15 +81,15 @@ namespace MigrationTools.Processors
             var requiredPath = sourceFolder.Path.Replace($"{Source.Project}/", $"{Target.Project}/");
 
             // Is the project name to be used in the migration as an extra folder level?
-            if (_options.PrefixProjectToNodes == true)
+            if (Options.PrefixProjectToNodes == true)
             {
                 // we need to inject the team name as a folder in the structure
-                requiredPath = requiredPath.Replace(_options.SharedFolderName, $"{_options.SharedFolderName}/{Source.Project}");
+                requiredPath = requiredPath.Replace(Options.SharedFolderName, $"{Options.SharedFolderName}/{Source.Project}");
 
                 // If on the root level we need to check that the extra folder has already been added
                 if (sourceFolder.Path.Count(f => f == '/') == 1)
                 {
-                    var targetSharedFolderRoot = (QueryFolder)parentFolder[_options.SharedFolderName];
+                    var targetSharedFolderRoot = (QueryFolder)parentFolder[Options.SharedFolderName];
                     var extraFolder = (QueryFolder)targetSharedFolderRoot.FirstOrDefault(q => q.Path == requiredPath);
                     if (extraFolder == null)
                     {
@@ -154,17 +151,17 @@ namespace MigrationTools.Processors
             // Sort out any path issues in the quertText
             var fixedQueryText = query.QueryText.Replace($"'{Source.Project}", $"'{Target.Project}"); // the ' should only items at the start of areapath etc.
 
-            if (_options.PrefixProjectToNodes)
+            if (Options.PrefixProjectToNodes)
             {
                 // we need to inject the team name as a folder in the structure too
                 fixedQueryText = fixedQueryText.Replace($"{Target.Project}\\", $"{Target.Project}\\{Source.Project}\\");
             }
 
-            if (_options.SourceToTargetFieldMappings != null)
+            if (Options.SourceToTargetFieldMappings != null)
             {
-                foreach (var sourceField in _options.SourceToTargetFieldMappings.Keys)
+                foreach (var sourceField in Options.SourceToTargetFieldMappings.Keys)
                 {
-                    fixedQueryText = fixedQueryText.Replace(sourceField, _options.SourceToTargetFieldMappings[sourceField]);
+                    fixedQueryText = fixedQueryText.Replace(sourceField, Options.SourceToTargetFieldMappings[sourceField]);
                 }
             }
 

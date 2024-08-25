@@ -8,23 +8,10 @@ using Microsoft.Extensions.Options;
 
 namespace MigrationTools.Tools
 {
-    public class TfsStaticTools
+    public class TfsCommonTools : CommonTools
     {
-        public TfsUserMappingTool UserMapping { get; private set; }
-        public TfsAttachmentTool Attachment { get; private set; }
-        public TfsNodeStructureTool NodeStructure { get; private set; }
-        public TfsRevisionManagerTool RevisionManager { get; private set; }
-        public TfsWorkItemLinkTool WorkItemLink { get; private set; }
-        public TfsWorkItemEmbededLinkTool WorkItemEmbededLink { get; private set; }
-        public TfsValidateRequiredFieldTool ValidateRequiredField { get; private set; }
-        public TfsTeamSettingsTool TeamSettings { get; private set; }
-
-        public TfsEmbededImagesTool EmbededImages { get; private set; }
-
-        public TfsGitRepositoryTool GitRepository { get; private set; }
-        public TfsStaticTools(ITelemetryLogger telemetry,
-                                        ILogger<TfsStaticTools> logger,
-                                        TfsUserMappingTool userMappingEnricher,
+        public TfsCommonTools(
+            TfsUserMappingTool userMappingEnricher,
                                         TfsAttachmentTool attachmentEnricher,
                                         TfsNodeStructureTool nodeStructureEnricher,
                                         TfsRevisionManagerTool revisionManager,
@@ -33,8 +20,11 @@ namespace MigrationTools.Tools
                                         TfsValidateRequiredFieldTool requiredFieldValidator,
                                         TfsTeamSettingsTool teamSettingsEnricher,
                                         TfsEmbededImagesTool embededImagesEnricher,
-                                        TfsGitRepositoryTool TfsGitRepositoryTool
-            )
+                                        TfsGitRepositoryTool TfsGitRepositoryTool,
+                                        StringManipulatorTool StringManipulatorTool,
+                                        WorkItemTypeMappingTool workItemTypeMapping,
+                                        FieldMappingTool fieldMappingTool
+            ) : base(StringManipulatorTool, workItemTypeMapping, fieldMappingTool)
         {
             UserMapping = userMappingEnricher;
             Attachment = attachmentEnricher;
@@ -47,6 +37,20 @@ namespace MigrationTools.Tools
             EmbededImages = embededImagesEnricher;
             GitRepository = TfsGitRepositoryTool;
         }
+
+        public TfsUserMappingTool UserMapping { get; private set; }
+        public TfsAttachmentTool Attachment { get; private set; }
+        public TfsNodeStructureTool NodeStructure { get; private set; }
+        public TfsRevisionManagerTool RevisionManager { get; private set; }
+        public TfsWorkItemLinkTool WorkItemLink { get; private set; }
+        public TfsWorkItemEmbededLinkTool WorkItemEmbededLink { get; private set; }
+        public TfsValidateRequiredFieldTool ValidateRequiredField { get; private set; }
+        public TfsTeamSettingsTool TeamSettings { get; private set; }
+
+        public TfsEmbededImagesTool EmbededImages { get; private set; }
+
+        public TfsGitRepositoryTool GitRepository { get; private set; }
+
 
     }
 }

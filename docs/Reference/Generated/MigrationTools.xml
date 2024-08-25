@@ -279,32 +279,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"feature/configuration-builder"
+            => @"feature/configuration-builder-trial2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"904a6c49"
+            => @"4ccc3776"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"904a6c4946cadd62bed7c87873bf7a2a5f61a99b"
+            => @"4ccc37765912f349fbd5485fca15c2ef26a8bf7c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-25T10:18:11+01:00"
+            => @"2024-08-25T15:33:43+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"185"
+            => @"186"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-185-g904a6c49"
+            => @"v15.1.8-Preview.9-186-g4ccc3776"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -339,7 +339,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"193"
+            => @"194"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

@@ -3,6 +3,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
+using System.ComponentModel.DataAnnotations;
 
 namespace MigrationTools.Processors
 {
@@ -20,6 +21,7 @@ namespace MigrationTools.Processors
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
         /// <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        [Required]
         public string WIQLQuery { get; set; }
 
 

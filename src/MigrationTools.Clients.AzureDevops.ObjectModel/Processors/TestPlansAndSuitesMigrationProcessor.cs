@@ -26,6 +26,7 @@ using Environment = System.Environment;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
@@ -38,7 +39,6 @@ namespace MigrationTools.Processors
     {
         private int __currentSuite = 0;
         private int __totalSuites = 0;
-        private TestPlansAndSuitesMigrationProcessorOptions _config;
         private int _currentPlan = 0;
         private int _currentTestCases = 0;
         private IIdentityManagementService _sourceIdentityManagementService;
@@ -49,35 +49,31 @@ namespace MigrationTools.Processors
         private TestManagementContext _targetTestStore;
         private int _totalPlans = 0;
         private int _totalTestCases = 0;
-        private TfsNodeStructureTool _nodeStructureEnricher;
-        private readonly EngineConfiguration _engineConfig;
 
-        public TestPlansAndSuitesMigrationProcessor(IOptions<TestPlansAndSuitesMigrationProcessorOptions> options, IOptions<EngineConfiguration> engineConfig, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public TestPlansAndSuitesMigrationProcessor(IOptions<TestPlansAndSuitesMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
-            _engineConfig = engineConfig.Value;
-            _config = options.Value;
         }
 
-        public override string Name
-        {
-            get
-            {
-                return typeof(TestPlansAndSuitesMigrationProcessor).Name;
-            }
-        }
+        new TestPlansAndSuitesMigrationProcessorOptions Options => (TestPlansAndSuitesMigrationProcessorOptions)base.Options;
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+
+
 
         protected override void InternalExecute()
         {
-            _sourceTestStore = new TestManagementContext(Engine.Source, _config.TestPlanQuery);
-            _targetTestStore = new TestManagementContext(Engine.Target);
+            _sourceTestStore = new TestManagementContext(Source, Options.TestPlanQuery);
+            _targetTestStore = new TestManagementContext(Target);
             _sourceTestConfigs = _sourceTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
             _targetTestConfigs = _targetTestStore.Project.TestConfigurations.Query("Select * From TestConfiguration");
-            _sourceIdentityManagementService = Engine.Source.GetService<IIdentityManagementService>();
-            _targetIdentityManagementService = Engine.Target.GetService<IIdentityManagementService>();
+            _sourceIdentityManagementService = Source.GetService<IIdentityManagementService>();
+            _targetIdentityManagementService = Target.GetService<IIdentityManagementService>();
 
-            _nodeStructureEnricher.ProcessorExecutionBegin(null);
+            CommonTools.NodeStructure.ProcessorExecutionBegin(null);
 
-            bool filterByCompleted = _config.FilterCompleted;
+            bool filterByCompleted = Options.FilterCompleted;
 
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
@@ -103,7 +99,7 @@ namespace MigrationTools.Processors
 
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                 {
-                    Log.LogInformation("TestPlansAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, _config.OnlyElementsWithTag);
+                    Log.LogInformation("TestPlansAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, Options.OnlyElementsWithTag);
                     continue;
                 }
                 ProcessTestPlan(sourcePlan);
@@ -130,7 +126,7 @@ namespace MigrationTools.Processors
 
             if (CanSkipElementBecauseOfTags(source.Id))
             {
-                Log.LogInformation("TestPlansAndSuitesMigrationContext::AddChildTestCases: Skipping Test Case {Id}:'{Name}' as is not tagged with '{Tag}'.", source.Id, source.Title, _config.OnlyElementsWithTag);
+                Log.LogInformation("TestPlansAndSuitesMigrationContext::AddChildTestCases: Skipping Test Case {Id}:'{Name}' as is not tagged with '{Tag}'.", source.Id, source.Title, Options.OnlyElementsWithTag);
                 return;
             }
 
@@ -147,12 +143,12 @@ namespace MigrationTools.Processors
 
                 if (CanSkipElementBecauseOfTags(sourceTestCaseEntry.Id))
                 {
-                    Log.LogInformation("TestPlansAndSuitesMigrationContext::AddChildTestCases: Skipping Test Suite {Id}:'{Name}' as is not tagged with '{Tag}'.", sourceTestCaseEntry.Id, sourceTestCaseEntry.Title, _config.OnlyElementsWithTag);
+                    Log.LogInformation("TestPlansAndSuitesMigrationContext::AddChildTestCases: Skipping Test Suite {Id}:'{Name}' as is not tagged with '{Tag}'.", sourceTestCaseEntry.Id, sourceTestCaseEntry.Title, Options.OnlyElementsWithTag);
                     continue;
                 }
 
                 InnerLog(source, string.Format("    Processing {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
-                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
+                WorkItemData wi = Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
                 if (wi == null)
                 {
                     InnerLog(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
@@ -239,7 +235,7 @@ namespace MigrationTools.Processors
                 var stopwatch = Stopwatch.StartNew();
                 var starttime = DateTime.Now;
                 _currentTestCases++;
-                WorkItemData wi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.AsWorkItemData(), false);
+                WorkItemData wi = Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.AsWorkItemData(), false);
                 ITestSuiteEntry targetTce;
                 if (wi != null)
                 {
@@ -276,8 +272,8 @@ namespace MigrationTools.Processors
                     || e.EntryType == TestSuiteEntryType.StaticTestSuite))
                 {
                     //Find migrated suite in target
-                    WorkItemData sourceSuiteWi = Engine.Source.WorkItems.GetWorkItem(sourceSuiteChild.Id.ToString());
-                    WorkItemData targetSuiteWi = Engine.Target.WorkItems.FindReflectedWorkItem(sourceSuiteWi, false);
+                    WorkItemData sourceSuiteWi = Source.WorkItems.GetWorkItem(sourceSuiteChild.Id.ToString());
+                    WorkItemData targetSuiteWi = Target.WorkItems.FindReflectedWorkItem(sourceSuiteWi, false);
                     if (targetSuiteWi != null)
                     {
                         ITestSuiteEntry targetSuiteChild = (from tc in ((IStaticTestSuite)targetSuite).Entries
@@ -338,13 +334,13 @@ namespace MigrationTools.Processors
 
         private void ApplyFieldMappings(int sourceWIId, int targetWIId)
         {
-            var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
-            var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
+            var sourceWI = Source.WorkItems.GetWorkItem(sourceWIId.ToString());
+            var targetWI = Target.WorkItems.GetWorkItem(targetWIId.ToString());
 
-            targetWI.ToWorkItem().AreaPath = _nodeStructureEnricher.GetNewNodeName(sourceWI.ToWorkItem().AreaPath, TfsNodeStructureType.Area);
-            targetWI.ToWorkItem().IterationPath = _nodeStructureEnricher.GetNewNodeName(sourceWI.ToWorkItem().IterationPath, TfsNodeStructureType.Iteration);
+            targetWI.ToWorkItem().AreaPath = CommonTools.NodeStructure.GetNewNodeName(sourceWI.ToWorkItem().AreaPath, TfsNodeStructureType.Area);
+            targetWI.ToWorkItem().IterationPath = CommonTools.NodeStructure.GetNewNodeName(sourceWI.ToWorkItem().IterationPath, TfsNodeStructureType.Iteration);
 
-            StaticEnrichers.FieldMappingTool.ApplyFieldMappings(sourceWI, targetWI);
+            CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWI, targetWI);
             targetWI.SaveToAzureDevOps();
         }
 
@@ -359,9 +355,9 @@ namespace MigrationTools.Processors
 
         private void AssignReflectedWorkItemId(int sourceWIId, int targetWIId)
         {
-            var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
-            var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
-            targetWI.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
+            var sourceWI = Source.WorkItems.GetWorkItem(sourceWIId.ToString());
+            var targetWI = Target.WorkItems.GetWorkItem(targetWIId.ToString());
+            targetWI.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIDFieldName].Value = Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
             targetWI.SaveToAzureDevOps();
         }
 
@@ -380,7 +376,7 @@ namespace MigrationTools.Processors
             {
                 _currentTestCases++;
                 // find target testcase id for this source tce
-                WorkItemData targetTc = Engine.Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.AsWorkItemData(), false);
+                WorkItemData targetTc = Target.WorkItems.FindReflectedWorkItem(sourceTce.TestCase.WorkItem.AsWorkItemData(), false);
 
                 if (targetTc == null)
                 {
@@ -469,12 +465,12 @@ namespace MigrationTools.Processors
 
         private bool CanSkipElementBecauseOfTags(int workItemId)
         {
-            if (_config.OnlyElementsWithTag == null)
+            if (Options.OnlyElementsWithTag == null)
             {
                 return false;
             }
-            var sourcePlanWorkItem = Engine.Source.WorkItems.GetWorkItem(workItemId.ToString());
-            var tagWhichMustBePresent = _config.OnlyElementsWithTag;
+            var sourcePlanWorkItem = Source.WorkItems.GetWorkItem(workItemId.ToString());
+            var tagWhichMustBePresent = Options.OnlyElementsWithTag;
             return !sourcePlanWorkItem.ToWorkItem().Tags.Contains(tagWhichMustBePresent);
         }
 
@@ -496,16 +492,16 @@ namespace MigrationTools.Processors
             IRequirementTestSuite targetSuiteChild;
             try
             {
-                string token = Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken;
-                string project = Engine.Target.Config.AsTeamProjectConfig().Project;
-                Uri collectionUri = Engine.Target.Config.AsTeamProjectConfig().Collection;
+                string token = Target.Options.PersonalAccessToken;
+                string project = Target.Options.Project;
+                Uri collectionUri = Target.Options.Collection;
                 VssConnection connection = new VssConnection(collectionUri, new VssClientCredentials());
                 if (!string.IsNullOrEmpty(token)) connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
                 TestPlanHttpClient testPlanHttpClient = connection.GetClient<TestPlanHttpClient>();
-                WorkItemData sourceSuite = Engine.Source.WorkItems.GetWorkItem(source.Parent.Id);
-                WorkItemData targetSuite = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSuite);
-                WorkItemData sourcePlan = Engine.Source.WorkItems.GetWorkItem(source.Plan.Id);
-                WorkItemData targetPlan = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourcePlan);
+                WorkItemData sourceSuite = Source.WorkItems.GetWorkItem(source.Parent.Id);
+                WorkItemData targetSuite = Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSuite);
+                WorkItemData sourcePlan = Source.WorkItems.GetWorkItem(source.Plan.Id);
+                WorkItemData targetPlan = Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourcePlan);
                 TestSuiteCreateParams testSuiteCreateParams = new TestSuiteCreateParams()
                 {
                     RequirementId = int.Parse(requirement.Id),
@@ -557,8 +553,8 @@ namespace MigrationTools.Processors
 
             // Set area and iteration to root of the target project.
             // We will set the correct values later, when we actually have a work item available
-            targetPlan.Iteration = Engine.Target.Config.AsTeamProjectConfig().Project;
-            targetPlan.AreaPath = Engine.Target.Config.AsTeamProjectConfig().Project;
+            targetPlan.Iteration = Target.Options.Project;
+            targetPlan.AreaPath = Target.Options.Project;
 
             // Remove testsettings reference because VSTS Sync doesn't support migrating these artifacts
             if (targetPlan.ManualTestSettingsId != 0)
@@ -585,14 +581,14 @@ namespace MigrationTools.Processors
             {
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::FOUND Test Suit {id}", testSuit.Id);
                 //Get Source ReflectedWorkItemId
-                var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceSuit.Id.ToString());
+                var sourceWI = Source.WorkItems.GetWorkItem(sourceSuit.Id.ToString());
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::SourceWorkItem[{workItemId]", sourceWI.Id);
-                string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
+                string expectedReflectedId = Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::SourceWorkItem[{workItemId] ~[{ReflectedWorkItemId]", sourceWI.Id, expectedReflectedId);
                 //Get Target ReflectedWorkItemId
-                var targetWI = Engine.Target.WorkItems.GetWorkItem(testSuit.Id.ToString());
+                var targetWI = Target.WorkItems.GetWorkItem(testSuit.Id.ToString());
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::TargetWorkItem[{workItemId]", targetWI.Id);
-                string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                string workItemReflectedId = (string)targetWI.Fields[Target.Options.ReflectedWorkItemIDFieldName].Value;
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);
                 //Compaire
                 if (workItemReflectedId != expectedReflectedId)
@@ -613,19 +609,19 @@ namespace MigrationTools.Processors
             {
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: FOUND Test Plan with {name}", planName);
                 //Get Source ReflectedWorkItemId
-                var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourcePlanId);
+                var sourceWI = Source.WorkItems.GetWorkItem(sourcePlanId);
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::SourceWorkItem[{workItemId]", sourceWI.Id);
-                string expectedReflectedId = Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
+                string expectedReflectedId = Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::SourceWorkItem[{workItemId] ~[{ReflectedWorkItemId]", sourceWI.Id, expectedReflectedId);
                 //Get Target ReflectedWorkItemId
-                var targetWI = Engine.Target.WorkItems.GetWorkItem(testPlan.Id.ToString());
+                var targetWI = Target.WorkItems.GetWorkItem(testPlan.Id.ToString());
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId]", targetWI.Id);
-                if (!targetWI.Fields.ContainsKey(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
+                if (!targetWI.Fields.ContainsKey(Target.Options.ReflectedWorkItemIDFieldName))
                 {
-                    Log.LogError("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId} does not have ReflectedWorkItemId field {ReflectedWorkItemIDFieldName}", targetWI.Id, Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                    Log.LogError("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId} does not have ReflectedWorkItemId field {ReflectedWorkItemIDFieldName}", targetWI.Id, Target.Options.ReflectedWorkItemIDFieldName);
                     Environment.Exit(-1);
                 }
-                string workItemReflectedId = (string)targetWI.Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                string workItemReflectedId = (string)targetWI.Fields[Target.Options.ReflectedWorkItemIDFieldName].Value;
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);
                 //Compaire
                 if (workItemReflectedId != expectedReflectedId)
@@ -643,8 +639,8 @@ namespace MigrationTools.Processors
 
         private void FixAssignedToValue(int sourceWIId, int targetWIId)
         {
-            var sourceWI = Engine.Source.WorkItems.GetWorkItem(sourceWIId.ToString());
-            var targetWI = Engine.Target.WorkItems.GetWorkItem(targetWIId.ToString());
+            var sourceWI = Source.WorkItems.GetWorkItem(sourceWIId.ToString());
+            var targetWI = Target.WorkItems.GetWorkItem(targetWIId.ToString());
             targetWI.ToWorkItem().Fields["System.AssignedTo"].Value = sourceWI.ToWorkItem().Fields["System.AssignedTo"].Value;
             targetWI.SaveToAzureDevOps();
         }
@@ -716,8 +712,8 @@ namespace MigrationTools.Processors
                     foreach (Match match in matches)
                     {
                         var qid = match.Value.Split('=')[1].Trim();
-                        TfsReflectedWorkItemId reflectedString = new TfsReflectedWorkItemId(int.Parse(qid), Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Source.Config.AsTeamProjectConfig().Collection);
-                        var targetWi = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(reflectedString.ToString());
+                        TfsReflectedWorkItemId reflectedString = new TfsReflectedWorkItemId(int.Parse(qid), Source.Options.Project, Source.Options.Collection);
+                        var targetWi = Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(reflectedString.ToString());
 
                         if (targetWi == null)
                         {
@@ -856,7 +852,7 @@ namespace MigrationTools.Processors
 
 
                 RemoveInvalidLinks(targetPlan);
-                if (_config.RemoveAllLinks)
+                if (Options.RemoveAllLinks)
                 {
                     targetPlan.Links.Clear();
                 }
@@ -928,9 +924,9 @@ namespace MigrationTools.Processors
                 return;
             //////////////////////////////////////////
             var stopwatch = Stopwatch.StartNew();
-            if (_config.MigrationDelay > 0)
+            if (Options.MigrationDelay > 0)
             {
-                System.Threading.Thread.Sleep(_config.MigrationDelay);
+                System.Threading.Thread.Sleep(Options.MigrationDelay);
             }
             var starttime = DateTime.Now;
             var metrics = new Dictionary<string, double>();
@@ -964,7 +960,7 @@ namespace MigrationTools.Processors
                         WorkItemData targetReq = null;
                         try
                         {
-                            sourceReq = Engine.Source.WorkItems.GetWorkItem(sourceRid.ToString());
+                            sourceReq = Source.WorkItems.GetWorkItem(sourceRid.ToString());
                             if (sourceReq == null)
                             {
                                 InnerLog(sourceSuite, "            Source work item not found", 5);
@@ -978,7 +974,7 @@ namespace MigrationTools.Processors
                         }
                         try
                         {
-                            targetReq = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceReq);
+                            targetReq = Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceReq);
 
                             if (targetReq == null)
                             {
@@ -989,7 +985,7 @@ namespace MigrationTools.Processors
                         catch (Exception ex)
                         {
                             InnerLog(sourceSuite, "            Source work item not migrated to target, cannot be found", 5);
-                            Log.LogError("Unable to locate SourceWI:{SourceWI} in the Target. ReflectedWorkItemId:{ReflectedWorkItemId}", sourceReq.Id, Engine.Target.WorkItems.CreateReflectedWorkItemId(sourceReq), ex);
+                            Log.LogError("Unable to locate SourceWI:{SourceWI} in the Target. ReflectedWorkItemId:{ReflectedWorkItemId}", sourceReq.Id, Target.WorkItems.CreateReflectedWorkItemId(sourceReq), ex);
                             break;
                         }
                         targetSuiteChild = CreateNewRequirementTestSuite(sourceSuite, targetReq);
@@ -1073,7 +1069,7 @@ namespace MigrationTools.Processors
 
             if (linksToRemove.Any())
             {
-                if (!_config.RemoveInvalidTestSuiteLinks)
+                if (!Options.RemoveInvalidTestSuiteLinks)
                 {
                     InnerLog(targetPlan, "We have detected test suite links that probably can't be migrated. You might receive an error 'The URL specified has a potentially unsafe URL protocol' when migrating to VSTS.", 5);
                     InnerLog(targetPlan, "Please see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178 for more details.", 5);
@@ -1106,10 +1102,10 @@ namespace MigrationTools.Processors
                 Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id.ToString(), newTestSuite.Title,
                       new Dictionary<string, string> {
                           { "Name", Name},
-                          { "Target Project", Engine.Target.Config.AsTeamProjectConfig().Project},
-                          { "Target Collection", Engine.Target.Config.AsTeamProjectConfig().Collection.ToString() },
-                          { "Source Project", Engine.Source.Config.AsTeamProjectConfig().Project},
-                          { "Source Collection", Engine.Source.Config.AsTeamProjectConfig().Collection.ToString() },
+                          { "Target Project", Target.Options.Project},
+                          { "Target Collection", Target.Options.Collection.ToString() },
+                          { "Source Project", Source.Options.Project},
+                          { "Source Collection", Source.Options.Collection.ToString() },
                           { "Status", Status.ToString() },
                           { "Task", "SaveNewTestSuitToPlan" },
                           { "Id", newTestSuite.Id.ToString()},
@@ -1127,14 +1123,14 @@ namespace MigrationTools.Processors
         private void TagCompletedTargetPlan(int workItemId)
         {
             // Remvoed to fix bug #852
-            //var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
+            //var targetPlanWorkItem = Target.WorkItems.GetWorkItem(workItemId.ToString());
             //targetPlanWorkItem.ToWorkItem().Tags = targetPlanWorkItem.ToWorkItem().Tags + ";migrated";
             //targetPlanWorkItem.SaveToAzureDevOps();
         }
 
         private bool TargetPlanContansTag(int workItemId)
         {
-            var targetPlanWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId.ToString());
+            var targetPlanWorkItem = Target.WorkItems.GetWorkItem(workItemId.ToString());
             return targetPlanWorkItem.ToWorkItem().Tags.Contains("migrated");
         }
 

@@ -14,6 +14,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -27,13 +28,7 @@ namespace MigrationTools.Processors
         private const string LogTypeName = nameof(TfsTeamSettingsProcessor);
         private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
 
-        private TfsTeamSettingsProcessorOptions _Options;
-
-        public TfsTeamSettingsProcessor(IOptions<TfsTeamSettingsProcessorOptions> options, ProcessorEnricherContainer processorEnrichers,
-                                        IServiceProvider services,
-                                        ITelemetryLogger telemetry,
-                                        ILogger<Processor> logger)
-            : base(options, processorEnrichers, services, telemetry, logger)
+        public TfsTeamSettingsProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
             _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
             {
@@ -75,7 +70,7 @@ namespace MigrationTools.Processors
         private void EnsureConfigured()
         {
             Log.LogInformation("Processor::EnsureConfigured");
-            if (_Options == null)
+            if (Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
@@ -103,9 +98,9 @@ namespace MigrationTools.Processors
             long elapsedms = 0;
 
             /////////
-            if (_Options.Teams != null)
+            if (Options.Teams != null)
             {
-                sourceTeams = sourceTeams.Where(t => _Options.Teams.Contains(t.Name)).ToList();
+                sourceTeams = sourceTeams.Where(t => Options.Teams.Contains(t.Name)).ToList();
             }
 
             var sourceHttpClient = Source.WorkHttpClient;
@@ -116,13 +111,13 @@ namespace MigrationTools.Processors
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 var foundTargetTeam = (from x in targetTeams where x.Name == sourceTeam.Name select x).SingleOrDefault();
-                if (foundTargetTeam == null || _Options.UpdateTeamSettings)
+                if (foundTargetTeam == null || Options.UpdateTeamSettings)
                 {
                     Log.LogDebug("Processing team '{0}':", sourceTeam.Name);
                     TeamFoundationTeam newTeam = foundTargetTeam ?? Target.TfsTeamService.CreateTeam(Target.TfsProjectUri.ToString(), sourceTeam.Name, sourceTeam.Description, null);
                     Log.LogDebug("-> Team '{0}' created", sourceTeam.Name);
 
-                    if (_Options.MigrateTeamSettings)
+                    if (Options.MigrateTeamSettings)
                     {
                         // Duplicate settings
                         Log.LogDebug("-> Processing team '{0}' settings:", sourceTeam.Name);
@@ -144,7 +139,7 @@ namespace MigrationTools.Processors
                                 }
 
                                 Log.LogInformation("-> Settings found for team '{sourceTeamName}'..", sourceTeam.Name);
-                                if (_Options.PrefixProjectToNodes)
+                                if (Options.PrefixProjectToNodes)
                                 {
                                     targetConfig.TeamSettings.BacklogIterationPath =
                                         string.Format("{0}\\{1}", Target.Project, sourceConfig.TeamSettings.BacklogIterationPath);
@@ -264,7 +259,7 @@ namespace MigrationTools.Processors
 
         private void MigrateCapacities(WorkHttpClient sourceHttpClient, WorkHttpClient targetHttpClient, TeamFoundationTeam sourceTeam, TeamFoundationTeam targetTeam, Dictionary<string, string> iterationMap)
         {
-            if (!_Options.MigrateTeamCapacities) return;
+            if (!Options.MigrateTeamCapacities) return;
 
             Log.LogInformation("Migrating team capacities..");
             try

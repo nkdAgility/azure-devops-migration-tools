@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.VisualStudio.Services.Common;
@@ -10,8 +11,7 @@ namespace MigrationTools.Endpoints
 {
     public class TfsEndpoint : GenericTfsEndpoint<TfsEndpointOptions>
     {
-        public TfsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<TfsEndpoint> logger)
-            : base(endpointEnrichers, telemetry, logger)
+        public TfsEndpoint(IOptions<TfsEndpointOptions> options, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<Endpoint<TfsEndpointOptions>> logger) : base(options, endpointEnrichers, serviceProvider, telemetry, logger)
         {
         }
     }
@@ -22,6 +22,10 @@ namespace MigrationTools.Endpoints
         private TfsTeamProjectCollection _Collection;
         private Project _Project;
         private WorkItemStore _Store;
+
+        public GenericTfsEndpoint(IOptions<TTfsOptions> options, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<Endpoint<TTfsOptions>> logger) : base(options, endpointEnrichers, serviceProvider, telemetry, logger)
+        {
+        }
 
         public string Project => Options.Project;
 
@@ -53,28 +57,8 @@ namespace MigrationTools.Endpoints
 
         public override int Count => 0;
 
-        public GenericTfsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<GenericTfsEndpoint<TTfsOptions>> logger)
-            : base(endpointEnrichers, telemetry, logger)
-        {
-        }
 
-        public override void Configure(TTfsOptions options)
-        {
-            base.Configure(options);
-            Log.LogDebug("TfsEndpoint::Configure");
-            if (string.IsNullOrEmpty(Options.Organisation))
-            {
-                throw new ArgumentNullException(nameof(Options.Organisation));
-            }
-            if (string.IsNullOrEmpty(Options.Project))
-            {
-                throw new ArgumentNullException(nameof(Options.Project));
-            }
-            if (string.IsNullOrEmpty(Options.AccessToken) && Options.AuthenticationMode == AuthenticationMode.AccessToken)
-            {
-                throw new ArgumentNullException(nameof(Options.AccessToken));
-            }
-        }
+
 
         private TfsTeamProjectCollection GetTfsCollection()
         {

@@ -62,7 +62,7 @@ namespace MigrationTools
 
             context.AddSingleton<FieldMappingTool>().AddSingleton<IConfigureOptions<FieldMappingToolOptions>, FieldMappingToolOptions.ConfigureOptions>();
             context.AddSingleton<VersionOptions>().AddSingleton<IConfigureOptions<VersionOptions>, VersionOptions.ConfigureOptions>();
-            context.AddSingleton<StaticTools>();
+            context.AddSingleton<CommonTools>();
 
 
             //context.AddTransient<WorkItemAttachmentEnricher>();

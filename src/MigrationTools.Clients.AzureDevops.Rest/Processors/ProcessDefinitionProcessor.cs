@@ -15,6 +15,7 @@ using Task = System.Threading.Tasks.Task;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Options;
 using Microsoft.Extensions.Options;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -68,18 +69,15 @@ namespace MigrationTools.Processors
 
         private Dictionary<string, WorkItemField> TargetFields = new Dictionary<string, WorkItemField>();
 
-        private WorkItemLayout TargetLayout { get; set; }
-
-        public ProcessDefinitionProcessor(IOptions<ProcessDefinitionProcessorOptions> options,
-                    ProcessorEnricherContainer processorEnrichers,
-                    IServiceProvider services,
-                    ITelemetryLogger telemetry,
-                    ILogger<Processor> logger)
-            : base(options, processorEnrichers, services, telemetry, logger)
+        public ProcessDefinitionProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
             SourceModel = new ProcessorModel();
             TargetModel = new ProcessorModel();
         }
+
+        private WorkItemLayout TargetLayout { get; set; }
+
+
 
         public new ProcessDefinitionProcessorOptions Options => (ProcessDefinitionProcessorOptions)base.Options;
 

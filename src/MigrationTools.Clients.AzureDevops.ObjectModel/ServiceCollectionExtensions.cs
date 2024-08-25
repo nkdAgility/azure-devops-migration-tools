@@ -61,7 +61,7 @@ namespace MigrationTools
                     break;
             }
 
-            context.AddSingleton<TfsStaticTools>();
+            context.AddSingleton<TfsCommonTools>();
             
         }
 

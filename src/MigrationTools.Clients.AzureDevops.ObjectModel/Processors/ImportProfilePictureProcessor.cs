@@ -7,10 +7,13 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 
@@ -22,23 +25,21 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Profiles</processingtarget>
-    public class ImportProfilePictureProcessor : TfsStaticProcessorBase
+    public class ImportProfilePictureProcessor : TfsProcessor
     {
         private readonly IIdentityManagementService2 ims2;
 
-        public ImportProfilePictureProcessor(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public ImportProfilePictureProcessor(IOptions<ProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
-            ims2 = (IIdentityManagementService2)me.Target.GetService<IIdentityManagementService2>();
+            ims2 = (IIdentityManagementService2)Target.GetService<IIdentityManagementService2>();
         }
 
-        public override string Name
-        {
-            get
-            {
-                return typeof(ImportProfilePictureProcessor).Name;
-            }
-        }
+        new ImportProfilePictureProcessorOptions Options => (ImportProfilePictureProcessorOptions)base.Options;
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
         public static string FriendlyDomainToLdapDomain(string friendlyDomainName)
         {

@@ -7,25 +7,25 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.DataContracts;
 using MigrationTools.Tools;
+using Microsoft.Extensions.Options;
+using MigrationTools.Enrichers;
+using MigrationTools._EngineV1.Clients;
 
 namespace MigrationTools.Processors
 {
     /// <summary>
     /// Note: this is only for internal usage. Don't use this in your configurations.
     /// </summary>
-    public class FakeProcessor : MigrationProcessorBase
+    public class FakeProcessor : TfsProcessor
     {
-        public FakeProcessor(IMigrationEngine engine, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, staticEnrichers, services, telemetry, logger)
+        public FakeProcessor(IOptions<ProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
-        public override string Name
-        {
-            get
-            {
-                return "FakeProcessor";
-            }
-        }
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
         protected override void InternalExecute()
         {
@@ -33,7 +33,7 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
 
             var query = @"SELECT [System.Id] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject ";// AND [System.Id] = 188708 ";
-            List<WorkItemData> sourceWIS = Engine.Source.WorkItems.GetWorkItems(query);
+            List<WorkItemData> sourceWIS = Source.WorkItems.GetWorkItems(query);
             Log.LogDebug("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
 

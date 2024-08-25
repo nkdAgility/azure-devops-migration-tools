@@ -21,7 +21,7 @@ namespace MigrationTools.Processors.Infrastructure
 
         public Processor(
             IOptions<ProcessorOptions> options,
-            StaticTools staticTools,
+            CommonTools commonTools,
             ProcessorEnricherContainer processorEnrichers,
             IServiceProvider services,
             ITelemetryLogger telemetry,
@@ -32,10 +32,10 @@ namespace MigrationTools.Processors.Infrastructure
             Telemetry = telemetry;
             Log = logger;
             ProcessorEnrichers = processorEnrichers;
-            StaticTools = staticTools;
+            CommonTools = commonTools;
         }
 
-        public StaticTools StaticTools { get; private set; }
+        public CommonTools CommonTools { get; private set; }
 
         public IProcessorOptions Options { get; private set; }
 

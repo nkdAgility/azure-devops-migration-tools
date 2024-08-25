@@ -30,6 +30,7 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools._EngineV1.DataContracts;
 
 using MigrationTools.DataContracts;
+using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 using Newtonsoft.Json.Linq;
@@ -53,34 +54,25 @@ namespace MigrationTools.Processors
         private static long _elapsedms = 0;
         private static int _totalWorkItem = 0;
         private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
-        private TfsWorkItemMigrationProcessorOptions _config;
         private List<string> _ignore;
 
         private ILogger contextLog;
         private ITelemetryLogger _telemetry;
-        private readonly EngineConfiguration _engineConfig;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
-
-        public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemMigrationProcessorOptions> processorConfig,IMigrationEngine engine,
-                                        IServiceProvider services,
-                                        ITelemetryLogger telemetry,
-                                        ILogger<TfsWorkItemMigrationProcessor> logger,
-                                        TfsStaticTools tfsStaticEnrichers,
-                                        IOptions<EngineConfiguration> engineConfig,
-                                        StaticTools staticEnrichers)
-            : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public TfsWorkItemMigrationProcessor(IOptions<ProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
-            _config = processorConfig.Value;
-            _telemetry = telemetry;
-            _engineConfig = engineConfig.Value;
-            contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
         }
 
-        public override string Name => typeof(TfsWorkItemMigrationProcessor).Name;
+        new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
@@ -97,17 +89,17 @@ namespace MigrationTools.Processors
         protected override void InternalExecute()
         {
             Log.LogDebug("WorkItemMigrationContext::InternalExecute ");
-            if (_config == null)
+            if (Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
             //////////////////////////////////////////////////
             ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
-            TfsStaticTools.NodeStructure.ProcessorExecutionBegin(null);
-            if (TfsStaticTools.TeamSettings.Enabled)
+            CommonTools.NodeStructure.ProcessorExecutionBegin(null);
+            if (CommonTools.TeamSettings.Enabled)
             {
-                TfsStaticTools.TeamSettings.ProcessorExecutionBegin(null);
+                CommonTools.TeamSettings.ProcessorExecutionBegin(null);
             } else
             {
                 Log.LogWarning("WorkItemMigrationContext::InternalExecute: teamSettingsEnricher is disabled!");
@@ -124,36 +116,36 @@ namespace MigrationTools.Processors
                 PopulateIgnoreList();
 
                 // Inform the user that he maybe has to be patient now
-                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", _config.WIQLQuery);
-                var sourceWorkItems = Engine.Source.WorkItems.GetWorkItems(_config.WIQLQuery);
+                contextLog.Information("Querying items to be migrated: {SourceQuery} ...", Options.WIQLQuery);
+                var sourceWorkItems = Source.WorkItems.GetWorkItems(Options.WIQLQuery);
                 contextLog.Information("Replay all revisions of {sourceWorkItemsCount} work items?",
                     sourceWorkItems.Count);
 
                 //////////////////////////////////////////////////
                 ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(sourceWorkItems);
                 ValiddateWorkItemTypesExistInTarget(sourceWorkItems);
-                TfsStaticTools.NodeStructure.ValidateAllNodesExistOrAreMapped(sourceWorkItems, Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name);
+                CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
 
-                contextLog.Information("Found target project as {@destProject}", Engine.Target.WorkItems.Project.Name);
+                contextLog.Information("Found target project as {@destProject}", Target.WorkItems.Project.Name);
 
                 //////////////////////////////////////////////////////////FilterCompletedByQuery
 
-                if (_config.FilterWorkItemsThatAlreadyExistInTarget)
+                if (Options.FilterWorkItemsThatAlreadyExistInTarget)
                 {
                     contextLog.Information(
                         "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for {sourceWorkItems} work items that may have already been migrated to the target...",
                         sourceWorkItems.Count());
 
-                    string targetWIQLQuery = TfsStaticTools.NodeStructure.FixAreaPathAndIterationPathForTargetQuery(_config.WIQLQuery,
-                        Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name, contextLog);
+                    string targetWIQLQuery = CommonTools.NodeStructure.FixAreaPathAndIterationPathForTargetQuery(Options.WIQLQuery,
+                        Source.WorkItems.Project.Name, Target.WorkItems.Project.Name, contextLog);
                     // Also replace Project Name
-                    targetWIQLQuery = targetWIQLQuery.Replace(Engine.Source.WorkItems.Project.Name, Engine.Target.WorkItems.Project.Name);
+                    targetWIQLQuery = targetWIQLQuery.Replace(Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                     //Then run query
-                    sourceWorkItems = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).FilterExistingWorkItems(
+                    sourceWorkItems = ((TfsWorkItemMigrationClient)Target.WorkItems).FilterExistingWorkItems(
                         sourceWorkItems, targetWIQLQuery,
-                        (TfsWorkItemMigrationClient)Engine.Source.WorkItems);
+                        (TfsWorkItemMigrationClient)Source.WorkItems);
                     contextLog.Information(
                         "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",
                         sourceWorkItems.Count());
@@ -180,8 +172,8 @@ namespace MigrationTools.Processors
                     {
                         try
                         {
-                            ProcessWorkItemAsync(sourceWorkItemData, _config.WorkItemCreateRetryLimit).Wait();
-                            if (_config.PauseAfterEachWorkItem)
+                            ProcessWorkItemAsync(sourceWorkItemData, Options.WorkItemCreateRetryLimit).Wait();
+                            if (Options.PauseAfterEachWorkItem)
                             {
                                 Console.WriteLine("Do you want to continue? (y/n)");
                                 if (Console.ReadKey().Key != ConsoleKey.Y)
@@ -196,14 +188,14 @@ namespace MigrationTools.Processors
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
                             workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
 
-                            if (_config.MaxGracefulFailures == 0)
+                            if (Options.MaxGracefulFailures == 0)
                             {
                                 throw;
                             }
 
-                            if (_itemsInError.Count > _config.MaxGracefulFailures)
+                            if (_itemsInError.Count > Options.MaxGracefulFailures)
                             {
-                                throw new Exception($"Too many errors: more than {_config.MaxGracefulFailures} errors occurred, aborting migration.");
+                                throw new Exception($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
                             }
                         }
                     }
@@ -211,9 +203,9 @@ namespace MigrationTools.Processors
             }
             finally
             {
-                if (_config.FixHtmlAttachmentLinks)
+                if (Options.FixHtmlAttachmentLinks)
                 {
-                     TfsStaticTools.EmbededImages?.ProcessorExecutionEnd(null);
+                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
                 }
 
                 stopwatch.Stop();
@@ -231,7 +223,7 @@ namespace MigrationTools.Processors
 
             contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
             List<IdentityMapData> usersToMap = new List<IdentityMapData>();
-            usersToMap = TfsStaticTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
+            usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
             if (usersToMap != null && usersToMap?.Count > 0)
             {
                 Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist in the target. This will not cause any errors, but may result in disconnected users that could have been mapped. Use the ExportUsersForMapping processor to create a list of mappable users. Then Import using ", usersToMap.Count);
@@ -242,15 +234,15 @@ namespace MigrationTools.Processors
         //private void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         //{
         //    contextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
-        //    if (!TfsStaticEnrichers.NodeStructure.Options.Enabled && Engine.Target.Config.AsTeamProjectConfig().Project != Engine.Source.Config.AsTeamProjectConfig().Project)
+        //    if (!TfsCommonTools.NodeStructure.Options.Enabled && Target.Options.Project != Source.Config.AsTeamProjectConfig().Project)
         //    {
         //        Log.LogError("Source and Target projects have different names, but  NodeStructureEnricher is not enabled. Cant continue... please enable nodeStructureEnricher in the config and restart.");
         //        Environment.Exit(-1);
         //    }
-        //    if ( TfsStaticEnrichers.NodeStructure.Options.Enabled)
+        //    if ( TfsCommonTools.NodeStructure.Options.Enabled)
         //    {
-        //        List<NodeStructureItem> nodeStructureMissingItems = TfsStaticEnrichers.NodeStructure.GetMissingRevisionNodes(sourceWorkItems);
-        //        if (TfsStaticEnrichers.NodeStructure.ValidateTargetNodesExist(nodeStructureMissingItems))
+        //        List<NodeStructureItem> nodeStructureMissingItems = TfsCommonTools.NodeStructure.GetMissingRevisionNodes(sourceWorkItems);
+        //        if (TfsCommonTools.NodeStructure.ValidateTargetNodesExist(nodeStructureMissingItems))
         //        {
         //            Log.LogError("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
         //            Environment.Exit(-1);
@@ -265,8 +257,8 @@ namespace MigrationTools.Processors
         {
             contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
 
-            var result =  TfsStaticTools.ValidateRequiredField.ValidatingRequiredField(
-                Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName, sourceWorkItems);
+            var result =  CommonTools.ValidateRequiredField.ValidatingRequiredField(
+                Target.Options.ReflectedWorkItemIDFieldName, sourceWorkItems);
             if (!result)
             {
                 var ex = new InvalidFieldValueException(
@@ -289,7 +281,7 @@ namespace MigrationTools.Processors
 
             Log.LogDebug("Validating::WorkItemTypes::sourceWorkItemTypes: {count} WorkItemTypes in the full source history {sourceWorkItemTypesString}", sourceWorkItemTypes.Count(), string.Join(",", sourceWorkItemTypes));
 
-            var targetWorkItemTypes = Engine.Target.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().Select(x => x.Name);
+            var targetWorkItemTypes = Target.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().Select(x => x.Name);
             Log.LogDebug("Validating::WorkItemTypes::targetWorkItemTypes::{count} WorkItemTypes in Target process: {targetWorkItemTypesString}", targetWorkItemTypes.Count(), string.Join(",", targetWorkItemTypes));
 
             var missingWorkItemTypes = sourceWorkItemTypes.Where(sourceWit => !targetWorkItemTypes.Contains(sourceWit)); // the real one
@@ -320,13 +312,13 @@ namespace MigrationTools.Processors
 
         private void ValidatePatTokenRequirement()
         {
-            string collUrl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
+            string collUrl = Target.Options.Collection.ToString();
             if (collUrl.Contains("dev.azure.com") || collUrl.Contains(".visualstudio.com"))
             {
-                var token = Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken;
-                if (Engine.Target.Config.AsTeamProjectConfig().PersonalAccessTokenVariableName != null)
+                var token = Target.Options.PersonalAccessToken;
+                if (Target.Options.PersonalAccessTokenVariableName != null)
                 {
-                    token = Environment.GetEnvironmentVariable(Engine.Target.Config.AsTeamProjectConfig().PersonalAccessTokenVariableName);
+                    token = Environment.GetEnvironmentVariable(Target.Options.PersonalAccessTokenVariableName);
                 }
                 // Test that
                 if (token.IsNullOrEmpty())
@@ -359,13 +351,13 @@ namespace MigrationTools.Processors
                 throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
             }
             newWorkItemTimer.Stop();
-            Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Engine.Target.Config.AsTeamProjectConfig().Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
-            if (_config.UpdateCreatedBy)
+            Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Target.Options.Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
+            if (Options.UpdateCreatedBy)
             {
                 newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value;
                 workItemLog.Debug("Setting 'System.CreatedBy'={SystemCreatedBy}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value);
             }
-            if (_config.UpdateCreatedDate)
+            if (Options.UpdateCreatedDate)
             {
                 newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value;
                 workItemLog.Debug("Setting 'System.CreatedDate'={SystemCreatedDate}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value);
@@ -429,7 +421,7 @@ namespace MigrationTools.Processors
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                TfsStaticTools.UserMapping.MapUserIdentityField(f);
+                CommonTools.UserMapping.MapUserIdentityField(f);
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
@@ -448,7 +440,7 @@ namespace MigrationTools.Processors
                     switch (f.FieldDefinition.FieldType)
                     {
                         case FieldType.String:
-                            StaticEnrichers.StringManipulator.ProcessorExecutionWithFieldItem(null, oldWorkItemData.Fields[f.ReferenceName]);
+                            CommonTools.StringManipulator.ProcessorExecutionWithFieldItem(null, oldWorkItemData.Fields[f.ReferenceName]);
                             newWorkItem.Fields[f.ReferenceName].Value = oldWorkItemData.Fields[f.ReferenceName].Value;
                             break;
                         default:
@@ -459,11 +451,11 @@ namespace MigrationTools.Processors
                 } 
             }
 
-            if (TfsStaticTools.NodeStructure.Enabled)
+            if (CommonTools.NodeStructure.Enabled)
             {
 
-                newWorkItem.AreaPath = TfsStaticTools.NodeStructure.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
-                newWorkItem.IterationPath = TfsStaticTools.NodeStructure.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
+                newWorkItem.AreaPath = CommonTools.NodeStructure.GetNewNodeName(oldWorkItem.AreaPath, TfsNodeStructureType.Area);
+                newWorkItem.IterationPath = CommonTools.NodeStructure.GetNewNodeName(oldWorkItem.IterationPath, TfsNodeStructureType.Iteration);
             }
             else
             {
@@ -493,17 +485,17 @@ namespace MigrationTools.Processors
 
         private void ProcessHTMLFieldAttachements(WorkItemData targetWorkItem)
         {
-            if (targetWorkItem != null && _config.FixHtmlAttachmentLinks)
+            if (targetWorkItem != null && Options.FixHtmlAttachmentLinks)
             {
-                TfsStaticTools.EmbededImages.FixEmbededImages(null, targetWorkItem);
+                CommonTools.EmbededImages.FixEmbededImages(null, targetWorkItem);
             }
         }
 
         private void ProcessWorkItemEmbeddedLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            if (sourceWorkItem != null && targetWorkItem != null && _config.FixHtmlAttachmentLinks)
+            if (sourceWorkItem != null && targetWorkItem != null && Options.FixHtmlAttachmentLinks)
             {
-                TfsStaticTools.WorkItemEmbededLink.Enrich(sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemEmbededLink.Enrich(sourceWorkItem, targetWorkItem);
             }
         }
 
@@ -513,10 +505,10 @@ namespace MigrationTools.Processors
             var startTime = DateTime.Now;
             processWorkItemMetrics = new Dictionary<string, double>();
             processWorkItemParamiters = new Dictionary<string, string>();
-            AddParameter("SourceURL", processWorkItemParamiters, Engine.Source.WorkItems.Config.AsTeamProjectConfig().Collection.ToString());
+            AddParameter("SourceURL", processWorkItemParamiters, Source.Options.Collection.ToString());
             AddParameter("SourceWorkItem", processWorkItemParamiters, sourceWorkItem.Id);
-            AddParameter("TargetURL", processWorkItemParamiters, Engine.Target.WorkItems.Config.AsTeamProjectConfig().Collection.ToString());
-            AddParameter("TargetProject", processWorkItemParamiters, Engine.Target.WorkItems.Project.Name);
+            AddParameter("TargetURL", processWorkItemParamiters, Target.Options.Collection.ToString());
+            AddParameter("TargetProject", processWorkItemParamiters, Target.WorkItems.Project.Name);
             AddParameter("RetryLimit", processWorkItemParamiters, retryLimit.ToString());
             AddParameter("RetryNumber", processWorkItemParamiters, retries.ToString());
             Log.LogDebug("######################################################################################");
@@ -526,14 +518,14 @@ namespace MigrationTools.Processors
             {
                 if (sourceWorkItem.Type != "Test Plan" && sourceWorkItem.Type != "Test Suite")
                 {
-                    var targetWorkItem = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWorkItem, false);
+                    var targetWorkItem = Target.WorkItems.FindReflectedWorkItem(sourceWorkItem, false);
                     ///////////////////////////////////////////////
                     TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
                         new Dictionary<string, object>(){
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
-                            { "ReplayRevisions", TfsStaticTools.RevisionManager.ReplayRevisions }}
+                            { "ReplayRevisions", CommonTools.RevisionManager.ReplayRevisions }}
                         );
-                    List<RevisionItem> revisionsToMigrate = TfsStaticTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
+                    List<RevisionItem> revisionsToMigrate = CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
@@ -544,7 +536,7 @@ namespace MigrationTools.Processors
                         if (revisionsToMigrate.Count == 0)
                         {
                             ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                            ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                            ProcessWorkItemLinks(Source.WorkItems, Target.WorkItems, sourceWorkItem, targetWorkItem);
                             ProcessHTMLFieldAttachements(targetWorkItem);
                             ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
@@ -638,28 +630,28 @@ namespace MigrationTools.Processors
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {
-            if (targetWorkItem != null && TfsStaticTools.Attachment.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
+            if (targetWorkItem != null && CommonTools.Attachment.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", TfsStaticTools.Attachment.Enabled } });
-                TfsStaticTools.Attachment.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
+                TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", CommonTools.Attachment.Enabled } });
+                CommonTools.Attachment.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.ToWorkItem().AttachedFileCount);
             }
         }
 
         private void ProcessWorkItemLinks(IWorkItemMigrationClient sourceStore, IWorkItemMigrationClient targetStore, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            if (targetWorkItem != null && TfsStaticTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
+            if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
-                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", TfsStaticTools.WorkItemLink.Enabled } });
-                TfsStaticTools.WorkItemLink.Enrich(sourceWorkItem, targetWorkItem);
+                TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", CommonTools.WorkItemLink.Enabled } });
+                CommonTools.WorkItemLink.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
-                int fixedLinkCount = TfsStaticTools.GitRepository.Enrich(sourceWorkItem, targetWorkItem);
+                int fixedLinkCount = CommonTools.GitRepository.Enrich(sourceWorkItem, targetWorkItem);
                 AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
             else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case" )
             {
-                TfsStaticTools.WorkItemLink.MigrateSharedSteps(sourceWorkItem, targetWorkItem);
-                TfsStaticTools.WorkItemLink.MigrateSharedParameters(sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemLink.MigrateSharedSteps(sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemLink.MigrateSharedParameters(sourceWorkItem, targetWorkItem);
             }
         }
 
@@ -683,12 +675,12 @@ namespace MigrationTools.Processors
                     {
                         targetType = workItemTypeMappingTool.Mappings[targetType];
                     }
-                    targetWorkItem = CreateWorkItem_Shell(Engine.Target.WorkItems.Project, sourceWorkItem, targetType);
+                    targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, targetType);
                 }
 
-                if (_config.AttachRevisionHistory)
+                if (Options.AttachRevisionHistory)
                 {
-                    TfsStaticTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
+                    CommonTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
                 foreach (var revision in revisionsToMigrate)
@@ -713,8 +705,8 @@ namespace MigrationTools.Processors
                     if (typeChange && workItemId > 0)
                     {
                         ValidatePatTokenRequirement();
-                        Uri collectionUri = Engine.Target.Config.AsTeamProjectConfig().Collection;
-                        string token = Engine.Target.Config.AsTeamProjectConfig().PersonalAccessToken;
+                        Uri collectionUri = Target.Options.Collection;
+                        string token = Target.Options.PersonalAccessToken;
                         VssConnection connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
                         WorkItemTrackingHttpClient workItemTrackingClient = connection.GetClient<WorkItemTrackingHttpClient>();
                         JsonPatchDocument patchDocument = new JsonPatchDocument();
@@ -761,7 +753,7 @@ namespace MigrationTools.Processors
                         }
                         );
                         var result = workItemTrackingClient.UpdateWorkItemAsync(patchDocument, workItemId, bypassRules: true).Result;
-                        targetWorkItem = Engine.Target.WorkItems.GetWorkItem(workItemId);
+                        targetWorkItem = Target.WorkItems.GetWorkItem(workItemId);
                     }
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
 
@@ -786,21 +778,21 @@ namespace MigrationTools.Processors
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
                     // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
-                    StaticEnrichers.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
+                    CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
 
-                    var reflectedUri = (TfsReflectedWorkItemId)Engine.Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
-                    if (!targetWorkItem.ToWorkItem().Fields.Contains(Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName))
+                    var reflectedUri = (TfsReflectedWorkItemId)Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
+                    if (!targetWorkItem.ToWorkItem().Fields.Contains(Target.Options.ReflectedWorkItemIDFieldName))
                     {
                         var ex = new InvalidOperationException("ReflectedWorkItemIDField Field Missing");
                         Log.LogError(ex,
                             " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}",
                             targetWorkItem.Type,
-                            Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+                            Target.Options.ReflectedWorkItemIDFieldName);
                         throw ex;
                     }
-                    targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
+                    targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
@@ -832,14 +824,14 @@ namespace MigrationTools.Processors
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     if (!string.IsNullOrEmpty(targetWorkItem.Id))
                     {
-                        ProcessWorkItemLinks(Engine.Source.WorkItems, Engine.Target.WorkItems, sourceWorkItem, targetWorkItem);
+                        ProcessWorkItemLinks(Source.WorkItems, Target.WorkItems, sourceWorkItem, targetWorkItem);
                         // The TFS client seems to plainly ignore the ChangedBy field when saving a link, so we need to put this back in place
                         targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                     }
 
-                    if (_config.GenerateMigrationComment)
+                    if (Options.GenerateMigrationComment)
                     {
-                        var reflectedUri = targetWorkItem.ToWorkItem().Fields[Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName].Value;
+                        var reflectedUri = targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIDFieldName].Value;
                         var history = new StringBuilder();
                         history.Append(
                             $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
@@ -847,7 +839,7 @@ namespace MigrationTools.Processors
                     }
                     targetWorkItem.SaveToAzureDevOps();
 
-                    TfsStaticTools.Attachment.CleanUpAfterSave();
+                    CommonTools.Attachment.CleanUpAfterSave();
                     TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
                 }
             }
@@ -917,7 +909,7 @@ namespace MigrationTools.Processors
 
         private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
         {
-            if (!_config.SkipRevisionWithInvalidIterationPath)
+            if (!Options.SkipRevisionWithInvalidIterationPath)
             {
                 return false;
             }
@@ -927,7 +919,7 @@ namespace MigrationTools.Processors
 
         private bool SkipRevisionWithInvalidAreaPath(WorkItemData targetWorkItemData)
         {
-            if (!_config.SkipRevisionWithInvalidAreaPath)
+            if (!Options.SkipRevisionWithInvalidAreaPath)
             {
                 return false;
             }

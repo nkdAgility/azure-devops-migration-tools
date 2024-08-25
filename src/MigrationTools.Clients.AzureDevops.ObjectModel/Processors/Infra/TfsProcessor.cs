@@ -13,12 +13,12 @@ namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class TfsProcessor : Processor
     {
-        protected TfsProcessor(IOptions<ProcessorOptions> options, TfsStaticTools tfsStaticTools, StaticTools staticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, staticTools, processorEnrichers, services, telemetry, logger)
+        protected TfsProcessor(IOptions<ProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
-            TfsStaticTools = tfsStaticTools;
+  
         }
 
-        public TfsStaticTools TfsStaticTools { get; private set; }
- 
+       new public TfsCommonTools CommonTools => (TfsCommonTools)base.CommonTools;
+
     }
 }

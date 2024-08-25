@@ -12,6 +12,8 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
+using Microsoft.Extensions.Options;
+using MigrationTools.Enrichers;
 
 
 namespace MigrationTools.Processors
@@ -21,28 +23,24 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Shared Queries</processingtarget>
-    public class CreateTeamFolders : TfsStaticProcessorBase
+    public class CreateTeamFolders : TfsProcessor
     {
-        public CreateTeamFolders(TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public CreateTeamFolders(IOptions<ProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
-        public override string Name
-        {
-            get
-            {
-                return "CreateTeamFolders";
-            }
-        }
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
 
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
-            QueryHierarchy qh = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.Projects[Engine.Target.Config.AsTeamProjectConfig().Project].QueryHierarchy;
-            List<TeamFoundationTeam> teamList = teamService.QueryTeams(Engine.Target.Config.AsTeamProjectConfig().Project).ToList();
+            TfsTeamService teamService = Target.GetService<TfsTeamService>();
+            QueryHierarchy qh = ((TfsWorkItemMigrationClient)Target.WorkItems).Store.Projects[Target.Options.Project].QueryHierarchy;
+            List<TeamFoundationTeam> teamList = teamService.QueryTeams(Target.Options.Project).ToList();
 
             Log.LogInformation("Found {0} teams?", teamList.Count);
             //////////////////////////////////////////////////

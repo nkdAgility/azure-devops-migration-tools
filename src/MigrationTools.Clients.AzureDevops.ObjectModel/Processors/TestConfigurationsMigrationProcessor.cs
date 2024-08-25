@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
-
+using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 
@@ -17,26 +19,24 @@ namespace MigrationTools.Processors
     /// <processingtarget>Suites &amp; Plans</processingtarget>
     public class TestConfigurationsMigrationProcessor : TfsProcessor
     {
-        public TestConfigurationsMigrationProcessor(IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public TestConfigurationsMigrationProcessor(IOptions<TestConfigurationsMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
+
 
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
+        new TestConfigurationsMigrationProcessorOptions Options => (TestConfigurationsMigrationProcessorOptions)base.Options;
 
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 
-        public override string Name
-        {
-            get
-            {
-                return typeof(TestConfigurationsMigrationProcessor).Name;
-            }
-        }
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+
 
         protected override void InternalExecute()
         {
-            TestManagementContext SourceTmc = new TestManagementContext(Engine.Source);
-            TestManagementContext targetTmc = new TestManagementContext(Engine.Target);
+            TestManagementContext SourceTmc = new TestManagementContext(Source);
+            TestManagementContext targetTmc = new TestManagementContext(Target);
 
             ITestConfigurationCollection tc = SourceTmc.Project.TestConfigurations.Query("Select * From TestConfiguration");
             Log.LogDebug("Plan to copy {TestCaseCount} Configurations", tc.Count);
@@ -54,7 +54,7 @@ namespace MigrationTools.Processors
                 {
                     Log.LogDebug("{sourceTestConfName} - Create new", sourceTestConf.Name);
                     targetTc = targetTmc.Project.TestConfigurations.Create();
-                    targetTc.AreaPath = sourceTestConf.AreaPath.Replace(Engine.Source.Config.AsTeamProjectConfig().Project, Engine.Target.Config.AsTeamProjectConfig().Project);
+                    targetTc.AreaPath = sourceTestConf.AreaPath.Replace(Source.Options.Project, Target.Options.Project);
                     targetTc.Description = sourceTestConf.Description;
                     targetTc.IsDefault = sourceTestConf.IsDefault;
                     targetTc.Name = sourceTestConf.Name;

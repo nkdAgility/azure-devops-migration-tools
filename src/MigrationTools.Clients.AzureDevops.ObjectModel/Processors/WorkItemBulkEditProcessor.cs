@@ -10,6 +10,8 @@ using MigrationTools.DataContracts;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools._EngineV1.Clients;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
@@ -17,29 +19,25 @@ namespace MigrationTools.Processors
     /// This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
     /// </summary>
     /// <processingtarget>WorkItem</processingtarget>
-    public class WorkItemBulkEditProcessor : TfsStaticProcessorBase
+    public class WorkItemBulkEditProcessor : TfsProcessor
     {
-        private WorkItemBulkEditProcessorOptions _config;
 
-        public WorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorOptions> options, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, IMigrationEngine me, ITelemetryLogger telemetry, ILogger<TfsStaticProcessorBase> logger) : base(tfsStaticEnrichers, staticEnrichers, services, me, telemetry, logger)
+        public WorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemBulkEditProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
-            _config = options.Value;
         }
 
+        new WorkItemBulkEditProcessorOptions Options => (WorkItemBulkEditProcessorOptions)base.Options;
 
-        public override string Name
-        {
-            get
-            {
-                return typeof(WorkItemBulkEditProcessor).Name;
-            }
-        }
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+
 
         protected override void InternalExecute()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            List<WorkItemData> workitems = Engine.Target.WorkItems.GetWorkItems(_config.WIQLQuery);
+            List<WorkItemData> workitems = Target.WorkItems.GetWorkItems(Options.WIQLQuery);
             Log.LogInformation("Update {0} work items?", workitems.Count);
             //////////////////////////////////////////////////
             int current = workitems.Count;
@@ -50,11 +48,11 @@ namespace MigrationTools.Processors
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 workitem.ToWorkItem().Open();
                 Log.LogInformation("Processing work item {0} - Type:{1} - ChangedDate:{2} - CreatedDate:{3}", workitem.Id, workitem.Type, workitem.ToWorkItem().ChangedDate.ToShortDateString(), workitem.ToWorkItem().CreatedDate.ToShortDateString());
-               StaticEnrichers.FieldMappingTool.ApplyFieldMappings(workitem);
+               CommonTools.FieldMappingTool.ApplyFieldMappings(workitem);
 
                 if (workitem.ToWorkItem().IsDirty)
                 {
-                    if (!_config.WhatIf)
+                    if (!Options.WhatIf)
                     {
                         try
                         {

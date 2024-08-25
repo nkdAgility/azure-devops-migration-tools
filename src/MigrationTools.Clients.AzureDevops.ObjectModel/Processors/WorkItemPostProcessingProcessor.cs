@@ -15,6 +15,7 @@ using MigrationTools.DataContracts;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Enrichers;
 
 namespace MigrationTools.Processors
 {
@@ -25,20 +26,16 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Items</processingtarget>
     public class WorkItemPostProcessingProcessor : TfsProcessor
     {
-        private WorkItemPostProcessingProcessorOptions _config;
-
-        public WorkItemPostProcessingProcessor(IOptions<WorkItemPostProcessingProcessorOptions> options, IMigrationEngine engine, TfsStaticTools tfsStaticEnrichers, StaticTools staticEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<MigrationProcessorBase> logger) : base(engine, tfsStaticEnrichers, staticEnrichers, services, telemetry, logger)
+        public WorkItemPostProcessingProcessor(IOptions<WorkItemPostProcessingProcessorOptions> options, TfsCommonTools tfsStaticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemPostProcessingProcessor> logger) : base(options, tfsStaticTools, processorEnrichers, services, telemetry, logger)
         {
-            _config = options.Value;
         }
 
-        public override string Name
-        {
-            get
-            {
-                return typeof(WorkItemPostProcessingProcessor).Name;
-            }
-        }
+        new WorkItemPostProcessingProcessorOptions Options => (WorkItemPostProcessingProcessorOptions)base.Options;
+
+        new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+
 
         protected override void InternalExecute()
         {
@@ -47,12 +44,12 @@ namespace MigrationTools.Processors
             var wiqbFactory = Services.GetRequiredService<IWorkItemQueryBuilderFactory>();
             var wiqb = wiqbFactory.Create();
             //Builds the constraint part of the query
-            wiqb.Query = _config.WIQLQuery;
+            wiqb.Query = Options.WIQLQuery;
 
-            List<WorkItemData> sourceWIS = Engine.Source.WorkItems.GetWorkItems(wiqb);
+            List<WorkItemData> sourceWIS = Source.WorkItems.GetWorkItems(wiqb);
             Log.LogInformation("Migrate {0} work items?", sourceWIS.Count);
             //////////////////////////////////////////////////
-            ProjectData destProject = Engine.Target.WorkItems.GetProject();
+            ProjectData destProject = Target.WorkItems.GetProject();
             Log.LogInformation("Found target project as {0}", destProject.Name);
 
             int current = sourceWIS.Count;
@@ -62,7 +59,7 @@ namespace MigrationTools.Processors
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
                 WorkItemData targetFound;
-                targetFound = Engine.Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
+                targetFound = Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
                 Log.LogInformation("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type);
                 if (targetFound == null)
                 {
@@ -72,9 +69,9 @@ namespace MigrationTools.Processors
                 {
                     Log.LogInformation("...Exists");
                     TfsExtensions.ToWorkItem(targetFound).Open();
-                   StaticEnrichers.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
-                   TfsStaticTools.WorkItemEmbededLink.Enrich(null, targetFound);
-                    TfsStaticTools.EmbededImages.FixEmbededImages(sourceWI, targetFound);
+                   CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
+                    CommonTools.WorkItemEmbededLink.Enrich(null, targetFound);
+                    CommonTools.EmbededImages.FixEmbededImages(sourceWI, targetFound);
                     if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try

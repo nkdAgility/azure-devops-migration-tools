@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Options;
@@ -13,18 +15,15 @@ namespace MigrationTools.Endpoints
     {
         private List<WorkItemData> _innerList;
 
-        public FileSystemWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<FileSystemWorkItemEndpoint> logger)
-            : base(endpointEnrichers, telemetry, logger)
+        public FileSystemWorkItemEndpoint(IOptions<FileSystemWorkItemEndpointOptions> options, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<Endpoint<FileSystemWorkItemEndpointOptions>> logger) : base(options, endpointEnrichers, serviceProvider, telemetry, logger)
         {
             _innerList = new List<WorkItemData>();
         }
 
         public override int Count => GetWorkItems().Count();
 
-        public override void Configure(FileSystemWorkItemEndpointOptions options)
+        public void EnsureStore()
         {
-            base.Configure(options);
-
             if (!Directory.Exists(Options.FileStore))
             {
                 Directory.CreateDirectory(Options.FileStore);
@@ -64,6 +63,7 @@ namespace MigrationTools.Endpoints
 
         public void PersistWorkItem(WorkItemData source)
         {
+            EnsureStore();
             var content = JsonConvert.SerializeObject(source, Formatting.Indented);
             var fileName = Path.Combine(Options.FileStore, string.Format("{0}.json", source.Id));
             File.WriteAllText(fileName, content);

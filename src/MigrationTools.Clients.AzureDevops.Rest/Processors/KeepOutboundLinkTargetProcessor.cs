@@ -14,6 +14,7 @@ using MigrationTools.Processors;
 using Newtonsoft.Json;
 using MigrationTools.Processors.Infrastructure;
 using Microsoft.Extensions.Options;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {
@@ -21,13 +22,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
     {
         private KeepOutboundLinkTargetProcessorOptions _options;
 
-        public KeepOutboundLinkTargetProcessor(
-                    IOptions<KeepOutboundLinkTargetProcessorOptions> options,
-                    ProcessorEnricherContainer processorEnrichers,
-                    IServiceProvider services,
-                    ITelemetryLogger telemetry,
-                    ILogger<KeepOutboundLinkTargetProcessor> logger)
-            : base(options, processorEnrichers, services, telemetry, logger)
+        public KeepOutboundLinkTargetProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

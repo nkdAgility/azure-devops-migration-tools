@@ -10,6 +10,7 @@ using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -20,16 +21,8 @@ namespace MigrationTools.Processors
     /// <processingtarget>Pipelines</processingtarget>
     public partial class AzureDevOpsPipelineProcessor : Processor
     {
-
-        public AzureDevOpsPipelineProcessor(
-                    IOptions<AzureDevOpsPipelineProcessorOptions> options,
-                    ProcessorEnricherContainer processorEnrichers,
-                    IServiceProvider services,
-                    ITelemetryLogger telemetry,
-                    ILogger<Processor> logger)
-            : base(options, processorEnrichers, services, telemetry, logger)
+        public AzureDevOpsPipelineProcessor(IOptions<ProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
-
         }
 
         public new AzureDevOpsPipelineProcessorOptions Options => (AzureDevOpsPipelineProcessorOptions)base.Options;
