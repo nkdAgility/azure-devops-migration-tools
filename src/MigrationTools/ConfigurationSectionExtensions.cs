@@ -13,6 +13,7 @@ using MigrationTools.Options;
 using MigrationTools.Tools.Infrastructure;
 using Serilog;
 using static System.Collections.Specialized.BitVector32;
+using System.ComponentModel.DataAnnotations;
 
 namespace MigrationTools
 {

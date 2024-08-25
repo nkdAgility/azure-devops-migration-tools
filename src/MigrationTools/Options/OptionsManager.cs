@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -74,6 +75,7 @@ namespace MigrationTools.Options
 
         public static OptionsConfiguration GetOptionsConfiguration(Type option)
         {
+           // ActivatorUtilities.CreateInstance(option);
             dynamic optionInsance = Activator.CreateInstance(option);
             OptionsConfiguration oc = new OptionsConfiguration();
             oc.SectionPath = (string)option.GetProperty("ConfigurationSectionPath")?.GetValue(optionInsance);

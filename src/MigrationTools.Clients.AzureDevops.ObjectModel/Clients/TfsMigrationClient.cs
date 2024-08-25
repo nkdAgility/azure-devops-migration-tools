@@ -12,7 +12,7 @@ using Serilog;
 
 namespace MigrationTools._EngineV1.Clients
 {
-    public class TfsMigrationClient : EndpointOptions, IMigrationClient
+    public class TfsMigrationClient : IMigrationClient
     {
         private TfsTeamProjectEndpointOptions _config;
         private TfsTeamProjectCollection _collection;
@@ -57,6 +57,11 @@ namespace MigrationTools._EngineV1.Clients
         }
 
         public VssCredentials Credentials => _vssCredentials ??= new VssCredentials();
+
+        public TfsMigrationClient()
+        {
+
+        }
 
         // if you add Migration Engine in here you will have to fix the infinate loop
         public TfsMigrationClient(ITestPlanMigrationClient testPlanClient, IWorkItemMigrationClient workItemClient, IServiceProvider services, ITelemetryLogger telemetry)
