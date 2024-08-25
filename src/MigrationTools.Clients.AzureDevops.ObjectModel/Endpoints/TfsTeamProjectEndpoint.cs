@@ -20,7 +20,6 @@ namespace MigrationTools._EngineV1.Clients
 {
     public class TfsTeamProjectEndpoint : Endpoint<TfsTeamProjectEndpointOptions>, IMigrationClient // TODO: Rename IMigrationClient to ITfsTeamProjectEndpoint
     {
-        private TfsTeamProjectEndpointOptions _config;
         private TfsTeamProjectCollection _collection;
         private VssCredentials _vssCredentials;
         private NetworkCredential _credentials;
@@ -31,13 +30,15 @@ namespace MigrationTools._EngineV1.Clients
             IOptions<TfsTeamProjectEndpointOptions> options,
             EndpointEnricherContainer endpointEnrichers,
             ITelemetryLogger telemetry,
-            ILogger<Endpoint<TfsTeamProjectEndpointOptions>> logger,
+            ILogger<TfsTeamProjectEndpoint> logger,
             IServiceProvider Services
             ) : base(options, endpointEnrichers, Services, telemetry, logger)
         {
-            _testPlanClient = ActivatorUtilities.CreateInstance<ITestPlanMigrationClient>(Services, options);
-            _workItemClient = ActivatorUtilities.CreateInstance< IWorkItemMigrationClient>(Services, options);
+            _testPlanClient = new TfsTestPlanMigrationClient(options);
+
+            _workItemClient = ActivatorUtilities.CreateInstance<TfsWorkItemMigrationClient>(Services, this, options);
             //networkCredentials IOptions<NetworkCredentialsOptions> networkCredentials,
+         
         }
 
         public override int Count => 0;
@@ -73,6 +74,7 @@ namespace MigrationTools._EngineV1.Clients
         {
             get
             {
+                EnsureCollection();
                 return _collection;
             }
         }
@@ -99,8 +101,8 @@ namespace MigrationTools._EngineV1.Clients
             TfsTeamProjectCollection y = null;
             try
             {
-                Log.LogDebug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", _config.AuthenticationMode.ToString());
-                switch (_config.AuthenticationMode)
+                Log.LogDebug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", Options.AuthenticationMode.ToString());
+                switch (Options.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
                         Log.LogInformation("Connecting with AccessToken ");
@@ -144,7 +146,7 @@ namespace MigrationTools._EngineV1.Clients
             {
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "401", false));
-                Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", _config.AuthenticationMode);
+                Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.AuthenticationMode);
                 Environment.Exit(-1);
             }
             catch (Exception ex)
@@ -159,8 +161,8 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, _config.AuthenticationMode);
-                switch (_config.AuthenticationMode)
+                Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, Options.AuthenticationMode);
+                switch (Options.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
                         Log.LogError("The PAT MUST be 'full access' for it to work with the Object Model API.");

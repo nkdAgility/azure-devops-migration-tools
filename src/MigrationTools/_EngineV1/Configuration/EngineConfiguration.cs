@@ -11,9 +11,6 @@ namespace MigrationTools._EngineV1.Configuration
         {
             LogLevel = "Information";
         }
-
-        public IEndpointOptions Source { get; set; }
-        public IEndpointOptions Target { get; set; }
         public string LogLevel { get; private set; }
 
     }

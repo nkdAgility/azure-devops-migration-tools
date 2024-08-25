@@ -103,15 +103,10 @@ namespace MigrationTools.Host
                        switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(context.Configuration).schema)
                        {
                            case MigrationConfigSchema.v1:
-                               //logger.LogCritical("The config file {ConfigFile} uses an outdated format. We are continuing to support this format through a grace period. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
-                               var parsed = reader.BuildFromFile(configFile); // TODO revert tp 
-                               options.Source = parsed.Source;
-                               options.Target = parsed.Target;
+      
                                break;
                            case MigrationConfigSchema.v160:
-                               // This code Converts the new config format to the v1 and v2 runtme format.
-                               options.Source = configuration.GetSection("MigrationTools:Source")?.GetMigrationToolsOption<IEndpointOptions>("EndpointType");
-                               options.Target = configuration.GetSection("MigrationTools:Target")?.GetMigrationToolsOption<IEndpointOptions>("EndpointType");
+       
                                break;
                            default:
                                logger.LogCritical("The config file {ConfigFile} is not of the correct format. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);

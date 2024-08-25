@@ -71,7 +71,7 @@ namespace MigrationTools.Processors
             _sourceIdentityManagementService = Source.GetService<IIdentityManagementService>();
             _targetIdentityManagementService = Target.GetService<IIdentityManagementService>();
 
-            CommonTools.NodeStructure.ProcessorExecutionBegin(null);
+            CommonTools.NodeStructure.ProcessorExecutionBegin(this);
 
             bool filterByCompleted = Options.FilterCompleted;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
@@ -12,8 +13,9 @@ namespace MigrationTools._EngineV1.Clients
     {
         private Dictionary<string, WorkItemData> _Cache = new Dictionary<string, WorkItemData>();
 
-        public WorkItemMigrationClientBase(IMigrationClient migrationClient, ITelemetryLogger telemetry)
+        public WorkItemMigrationClientBase(IOptions<IEndpointOptions> options, IMigrationClient migrationClient, ITelemetryLogger telemetry)
         {
+            Options = options.Value;
             Telemetry = telemetry;
             MigrationClient = migrationClient;
         }

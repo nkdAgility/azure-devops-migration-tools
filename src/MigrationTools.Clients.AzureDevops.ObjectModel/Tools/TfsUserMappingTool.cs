@@ -23,7 +23,7 @@ namespace MigrationTools.Tools
     /// </summary>
     public class TfsUserMappingTool : Tool<TfsUserMappingToolOptions>
     {
-        public TfsUserMappingToolOptions Options { get; private set; }
+        new public TfsUserMappingToolOptions Options => (TfsUserMappingToolOptions)base.Options;
 
         public TfsUserMappingTool(IOptions<TfsUserMappingToolOptions> options, IServiceProvider services, ILogger<TfsUserMappingTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {

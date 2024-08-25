@@ -74,7 +74,7 @@ namespace MigrationTools.Tools
             _targetProjectName = settings.TargetProjectName;
         }
 
-        public void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems, string sourceProject,string targetProject)
+        public void ValidateAllNodesExistOrAreMapped(TfsProcessor processor, List<WorkItemData> sourceWorkItems, string sourceProject,string targetProject)
         {
             ContextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
             if (!Options.Enabled && targetProject != sourceProject)
@@ -84,7 +84,7 @@ namespace MigrationTools.Tools
             }
             if (Options.Enabled)
             {
-                List<NodeStructureItem> nodeStructureMissingItems = GetMissingRevisionNodes(sourceWorkItems);
+                List<NodeStructureItem> nodeStructureMissingItems = GetMissingRevisionNodes(processor, sourceWorkItems);
                 if (ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
                     Log.LogError("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
@@ -291,7 +291,7 @@ namespace MigrationTools.Tools
             {
                 if (_sourceCommonStructureService is null)
                 {
-                    _sourceCommonStructureService = (ICommonStructureService4)processor.Source.GetService<ICommonStructureService>();
+                    _sourceCommonStructureService = (ICommonStructureService4)processor.Source.GetService<ICommonStructureService4>();
                     _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(processor.Source.Options.Project);
                     _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
                     _sourceLanguageMaps = processor.Source.Options.LanguageMaps;
@@ -528,9 +528,9 @@ namespace MigrationTools.Tools
             return fieldName;
         }
 
-        public List<NodeStructureItem> CheckForMissingPaths(List<WorkItemData> workItems, TfsNodeStructureType nodeType)
+        public List<NodeStructureItem> CheckForMissingPaths(TfsProcessor processor, List<WorkItemData> workItems, TfsNodeStructureType nodeType)
         {
-            EntryForProcessorType(null);
+            EntryForProcessorType(processor);
              Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths");
             _targetCommonStructureService.ClearProjectInfoCache();
 
@@ -626,10 +626,10 @@ namespace MigrationTools.Tools
             }
         }
 
-        public List<NodeStructureItem> GetMissingRevisionNodes(List<WorkItemData> workItems)
+        public List<NodeStructureItem> GetMissingRevisionNodes(TfsProcessor processor, List<WorkItemData> workItems)
         {
-            List<NodeStructureItem> missingPaths = CheckForMissingPaths(workItems, TfsNodeStructureType.Area);
-            missingPaths.AddRange(CheckForMissingPaths(workItems, TfsNodeStructureType.Iteration));
+            List<NodeStructureItem> missingPaths = CheckForMissingPaths(processor, workItems, TfsNodeStructureType.Area);
+            missingPaths.AddRange(CheckForMissingPaths(processor, workItems, TfsNodeStructureType.Iteration));
             return missingPaths;
         }
 

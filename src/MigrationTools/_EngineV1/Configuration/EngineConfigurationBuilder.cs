@@ -161,8 +161,8 @@ namespace MigrationTools._EngineV1.Configuration
                 //Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(2),
                 //Processors = new List<IProcessorConfig>(),
             };
-            ec.Source = GetMigrationConfigDefault();
-            ec.Target = GetMigrationConfigDefault();
+            //ec.Source = GetMigrationConfigDefault();
+            //ec.Target = GetMigrationConfigDefault();
             return ec;
         }
 

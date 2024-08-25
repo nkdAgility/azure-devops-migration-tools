@@ -26,7 +26,7 @@ namespace MigrationTools._EngineV1.Clients
         private WorkItemStore _wistore;
 
         public TfsWorkItemMigrationClient(IOptions<TfsTeamProjectEndpointOptions> options, IMigrationClient migrationClient, IWorkItemQueryBuilderFactory workItemQueryBuilderFactory, ITelemetryLogger telemetry)
-            : base(migrationClient, telemetry)
+            : base(options, migrationClient, telemetry)
         {
             _telemetry = telemetry;
             _workItemQueryBuilderFactory = workItemQueryBuilderFactory;
@@ -233,7 +233,7 @@ namespace MigrationTools._EngineV1.Clients
         {
             _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
             _wistore = GetWorkItemStore();
-            _project = migrationClient.WorkItems.GetProject();
+            _project = GetProject();
         }
 
         public override WorkItemData PersistWorkItem(WorkItemData workItem)

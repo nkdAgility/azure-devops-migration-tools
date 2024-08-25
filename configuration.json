@@ -9,14 +9,14 @@
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
+        "PersonalAccessToken": "",
         "AllowCrossProjectLinking": false,
         "NetworkCredentials": {
           "UserName": "",
           "Password": "",
-            "Domain": ""
+          "Domain": ""
         },
         "AuthenticationMode": "AccessToken",
-        "PersonalAccessToken": "",
         "LanguageMaps": {
           "AreaPath": "Area",
           "IterationPath": "Iteration"
@@ -26,6 +26,7 @@
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationTest5",
+        "PersonalAccessToken": "",
         "TfsVersion": "AzureDevOps",
         "NetworkCredentials": {
           "UserName": "",
@@ -35,7 +36,6 @@
         "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "AuthenticationMode": "AccessToken",
-        "PersonalAccessToken": "",
         "LanguageMaps": {
           "AreaPath": "Area",
           "IterationPath": "Iteration"

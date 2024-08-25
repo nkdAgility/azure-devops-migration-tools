@@ -57,7 +57,6 @@ namespace MigrationTools.Processors
         private List<string> _ignore;
 
         private ILogger contextLog;
-        private ITelemetryLogger _telemetry;
         private IDictionary<string, double> processWorkItemMetrics = null;
         private IDictionary<string, string> processWorkItemParamiters = null;
         private ILogger workItemLog;
@@ -65,7 +64,7 @@ namespace MigrationTools.Processors
 
         public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
-
+            contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
         }
 
         new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
@@ -97,10 +96,10 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
             ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
-            CommonTools.NodeStructure.ProcessorExecutionBegin(null);
+            CommonTools.NodeStructure.ProcessorExecutionBegin(this);
             if (CommonTools.TeamSettings.Enabled)
             {
-                CommonTools.TeamSettings.ProcessorExecutionBegin(null);
+                CommonTools.TeamSettings.ProcessorExecutionBegin(this);
             } else
             {
                 Log.LogWarning("WorkItemMigrationContext::InternalExecute: teamSettingsEnricher is disabled!");
@@ -125,7 +124,7 @@ namespace MigrationTools.Processors
                 //////////////////////////////////////////////////
                 ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(sourceWorkItems);
                 ValiddateWorkItemTypesExistInTarget(sourceWorkItems);
-                CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
+                CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
 
@@ -852,7 +851,7 @@ namespace MigrationTools.Processors
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
                         parameters.Add($"{f.ReferenceName} ({f.Name})", f.Value?.ToString());
                 }
-                _telemetry.TrackException(ex, parameters);
+                Telemetry.TrackException(ex, parameters);
                 TraceWriteLine(LogEventLevel.Information, "...FAILED to Save");
                 Log.LogInformation("===============================================================");
                 if (targetWorkItem != null)
