@@ -13,14 +13,14 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
     public class TfsGitRepositoryTool : Tool<TfsGitRepositoryToolOptions>
     {
-        private IMigrationEngine _Engine;
-        private readonly ILogger<TfsGitRepositoryTool> _Logger;
+
         private bool _save = true;
         private bool _filter = true;
         private GitRepositoryService sourceRepoService;
@@ -30,13 +30,10 @@ namespace MigrationTools.Tools
         private IList<GitRepository> targetRepos;
         private IList<GitRepository> allTargetRepos;
         private List<string> gitWits;
-
-        public IMigrationEngine Engine { get => _Engine; set => _Engine = value; }
+        private TfsProcessor _processor;
 
         public TfsGitRepositoryTool(IOptions<TfsGitRepositoryToolOptions> options, IServiceProvider services, ILogger<TfsGitRepositoryTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
-            Engine = Services.GetRequiredService<IMigrationEngine>();
-            _Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             gitWits = new List<string>
                 {
                     "Branch",
@@ -46,18 +43,18 @@ namespace MigrationTools.Tools
                 };
         }
 
-        public void SetupRepoBits()
+        private void SetupRepoBits()
         {
             if (sourceRepoService == null)
             {
                 try
                 {
-                    sourceRepoService = Engine.Source.GetService<GitRepositoryService>();
-                    sourceRepos = sourceRepoService.QueryRepositories(Engine.Source.Config.AsTeamProjectConfig().Project);
+                    sourceRepoService = _processor.Source.GetService<GitRepositoryService>();
+                    sourceRepos = sourceRepoService.QueryRepositories(_processor.Source.Options.Project);
                     allSourceRepos = sourceRepoService.QueryRepositories("");
                     //////////////////////////////////////////////////
-                    targetRepoService = Engine.Target.GetService<GitRepositoryService>();
-                    targetRepos = targetRepoService.QueryRepositories(Engine.Target.Config.AsTeamProjectConfig().Project);
+                    targetRepoService = _processor.Target.GetService<GitRepositoryService>();
+                    targetRepos = targetRepoService.QueryRepositories(_processor.Target.Options.Project);
                     allTargetRepos = targetRepoService.QueryRepositories("");
                 }
                 catch (Exception ex)
@@ -69,8 +66,9 @@ namespace MigrationTools.Tools
         }
 
 
-        public  int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
+            _processor = processor;
             if (sourceWorkItem is null)
             {
                 throw new ArgumentNullException(nameof(sourceWorkItem));
@@ -125,8 +123,8 @@ namespace MigrationTools.Tools
                     if (sourceRepoInfo.GitRepo != null)
                     {
                         string targetRepoName = GetTargetRepoName(gitRepoMaps.Mappings, sourceRepoInfo);
-                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? Engine.Target.Config.AsTeamProjectConfig().Project;
-                        string targetProjectName = Engine.Target.Config.AsTeamProjectConfig().Project;
+                        string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? _processor.Target.Options.Project;
+                        string targetProjectName = _processor.Target.Options.Project;
 
                         TfsGitRepositoryInfo targetRepoInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
                         // if repo was not found in the target project, try to find it in the whole target project collection
@@ -152,13 +150,13 @@ namespace MigrationTools.Tools
                             switch (l.ArtifactLinkType.Name)
                             {
                                 case "Branch":
-                                    newLink = new ExternalLink(((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
+                                    newLink = new ExternalLink(((TfsWorkItemMigrationClient)_processor.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
                                         $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     break;
 
                                 case "Fixed in Changeset":  // TFVC
                                 case "Fixed in Commit":
-                                    newLink = new ExternalLink(((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
+                                    newLink = new ExternalLink(((TfsWorkItemMigrationClient)_processor.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
                                         $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
                                     newLink.Comment = el.Comment;
                                     break;

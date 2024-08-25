@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.Services.Commerce;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -22,40 +23,10 @@ namespace MigrationTools.Tools
     /// </summary>
     public class TfsUserMappingTool : Tool<TfsUserMappingToolOptions>
     {
-
-        private readonly IMigrationEngine Engine;
-        IGroupSecurityService _gssSourse;
-        private IGroupSecurityService _gssTarget;
-
-        private IGroupSecurityService GssSource
-        {
-            get
-            {
-                if (_gssSourse == null)
-                {
-                    _gssSourse = Engine.Source.GetService<IGroupSecurityService>();
-                }
-                return _gssSourse;
-            }
-        }
-
-        private IGroupSecurityService GssTarget
-        {
-            get
-            {
-                if (_gssTarget == null)
-                {
-                    _gssTarget = Engine.Target.GetService<IGroupSecurityService>();
-                }
-                return _gssTarget;
-            }
-        }
-
         public TfsUserMappingToolOptions Options { get; private set; }
 
         public TfsUserMappingTool(IOptions<TfsUserMappingToolOptions> options, IServiceProvider services, ILogger<TfsUserMappingTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
-            Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
 
@@ -83,7 +54,7 @@ namespace MigrationTools.Tools
 
 
 
-        public void MapUserIdentityField(FieldItem field)
+        private void MapUserIdentityField(FieldItem field)
         {
             if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
             {
@@ -97,7 +68,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        public void MapUserIdentityField(Field field)
+        public void MapUserIdentityField(TfsProcessor processor, Field field)
         {
             if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
             {
@@ -175,14 +146,14 @@ namespace MigrationTools.Tools
         }
 
 
-        public List<IdentityMapData> GetUsersInSourceMappedToTarget()
+        public List<IdentityMapData> GetUsersInSourceMappedToTarget(TfsProcessor processor)
         {
             Log.LogDebug("TfsUserMappingTool::GetUsersInSourceMappedToTarget");
             if (Options.Enabled)
             {
-                var sourceUsers = GetUsersListFromServer(GssSource);
+                var sourceUsers = GetUsersListFromServer(processor.Source.GetService<IGroupSecurityService>());
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTarget [SourceUsersCount|{sourceUsers.Count}]");
-                var targetUsers = GetUsersListFromServer(GssTarget);
+                var targetUsers = GetUsersListFromServer(processor.Target.GetService<IGroupSecurityService>());
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTarget [targetUsersCount|{targetUsers.Count}]");
                 return sourceUsers.Select(sUser => new IdentityMapData { Source = sUser, target = targetUsers.SingleOrDefault(tUser => tUser.FriendlyName == sUser.FriendlyName) }).ToList();
             }
@@ -195,7 +166,7 @@ namespace MigrationTools.Tools
         }
 
 
-        public List<IdentityMapData> GetUsersInSourceMappedToTargetForWorkItems(List<WorkItemData> sourceWorkItems)
+        public List<IdentityMapData> GetUsersInSourceMappedToTargetForWorkItems(TfsProcessor processor, List<WorkItemData> sourceWorkItems)
         {
             if (Options.Enabled)
             {
@@ -203,7 +174,7 @@ namespace MigrationTools.Tools
                 Dictionary<string, string> result = new Dictionary<string, string>();
                 List<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
-                List<IdentityMapData> mappedUsers = GetUsersInSourceMappedToTarget();
+                List<IdentityMapData> mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.Count}]");
                 return mappedUsers.Where(x => workItemUsers.Contains(x.Source.FriendlyName)).ToList();
             }

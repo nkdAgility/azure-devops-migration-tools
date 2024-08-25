@@ -9,6 +9,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -24,11 +25,11 @@ namespace MigrationTools.Tools
 
         public IMigrationEngine Engine { get; private set; }
 
-        public bool ValidatingRequiredField(string fieldToFind, List<WorkItemData> sourceWorkItems)
+        public bool ValidatingRequiredField(TfsProcessor processor, string fieldToFind, List<WorkItemData> sourceWorkItems)
         {
             var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
             var sourceWorkItemTypes = sourceWorkItems.Select(wid => wid.ToWorkItem().Type).Distinct();
-            var targetTypes = Engine.Target.WorkItems.Project.ToProject().WorkItemTypes;
+            var targetTypes = processor.Target.WorkItems.Project.ToProject().WorkItemTypes;
             var result = true;
             foreach (WorkItemType sourceWorkItemType in sourceWorkItemTypes)
             {

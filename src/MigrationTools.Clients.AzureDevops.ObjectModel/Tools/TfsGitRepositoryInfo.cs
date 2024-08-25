@@ -31,13 +31,13 @@ namespace MigrationTools.Tools
                     return CreateFromGit(gitExternalLink, possibleRepos);
 
                 case RepistoryType.TFVC:
-                    return CreateFromTFVC(gitExternalLink, possibleRepos, tfsChangeSetMappingTool.Items, migrationEngine.Source.Config.AsTeamProjectConfig().Project, workItemSourceProjectName);
+                    return CreateFromTFVC(gitExternalLink, possibleRepos, tfsChangeSetMappingTool.Items, workItemSourceProjectName);
             }
 
             return null;
         }
 
-        private static TfsGitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName, string workItemSourceProjectName)
+        private static TfsGitRepositoryInfo CreateFromTFVC(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, ReadOnlyDictionary<int, string> changesetMapping, string sourceProjectName)
         {
             //vstfs:///VersionControl/Changeset/{id}
             var changeSetIdPart = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
@@ -54,7 +54,7 @@ namespace MigrationTools.Tools
             }
 
             //assume the GitRepository source name is the work items project name, which changeset links needs to be fixed
-            return new TfsGitRepositoryInfo(commitIDKvPair.Value, null, new GitRepository() { Name = workItemSourceProjectName });
+            return new TfsGitRepositoryInfo(commitIDKvPair.Value, null, new GitRepository() { Name = sourceProjectName });
         }
 
         private enum RepistoryType

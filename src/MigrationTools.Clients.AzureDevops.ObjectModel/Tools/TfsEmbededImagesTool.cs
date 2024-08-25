@@ -27,33 +27,31 @@ namespace MigrationTools.Tools
         private const string RegexPatternForImageFileName = "(?<=FileName=)[^=]*";
         private const string TargetDummyWorkItemTitle = "***** DELETE THIS - Migration Tool Generated Dummy Work Item For TfsEmbededImagesTool *****";
 
-        private readonly Project _targetProject;
-        private readonly TfsTeamProjectEndpointOptions _targetConfig;
+        private  Project _targetProject;
+        private  TfsTeamProjectEndpointOptions _targetConfig;
 
         private readonly IDictionary<string, string> _cachedUploadedUrisBySourceValue;
 
         private WorkItem _targetDummyWorkItem;
 
-        public IMigrationEngine Engine { get; private set; }
-
         public TfsEmbededImagesTool(IOptions<TfsEmbededImagesToolOptions> options, IServiceProvider services, ILogger<TfsEmbededImagesTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
-            Engine = services.GetRequiredService<IMigrationEngine>();
-            _targetProject = Engine.Target.WorkItems.Project.ToProject();
-            _targetConfig = Engine.Target.Config.AsTeamProjectConfig();
-
             _cachedUploadedUrisBySourceValue = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
 
-        public int FixEmbededImages(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public int FixEmbededImages(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            FixEmbededImages(targetWorkItem, Engine.Source.Config.AsTeamProjectConfig().Collection.AbsoluteUri, Engine.Target.Config.AsTeamProjectConfig().Collection.AbsoluteUri, Engine.Source.Config.AsTeamProjectConfig().PersonalAccessToken);
+            _processor = processor;
+            _targetProject = processor.Target.WorkItems.Project.ToProject();
+            _targetConfig = processor.Target.Options;
+            FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, processor.Source.Options.PersonalAccessToken);
             return 0;
         }
 
-        public  void ProcessorExecutionEnd(IProcessor processor)
+        public  void ProcessorExecutionEnd(TfsProcessor processor)
         {
+            _processor = processor;
             if (_targetDummyWorkItem != null)
             {
                 _targetDummyWorkItem.Close();
@@ -169,7 +167,7 @@ namespace MigrationTools.Tools
 
         private Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.AttachmentReference UploadImageToTarget(WorkItem wi, string filePath)
         {
-            var httpClient = ((TfsConnection)Engine.Target.InternalCollection).GetClient<WorkItemTrackingHttpClient>();
+            var httpClient = ((TfsConnection)_processor.Target.InternalCollection).GetClient<WorkItemTrackingHttpClient>();
 
             // uploads and creates the image attachment
             Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.AttachmentReference link = null;
@@ -216,6 +214,7 @@ namespace MigrationTools.Tools
 
 
         private int _DummyWorkItemCount = 0;
+        private TfsProcessor _processor;
 
         private WorkItem GetDummyWorkItem(WorkItemType type = null)
         {

@@ -51,5 +51,6 @@
 
   <ItemGroup>
     <Folder Include="Tools\FieldMappingTool\" />
+    <Folder Include="Tools\Infrastructure\" />
   </ItemGroup>
 </Project>

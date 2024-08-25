@@ -101,8 +101,7 @@ namespace MigrationTools.Endpoints.Tests
         private FileSystemWorkItemEndpoint CreateEndpoint(string direction)
         {
             var options = new FileSystemWorkItemEndpointOptions() { FileStore = string.Format(@".\Store\{0}\", direction) };
-            FileSystemWorkItemEndpoint e = Services.GetRequiredService<FileSystemWorkItemEndpoint>();
-            e.Configure(options);
+            FileSystemWorkItemEndpoint e = ActivatorUtilities.CreateInstance<FileSystemWorkItemEndpoint>(Services, options);
             return e;
         }
     }

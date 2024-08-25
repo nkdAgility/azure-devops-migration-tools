@@ -13,12 +13,13 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 using Serilog;
 
 namespace MigrationTools.Tools
 {
-    public class TfsAttachmentTool : Tool<TfsAttachmentToolOptions>, IAttachmentMigrationEnricher
+    public class TfsAttachmentTool : Tool<TfsAttachmentToolOptions>
     {
         private string _exportWiPath;
         private WorkItemServer _workItemServer;
@@ -29,9 +30,9 @@ namespace MigrationTools.Tools
 
         }
 
-        public void ProcessAttachemnts(WorkItemData source, WorkItemData target, bool save = true)
+        public void ProcessAttachemnts(TfsProcessor processer, WorkItemData source, WorkItemData target, bool save = true)
         {
-            SetupWorkItemServer();
+            SetupWorkItemServer(processer);
             if (source is null)
             {
                 throw new ArgumentNullException(nameof(source));
@@ -81,13 +82,12 @@ namespace MigrationTools.Tools
             {
                 target.SaveToAzureDevOps();
                 Log.LogInformation("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
-                CleanUpAfterSave();
+                CleanUpAfterSave(processer);
             }
         }
 
-        public void CleanUpAfterSave()
+        public void CleanUpAfterSave(TfsProcessor processer)
         {
-            SetupWorkItemServer();
             if (_exportWiPath != null && Directory.Exists(_exportWiPath))
             {
                 try
@@ -134,7 +134,6 @@ namespace MigrationTools.Tools
 
         private void ImportAttachment(WorkItem targetWorkItem, Attachment wia, string filepath, bool save = true)
         {
-            SetupWorkItemServer();
             var filename = Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
             if (Options.MaxAttachmentSize > fi.Length)
@@ -176,12 +175,12 @@ namespace MigrationTools.Tools
             return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
 
-        private void SetupWorkItemServer()
+        private void SetupWorkItemServer(TfsProcessor processer)
         {
             if (_workItemServer == null)
             {
                 IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
-                _workItemServer = engine.Source.GetService<WorkItemServer>();
+                _workItemServer = processer.Source.GetService<WorkItemServer>();
             }
         }
 

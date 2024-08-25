@@ -264,7 +264,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        public  void ProcessorExecutionBegin(IProcessor processor)
+        public  void ProcessorExecutionBegin(TfsProcessor processor)
         {
             if (Options.Enabled)
             {
@@ -281,59 +281,35 @@ namespace MigrationTools.Tools
             }
         }
 
-        protected  void EntryForProcessorType(IProcessor processor)
+        protected  void EntryForProcessorType(TfsProcessor processor)
         {
             if (processor is null)
             {
-                IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
-                if (_sourceCommonStructureService is null)
-                {
-                    _sourceCommonStructureService = engine.Source.GetService<ICommonStructureService4>();
-                    _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(engine.Source.Config.AsTeamProjectConfig().Project);
-                    _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
-                    _sourceLanguageMaps = engine.Source.Config.AsTeamProjectConfig().LanguageMaps;
-                    _sourceProjectName = engine.Source.Config.AsTeamProjectConfig().Project;
-                }
-                if (_targetCommonStructureService is null)
-                {
-                    _targetCommonStructureService = engine.Target.GetService<ICommonStructureService4>();
-                    _targetLanguageMaps = engine.Target.Config.AsTeamProjectConfig().LanguageMaps;
-                    _targetProjectName = engine.Target.Config.AsTeamProjectConfig().Project;
-                }
+                throw new Exception("Processor is null");
             }
             else
             {
                 if (_sourceCommonStructureService is null)
                 {
-                    var source = (TfsWorkItemEndpoint)processor.Source;
-                    _sourceCommonStructureService = (ICommonStructureService4)source.TfsCollection.GetService<ICommonStructureService>();
-                    _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(source.Project);
+                    _sourceCommonStructureService = (ICommonStructureService4)processor.Source.GetService<ICommonStructureService>();
+                    _sourceProjectInfo = _sourceCommonStructureService.GetProjectFromName(processor.Source.Options.Project);
                     _sourceRootNodes = _sourceCommonStructureService.ListStructures(_sourceProjectInfo.Uri);
-                    _sourceLanguageMaps = source.Options.LanguageMaps;
-                    _sourceProjectName = source.Project;
+                    _sourceLanguageMaps = processor.Source.Options.LanguageMaps;
+                    _sourceProjectName = processor.Source.Options.Project;
                 }
                 if (_targetCommonStructureService is null)
                 {
-                    var target = (TfsWorkItemEndpoint)processor.Target;
-                    _targetCommonStructureService = target.TfsCollection.GetService<ICommonStructureService4>();
-                    _targetLanguageMaps = target.Options.LanguageMaps;
-                    _targetProjectName = target.Project;
+                    _targetCommonStructureService = processor.Target.GetService<ICommonStructureService4>();
+                    _targetLanguageMaps = processor.Target.Options.LanguageMaps;
+                    _targetProjectName = processor.Target.Options.Project;
                 }
             }
         }
 
-        protected  void RefreshForProcessorType(IProcessor processor)
+        protected  void RefreshForProcessorType(TfsProcessor processor)
         {
-            if (processor is null)
-            {
-                IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
-                ((TfsWorkItemMigrationClient)engine.Target.WorkItems).Store?.RefreshCache(true);
-            }
-            else
-            {
-                TfsEndpoint target = (TfsEndpoint)processor.Target;
-                target.TfsStore.RefreshCache(true);
-            }
+ 
+                ((TfsWorkItemMigrationClient)processor.Target.WorkItems).Store?.RefreshCache(true);
         }
 
         private void CreateNodes(XmlNodeList nodeList, string treeType, TfsNodeStructureType nodeStructureType)

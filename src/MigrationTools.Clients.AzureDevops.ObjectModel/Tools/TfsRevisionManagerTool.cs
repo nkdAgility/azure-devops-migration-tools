@@ -34,7 +34,7 @@ namespace MigrationTools.Tools
         }
 
 
-        public  void ProcessorExecutionBegin(IProcessor processor) // Could be a IProcessorEnricher
+        public  void ProcessorExecutionBegin(TfsProcessor processor) // Could be a IProcessorEnricher
         {
             if (Options.Enabled)
             {
@@ -45,18 +45,14 @@ namespace MigrationTools.Tools
             }
         }
 
-        protected  void RefreshForProcessorType(IProcessor processor)
+        protected  void RefreshForProcessorType(TfsProcessor processor)
         {
-            if (processor is null)
+            if (processor == null)
             {
-                IMigrationEngine engine = Services.GetRequiredService<IMigrationEngine>();
-                ((TfsWorkItemMigrationClient)engine.Target.WorkItems).Store?.RefreshCache(true);
+                throw new ArgumentNullException(nameof(processor));
             }
-            else
-            {
-                TfsEndpoint target = (TfsEndpoint)processor.Target;
-                target.TfsStore.RefreshCache(true);
-            }
+            ((TfsWorkItemMigrationClient)processor.Target.WorkItems).Store?.RefreshCache(true);
+
         }
 
         public List<RevisionItem> GetRevisionsToMigrate(List<RevisionItem> sourceRevisions, List<RevisionItem> targetRevisions)

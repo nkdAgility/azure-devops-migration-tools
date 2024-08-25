@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools.Enrichers;
 using MigrationTools.Tools;
 
@@ -18,7 +19,11 @@ namespace MigrationTools.Processors.Infrastructure
   
         }
 
-       new public TfsCommonTools CommonTools => (TfsCommonTools)base.CommonTools;
+        new public TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+
+        new public TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+
+        new public TfsCommonTools CommonTools => (TfsCommonTools)base.CommonTools;
 
     }
 }

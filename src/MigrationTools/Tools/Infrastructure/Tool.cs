@@ -7,18 +7,18 @@ using Microsoft.Extensions.Options;
 
 namespace MigrationTools.Tools.Infrastructure
 {
-    public abstract class Tool<ToolOptions> : ITool where ToolOptions : class, IToolOptions, new()
+    public abstract class Tool<TToolOptions> : ITool where TToolOptions : class, IToolOptions, new()
     {
         protected ITelemetryLogger Telemetry { get; }
         protected IServiceProvider Services { get; }
         protected ILogger<ITool> Log { get; }
         protected Serilog.ILogger ContextLog {get;}
 
-        protected ToolOptions Options { get; }
+        protected TToolOptions Options { get; }
 
         public bool Enabled => Options.Enabled;
 
-        public Tool(IOptions<ToolOptions> options, IServiceProvider services, ILogger<ITool> logger, ITelemetryLogger telemetry)
+        public Tool(IOptions<TToolOptions> options, IServiceProvider services, ILogger<ITool> logger, ITelemetryLogger telemetry)
         {
             if (options is null)
             {
@@ -27,7 +27,7 @@ namespace MigrationTools.Tools.Infrastructure
             Options = options.Value;
             Services = services;
             Log = logger;
-            ContextLog = Serilog.Log.ForContext<Tool<ToolOptions>>();
+            ContextLog = Serilog.Log.ForContext<Tool<TToolOptions>>();
             Telemetry = telemetry;
         }
     }

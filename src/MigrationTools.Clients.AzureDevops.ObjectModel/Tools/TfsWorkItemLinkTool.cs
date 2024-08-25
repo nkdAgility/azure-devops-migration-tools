@@ -9,6 +9,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -20,10 +21,10 @@ namespace MigrationTools.Tools
         public TfsWorkItemLinkTool(IOptions<TfsWorkItemLinkToolOptions> options, IServiceProvider services, ILogger<TfsWorkItemLinkTool> logger, ITelemetryLogger telemetryLogger)
             : base(options, services, logger, telemetryLogger)
         {
-            Engine = services.GetRequiredService<IMigrationEngine>();
+
         }
 
-        public  int Enrich(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (sourceWorkItemLinkStart is null)
             {
@@ -99,7 +100,7 @@ namespace MigrationTools.Tools
             return 0;
         }
 
-        public void MigrateSharedSteps(WorkItemData wiSourceL, WorkItemData wiTargetL)
+        public void MigrateSharedSteps(TfsProcessor processor, WorkItemData wiSourceL, WorkItemData wiTargetL)
         {
             const string microsoftVstsTcmSteps = "Microsoft.VSTS.TCM.Steps";
             var oldSteps = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmSteps].Value.ToString();
@@ -108,12 +109,12 @@ namespace MigrationTools.Tools
             var sourceSharedStepLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
             var sourceSharedSteps =
-                sourceSharedStepLinks.Select(x => Engine.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
+                sourceSharedStepLinks.Select(x => processor.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
 
             foreach (WorkItemData sourceSharedStep in sourceSharedSteps)
             {
                 WorkItemData matchingTargetSharedStep =
-                    Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
+                    processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
 
                 if (matchingTargetSharedStep != null)
                 {
@@ -133,7 +134,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        public void MigrateSharedParameters(WorkItemData wiSourceL, WorkItemData wiTargetL)
+        public void MigrateSharedParameters(TfsProcessor processor, WorkItemData wiSourceL, WorkItemData wiTargetL)
         {
             const string microsoftVstsTcmLocalDataSource = "Microsoft.VSTS.TCM.LocalDataSource";
             var oldSteps = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource].Value.ToString();
@@ -142,12 +143,12 @@ namespace MigrationTools.Tools
             var sourceSharedParametersLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.ImmutableName == "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse").ToList();
             var sourceSharedParameters =
-                sourceSharedParametersLinks.Select(x => Engine.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
+                sourceSharedParametersLinks.Select(x => processor.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
 
             foreach (WorkItemData sourceSharedParameter in sourceSharedParameters)
             {
                 WorkItemData matchingTargetSharedParameter =
-                    Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedParameter);
+                    processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedParameter);
 
                 if (matchingTargetSharedParameter != null)
                 {
@@ -225,7 +226,7 @@ namespace MigrationTools.Tools
                    link.LinkedArtifactUri.StartsWith("vstfs:///Build/Build/", StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private void CreateRelatedLink(WorkItemData wiSourceL, RelatedLink item, WorkItemData wiTargetL)
+        private void CreateRelatedLink(TfsProcessor processor, WorkItemData wiSourceL, RelatedLink item, WorkItemData wiTargetL)
         {
             RelatedLink rl = item;
             WorkItemData wiSourceR = null;
@@ -237,7 +238,7 @@ namespace MigrationTools.Tools
             {
                 try
                 {
-                    wiSourceR = Engine.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                    wiSourceR = processor.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
                 }
                 catch (Exception ex)
                 {
@@ -247,7 +248,7 @@ namespace MigrationTools.Tools
                 }
                 try
                 {
-                    wiTargetR = GetRightHandSideTargetWi(wiSourceR, wiTargetL);
+                    wiTargetR = GetRightHandSideTargetWi(processor, wiSourceR, wiTargetL);
                 }
                 catch (Exception ex)
                 {
@@ -281,7 +282,7 @@ namespace MigrationTools.Tools
                     if (wiSourceR.Id != wiTargetR.Id)
                     {
                         Log.LogInformation("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
-                        var client = (TfsWorkItemMigrationClient)Engine.Target.WorkItems;
+                        var client = (TfsWorkItemMigrationClient)processor.Target.WorkItems;
                         if (!client.Store.WorkItemLinkTypes.LinkTypeEnds.Contains(rl.LinkTypeEnd.ImmutableName))
                         {
                             Log.LogWarning($"  [SKIP] Unable to migrate Link because type {rl.LinkTypeEnd.ImmutableName} does not exist in the target project.");
@@ -301,7 +302,7 @@ namespace MigrationTools.Tools
                             {
                                 wiTargetR.ToWorkItem().Links.Remove(potentialParentConflictLink);
                             }
-                            linkTypeEnd = ((TfsWorkItemMigrationClient)Engine.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                            linkTypeEnd = ((TfsWorkItemMigrationClient)processor.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
                             RelatedLink newLl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetL.Id));
                             wiTargetR.ToWorkItem().Links.Add(newLl);
 
@@ -363,7 +364,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        private WorkItemData GetRightHandSideTargetWi(WorkItemData wiSourceR, WorkItemData wiTargetL)
+        private WorkItemData GetRightHandSideTargetWi(TfsProcessor processor, WorkItemData wiSourceR, WorkItemData wiTargetL)
         {
             WorkItemData wiTargetR;
             if (!(wiTargetL == null)
@@ -376,7 +377,7 @@ namespace MigrationTools.Tools
             else
             {
                 // Moving to Other Team Project from Source
-                wiTargetR = Engine.Target.WorkItems.FindReflectedWorkItem(wiSourceR, true);
+                wiTargetR = processor.Target.WorkItems.FindReflectedWorkItem(wiSourceR, true);
                 if (wiTargetR == null) // Assume source only (other team project)
                 {
                     wiTargetR = wiSourceR;

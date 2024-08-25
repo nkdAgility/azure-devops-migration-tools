@@ -36,46 +36,47 @@ namespace MigrationTools.Tools
 
         private const string LogTypeName = nameof(TfsTeamSettingsTool);
 
-        public IMigrationEngine Engine { get; }
+        private Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
 
-        private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
+        private TfsProcessor _processor;
 
-        public TfsTeamService SourceTeamService { get; }
-        public TeamSettingsConfigurationService SourceTeamSettings { get; }
-        public TfsTeamService TargetTeamService { get; }
-        public TeamSettingsConfigurationService TargetTeamSettings { get; }
+        public TfsTeamService SourceTeamService { get; protected set; }
+        public TeamSettingsConfigurationService SourceTeamSettings { get; protected set; }
+        public TfsTeamService TargetTeamService { get; protected set; }
+        public TeamSettingsConfigurationService TargetTeamSettings { get; protected set; }
 
         public TfsTeamSettingsTool(IOptions<TfsTeamSettingsToolOptions> options, IServiceProvider services, ILogger<TfsTeamSettingsTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
-            Engine = services.GetRequiredService<IMigrationEngine>();
-            _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
-            {
-                try
-                {
-                    var identityService = Engine.Target.GetService<IIdentityManagementService>();
-                    var tfi = identityService.ReadIdentity(IdentitySearchFactor.General, "Project Collection Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
-                    return identityService.ReadIdentities(tfi.Members, MembershipQuery.None, ReadIdentityOptions.None).ToList();
-                }
-                catch (Exception ex)
-                {
-                    Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
-                    Telemetry.TrackException(ex, null, null);
-                    return new List<TeamFoundationIdentity>();
-                }
-            });
-            SourceTeamService = Engine.Source.GetService<TfsTeamService>();
-            SourceTeamSettings = Engine.Source.GetService<TeamSettingsConfigurationService>();
-            TargetTeamService = Engine.Target.GetService<TfsTeamService>();
-            TargetTeamSettings = Engine.Target.GetService<TeamSettingsConfigurationService>();
+            
         }
 
 
-        public void ProcessorExecutionBegin(IProcessor processor) // Could be a IProcessorEnricher
+        public void ProcessorExecutionBegin(TfsProcessor processor) // Could be a IProcessorEnricher
         {
+            _processor = processor;
             if (Options.Enabled)
             {
                 Log.LogInformation("----------------------------------------------");
                 Log.LogInformation("Migrating all Teams before the Processor run.");
+                _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
+                {
+                    try
+                    {
+                        var identityService = processor.Target.GetService<IIdentityManagementService>();
+                        var tfi = identityService.ReadIdentity(IdentitySearchFactor.General, "Project Collection Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
+                        return identityService.ReadIdentities(tfi.Members, MembershipQuery.None, ReadIdentityOptions.None).ToList();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
+                        Telemetry.TrackException(ex, null, null);
+                        return new List<TeamFoundationIdentity>();
+                    }
+                });
+                SourceTeamService = processor.Source.GetService<TfsTeamService>();
+                SourceTeamSettings = processor.Source.GetService<TeamSettingsConfigurationService>();
+                TargetTeamService = processor.Target.GetService<TfsTeamService>();
+                TargetTeamSettings = processor.Target.GetService<TeamSettingsConfigurationService>();
                 MigrateTeamSettings();
 
             }
@@ -85,10 +86,10 @@ namespace MigrationTools.Tools
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
             //////////////////////////////////////////////////
-            List<TeamFoundationTeam> sourceTeams = SourceTeamService.QueryTeams(Engine.Source.Config.AsTeamProjectConfig().Project).ToList();
+            List<TeamFoundationTeam> sourceTeams = SourceTeamService.QueryTeams(_processor.Source.Options.Project).ToList();
             Log.LogInformation("TfsTeamSettingsProcessor::InternalExecute: Found {0} teams in Source?", sourceTeams.Count);
             //////////////////////////////////////////////////
-            List<TeamFoundationTeam> targetTeams = TargetTeamService.QueryTeams(Engine.Target.Config.AsTeamProjectConfig().Project).ToList();
+            List<TeamFoundationTeam> targetTeams = TargetTeamService.QueryTeams(_processor.Target.Options.Project).ToList();
             Log.LogDebug("Found {0} teams in Target?", sourceTeams.Count);
             //////////////////////////////////////////////////
             if (!Options.Enabled)
@@ -115,7 +116,7 @@ namespace MigrationTools.Tools
                 if (foundTargetTeam == null || Options.UpdateTeamSettings)
                 {
                     Log.LogDebug("Processing team '{0}':", sourceTeam.Name);
-                    TeamFoundationTeam newTeam = foundTargetTeam ?? TargetTeamService.CreateTeam(Engine.Target.WorkItems.Project.Url, sourceTeam.Name, sourceTeam.Description, null);
+                    TeamFoundationTeam newTeam = foundTargetTeam ?? TargetTeamService.CreateTeam(_processor.Target.WorkItems.Project.Url, sourceTeam.Name, sourceTeam.Description, null);
                     Log.LogDebug("-> Team '{0}' created", sourceTeam.Name);
 
                     if (Options.MigrateTeamSettings)
@@ -223,16 +224,16 @@ namespace MigrationTools.Tools
 
             Log.LogInformation("Migrating team capacities..");
 
-            WorkHttpClient sourceHttpClient = Engine.Source.GetClient<WorkHttpClient>();
-            WorkHttpClient targetHttpClient = Engine.Target.GetClient<WorkHttpClient>();
+            WorkHttpClient sourceHttpClient = _processor.Source.GetClient<WorkHttpClient>();
+            WorkHttpClient targetHttpClient = _processor.Target.GetClient<WorkHttpClient>();
 
             try
             {
 
-                var sourceTeamContext = new TeamContext(Engine.Source.WorkItems.Project.Guid, sourceTeam.Identity.TeamFoundationId);
+                var sourceTeamContext = new TeamContext(_processor.Source.WorkItems.Project.Guid, sourceTeam.Identity.TeamFoundationId);
                 var sourceIterations = sourceHttpClient.GetTeamIterationsAsync(sourceTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
 
-                var targetTeamContext = new TeamContext(Engine.Target.WorkItems.Project.Guid, targetTeam.Identity.TeamFoundationId);
+                var targetTeamContext = new TeamContext(_processor.Target.WorkItems.Project.Guid, targetTeam.Identity.TeamFoundationId);
                 var targetIterations = targetHttpClient.GetTeamIterationsAsync(targetTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
 
                 foreach (var sourceIteration in sourceIterations)

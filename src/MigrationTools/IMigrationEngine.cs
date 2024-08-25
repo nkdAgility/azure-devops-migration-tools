@@ -11,8 +11,5 @@ namespace MigrationTools
     {
         ProcessingStatus Run();
 
-        IEndpoint Source { get; }
-
-        IEndpoint Target { get; }
     }
 }
