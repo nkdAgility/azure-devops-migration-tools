@@ -97,7 +97,7 @@ namespace MigrationTools.Tools
                 {
                     ExternalLink el = (ExternalLink)l;
 
-                    TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, changeSetMappings, Engine, sourceWorkItem?.ProjectName);
+                    TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, changeSetMappings, sourceWorkItem?.ProjectName);
 
                     // if sourceRepo is null ignore this link and keep processing further links
                     if (sourceRepoInfo == null)
@@ -108,7 +108,7 @@ namespace MigrationTools.Tools
                     // if repo was not found in source project, try to find it by repoId in the whole project collection
                     if (sourceRepoInfo.GitRepo == null)
                     {
-                        var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, Engine, sourceWorkItem?.ProjectName);
+                        var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, sourceWorkItem?.ProjectName);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
                         if (anyProjectSourceRepoInfo.GitRepo != null && gitRepoMaps.Mappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {

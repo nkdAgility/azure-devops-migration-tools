@@ -22,7 +22,7 @@ namespace MigrationTools.Tools
             this.GitRepo = GitRepo;
         }
 
-        public static TfsGitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, TfsChangeSetMappingTool tfsChangeSetMappingTool, IMigrationEngine migrationEngine, string workItemSourceProjectName)
+        public static TfsGitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, TfsChangeSetMappingTool tfsChangeSetMappingTool, string workItemSourceProjectName)
         {
             var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
             switch (repoType)

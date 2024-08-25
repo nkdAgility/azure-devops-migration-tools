@@ -70,8 +70,8 @@ namespace MigrationTools.Processors
                     Log.LogInformation("...Exists");
                     TfsExtensions.ToWorkItem(targetFound).Open();
                    CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
-                    CommonTools.WorkItemEmbededLink.Enrich(null, targetFound);
-                    CommonTools.EmbededImages.FixEmbededImages(sourceWI, targetFound);
+                    CommonTools.WorkItemEmbededLink.Enrich(this, null, targetFound);
+                    CommonTools.EmbededImages.FixEmbededImages(this, sourceWI, targetFound);
                     if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try

@@ -14,16 +14,16 @@ namespace MigrationTools.Processors.Infrastructure
 
         internal ITestManagementTeamProject Project { get; }
 
-        public TestManagementContext(IMigrationClient source) : this(source, null)
+        public TestManagementContext(TfsTeamProjectEndpoint source) : this(source, null)
         {
         }
 
-        public TestManagementContext(IMigrationClient source, string testPlanQuery)
+        public TestManagementContext(TfsTeamProjectEndpoint source, string testPlanQuery)
         {
             this.testPlanQuery = testPlanQuery;
             _source = source;
             tms = _source.GetService<ITestManagementService>();
-            Project = tms.GetTeamProject(source.Config.AsTeamProjectConfig().Project);
+            Project = tms.GetTeamProject(source.Options.Project);
         }
 
         internal List<ITestPlan> GetTestPlans()

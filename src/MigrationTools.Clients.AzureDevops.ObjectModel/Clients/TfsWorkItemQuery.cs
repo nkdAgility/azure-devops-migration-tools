@@ -17,6 +17,8 @@ namespace MigrationTools._EngineV1.Clients
         {
         }
 
+        new TfsTeamProjectEndpoint MigrationClient => (TfsTeamProjectEndpoint)base.MigrationClient;
+
         public override List<int> GetWorkItemIds()
         {
             return GetInternalWorkItems().Select(wi => wi.Id).ToList();
@@ -80,19 +82,19 @@ namespace MigrationTools._EngineV1.Clients
                     }
                 }
                 timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Options.Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "200", true));
             }
             catch (ValidationException ex)
             {
                 timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Options.Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
                 Log.Error(ex, " Error running query");
                 Environment.Exit(-1);
             }
             catch (Exception ex)
             {
                 timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Config.AsTeamProjectConfig().Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
+                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", MigrationClient.Options.Collection.ToString(), "GetWorkItemsFromQuery", null, startTime, timer.Elapsed, "500", false));
                 Telemetry.TrackException(ex,
                        new Dictionary<string, string> {
                             { "CollectionUrl", wiClient.Store.TeamProjectCollection.Uri.ToString() }

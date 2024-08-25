@@ -12,6 +12,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -21,23 +22,25 @@ namespace MigrationTools.Tools
         private const string LogTypeName = nameof(TfsWorkItemEmbededLinkTool);
         private const string RegexPatternLinkAnchorTag = "<a[^>].*?(?:href=\"(?<href>[^\"]*)\".*?|(?<version>data-vss-mention=\"[^\"]*\").*?)*>(?<value>.*?)<\\/a?>";
         private const string RegexPatternWorkItemUrl = "http[s]*://.*?/_workitems/edit/(?<id>\\d+)";
-        private readonly Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
-        private readonly IMigrationEngine Engine;
+        private  Lazy<List<TeamFoundationIdentity>> _targetTeamFoundationIdentitiesLazyCache;
 
         public TfsWorkItemEmbededLinkTool(IOptions<TfsWorkItemEmbededLinkToolOptions> options, IServiceProvider services, ILogger<TfsWorkItemEmbededLinkTool> logger, ITelemetryLogger telemetryLogger)
             : base(options, services, logger, telemetryLogger)
         {
 
-            Engine = services.GetRequiredService<IMigrationEngine>();
+           
+        }
 
+        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
             _targetTeamFoundationIdentitiesLazyCache = new Lazy<List<TeamFoundationIdentity>>(() =>
             {
                 try
                 {
-                    TfsTeamService teamService = Engine.Target.GetService<TfsTeamService>();
-                    TfsConnection connection = (TfsConnection)Engine.Target.InternalCollection;
+                    TfsTeamService teamService = processor.Target.GetService<TfsTeamService>();
+                    TfsConnection connection = (TfsConnection)processor.Target.InternalCollection;
 
-                    var identityService = Engine.Target.GetService<IIdentityManagementService>();
+                    var identityService = processor.Target.GetService<IIdentityManagementService>();
                     var tfi = identityService.ReadIdentity(IdentitySearchFactor.General, "Project Collection Valid Users", MembershipQuery.Expanded, ReadIdentityOptions.None);
                     return identityService.ReadIdentities(tfi.Members, MembershipQuery.None, ReadIdentityOptions.None).ToList();
                 }
@@ -48,15 +51,13 @@ namespace MigrationTools.Tools
                     return new List<TeamFoundationIdentity>();
                 }
             });
-        }
 
-        public  int Enrich(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
-        {
-            string oldTfsurl = Engine.Source.Config.AsTeamProjectConfig().Collection.ToString();
-            string newTfsurl = Engine.Target.Config.AsTeamProjectConfig().Collection.ToString();
 
-            string oldTfsProject = Engine.Source.Config.AsTeamProjectConfig().Project;
-            string newTfsProject = Engine.Target.Config.AsTeamProjectConfig().Project;
+            string oldTfsurl = processor.Source.Options.Collection.ToString();
+            string newTfsurl = processor.Target.Options.Collection.ToString();
+
+            string oldTfsProject = processor.Source.Options.Project;
+            string newTfsProject = processor.Target.Options.Project;
 
             Log.LogInformation("{LogTypeName}: Fixing embedded mention links on target work item {targetWorkItemId} from {oldTfsurl} to {newTfsurl}", LogTypeName, targetWorkItem.Id, oldTfsurl, newTfsurl);
 
@@ -88,10 +89,10 @@ namespace MigrationTools.Tools
                         {
                             var workItemId = workItemLinkMatch.Groups["id"].Value;
                             Log.LogDebug("{LogTypeName}: Source work item {workItemId} mention link traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
-                            var sourceLinkWi = Engine.Source.WorkItems.GetWorkItem(workItemId, false);
+                            var sourceLinkWi = processor.Source.WorkItems.GetWorkItem(workItemId, false);
                             if (sourceLinkWi != null)
                             {
-                                var linkWI = Engine.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
+                                var linkWI = processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
                                 if (linkWI != null)
                                 {
                                     var replaceValue = anchorTagMatch.Value

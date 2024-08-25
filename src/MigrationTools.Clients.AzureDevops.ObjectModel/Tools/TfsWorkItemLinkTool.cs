@@ -55,7 +55,7 @@ namespace MigrationTools.Tools
                         else if (IsRelatedLink(item))
                         {
                             RelatedLink rl = (RelatedLink)item;
-                            CreateRelatedLink(sourceWorkItemLinkStart, rl, targetWorkItemLinkStart);
+                            CreateRelatedLink(processor, sourceWorkItemLinkStart, rl, targetWorkItemLinkStart);
                         }
                         else if (IsExternalLink(item))
                         {
@@ -94,8 +94,8 @@ namespace MigrationTools.Tools
             }
             if (sourceWorkItemLinkStart.Type == "Test Case")
             {
-                MigrateSharedSteps(sourceWorkItemLinkStart, targetWorkItemLinkStart);
-                MigrateSharedParameters(sourceWorkItemLinkStart, targetWorkItemLinkStart);
+                MigrateSharedSteps(processor, sourceWorkItemLinkStart, targetWorkItemLinkStart);
+                MigrateSharedParameters(processor, sourceWorkItemLinkStart, targetWorkItemLinkStart);
             }
             return 0;
         }

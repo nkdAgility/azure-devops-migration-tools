@@ -223,7 +223,7 @@ namespace MigrationTools.Processors
 
             contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
             List<IdentityMapData> usersToMap = new List<IdentityMapData>();
-            usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
+            usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
             if (usersToMap != null && usersToMap?.Count > 0)
             {
                 Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist in the target. This will not cause any errors, but may result in disconnected users that could have been mapped. Use the ExportUsersForMapping processor to create a list of mappable users. Then Import using ", usersToMap.Count);
@@ -257,7 +257,7 @@ namespace MigrationTools.Processors
         {
             contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
 
-            var result =  CommonTools.ValidateRequiredField.ValidatingRequiredField(
+            var result =  CommonTools.ValidateRequiredField.ValidatingRequiredField(this,
                 Target.Options.ReflectedWorkItemIDFieldName, sourceWorkItems);
             if (!result)
             {
@@ -421,7 +421,7 @@ namespace MigrationTools.Processors
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                CommonTools.UserMapping.MapUserIdentityField(f);
+                CommonTools.UserMapping.MapUserIdentityField(this, f);
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
@@ -487,7 +487,7 @@ namespace MigrationTools.Processors
         {
             if (targetWorkItem != null && Options.FixHtmlAttachmentLinks)
             {
-                CommonTools.EmbededImages.FixEmbededImages(null, targetWorkItem);
+                CommonTools.EmbededImages.FixEmbededImages(this, null, targetWorkItem);
             }
         }
 
@@ -495,7 +495,7 @@ namespace MigrationTools.Processors
         {
             if (sourceWorkItem != null && targetWorkItem != null && Options.FixHtmlAttachmentLinks)
             {
-                CommonTools.WorkItemEmbededLink.Enrich(sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemEmbededLink.Enrich(this, sourceWorkItem, targetWorkItem);
             }
         }
 
@@ -633,7 +633,7 @@ namespace MigrationTools.Processors
             if (targetWorkItem != null && CommonTools.Attachment.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", CommonTools.Attachment.Enabled } });
-                CommonTools.Attachment.ProcessAttachemnts(sourceWorkItem, targetWorkItem, save);
+                CommonTools.Attachment.ProcessAttachemnts(this, sourceWorkItem, targetWorkItem, save);
                 AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.ToWorkItem().AttachedFileCount);
             }
         }
@@ -650,8 +650,8 @@ namespace MigrationTools.Processors
             }
             else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case" )
             {
-                CommonTools.WorkItemLink.MigrateSharedSteps(sourceWorkItem, targetWorkItem);
-                CommonTools.WorkItemLink.MigrateSharedParameters(sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemLink.MigrateSharedSteps(this, sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemLink.MigrateSharedParameters(this, sourceWorkItem, targetWorkItem);
             }
         }
 

@@ -22,8 +22,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = ActivatorUtilities.CreateInstance< TfsWorkItemEndpoint>(Services, GetTfsWorkItemEndPointOptions("migrationSource1"));
             endpoint.GetWorkItems();
             Assert.IsNotNull(endpoint);
         }
@@ -31,16 +30,14 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointConfigureTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = ActivatorUtilities.CreateInstance<TfsWorkItemEndpoint>(Services, GetTfsWorkItemEndPointOptions("migrationSource1"));
             Assert.IsNotNull(endpoint);
         }
 
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointGetWorkItemsTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = ActivatorUtilities.CreateInstance<TfsWorkItemEndpoint>(Services, GetTfsWorkItemEndPointOptions("migrationSource1"));
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
             Assert.AreEqual(13, result.Count());
         }
@@ -48,8 +45,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointGetWorkItemsQueryTest()
         {
-            TfsWorkItemEndpoint endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = ActivatorUtilities.CreateInstance<TfsWorkItemEndpoint>(Services, GetTfsWorkItemEndPointOptions("migrationSource1"));
             QueryOptions qo = new QueryOptions()
             {
                 Query = "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",

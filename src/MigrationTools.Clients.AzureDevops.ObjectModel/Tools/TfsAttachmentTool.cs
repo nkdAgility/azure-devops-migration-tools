@@ -82,11 +82,11 @@ namespace MigrationTools.Tools
             {
                 target.SaveToAzureDevOps();
                 Log.LogInformation("Work iTem now has {AttachmentCount} attachemnts", source.ToWorkItem().Attachments.Count);
-                CleanUpAfterSave(processer);
+                CleanUpAfterSave();
             }
         }
 
-        public void CleanUpAfterSave(TfsProcessor processer)
+        public void CleanUpAfterSave()
         {
             if (_exportWiPath != null && Directory.Exists(_exportWiPath))
             {
@@ -104,7 +104,6 @@ namespace MigrationTools.Tools
 
         private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
         {
-            SetupWorkItemServer();
             string fname = GetSafeFilename(wia.Name);
             Log.LogDebug(fname);
 

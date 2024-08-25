@@ -58,13 +58,13 @@ namespace MigrationTools.Processors
                 List<WorkItemData> sourceWorkItems = Source.WorkItems.GetWorkItems(Options.WIQLQuery);
                 Log.LogInformation("Processed {0} work items from Source", sourceWorkItems.Count);
 
-                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(sourceWorkItems);
+                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
                 Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
             }
             else
             {
                 Log.LogInformation("OnlyListUsersInWorkItems is false, all users will be listed");
-                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTarget();
+                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTarget(this);
                 Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
             }
 
