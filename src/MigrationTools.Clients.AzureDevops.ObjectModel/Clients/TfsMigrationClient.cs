@@ -12,7 +12,7 @@ using Serilog;
 
 namespace MigrationTools._EngineV1.Clients
 {
-    public class TfsMigrationClient : IMigrationClient
+    public class TfsMigrationClient : EndpointOptions, IMigrationClient
     {
         private TfsTeamProjectEndpointOptions _config;
         private TfsTeamProjectCollection _collection;

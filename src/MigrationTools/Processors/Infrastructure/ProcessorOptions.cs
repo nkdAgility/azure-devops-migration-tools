@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
@@ -18,6 +19,7 @@ namespace MigrationTools.Processors.Infrastructure
         /// <summary>
         /// If set to `true` then the processor will run. Set to `false` and the processor will not run.
         /// </summary>
+        [Required]
         public bool Enabled { get; set; }
 
         /// <summary>

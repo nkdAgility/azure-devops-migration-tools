@@ -3,6 +3,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
+using System.ComponentModel.DataAnnotations;
 
 namespace MigrationTools.Processors
 {
@@ -27,10 +28,12 @@ namespace MigrationTools.Processors
         /// <default>true</default>
         public bool UpdateCreatedBy { get; set; }
 
+
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
         /// <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
+        [Required]
         public string WIQLQuery { get; set; }
 
         /// <summary>
