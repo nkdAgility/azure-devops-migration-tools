@@ -8,7 +8,23 @@ configurationSamples:
     {
       "MigrationTools": {
         "EndpointDefaults": {
-          "TfsTeamProjectEndpoint": []
+          "TfsTeamProjectEndpoint": {
+            "AllowCrossProjectLinking": "False",
+            "AuthenticationMode": "AccessToken",
+            "Collection": "",
+            "EndpointType": "TfsTeamProjectEndpoint",
+            "LanguageMaps": {
+              "AreaPath": "Area",
+              "IterationPath": "Iteration"
+            },
+            "NetworkCredentials": {
+              "Domain": "",
+              "Password": "",
+              "UserName": ""
+            },
+            "PersonalAccessToken": "",
+            "Project": ""
+          }
         }
       }
     }
@@ -19,7 +35,23 @@ configurationSamples:
     {
       "MigrationTools": {
         "EndpointDefaults": {
-          "TfsTeamProjectEndpoint": []
+          "TfsTeamProjectEndpoint": {
+            "AllowCrossProjectLinking": "False",
+            "AuthenticationMode": "AccessToken",
+            "Collection": "https://dev.azure.com/nkdagility-preview/",
+            "EndpointType": "TfsTeamProjectEndpoint",
+            "LanguageMaps": {
+              "AreaPath": "Area",
+              "IterationPath": "Iteration"
+            },
+            "NetworkCredentials": {
+              "Domain": "",
+              "Password": "",
+              "UserName": ""
+            },
+            "PersonalAccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+            "Project": "migrationSource1"
+          }
         }
       }
     }
@@ -30,15 +62,23 @@ configurationSamples:
     {
       "$type": "TfsTeamProjectEndpointOptions",
       "Enabled": false,
-      "Collection": null,
-      "Project": null,
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationSource1",
       "ReflectedWorkItemIDFieldName": null,
       "AllowCrossProjectLinking": false,
       "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": null,
+      "PersonalAccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
       "PersonalAccessTokenVariableName": null,
-      "LanguageMaps": null,
-      "CollectionName": "https://dev.azure.com/sampleAccount",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      },
+      "NetworkCredentials": {
+        "Domain": "",
+        "UserName": "",
+        "Password": ""
+      },
+      "CollectionName": "https://dev.azure.com/nkdagility-preview/",
       "Name": null,
       "EndpointEnrichers": null
     }
@@ -80,6 +120,10 @@ options:
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: NetworkCredentials
+  type: NetworkCredentials
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: PersonalAccessToken
   type: String
   description: missng XML code comments
@@ -99,7 +143,7 @@ options:
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Endpoints/TfsTeamProjectEndpoint.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Endpoints/TfsTeamProjectEndpointOptions.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Endpoints/TfsTeamProjectEndPointOptions.cs
 
 redirectFrom:
 - /Reference/Endpoints/TfsTeamProjectEndpointOptions/
