@@ -1,6 +1,6 @@
 ﻿using MigrationTools.Services;
 
-namespace MigrationTools.Helpers.Tests
+namespace MigrationTools.Services.Shadows
 {
     public class FakeMigrationToolVersion : IMigrationToolVersion
     {

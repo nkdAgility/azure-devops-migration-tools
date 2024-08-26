@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.Endpoints
 {

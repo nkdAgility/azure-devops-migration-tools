@@ -9,9 +9,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Helpers.Tests;
 using MigrationTools.Options;
 using MigrationTools.Services;
+using MigrationTools.Services.Shadows;
 using MigrationTools.TestExtensions;
 using Serilog;
 

@@ -5,10 +5,10 @@ using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Engine.Containers.Tests;
 using MigrationTools.Enrichers;
-using MigrationTools.Helpers.Tests;
 using MigrationTools.Processors;
 using MigrationTools.Services;
-using MigrationTools.TestExtensions;
+using MigrationTools.Services.Shadows;
+using MigrationTools.Shadows;
 using MigrationTools.Tools;
 
 namespace MigrationTools.Tests

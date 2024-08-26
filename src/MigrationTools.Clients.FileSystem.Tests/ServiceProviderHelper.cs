@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Services;
 using MigrationTools.TestExtensions;
-using MigrationTools.Helpers.Tests;
 using Microsoft.Extensions.Configuration;
+using MigrationTools.Services.Shadows;
 
 namespace MigrationTools.Tests
 {

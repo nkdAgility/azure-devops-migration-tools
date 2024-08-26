@@ -1,11 +1,12 @@
 ﻿using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Services;
+using MigrationTools.Services.Shadows;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.InMemory;
 
-namespace MigrationTools.TestExtensions
+namespace MigrationTools.Shadows
 {
     public static class ServiceCollectionExtensions
     {
@@ -29,7 +30,7 @@ namespace MigrationTools.TestExtensions
             context.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
             // Add Telemitery Adapter
             context.AddSingleton<ITelemetryLogger, TelemetryLoggerFake>();
-            context.AddSingleton<IMigrationToolVersion, MigrationToolVersionFake>();
+            context.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
         }
     }
 }

@@ -4,9 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
-using MigrationTools.Helpers.Tests;
 using MigrationTools.Services;
-using MigrationTools.TestExtensions;
+using MigrationTools.Services.Shadows;
+using MigrationTools.Shadows;
 
 namespace MigrationTools.Tests
 {

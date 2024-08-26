@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MigrationTools.Helpers.Tests;
+using MigrationTools.Services.Shadows;
 
 namespace MigrationTools.Tests
 {
