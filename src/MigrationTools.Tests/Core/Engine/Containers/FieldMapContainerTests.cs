@@ -8,6 +8,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.Tests;
 using MigrationTools.Tools;
+using MigrationTools.Tools.Shadows;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
@@ -34,7 +35,7 @@ namespace MigrationTools.Engine.Containers.Tests
 
             Assert.AreEqual(0, config.Value.FieldMaps.Count);
 
-            var testSimple = new SimpleFieldMapMockOptions
+            var testSimple = new MockSimpleFieldMapOptions
             {
                 ApplyTo = new List<string> { "*" },
             };

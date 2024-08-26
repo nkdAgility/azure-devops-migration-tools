@@ -6,10 +6,12 @@ using MigrationTools.Endpoints;
 using MigrationTools.Engine.Containers.Tests;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure.Shadows;
 using MigrationTools.Services;
 using MigrationTools.Services.Shadows;
 using MigrationTools.Shadows;
 using MigrationTools.Tools;
+using MigrationTools.Tools.Shadows;
 
 namespace MigrationTools.Tests
 {
@@ -42,9 +44,9 @@ namespace MigrationTools.Tests
 
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
-            services.AddTransient<SimpleFieldMapMock>();
-            services.AddTransient<SimpleFieldMapMockOptions>();
-            services.AddTransient<SimpleProcessorMock>();
+            services.AddTransient<MockSimpleFieldMap>();
+            services.AddTransient<MockSimpleFieldMapOptions>();
+            services.AddTransient<MockSimpleProcessor>();
 
             return services;
         }

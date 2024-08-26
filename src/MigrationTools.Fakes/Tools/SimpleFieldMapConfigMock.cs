@@ -1,9 +1,9 @@
 ﻿using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools.Engine.Containers.Tests
+namespace MigrationTools.Tools.Shadows
 {
-    public class SimpleFieldMapMockOptions : FieldMapOptions
+    public class MockSimpleFieldMapOptions : FieldMapOptions
     {
         public void SetExampleConfigDefaults()
         {

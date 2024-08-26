@@ -8,6 +8,7 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.Processors;
 using MigrationTools.Tests;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Processors.Infrastructure.Shadows;
 
 namespace MigrationTools.Engine.Containers.Tests
 {
@@ -31,7 +32,7 @@ namespace MigrationTools.Engine.Containers.Tests
         public void ProcessorContainerTest()
         {
             var config = CreateProcessorContainerOptions();
-            var testSimple = new SimpleProcessorMockOptions();
+            var testSimple = new MockSimpleProcessorOptions();
 
             Assert.AreEqual(0, config.Value.Processors.Count);
 

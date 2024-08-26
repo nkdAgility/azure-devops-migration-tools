@@ -4,9 +4,9 @@ using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
 using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools.Engine.Containers.Tests
+namespace MigrationTools.Tools.Shadows
 {
-    public class SimpleFieldMapMock : IFieldMap
+    public class MockSimpleFieldMap : IFieldMap
     {
         protected IFieldMapOptions _Config;
 
@@ -23,7 +23,7 @@ namespace MigrationTools.Engine.Containers.Tests
             }
         }
 
-        public string MappingDisplayName => "SimpleFieldMapMock";
+        public string MappingDisplayName => "MockSimpleFieldMap";
 
         public void Execute(WorkItemData source, WorkItemData target)
         {
