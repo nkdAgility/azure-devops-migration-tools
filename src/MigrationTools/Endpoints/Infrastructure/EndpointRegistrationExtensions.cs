@@ -32,7 +32,7 @@ namespace MigrationTools
                     {
                         // Create the options instance and bind the configuration
                         var endpointOptionsInstance = Activator.CreateInstance(endpointOptionsType);
-                        endpointConfig.Bind(endpointOptionsInstance);
+                        endpointConfig.Bind(endpointOptionsInstance); // TODO: Find out why this does not load Environment Variables?
                         IEndpoint endpointInstance;
                         try
                         {
