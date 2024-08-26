@@ -16,7 +16,7 @@ namespace MigrationTools.Tests
 
             services.AddMigrationToolServices(configuration);
             services.AddMigrationToolServicesForClientFileSystem(configuration);
-
+            
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
 
