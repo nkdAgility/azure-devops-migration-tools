@@ -284,27 +284,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"10e5bd5f"
+            => @"af53e033"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"10e5bd5f342e6a65a2aa687e9e0bb663c1893af1"
+            => @"af53e0333e023ac1c3e98740e0fefa464b7a06f5"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-27T14:16:58+01:00"
+            => @"2024-08-27T15:16:42+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"203"
+            => @"204"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.9-203-g10e5bd5f"
+            => @"v15.1.8-Preview.9-204-gaf53e033"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -339,7 +339,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"211"
+            => @"212"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

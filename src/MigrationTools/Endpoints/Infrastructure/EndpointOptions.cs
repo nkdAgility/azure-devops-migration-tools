@@ -7,7 +7,7 @@ namespace MigrationTools.Endpoints.Infrastructure
     public abstract class EndpointOptions : IEndpointOptions
     {
         public string ConfigurationSectionPath => $"MigrationTools:EndpointDefaults:{ConfigurationOptionFor}";
-        public string ConfigurationCollectionPath => $"MigrationTools:Endpoints:*:{ConfigurationOptionFor}";
+        public string ConfigurationCollectionPath => null;
         public string ConfigurationObjectName => $"EndpointType";
         public string ConfigurationSamplePath => $"MigrationTools:EndpointSamples:{ConfigurationOptionFor}";
 

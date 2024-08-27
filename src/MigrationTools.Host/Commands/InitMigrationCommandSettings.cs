@@ -21,6 +21,7 @@ namespace MigrationTools.Host.Commands
     {
         Reference = 0,
         WorkItemTracking = 1,
-        Basic = 4
+        Basic = 4,
+        PipelineProcessor = 5
     }
 }

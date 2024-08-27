@@ -4,12 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elmah.Io.Client;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -71,27 +73,50 @@ namespace MigrationTools.Host.Commands
 
                     _logger.LogInformation("Populating config with {Options}", settings.Options.ToString());
                     List<string> optionsToInclude = null;
+                    Dictionary<string, string> endpointsToInclude = null;
                     switch (settings.Options)
                     {
                         case OptionsMode.Reference:
 
                             break;
                         case OptionsMode.Basic:
-                             optionsToInclude = new List<string>() { "TfsWorkItemMigrationProcessorOptions", "FieldMappingToolOptions", "FieldLiteralMapOptions" };
+                             optionsToInclude = new List<string>() { "TfsWorkItemMigrationProcessor", "FieldMappingTool", "FieldLiteralMap" };
+                            endpointsToInclude = new Dictionary<string, string> () { { "Source", "TfsTeamProjectEndpoint" }, { "Target", "TfsTeamProjectEndpoint" } };
                             break;
                         case OptionsMode.WorkItemTracking:
-                             optionsToInclude = new List<string>() { "TfsWorkItemMigrationProcessorOptions", "FieldMappingToolOptions", "FieldLiteralMapOptions" };
+                             optionsToInclude = new List<string>() { "TfsWorkItemMigrationProcessor", "FieldMappingTool", "FieldLiteralMap" };
+                            endpointsToInclude = new Dictionary<string, string>() { { "Source", "TfsTeamProjectEndpoint" }, { "Target", "TfsTeamProjectEndpoint" } };
                             break;
+                            case OptionsMode.PipelineProcessor:
                         default:
-                            optionsToInclude = new List<string>() { "TfsWorkItemMigrationProcessorOptions", "FieldMappingToolOptions", "FieldLiteralMapOptions" };
+                            optionsToInclude = new List<string>() { "AzureDevOpsPipelineProcessor"};
+                            endpointsToInclude = new Dictionary<string, string>() { { "Source", "AzureDevOpsEndpoint" }, { "Target", "AzureDevOpsEndpoint" } };
                             break;
+                    }
+
+                    if (endpointsToInclude !=null)
+                    {
+                        foreach (var item in endpointsToInclude)
+                        {
+                            var item2 = allOptions.WithInterface<IEndpointOptions>().FirstOrDefault(x => x.Name.StartsWith(item.Value));
+                            configJson = AddEndpointOptionToConfig(configuration, configJson, item.Key, item2);
+                        }
+                    } else
+                    {
+                        _logger.LogWarning($"You are adding all of the EndPoints, there may be some that cant be added and will cause an error...");
+                        int epNo = 1;
+                        foreach (var item in allOptions.WithInterface<IEndpointOptions>())
+                        {
+                            configJson = AddEndpointOptionToConfig(configuration, configJson, $"Endpoint{epNo}", item);
+                            epNo++;
+                        }
                     }
 
                     if (optionsToInclude != null)
                     {
                         foreach (var item in optionsToInclude)
                         {
-                            var item2 = allOptions.FirstOrDefault(x => x.Name == item);
+                            var item2 = allOptions.FirstOrDefault(x => x.Name.StartsWith(item));
                             configJson = AddOptionToConfig(configuration, configJson, item2);
                         }
                     } else
@@ -105,7 +130,9 @@ namespace MigrationTools.Host.Commands
 
 
                     File.WriteAllText(configFile, configJson.ToString(Formatting.Indented));
-                    _logger.LogInformation($"New {configFile} file has been created");
+                    _logger.LogInformation("New {configFile} file has been created", configFile);
+                    _logger.LogInformation(configJson.ToString(Formatting.Indented));
+
                 }
                 _exitCode = 0;
             }
@@ -123,6 +150,28 @@ namespace MigrationTools.Host.Commands
             return _exitCode;
         }
 
+        private JObject AddEndpointOptionToConfig(IConfigurationRoot configuration, JObject configJson, string key, Type endpointType)
+        {
+            IOptions instanceOfOption = (IOptions)Activator.CreateInstance(endpointType);
+            bool isCollection = !string.IsNullOrEmpty(instanceOfOption.ConfigurationCollectionPath);
+            var section = configuration.GetSection(instanceOfOption.ConfigurationSectionPath);
+            section.Bind(instanceOfOption);
+            try
+            {
+                //instanceOfOption.ConfigurationSectionPath = $"MigrationTools:Endpoints:{key}";
+                var hardPath = $"MigrationTools:Endpoints:{key}";
+                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, hardPath, true, false);
+                _logger.LogInformation("Adding Option: {item}", endpointType.Name);
+            }
+            catch (Exception)
+            {
+
+                _logger.LogInformation("FAILED!! Adding Option: {item}", endpointType.FullName);
+            }
+
+            return configJson;
+        }
+
         private JObject AddOptionToConfig(IConfigurationRoot configuration, JObject configJson, Type item)
         {
             IOptions instanceOfOption = (IOptions)Activator.CreateInstance(item);
@@ -131,7 +180,7 @@ namespace MigrationTools.Host.Commands
             section.Bind(instanceOfOption);
             try
             {
-                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, isCollection);
+                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, false, isCollection);
                 _logger.LogInformation("Adding Option: {item}", item.Name);
             }
             catch (Exception)

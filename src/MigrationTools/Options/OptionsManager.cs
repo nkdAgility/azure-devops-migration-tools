@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -53,7 +54,15 @@ namespace MigrationTools.Options
             return result;
         }
 
-        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, bool isCollection = false)
+        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, bool shouldAddObjectName = false, bool isCollection = false)
+        {
+            //JObject configJson, TOptions options, string path, string objectName, string optionFor, bool isCollection = false, bool shouldAddObjectName = false
+            string path = isCollection ? iOption.ConfigurationCollectionPath : iOption.ConfigurationSectionPath;
+
+            return AddOptionsToConfiguration(configJson, iOption, path, shouldAddObjectName, isCollection);
+        }
+
+        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, string sectionPath, bool shouldAddObjectName = false, bool isCollection = false)
         {
             Type optionsManagerType = typeof(OptionsManager<>).MakeGenericType(iOption.GetType());
 
@@ -64,7 +73,7 @@ namespace MigrationTools.Options
             MethodInfo createMethod = optionsManagerType.GetMethod("AddOptionsToConfiguration");
 
             // Prepare parameters for the method
-            object[] parameters = { configJson, iOption, isCollection };
+            object[] parameters = { configJson, iOption, sectionPath, iOption.ConfigurationObjectName, iOption.ConfigurationOptionFor, shouldAddObjectName, isCollection };
 
             // Invoke the method dynamically
             JObject result = (JObject)createMethod.Invoke(optionsManagerInstance, parameters);
@@ -218,29 +227,26 @@ namespace MigrationTools.Options
             }
         }
 
-        public string CreateNewConfigurationJson(TOptions options, bool isCollection = false)
+        public string CreateNewConfigurationJson(TOptions options, string path, string objectName, string optionFor, bool isCollection = false, bool shouldAddObjectName = false)
         {
             // Load existing configuration from a file or create a new JObject if necessary
             JObject configJson = new JObject();
 
-            // Add or update the options in the configuration
-            configJson = AddOptionsToConfiguration(configJson, options, isCollection);
+            // Add or update the options in the configuration using the new method signature
+            configJson = AddOptionsToConfiguration(configJson, options, path, objectName, optionFor, isCollection, shouldAddObjectName);
 
             // Return the updated JSON as a formatted string
             return configJson.ToString(Formatting.Indented);
         }
 
         // New method that updates the configuration
-        public JObject AddOptionsToConfiguration(JObject configJson, TOptions options, bool isCollection = false)
+        public JObject AddOptionsToConfiguration(JObject configJson, TOptions options, string path, string objectName, string optionFor, bool shouldAddObjectName = false, bool isCollection = false)
         {
             // Initialize the JObject if it was null
             if (configJson == null)
             {
                 configJson = new JObject();
             }
-
-            // Determine the path based on whether this is a collection or a section
-            string path = isCollection ? options.ConfigurationCollectionPath : options.ConfigurationSectionPath;
 
             // Split the path into its components
             string[] pathParts = path.Split(':');
@@ -260,7 +266,13 @@ namespace MigrationTools.Options
                     // Add the options object as part of the collection
                     var collectionArray = (JArray)currentSection[pathParts[i]];
                     var optionsObject = JObject.FromObject(options);
-                    optionsObject.AddFirst(new JProperty(options.ConfigurationObjectName, options.ConfigurationOptionFor));
+
+                    // Add the object name if required
+                    if (shouldAddObjectName)
+                    {
+                        optionsObject.AddFirst(new JProperty(objectName, optionFor));
+                    }
+
                     collectionArray.Add(optionsObject);
                 }
                 else
@@ -270,7 +282,18 @@ namespace MigrationTools.Options
                     {
                         currentSection[pathParts[i]] = new JObject();
                     }
-                    currentSection = (JObject)currentSection[pathParts[i]];
+
+                    // Add the object name if it's the last element and shouldAddObjectName is true
+                    if (i == pathParts.Length - 1 && shouldAddObjectName)
+                    {
+                        var optionsObject = JObject.FromObject(options);
+                        optionsObject.AddFirst(new JProperty(objectName, optionFor));
+                        currentSection[pathParts[i]] = optionsObject;
+                    }
+                    else
+                    {
+                        currentSection = (JObject)currentSection[pathParts[i]];
+                    }
                 }
             }
 
@@ -279,6 +302,12 @@ namespace MigrationTools.Options
             {
                 JObject optionsObject = JObject.FromObject(options);
 
+                // Add the object name if required
+                if (shouldAddObjectName)
+                {
+                    optionsObject.AddFirst(new JProperty(options.ConfigurationObjectName, options.ConfigurationOptionFor));
+                }
+
                 // Replace or add the options content in the current section
                 currentSection.Replace(optionsObject);
             }
@@ -286,6 +315,7 @@ namespace MigrationTools.Options
             // Return the modified JObject
             return configJson;
         }
+
 
         private OptionsConfiguration GetOptionsConfiguration()
         {
