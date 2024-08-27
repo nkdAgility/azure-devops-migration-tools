@@ -38,8 +38,8 @@ namespace MigrationTools.Processors.Infrastructure
 
         public IProcessorOptions Options { get; private set; }
 
-        public IEndpoint Source { get { if (_source == null) { _source = Services.GetRequiredKeyedService<IEndpoint>(Options.SourceName); } return _source; } }
-        public IEndpoint Target { get { if (_target == null) { _target = Services.GetRequiredKeyedService<IEndpoint>(Options.TargetName); } return _target; } }
+        public IEndpoint Source { get { if (_source == null) { _source = GetEndpoint(Options.SourceName); } return _source; } }
+        public IEndpoint Target { get { if (_target == null) { _target = GetEndpoint(Options.TargetName); } return _target; } }
 
         public ProcessorEnricherContainer ProcessorEnrichers { get; }
 
@@ -53,6 +53,29 @@ namespace MigrationTools.Processors.Infrastructure
         public bool SupportsProcessorEnrichers => false;
 
         public virtual ProcessorType Type => ProcessorType.AddHock;
+
+        public IEndpoint GetEndpoint(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Endpoint name cannot be null or empty", nameof(name));
+            }
+            try
+            {
+                // Assuming GetRequiredKeyedService throws an exception if the service is not found
+                IEndpoint endpoint = Services.GetKeyedService<IEndpoint>(name);
+                if (endpoint == null)
+                {
+                    Log.LogCritical("Processor::GetEndpoint: The endpoint '{EndpointName}' could not be found.", name);
+                }
+                return endpoint;
+            }
+            catch (Exception ex)
+            {
+                // Catch any other exceptions that might occur and wrap them in a more specific exception if needed
+                throw new InvalidOperationException($"An error occurred while retrieving the endpoint '{name}'.", ex);
+            }
+        }
 
         public void Execute()
         {

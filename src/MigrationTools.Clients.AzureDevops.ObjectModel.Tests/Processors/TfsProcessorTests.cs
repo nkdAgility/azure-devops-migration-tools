@@ -15,6 +15,7 @@ using MigrationTools.Endpoints.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Microsoft.VisualStudio.Services.Commerce;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -28,6 +29,9 @@ namespace MigrationTools.Processors.Tests
 
         protected TfsTeamSettingsProcessor GetTfsTeamSettingsProcessor(TfsTeamSettingsProcessorOptions options = null)
         {
+            string SourceName = options != null ? options.SourceName : "Target";
+            string TargetName = options != null ? options.TargetName : "Source";
+
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
             // Add required DI Bits
@@ -42,9 +46,9 @@ namespace MigrationTools.Processors.Tests
             // Add the Processor
             services.AddSingleton<TfsTeamSettingsProcessor>();
             // Add the Endpoints
-            services.AddKeyedSingleton(typeof(IEndpoint), "Source", (sp, key) =>
+            services.AddKeyedSingleton(typeof(IEndpoint), SourceName, (sp, key) =>
             {
-                var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), new TfsTeamSettingsEndpointOptions()
+                IOptions<TfsTeamSettingsEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamSettingsEndpointOptions()
                 {
                     Organisation = "https://dev.azure.com/nkdagility-preview/",
                     Project = "migrationSource1",
@@ -52,11 +56,11 @@ namespace MigrationTools.Processors.Tests
                     AuthenticationMode = AuthenticationMode.AccessToken,
                     ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId",
                 });
-                return endpoint;
+               return ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), options);
             });
-            services.AddKeyedSingleton(typeof(IEndpoint), "Target", (sp, key) =>
+            services.AddKeyedSingleton(typeof(IEndpoint), TargetName, (sp, key) =>
             {
-                var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), new TfsTeamSettingsEndpointOptions()
+                IOptions<TfsTeamSettingsEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamSettingsEndpointOptions()
                 {
                     Organisation = "https://dev.azure.com/nkdagility-preview/",
                     Project = "migrationTarget1",
@@ -64,14 +68,14 @@ namespace MigrationTools.Processors.Tests
                     AuthenticationMode = AuthenticationMode.AccessToken,
                     ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId",
                 });
-                return endpoint;
+                return ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), options);
             });
             // Add the settings
             services.Configure<TfsTeamSettingsProcessorOptions>(o =>
             {
                 o.Enabled = options != null ? options.Enabled : true;
-                o.SourceName = options != null ? options.SourceName : "Source";
-                o.TargetName = options != null ? options.SourceName : "Target";
+                o.SourceName = SourceName;
+                o.TargetName = TargetName;
                 o.Enrichers = options != null ? options.Enrichers : null;
                 o.ProcessorEnrichers = options != null ? options.ProcessorEnrichers : null;
                 o.RefName = options != null ? options.RefName : null;
@@ -88,6 +92,9 @@ namespace MigrationTools.Processors.Tests
 
         protected TfsSharedQueryProcessor GetTfsSharedQueryProcessor(TfsSharedQueryProcessorOptions options = null)
         {
+            string SourceName = options != null ? options.SourceName : "Target";
+            string TargetName = options != null ? options.TargetName : "Source";
+
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
 
@@ -100,18 +107,46 @@ namespace MigrationTools.Processors.Tests
 
             services.AddSingleton<TfsSharedQueryProcessor>();
 
-            //AddEndpoint(services, options != null ? options.SourceName : "Source", "migrationSource1");
-            services.AddKeyedSingleton(typeof(IEndpoint), "Source", (sp, key) =>
+            services.AddKeyedSingleton(typeof(IEndpoint), SourceName, (sp, key) =>
             {
-                var options = GetTfsTeamProjectEndpointOptions("migrationSource1");
+                IOptions<TfsTeamProjectEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamProjectEndpointOptions()
+                {
+                    Collection = new System.Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Project = "migrationSource1",
+                    Authentication = new TfsAuthenticationOptions()
+                    {
+                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AccessToken = TestingConstants.AccessToken
+                    },
+                    AllowCrossProjectLinking = false,
+                    LanguageMaps = new TfsLanguageMapOptions()
+                    {
+                        AreaPath = "Area",
+                        IterationPath = "Iteration"
+                    },
+                });
                 var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamProjectEndpoint), options);
                 return endpoint;
             });
 
-           // AddEndpoint(services, options != null ? options.SourceName : "Target", "migrationTarget1");
-            services.AddKeyedSingleton(typeof(IEndpoint), "Target", (sp, key) =>
+            services.AddKeyedSingleton(typeof(IEndpoint), TargetName, (sp, key) =>
             {
-                var options = GetTfsTeamProjectEndpointOptions("migrationTarget1");
+                IOptions<TfsTeamProjectEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamProjectEndpointOptions()
+                {
+                    Collection = new System.Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Project = "migrationTarget1",
+                    Authentication = new TfsAuthenticationOptions()
+                    {
+                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AccessToken = TestingConstants.AccessToken
+                    },
+                    AllowCrossProjectLinking = false,
+                    LanguageMaps = new TfsLanguageMapOptions()
+                    {
+                        AreaPath = "Area",
+                        IterationPath = "Iteration"
+                    },
+                });
                 var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamProjectEndpoint), options);
                 return endpoint;
             });
@@ -119,8 +154,8 @@ namespace MigrationTools.Processors.Tests
             services.Configure<TfsSharedQueryProcessorOptions>(o =>
             {
                 o.Enabled = options != null ? options.Enabled : true;
-                o.SourceName = options != null ? options.SourceName : "Source";
-                o.TargetName = options != null ? options.SourceName : "Target";
+                o.SourceName = SourceName;
+                o.TargetName = TargetName;
                 o.Enrichers = options != null ? options.Enrichers : null;
                 o.ProcessorEnrichers = options != null ? options.ProcessorEnrichers : null;
                 o.RefName = options != null ? options.RefName : null;
@@ -133,25 +168,5 @@ namespace MigrationTools.Processors.Tests
             return services.BuildServiceProvider().GetService<TfsSharedQueryProcessor>();
         }
 
-        private static IOptions<TfsTeamProjectEndpointOptions> GetTfsTeamProjectEndpointOptions(string project)
-        {
-            IOptions<TfsTeamProjectEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamProjectEndpointOptions()
-            {
-                Collection = new System.Uri("https://dev.azure.com/nkdagility-preview/"),
-                Project = "migrationSource1",
-                Authentication = new TfsAuthenticationOptions()
-                {
-                 AuthenticationMode = AuthenticationMode.AccessToken,
-                 AccessToken = TestingConstants.AccessToken
-                },
-                AllowCrossProjectLinking = false,
-                LanguageMaps = new TfsLanguageMapOptions()
-                {
-                    AreaPath = "Area",
-                    IterationPath = "Iteration"
-                },
-            });
-            return options;
-        }
     }
 }
