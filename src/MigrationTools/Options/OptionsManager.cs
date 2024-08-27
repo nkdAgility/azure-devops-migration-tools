@@ -54,15 +54,15 @@ namespace MigrationTools.Options
             return result;
         }
 
-        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, bool shouldAddObjectName = false, bool isCollection = false)
+        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, bool isCollection = false, bool shouldAddObjectName = false)
         {
             //JObject configJson, TOptions options, string path, string objectName, string optionFor, bool isCollection = false, bool shouldAddObjectName = false
             string path = isCollection ? iOption.ConfigurationCollectionPath : iOption.ConfigurationSectionPath;
 
-            return AddOptionsToConfiguration(configJson, iOption, path, shouldAddObjectName, isCollection);
+            return AddOptionsToConfiguration(configJson, iOption, path,  isCollection,shouldAddObjectName);
         }
 
-        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, string sectionPath, bool shouldAddObjectName = false, bool isCollection = false)
+        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, string sectionPath, bool isCollection = false, bool shouldAddObjectName = false)
         {
             Type optionsManagerType = typeof(OptionsManager<>).MakeGenericType(iOption.GetType());
 
@@ -73,7 +73,7 @@ namespace MigrationTools.Options
             MethodInfo createMethod = optionsManagerType.GetMethod("AddOptionsToConfiguration");
 
             // Prepare parameters for the method
-            object[] parameters = { configJson, iOption, sectionPath, iOption.ConfigurationObjectName, iOption.ConfigurationOptionFor, shouldAddObjectName, isCollection };
+            object[] parameters = { configJson, iOption, sectionPath, iOption.ConfigurationObjectName, iOption.ConfigurationOptionFor, isCollection, shouldAddObjectName  };
 
             // Invoke the method dynamically
             JObject result = (JObject)createMethod.Invoke(optionsManagerInstance, parameters);
@@ -241,13 +241,13 @@ namespace MigrationTools.Options
 
         // New method that updates the configuration
         public JObject AddOptionsToConfiguration(
-         JObject configJson,
-         TOptions options,
-         string path,
-         string objectName,
-         string optionFor,
-         bool isCollection = false,
-         bool shouldAddObjectName = false)
+      JObject configJson,
+      TOptions options,
+      string path,
+      string objectName,
+      string optionFor,
+      bool isCollection = false,
+      bool shouldAddObjectName = false)
         {
             // Initialize the JObject if it was null
             if (configJson == null)
@@ -288,12 +288,19 @@ namespace MigrationTools.Options
                     else
                     {
                         // We're at the last part of the path, so add the options object here
-                        var optionsObject = JObject.FromObject(options);
+                        var optionsObject = new JObject();
 
+                        // Add the object name and options
                         if (shouldAddObjectName)
                         {
-                            optionsObject.AddFirst(new JProperty(objectName, optionFor));
+                            optionsObject[objectName] = optionFor;
                         }
+
+                        // Add the other properties from the options object
+                        optionsObject.Merge(JObject.FromObject(options), new JsonMergeSettings
+                        {
+                            MergeArrayHandling = MergeArrayHandling.Concat
+                        });
 
                         // Replace or add the object in the current section
                         currentSection[pathParts[i]] = optionsObject;
@@ -313,6 +320,8 @@ namespace MigrationTools.Options
             // Return the modified JObject
             return configJson;
         }
+
+
 
 
 

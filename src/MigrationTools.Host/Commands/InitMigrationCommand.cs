@@ -160,7 +160,7 @@ namespace MigrationTools.Host.Commands
             {
                 //instanceOfOption.ConfigurationSectionPath = $"MigrationTools:Endpoints:{key}";
                 var hardPath = $"MigrationTools:Endpoints:{key}";
-                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, hardPath, true, false);
+                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, hardPath, false, true);
                 _logger.LogInformation("Adding Option: {item}", endpointType.Name);
             }
             catch (Exception)
@@ -180,7 +180,7 @@ namespace MigrationTools.Host.Commands
             section.Bind(instanceOfOption);
             try
             {
-                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, false, isCollection);
+                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, isCollection, false);
                 _logger.LogInformation("Adding Option: {item}", item.Name);
             }
             catch (Exception)
