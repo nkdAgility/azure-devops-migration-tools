@@ -84,12 +84,12 @@ namespace MigrationTools.Options
 
         public static OptionsConfiguration GetOptionsConfiguration(Type option)
         {
-           // ActivatorUtilities.CreateInstance(option);
+            // ActivatorUtilities.CreateInstance(option);
             dynamic optionInsance = Activator.CreateInstance(option);
             OptionsConfiguration oc = new OptionsConfiguration();
             oc.SectionPath = (string)option.GetProperty("ConfigurationSectionPath")?.GetValue(optionInsance);
             oc.CollectionPath = (string)option.GetProperty("ConfigurationCollectionPath")?.GetValue(optionInsance);
-            oc.CollectionObjectName = (string)option.GetProperty("ConfigurationCollectionObjectName")?.GetValue(optionInsance); 
+            oc.CollectionObjectName = (string)option.GetProperty("ConfigurationCollectionObjectName")?.GetValue(optionInsance);
             oc.OptionFor = (string)option.GetProperty("ConfigurationOptionFor")?.GetValue(optionInsance);
             return oc;
         }
@@ -240,7 +240,14 @@ namespace MigrationTools.Options
         }
 
         // New method that updates the configuration
-        public JObject AddOptionsToConfiguration(JObject configJson, TOptions options, string path, string objectName, string optionFor, bool shouldAddObjectName = false, bool isCollection = false)
+        public JObject AddOptionsToConfiguration(
+         JObject configJson,
+         TOptions options,
+         string path,
+         string objectName,
+         string optionFor,
+         bool isCollection = false,
+         bool shouldAddObjectName = false)
         {
             // Initialize the JObject if it was null
             if (configJson == null)
@@ -255,66 +262,59 @@ namespace MigrationTools.Options
             // Traverse or create the JSON structure for the section or collection
             for (int i = 0; i < pathParts.Length; i++)
             {
-                if (i == pathParts.Length - 1 && isCollection)
+                // If this is the last part of the path
+                if (i == pathParts.Length - 1)
                 {
-                    // If it's a collection, ensure we have a JArray at this position
-                    if (currentSection[pathParts[i]] == null)
+                    if (isCollection)
                     {
-                        currentSection[pathParts[i]] = new JArray();
+                        // Ensure we have a JArray at this position
+                        if (currentSection[pathParts[i]] == null)
+                        {
+                            currentSection[pathParts[i]] = new JArray();
+                        }
+
+                        // Add the options object as part of the collection
+                        var collectionArray = (JArray)currentSection[pathParts[i]];
+                        var optionsObject = JObject.FromObject(options);
+
+                        // Add the object name if required
+                        if (shouldAddObjectName)
+                        {
+                            optionsObject.AddFirst(new JProperty(objectName, optionFor));
+                        }
+
+                        collectionArray.Add(optionsObject);
                     }
-
-                    // Add the options object as part of the collection
-                    var collectionArray = (JArray)currentSection[pathParts[i]];
-                    var optionsObject = JObject.FromObject(options);
-
-                    // Add the object name if required
-                    if (shouldAddObjectName)
+                    else
                     {
-                        optionsObject.AddFirst(new JProperty(objectName, optionFor));
-                    }
+                        // We're at the last part of the path, so add the options object here
+                        var optionsObject = JObject.FromObject(options);
 
-                    collectionArray.Add(optionsObject);
+                        if (shouldAddObjectName)
+                        {
+                            optionsObject.AddFirst(new JProperty(objectName, optionFor));
+                        }
+
+                        // Replace or add the object in the current section
+                        currentSection[pathParts[i]] = optionsObject;
+                    }
                 }
                 else
                 {
-                    // Create or navigate to the JObject for the section
+                    // Traverse or create the JObject for the current section
                     if (currentSection[pathParts[i]] == null)
                     {
                         currentSection[pathParts[i]] = new JObject();
                     }
-
-                    // Add the object name if it's the last element and shouldAddObjectName is true
-                    if (i == pathParts.Length - 1 && shouldAddObjectName)
-                    {
-                        var optionsObject = JObject.FromObject(options);
-                        optionsObject.AddFirst(new JProperty(objectName, optionFor));
-                        currentSection[pathParts[i]] = optionsObject;
-                    }
-                    else
-                    {
-                        currentSection = (JObject)currentSection[pathParts[i]];
-                    }
+                    currentSection = (JObject)currentSection[pathParts[i]];
                 }
-            }
-
-            // If it's not a collection, add or update the options content directly in the final section
-            if (!isCollection)
-            {
-                JObject optionsObject = JObject.FromObject(options);
-
-                // Add the object name if required
-                if (shouldAddObjectName)
-                {
-                    optionsObject.AddFirst(new JProperty(options.ConfigurationObjectName, options.ConfigurationOptionFor));
-                }
-
-                // Replace or add the options content in the current section
-                currentSection.Replace(optionsObject);
             }
 
             // Return the modified JObject
             return configJson;
         }
+
+
 
 
         private OptionsConfiguration GetOptionsConfiguration()
@@ -331,7 +331,7 @@ namespace MigrationTools.Options
 
 
 
-        
+
 
     }
 }
