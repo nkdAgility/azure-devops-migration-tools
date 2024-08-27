@@ -5,9 +5,9 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors;
 using MigrationTools.Tests;
-using MigrationTools.TestExtensions;
 using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
+using MigrationTools.Shadows;
 
 namespace MigrationTools.ProcessorEnrichers.Tests
 {

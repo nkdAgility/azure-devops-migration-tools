@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Tests;
-using MigrationTools.TestExtensions;
 using System.Threading.Tasks;
+using MigrationTools.Shadows;
 using System;
 using MigrationTools.Tools;
 

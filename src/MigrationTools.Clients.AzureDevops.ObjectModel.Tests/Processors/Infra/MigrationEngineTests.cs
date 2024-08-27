@@ -12,7 +12,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Options;
 using MigrationTools.Services;
 using MigrationTools.Services.Shadows;
-using MigrationTools.TestExtensions;
+using MigrationTools.Shadows;
 using Serilog;
 
 namespace _VstsSyncMigrator.Engine.Tests
