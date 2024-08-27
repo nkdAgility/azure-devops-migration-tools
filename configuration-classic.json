@@ -65,14 +65,14 @@
       }
     },
     {
-      "$type": "FieldtoFieldMapOptions",
+      "$type": "FieldToFieldMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank",
       "defaultValue": null
     },
     {
-      "$type": "FieldtoFieldMultiMapOptions",
+      "$type": "FieldToFieldMultiMapOptions",
       "WorkItemTypeName": "*",
       "SourceToTargetMappings": {
         "SourceField1": "TargetField1",
@@ -80,7 +80,7 @@
       }
     },
     {
-      "$type": "FieldtoTagMapOptions",
+      "$type": "FieldToTagFieldMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "formatExpression": "ScrumState:{0}"
@@ -104,14 +104,14 @@
       "replacement": "$1"
     },
     {
-      "$type": "FieldValuetoTagMapOptions",
+      "$type": "FieldValueToTagMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.CMMI.Blocked",
       "pattern": "Yes",
       "formatExpression": "{0}"
     },
     {
-      "$type": "TreeToTagMapOptions",
+      "$type": "TreeToTagFieldMapOptions",
       "WorkItemTypeName": "*",
       "toSkip": 3,
       "timeTravel": 1

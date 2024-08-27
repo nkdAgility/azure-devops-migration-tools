@@ -157,7 +157,7 @@
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools.Tools.FieldValuetoTagMapOptions">
+        <member name="T:MigrationTools.Tools.FieldValueToTagMapOptions">
             <summary>
             Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
             </summary>
@@ -284,27 +284,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"743c8765"
+            => @"2f46086a"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"743c8765457c7ffb5f2da03d23f8eb9b7b5e7abb"
+            => @"2f46086a932e59444a25a87df7ba5bd932e65158"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-27T19:35:00+01:00"
+            => @"2024-08-27T20:45:14+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"210"
+            => @"211"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.2.1-210-g743c8765"
+            => @"v15.2.1-211-g2f46086a"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -339,7 +339,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"211"
+            => @"212"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

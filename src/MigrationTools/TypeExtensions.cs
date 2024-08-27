@@ -26,7 +26,7 @@ namespace MigrationTools
 
         public static Type WithNameString(this IEnumerable<Type> types, string search)
         {
-            return types.SingleOrDefault(type => type.Name.StartsWith(search));
+            return types.SingleOrDefault(type => type.Name.StartsWith(search, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public static Type FromOptions(this IEnumerable<Type> types, IOptions option)

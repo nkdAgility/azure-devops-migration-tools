@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
-using MigrationTools.Engine.Containers.Tests;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure.Shadows;
@@ -17,6 +17,7 @@ namespace MigrationTools.Tests
 {
     internal static class ServiceProviderHelper
     {
+        [Obsolete]
         internal static ServiceProvider GetWorkItemMigrationProcessor()
         {
             var configuration = new ConfigurationBuilder().Build();
@@ -24,6 +25,7 @@ namespace MigrationTools.Tests
             return services.BuildServiceProvider();
         }
 
+        [Obsolete]
         internal static ServiceCollection GetServiceCollection()
         {
             var configuration = new ConfigurationBuilder().Build();

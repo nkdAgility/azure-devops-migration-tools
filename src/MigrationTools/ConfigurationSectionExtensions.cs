@@ -75,7 +75,7 @@ namespace MigrationTools
             var processorType = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<TMigrationOptions>().WithNameString(processorTypeString);
             if (processorType == null)
             {
-                Log.Warning("There was no match for {optionTypeName} from {sectionKey}", optionTypeName, section.Key);
+                Log.Warning("There was no match for {optionTypeName} as {processorTypeString} from {sectionKey} in {TMigrationOptions}", optionTypeName, processorTypeString, section.Key, typeof(TMigrationOptions));
                 return default(TMigrationOptions);
             }
             var obj = Activator.CreateInstance(processorType);

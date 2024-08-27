@@ -68,6 +68,7 @@ namespace MigrationTool.Endpoints.Tests
             var json = @"
             {
               ""MigrationTools"": {
+                ""Version"": ""16.0"",
                 ""Endpoints"": {
                   ""Source"": {
                     ""EndpointType"": ""FakeEndpoint"",

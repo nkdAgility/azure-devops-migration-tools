@@ -73,10 +73,10 @@ namespace MigrationTools.Processors.Infrastructure
                         foreach (var constructor in constructors)
                         {
                             var parameters = constructor.GetParameters();
-                            _logger.LogInformation("Constructor found: {Constructor}", string.Join(", ", parameters.Select(p => p.ParameterType.Name)));
+                            _logger.LogDebug("Constructor found: {Constructor}", string.Join(", ", parameters.Select(p => p.ParameterType.Name)));
                         }
 
-                        _logger.LogInformation("Attempting to pass parameters: {Parameters}", string.Join(", ", new object[] { Microsoft.Extensions.Options.Options.Create(processorOption) }.Select(p => p.GetType().Name)));
+                        _logger.LogDebug("Attempting to pass parameters: {Parameters}", string.Join(", ", new object[] { Microsoft.Extensions.Options.Options.Create(processorOption) }.Select(p => p.GetType().Name)));
 
 
                         //var optionsWrapperType = typeof(IOptions<>).MakeGenericType(processorOption.GetType());
