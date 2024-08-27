@@ -10,13 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldLiteralMap": {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "targetField": "Custom.SomeField",
-                "value": "New field value"
-              }
+              "FieldLiteralMap": []
             }
           }
         }
@@ -43,11 +37,9 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldLiteralMapOptions",
-      "targetField": "Custom.SomeField",
-      "value": "New field value",
-      "ApplyTo": [
-        "SomeWorkItemType"
-      ]
+      "targetField": null,
+      "value": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 description: missng XML code comments

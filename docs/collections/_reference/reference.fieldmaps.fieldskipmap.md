@@ -10,12 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldSkipMap": {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "targetField": "Custom.ReflectedWorkItemId"
-              }
+              "FieldSkipMap": []
             }
           }
         }
@@ -42,10 +37,8 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldSkipMapOptions",
-      "targetField": "Custom.ReflectedWorkItemId",
-      "ApplyTo": [
-        "SomeWorkItemType"
-      ]
+      "targetField": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 description: missng XML code comments

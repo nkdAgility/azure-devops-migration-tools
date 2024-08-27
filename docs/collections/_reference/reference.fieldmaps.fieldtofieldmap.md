@@ -10,14 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldToFieldMap": {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "defaultValue": "42",
-                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-                "targetField": "Microsoft.VSTS.Common.StackRank"
-              }
+              "FieldToFieldMap": []
             }
           }
         }
@@ -44,12 +37,10 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMapOptions",
-      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-      "targetField": "Microsoft.VSTS.Common.StackRank",
-      "defaultValue": "42",
-      "ApplyTo": [
-        "SomeWorkItemType"
-      ]
+      "sourceField": null,
+      "targetField": null,
+      "defaultValue": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 description: missng XML code comments

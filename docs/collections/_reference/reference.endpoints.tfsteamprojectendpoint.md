@@ -49,7 +49,6 @@ configurationSamples:
                 "UserName": ""
               }
             },
-            "AuthenticationMode": "AccessToken",
             "Collection": "https://dev.azure.com/nkdagility-preview/",
             "EndpointType": "TfsTeamProjectEndpoint",
             "LanguageMaps": {

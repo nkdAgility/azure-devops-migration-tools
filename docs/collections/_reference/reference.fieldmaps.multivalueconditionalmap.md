@@ -10,19 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "MultiValueConditionalMap": {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "sourceFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                },
-                "targetFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                }
-              }
+              "MultiValueConditionalMap": []
             }
           }
         }
@@ -49,17 +37,9 @@ configurationSamples:
   code: >-
     {
       "$type": "MultiValueConditionalMapOptions",
-      "sourceFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      },
-      "targetFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      },
-      "ApplyTo": [
-        "SomeWorkItemType"
-      ]
+      "sourceFieldsAndValues": null,
+      "targetFieldsAndValues": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 description: missng XML code comments

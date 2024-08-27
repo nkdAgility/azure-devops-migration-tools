@@ -10,17 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldToTagFieldMap": {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-                "sourceFields": [
-                  "System.Description",
-                  "Microsoft.VSTS.Common.AcceptanceCriteria"
-                ],
-                "targetField": "System.Description"
-              }
+              "FieldToTagFieldMap": []
             }
           }
         }
@@ -48,10 +38,8 @@ configurationSamples:
     {
       "$type": "FieldToTagFieldMapOptions",
       "sourceField": null,
-      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-      "ApplyTo": [
-        "SomeWorkItemType"
-      ]
+      "formatExpression": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 description: missng XML code comments

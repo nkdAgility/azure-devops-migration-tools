@@ -10,15 +10,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "RegexFieldMap": {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "pattern": "PRODUCT \\d{4}.(\\d{1})",
-                "replacement": "$1",
-                "sourceField": "COMPANY.PRODUCT.Release",
-                "targetField": "COMPANY.DEVISION.MinorReleaseVersion"
-              }
+              "RegexFieldMap": []
             }
           }
         }
@@ -45,13 +37,11 @@ configurationSamples:
   code: >-
     {
       "$type": "RegexFieldMapOptions",
-      "sourceField": "COMPANY.PRODUCT.Release",
-      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
-      "pattern": "PRODUCT \\d{4}.(\\d{1})",
-      "replacement": "$1",
-      "ApplyTo": [
-        "SomeWorkItemType"
-      ]
+      "sourceField": null,
+      "targetField": null,
+      "pattern": null,
+      "replacement": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 description: missng XML code comments
