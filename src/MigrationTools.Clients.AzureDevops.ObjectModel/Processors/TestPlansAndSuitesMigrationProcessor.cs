@@ -492,7 +492,7 @@ namespace MigrationTools.Processors
             IRequirementTestSuite targetSuiteChild;
             try
             {
-                string token = Target.Options.PersonalAccessToken;
+                string token = Target.Options.Authentication.AccessToken;
                 string project = Target.Options.Project;
                 Uri collectionUri = Target.Options.Collection;
                 VssConnection connection = new VssConnection(collectionUri, new VssClientCredentials());

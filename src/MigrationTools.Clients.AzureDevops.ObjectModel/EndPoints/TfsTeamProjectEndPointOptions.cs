@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.VisualStudio.Services.Client;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Options;
@@ -12,17 +13,12 @@ namespace MigrationTools.Endpoints
     {
         public Uri Collection { get; set; }
         public string Project { get; set; }
+
+        public TfsAuthenticationOptions Authentication { get; set; }
         public string ReflectedWorkItemIDFieldName { get; set; }
         public bool AllowCrossProjectLinking { get; set; }
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AuthenticationMode AuthenticationMode { get; set; }
-
-        public string PersonalAccessToken { get; set; }
-        public string PersonalAccessTokenVariableName { get; set; }
         public TfsLanguageMapOptions LanguageMaps { get; set; }
-
-        public NetworkCredentials NetworkCredentials { get; set; }
 
         public string CollectionName { get { return GetCollectionName(); } }
 

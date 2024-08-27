@@ -45,7 +45,7 @@ namespace MigrationTools.Tools
             _processor = processor;
             _targetProject = processor.Target.WorkItems.Project.ToProject();
             _targetConfig = processor.Target.Options;
-            FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, processor.Source.Options.PersonalAccessToken);
+            FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, processor.Source.Options.Authentication.AccessToken);
             return 0;
         }
 

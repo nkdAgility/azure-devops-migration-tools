@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
+using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools._EngineV1.Configuration;
@@ -22,7 +23,6 @@ namespace MigrationTools._EngineV1.Clients
     {
         private TfsTeamProjectCollection _collection;
         private VssCredentials _vssCredentials;
-        private NetworkCredential _credentials;
         private IWorkItemMigrationClient _workItemClient;
         private ITestPlanMigrationClient _testPlanClient;
 
@@ -60,16 +60,6 @@ namespace MigrationTools._EngineV1.Clients
             }
         }
 
-        public VssCredentials Credentials => _vssCredentials ??= new VssCredentials();
-
-
-
-        public void Configure(IEndpointOptions config, NetworkCredential credentials = null)
-        {
-            _credentials = credentials;
-            EnsureCollection();
-        }
-
         public object InternalCollection
         {
             get
@@ -90,44 +80,47 @@ namespace MigrationTools._EngineV1.Clients
                           { "Target Collection",Options.Collection.ToString() },
                            { "ReflectedWorkItemID Field Name",Options.ReflectedWorkItemIDFieldName }
                     }, null);
-                _collection = GetDependantTfsCollection(_credentials);
+                _collection = GetDependantTfsCollection();
             }
         }
 
-        private TfsTeamProjectCollection GetDependantTfsCollection(NetworkCredential credentials)
+        private TfsTeamProjectCollection GetDependantTfsCollection()
         {
             var startTime = DateTime.UtcNow;
             var timer = System.Diagnostics.Stopwatch.StartNew();
             TfsTeamProjectCollection y = null;
             try
             {
-                Log.LogDebug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", Options.AuthenticationMode.ToString());
-                switch (Options.AuthenticationMode)
+                Log.LogDebug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", Options.Authentication.AuthenticationMode.ToString());
+                switch (Options.Authentication.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
                         Log.LogInformation("Connecting with AccessToken ");
-                        var pat = Options.PersonalAccessToken;
-                        if (!string.IsNullOrEmpty(Options.PersonalAccessTokenVariableName))
+                        if (string.IsNullOrEmpty(Options.Authentication.AccessToken))
                         {
-                            pat = Environment.GetEnvironmentVariable(Options.PersonalAccessTokenVariableName);
+                            Log.LogCritical("You must provide a PAT to use 'AccessToken' as the authentication mode");
+                            Environment.Exit(-1);
                         }
+                        var pat = Options.Authentication.AccessToken;
                         _vssCredentials = new VssBasicCredential(string.Empty, pat);
                         y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
                         break;
-
                     case AuthenticationMode.Windows:
-                        Log.LogInformation("Connecting with NetworkCredential passes on CommandLine ");
-                        if (credentials is null)
+                        Log.LogInformation("Connecting with NetworkCredential ");
+                        if (Options.Authentication.NetworkCredentials == null)
                         {
-                            throw new InvalidOperationException("If AuthenticationMode = Windows then you must pass credentails on the command line.");
+                            Log.LogCritical("You must set NetworkCredential to use 'Windows' as the authentication mode");
+                            Environment.Exit(-1);
                         }
-                        _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(credentials));
+                        var cred = new NetworkCredential(Options.Authentication.NetworkCredentials.UserName, Options.Authentication.NetworkCredentials.Password, Options.Authentication.NetworkCredentials.Domain);
+                        _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(cred));
                         y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
                         break;
-
                     case AuthenticationMode.Prompt:
                         Log.LogInformation("Prompting for credentials ");
-                        y = new TfsTeamProjectCollection(Options.Collection);
+                        _vssCredentials = new VssClientCredentials();
+                        _vssCredentials.PromptType = CredentialPromptType.PromptIfNeeded;
+                        y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
                         break;
 
                     default:
@@ -146,7 +139,7 @@ namespace MigrationTools._EngineV1.Clients
             {
                 timer.Stop();
                 Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "401", false));
-                Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.AuthenticationMode);
+                Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.Authentication.AuthenticationMode);
                 Environment.Exit(-1);
             }
             catch (Exception ex)
@@ -161,8 +154,8 @@ namespace MigrationTools._EngineV1.Clients
                        new Dictionary<string, double> {
                             { "Time",timer.ElapsedMilliseconds }
                        });
-                Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, Options.AuthenticationMode);
-                switch (Options.AuthenticationMode)
+                Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, Options.Authentication.AuthenticationMode);
+                switch (Options.Authentication.AuthenticationMode)
                 {
                     case AuthenticationMode.AccessToken:
                         Log.LogError("The PAT MUST be 'full access' for it to work with the Object Model API.");

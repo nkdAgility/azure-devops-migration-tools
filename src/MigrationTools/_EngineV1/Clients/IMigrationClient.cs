@@ -14,8 +14,6 @@ namespace MigrationTools._EngineV1.Clients
         IWorkItemMigrationClient WorkItems { get; }
         ITestPlanMigrationClient TestPlans { get; }
 
-        VssCredentials Credentials { get; }
-
         T GetService<T>();
         T GetClient<T>() where T : IVssHttpClient;
 

@@ -315,11 +315,7 @@ namespace MigrationTools.Processors
             string collUrl = Target.Options.Collection.ToString();
             if (collUrl.Contains("dev.azure.com") || collUrl.Contains(".visualstudio.com"))
             {
-                var token = Target.Options.PersonalAccessToken;
-                if (Target.Options.PersonalAccessTokenVariableName != null)
-                {
-                    token = Environment.GetEnvironmentVariable(Target.Options.PersonalAccessTokenVariableName);
-                }
+                var token = Target.Options.Authentication.AccessToken;
                 // Test that
                 if (token.IsNullOrEmpty())
                 {
@@ -706,7 +702,7 @@ namespace MigrationTools.Processors
                     {
                         ValidatePatTokenRequirement();
                         Uri collectionUri = Target.Options.Collection;
-                        string token = Target.Options.PersonalAccessToken;
+                        string token = Target.Options.Authentication.AccessToken;
                         VssConnection connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
                         WorkItemTrackingHttpClient workItemTrackingClient = connection.GetClient<WorkItemTrackingHttpClient>();
                         JsonPatchDocument patchDocument = new JsonPatchDocument();
