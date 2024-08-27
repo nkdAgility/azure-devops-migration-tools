@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -10,7 +11,8 @@ namespace MigrationTools.Options
     public enum MigrationConfigSchema
     {
         v1,
-        v160
+        v160,
+        Empty
     }
 
     public class VersionOptions
@@ -39,27 +41,34 @@ namespace MigrationTools.Options
 
                 public static (MigrationConfigSchema schema, string str) GetMigrationConfigVersion(IConfiguration configuration)
             {
-                bool isOldFormat = false;
-                string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
-                if (string.IsNullOrEmpty(configVersionString))
+                if (configuration.GetChildren().Any())
                 {
-                    isOldFormat = true;
-                    configVersionString = configuration.GetValue<string>("Version");
-                }
-                if (string.IsNullOrEmpty(configVersionString))
+                    bool isOldFormat = false;
+                    string configVersionString = configuration.GetValue<string>("MigrationTools:Version");
+                    if (string.IsNullOrEmpty(configVersionString))
+                    {
+                        isOldFormat = true;
+                        configVersionString = configuration.GetValue<string>("Version");
+                    }
+                    if (string.IsNullOrEmpty(configVersionString))
+                    {
+                        configVersionString = "0.0";
+                    }
+                    Version.TryParse(configVersionString, out Version configVersion);
+                    if (configVersion < Version.Parse("16.0") || isOldFormat)
+                    {
+                        Console.WriteLine("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
+                        return (MigrationConfigSchema.v1, configVersionString);
+                    }
+                    else
+                    {
+                        return (MigrationConfigSchema.v160, configVersionString);
+                    }
+                } else
                 {
-                    configVersionString = "0.0";
+                    return (MigrationConfigSchema.Empty, "0.0");
                 }
-                Version.TryParse(configVersionString, out Version configVersion);
-                if (configVersion < Version.Parse("16.0") || isOldFormat)
-                {
-                    Console.WriteLine("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
-                    return (MigrationConfigSchema.v1, configVersionString);
-                }
-                else
-                {
-                    return (MigrationConfigSchema.v160, configVersionString);
-                }
+                
             }
         }
 
