@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Options;
 using MigrationTools.Services;
@@ -15,7 +14,7 @@ using MigrationTools.Services.Shadows;
 using MigrationTools.Shadows;
 using Serilog;
 
-namespace _VstsSyncMigrator.Engine.Tests
+namespace MigrationTools.Tests.Processors.Infra
 {
     [TestClass]
     public class MigrationEngineTests
@@ -27,7 +26,7 @@ namespace _VstsSyncMigrator.Engine.Tests
         {
             var configuration = new ConfigurationBuilder().Build();
             var VersionOptions = new VersionOptions();
-            IOptions<VersionOptions> options = Options.Create(VersionOptions);
+            IOptions<VersionOptions> options = Microsoft.Extensions.Options.Options.Create(VersionOptions);
             var ecb = new EngineConfigurationBuilder(options, new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
             // Core
@@ -42,7 +41,7 @@ namespace _VstsSyncMigrator.Engine.Tests
             //
             services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddOptions();
-            services.AddSingleton<EngineConfiguration>(ecb.BuildDefault());
+            services.AddSingleton(ecb.BuildDefault());
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
 

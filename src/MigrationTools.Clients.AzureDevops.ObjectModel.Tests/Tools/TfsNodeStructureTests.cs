@@ -9,7 +9,7 @@ using MigrationTools.Shadows;
 using System;
 using MigrationTools.Tools;
 
-namespace MigrationTools.ProcessorEnrichers.Tests
+namespace MigrationTools.Tests.Tools
 {
     [TestClass()]
     public class TfsNodeStructureToolTests

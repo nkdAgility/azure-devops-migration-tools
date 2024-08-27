@@ -12,11 +12,13 @@ using MigrationTools.Shadows;
 using MigrationTools.Endpoints;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools.Endpoints.Infrastructure;
+using System;
 
 namespace MigrationTools.Processors.Tests
 {
     public class TfsProcessorTests
     {
+        [Obsolete]
         protected ServiceProvider Services = ServiceProviderHelper.GetServices();
 
         [TestInitialize]
@@ -24,6 +26,7 @@ namespace MigrationTools.Processors.Tests
         {
         }
 
+        [Obsolete]
         protected static TfsTeamSettingsProcessorOptions GetTfsTeamSettingsProcessorOptions()
         {
             // Tfs To Tfs
@@ -39,6 +42,7 @@ namespace MigrationTools.Processors.Tests
             return migrationConfig;
         }
 
+        [Obsolete]
         protected static TfsSharedQueryProcessorOptions GetTfsSharedQueryProcessorOptions()
         {
             // Tfs To Tfs
@@ -65,6 +69,7 @@ namespace MigrationTools.Processors.Tests
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
 
             services.AddSingleton<TfsSharedQueryProcessor>();
+
             AddEndpoint(services, options != null ? options.SourceName : "Source", "migrationSource1");
             AddEndpoint(services, options != null ? options.SourceName : "Target", "migrationTarget1");
             services.Configure<TfsSharedQueryProcessorOptions>(o =>
@@ -76,6 +81,9 @@ namespace MigrationTools.Processors.Tests
                 o.ProcessorEnrichers = options != null ? options.ProcessorEnrichers : null;
                 o.RefName = options != null ? options.RefName : null;
                 /// Add custom
+                o.SourceToTargetFieldMappings = options != null ? options.SourceToTargetFieldMappings : null;
+                o.PrefixProjectToNodes = options != null ? options.PrefixProjectToNodes : false;
+                o.SharedFolderName = options != null ? options.SharedFolderName : "Shared Queries";
             });
 
             return services.BuildServiceProvider().GetService<TfsSharedQueryProcessor>();

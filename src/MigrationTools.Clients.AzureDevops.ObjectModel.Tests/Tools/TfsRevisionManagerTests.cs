@@ -8,7 +8,7 @@ using MigrationTools.Tests;
 using MigrationTools.Tools;
 
 
-namespace MigrationTools.ProcessorEnrichers.Tests
+namespace MigrationTools.Tests.Tools
 {
     [TestClass()]
     public class TfsRevisionManagerToolTests
@@ -16,7 +16,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
         private static List<RevisionItem> GetWorkItemWithRevisions(DateTime currentDateTime, int startHours = 1, int endHours = 1, bool dateIncreasing = true)
         {
-            var revisions = new System.Collections.Generic.SortedDictionary<int, RevisionItem>();
+            var revisions = new SortedDictionary<int, RevisionItem>();
             for (int i = startHours; i < endHours + startHours; i++)
             {
                 DateTime dateTime = dateIncreasing ? currentDateTime.AddHours(i) : currentDateTime;
@@ -32,7 +32,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var processorEnricher = GetTfsRevisionManagerTool();
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 1);
             List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
 
@@ -47,7 +47,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var processorEnricher = GetTfsRevisionManagerTool();
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10);
             List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 10);
 
@@ -62,7 +62,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var processorEnricher = GetTfsRevisionManagerTool();
 
-            var currentDateTime = System.DateTime.Now;
+            var currentDateTime = DateTime.Now;
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 2);
             List<RevisionItem> target = GetWorkItemWithRevisions(currentDateTime, 1, 1);
 
