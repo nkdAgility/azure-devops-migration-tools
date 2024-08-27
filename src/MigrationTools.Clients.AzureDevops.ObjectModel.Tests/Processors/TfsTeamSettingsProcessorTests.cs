@@ -10,8 +10,8 @@ namespace MigrationTools.Processors.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsTeamSettingsProcessorTest()
         {
-            var x = Services.GetRequiredService<TfsTeamSettingsProcessor>();
-            Assert.IsNotNull(x);
+            var processor = GetTfsTeamSettingsProcessor();
+            Assert.IsNotNull(processor);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -26,32 +26,17 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "TfsTeamSettingsSource",
                 TargetName = "TfsTeamSettingsTarget"
             };
-            var x = ActivatorUtilities.CreateInstance<TfsTeamSettingsProcessor>(Services, y);
+            var x = GetTfsTeamSettingsProcessor(y);
             Assert.IsNotNull(x);
-        }
-
-        [TestMethod(), TestCategory("L0")]
-        public void TfsTeamSettingsProcessorRunTest()
-        {
-            var y = new TfsTeamSettingsProcessorOptions
-            {
-                Enabled = true,
-                MigrateTeamSettings = true,
-                UpdateTeamSettings = true,
-                PrefixProjectToNodes = false,
-                SourceName = "TfsTeamSettingsSource",
-                TargetName = "TfsTeamSettingsTarget"
-            };
-            var x = ActivatorUtilities.CreateInstance<TfsTeamSettingsProcessor>(Services, y);
-            Assert.IsNotNull(x);
+            Assert.AreEqual(x.Options.SourceName, "TfsTeamSettingsSource");
+            Assert.IsNotNull(x.Source);
         }
 
         [TestMethod(), TestCategory("L3")]
         public void TfsTeamSettingsProcessorNoEnrichersTest()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
-            var migrationConfig = GetTfsTeamSettingsProcessorOptions();
-            var processor = ActivatorUtilities.CreateInstance<TfsTeamSettingsProcessor>(Services, migrationConfig);
+            var processor = GetTfsTeamSettingsProcessor();
             processor.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }
