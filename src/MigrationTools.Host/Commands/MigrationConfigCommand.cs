@@ -25,23 +25,17 @@ namespace MigrationTools.Host.Commands
     internal class MigrationConfigCommand : AsyncCommand<MigrationConfigCommandSettings>
     {
         private IServiceProvider _services;
-        private readonly IEngineConfigurationBuilder _configurationBuilder;
-        private readonly ISettingsWriter _settingWriter;
         private readonly ILogger _logger;
         private readonly ITelemetryLogger Telemetery;
         private readonly IHostApplicationLifetime _appLifetime;
 
         public MigrationConfigCommand(
             IServiceProvider services,
-            IEngineConfigurationBuilder configurationBuilder,
-            ISettingsWriter settingsWriter,
             ILogger<InitMigrationCommand> logger,
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
             _services = services;
-            _configurationBuilder = configurationBuilder;
-            _settingWriter = settingsWriter;
             _logger = logger;
             Telemetery = telemetryLogger;
             _appLifetime = appLifetime;

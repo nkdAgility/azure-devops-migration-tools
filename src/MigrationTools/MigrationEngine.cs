@@ -24,11 +24,9 @@ namespace MigrationTools
         private IEndpoint _source;
         private IEndpoint _target;
         private ITelemetryLogger _telemetryLogger;
-        private EngineConfiguration _engineConfiguration;
 
         public MigrationEngine(
             IServiceProvider services,
-            IOptions<EngineConfiguration> config,
             ProcessorContainer processors,
             ITelemetryLogger telemetry,
             ILogger<MigrationEngine> logger)
@@ -38,7 +36,6 @@ namespace MigrationTools
             _services = services;
             Processors = processors;
             _telemetryLogger = telemetry;
-            _engineConfiguration = config.Value;
         }
         
 
@@ -79,7 +76,7 @@ namespace MigrationTools
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
-            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", _engineConfiguration.LogLevel);
+            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", "unknown");
             _logger.LogInformation("                              Max Logfile: {FileLogLevel}. ", "Verbose");
             _logger.LogInformation("                              Max Console: {ConsoleLogLevel}. ", "Debug");
             _logger.LogInformation("                 Max Application Insights: {AILogLevel}. ", "Error");

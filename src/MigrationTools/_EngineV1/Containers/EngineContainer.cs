@@ -7,7 +7,6 @@ namespace MigrationTools._EngineV1.Containers
     public abstract class EngineContainer<TItemType>
     {
         private readonly IServiceProvider _services;
-        private readonly EngineConfiguration _Config;
         private bool _configured = false;
 
         public abstract TItemType Items
@@ -23,15 +22,10 @@ namespace MigrationTools._EngineV1.Containers
             get { return _services; }
         }
 
-        protected EngineConfiguration Config
-        {
-            get { return _Config; }
-        }
 
-        protected EngineContainer(IServiceProvider services, IOptions<EngineConfiguration> config)
+        protected EngineContainer(IServiceProvider services)
         {
             _services = services;
-            _Config = config.Value;
         }
 
         protected abstract void Configure();

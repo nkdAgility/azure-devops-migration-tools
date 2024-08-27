@@ -98,7 +98,7 @@ namespace MigrationTools._EngineV1.Clients
                         Log.LogInformation("Connecting with AccessToken ");
                         if (string.IsNullOrEmpty(Options.Authentication.AccessToken))
                         {
-                            Log.LogCritical("You must provide a PAT to use 'AccessToken' as the authentication mode");
+                            Log.LogCritical("You must provide a PAT to use 'AccessToken' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/");
                             Environment.Exit(-1);
                         }
                         var pat = Options.Authentication.AccessToken;
@@ -109,7 +109,7 @@ namespace MigrationTools._EngineV1.Clients
                         Log.LogInformation("Connecting with NetworkCredential ");
                         if (Options.Authentication.NetworkCredentials == null)
                         {
-                            Log.LogCritical("You must set NetworkCredential to use 'Windows' as the authentication mode");
+                            Log.LogCritical("You must set NetworkCredential to use 'Windows' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/");
                             Environment.Exit(-1);
                         }
                         var cred = new NetworkCredential(Options.Authentication.NetworkCredentials.UserName, Options.Authentication.NetworkCredentials.Password, Options.Authentication.NetworkCredentials.Domain);

@@ -91,31 +91,6 @@ namespace MigrationTools.Host
 
                  services.AddOptions();
 
-                 services.AddOptions<EngineConfiguration>().Configure<IEngineConfigurationReader, ILogger<EngineConfiguration>, IConfiguration>(
-                   (options, reader, logger, configuration) =>
-                   {
-                       if (!File.Exists(configFile))
-                       {
-                           logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
-                           Environment.Exit(-1);
-                       }
-                       logger.LogInformation("Config Found, creating engine host");
-                       switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(context.Configuration).schema)
-                       {
-                           case MigrationConfigSchema.v1:
-      
-                               break;
-                           case MigrationConfigSchema.v160:
-       
-                               break;
-                           default:
-                               logger.LogCritical("The config file {ConfigFile} is not of the correct format. Use '{ExecutableName}.exe init' to create a new configuration file and port over your old configuration.", configFile, Assembly.GetEntryAssembly().GetName().Name);
-                               Environment.Exit(-1);
-                               break;
-                       }
-                   }
-               );
-
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
                  aiso.ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -132,12 +107,6 @@ namespace MigrationTools.Host
 
                  services.AddSingleton<IMigrationToolVersionInfo, MigrationToolVersionInfo>();
                  services.AddSingleton<IMigrationToolVersion, MigrationToolVersion>();
-
-
-                 //// Config
-                 services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as IEngineConfigurationReader);
-                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as ISettingsWriter);
 
                  //// Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();

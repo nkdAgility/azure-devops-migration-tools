@@ -13,6 +13,7 @@ namespace MigrationTools.Endpoints.Infrastructure
 
         public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
 
+        [JsonIgnore]
         public string Name { get; set; }
         public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }
         public bool Enabled { get; set; }

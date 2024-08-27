@@ -20,6 +20,7 @@ namespace MigrationTools.Endpoints
 
         public TfsLanguageMapOptions LanguageMaps { get; set; }
 
+        [JsonIgnore]
         public string CollectionName { get { return GetCollectionName(); } }
 
         public string GetCollectionName()

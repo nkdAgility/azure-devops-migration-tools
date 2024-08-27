@@ -27,7 +27,6 @@ namespace MigrationTools.Tests.Processors.Infra
             var configuration = new ConfigurationBuilder().Build();
             var VersionOptions = new VersionOptions();
             IOptions<VersionOptions> options = Microsoft.Extensions.Options.Options.Create(VersionOptions);
-            var ecb = new EngineConfigurationBuilder(options, new NullLogger<EngineConfigurationBuilder>());
             var services = new ServiceCollection();
             // Core
             services.AddMigrationToolServicesForUnitTests();
@@ -39,9 +38,7 @@ namespace MigrationTools.Tests.Processors.Infra
             services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
 
             //
-            services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
             services.AddOptions();
-            services.AddSingleton(ecb.BuildDefault());
 
             services.AddSingleton<IMigrationEngine, MigrationEngine>();
 
@@ -55,7 +52,6 @@ namespace MigrationTools.Tests.Processors.Infra
         [Ignore("Need to ignore untill new config model live")]
         public void TestEngineExecuteEmptyProcessors()
         {
-            EngineConfiguration ec = _services.GetRequiredService<EngineConfiguration>();
             IMigrationEngine me = _services.GetRequiredService<IMigrationEngine>();
             me.Run();
         }
