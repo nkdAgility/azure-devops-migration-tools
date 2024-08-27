@@ -4,6 +4,7 @@ using System.Net;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Client;
+using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools._EngineV1.Configuration;
@@ -141,7 +142,9 @@ namespace MigrationTools._EngineV1.Clients
 
                     case AuthenticationMode.Prompt:
                         Log.Information("Prompting for credentials ");
-                        y = new TfsTeamProjectCollection(TfsConfig.Collection);
+                        _vssCredentials = new VssClientCredentials();
+                        _vssCredentials.PromptType = CredentialPromptType.PromptIfNeeded; ;
+                        y = new TfsTeamProjectCollection(TfsConfig.Collection, _vssCredentials);
                         break;
 
                     default:
