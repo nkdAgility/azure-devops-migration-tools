@@ -12,6 +12,7 @@ using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
+using MigrationTools.Tools.Interfaces;
 using Serilog;
 
 namespace MigrationTools
@@ -42,25 +43,25 @@ namespace MigrationTools
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
             {
                 case MigrationConfigSchema.v1:
-                    context.AddSingleton<StringManipulatorTool>().AddSingleton<IOptions<StringManipulatorToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorToolOptions>()));
-                    context.AddSingleton<WorkItemTypeMappingTool>().AddSingleton<IOptions<WorkItemTypeMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingToolOptions>()));
+                    context.AddSingleton<IStringManipulatorTool, StringManipulatorTool>().AddSingleton<IOptions<StringManipulatorToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorToolOptions>()));
+                    context.AddSingleton<IWorkItemTypeMappingTool, WorkItemTypeMappingTool>().AddSingleton<IOptions<WorkItemTypeMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingToolOptions>()));
                     context.AddSingleton<GitRepoMappingTool>().AddSingleton<IOptions<GitRepoMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<GitRepoMappingToolOptions>()));
                     break;
                 case MigrationConfigSchema.v160:
-                    context.AddSingleton<StringManipulatorTool>().AddMigrationToolsOptions<StringManipulatorToolOptions>(configuration);
-                    context.AddSingleton<WorkItemTypeMappingTool>().AddMigrationToolsOptions<WorkItemTypeMappingToolOptions>(configuration);
+                    context.AddSingleton<IStringManipulatorTool, StringManipulatorTool>().AddMigrationToolsOptions<StringManipulatorToolOptions>(configuration);
+                    context.AddSingleton<IWorkItemTypeMappingTool, WorkItemTypeMappingTool>().AddMigrationToolsOptions<WorkItemTypeMappingToolOptions>(configuration);
                     context.AddSingleton<GitRepoMappingTool>().AddMigrationToolsOptions<GitRepoMappingToolOptions>(configuration);
                     break;
             }
             context.AddSingleton<ProcessorContainer>()
                 .AddSingleton<IConfigureOptions<ProcessorContainerOptions>, ProcessorContainerOptions.ConfigureOptions>()
                 ;
-            context.AddSingleton < IWritableOptions<ProcessorContainerOptions>>(sp => {
-                return new WritableOptions<ProcessorContainerOptions>(sp.GetRequiredService<IOptionsMonitor<ProcessorContainerOptions>>(),ProcessorContainerOptions.ConfigurationSectionName, configFile);
-            });
+            //context.AddSingleton < IWritableOptions<ProcessorContainerOptions>>(sp => {
+            //    return new WritableOptions<ProcessorContainerOptions>(sp.GetRequiredService<IOptionsMonitor<ProcessorContainerOptions>>(),ProcessorContainerOptions.ConfigurationSectionName, configFile);
+            //});
 
 
-            context.AddSingleton<FieldMappingTool>().AddSingleton<IConfigureOptions<FieldMappingToolOptions>, FieldMappingToolOptions.ConfigureOptions>();
+            context.AddSingleton<IFieldMappingTool, FieldMappingTool>().AddSingleton<IConfigureOptions<FieldMappingToolOptions>, FieldMappingToolOptions.ConfigureOptions>();
             context.AddSingleton<VersionOptions>().AddSingleton<IConfigureOptions<VersionOptions>, VersionOptions.ConfigureOptions>();
             context.AddSingleton<CommonTools>();
 

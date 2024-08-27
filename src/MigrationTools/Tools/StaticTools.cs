@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
     public class CommonTools
     {
-        public StringManipulatorTool StringManipulator { get; private set; }
-        public WorkItemTypeMappingTool WorkItemTypeMapping { get; private set; }
+        public IStringManipulatorTool StringManipulator { get; private set; }
+        public IWorkItemTypeMappingTool WorkItemTypeMapping { get; private set; }
 
-        public FieldMappingTool FieldMappingTool { get; private set; }
-        public CommonTools(StringManipulatorTool StringManipulatorTool, WorkItemTypeMappingTool workItemTypeMapping, FieldMappingTool fieldMappingTool)
+        public IFieldMappingTool FieldMappingTool { get; private set; }
+        public CommonTools(IStringManipulatorTool StringManipulatorTool, IWorkItemTypeMappingTool workItemTypeMapping, IFieldMappingTool fieldMappingTool)
         {
             StringManipulator = StringManipulatorTool;
             WorkItemTypeMapping = workItemTypeMapping;
