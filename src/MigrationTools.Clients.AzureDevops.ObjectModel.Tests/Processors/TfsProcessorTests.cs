@@ -81,7 +81,7 @@ namespace MigrationTools.Processors.Tests
                 o.ProcessorEnrichers = options != null ? options.ProcessorEnrichers : null;
                 o.RefName = options != null ? options.RefName : null;
                 /// Add custom
-                o.SourceToTargetFieldMappings = options != null ? options.SourceToTargetFieldMappings : null;
+                o.SourceToTargetFieldMappings = options != null ? options.SourceToTargetFieldMappings : new System.Collections.Generic.Dictionary<string, string> { {"sourceFieldA", "targetFieldB" } };
                 o.PrefixProjectToNodes = options != null ? options.PrefixProjectToNodes : false;
                 o.SharedFolderName = options != null ? options.SharedFolderName : "Shared Queries";
             });
