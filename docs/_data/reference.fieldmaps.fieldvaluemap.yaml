@@ -9,17 +9,7 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "FieldMapDefaults": {
-              "FieldValueMap": {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "defaultValue": "StateB",
-                "sourceField": "System.State",
-                "targetField": "System.State",
-                "valueMapping": {
-                  "StateA": "StateB"
-                }
-              }
+              "FieldValueMap": []
             }
           }
         }
@@ -46,15 +36,11 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldValueMapOptions",
-      "sourceField": "System.State",
-      "targetField": "System.State",
-      "defaultValue": "StateB",
-      "valueMapping": {
-        "StateA": "StateB"
-      },
-      "ApplyTo": [
-        "SomeWorkItemType"
-      ]
+      "sourceField": null,
+      "targetField": null,
+      "defaultValue": null,
+      "valueMapping": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 description: missng XML code comments

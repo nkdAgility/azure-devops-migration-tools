@@ -91,7 +91,7 @@ namespace MigrationTools.Processors.Infrastructure
                     Log.LogError("Processor::Execute: Processer base has not been configured. Options does not exist!");
                     throw new InvalidOperationException("Processer base has not been configured.");
                 }
-                if (string.IsNullOrEmpty(Options.SourceName) || string.IsNullOrEmpty(Options.SourceName))
+                if (string.IsNullOrEmpty(Options.SourceName) || string.IsNullOrEmpty(Options.TargetName))
                 {
                    Log.LogCritical("Processor::Execute: Processer base has not been configured. Source or Target is null! You need to set both 'SourceName' and 'TargetName' on the processer to a valid 'Endpoint' entry.");
                    Environment.Exit(-200);

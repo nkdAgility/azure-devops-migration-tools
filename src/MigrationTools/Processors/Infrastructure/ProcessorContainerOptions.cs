@@ -31,46 +31,51 @@ namespace MigrationTools.Processors.Infrastructure
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration).schema)
                 {
                     case MigrationConfigSchema.v160:
-                        _configuration.GetSection(ConfigurationSectionName).Bind(options);
-
-                        foreach (var processorSection in _configuration.GetSection(ConfigurationSectionName).GetChildren())
-                        {
-                            var processorTypeString = processorSection.GetValue<string>("ProcessorType");
-                            if (processorTypeString == null)
-                            {
-                                Log.Warning("There was no value for {optionTypeName} from {sectionKey}", "ProcessorType", processorSection.Key);
-                                throw new Exception();
-                            }
-                            var processorType = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessorOptions>().WithNameString(processorTypeString);
-                            if (processorType == null)
-                            {
-                                Log.Warning("There was no match for {optionTypeName} from {sectionKey}", "ProcessorType", processorSection.Key);
-                                throw new Exception();
-                            }
-
-                            IProcessorOptions processorOption = Activator.CreateInstance(processorType) as IProcessorOptions;
-                            // get sefaults and bind
-                            _configuration.GetSection(processorOption.ConfigurationSectionPath).Bind(processorOption);
-                            // Bind collection item
-                            processorSection.Bind(processorOption);
-
-                            // Bind enrichers for each processor
-                            var enrichersSection = processorSection.GetSection("Enrichers");
-                            var enrichers = enrichersSection?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorEnricher>("EnricherType"));
-                            if (processorOption.Enrichers == null)
-                            {
-                                processorOption.Enrichers = new List<IProcessorEnricher>();
-                            }
-                            processorOption.Enrichers.AddRange(enrichers);
-                            options.Processors.Add(processorOption);
-                        }
+                        BindProcessorOptions(options, ConfigurationSectionName, "ProcessorType");
                         break;
                     case MigrationConfigSchema.v1:
-                        options.Processors = _configuration.GetSection("Processors")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorConfig>("$type"));
+                        BindProcessorOptions(options, "Processors", "$type");
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                         break;
+                }
+            }
+
+            private void BindProcessorOptions(ProcessorContainerOptions options, string sectionName, string objectTypePropertyName)
+            {
+                _configuration.GetSection(sectionName).Bind(options);
+
+                foreach (var processorSection in _configuration.GetSection(sectionName).GetChildren())
+                {
+                    var processorTypeString = processorSection.GetValue<string>(objectTypePropertyName);
+                    if (processorTypeString == null)
+                    {
+                        Log.Warning("There was no value for {optionTypeName} from {sectionKey}", objectTypePropertyName, processorSection.Key);
+                        throw new Exception();
+                    }
+                    var processorType = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessorOptions>().WithNameString(processorTypeString);
+                    if (processorType == null)
+                    {
+                        Log.Warning("There was no match for {optionTypeName} from {sectionKey}", objectTypePropertyName, processorSection.Key);
+                        throw new Exception();
+                    }
+
+                    IProcessorOptions processorOption = Activator.CreateInstance(processorType) as IProcessorOptions;
+                    // get sefaults and bind
+                    _configuration.GetSection(processorOption.ConfigurationSectionPath).Bind(processorOption);
+                    // Bind collection item
+                    processorSection.Bind(processorOption);
+
+                    // Bind enrichers for each processor
+                    var enrichersSection = processorSection.GetSection("Enrichers");
+                    var enrichers = enrichersSection?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorEnricher>("EnricherType"));
+                    if (processorOption.Enrichers == null)
+                    {
+                        processorOption.Enrichers = new List<IProcessorEnricher>();
+                    }
+                    processorOption.Enrichers.AddRange(enrichers);
+                    options.Processors.Add(processorOption);
                 }
             }
         }

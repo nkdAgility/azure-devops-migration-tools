@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
@@ -21,9 +22,9 @@ namespace MigrationTools.Tools
                                         TfsTeamSettingsTool teamSettingsEnricher,
                                         TfsEmbededImagesTool embededImagesEnricher,
                                         TfsGitRepositoryTool TfsGitRepositoryTool,
-                                        StringManipulatorTool StringManipulatorTool,
-                                        WorkItemTypeMappingTool workItemTypeMapping,
-                                        FieldMappingTool fieldMappingTool
+                                        IStringManipulatorTool StringManipulatorTool,
+                                        IWorkItemTypeMappingTool workItemTypeMapping,
+                                        IFieldMappingTool fieldMappingTool
             ) : base(StringManipulatorTool, workItemTypeMapping, fieldMappingTool)
         {
             UserMapping = userMappingEnricher;

@@ -10,6 +10,15 @@ configurationSamples:
         "EndpointDefaults": {
           "TfsTeamProjectEndpoint": {
             "AllowCrossProjectLinking": "False",
+            "Authentication": {
+              "AccessToken": "",
+              "AuthenticationMode": "AccessToken",
+              "NetworkCredentials": {
+                "Domain": "",
+                "Password": "",
+                "UserName": ""
+              }
+            },
             "AuthenticationMode": "AccessToken",
             "Collection": "",
             "EndpointType": "TfsTeamProjectEndpoint",
@@ -17,12 +26,6 @@ configurationSamples:
               "AreaPath": "Area",
               "IterationPath": "Iteration"
             },
-            "NetworkCredentials": {
-              "Domain": "",
-              "Password": "",
-              "UserName": ""
-            },
-            "PersonalAccessToken": "",
             "Project": ""
           }
         }
@@ -37,6 +40,15 @@ configurationSamples:
         "EndpointDefaults": {
           "TfsTeamProjectEndpoint": {
             "AllowCrossProjectLinking": "False",
+            "Authentication": {
+              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+              "AuthenticationMode": "AccessToken",
+              "NetworkCredentials": {
+                "Domain": "",
+                "Password": "",
+                "UserName": ""
+              }
+            },
             "AuthenticationMode": "AccessToken",
             "Collection": "https://dev.azure.com/nkdagility-preview/",
             "EndpointType": "TfsTeamProjectEndpoint",
@@ -44,12 +56,6 @@ configurationSamples:
               "AreaPath": "Area",
               "IterationPath": "Iteration"
             },
-            "NetworkCredentials": {
-              "Domain": "",
-              "Password": "",
-              "UserName": ""
-            },
-            "PersonalAccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
             "Project": "migrationSource1"
           }
         }
@@ -64,19 +70,20 @@ configurationSamples:
       "Enabled": false,
       "Collection": "https://dev.azure.com/nkdagility-preview/",
       "Project": "migrationSource1",
+      "Authentication": {
+        "AuthenticationMode": 0,
+        "NetworkCredentials": {
+          "Domain": "",
+          "UserName": "",
+          "Password": ""
+        },
+        "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad"
+      },
       "ReflectedWorkItemIDFieldName": null,
       "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
-      "PersonalAccessTokenVariableName": null,
       "LanguageMaps": {
         "AreaPath": "Area",
         "IterationPath": "Iteration"
-      },
-      "NetworkCredentials": {
-        "Domain": "",
-        "UserName": "",
-        "Password": ""
       },
       "CollectionName": "https://dev.azure.com/nkdagility-preview/",
       "Name": null,
@@ -92,8 +99,8 @@ options:
   type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: AuthenticationMode
-  type: AuthenticationMode
+- parameterName: Authentication
+  type: TfsAuthenticationOptions
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Collection
@@ -117,18 +124,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Name
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: NetworkCredentials
-  type: NetworkCredentials
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: PersonalAccessToken
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: PersonalAccessTokenVariableName
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

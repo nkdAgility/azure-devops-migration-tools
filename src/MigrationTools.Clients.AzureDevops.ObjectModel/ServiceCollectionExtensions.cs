@@ -19,11 +19,12 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientTfs_Tools(this IServiceCollection context, IConfiguration configuration)
         {
+            context.AddConfiguredEndpoints(configuration);
+            context.AddSingleton<TfsCommonTools>();
+
             switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
             {
                 case MigrationConfigSchema.v1:
-
-
 
                     context.AddSingleton<TfsAttachmentTool>().AddSingleton<IOptions<TfsAttachmentToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentToolOptions>()));
 
@@ -60,8 +61,6 @@ namespace MigrationTools
                     context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
                     break;
             }
-
-            context.AddSingleton<TfsCommonTools>();
             
         }
 

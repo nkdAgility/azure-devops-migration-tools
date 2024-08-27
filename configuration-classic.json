@@ -144,7 +144,7 @@
   ],
   "Processors": [
     {
-      "$type": "WorkItemMigrationProcessorOptions",
+      "$type": "TfsWorkItemMigrationProcessorOptions",
       "Enabled": true,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
@@ -158,7 +158,8 @@
       "WorkItemIDs": null,
       "MaxGracefulFailures": 0,
       "SkipRevisionWithInvalidIterationPath": false,
-      "SkipRevisionWithInvalidAreaPath": false
+      "SkipRevisionWithInvalidAreaPath": false,
+      "SourceName":  "Source"
     }
   ],
   "Version": "16.0",

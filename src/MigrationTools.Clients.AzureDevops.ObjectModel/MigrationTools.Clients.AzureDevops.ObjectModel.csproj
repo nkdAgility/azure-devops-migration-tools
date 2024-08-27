@@ -14,12 +14,15 @@
     <Compile Remove="EndpointEnrichers\**" />
     <Compile Remove="Enrichers\**" />
     <Compile Remove="ProcessorEnrichers\**" />
+    <Compile Remove="Tools\Infrastructure\**" />
     <EmbeddedResource Remove="EndpointEnrichers\**" />
     <EmbeddedResource Remove="Enrichers\**" />
     <EmbeddedResource Remove="ProcessorEnrichers\**" />
+    <EmbeddedResource Remove="Tools\Infrastructure\**" />
     <None Remove="EndpointEnrichers\**" />
     <None Remove="Enrichers\**" />
     <None Remove="ProcessorEnrichers\**" />
+    <None Remove="Tools\Infrastructure\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,6 +54,5 @@
 
   <ItemGroup>
     <Folder Include="Tools\FieldMappingTool\" />
-    <Folder Include="Tools\Infrastructure\" />
   </ItemGroup>
 </Project>
