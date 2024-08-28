@@ -27,6 +27,8 @@ namespace MigrationTools.Host.Commands
 {
     internal class UpgradeConfigCommand : AsyncCommand<UpgradeConfigCommandSettings>
     {
+        private readonly IConfiguration configuration;
+
         public IServiceProvider Services { get; }
 
         private readonly ILogger _logger;
@@ -36,11 +38,13 @@ namespace MigrationTools.Host.Commands
         private static Dictionary<string, string> classNameMappings = new Dictionary<string, string>();
 
         public UpgradeConfigCommand(
+            IConfiguration configuration,
             IServiceProvider services,
             ILogger<InitMigrationCommand> logger,
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
+            this.configuration = configuration;
             Services = services;
             _logger = logger;
             Telemetery = telemetryLogger;
@@ -65,12 +69,12 @@ namespace MigrationTools.Host.Commands
                 }
                 _logger.LogInformation("ConfigFile: {configFile}", configFile);
 
-                // Load configuration
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
-                    .Build();
+                //// Load configuration
+                //var configuration = new ConfigurationBuilder()
+                //    .SetBasePath(Directory.GetCurrentDirectory())
+                //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                //    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
+                //    .Build();
 
                 classNameMappings.Add("WorkItemMigrationContext", "TfsWorkItemMigrationProcessor");
                 classNameMappings.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");

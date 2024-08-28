@@ -18,7 +18,7 @@ namespace MigrationTools.Endpoints.Infrastructure
             PathToInstance = $"MigrationTools:Endpoints:#KEY#:{OptionFor}",
             ObjectName = $"EndpointType",
             OptionFor = OptionFor,
-            PathToDefault = $"MigrationTools:EndpointSamples:{OptionFor}",
+            PathToDefault = $"MigrationTools:EndpointDefaults:{OptionFor}",
             PathToSample = $"MigrationTools:EndpointSamples:{OptionFor}"
         };
 
