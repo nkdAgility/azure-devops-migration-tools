@@ -8,6 +8,10 @@ namespace MigrationTools.Tools
 {
     public class TfsGitRepositoryToolOptions : ToolOptions
     {
-     
+        /// <summary>
+        /// List of work item mappings. 
+        /// </summary>
+        /// <default>{}</default>
+        public Dictionary<string, string> Mappings { get; set; }
     }
 }

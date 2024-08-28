@@ -201,17 +201,6 @@
             If set to `true` then the tool will run. Set to `false` and the processor will not run.
             </summary>
         </member>
-        <member name="T:MigrationTools.Tools.GitRepoMappingTool">
-            <summary>
-            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Tools.GitRepoMappingToolOptions.Mappings">
-            <summary>
-            List of work item mappings. 
-            </summary>
-            <default>{}</default>
-        </member>
         <member name="T:MigrationTools.Tools.StringManipulatorTool">
             <summary>
             Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
@@ -274,27 +263,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"91912a6b"
+            => @"7eaf4f78"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"91912a6b094734882a9067fd23d5d7bbda82b191"
+            => @"7eaf4f78b693a09be4ba34347308121603371a18"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-28T10:20:42+01:00"
+            => @"2024-08-28T10:49:54+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"216"
+            => @"217"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.2.1-216-g91912a6b"
+            => @"v15.2.1-217-g7eaf4f78"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -329,7 +318,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"217"
+            => @"218"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

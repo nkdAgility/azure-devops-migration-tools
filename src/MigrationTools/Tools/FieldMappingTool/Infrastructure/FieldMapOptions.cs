@@ -15,11 +15,12 @@ namespace MigrationTools.Tools.Infrastructure
         [JsonIgnore]
         public ConfigurationMetadata ConfigurationMetadata => new ConfigurationMetadata
         {
-            PathToInstance = $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps:{OptionFor}",
+            IsCollection = true,
+            PathToInstance = $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps",
             ObjectName = $"FieldMapType",
             OptionFor = OptionFor,
-            PathToDefault = $"MigrationTools::CommonToolDefaults:FieldMappingTool:FieldMaps:{OptionFor}",
-            PathToSample = $"MigrationTools::CommonToolSamples:FieldMappingTool:FieldMaps:{OptionFor}"
+            PathToDefault = $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults:{OptionFor}",
+            PathToSample = $"MigrationTools:CommonToolSamples:FieldMappingTool:FieldMapSamples:{OptionFor}"
         };
 
         protected FieldMapOptions()

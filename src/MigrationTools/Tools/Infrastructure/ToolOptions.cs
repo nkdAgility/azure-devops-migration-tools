@@ -9,7 +9,7 @@ namespace MigrationTools.Tools.Infrastructure
     public abstract class ToolOptions : IToolOptions
     {
         [JsonIgnore]
-        public string OptionFor => $"{GetType().Name.Replace("Options", "")}";
+        private string OptionFor => $"{GetType().Name.Replace("Options", "")}";
 
         [JsonIgnore]
         public ConfigurationMetadata ConfigurationMetadata => new ConfigurationMetadata

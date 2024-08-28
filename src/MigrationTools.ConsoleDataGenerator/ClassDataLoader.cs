@@ -96,7 +96,7 @@ namespace MigrationTools.ConsoleDataGenerator
                         data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = json.Trim() });
                     } else
                     {
-                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = "Default Unavailable" });
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = "There are no defaults! Check the sample for options!" });
                     }
                 }
                 if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToSample))
@@ -111,7 +111,7 @@ namespace MigrationTools.ConsoleDataGenerator
                     }
                     else
                     {
-                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = "Sample Unavailable" });
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = "There is no sample, but you can check the classic below for a general feel." });
                     }
                 }
                 data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });

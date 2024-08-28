@@ -81,7 +81,6 @@ namespace MigrationTools.Tools
 
             Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
             var changeSetMappings = Services.GetService<TfsChangeSetMappingTool>();
-            var gitRepoMaps = Services.GetService<GitRepoMappingTool>();
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
@@ -110,7 +109,7 @@ namespace MigrationTools.Tools
                     {
                         var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, sourceWorkItem?.ProjectName);
                         // if repo is found in a different project and the repo Name is listed in repo mappings, use it
-                        if (anyProjectSourceRepoInfo.GitRepo != null && gitRepoMaps.Mappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
+                        if (anyProjectSourceRepoInfo.GitRepo != null && Options.Mappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
                         {
                             sourceRepoInfo = anyProjectSourceRepoInfo;
                         }
@@ -122,7 +121,7 @@ namespace MigrationTools.Tools
 
                     if (sourceRepoInfo.GitRepo != null)
                     {
-                        string targetRepoName = GetTargetRepoName(gitRepoMaps.Mappings, sourceRepoInfo);
+                        string targetRepoName = GetTargetRepoName(Options.Mappings, sourceRepoInfo);
                         string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? _processor.Target.Options.Project;
                         string targetProjectName = _processor.Target.Options.Project;
 
@@ -130,7 +129,7 @@ namespace MigrationTools.Tools
                         // if repo was not found in the target project, try to find it in the whole target project collection
                         if (targetRepoInfo.GitRepo == null)
                         {
-                            if (gitRepoMaps.Mappings.Values.Contains(targetRepoName))
+                            if (Options.Mappings.Values.Contains(targetRepoName))
                             {
                                 var anyTargetRepoInCollectionInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
                                 if (anyTargetRepoInCollectionInfo.GitRepo != null)
@@ -233,7 +232,7 @@ namespace MigrationTools.Tools
             return count;
         }
 
-        private string GetTargetRepoName(ReadOnlyDictionary<string, string> gitRepoMappings, TfsGitRepositoryInfo repoInfo)
+        private string GetTargetRepoName(Dictionary<string, string> gitRepoMappings, TfsGitRepositoryInfo repoInfo)
         {
             if (gitRepoMappings.ContainsKey(repoInfo.GitRepo.Name))
             {
