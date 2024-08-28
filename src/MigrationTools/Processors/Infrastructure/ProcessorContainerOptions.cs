@@ -28,18 +28,7 @@ namespace MigrationTools.Processors.Infrastructure
 
             public void Configure(ProcessorContainerOptions options)
             {
-                switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(_configuration).schema)
-                {
-                    case MigrationConfigSchema.v160:
-                        BindProcessorOptions(options, ConfigurationSectionName, "ProcessorType");
-                        break;
-                    case MigrationConfigSchema.v1:
-                        BindProcessorOptions(options, "Processors", "$type");
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                        break;
-                }
+               BindProcessorOptions(options, ConfigurationSectionName, "ProcessorType");
             }
 
             private void BindProcessorOptions(ProcessorContainerOptions options, string sectionName, string objectTypePropertyName)

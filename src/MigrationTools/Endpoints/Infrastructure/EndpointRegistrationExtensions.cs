@@ -19,34 +19,14 @@ namespace MigrationTools
         public static void AddConfiguredEndpoints(this IServiceCollection services, IConfiguration configuration)
         {
 
-            switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
-            {
-                case MigrationConfigSchema.v160:
                     AddConfiguredEndpointsV160(services, configuration);
-                    break;
-                case MigrationConfigSchema.v1:
-                    AddConfiguredEndpointsV1(services, configuration);
-                    break;
-                default:
-                    Log.Error("Unknown Configuration version");
-                    throw new NotSupportedException();
-                    break;
-            }
+
 
 
            
         }
 
-        private static void AddConfiguredEndpointsV1(IServiceCollection services, IConfiguration configuration)
-        {
-            var nodes = new List<string> { "Source", "Target" };
-            foreach (var node in nodes)
-            {
-                var endpointsSection = configuration.GetSection(node);
-                var endpointType = endpointsSection.GetValue<string>("$type").Replace("Options", "").Replace("Config", "");
-                AddEndPointSingleton(services, configuration, endpointsSection, node, endpointType);
-            } 
-        }
+       
 
         private static void AddConfiguredEndpointsV160(IServiceCollection services, IConfiguration configuration)
         {

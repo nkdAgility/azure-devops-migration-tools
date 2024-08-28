@@ -25,6 +25,9 @@ using static MigrationTools.ConfigurationExtensions;
 using MigrationTools.Options;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
+using Microsoft.Extensions.Options;
+using System.Configuration;
+using Spectre.Console;
 
 namespace MigrationTools.Host
 {
@@ -87,9 +90,16 @@ namespace MigrationTools.Host
             });
 
             hostBuilder.ConfigureServices((context, services) =>
-             {
-
-                 services.AddOptions();
+            {
+                // KILL if the config is not valid
+                if (!VersionOptions.ConfigureOptions.IsConfigValid(context.Configuration))
+                {
+                    var serviceProvider = services.BuildServiceProvider();
+                    var logger = serviceProvider.GetRequiredService<Serilog.ILogger>();
+                    BoilerplateCli.ConfigIsNotValidMessage(context.Configuration, logger);
+                    Environment.Exit(-1);
+                }
+                    services.AddOptions();
 
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
@@ -125,10 +135,14 @@ namespace MigrationTools.Host
                             .WithExample("init -options Basic")
                             .WithExample("init -options WorkItemTracking ")
                             .WithExample("init -options Reference ");
+                config.AddCommand<Commands.UpgradeConfigCommand>("upgrade")
+                           .WithDescription("Atempts to upgrade your config from the old version to the new one. For each object we will load the defaults, then apply your config. This will only bring accross valid settings. This is 'best effort' and you will need to check all the values as we have changed a lot!")
+                           .WithExample("upgrade -config \"configuration.json\"");
 
-                config.AddCommand<Commands.MigrationConfigCommand>("config")
-                            .WithDescription("Creates or edits a configuration file")
-                           .WithExample("config -config \"configuration.json\"");
+                //config.AddCommand<Commands.MigrationConfigCommand>("config")
+                //            .WithDescription("Creates or edits a configuration file")
+                //           .WithExample("config -config \"configuration.json\"");
+
                 extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });

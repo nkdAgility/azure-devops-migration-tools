@@ -9,9 +9,6 @@ namespace VstsSyncMigrator.ConsoleApp
     {
         public static async Task Main(string[] args)
         {
-
-
-
             var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args);
             if(hostBuilder is null)
             {
@@ -31,7 +28,7 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddMigrationToolServicesForClientLegacyCore();
                 });
 
-
+       
 
             await hostBuilder.RunConsoleAsync();
         }

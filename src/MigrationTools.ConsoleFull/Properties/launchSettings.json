@@ -11,10 +11,6 @@
       "commandName": "Project",
       "commandLineArgs": "execute -c \"configuration.json\""
     },
-    "executepipe": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c configuration2-pipeline.json"
-    },
     "execute --help": {
       "commandName": "Project",
       "commandLineArgs": "execute --help"
@@ -23,14 +19,6 @@
       "commandName": "Project",
       "commandLineArgs": "init --options Basic --overwrite"
     },
-    "Execute Classic": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c \"configuration-classic.json\""
-    },
-    "execute classic2": {
-      "commandName": "Project",
-      "commandLineArgs": "execute -c configuration-classic2.json"
-    },
     "Config": {
       "commandName": "Project",
       "commandLineArgs": "config -c \"configuration.json\""
@@ -38,6 +26,14 @@
     "init Options-Reference": {
       "commandName": "Project",
       "commandLineArgs": "init --options Reference -c configuration-ref.json"
+    },
+    "Upgrade": {
+      "commandName": "Project",
+      "commandLineArgs": "upgrade -c \"configuration-classic.json\""
+    },
+    "Execute Classic": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c \"configuration-classic.json\""
     }
   }
 }

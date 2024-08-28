@@ -57,7 +57,6 @@ namespace MigrationTools.Options
                     Version.TryParse(configVersionString, out Version configVersion);
                     if (configVersion < Version.Parse("16.0") || isOldFormat)
                     {
-                        Console.WriteLine("!!ACTION REQUIRED!! You are using a deprecated version of the configuration, please update to v16. backward compatability will be removed in a future version.");
                         return (MigrationConfigSchema.v1, configVersionString);
                     }
                     else
@@ -69,6 +68,25 @@ namespace MigrationTools.Options
                     return (MigrationConfigSchema.Empty, "0.0");
                 }
                 
+            }
+
+            public static bool IsConfigValid(IConfiguration configuration)
+            {
+                var isValid = true;
+                switch (GetMigrationConfigVersion(configuration).schema)
+                {
+                    case MigrationConfigSchema.v1:
+                        isValid = false;
+                        break;
+                    case MigrationConfigSchema.v160:
+                        // This is the corect version
+                        break;
+                    default:
+                        isValid = false;
+                        break;
+                }
+                return isValid;
+
             }
         }
 

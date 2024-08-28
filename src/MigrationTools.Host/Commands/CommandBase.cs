@@ -149,47 +149,16 @@ namespace MigrationTools.Host.Commands
         private void ApplicationStartup( TSettings settings)
         {
             _mainTimer.Start();
-            AsciiLogo(_MigrationToolVersion.GetRunningVersion().versionString);
-            TelemetryNote(settings);
+           BoilerplateCli.AsciiLogo(_MigrationToolVersion.GetRunningVersion().versionString, Log.Logger);
+            BoilerplateCli.TelemetryNote(settings, Log.Logger);
             _logger.LogInformation("Start Time: {StartTime}", DateTime.Now.ToUniversalTime().ToLocalTime());
             _logger.LogInformation("Running with settings: {@settings}", settings);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
             _logger.LogInformation("Version (Assembly): {Version}", _MigrationToolVersion.GetRunningVersion().versionString);
-        }
+        }       
 
-        private void TelemetryNote(TSettings settings)
-        {
-            _logger.LogInformation("--------------------------------------");
-            _logger.LogInformation("Telemetry Note:");
-            if (settings.DisableTelemetry)
-            {
-                _logger.LogInformation("   Telemetry is disabled by the user.");
-            } else
-            {
-                _logger.LogInformation("   We use Application Insights to collect usage and error information in order to improve the quality of the tools.");
-                _logger.LogInformation("   Currently we collect the following anonymous data:");
-                _logger.LogInformation("     -Event data: application version, client city/country, hosting type, item count, error count, warning count, elapsed time.");
-                _logger.LogInformation("     -Exceptions: application errors and warnings.");
-                _logger.LogInformation("     -Dependencies: REST/ObjectModel calls to Azure DevOps to help us understand performance issues.");
-                _logger.LogInformation("   This data is tied to a session ID that is generated on each run of the application and shown in the logs. This can help with debugging. If you want to disable telemetry you can run the tool with '--disableTelemetry' on the command prompt.");
-                _logger.LogInformation("   Note: Exception data cannot be 100% guaranteed to not leak production data");
-            }
-            
-            _logger.LogInformation("--------------------------------------");
-        }
-
-        private void AsciiLogo(string thisVersion)
-        {
-            AnsiConsole.Write(new FigletText("Azure DevOps").LeftJustified().Color(Color.Purple));
-            AnsiConsole.Write(new FigletText("Migration Tools").LeftJustified().Color(Color.Purple));
-            var productName = ((AssemblyProductAttribute)Assembly.GetEntryAssembly()
-                .GetCustomAttributes(typeof(AssemblyProductAttribute), true)[0]).Product;
-            _logger.LogInformation("{productName} ", productName);
-            _logger.LogInformation("{thisVersion}", thisVersion);
-            var companyName = ((AssemblyCompanyAttribute)Assembly.GetEntryAssembly()
-                .GetCustomAttributes(typeof(AssemblyCompanyAttribute), true)[0]).Company;
-            _logger.LogInformation("{companyName} ", companyName);
-            _logger.LogInformation("===============================================================================");
-        }
+        
     }
+
+
 }
