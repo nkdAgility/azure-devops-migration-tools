@@ -80,24 +80,15 @@ namespace MigrationTools.Host.Commands
 
                         // Find all options
                         List<IOptions> options = new List<IOptions>();
+                        Dictionary<string, IOptions> namedOptions = new Dictionary<string, IOptions>();
 
                         var AllOptionsObjects = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>();
 
                         // ChangeSetMappingFile
                        
-                        options.Add(GetTfsChangeSetMappingToolOptions(configuration));
-
-                        var sourceConfig = configuration.GetSection("Source");
-                        var sourceType = sourceConfig.GetValue<string>("$type");
-                        if (classNameMappings.ContainsKey(sourceType))
-                        {
-                            sourceType = classNameMappings[sourceType];
-                        }
-                        var type = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().FirstOrDefault(t => t.Name == sourceType);
-                        var sourceOptions = (IOptions)Activator.CreateInstance(type);
-                        sourceConfig.Bind(sourceOptions);
-
-
+                        options.Add(GetV1TfsChangeSetMappingToolOptions(configuration));
+                        namedOptions.Add("Source", GetV1EndpointOptions(configuration, "Source"));
+                        namedOptions.Add("Target", GetV1EndpointOptions(configuration, "Target"));
 
 
 
@@ -165,7 +156,24 @@ namespace MigrationTools.Host.Commands
         //    }
         //}
 
-        private IOptions GetTfsChangeSetMappingToolOptions(IConfiguration configuration)
+        private IOptions GetV1EndpointOptions(IConfiguration configuration, string name)
+        {
+            var sourceConfig = configuration.GetSection(name);
+            var sourceType = sourceConfig.GetValue<string>("$type");
+            if (classNameMappings.ContainsKey(sourceType))
+            {
+                sourceType = classNameMappings[sourceType];
+            }
+            var type = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().FirstOrDefault(t => t.Name == sourceType);
+            var sourceOptions = (IOptions)Activator.CreateInstance(type);
+            sourceConfig.Bind(sourceOptions);
+
+
+
+            return sourceOptions;
+        }
+
+        private IOptions GetV1TfsChangeSetMappingToolOptions(IConfiguration configuration)
         {
             var changeSetMappingOptions = configuration.GetValue<string>("ChangeSetMappingFile");
             var properties = new Dictionary<string, object>
