@@ -32,7 +32,7 @@ namespace MigrationTools.Processors.Tests
             services.AddSingleton<AzureDevOpsPipelineProcessor>();
             AddEndpoint(services, options != null ? options.SourceName : "Source", "migrationSource1");
             AddEndpoint(services, options != null ? options.SourceName : "Target", "migrationTarget1");
-            services.Configure<AzureDevOpsPipelineProcessorOptions>(o =>
+            services.Configure((System.Action<AzureDevOpsPipelineProcessorOptions>)(o =>
             {
                 o.Enabled = options != null ? options.Enabled : true;
                 o.BuildPipelines = options != null ? options.BuildPipelines : null;
@@ -45,10 +45,10 @@ namespace MigrationTools.Processors.Tests
                 o.MigrateReleasePipelines = options != null ? options.MigrateReleasePipelines : true;
                 o.MigrateServiceConnections = options != null ? options.MigrateServiceConnections : true;
                 o.MigrateVariableGroups = options != null ? options.MigrateVariableGroups : true;
-                o.ProcessorEnrichers = options != null ? options.ProcessorEnrichers : null;
+                o.Enrichers = options != null ? options.Enrichers : null;
                 o.RefName = options != null ? options.RefName : null;
                 o.RepositoryNameMaps = options != null ? options.RepositoryNameMaps : null;
-            });
+            }));
             
             return services.BuildServiceProvider().GetService<AzureDevOpsPipelineProcessor>();
         }

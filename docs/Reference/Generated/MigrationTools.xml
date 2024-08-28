@@ -51,11 +51,6 @@
             For internal use
             </summary>
         </member>
-        <member name="P:MigrationTools.Options.IOldOptions.RefName">
-            <summary>
-            If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
-            </summary>
-        </member>
         <member name="P:MigrationTools.Options.IOptions.Enabled">
             <summary>
             Will be used if enabled
@@ -71,7 +66,7 @@
             This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.ProcessorEnrichers">
+        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.Enrichers">
             <summary>
             List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
             </summary>
@@ -82,11 +77,6 @@
             </summary>
         </member>
         <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.ProcessorEnrichers">
             <summary>
             List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
             </summary>
@@ -284,27 +274,27 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"e49b276e"
+            => @"e678624e"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"e49b276ea931baea8bfac1fe241cc494257da4dd"
+            => @"e678624e19e6c1968c2e23ca4cd69e68fc85aa6c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-27T21:33:36+01:00"
+            => @"2024-08-28T08:49:22+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"213"
+            => @"214"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.2.1-213-ge49b276e"
+            => @"v15.2.1-214-ge678624e"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -339,7 +329,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"214"
+            => @"215"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

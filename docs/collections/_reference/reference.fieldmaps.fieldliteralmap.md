@@ -39,7 +39,6 @@ configurationSamples:
       "$type": "FieldLiteralMapOptions",
       "targetField": null,
       "value": null,
-      "ConfigurationOptionFor": "FieldLiteralMap",
       "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
@@ -50,10 +49,6 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationOptionFor
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: targetField

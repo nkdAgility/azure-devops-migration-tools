@@ -7,7 +7,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
@@ -16,7 +18,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
@@ -31,7 +35,6 @@ configurationSamples:
       "Password": null,
       "PictureEmpIDFormat": null,
       "Enrichers": null,
-      "ProcessorEnrichers": null,
       "SourceName": null,
       "TargetName": null,
       "RefName": null
@@ -52,7 +55,7 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Enrichers
   type: List
-  description: A list of enrichers that can augment the proccessing of the data
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: Password
   type: String
@@ -62,10 +65,6 @@ options:
   type: String
   description: 'TODO: You wpuld need to customise this for your system. Clone repo and run in Debug'
   defaultValue: String.Empty
-- parameterName: ProcessorEnrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'

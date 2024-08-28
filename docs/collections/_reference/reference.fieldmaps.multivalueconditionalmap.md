@@ -39,7 +39,6 @@ configurationSamples:
       "$type": "MultiValueConditionalMapOptions",
       "sourceFieldsAndValues": null,
       "targetFieldsAndValues": null,
-      "ConfigurationOptionFor": "MultiValueConditionalMap",
       "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
@@ -50,10 +49,6 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationOptionFor
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: sourceFieldsAndValues

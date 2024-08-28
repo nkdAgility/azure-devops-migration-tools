@@ -71,20 +71,20 @@ namespace MigrationTools.Processors.Tests
                 return ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), options);
             });
             // Add the settings
-            services.Configure<TfsTeamSettingsProcessorOptions>(o =>
+            services.Configure((Action<TfsTeamSettingsProcessorOptions>)(o =>
             {
                 o.Enabled = options != null ? options.Enabled : true;
                 o.SourceName = SourceName;
                 o.TargetName = TargetName;
                 o.Enrichers = options != null ? options.Enrichers : null;
-                o.ProcessorEnrichers = options != null ? options.ProcessorEnrichers : null;
+                o.Enrichers = options != null ? options.Enrichers : null;
                 o.RefName = options != null ? options.RefName : null;
                 /// Add custom
                 o.PrefixProjectToNodes = options != null ? options.PrefixProjectToNodes : false;
                 o.MigrateTeamCapacities = options != null ? options.MigrateTeamCapacities : false;
                 o.MigrateTeamSettings = options != null ? options.MigrateTeamSettings : false;
                 o.Teams = options?.Teams != null ? options.Teams : new List<string>() { "Team 1" };
-            });
+            }));
             ///Return the processor
             return services.BuildServiceProvider().GetService<TfsTeamSettingsProcessor>();
         }
@@ -151,19 +151,19 @@ namespace MigrationTools.Processors.Tests
                 return endpoint;
             });
 
-            services.Configure<TfsSharedQueryProcessorOptions>(o =>
+            services.Configure((Action<TfsSharedQueryProcessorOptions>)(o =>
             {
                 o.Enabled = options != null ? options.Enabled : true;
                 o.SourceName = SourceName;
                 o.TargetName = TargetName;
                 o.Enrichers = options != null ? options.Enrichers : null;
-                o.ProcessorEnrichers = options != null ? options.ProcessorEnrichers : null;
+                o.Enrichers = options != null ? options.Enrichers : null;
                 o.RefName = options != null ? options.RefName : null;
                 /// Add custom
                 o.SourceToTargetFieldMappings = options != null ? options.SourceToTargetFieldMappings : new System.Collections.Generic.Dictionary<string, string> { {"sourceFieldA", "targetFieldB" } };
                 o.PrefixProjectToNodes = options != null ? options.PrefixProjectToNodes : false;
                 o.SharedFolderName = options != null ? options.SharedFolderName : "Shared Queries";
-            });
+            }));
 
             return services.BuildServiceProvider().GetService<TfsSharedQueryProcessor>();
         }

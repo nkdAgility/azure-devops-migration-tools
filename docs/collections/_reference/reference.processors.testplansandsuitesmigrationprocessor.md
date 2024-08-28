@@ -7,7 +7,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
@@ -16,7 +18,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
@@ -33,7 +37,6 @@ configurationSamples:
       "RemoveInvalidTestSuiteLinks": false,
       "FilterCompleted": false,
       "Enrichers": null,
-      "ProcessorEnrichers": null,
       "SourceName": null,
       "TargetName": null,
       "RefName": null
@@ -50,7 +53,7 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Enrichers
   type: List
-  description: A list of enrichers that can augment the proccessing of the data
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: FilterCompleted
   type: Boolean
@@ -64,10 +67,6 @@ options:
   type: String
   description: The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
   defaultValue: '`String.Empty`'
-- parameterName: ProcessorEnrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'

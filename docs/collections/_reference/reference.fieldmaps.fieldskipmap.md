@@ -38,7 +38,6 @@ configurationSamples:
     {
       "$type": "FieldSkipMapOptions",
       "targetField": null,
-      "ConfigurationOptionFor": "FieldSkipMap",
       "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
@@ -49,10 +48,6 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ConfigurationOptionFor
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: targetField

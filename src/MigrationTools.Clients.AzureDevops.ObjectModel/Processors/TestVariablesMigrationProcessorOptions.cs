@@ -10,11 +10,6 @@ namespace MigrationTools.Processors
         /// <inheritdoc />
         public bool Enabled { get; set; }
 
-        /// <summary>
-        /// A list of enrichers that can augment the proccessing of the data
-        /// </summary>
-        public List<IProcessorEnricher> Enrichers { get; set; }
-
         /// <inheritdoc />
         public string Processor
         {

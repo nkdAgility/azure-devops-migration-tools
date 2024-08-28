@@ -7,7 +7,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
@@ -16,7 +18,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
@@ -26,9 +30,8 @@ configurationSamples:
     {
       "$type": "TestVariablesMigrationProcessorOptions",
       "Enabled": false,
-      "Enrichers": null,
       "Processor": "TestVariablesMigrationContext",
-      "ProcessorEnrichers": null,
+      "Enrichers": null,
       "SourceName": null,
       "TargetName": null,
       "RefName": null
@@ -45,15 +48,11 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Enrichers
   type: List
-  description: A list of enrichers that can augment the proccessing of the data
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: Processor
   type: String
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ProcessorEnrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: RefName
   type: String

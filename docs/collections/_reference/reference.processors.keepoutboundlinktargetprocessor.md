@@ -7,7 +7,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
@@ -16,7 +18,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions
@@ -28,12 +32,11 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "2804aeea-71e7-4067-baf0-12b36d095126",
+      "TargetLinksToKeepProject": "7337f58d-3033-4b32-ad75-811ee7b75070",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
       "Enrichers": null,
-      "ProcessorEnrichers": null,
       "SourceName": null,
       "TargetName": null,
       "RefName": null
@@ -58,15 +61,11 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Enrichers
   type: List
-  description: A list of enrichers that can augment the proccessing of the data
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: PrependCommand
   type: String
   description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: ProcessorEnrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: RefName
   type: String

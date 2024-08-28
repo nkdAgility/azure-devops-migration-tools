@@ -69,10 +69,10 @@ namespace MigrationTools.Processors.Infrastructure
 
                     // Bind enrichers for each processor
                     var enrichersSection = processorSection.GetSection("Enrichers");
-                    var enrichers = enrichersSection?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorEnricher>("EnricherType"));
+                    var enrichers = enrichersSection?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IProcessorEnricherOptions>("EnricherType"));
                     if (processorOption.Enrichers == null)
                     {
-                        processorOption.Enrichers = new List<IProcessorEnricher>();
+                        processorOption.Enrichers = new List<IProcessorEnricherOptions>();
                     }
                     processorOption.Enrichers.AddRange(enrichers);
                     options.Processors.Add(processorOption);

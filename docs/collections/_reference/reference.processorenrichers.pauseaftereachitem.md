@@ -6,12 +6,10 @@ configurationSamples:
   description: 
   code: >-
     {
-      "MigrationTools": {
-        "": {
-          "ProcessorEnricherDefaults": {
-            "PauseAfterEachItem": []
-          }
-        }
+      "DemoProcessor": {
+        "Enrichers": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
@@ -19,12 +17,10 @@ configurationSamples:
   description: 
   code: >-
     {
-      "MigrationTools": {
-        "": {
-          "ProcessorEnricherSamples": {
-            "PauseAfterEachItem": []
-          }
-        }
+      "DemoProcessor": {
+        "Enrichers": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions

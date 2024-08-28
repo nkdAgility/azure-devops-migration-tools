@@ -7,7 +7,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
@@ -16,7 +18,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
@@ -27,7 +31,6 @@ configurationSamples:
       "$type": "ImportProfilePictureProcessorOptions",
       "Enabled": false,
       "Enrichers": null,
-      "ProcessorEnrichers": null,
       "SourceName": null,
       "TargetName": null,
       "RefName": null
@@ -43,10 +46,6 @@ options:
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
 - parameterName: Enrichers
-  type: List
-  description: A list of enrichers that can augment the proccessing of the data
-  defaultValue: missng XML code comments
-- parameterName: ProcessorEnrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments

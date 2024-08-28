@@ -13,8 +13,6 @@ namespace MigrationTools._EngineV1.Configuration
         [JsonProperty(Order = -200)]
         bool Enabled { get; set; }
 
-        List<IProcessorEnricher> Enrichers { get; set; }
-
         /// <summary>
         /// Indicates, if this processor can be added to the list of current processors or not.
         /// Some processors are not compatible with each other.

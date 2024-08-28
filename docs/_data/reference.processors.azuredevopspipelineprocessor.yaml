@@ -6,18 +6,20 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": {
-          "BuildPipelines": "",
-          "Enabled": "False",
-          "MigrateBuildPipelines": "True",
-          "MigrateReleasePipelines": "True",
-          "MigrateServiceConnections": "True",
-          "MigrateTaskGroups": "True",
-          "MigrateVariableGroups": "True",
-          "ReleasePipelines": "",
-          "SourceName": "sourceName",
-          "TargetName": "targetName"
-        }
+        "Processors": [
+          {
+            "BuildPipelines": "",
+            "Enabled": "False",
+            "MigrateBuildPipelines": "True",
+            "MigrateReleasePipelines": "True",
+            "MigrateServiceConnections": "True",
+            "MigrateTaskGroups": "True",
+            "MigrateVariableGroups": "True",
+            "ReleasePipelines": "",
+            "SourceName": "sourceName",
+            "TargetName": "targetName"
+          }
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
@@ -26,7 +28,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
@@ -45,7 +49,6 @@ configurationSamples:
       "ReleasePipelines": null,
       "RepositoryNameMaps": null,
       "Enrichers": null,
-      "ProcessorEnrichers": null,
       "SourceName": "sourceName",
       "TargetName": "targetName",
       "RefName": null
@@ -66,7 +69,7 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Enrichers
   type: List
-  description: A list of enrichers that can augment the proccessing of the data
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: MigrateBuildPipelines
   type: Boolean
@@ -88,10 +91,6 @@ options:
   type: Boolean
   description: Migrate Valiable Groups
   defaultValue: true
-- parameterName: ProcessorEnrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'

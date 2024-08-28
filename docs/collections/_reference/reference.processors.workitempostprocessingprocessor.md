@@ -7,7 +7,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
@@ -16,7 +18,9 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "Processors": []
+        "Processors": [
+          []
+        ]
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
@@ -32,7 +36,6 @@ configurationSamples:
       "PauseAfterEachWorkItem": false,
       "WorkItemCreateRetryLimit": 0,
       "Enrichers": null,
-      "ProcessorEnrichers": null,
       "SourceName": null,
       "TargetName": null,
       "RefName": null
@@ -49,7 +52,7 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Enrichers
   type: List
-  description: A list of enrichers that can augment the proccessing of the data
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
@@ -59,10 +62,6 @@ options:
   type: Boolean
   description: Pause after each work item is migrated
   defaultValue: false
-- parameterName: ProcessorEnrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'

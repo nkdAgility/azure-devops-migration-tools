@@ -22,12 +22,7 @@ configurationSamples:
     {
       "MigrationTools": {
         "CommonTools": {
-          "TfsGitRepositoryTool": {
-            "Enabled": "True",
-            "Mappings": {
-              "Repo1": "Repo2"
-            }
-          }
+          "TfsGitRepositoryTool": []
         }
       }
     }

@@ -193,11 +193,6 @@
         <member name="P:MigrationTools.Processors.TestVariablesMigrationProcessorOptions.Enabled">
             <inheritdoc />
         </member>
-        <member name="P:MigrationTools.Processors.TestVariablesMigrationProcessorOptions.Enrichers">
-            <summary>
-            A list of enrichers that can augment the proccessing of the data
-            </summary>
-        </member>
         <member name="P:MigrationTools.Processors.TestVariablesMigrationProcessorOptions.Processor">
             <inheritdoc />
         </member>

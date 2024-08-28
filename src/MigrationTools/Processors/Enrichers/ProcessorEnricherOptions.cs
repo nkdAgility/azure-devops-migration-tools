@@ -12,11 +12,12 @@ namespace MigrationTools.Enrichers
         [JsonIgnore]
         public ConfigurationMetadata ConfigurationMetadata => new ConfigurationMetadata
         {
-            PathToInstance = null,
+            IsCollection = true,
+            PathToInstance = $"DemoProcessor:Enrichers",
             ObjectName = $"ProcessorEnricherType",
             OptionFor = OptionFor,
-            PathToDefault = $"MigrationTools::ProcessorEnricherDefaults:{OptionFor}",
-            PathToSample = $"MigrationTools::ProcessorEnricherSamples:{OptionFor}"
+            PathToDefault = $"MigrationTools:ProcessorEnricherDefaults:{OptionFor}",
+            PathToSample = $"MigrationTools:ProcessorEnricherSamples:{OptionFor}"
         };
 
         /// <summary>
