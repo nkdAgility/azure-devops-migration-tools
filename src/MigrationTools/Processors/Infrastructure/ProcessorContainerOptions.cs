@@ -52,7 +52,7 @@ namespace MigrationTools.Processors.Infrastructure
 
                     IProcessorOptions processorOption = Activator.CreateInstance(processorType) as IProcessorOptions;
                     // get sefaults and bind
-                    _configuration.GetSection(processorOption.ConfigurationMetadata.PathToInstance).Bind(processorOption);
+                    _configuration.GetSection(processorOption.ConfigurationMetadata.PathToDefault).Bind(processorOption);
                     // Bind collection item
                     processorSection.Bind(processorOption);
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -30,6 +32,8 @@ namespace MigrationTools.Host.Commands
         private readonly ITelemetryLogger Telemetery;
         private readonly IHostApplicationLifetime _appLifetime;
 
+        private static Dictionary<string, string> classNameMappings = new Dictionary<string, string>();
+
         public UpgradeConfigCommand(
             IServiceProvider services,
             ILogger<InitMigrationCommand> logger,
@@ -41,6 +45,9 @@ namespace MigrationTools.Host.Commands
             Telemetery = telemetryLogger;
             _appLifetime = appLifetime;
         }
+
+
+      
 
 
         public override async Task<int> ExecuteAsync(CommandContext context, UpgradeConfigCommandSettings settings)
@@ -64,9 +71,35 @@ namespace MigrationTools.Host.Commands
                     .AddJsonFile(configFile, optional: true, reloadOnChange: true)
                     .Build();
 
+                classNameMappings.Add("WorkItemMigrationContext", "TfsWorkItemMigrationProcessor");
+                classNameMappings.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");
+
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
                 {
                     case MigrationConfigSchema.v1:
+
+                        // Find all options
+                        List<IOptions> options = new List<IOptions>();
+
+                        var AllOptionsObjects = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>();
+
+                        // ChangeSetMappingFile
+                       
+                        options.Add(GetTfsChangeSetMappingToolOptions(configuration));
+
+                        var sourceConfig = configuration.GetSection("Source");
+                        var sourceType = sourceConfig.GetValue<string>("$type");
+                        if (classNameMappings.ContainsKey(sourceType))
+                        {
+                            sourceType = classNameMappings[sourceType];
+                        }
+                        var type = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().FirstOrDefault(t => t.Name == sourceType);
+                        var sourceOptions = (IOptions)Activator.CreateInstance(type);
+                        sourceConfig.Bind(sourceOptions);
+
+
+
+
 
                         //field mapping
                         //options.Enabled = true;
@@ -101,17 +134,7 @@ namespace MigrationTools.Host.Commands
 
                         break;
                     case MigrationConfigSchema.v160:
-                        //context.AddConfiguredEndpoints(configuration);
-                        //context.AddSingleton<TfsAttachmentTool>().AddMigrationToolsOptions<TfsAttachmentToolOptions>(configuration);
-                        //context.AddSingleton<TfsUserMappingTool>().AddMigrationToolsOptions<TfsUserMappingToolOptions>(configuration);
-                        //context.AddSingleton<TfsValidateRequiredFieldTool>().AddMigrationToolsOptions<TfsValidateRequiredFieldToolOptions>(configuration);
-                        //context.AddSingleton<TfsWorkItemLinkTool>().AddMigrationToolsOptions<TfsWorkItemLinkToolOptions>(configuration);
-                        //context.AddSingleton<TfsWorkItemEmbededLinkTool>().AddMigrationToolsOptions<TfsWorkItemEmbededLinkToolOptions>(configuration);
-                        //context.AddSingleton<TfsEmbededImagesTool>().AddMigrationToolsOptions<TfsEmbededImagesToolOptions>(configuration);
-                        //context.AddSingleton<TfsGitRepositoryTool>().AddMigrationToolsOptions<TfsGitRepositoryToolOptions>(configuration);
-                        //context.AddSingleton<TfsNodeStructureTool>().AddMigrationToolsOptions<TfsNodeStructureToolOptions>(configuration);
-                        //context.AddSingleton<TfsRevisionManagerTool>().AddMigrationToolsOptions<TfsRevisionManagerToolOptions>(configuration);
-                        //context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
+
                         break;
                 }
 
@@ -141,6 +164,16 @@ namespace MigrationTools.Host.Commands
         //        AddEndPointSingleton(services, configuration, endpointsSection, node, endpointType);
         //    }
         //}
+
+        private IOptions GetTfsChangeSetMappingToolOptions(IConfiguration configuration)
+        {
+            var changeSetMappingOptions = configuration.GetValue<string>("ChangeSetMappingFile");
+            var properties = new Dictionary<string, object>
+                        {
+                            { "ChangeSetMappingFile", changeSetMappingOptions }
+                        };
+            return (IOptions)OptionsBinder.BindToOptions("TfsChangeSetMappingToolOptions", properties, classNameMappings);
+        }
 
 
     }

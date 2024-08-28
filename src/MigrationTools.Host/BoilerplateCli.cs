@@ -19,8 +19,6 @@ namespace MigrationTools.Host
             AsciiLogo("unknown", logger);
             logger.Fatal("Config is Invalid");
             
-            var classMapper = new Dictionary<string, string>() { { "WorkItemMigrationContext", "TfsWorkItemMigrationProcessor" }, { "TfsTeamProjectConfig", "TfsTeamProjectEndpoint" } };
-
             string exeName = Path.GetFileName(Assembly.GetEntryAssembly().Location);
             AnsiConsole.WriteLine();
             AnsiConsole.Write(new Markup($"[red]!!ACTION REQUIRED!![/] we no longer support the [yellow]{version.schema.ToString()} config schema[/]...  "));

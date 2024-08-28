@@ -91,14 +91,7 @@ namespace MigrationTools.Host
 
             hostBuilder.ConfigureServices((context, services) =>
             {
-                // KILL if the config is not valid
-                if (!VersionOptions.ConfigureOptions.IsConfigValid(context.Configuration))
-                {
-                    var serviceProvider = services.BuildServiceProvider();
-                    var logger = serviceProvider.GetRequiredService<Serilog.ILogger>();
-                    BoilerplateCli.ConfigIsNotValidMessage(context.Configuration, logger);
-                    Environment.Exit(-1);
-                }
+
                     services.AddOptions();
 
                  // Application Insights

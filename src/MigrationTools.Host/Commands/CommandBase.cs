@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Host.Services;
+using MigrationTools.Options;
 using MigrationTools.Services;
 using Serilog;
 using Spectre.Console;
@@ -28,8 +30,9 @@ namespace MigrationTools.Host.Commands
         private readonly ILogger<CommandBase<TSettings>> _logger;
         private readonly ITelemetryLogger _telemetryLogger;
         private static Stopwatch _mainTimer = new Stopwatch();
+        private readonly IConfiguration _configuration;
 
-        public CommandBase(IHostApplicationLifetime appLifetime, IServiceProvider services, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<TSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion)
+        public CommandBase(IHostApplicationLifetime appLifetime, IServiceProvider services, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<TSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion, IConfiguration configuration)
         {
             _services = services;
             _MigrationToolVersion = migrationToolVersion;
@@ -38,10 +41,12 @@ namespace MigrationTools.Host.Commands
             _detectVersionService = detectVersionService;
             _logger = logger;
             _telemetryLogger = telemetryLogger;
+            _configuration = configuration;
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, TSettings settings)
         {
+          
             _mainTimer.Start();
             // Disable Telemetry
             TelemetryConfiguration ai = _services.GetService<TelemetryConfiguration>();
@@ -52,6 +57,12 @@ namespace MigrationTools.Host.Commands
             RunStartupLogic(settings);
             try
             {
+                // KILL if the config is not valid
+                if (!VersionOptions.ConfigureOptions.IsConfigValid(_configuration))
+                {
+                    BoilerplateCli.ConfigIsNotValidMessage(_configuration, Log.Logger);
+                    Environment.Exit(-1);
+                }
                 return await ExecuteInternalAsync(context, settings);
             }
             catch (Exception ex)
