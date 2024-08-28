@@ -27,7 +27,8 @@ namespace MigrationTools.Host.Commands
 {
     internal class UpgradeConfigCommand : AsyncCommand<UpgradeConfigCommandSettings>
     {
-        private IServiceProvider _services;
+        public IServiceProvider Services { get; }
+
         private readonly ILogger _logger;
         private readonly ITelemetryLogger Telemetery;
         private readonly IHostApplicationLifetime _appLifetime;
@@ -40,7 +41,7 @@ namespace MigrationTools.Host.Commands
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
-            _services = services;
+            Services = services;
             _logger = logger;
             Telemetery = telemetryLogger;
             _appLifetime = appLifetime;
@@ -74,23 +75,16 @@ namespace MigrationTools.Host.Commands
                 classNameMappings.Add("WorkItemMigrationContext", "TfsWorkItemMigrationProcessor");
                 classNameMappings.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");
 
+                OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
+
                 switch (VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration).schema)
                 {
                     case MigrationConfigSchema.v1:
-
-                        // Find all options
-                        List<IOptions> options = new List<IOptions>();
-                        Dictionary<string, IOptions> namedOptions = new Dictionary<string, IOptions>();
-
-                        var AllOptionsObjects = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>();
-
+                    case MigrationConfigSchema.v150:
                         // ChangeSetMappingFile
-                       
-                        options.Add(GetV1TfsChangeSetMappingToolOptions(configuration));
-                        namedOptions.Add("Source", GetV1EndpointOptions(configuration, "Source"));
-                        namedOptions.Add("Target", GetV1EndpointOptions(configuration, "Target"));
-
-
+                        optionsBuilder.AddOption(GetV1TfsChangeSetMappingToolOptions(configuration));
+                        optionsBuilder.AddOption(GetV1EndpointOptions(configuration, "Source"), "Source");
+                        optionsBuilder.AddOption(GetV1EndpointOptions(configuration, "Target"), "Target");
 
                         //field mapping
                         //options.Enabled = true;
@@ -129,6 +123,12 @@ namespace MigrationTools.Host.Commands
                         break;
                 }
 
+                string json = optionsBuilder.Build();
+                configFile = AddSuffixToFileName(configFile, "-upgraded");
+                File.WriteAllText(configFile, json);
+                _logger.LogInformation("New {configFile} file has been created", configFile);
+                _logger.LogInformation(json);
+
                 _exitCode = 0;
             }
             catch (Exception ex)
@@ -145,6 +145,24 @@ namespace MigrationTools.Host.Commands
             return _exitCode;
         }
 
+        static string AddSuffixToFileName(string filePath, string suffix)
+        {
+            // Get the directory path
+            string directory = Path.GetDirectoryName(filePath);
+
+            // Get the file name without the extension
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+
+            // Get the file extension
+            string extension = Path.GetExtension(filePath);
+
+            // Combine them to create the new file name
+            string newFileName = $"{fileNameWithoutExtension}{suffix}{extension}";
+
+            // Combine the directory with the new file name
+            return Path.Combine(directory, newFileName);
+        }
+
         //private static void AddConfiguredEndpointsV1(IServiceCollection services, IConfiguration configuration)
         //{
         //    var nodes = new List<string> { "Source", "Target" };
@@ -159,6 +177,7 @@ namespace MigrationTools.Host.Commands
         private IOptions GetV1EndpointOptions(IConfiguration configuration, string name)
         {
             var sourceConfig = configuration.GetSection(name);
+            
             var sourceType = sourceConfig.GetValue<string>("$type");
             if (classNameMappings.ContainsKey(sourceType))
             {
@@ -166,9 +185,10 @@ namespace MigrationTools.Host.Commands
             }
             var type = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().FirstOrDefault(t => t.Name == sourceType);
             var sourceOptions = (IOptions)Activator.CreateInstance(type);
+            var defaultConfig = configuration.GetSection(sourceOptions.ConfigurationMetadata.PathToDefault);
+            defaultConfig.Bind(sourceOptions);
             sourceConfig.Bind(sourceOptions);
-
-
+            // TODO Get Authentication bits
 
             return sourceOptions;
         }

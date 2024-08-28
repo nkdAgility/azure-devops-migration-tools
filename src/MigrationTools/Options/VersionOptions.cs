@@ -11,6 +11,7 @@ namespace MigrationTools.Options
     public enum MigrationConfigSchema
     {
         v1,
+        v150,
         v160,
         Empty
     }
@@ -57,7 +58,14 @@ namespace MigrationTools.Options
                     Version.TryParse(configVersionString, out Version configVersion);
                     if (configVersion < Version.Parse("16.0") || isOldFormat)
                     {
-                        return (MigrationConfigSchema.v1, configVersionString);
+                        if (configVersion < Version.Parse("15.0"))
+                        {
+                            return (MigrationConfigSchema.v1, configVersionString);
+                        }
+                        else
+                        {
+                            return (MigrationConfigSchema.v150, configVersionString);
+                        }
                     }
                     else
                     {
