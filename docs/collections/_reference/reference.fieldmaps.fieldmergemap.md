@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.FieldMergeMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldMergeMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: sample
   description: 
@@ -24,9 +13,20 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldMergeMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldMergeMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              }
+            ]
           }
         }
       }
@@ -37,10 +37,15 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldMergeMapOptions",
-      "sourceFields": null,
-      "targetField": null,
-      "formatExpression": null,
-      "ApplyTo": []
+      "sourceFields": [
+        "Custom.FieldA",
+        "Custom.FieldB"
+      ],
+      "targetField": "Custom.FieldC",
+      "formatExpression": "{0} \n {1}",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 description: missng XML code comments

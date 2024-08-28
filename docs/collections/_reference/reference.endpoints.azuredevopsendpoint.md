@@ -4,29 +4,11 @@ optionsClassFullName: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "AzureDevOpsEndpoint": []
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "AzureDevOpsEndpoint": []
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: classic
   description: 

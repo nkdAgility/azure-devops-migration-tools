@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.FieldClearMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldClearMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
 - name: sample
   description: 
@@ -24,9 +13,15 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldClearMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldClearMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.FieldC"
+              }
+            ]
           }
         }
       }
@@ -37,8 +32,10 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldClearMapOptions",
-      "targetField": null,
-      "ApplyTo": []
+      "targetField": "Custom.FieldC",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
 description: missng XML code comments

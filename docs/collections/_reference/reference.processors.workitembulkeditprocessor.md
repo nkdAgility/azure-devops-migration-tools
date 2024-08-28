@@ -4,11 +4,11 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItem
 configurationSamples:
 - name: defaults
   description: 
-  code: Default Unavailable
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions
 - name: sample
   description: 
-  code: Sample Unavailable
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions
 - name: classic
   description: 

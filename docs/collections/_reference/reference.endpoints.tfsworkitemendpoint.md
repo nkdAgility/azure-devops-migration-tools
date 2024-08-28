@@ -4,29 +4,11 @@ optionsClassFullName: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "TfsWorkItemEndpoint": []
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "TfsWorkItemEndpoint": []
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
 - name: classic
   description: 

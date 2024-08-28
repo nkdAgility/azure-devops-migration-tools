@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.FieldToFieldMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldToFieldMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 - name: sample
   description: 
@@ -24,9 +13,17 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldToFieldMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldToFieldMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "42",
+                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+                "targetField": "Microsoft.VSTS.Common.StackRank"
+              }
+            ]
           }
         }
       }
@@ -37,10 +34,12 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMapOptions",
-      "sourceField": null,
-      "targetField": null,
-      "defaultValue": null,
-      "ApplyTo": []
+      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+      "targetField": "Microsoft.VSTS.Common.StackRank",
+      "defaultValue": "42",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 description: missng XML code comments

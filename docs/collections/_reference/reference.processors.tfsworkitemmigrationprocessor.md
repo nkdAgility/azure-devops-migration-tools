@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "Processors": [
           {
+            "ProcessorType": "TfsWorkItemMigrationProcessor",
             "AttachRevisionHistory": "False",
             "Enabled": "False",
             "FilterWorkItemsThatAlreadyExistInTarget": "False",
@@ -32,7 +33,7 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: sample
   description: 
-  code: Sample Unavailable
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: classic
   description: 

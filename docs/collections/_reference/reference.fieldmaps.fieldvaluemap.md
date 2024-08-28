@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.FieldValueMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldValueMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: sample
   description: 
@@ -24,9 +13,20 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldValueMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValueMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "StateB",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "StateA": "StateB"
+                }
+              }
+            ]
           }
         }
       }
@@ -37,11 +37,15 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldValueMapOptions",
-      "sourceField": null,
-      "targetField": null,
-      "defaultValue": null,
-      "valueMapping": null,
-      "ApplyTo": []
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "StateB",
+      "valueMapping": {
+        "StateA": "StateB"
+      },
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 description: missng XML code comments

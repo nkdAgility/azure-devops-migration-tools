@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.FieldToTagFieldMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldToTagFieldMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 - name: sample
   description: 
@@ -24,9 +13,20 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldToTagFieldMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldToTagFieldMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "sourceFields": [
+                  "System.Description",
+                  "Microsoft.VSTS.Common.AcceptanceCriteria"
+                ],
+                "targetField": "System.Description"
+              }
+            ]
           }
         }
       }
@@ -38,8 +38,10 @@ configurationSamples:
     {
       "$type": "FieldToTagFieldMapOptions",
       "sourceField": null,
-      "formatExpression": null,
-      "ApplyTo": []
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 description: missng XML code comments

@@ -4,29 +4,11 @@ optionsClassFullName: MigrationTools.Endpoints.TfsEndpointOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "TfsEndpoint": []
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.TfsEndpointOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "TfsEndpoint": []
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Endpoints.TfsEndpointOptions
 - name: classic
   description: 

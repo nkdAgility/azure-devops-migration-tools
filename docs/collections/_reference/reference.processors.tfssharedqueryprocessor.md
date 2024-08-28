@@ -4,11 +4,11 @@ optionsClassFullName: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: Default Unavailable
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 - name: sample
   description: 
-  code: Sample Unavailable
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
 - name: classic
   description: 

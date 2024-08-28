@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.MultiValueConditionalMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "MultiValueConditionalMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 - name: sample
   description: 
@@ -24,9 +13,22 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "MultiValueConditionalMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "MultiValueConditionalMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "sourceFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "targetFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                }
+              }
+            ]
           }
         }
       }
@@ -37,9 +39,17 @@ configurationSamples:
   code: >-
     {
       "$type": "MultiValueConditionalMapOptions",
-      "sourceFieldsAndValues": null,
-      "targetFieldsAndValues": null,
-      "ApplyTo": []
+      "sourceFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "targetFieldsAndValues": {
+        "Field1": "Value1",
+        "Field2": "Value2"
+      },
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 description: missng XML code comments

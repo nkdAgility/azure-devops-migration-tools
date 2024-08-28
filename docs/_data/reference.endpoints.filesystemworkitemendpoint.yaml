@@ -3,29 +3,11 @@ optionsClassFullName: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "FileSystemWorkItemEndpoint": []
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Endpoints": {
-          "#KEY#": {
-            "FileSystemWorkItemEndpoint": []
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 - name: classic
   description: 

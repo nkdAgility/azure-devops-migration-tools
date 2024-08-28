@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.RegexFieldMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "RegexFieldMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 - name: sample
   description: 
@@ -24,9 +13,18 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "RegexFieldMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "RegexFieldMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "pattern": "PRODUCT \\d{4}.(\\d{1})",
+                "replacement": "$1",
+                "sourceField": "COMPANY.PRODUCT.Release",
+                "targetField": "COMPANY.DEVISION.MinorReleaseVersion"
+              }
+            ]
           }
         }
       }
@@ -37,11 +35,13 @@ configurationSamples:
   code: >-
     {
       "$type": "RegexFieldMapOptions",
-      "sourceField": null,
-      "targetField": null,
-      "pattern": null,
-      "replacement": null,
-      "ApplyTo": []
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 description: missng XML code comments

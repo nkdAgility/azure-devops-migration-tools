@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Enrichers.PauseAfterEachItemOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "DemoProcessor": {
-        "Enrichers": [
-          []
-        ]
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "DemoProcessor": {
-        "Enrichers": [
-          []
-        ]
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
 - name: classic
   description: 

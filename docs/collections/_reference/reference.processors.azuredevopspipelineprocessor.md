@@ -9,6 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "Processors": [
           {
+            "ProcessorType": "AzureDevOpsPipelineProcessor",
             "BuildPipelines": "",
             "Enabled": "False",
             "MigrateBuildPipelines": "True",
@@ -26,7 +27,7 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: sample
   description: 
-  code: Sample Unavailable
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: classic
   description: 

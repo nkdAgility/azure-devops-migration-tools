@@ -4,18 +4,7 @@ optionsClassFullName: MigrationTools.Tools.FieldLiteralMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldLiteralMap": []
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 - name: sample
   description: 
@@ -24,9 +13,16 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMaps": {
-              "FieldLiteralMap": []
-            }
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldLiteralMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.SomeField",
+                "value": "New field value"
+              }
+            ]
           }
         }
       }
@@ -37,9 +33,11 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldLiteralMapOptions",
-      "targetField": null,
-      "value": null,
-      "ApplyTo": []
+      "targetField": "Custom.SomeField",
+      "value": "New field value",
+      "ApplyTo": [
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 description: missng XML code comments

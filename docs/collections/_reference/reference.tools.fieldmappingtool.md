@@ -10,7 +10,6 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "Enabled": "False",
-            "FieldMapDefaults": null,
             "FieldMaps": null
           }
         }
@@ -42,41 +41,14 @@ configurationSamples:
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "FieldMapType": "FieldLiteralMap",
-                "targetField": "Custom.SomeField",
-                "value": "New field value"
-              },
-              {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "FieldMapType": "MultiValueConditionalMap",
-                "sourceFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                },
-                "targetFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                }
-              },
-              {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "FieldMapType": "FieldSkipMap",
-                "targetField": "Custom.ReflectedWorkItemId"
-              },
-              {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "defaultValue": "StateB",
+                "defaultValue": "New",
                 "FieldMapType": "FieldValueMap",
                 "sourceField": "System.State",
                 "targetField": "System.State",
                 "valueMapping": {
-                  "StateA": "StateB"
+                  "Active": "InProgress",
+                  "Closed": "Done",
+                  "Resolved": "InProgress"
                 }
               },
               {
@@ -87,31 +59,55 @@ configurationSamples:
                 "FieldMapType": "FieldToFieldMap",
                 "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
                 "targetField": "Microsoft.VSTS.Common.StackRank"
+              }
+            ],
+            "FieldMapSamples": {
+              "FieldClearMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.FieldC"
               },
-              {
+              "FieldLiteralMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.SomeField",
+                "value": "New field value"
+              },
+              "FieldMergeMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              },
+              "FieldToFieldMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "42",
+                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+                "targetField": "Microsoft.VSTS.Common.StackRank"
+              },
+              "FieldToFieldMultiMap": {
                 "ApplyTo": [
                   "SomeWorkItemType",
                   "SomeOtherWorkItemType"
                 ],
-                "FieldMapType": "FieldToFieldMultiMap",
                 "SourceToTargetMappings": {
                   "SourceField1": "TargetField1",
                   "SourceField2": "TargetField2"
                 }
               },
-              {
+              "FieldToTagFieldMap": {
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "FieldMapType": "FieldToTagMap",
-                "formatExpression": "ScrumState:{0}",
-                "sourceField": "System.State"
-              },
-              {
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "FieldMapType": "FieldToTagFieldMap",
                 "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
                 "sourceFields": [
                   "System.Description",
@@ -119,34 +115,68 @@ configurationSamples:
                 ],
                 "targetField": "System.Description"
               },
-              {
+              "FieldToTagMap": {
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "FieldMapType": "RegexFieldMap",
+                "formatExpression": "ScrumState:{0}",
+                "sourceField": "System.State"
+              },
+              "FieldValueMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "StateB",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "StateA": "StateB"
+                }
+              },
+              "FieldValueToTagMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0}",
+                "pattern": "Yes",
+                "sourceField": "Microsoft.VSTS.CMMI.Blocked"
+              },
+              "MultiValueConditionalMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "sourceFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "targetFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                }
+              },
+              "RegexFieldMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
                 "pattern": "PRODUCT \\d{4}.(\\d{1})",
                 "replacement": "$1",
                 "sourceField": "COMPANY.PRODUCT.Release",
                 "targetField": "COMPANY.DEVISION.MinorReleaseVersion"
               },
-              {
+              "targetFieldsAndValues": {
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "FieldMapType": "FieldValueToTagMap",
-                "formatExpression": "{0}",
-                "pattern": "Yes",
-                "sourceField": "Microsoft.VSTS.CMMI.Blocked"
+                "targetField": "Custom.ReflectedWorkItemId"
               },
-              {
+              "TreeToTagMap": {
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "FieldMapType": "TreeToTagMap",
                 "timeTravel": "1",
                 "toSkip": "3"
               }
-            ]
+            }
           }
         }
       }
