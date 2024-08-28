@@ -7,8 +7,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "TfsWorkItemEndpoint": []
+        "Endpoints": {
+          "#KEY#": {
+            "TfsWorkItemEndpoint": []
+          }
         }
       }
     }
@@ -18,8 +20,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "TfsWorkItemEndpoint": []
+        "Endpoints": {
+          "#KEY#": {
+            "TfsWorkItemEndpoint": []
+          }
         }
       }
     }
@@ -37,7 +41,6 @@ configurationSamples:
       "AccessToken": null,
       "ReflectedWorkItemIdField": null,
       "LanguageMaps": null,
-      "Name": null,
       "EndpointEnrichers": null
     }
   sampleFor: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
@@ -64,10 +67,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: LanguageMaps
   type: TfsLanguageMapOptions
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Name
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Organisation

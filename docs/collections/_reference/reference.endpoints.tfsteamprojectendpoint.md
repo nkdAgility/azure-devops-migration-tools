@@ -7,26 +7,27 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "TfsTeamProjectEndpoint": {
-            "AllowCrossProjectLinking": "False",
-            "Authentication": {
-              "AccessToken": "",
-              "AuthenticationMode": "AccessToken",
-              "NetworkCredentials": {
-                "Domain": "",
-                "Password": "",
-                "UserName": ""
-              }
-            },
-            "AuthenticationMode": "AccessToken",
-            "Collection": "",
-            "EndpointType": "TfsTeamProjectEndpoint",
-            "LanguageMaps": {
-              "AreaPath": "Area",
-              "IterationPath": "Iteration"
-            },
-            "Project": ""
+        "Endpoints": {
+          "#KEY#": {
+            "TfsTeamProjectEndpoint": {
+              "AllowCrossProjectLinking": "False",
+              "Authentication": {
+                "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+                "AuthenticationMode": "AccessToken",
+                "NetworkCredentials": {
+                  "Domain": "",
+                  "Password": "",
+                  "UserName": ""
+                }
+              },
+              "Collection": "https://dev.azure.com/nkdagility-preview/",
+              "EndpointType": "TfsTeamProjectEndpoint",
+              "LanguageMaps": {
+                "AreaPath": "Area",
+                "IterationPath": "Iteration"
+              },
+              "Project": "migrationSource1"
+            }
           }
         }
       }
@@ -37,25 +38,27 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "TfsTeamProjectEndpoint": {
-            "AllowCrossProjectLinking": "False",
-            "Authentication": {
-              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
-              "AuthenticationMode": "AccessToken",
-              "NetworkCredentials": {
-                "Domain": "",
-                "Password": "",
-                "UserName": ""
-              }
-            },
-            "Collection": "https://dev.azure.com/nkdagility-preview/",
-            "EndpointType": "TfsTeamProjectEndpoint",
-            "LanguageMaps": {
-              "AreaPath": "Area",
-              "IterationPath": "Iteration"
-            },
-            "Project": "migrationSource1"
+        "Endpoints": {
+          "#KEY#": {
+            "TfsTeamProjectEndpoint": {
+              "AllowCrossProjectLinking": "False",
+              "Authentication": {
+                "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+                "AuthenticationMode": "AccessToken",
+                "NetworkCredentials": {
+                  "Domain": "",
+                  "Password": "",
+                  "UserName": ""
+                }
+              },
+              "Collection": "https://dev.azure.com/nkdagility-preview/",
+              "EndpointType": "TfsTeamProjectEndpoint",
+              "LanguageMaps": {
+                "AreaPath": "Area",
+                "IterationPath": "Iteration"
+              },
+              "Project": "migrationSource1"
+            }
           }
         }
       }
@@ -84,8 +87,6 @@ configurationSamples:
         "AreaPath": "Area",
         "IterationPath": "Iteration"
       },
-      "CollectionName": "https://dev.azure.com/nkdagility-preview/",
-      "Name": null,
       "EndpointEnrichers": null
     }
   sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
@@ -106,10 +107,6 @@ options:
   type: Uri
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: CollectionName
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: Enabled
   type: Boolean
   description: missng XML code comments
@@ -120,10 +117,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: LanguageMaps
   type: TfsLanguageMapOptions
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Name
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Project

@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemPostProcessingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemPostProcessingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions

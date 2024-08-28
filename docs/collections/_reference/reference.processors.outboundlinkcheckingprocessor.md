@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "OutboundLinkCheckingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "OutboundLinkCheckingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions

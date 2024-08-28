@@ -98,7 +98,7 @@ namespace MigrationTools
         public static TOptions GetSectionCommonEnrichers_v15<TOptions>(this IConfiguration configuration) where TOptions : IOptions, new()
         {
             TOptions options = Activator.CreateInstance<TOptions>();
-            var options_default = configuration.GetSection(options.ConfigurationSectionPath);
+            var options_default = configuration.GetSection(options.ConfigurationMetadata.PathToInstance);
             var optionsclass = typeof(TOptions).Name;
             var options_v15 = configuration.GetSection("CommonEnrichersConfig").GetChildren().Where(x => x.GetValue<string>("$type") == optionsclass).FirstOrDefault();
 

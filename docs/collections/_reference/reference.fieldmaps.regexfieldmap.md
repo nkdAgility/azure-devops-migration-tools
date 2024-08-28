@@ -9,7 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "RegexFieldMap": []
             }
           }
@@ -24,7 +24,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "RegexFieldMap": []
             }
           }
@@ -41,6 +41,7 @@ configurationSamples:
       "targetField": null,
       "pattern": null,
       "replacement": null,
+      "ConfigurationOptionFor": "RegexFieldMap",
       "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
@@ -51,6 +52,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationOptionFor
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: pattern

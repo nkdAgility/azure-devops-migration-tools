@@ -84,23 +84,23 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassName = optionInFocus.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
                 ///bind Item or Defaults
-                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationSectionPath))
+                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToDefault))
                 {
                     IConfigurationSection mainOrDefaultSection;
                     Console.WriteLine("Processing as ConfigurationSectionName");
-                    mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationSectionPath);
+                    mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToDefault);
                     mainOrDefaultSection.Bind(instanceOfOption);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection).Trim() });
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection, instanceOfOption).Trim() });
                 } else
                 {
                     data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = "Default Unavailable" });
                 }
-                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationSamplePath))
+                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToSample))
                 {
                     Console.WriteLine("targetItem");
-                    IConfigurationSection sampleSection = configuration.GetSection(instanceOfOption.ConfigurationSamplePath);
+                    IConfigurationSection sampleSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToSample);
                     sampleSection.Bind(instanceOfOption);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, sampleSection, instanceOfOption.ConfigurationSectionPath).Trim() });
+                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, sampleSection, instanceOfOption).Trim() });
                    
                 } else
                 {
@@ -139,9 +139,9 @@ namespace MigrationTools.ConsoleDataGenerator
             return options;
         }
 
-        static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section, string pathToPlaceUnder = null)
+        static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section, IOptions option = null)
         {
-            var pathSegments = string.IsNullOrEmpty(pathToPlaceUnder) ? section.Path.Split(':') : pathToPlaceUnder.Split(':');
+            var pathSegments = option == null ? section.Path.Split(':') : option.ConfigurationMetadata.PathToInstance.Split(':');
             JObject root = new JObject();
             JObject currentObject = root;
 
@@ -164,7 +164,24 @@ namespace MigrationTools.ConsoleDataGenerator
                 {
                     // We are at the target section, serialize its children
                     JToken sectionObject = ConvertSectionToJson(section);
-                    currentObject[key] = sectionObject;
+
+                    if (option != null && option.ConfigurationMetadata.IsCollection)
+                    {
+                        // Handle as a collection
+                        if (currentObject[key] == null)
+                        {
+                            currentObject[key] = new JArray();
+                        }
+                        if (currentObject[key] is JArray array)
+                        {
+                            array.Add(sectionObject);
+                        }
+                    }
+                    else
+                    {
+                        // Handle as a regular object
+                        currentObject[key] = sectionObject;
+                    }
                 }
             }
 

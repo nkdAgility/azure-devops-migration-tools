@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "ExportProfilePictureFromADProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "ExportProfilePictureFromADProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions

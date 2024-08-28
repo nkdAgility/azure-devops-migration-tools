@@ -23,7 +23,7 @@ namespace MigrationTools
         public static OptionsBuilder<TOptions> AddMigrationToolsOptions<TOptions>(this IServiceCollection services, IConfiguration configuration) where TOptions : class
         {
             IOptions options = (IOptions)Activator.CreateInstance<TOptions>();
-            return services.AddOptions<TOptions>().Bind(configuration.GetSection(options.ConfigurationSectionPath));
+            return services.AddOptions<TOptions>().Bind(configuration.GetSection(options.ConfigurationMetadata.PathToInstance));
         }
 
         public static void AddMigrationToolServices(this IServiceCollection context, IConfiguration configuration, string configFile = "configuration.json")

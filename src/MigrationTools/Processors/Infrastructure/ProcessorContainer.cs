@@ -57,16 +57,16 @@ namespace MigrationTools.Processors.Infrastructure
                 {
                     if (processorOption.IsProcessorCompatible(enabledProcessors))
                     {
-                        _logger.LogInformation("ProcessorContainer: Adding Processor {ProcessorName}", processorOption.ConfigurationOptionFor);
+                        _logger.LogInformation("ProcessorContainer: Adding Processor {ProcessorName}", processorOption.ConfigurationMetadata.OptionFor);
 
 
                         Type type = allTypes
-                              .FirstOrDefault(t => t.Name.Equals(processorOption.ConfigurationOptionFor));
+                              .FirstOrDefault(t => t.Name.Equals(processorOption.ConfigurationMetadata.OptionFor));
 
                         if (type == null)
                         {
-                            _logger.LogError("Type " + processorOption.ConfigurationOptionFor + " not found.", processorOption.ConfigurationOptionFor);
-                            throw new Exception("Type " + processorOption.ConfigurationOptionFor + " not found.");
+                            _logger.LogError("Type " + processorOption.ConfigurationMetadata.OptionFor + " not found.", processorOption.ConfigurationMetadata.OptionFor);
+                            throw new Exception("Type " + processorOption.ConfigurationMetadata.OptionFor + " not found.");
                         }
 
                         var constructors = type.GetConstructors();
@@ -92,8 +92,8 @@ namespace MigrationTools.Processors.Infrastructure
                     else
                     {
                         var message = "ProcessorContainer: Cannot add Processor {ProcessorName}. Processor is not compatible with other enabled processors in configuration.";
-                        _logger.LogError(message, processorOption.ConfigurationOptionFor);
-                        throw new InvalidOperationException(string.Format(message, processorOption.ConfigurationOptionFor, "ProcessorContainer"));
+                        _logger.LogError(message, processorOption.ConfigurationMetadata.OptionFor);
+                        throw new InvalidOperationException(string.Format(message, processorOption.ConfigurationMetadata.OptionFor, "ProcessorContainer"));
                     }
                 }
             }

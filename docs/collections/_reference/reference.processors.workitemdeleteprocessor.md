@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemDeleteProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemDeleteProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions

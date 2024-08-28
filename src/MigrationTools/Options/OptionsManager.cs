@@ -12,14 +12,6 @@ using Newtonsoft.Json.Linq;
 
 namespace MigrationTools.Options
 {
-    public struct OptionsConfiguration
-    {
-        public string SectionPath { get; internal set; }
-        public string CollectionPath { get; internal set; }
-        public string CollectionObjectName { get; internal set; }
-        public string OptionFor { get; internal set; }
-    }
-
     public class OptionsManager
     {
 
@@ -54,15 +46,13 @@ namespace MigrationTools.Options
             return result;
         }
 
-        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, bool isCollection = false, bool shouldAddObjectName = false)
+        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, bool shouldAddObjectName = false)
         {
             //JObject configJson, TOptions options, string path, string objectName, string optionFor, bool isCollection = false, bool shouldAddObjectName = false
-            string path = isCollection ? iOption.ConfigurationCollectionPath : iOption.ConfigurationSectionPath;
-
-            return AddOptionsToConfiguration(configJson, iOption, path,  isCollection,shouldAddObjectName);
+            return AddOptionsToConfiguration(configJson, iOption, iOption.ConfigurationMetadata.PathToInstance,shouldAddObjectName);
         }
 
-        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, string sectionPath, bool isCollection = false, bool shouldAddObjectName = false)
+        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, string sectionPath, bool shouldAddObjectName = false)
         {
             Type optionsManagerType = typeof(OptionsManager<>).MakeGenericType(iOption.GetType());
 
@@ -73,7 +63,7 @@ namespace MigrationTools.Options
             MethodInfo createMethod = optionsManagerType.GetMethod("AddOptionsToConfiguration");
 
             // Prepare parameters for the method
-            object[] parameters = { configJson, iOption, sectionPath, iOption.ConfigurationObjectName, iOption.ConfigurationOptionFor, isCollection, shouldAddObjectName  };
+            object[] parameters = { configJson, iOption, sectionPath, iOption.ConfigurationMetadata.ObjectName, iOption.ConfigurationMetadata.OptionFor, iOption.ConfigurationMetadata.IsCollection, shouldAddObjectName  };
 
             // Invoke the method dynamically
             JObject result = (JObject)createMethod.Invoke(optionsManagerInstance, parameters);
@@ -82,16 +72,11 @@ namespace MigrationTools.Options
             return result;
         }
 
-        public static OptionsConfiguration GetOptionsConfiguration(Type option)
+        public static ConfigurationMetadata GetOptionsConfiguration(Type option)
         {
             // ActivatorUtilities.CreateInstance(option);
-            dynamic optionInsance = Activator.CreateInstance(option);
-            OptionsConfiguration oc = new OptionsConfiguration();
-            oc.SectionPath = (string)option.GetProperty("ConfigurationSectionPath")?.GetValue(optionInsance);
-            oc.CollectionPath = (string)option.GetProperty("ConfigurationCollectionPath")?.GetValue(optionInsance);
-            oc.CollectionObjectName = (string)option.GetProperty("ConfigurationCollectionObjectName")?.GetValue(optionInsance);
-            oc.OptionFor = (string)option.GetProperty("ConfigurationOptionFor")?.GetValue(optionInsance);
-            return oc;
+            IOptions optionInsance = (IOptions)Activator.CreateInstance(option);
+            return optionInsance.ConfigurationMetadata;
         }
 
     }
@@ -104,14 +89,14 @@ namespace MigrationTools.Options
             JObject json = File.Exists(filePath) ? JObject.Parse(File.ReadAllText(filePath)) : new JObject();
 
             // Determine the path based on whether this is a collection or a section
-            string path = isCollection ? optionsConfig.CollectionPath : optionsConfig.SectionPath;
+            string path = optionsConfig.PathToInstance;
 
             if (isCollection)
             {
                 // Load from a collection
                 var collection = json.SelectToken(path.Replace(":", ".")) as JArray;
 
-                var item = collection?.FirstOrDefault(p => p[optionsConfig.CollectionObjectName]?.ToString() == optionsConfig.OptionFor);
+                var item = collection?.FirstOrDefault(p => p[optionsConfig.ObjectName]?.ToString() == optionsConfig.OptionFor);
 
                 return item != null ? item.ToObject<TOptions>() : new TOptions();
             }
@@ -129,7 +114,7 @@ namespace MigrationTools.Options
             JObject json = File.Exists(filePath) ? JObject.Parse(File.ReadAllText(filePath)) : new JObject();
 
             // Determine the path based on whether this is a collection or a section
-            string path = isCollection ? options.ConfigurationCollectionPath : options.ConfigurationSectionPath;
+            string path = options.ConfigurationMetadata.PathToInstance;
 
             string[] pathParts = path.Split(':');
             JObject currentSection = json;
@@ -148,7 +133,7 @@ namespace MigrationTools.Options
                     var collectionArray = (JArray)currentSection[pathParts[i]];
 
                     // Check if the object already exists in the collection
-                    var existingItem = collectionArray.FirstOrDefault(p => p[options.ConfigurationObjectName]?.ToString() == options.ConfigurationOptionFor);
+                    var existingItem = collectionArray.FirstOrDefault(p => p[options.ConfigurationMetadata.ObjectName]?.ToString() == options.ConfigurationMetadata.OptionFor);
 
                     if (existingItem != null)
                     {
@@ -160,7 +145,7 @@ namespace MigrationTools.Options
                     {
                         // Add the new item to the collection
                         var newItem = JObject.FromObject(options);
-                        newItem[options.ConfigurationObjectName] = options.ConfigurationOptionFor;
+                        newItem[options.ConfigurationMetadata.ObjectName] = options.ConfigurationMetadata.OptionFor;
                         collectionArray.Add(newItem);
                     }
                 }
@@ -199,12 +184,12 @@ namespace MigrationTools.Options
         }
 
 
-        private void SearchForOptions(JToken token, OptionsConfiguration config, List<TOptions> foundTools)
+        private void SearchForOptions(JToken token, ConfigurationMetadata config, List<TOptions> foundTools)
         {
             if (token is JObject obj)
             {
                 // Check if this object has a "FieldType" property with the value "FieldMappingTool"
-                if (obj.TryGetValue(config.CollectionObjectName, out JToken fieldTypeToken) && fieldTypeToken.ToString() == config.OptionFor)
+                if (obj.TryGetValue(config.ObjectName, out JToken fieldTypeToken) && fieldTypeToken.ToString() == config.OptionFor)
                 {
                     // Deserialize the JObject into a FieldMappingToolOptions object
                     var options = obj.ToObject<TOptions>();
@@ -326,15 +311,10 @@ namespace MigrationTools.Options
 
 
 
-        private OptionsConfiguration GetOptionsConfiguration()
+        private ConfigurationMetadata GetOptionsConfiguration()
         {
             TOptions options = new TOptions();
-            OptionsConfiguration oc = new OptionsConfiguration();
-            oc.SectionPath = options.ConfigurationSectionPath;
-            oc.CollectionPath = options.ConfigurationCollectionPath;
-            oc.CollectionObjectName = options.ConfigurationObjectName;
-            oc.OptionFor = options.ConfigurationOptionFor;
-            return oc;
+            return options.ConfigurationMetadata;
         }
 
 

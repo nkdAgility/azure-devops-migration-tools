@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemBulkEditProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemBulkEditProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions

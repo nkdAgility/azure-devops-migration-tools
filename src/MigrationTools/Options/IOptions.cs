@@ -23,15 +23,7 @@ namespace MigrationTools.Options
     public interface IOptions
     {
         [JsonIgnore]
-        public string ConfigurationOptionFor { get; }
-        [JsonIgnore]
-        public string ConfigurationSectionPath { get; }
-        [JsonIgnore]
-        public string ConfigurationSamplePath { get; }
-        [JsonIgnore]
-        public string ConfigurationCollectionPath { get; }
-        [JsonIgnore]
-        public string ConfigurationObjectName { get; }
+        public ConfigurationMetadata ConfigurationMetadata { get; }
 
         /// <summary>
         /// Will be used if enabled

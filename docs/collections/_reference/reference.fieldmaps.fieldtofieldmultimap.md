@@ -9,7 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "FieldToFieldMultiMap": []
             }
           }
@@ -24,7 +24,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "FieldToFieldMultiMap": []
             }
           }
@@ -38,6 +38,7 @@ configurationSamples:
     {
       "$type": "FieldToFieldMultiMapOptions",
       "SourceToTargetMappings": null,
+      "ConfigurationOptionFor": "FieldToFieldMultiMap",
       "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
@@ -48,6 +49,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationOptionFor
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: SourceToTargetMappings

@@ -1,16 +1,25 @@
 ﻿using System;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools.EndpointEnrichers
 {
     public abstract class EndpointEnricherOptions : IEndpointEnricherOptions
     {
-        public string ConfigurationSectionPath => $"MigrationTools:EndpointEnricherDefaults:{ConfigurationOptionFor}";
-        public string ConfigurationCollectionPath => $"MigrationTools:Endpoints:*:Enrichers:*:{ConfigurationOptionFor}";
-        public string ConfigurationObjectName => $"EndpointEnricherType";
-        public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
-        public string ConfigurationSamplePath => $"MigrationTools:EndpointEnricherSamples:{ConfigurationOptionFor}";
+        [JsonIgnore]
+        public string OptionFor => $"{GetType().Name.Replace("Options", "")}";
 
+        [JsonIgnore]
+        public ConfigurationMetadata ConfigurationMetadata => new ConfigurationMetadata
+        {
+            IsCollection = true,
+            PathToInstance = null,
+            ObjectName = $"ProcessorType",
+            OptionFor = OptionFor,
+            PathToDefault = $"MigrationTools:Endpoints:EnricherDefaults:{OptionFor}",
+            PathToSample = $"MigrationTools:Endpoints:EnricherSamples:{OptionFor}"
+        };
+    
         public bool Enabled { get; set; }
 
         public abstract Type ToConfigure { get; }

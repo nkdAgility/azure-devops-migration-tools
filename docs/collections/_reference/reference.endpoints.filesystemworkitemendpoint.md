@@ -7,8 +7,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "FileSystemWorkItemEndpoint": []
+        "Endpoints": {
+          "#KEY#": {
+            "FileSystemWorkItemEndpoint": []
+          }
         }
       }
     }
@@ -18,8 +20,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "FileSystemWorkItemEndpoint": []
+        "Endpoints": {
+          "#KEY#": {
+            "FileSystemWorkItemEndpoint": []
+          }
         }
       }
     }
@@ -31,7 +35,6 @@ configurationSamples:
       "$type": "FileSystemWorkItemEndpointOptions",
       "Enabled": false,
       "FileStore": null,
-      "Name": null,
       "EndpointEnrichers": null
     }
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
@@ -49,10 +52,6 @@ options:
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: FileStore
-  type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Name
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

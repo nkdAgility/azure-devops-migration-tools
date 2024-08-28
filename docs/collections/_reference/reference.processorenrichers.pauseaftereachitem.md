@@ -7,8 +7,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorEnricherDefaults": {
-          "PauseAfterEachItem": []
+        "": {
+          "ProcessorEnricherDefaults": {
+            "PauseAfterEachItem": []
+          }
         }
       }
     }
@@ -18,8 +20,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorEnricherDefaults": {
-          "PauseAfterEachItem": []
+        "": {
+          "ProcessorEnricherSamples": {
+            "PauseAfterEachItem": []
+          }
         }
       }
     }
@@ -30,6 +34,7 @@ configurationSamples:
     {
       "$type": "PauseAfterEachItemOptions",
       "Enabled": false,
+      "OptionFor": "PauseAfterEachItem",
       "RefName": null
     }
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
@@ -42,6 +47,10 @@ options:
   type: Boolean
   description: If enabled this will run this migrator
   defaultValue: true
+- parameterName: OptionFor
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
   description: For internal use

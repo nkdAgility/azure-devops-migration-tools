@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsTeamSettingsProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsTeamSettingsProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions

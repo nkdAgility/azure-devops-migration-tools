@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemUpdateAreasAsTagsProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemUpdateAreasAsTagsProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions

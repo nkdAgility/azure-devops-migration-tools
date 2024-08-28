@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TestConfigurationsMigrationProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TestConfigurationsMigrationProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.TestConfigurationsMigrationProcessorOptions

@@ -9,7 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "FieldClearMap": []
             }
           }
@@ -24,7 +24,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "FieldClearMap": []
             }
           }
@@ -38,6 +38,7 @@ configurationSamples:
     {
       "$type": "FieldClearMapOptions",
       "targetField": null,
+      "ConfigurationOptionFor": "FieldClearMap",
       "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
@@ -48,6 +49,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationOptionFor
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: targetField

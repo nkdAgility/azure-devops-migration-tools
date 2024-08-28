@@ -153,14 +153,13 @@ namespace MigrationTools.Host.Commands
         private JObject AddEndpointOptionToConfig(IConfigurationRoot configuration, JObject configJson, string key, Type endpointType)
         {
             IOptions instanceOfOption = (IOptions)Activator.CreateInstance(endpointType);
-            bool isCollection = !string.IsNullOrEmpty(instanceOfOption.ConfigurationCollectionPath);
-            var section = configuration.GetSection(instanceOfOption.ConfigurationSectionPath);
+            var section = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToInstance);
             section.Bind(instanceOfOption);
             try
             {
-                //instanceOfOption.ConfigurationSectionPath = $"MigrationTools:Endpoints:{key}";
+                //instanceOfOption.ConfigurationMetadata.Path = $"MigrationTools:Endpoints:{key}";
                 var hardPath = $"MigrationTools:Endpoints:{key}";
-                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, hardPath, false, true);
+                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, hardPath, true);
                 _logger.LogInformation("Adding Option: {item}", endpointType.Name);
             }
             catch (Exception)
@@ -175,12 +174,11 @@ namespace MigrationTools.Host.Commands
         private JObject AddOptionToConfig(IConfigurationRoot configuration, JObject configJson, Type item)
         {
             IOptions instanceOfOption = (IOptions)Activator.CreateInstance(item);
-            bool isCollection = !string.IsNullOrEmpty(instanceOfOption.ConfigurationCollectionPath);
-            var section = configuration.GetSection(instanceOfOption.ConfigurationSectionPath);
+            var section = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToInstance);
             section.Bind(instanceOfOption);
             try
             {
-                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, isCollection, false);
+                configJson = Options.OptionsManager.AddOptionsToConfiguration(configJson, instanceOfOption, false);
                 _logger.LogInformation("Adding Option: {item}", item.Name);
             }
             catch (Exception)

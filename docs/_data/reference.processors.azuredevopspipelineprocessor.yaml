@@ -6,19 +6,17 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "AzureDevOpsPipelineProcessor": {
-            "BuildPipelines": "",
-            "Enabled": "False",
-            "MigrateBuildPipelines": "True",
-            "MigrateReleasePipelines": "True",
-            "MigrateServiceConnections": "True",
-            "MigrateTaskGroups": "True",
-            "MigrateVariableGroups": "True",
-            "ReleasePipelines": "",
-            "SourceName": "sourceName",
-            "TargetName": "targetName"
-          }
+        "Processors": {
+          "BuildPipelines": "",
+          "Enabled": "False",
+          "MigrateBuildPipelines": "True",
+          "MigrateReleasePipelines": "True",
+          "MigrateServiceConnections": "True",
+          "MigrateTaskGroups": "True",
+          "MigrateVariableGroups": "True",
+          "ReleasePipelines": "",
+          "SourceName": "sourceName",
+          "TargetName": "targetName"
         }
       }
     }
@@ -28,9 +26,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "AzureDevOpsPipelineProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions

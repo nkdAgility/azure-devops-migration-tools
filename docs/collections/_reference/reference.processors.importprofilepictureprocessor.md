@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "ImportProfilePictureProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "ImportProfilePictureProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions

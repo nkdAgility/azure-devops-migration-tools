@@ -5,16 +5,25 @@ using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Processors.Infrastructure
 {
     public abstract class ProcessorOptions : IProcessorOptions
     {
-        public string ConfigurationSectionPath => $"MigrationTools:ProcessorDefaults:{ConfigurationOptionFor}";
-        public string ConfigurationCollectionPath => $"MigrationTools:Processors";
-        public string ConfigurationObjectName => $"ProcessorType";
-        public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
-        public string ConfigurationSamplePath => $"MigrationTools:ProcessorSamples:{ConfigurationOptionFor}";
+        [JsonIgnore]
+        public string OptionFor => $"{GetType().Name.Replace("Options", "")}";
+
+        [JsonIgnore]
+        public ConfigurationMetadata ConfigurationMetadata => new ConfigurationMetadata
+        {
+            IsCollection = true,
+            PathToInstance = $"MigrationTools:Processors",
+            ObjectName = $"ProcessorType",
+            OptionFor = OptionFor,
+            PathToDefault = $"MigrationTools:ProcessorDefaults:{OptionFor}",
+            PathToSample = $"MigrationTools:ProcessorSamples:{OptionFor}"
+        };
 
         /// <summary>
         /// If set to `true` then the processor will run. Set to `false` and the processor will not run.

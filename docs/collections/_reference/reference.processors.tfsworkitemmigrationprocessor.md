@@ -7,25 +7,23 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsWorkItemMigrationProcessor": {
-            "AttachRevisionHistory": "False",
-            "Enabled": "False",
-            "FilterWorkItemsThatAlreadyExistInTarget": "False",
-            "FixHtmlAttachmentLinks": "True",
-            "GenerateMigrationComment": "True",
-            "MaxGracefulFailures": "0",
-            "PauseAfterEachWorkItem": "False",
-            "SkipRevisionWithInvalidAreaPath": "False",
-            "SkipRevisionWithInvalidIterationPath": "False",
-            "SourceName": "Source",
-            "TargetName": "Target",
-            "UpdateCreatedBy": "True",
-            "UpdateCreatedDate": "True",
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-            "WorkItemCreateRetryLimit": "5",
-            "WorkItemIDs": null
-          }
+        "Processors": {
+          "AttachRevisionHistory": "False",
+          "Enabled": "False",
+          "FilterWorkItemsThatAlreadyExistInTarget": "False",
+          "FixHtmlAttachmentLinks": "True",
+          "GenerateMigrationComment": "True",
+          "MaxGracefulFailures": "0",
+          "PauseAfterEachWorkItem": "False",
+          "SkipRevisionWithInvalidAreaPath": "False",
+          "SkipRevisionWithInvalidIterationPath": "False",
+          "SourceName": "Source",
+          "TargetName": "Target",
+          "UpdateCreatedBy": "True",
+          "UpdateCreatedDate": "True",
+          "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+          "WorkItemCreateRetryLimit": "5",
+          "WorkItemIDs": null
         }
       }
     }
@@ -35,9 +33,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsWorkItemMigrationProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions

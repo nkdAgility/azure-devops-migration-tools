@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemTrackingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemTrackingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions

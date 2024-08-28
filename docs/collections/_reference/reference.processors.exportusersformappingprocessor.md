@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "ExportUsersForMappingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "ExportUsersForMappingProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions

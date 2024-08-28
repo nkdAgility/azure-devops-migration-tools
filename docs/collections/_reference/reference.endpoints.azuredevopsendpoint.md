@@ -7,8 +7,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "AzureDevOpsEndpoint": []
+        "Endpoints": {
+          "#KEY#": {
+            "AzureDevOpsEndpoint": []
+          }
         }
       }
     }
@@ -18,8 +20,10 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "EndpointDefaults": {
-          "AzureDevOpsEndpoint": []
+        "Endpoints": {
+          "#KEY#": {
+            "AzureDevOpsEndpoint": []
+          }
         }
       }
     }
@@ -35,7 +39,6 @@ configurationSamples:
       "Organisation": null,
       "Project": null,
       "ReflectedWorkItemIdField": null,
-      "Name": null,
       "EndpointEnrichers": null
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
@@ -58,10 +61,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: EndpointEnrichers
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Name
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Organisation

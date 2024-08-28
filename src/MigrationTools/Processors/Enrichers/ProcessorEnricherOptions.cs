@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using MigrationTools.Options;
 
 namespace MigrationTools.Enrichers
 {
     public abstract class ProcessorEnricherOptions : IProcessorEnricherOptions
     {
-        public virtual string ConfigurationSectionPath => $"MigrationTools:ProcessorEnricherDefaults:{ConfigurationOptionFor}";
-        public virtual string ConfigurationCollectionPath => $"MigrationTools:Processors:*:Enrichers";
-        public virtual string ConfigurationObjectName => $"ProcessorEnricherType";
-        public virtual string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
-        public string ConfigurationSamplePath => $"MigrationTools:ProcessorEnricherSamples:{ConfigurationOptionFor}";
+        [JsonIgnore]
+        public string OptionFor => $"{GetType().Name.Replace("Options", "")}";
+
+        [JsonIgnore]
+        public ConfigurationMetadata ConfigurationMetadata => new ConfigurationMetadata
+        {
+            PathToInstance = null,
+            ObjectName = $"ProcessorEnricherType",
+            OptionFor = OptionFor,
+            PathToDefault = $"MigrationTools::ProcessorEnricherDefaults:{OptionFor}",
+            PathToSample = $"MigrationTools::ProcessorEnricherSamples:{OptionFor}"
+        };
 
         /// <summary>
         /// If enabled this will run this migrator

@@ -9,7 +9,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "TreeToTagFieldMap": []
             }
           }
@@ -24,7 +24,7 @@ configurationSamples:
       "MigrationTools": {
         "CommonTools": {
           "FieldMappingTool": {
-            "FieldMapDefaults": {
+            "FieldMaps": {
               "TreeToTagFieldMap": []
             }
           }
@@ -39,6 +39,7 @@ configurationSamples:
       "$type": "TreeToTagFieldMapOptions",
       "toSkip": 0,
       "timeTravel": 0,
+      "ConfigurationOptionFor": "TreeToTagFieldMap",
       "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
@@ -49,6 +50,10 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ConfigurationOptionFor
+  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: timeTravel

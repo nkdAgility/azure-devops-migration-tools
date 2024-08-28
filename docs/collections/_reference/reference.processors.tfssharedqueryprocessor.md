@@ -7,9 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsSharedQueryProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
@@ -18,9 +16,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
-        "ProcessorDefaults": {
-          "TfsSharedQueryProcessor": []
-        }
+        "Processors": []
       }
     }
   sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions

@@ -1,17 +1,26 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Options;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Endpoints.Infrastructure
 {
     public abstract class EndpointOptions : IEndpointOptions
     {
-        public string ConfigurationSectionPath => $"MigrationTools:EndpointDefaults:{ConfigurationOptionFor}";
-        public string ConfigurationCollectionPath => null;
-        public string ConfigurationObjectName => $"EndpointType";
-        public string ConfigurationSamplePath => $"MigrationTools:EndpointSamples:{ConfigurationOptionFor}";
+        [JsonIgnore]
+        public string OptionFor => $"{GetType().Name.Replace("Options", "")}";
 
-        public string ConfigurationOptionFor => $"{GetType().Name.Replace("Options", "")}";
+        [JsonIgnore]
+        public ConfigurationMetadata ConfigurationMetadata => new ConfigurationMetadata
+        {
+            IsCollection = false,
+            IsKeyed = true,
+            PathToInstance = $"MigrationTools:Endpoints:#KEY#:{OptionFor}",
+            ObjectName = $"EndpointType",
+            OptionFor = OptionFor,
+            PathToDefault = $"MigrationTools:EndpointSamples:{OptionFor}",
+            PathToSample = $"MigrationTools:EndpointSamples:{OptionFor}"
+        };
 
         [JsonIgnore]
         public string Name { get; set; }
