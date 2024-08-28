@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Processors.ProcessDefinitionProcessorOption
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 - name: classic
   description: 

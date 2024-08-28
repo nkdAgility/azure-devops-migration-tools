@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Processors.WorkItemPostProcessingProcessorO
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
 - name: classic
   description: 

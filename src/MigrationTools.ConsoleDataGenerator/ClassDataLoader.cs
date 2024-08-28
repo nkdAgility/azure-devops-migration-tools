@@ -89,22 +89,30 @@ namespace MigrationTools.ConsoleDataGenerator
                     IConfigurationSection mainOrDefaultSection;
                     Console.WriteLine("Processing as ConfigurationSectionName");
                     mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToDefault);
-                    mainOrDefaultSection.Bind(instanceOfOption);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection, instanceOfOption).Trim() });
-                } else
-                {
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = "Default Unavailable" });
+                    if (mainOrDefaultSection.Exists())
+                    {
+                        mainOrDefaultSection.Bind(instanceOfOption);
+                        var json = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection, instanceOfOption);
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = json.Trim() });
+                    } else
+                    {
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = "Default Unavailable" });
+                    }
                 }
                 if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToSample))
                 {
                     Console.WriteLine("targetItem");
                     IConfigurationSection sampleSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToSample);
                     sampleSection.Bind(instanceOfOption);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = ConvertSectionWithPathToJson(configuration, sampleSection, instanceOfOption).Trim() });
-                   
-                } else
-                {
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = "Sample Unavailable" });
+                    if (sampleSection.Exists())
+                    {
+                        var json = ConvertSectionWithPathToJson(configuration, sampleSection, instanceOfOption);
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = json.Trim() });
+                    }
+                    else
+                    {
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = "Sample Unavailable" });
+                    }
                 }
                 data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
                 if (instanceOfOption != null)
@@ -174,7 +182,10 @@ namespace MigrationTools.ConsoleDataGenerator
                         }
                         if (currentObject[key] is JArray array)
                         {
-                            array.Add(sectionObject);
+                            JObject itemObject = sectionObject as JObject ?? new JObject();
+                            // Add ObjectName and OptionFor to the object
+                            itemObject.AddFirst(new JProperty(option.ConfigurationMetadata.ObjectName, option.ConfigurationMetadata.OptionFor));
+                            array.Add(itemObject);
                         }
                     }
                     else

@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcess
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
 - name: classic
   description: 

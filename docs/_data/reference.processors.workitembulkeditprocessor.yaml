@@ -3,25 +3,11 @@ optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.WorkItem
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions
 - name: classic
   description: 

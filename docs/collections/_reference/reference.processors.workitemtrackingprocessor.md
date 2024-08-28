@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 - name: classic
   description: 

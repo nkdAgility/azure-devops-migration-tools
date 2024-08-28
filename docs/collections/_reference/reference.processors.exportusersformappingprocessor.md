@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Processors.ExportUsersForMappingProcessorOp
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 - name: classic
   description: 

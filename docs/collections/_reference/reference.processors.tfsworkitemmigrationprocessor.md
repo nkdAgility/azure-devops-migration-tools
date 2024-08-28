@@ -32,14 +32,7 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: classic
   description: 

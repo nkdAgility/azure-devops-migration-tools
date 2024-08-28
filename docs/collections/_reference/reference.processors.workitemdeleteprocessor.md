@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Processors.WorkItemDeleteProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
 - name: classic
   description: 

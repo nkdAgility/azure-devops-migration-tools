@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 - name: classic
   description: 

@@ -4,25 +4,11 @@ optionsClassFullName: MigrationTools.Clients.AzureDevops.Rest.Processors.Outboun
 configurationSamples:
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Default Unavailable
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions
 - name: classic
   description: 

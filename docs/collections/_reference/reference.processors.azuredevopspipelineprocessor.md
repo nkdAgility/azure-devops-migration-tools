@@ -26,14 +26,7 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          []
-        ]
-      }
-    }
+  code: Sample Unavailable
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: classic
   description: 
