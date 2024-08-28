@@ -118,8 +118,8 @@ namespace MigrationTools.Options
             configJson["Serilog"] = new JObject();
             configJson["Serilog"]["MinimumLevel"] = $"Information";
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            configJson["MigrationTools"]["Version"] = $"{version.Major}.{version.Minor}";
             configJson["MigrationTools"] = new JObject();
+            configJson["MigrationTools"]["Version"] = $"{version.Major}.{version.Minor}";
             configJson["MigrationTools"]["Endpoints"] = new JObject();
             configJson["MigrationTools"]["Processors"] = new JArray();
             configJson["MigrationTools"]["CommonTools"] = new JObject();

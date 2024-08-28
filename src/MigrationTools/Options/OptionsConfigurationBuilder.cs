@@ -198,13 +198,8 @@ public static class OptionsConfigurationBuilder
                     // Add the options object as part of the collection
                     var collectionArray = (JArray)currentSection[pathParts[i]];
                     var optionsObject = JObject.FromObject(options);
-
-                    // Add the object name if required
-                    if (shouldAddObjectName)
-                    {
-                        optionsObject.AddFirst(new JProperty(objectName, optionFor));
-                    }
-
+                    // Always add object name for collections
+                    optionsObject.AddFirst(new JProperty(objectName, optionFor));
                     collectionArray.Add(optionsObject);
                 }
                 else

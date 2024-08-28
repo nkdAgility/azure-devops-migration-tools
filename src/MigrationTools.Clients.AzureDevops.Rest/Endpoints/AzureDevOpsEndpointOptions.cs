@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using MigrationTools.Endpoints.Infrastructure;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace MigrationTools.Endpoints
 {
     public class AzureDevOpsEndpointOptions : EndpointOptions
     {
         [Required]
+        [JsonConverter(typeof(StringEnumConverter))]
         public AuthenticationMode AuthenticationMode { get; set; }
 
         [Required]
