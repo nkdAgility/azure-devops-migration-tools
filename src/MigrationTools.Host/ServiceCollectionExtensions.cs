@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Options;
 
 namespace MigrationTools
 {
@@ -12,6 +13,7 @@ namespace MigrationTools
             //collection.Configure
             //collection.Configure<GreetingServiceOptions>(config);
             //return collection.AddTransient<IGreetingService, GreetingService>();
+
             return collection;
         }
     }

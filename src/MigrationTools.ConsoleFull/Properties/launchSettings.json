@@ -25,7 +25,7 @@
     },
     "init Options-Reference": {
       "commandName": "Project",
-      "commandLineArgs": "init --options Reference -c configuration-ref.json"
+      "commandLineArgs": "init --options Reference -c configuration-ref.json --overwrite"
     },
     "Upgrade": {
       "commandName": "Project",
