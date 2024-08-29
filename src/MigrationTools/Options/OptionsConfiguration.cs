@@ -51,10 +51,10 @@ namespace MigrationTools.Options
                         AddOption(optionType.Name, keyGen.GetNextKey());
                         break;
                     case Type t when typeof(IProcessorEnricherOptions).IsAssignableFrom(t):
-                        logger.LogInformation("Skipping ProcessorEnricherOptions: {optionType}", optionType.Name);
+                        logger.LogWarning("Skipping ProcessorEnricherOptions: {optionType}", optionType.Name);
                         break;
                     case Type t when typeof(IEndpointEnricherOptions).IsAssignableFrom(t):
-                        logger.LogInformation("Skipping ProcessorEnricherOptions: {optionType}", optionType.Name);
+                        logger.LogWarning("Skipping ProcessorEnricherOptions: {optionType}", optionType.Name);
                         break;
                     default:
                         AddOption(optionType.Name);
@@ -68,6 +68,11 @@ namespace MigrationTools.Options
             OptionsToInclude.Add(option);
         }
 
+        public void AddOption(IEnumerable<IOptions> options)
+        {
+            OptionsToInclude.AddRange(options);
+        }
+
         public void AddOption(string optionName)
         {
             optionName = optionName.Replace("Options", "");
@@ -77,7 +82,7 @@ namespace MigrationTools.Options
                 logger.LogWarning("Could not find option type for {optionName}", optionName);
             } else
             {
-                logger.LogInformation("Adding {optionName}", optionName);
+                logger.LogDebug("Adding {optionName}", optionName);
                 OptionsToInclude.Add(CreateOptionFromType(optionType));
             }
             
@@ -93,7 +98,10 @@ namespace MigrationTools.Options
 
         public void AddOption(IOptions option, string key)
         {
-            NamedOptionsToInclude.Add(key, option);
+            if (option != null)
+            {
+                NamedOptionsToInclude.Add(key, option);
+            }            
         }
 
         public void AddOption(string optionName, string key)
@@ -106,7 +114,7 @@ namespace MigrationTools.Options
             }
             else
             {
-                logger.LogInformation("Adding {optionName} as {key}", optionName, key);
+                logger.LogDebug("Adding {optionName} as {key}", optionName, key);
                 NamedOptionsToInclude.Add(key, CreateOptionFromType(optionType));
             }            
         }
@@ -144,7 +152,7 @@ namespace MigrationTools.Options
             try
             {
                 var hardPath = $"MigrationTools:Endpoints:{key}";
-                logger.LogInformation("Building Option: {item} to {hardPath}", option.GetType().Name, hardPath);
+                logger.LogDebug("Building Option: {item} to {hardPath}", option.GetType().Name, hardPath);
                 configJson = OptionsConfigurationBuilder.AddOptionsToConfiguration(configJson, option, hardPath, true);
                 
             }
@@ -166,7 +174,7 @@ namespace MigrationTools.Options
             }
             try
             {
-                logger.LogInformation("Building Option: {item} to {path}", option.GetType().Name, option.ConfigurationMetadata.PathToInstance);
+                logger.LogDebug("Building Option: {item} to {path}", option.GetType().Name, option.ConfigurationMetadata.PathToInstance);
                 configJson = OptionsConfigurationBuilder.AddOptionsToConfiguration(configJson, option, false);
                 
             }

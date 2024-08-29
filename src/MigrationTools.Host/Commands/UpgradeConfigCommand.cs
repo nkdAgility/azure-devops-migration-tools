@@ -5,8 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +23,7 @@ using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using Newtonsoft.Json.Linq;
+using NuGet.Packaging;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -35,7 +39,7 @@ namespace MigrationTools.Host.Commands
         private readonly ITelemetryLogger Telemetery;
         private readonly IHostApplicationLifetime _appLifetime;
 
-        private static Dictionary<string, string> classNameMappings = new Dictionary<string, string>();
+        private static Dictionary<string, string> classNameChangeLog = new Dictionary<string, string>();
 
         public UpgradeConfigCommand(
             IConfiguration configuration,
@@ -50,10 +54,6 @@ namespace MigrationTools.Host.Commands
             Telemetery = telemetryLogger;
             _appLifetime = appLifetime;
         }
-
-
-      
-
 
         public override async Task<int> ExecuteAsync(CommandContext context, UpgradeConfigCommandSettings settings)
         {
@@ -76,8 +76,10 @@ namespace MigrationTools.Host.Commands
                 //    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
                 //    .Build();
 
-                classNameMappings.Add("WorkItemMigrationContext", "TfsWorkItemMigrationProcessor");
-                classNameMappings.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");
+                classNameChangeLog.Add("WorkItemMigrationContext", "TfsWorkItemMigrationProcessor");
+                classNameChangeLog.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");
+                classNameChangeLog.Add("WorkItemGitRepoMappingTool", "TfsGitRepositoryTool");
+                classNameChangeLog.Add("WorkItemFieldMappingTool", "FieldMappingTool");
 
                 OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
 
@@ -86,41 +88,20 @@ namespace MigrationTools.Host.Commands
                     case MigrationConfigSchema.v1:
                     case MigrationConfigSchema.v150:
                         // ChangeSetMappingFile
-                        optionsBuilder.AddOption(GetV1TfsChangeSetMappingToolOptions(configuration));
-                        optionsBuilder.AddOption(GetV1EndpointOptions(configuration, "Source"), "Source");
-                        optionsBuilder.AddOption(GetV1EndpointOptions(configuration, "Target"), "Target");
-
-                        //field mapping
-                        //options.Enabled = true;
-                        //options.FieldMaps = _configuration.GetSection("FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapOptions>("$type"));
-
-
-                        // Tools
-                        //context.AddSingleton<IStringManipulatorTool, StringManipulatorTool>().AddSingleton<IOptions<StringManipulatorToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<StringManipulatorToolOptions>()));
-                        //context.AddSingleton<IWorkItemTypeMappingTool, WorkItemTypeMappingTool>().AddSingleton<IOptions<WorkItemTypeMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<WorkItemTypeMappingToolOptions>()));
-
-                        //TFS Tools
-                        //context.AddSingleton<GitRepoMappingTool>().AddSingleton<IOptions<GitRepoMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<GitRepoMappingToolOptions>()));
-                        //context.AddSingleton<TfsAttachmentTool>().AddSingleton<IOptions<TfsAttachmentToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsAttachmentToolOptions>()));
-
-                        //context.AddSingleton<TfsUserMappingTool>().AddSingleton<IOptions<TfsUserMappingToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsUserMappingToolOptions>()));
-
-                        //context.AddSingleton<TfsValidateRequiredFieldTool>().AddSingleton<IOptions<TfsValidateRequiredFieldToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsValidateRequiredFieldToolOptions>()));
-
-                        //context.AddSingleton<TfsWorkItemLinkTool>().AddSingleton<IOptions<TfsWorkItemLinkToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemLinkToolOptions>()));
-
-                        //context.AddSingleton<TfsWorkItemEmbededLinkTool>().AddSingleton<IOptions<TfsWorkItemEmbededLinkToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsWorkItemEmbededLinkToolOptions>()));
-
-                        //context.AddSingleton<TfsEmbededImagesTool>().AddSingleton<IOptions<TfsEmbededImagesToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsEmbededImagesToolOptions>()));
-
-                        //context.AddSingleton<TfsGitRepositoryTool>().AddSingleton<IOptions<TfsGitRepositoryToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsGitRepositoryToolOptions>()));
-
-                        //context.AddSingleton<TfsNodeStructureTool>().AddSingleton<IOptions<TfsNodeStructureToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsNodeStructureToolOptions>()));
-
-                        //context.AddSingleton<TfsRevisionManagerTool>().AddSingleton<IOptions<TfsRevisionManagerToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsRevisionManagerToolOptions>()));
-
-                        //context.AddSingleton<TfsTeamSettingsTool>().AddSingleton<IOptions<TfsTeamSettingsToolOptions>>(Microsoft.Extensions.Options.Options.Create(configuration.GetSectionCommonEnrichers_v15<TfsTeamSettingsToolOptions>()));
-
+                        optionsBuilder.AddOption(ParseV1TfsChangeSetMappingToolOptions(configuration));
+                        optionsBuilder.AddOption(ParseV1TfsGitRepoMappingOptions(configuration));
+                        optionsBuilder.AddOption(ParseV1FieldMaps(configuration));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "Processors", "$type"));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "CommonEnrichersConfig", "$type"));
+                        if (!IsSectionNullOrEmpty(configuration.GetSection("Source")) || !IsSectionNullOrEmpty(configuration.GetSection("Target")))
+                        {
+                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "Source", "$type"), "Source");
+                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "Target", "$type"), "Target");
+                        } else
+                        {
+                            optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(configuration, "Endpoints:AzureDevOpsEndpoints", "Source"), "Source");
+                            optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(configuration, "Endpoints:AzureDevOpsEndpoints", "Target"), "Target");
+                        }
                         break;
                     case MigrationConfigSchema.v160:
 
@@ -149,6 +130,51 @@ namespace MigrationTools.Host.Commands
             return _exitCode;
         }
 
+        private IOptions ParseSectionCollectionWithPathAsTypeToOption(IConfiguration configuration, string path, string filter)
+        {
+            var optionsConfigList = configuration.GetSection(path);
+            var optionTypeString = GetLastSegment(path);
+            IOptions option = null ;
+            foreach (var childSection in optionsConfigList.GetChildren())
+            {
+                if (childSection.GetValue<string>("Name") == filter)
+                {
+                    option = GetOptionFromTypeString(configuration, childSection, optionTypeString);
+
+                }                
+            }
+            return option;
+        }
+
+        private List<IOptions> ParseSectionCollectionWithTypePropertyNameToList(IConfiguration configuration, string path, string typePropertyName)
+        {
+            var targetSection = configuration.GetSection(path);
+            List<IOptions> options = new List<IOptions>();
+            foreach (var childSection in targetSection.GetChildren())
+            {
+                var optionTypeString = childSection.GetValue<string>(typePropertyName);
+                var newOptionTypeString = ParseOptionsType(optionTypeString);
+                _logger.LogInformation("Upgrading {group} item {old} to {new}", path, optionTypeString, newOptionTypeString);
+                var option = GetOptionWithDefaults(configuration, newOptionTypeString);
+                childSection.Bind(option);
+                options.Add(option);
+            }
+
+            return options;
+        }
+
+        private List<IOptions> ParseV1FieldMaps(IConfiguration configuration)
+        {
+            List<IOptions> options = new List<IOptions>();
+            _logger.LogInformation("Upgrading {old} to {new}", "FieldMaps", "FieldMappingToolOptions");
+            var toolOption = GetOptionWithDefaults(configuration, ParseOptionsType("FieldMappingToolOptions"));
+            toolOption.Enabled = true;
+            options.Add(toolOption);
+            // parese FieldMaps
+            options.AddRange(ParseSectionCollectionWithTypePropertyNameToList(configuration, "FieldMaps", "$type"));
+            return options;
+        }
+
         static string AddSuffixToFileName(string filePath, string suffix)
         {
             // Get the directory path
@@ -167,44 +193,92 @@ namespace MigrationTools.Host.Commands
             return Path.Combine(directory, newFileName);
         }
 
-        //private static void AddConfiguredEndpointsV1(IServiceCollection services, IConfiguration configuration)
-        //{
-        //    var nodes = new List<string> { "Source", "Target" };
-        //    foreach (var node in nodes)
-        //    {
-        //        var endpointsSection = configuration.GetSection(node);
-        //        var endpointType = endpointsSection.GetValue<string>("$type").Replace("Options", "").Replace("Config", "");
-        //        AddEndPointSingleton(services, configuration, endpointsSection, node, endpointType);
-        //    }
-        //}
-
-        private IOptions GetV1EndpointOptions(IConfiguration configuration, string name)
+        private IOptions ParseSectionWithTypePropertyNameToOptions(IConfiguration configuration, string path, string typePropertyName)
         {
-            var sourceConfig = configuration.GetSection(name);
-            
-            var sourceType = sourceConfig.GetValue<string>("$type");
-            if (classNameMappings.ContainsKey(sourceType))
-            {
-                sourceType = classNameMappings[sourceType];
-            }
-            var type = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().FirstOrDefault(t => t.Name == sourceType);
-            var sourceOptions = (IOptions)Activator.CreateInstance(type);
-            var defaultConfig = configuration.GetSection(sourceOptions.ConfigurationMetadata.PathToDefault);
-            defaultConfig.Bind(sourceOptions);
-            sourceConfig.Bind(sourceOptions);
-            // TODO Get Authentication bits
-
+            var optionsConfig = configuration.GetSection(path);
+            var optionTypeString = optionsConfig.GetValue<string>(typePropertyName);
+            IOptions sourceOptions = GetOptionFromTypeString(configuration, optionsConfig, optionTypeString);
             return sourceOptions;
         }
 
-        private IOptions GetV1TfsChangeSetMappingToolOptions(IConfiguration configuration)
+        private IOptions GetOptionFromTypeString(IConfiguration configuration, IConfigurationSection optionsConfig, string optionTypeString)
         {
+            var newOptionTypeString = ParseOptionsType(optionTypeString);
+            _logger.LogInformation("Upgrading to {old} to {new}", optionTypeString, newOptionTypeString);
+            IOptions sourceOptions;
+            sourceOptions = GetOptionWithDefaults(configuration, newOptionTypeString);
+            optionsConfig.Bind(sourceOptions);
+            return sourceOptions;
+        }
+
+        private IOptions GetOptionWithDefaults(IConfiguration configuration, string optionTypeString)
+        {
+            IOptions option;
+            optionTypeString = ParseOptionsType(optionTypeString);
+            var optionType = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().FirstOrDefault(t => t.Name.StartsWith(optionTypeString, StringComparison.InvariantCultureIgnoreCase));
+            if (optionType == null)
+            {
+                _logger.LogWarning("Could not find type {optionTypeString}", optionTypeString);
+                return null;
+            }
+            option = (IOptions)Activator.CreateInstance(optionType);
+            var defaultConfig = configuration.GetSection(option.ConfigurationMetadata.PathToDefault);
+            defaultConfig.Bind(option);
+            return option;
+        }
+
+        private IOptions ParseV1TfsChangeSetMappingToolOptions(IConfiguration configuration)
+        {
+            _logger.LogInformation("Upgrading {old} to {new}", "ChangeSetMappingFile", "TfsChangeSetMappingTool");
             var changeSetMappingOptions = configuration.GetValue<string>("ChangeSetMappingFile");
             var properties = new Dictionary<string, object>
                         {
                             { "ChangeSetMappingFile", changeSetMappingOptions }
                         };
-            return (IOptions)OptionsBinder.BindToOptions("TfsChangeSetMappingToolOptions", properties, classNameMappings);
+            var option = (IOptions)OptionsBinder.BindToOptions("TfsChangeSetMappingToolOptions", properties, classNameChangeLog);
+            option.Enabled = true;
+            return option;
+        }
+
+        private IOptions ParseV1TfsGitRepoMappingOptions(IConfiguration configuration)
+        {
+            _logger.LogInformation("Upgrading {old} to {new}", "GitRepoMapping", "TfsGitRepoMappingTool");
+            var data = configuration.GetValue<Dictionary<string, string>>("GitRepoMapping");
+            var properties = new Dictionary<string, object>
+                        {
+                            { "Mappings", data }
+                        };
+            var option = (IOptions)OptionsBinder.BindToOptions("TfsGitRepositoryToolOptions", properties, classNameChangeLog);
+            option.Enabled = true;
+            return option;
+        }
+
+        static string ParseOptionsType(string optionTypeString)
+        {
+            if (classNameChangeLog.ContainsKey(optionTypeString))
+            {
+                optionTypeString = classNameChangeLog[optionTypeString];
+            }
+            return RemoveSuffix(optionTypeString);
+        }
+
+        static string RemoveSuffix(string input)
+        {
+            // Use regex to replace "Config" or "Options" only if they appear at the end of the string
+            return Regex.Replace(input, "(s|Config|Options)$", "");
+        }
+
+        static string GetLastSegment(string path)
+        {
+            // Split the path by colon and return the last segment
+            string[] segments = path.Split(':');
+            return segments[segments.Length - 1];
+        }
+
+        static bool IsSectionNullOrEmpty(IConfigurationSection section)
+        {
+            // Check if the section exists and has a value or children
+            return !section.Exists() || string.IsNullOrEmpty(section.Value) && !section.GetChildren().Any();
         }
 
 

@@ -19,7 +19,7 @@ namespace MigrationTools.Tools.Infrastructure
             PathToInstance = $"MigrationTools:CommonTools:FieldMappingTool:FieldMaps",
             ObjectName = $"FieldMapType",
             OptionFor = OptionFor,
-            PathToDefault = $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults:{OptionFor}",
+            PathToDefault = $"MigrationTools:CommonTools:FieldMappingTool:FieldMapDefaults",
             PathToSample = $"MigrationTools:CommonToolSamples:FieldMappingTool:FieldMapSamples:{OptionFor}"
         };
 
