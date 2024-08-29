@@ -1,5 +1,5 @@
 ---
-title: Reference Overview
+title: Reference
 layout: page
 pageType: index
 toc: true
@@ -7,226 +7,217 @@ pageStatus: published
 discussionId: 
 ---
 
+Azure DevOps Migration Tools are mainly powered by configuration which allows you to control most aspects of the execution flow. This page will guide you through the configuration options available to you.
 
->**_This documentation is for a preview version of the Azure DevOps Migration Tools._ If you are not using the preview version then please head over to the main [documentation](https://nkdagility.com/docs/azure-devops-migration-tools).**
+## Creating a Configuration File
 
-[Overview](.././index.md) > **Reference**
+The easyest way to get started with the configruation is to create both a reference file, thats one with everything, and a minimal file that will get you started using the tool. 
 
-There are two version of the documentation that corrospnd to tools that focus on the new REST API and the main body of the tools that use the Object Model.
+### Creating a Reference File
 
-- **[API v1](../Reference/v1/index.md)** - Go here for WorkItemMigration as well as Test Plans and Suits.
-- **[API v2](../Reference/v2/index.md)** - Go here for Queries, Pipelines, and Team Settings
+If you run `devlopsmigration init --options Reference -c configuration-ref.json` the output should be a file with all posible options using the Sample data.
 
+### Creating a Minimal File
 
-## Configuration
-Azure DevOps Migration Tools are mainly powered by configuration which allows you to control most aspects of the execution flow.
+To get a file that you can use its best to start with a minimal file. If you run `devlopsmigration init --options Basic --overwrite` thsi will create that minimal file.
 
-### Configuration tool
-If you run `migrator.exe init` you will be launched into a configuration tool that will generate a default file. Using the `init` command will create a `configuration.yml` file in the
-working directory. At run time you can specify the configuration file to use.
+### Other options
 
-- `migrator.exe init` - This will create a shortened getting started config with just what you need to migrate Work Items.
-- `migrator.exe init --options Full` - The output of this is a full template with all of the options. You will not need it all.
+Right now we support:
+
+- *Reference* - Create the reference file with everything
+- *Basic | WorkItemTracking* - Create a minimal file with just the WorkItemTracking processor enabled
+- *PipelineProcessor* - Create a minimal file with just the PipelineProcessor enabled
 
 **Note:** Azure DevOps Migration Tools do not ship with internal default configuration and will not function without one.
 
-To create your config file just type `vstssyncmigrator init` in the directory that you unzipped the tools and a minimal `configuration.json` configuration
+To create your config file just type `devlopsmigration init` in the directory that you unzipped the tools and a minimal `configuration.json` configuration
 file will be created. Modify this as you need.
 
 Note that the generated file show all the possible options, you configuration file will probably only need a subset of those shown.
 
 ### Global configuration
-The global configuration created by the `init` command look like this:
+The global configuration created by the `init` command look something like this:
 
 ```json
 {
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "myProjectName",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
+  "Serilog": {
+    "MinimumLevel": "Debug"
   },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "myProjectName",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
-    {
-      "$type": "MultiValueConditionalMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      },
-      "targetFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      }
-    },
-    {
-      "$type": "FieldBlankMapConfig",
-      "WorkItemTypeName": "*",
-      "targetField": "TfsMigrationTool.ReflectedWorkItemId"
-    },
-    {
-      "$type": "FieldValueMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "System.State",
-      "targetField": "System.State",
-      "defaultValue": "New",
-      "valueMapping": {
-        "Approved": "New",
-        "New": "New",
-        "Committed": "Active",
-        "In Progress": "Active",
-        "To Do": "New",
-        "Done": "Closed",
-        "Removed": "Removed"
-      }
-    },
-    {
-      "$type": "FieldtoFieldMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-      "targetField": "Microsoft.VSTS.Common.StackRank",
-      "defaultValue": null
-    },
-    {
-      "$type": "FieldtoFieldMultiMapConfig",
-      "WorkItemTypeName": "*",
-      "SourceToTargetMappings": {
-        "SourceField1": "TargetField1",
-        "SourceField2": "TargetField2"
-      }
-    },
-    {
-      "$type": "FieldtoTagMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "System.State",
-      "formatExpression": "ScrumState:{0}"
-    },
-    {
-      "$type": "FieldMergeMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField1": "System.Description",
-      "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
-      "targetField": "System.Description",
-      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
-    },
-    {
-      "$type": "RegexFieldMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "COMPANY.PRODUCT.Release",
-      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
-      "pattern": "PRODUCT \\d{4}.(\\d{1})",
-      "replacement": "$1"
-    },
-    {
-      "$type": "FieldValuetoTagMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "Microsoft.VSTS.CMMI.Blocked",
-      "pattern": "Yes",
-      "formatExpression": "{0}"
-    },
-    {
-      "$type": "TreeToTagMapConfig",
-      "WorkItemTypeName": "*",
-      "toSkip": 3,
-      "timeTravel": 1
-    }
-  ],
-  "CommonEnrichersConfig": [
-    {
-      "$type": "TfsNodeStructureOptions",
-      "Enabled": false,
-      "PrefixProjectToNodes": false,
-      "NodeBasePaths": [
-        "Product\\Area\\Path1",
-        "Product\\Area\\Path2"
-      ],
-      "IterationMaps": {
-        "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
-        "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
-        "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
-      },
-      "AreaMaps": {
-        "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
-        "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
-      },
-    }
-  ],
-  "GitRepoMapping": null,
-  "LogLevel": "Information",
-  "Processors": [
-    {
-      "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
-      "UpdateCreatedDate": true,
-      "UpdateCreatedBy": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "FixHtmlAttachmentLinks": false,
-      "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": false,
-      "PauseAfterEachWorkItem": false,
-      "AttachRevisionHistory": false,
-      "GenerateMigrationComment": true,
-      "WorkItemIDs": null,
-      "MaxGracefulFailures": 0,
-      "SkipRevisionWithInvalidIterationPath": false,
-      "SkipRevisionWithInvalidAreaPath": false
-    },
-    {
-      "$type": "TestConfigurationsMigrationConfig",
-      "Enabled": false
-    },
-    {
-        "$type": "TestPlansAndSuitesMigrationConfig",
-        "Enabled": false,
-        "RemoveInvalidTestSuiteLinks": true,
-        "TestPlanQueryBit": "AreaPath UNDER 'Project1' AND PlanName CONTAINS 'Title' AND TestState NOT IN ('Inactive')",
-        "UseCommonNodeStructureEnricherConfig": false,
-        "NodeBasePaths": [
-          "Product\\Area\\Path1",
-          "Product\\Area\\Path2"
-        ],
-        "IterationMaps": {
-          "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
-          "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
-          "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "",
+          "NetworkCredentials": {
+            "UserName": "",
+            "Password": "",
+            "Domain": ""
+          }
         },
-        "AreaMaps": {
-          "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
-          "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
         }
-    }
-  ],
-  "Version": "11.6",
-  "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "TfsVersion": "AzureDevOps",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "",
+          "NetworkCredentials": {
+            "UserName": "",
+            "Password": "",
+            "Domain": ""
+          }
+        },
+        "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
+      }
+    },
+    "CommonTools": {
+      "WorkItemTypeMappingTool": {
+        "Enabled": true,
+        "Mappings": {
+          "User Story": "Product Backlog Item"
+        }
+      },
+      "StringManipulatorTool": {
+        "Enabled": true,
+        "MaxStringLength": 1000000,
+        "Manipulators": [
+          {
+            "$type": "RegexStringManipulator",
+            "Enabled": true,
+            "Pattern": "[^( -~)\n\r\t]+",
+            "Replacement": "",
+            "Description": "Remove invalid characters from the end of the string"
+          }
+        ]
+      },
+      "TfsAttachmentTool": {
+        "RefName": "TfsAttachmentTool",
+        "Enabled": true,
+        "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+        "MaxRevisions": 480000000
+      },
+      "TfsChangeSetMappingTool": {
+        "Enabled": true,
+        "File": "C:\\temp\\ChangeSetMappingFile.json"
+      },
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldtoFieldMap",
+            "ApplyTo": [ "SomeWorkItemType" ],
+            "sourceField": "System.AcceptanceCriteria",
+            "targetField": "System.AcceptanceCriteria2"
+
+          },
+          {
+            "FieldMapType": "FieldtoFieldMap",
+            "ApplyTo": [ "SomeWorkItemType" ],
+            "sourceField": "System.Description",
+            "targetField": "System.Description2"
+
+          }
+        ]
+      },
+      "GitRepoMappingTool": {
+        "Enabled": true,
+        "Mappings": {
+          "Source Repo Name": "Target Repo Name"
+        }
+      },
+      "TfsNodeStructureTool": {
+        "Enabled": true,
+        "Areas": {
+          "Filters": [ " *\\Team 1,*\\Team 1\\**" ],
+          "Mappings": {
+            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+          }
+        },
+        "Iterations": {
+          "Filters": [],
+          "Mappings": {
+            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+          }
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManagerTool": {
+        "Enabled": true,
+        "ReplayRevisions": true,
+        "MaxRevisions": 0
+      },
+      "TfsTeamSettingsTool": {
+        "Enabled": true,
+        "MigrateTeamSettings": true,
+        "UpdateTeamSettings": true,
+        "MigrateTeamCapacities": true,
+        "Teams": [ "Team 1", "Team 2" ]
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "Enabled": true,
+        "UpdateCreatedDate": true,
+        "UpdateCreatedBy": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+        "FixHtmlAttachmentLinks": false,
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": false,
+        "PauseAfterEachWorkItem": false,
+        "AttachRevisionHistory": false,
+        "GenerateMigrationComment": true,
+        "WorkItemIDs": [ 12 ],
+        "MaxGracefulFailures": 0,
+        "SkipRevisionWithInvalidIterationPath": false,
+        "SkipRevisionWithInvalidAreaPath": false
+      }
+    ]
   }
 }
-
 ```
+
+## Anatomy of the Configuration File
+
+
+### Endpoints
+
+{% include content-collection-table.html collection = "reference" typeName = "Endpoints" %}
+
+### Processors
+
+{% include content-collection-table.html collection = "reference" typeName = "Processors" %}
+
+### Common Tools
+
+{% include content-collection-table.html collection = "reference" typeName = "Tools" %}
+
 
 And the description of the available options are:
 
 #### TelemetryEnableTrace
+
 Allows you to submit trace to Application Insights to allow the development team to diagnose any issues that may be found. If you are submitting a support ticket then please include the Session GUID found in your log file for that run. This will help us find the problem.
 
 **Note:** All exceptions that you encounter will surface inside of Visual Studio as the developers are working on the source. This will make sure that they tackle issues as they arise.

@@ -19,26 +19,9 @@ Created and maintained by [Martin Hinshelwood](https://www.linkedin.com/in/marti
 
 # Azure DevOps Migration Tools
 
-The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a Winget package a `nkdAgility.AzureDevOpsMigrationTools`.
+The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://nkdagility.com/learn/azure-devops-migration-tools/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a Winget package a `nkdAgility.AzureDevOpsMigrationTools`.
 
 **Ask Questions on Github: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
-
-## Some Data from the last 30 days (as of 05/03/2024)
-
-| Category  | Metric | Notes |
-| ------------- | ------------- | ------------- |
-| Work Items | **1m** | A single Work Item may have many revisions that we need to migrate |
-| Work Item Revisions | **23m** | A single Work Item may have many revisions that we need to migrate |
-| RelatedLinkCount | **11m** | Each work item may have many links or none. |
-| Git Commit Links  | **1.3m** |  |
-| Attachments | **1.2m**  | Total number of attachments migrated |
-| Test Suits | 52k | total suits migrated | 
-| Test Cases Mapped | **1.4m** | Total test cases mapped into Suits |
-| Migration Run Ave  | **14 minutes** | Includes dry-runs as well.  |
-| Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
-| Average Work item Migration Time  | **22s** | Work Item (includes all revisions, links, and attachments for the work item) |
-
-Exceptions shipped to Application Insights and [Elmah.io](https://elmah.io) for analysis and improvement.
 
 ## Compatability
 
@@ -80,34 +63,34 @@ For the most part we support moving data between ((Azure DevOps Server | Team Fo
 
 ## Quick Links
 
-- [Documenation](https://nkdagility.com/docs/azure-devops-migration-tools/)] 
+- [Documenation](https://nkdagility.com/docs/azure-devops-migration-tools/)
 - [Installation](https://nkdagility.com/learn/azure-devops-migration-tools/installation/)
+- [Permissions](https://nkdagility.com/learn/azure-devops-migration-tools/permissions/)
 - [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started/)
-- [Reference](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/)
+- [Configuration Reference](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/)
 - [Community Support](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
 - [Commercial Support](https://nkdagility.com/capabilities/azure-devops-migration-services/)
 
 The documentation for the preview is on [Preview](https://nkdagility.com/docs/azure-devops-migration-tools/preview/)]
 
-## Minimum Permission Requirements
+## Some Data from the last 30 days (as of 05/03/2024)
 
-At this time the documented minimum required permissions for running the tools are:
+| Category  | Metric | Notes |
+| ------------- | ------------- | ------------- |
+| Work Items | **1m** | A single Work Item may have many revisions that we need to migrate |
+| Work Item Revisions | **23m** | A single Work Item may have many revisions that we need to migrate |
+| RelatedLinkCount | **11m** | Each work item may have many links or none. |
+| Git Commit Links  | **1.3m** |  |
+| Attachments | **1.2m**  | Total number of attachments migrated |
+| Test Suits | 52k | total suits migrated | 
+| Test Cases Mapped | **1.4m** | Total test cases mapped into Suits |
+| Migration Run Ave  | **14 minutes** | Includes dry-runs as well.  |
+| Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
+| Average Work item Migration Time  | **22s** | Work Item (includes all revisions, links, and attachments for the work item) |
 
-- Account in both the source and target projects with "Project Collection Administrator" rights
-- PAT with "full access" for both the Source and the Target
+Exceptions shipped to Application Insights and [Elmah.io](https://elmah.io) for analysis and improvement.
 
-Note: I have been informed by the Azure DevOps product team information that ObjectModel API only works with full scoped PATs, so it won't work with any PAT that has specific scopes. 
 
-### Advanced Unsupported Permission Options
-
-We have seen that the tools may work with less permissions however the following has not been full tested and is not currently supported:
-
-- Project and Team (Read, write, & manage)
-- Work Items (Read, Write & Manage)
-- Identity (Read & Manage)
-- Security (Manage)
-
-If you do try this out then please let us know how you get on!
 
 ## Advanced tools
 
