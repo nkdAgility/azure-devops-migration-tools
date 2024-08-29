@@ -139,9 +139,12 @@ namespace MigrationTools.Host
                 extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });
-            hostBuilder.UseConsoleLifetime();
+            hostBuilder.UseConsoleLifetime(configureOptions =>
+            {
+                configureOptions.SuppressStatusMessages = true;
+            } );
 
-
+   
 
             return hostBuilder;
         }

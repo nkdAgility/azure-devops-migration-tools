@@ -64,8 +64,4 @@
     <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Processors\Infrastructure\" />
-  </ItemGroup>
-
 </Project>

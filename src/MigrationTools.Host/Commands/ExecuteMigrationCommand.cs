@@ -41,6 +41,7 @@ namespace MigrationTools.Host.Commands
             {
                 Telemetery.TrackException(ex, null, null);
                 _logger.LogError(ex, "Unhandled exception!");
+
                 _exitCode = 1;
             }
             finally
