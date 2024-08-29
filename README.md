@@ -1,4 +1,4 @@
-![azure-devops-migration-tools](https://socialify.git.ci/nkdAgility/azure-devops-migration-tools/image?description=1&descriptionEditable=Azure%20DevOps%20Migration%20Tools%20allow%20you%20to%20migrate%20Work%20Items%2C%20Plans%20%26%20Suits%2C%20%26%20Pipelines%20from%20one%20Azure%20DevOps%20%2F%20TFS%20to%20another!&font=Inter&forks=1&name=1&owner=1&pattern=Signal&stargazers=1&theme=Light)
+![Azure DevOps Migration Tools from Naked Agility with Martin Hinshelwood](https://github.com/user-attachments/assets/997cc49f-cbe9-4f22-a8e1-49b529d0dff0)
 ![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)
 ![GitHub pre-release](https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases)
 
