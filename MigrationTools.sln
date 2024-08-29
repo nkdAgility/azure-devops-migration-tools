@@ -115,7 +115,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BADF6B5C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Documentation", "docs\MigrationTools.Documentation.csproj", "{217A2F5E-C6C7-4B1A-9E22-C7A1D00E9BED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Shadows", "src\MigrationTools.Fakes\MigrationTools.Shadows.csproj", "{FA314A24-7616-498C-83F1-84D64365D00F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Shadows", "src\MigrationTools.Shadows\MigrationTools.Shadows.csproj", "{FA314A24-7616-498C-83F1-84D64365D00F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
