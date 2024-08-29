@@ -10,6 +10,11 @@ configurationSamples:
         "CommonTools": {
           "FieldMappingTool": {
             "Enabled": "False",
+            "FieldMapDefaults": {
+              "ApplyTo": [
+                "*"
+              ]
+            },
             "FieldMaps": null
           }
         }

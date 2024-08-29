@@ -32,7 +32,32 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: sample
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "TfsWorkItemMigrationProcessor",
+            "AttachRevisionHistory": "False",
+            "Enabled": "False",
+            "FilterWorkItemsThatAlreadyExistInTarget": "False",
+            "FixHtmlAttachmentLinks": "True",
+            "GenerateMigrationComment": "True",
+            "MaxGracefulFailures": "0",
+            "PauseAfterEachWorkItem": "False",
+            "SkipRevisionWithInvalidAreaPath": "False",
+            "SkipRevisionWithInvalidIterationPath": "False",
+            "SourceName": "Source",
+            "TargetName": "Target",
+            "UpdateCreatedBy": "True",
+            "UpdateCreatedDate": "True",
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+            "WorkItemCreateRetryLimit": "5",
+            "WorkItemIDs": null
+          }
+        ]
+      }
+    }
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: classic
   description: 

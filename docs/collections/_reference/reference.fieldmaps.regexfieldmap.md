@@ -4,7 +4,23 @@ optionsClassFullName: MigrationTools.Tools.RegexFieldMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "RegexFieldMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 - name: sample
   description: 
@@ -40,6 +56,7 @@ configurationSamples:
       "pattern": "PRODUCT \\d{4}.(\\d{1})",
       "replacement": "$1",
       "ApplyTo": [
+        "*",
         "SomeWorkItemType"
       ]
     }

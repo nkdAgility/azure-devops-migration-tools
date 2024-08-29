@@ -4,7 +4,23 @@ optionsClassFullName: MigrationTools.Tools.FieldValueMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValueMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: sample
   description: 
@@ -44,6 +60,7 @@ configurationSamples:
         "StateA": "StateB"
       },
       "ApplyTo": [
+        "*",
         "SomeWorkItemType"
       ]
     }

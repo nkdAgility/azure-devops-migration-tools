@@ -61,7 +61,7 @@ namespace MigrationTools.ConsoleDataGenerator
         private ClassData CreateClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName, Type optionInFocus)
             where TOptionsInterface : IOptions
         {
-           var oConfig =  OptionsManager.GetOptionsConfiguration(optionInFocus);
+           var oConfig =  GetOptionsConfiguration(optionInFocus);
             var typeOftargetOfOption = allTypes.Where(t => t.Name == oConfig.OptionFor && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
             if (typeOftargetOfOption == null)
             {
@@ -243,6 +243,13 @@ namespace MigrationTools.ConsoleDataGenerator
             }
         }
 
+
+        public static ConfigurationMetadata GetOptionsConfiguration(Type option)
+        {
+            // ActivatorUtilities.CreateInstance(option);
+            IOptions optionInsance = (IOptions)Activator.CreateInstance(option);
+            return optionInsance.ConfigurationMetadata;
+        }
 
     }
 }

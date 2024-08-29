@@ -12,7 +12,7 @@ configurationSamples:
             "TfsTeamProjectEndpoint": {
               "AllowCrossProjectLinking": "False",
               "Authentication": {
-                "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+                "AccessToken": "12345",
                 "AuthenticationMode": "AccessToken",
                 "NetworkCredentials": {
                   "Domain": "",
@@ -20,13 +20,14 @@ configurationSamples:
                   "UserName": ""
                 }
               },
-              "Collection": "https://dev.azure.com/nkdagility-preview/",
+              "AuthenticationMode": "AccessToken",
+              "Collection": "",
               "EndpointType": "TfsTeamProjectEndpoint",
               "LanguageMaps": {
                 "AreaPath": "Area",
                 "IterationPath": "Iteration"
               },
-              "Project": "migrationSource1"
+              "Project": ""
             }
           }
         }
@@ -69,11 +70,10 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamProjectEndpointOptions",
-      "Enabled": false,
       "Collection": "https://dev.azure.com/nkdagility-preview/",
       "Project": "migrationSource1",
       "Authentication": {
-        "AuthenticationMode": 0,
+        "AuthenticationMode": "AccessToken",
         "NetworkCredentials": {
           "Domain": "",
           "UserName": "",
@@ -105,10 +105,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Collection
   type: Uri
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: EndpointEnrichers

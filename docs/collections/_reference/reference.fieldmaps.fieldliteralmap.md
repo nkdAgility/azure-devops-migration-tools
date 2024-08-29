@@ -4,7 +4,23 @@ optionsClassFullName: MigrationTools.Tools.FieldLiteralMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldLiteralMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 - name: sample
   description: 
@@ -36,6 +52,7 @@ configurationSamples:
       "targetField": "Custom.SomeField",
       "value": "New field value",
       "ApplyTo": [
+        "*",
         "SomeWorkItemType"
       ]
     }

@@ -4,7 +4,23 @@ optionsClassFullName: MigrationTools.Tools.TreeToTagFieldMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "TreeToTagFieldMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 - name: sample
   description: 
@@ -17,7 +33,9 @@ configurationSamples:
       "$type": "TreeToTagFieldMapOptions",
       "toSkip": 0,
       "timeTravel": 0,
-      "ApplyTo": []
+      "ApplyTo": [
+        "*"
+      ]
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 description: missng XML code comments

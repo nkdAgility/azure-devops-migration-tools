@@ -15,7 +15,6 @@ configurationSamples:
   code: >-
     {
       "$type": "FileSystemWorkItemEndpointOptions",
-      "Enabled": false,
       "FileStore": null,
       "EndpointEnrichers": null
     }
@@ -25,10 +24,6 @@ className: FileSystemWorkItemEndpoint
 typeName: Endpoints
 architecture: 
 options:
-- parameterName: Enabled
-  type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
 - parameterName: EndpointEnrichers
   type: List
   description: missng XML code comments

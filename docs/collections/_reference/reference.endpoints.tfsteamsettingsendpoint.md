@@ -15,7 +15,6 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamSettingsEndpointOptions",
-      "Enabled": false,
       "Organisation": null,
       "Project": null,
       "AuthenticationMode": "AccessToken",
@@ -36,10 +35,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: AuthenticationMode
   type: AuthenticationMode
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: EndpointEnrichers

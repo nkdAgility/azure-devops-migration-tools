@@ -36,7 +36,10 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsGitRepositoryToolOptions",
-      "Enabled": true
+      "Enabled": true,
+      "Mappings": {
+        "RepoInSource": "RepoInTarget"
+      }
     }
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 description: missng XML code comments
@@ -48,6 +51,10 @@ options:
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missng XML code comments
+- parameterName: Mappings
+  type: Dictionary
+  description: List of work item mappings.
+  defaultValue: '{}'
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsGitRepositoryTool.cs

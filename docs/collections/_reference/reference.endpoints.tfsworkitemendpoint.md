@@ -15,7 +15,6 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsWorkItemEndpointOptions",
-      "Enabled": false,
       "Organisation": null,
       "Project": null,
       "Query": null,
@@ -37,10 +36,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: AuthenticationMode
   type: AuthenticationMode
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Enabled
-  type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: EndpointEnrichers

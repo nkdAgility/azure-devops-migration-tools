@@ -4,7 +4,23 @@ optionsClassFullName: MigrationTools.Tools.FieldToTagFieldMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldToTagFieldMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 - name: sample
   description: 
@@ -40,6 +56,7 @@ configurationSamples:
       "sourceField": null,
       "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
       "ApplyTo": [
+        "*",
         "SomeWorkItemType"
       ]
     }

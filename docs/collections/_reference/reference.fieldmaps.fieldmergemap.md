@@ -4,7 +4,23 @@ optionsClassFullName: MigrationTools.Tools.FieldMergeMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldMergeMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: sample
   description: 
@@ -44,6 +60,7 @@ configurationSamples:
       "targetField": "Custom.FieldC",
       "formatExpression": "{0} \n {1}",
       "ApplyTo": [
+        "*",
         "SomeWorkItemType"
       ]
     }

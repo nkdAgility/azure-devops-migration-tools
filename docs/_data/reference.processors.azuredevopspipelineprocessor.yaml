@@ -26,7 +26,26 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: sample
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "AzureDevOpsPipelineProcessor",
+            "BuildPipelines": "",
+            "Enabled": "False",
+            "MigrateBuildPipelines": "True",
+            "MigrateReleasePipelines": "True",
+            "MigrateServiceConnections": "True",
+            "MigrateTaskGroups": "True",
+            "MigrateVariableGroups": "True",
+            "ReleasePipelines": "",
+            "SourceName": "sourceName",
+            "TargetName": "targetName"
+          }
+        ]
+      }
+    }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: classic
   description: 

@@ -4,7 +4,23 @@ optionsClassFullName: MigrationTools.Tools.FieldToFieldMapOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldToFieldMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 - name: sample
   description: 
@@ -38,6 +54,7 @@ configurationSamples:
       "targetField": "Microsoft.VSTS.Common.StackRank",
       "defaultValue": "42",
       "ApplyTo": [
+        "*",
         "SomeWorkItemType"
       ]
     }
