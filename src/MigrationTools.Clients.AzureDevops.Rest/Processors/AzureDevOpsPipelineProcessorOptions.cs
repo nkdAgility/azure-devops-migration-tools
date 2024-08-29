@@ -1,11 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using MigrationTools.Endpoints;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
     public class AzureDevOpsPipelineProcessorOptions : ProcessorOptions
     {
+        public AzureDevOpsPipelineProcessorOptions()
+        {
+            Enabled = false;
+            MigrateBuildPipelines = true;
+            MigrateReleasePipelines = true;
+            MigrateTaskGroups = true;
+            MigrateVariableGroups = true;
+            MigrateServiceConnections = true;
+            BuildPipelines = null;
+            ReleasePipelines = null;
+            SourceName = "sourceName";
+            TargetName = "targetName";
+        }
         /// <summary>
         /// Migrate Build Pipelines
         /// </summary>
@@ -51,24 +65,5 @@ namespace MigrationTools.Processors
         /// </summary>
         public Dictionary<string, string> RepositoryNameMaps { get; set; } //Can we reuse GitRepoMapping?
 
-        public override Type ToConfigure => typeof(AzureDevOpsPipelineProcessor);
-
-        public override IProcessorOptions GetDefault()
-        {
-            return this;
-        }
-
-        public override void SetDefaults()
-        {
-            MigrateBuildPipelines = true;
-            MigrateReleasePipelines = true;
-            MigrateTaskGroups = true;
-            MigrateVariableGroups = true;
-            MigrateServiceConnections = true;
-            BuildPipelines = null;
-            ReleasePipelines = null;
-            SourceName = "sourceName";
-            TargetName = "targetName";
-        }
     }
 }

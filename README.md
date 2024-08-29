@@ -44,61 +44,39 @@ Exceptions shipped to Application Insights and [Elmah.io](https://elmah.io) for 
 
 ## What can you do with this tool?
 
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Team Project` to another
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Organization` to another
-- Bulk edit of `Work Items` across an entire `Project`.
+- Migrate `Work Items`, `Test Plans & Suites`, `Teams`, `Shared Queries`, `Pipelines`, and `Processes` between different `Team Projects` or `Organizations`.
+- Perform bulk edits on `Work Items` across an entire `Project`.
 
-**WARNING: This tool is not designed for a novice. This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**
-**Community support is available through [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) ; Paid support is available through our [recommended consultants](https://nkdagility.com/docs/azure-devops-migration-tools/#support) as well as our contributors and many DevOps consultants around the world.**
+**Important:** This tool is intended for experienced users familiar with TFS/Azure DevOps object models and debugging in Visual Studio. It was developed by over 30 contributors from the Azure DevOps community to handle various scenarios and edge cases. 
+
+**Support Options:** Community support is available on [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions). For paid support, consider our [Azure DevOps Migration Services](https://nkdagility.com/capabilities/azure-devops-migration-services/).
 
 ### What versions of Azure DevOps & TFS do you support?
 
-- Work Item Migration Supports all versions of TFS 2013+ and all versions of Azure DevOps
-- You can move from any Tfs/AzureDevOps source to any Tfs/AzureDevOps target.
-- Process Template migration only supports XML based Projects
+- Supports all versions of TFS 2013+ and all versions of Azure DevOps.
+- You can migrate from any TFS/Azure DevOps source to any TFS/Azure DevOps target.
 
 ### Typical Uses of this tool
 
-- Merge many projects into a single project
-- Split one project into many projects
-- Assistance in changing Process Templates
-- Bulk edit of Work Items
-- Migration of Test Suites & Test Plans
-- _new_ Migration of Builds & Pipelines
-- Migrate from one Language version of TFS / Azure Devops to another (*new v9.0*)1.34
-- _new_  Migration of Processes
+- Merge multiple projects into a single project.
+- Split one project into several projects.
+- Change Process Templates.
+- Bulk edit Work Items.
+- Migrate Test Suites & Test Plans.
+- Migrate Builds & Pipelines (new).
+- Migrate between different language versions of TFS/Azure DevOps (new in v9.0).
+- Migrate Processes.
 
-**NOTE: If you are able to migrate your entire Collection to Azure DevOps Services you should use [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/) from Microsoft. If you have a requirement to change Process Template then you will need to do that before you move to Azure DevOps Services.**
+**Note:** If you're migrating an entire collection to Azure DevOps Services, consider using Microsoft's [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/). If you need to change the Process Template, do so before moving to Azure DevOps Services.
 
 ## Quick Links
 
  - [Video Overview](https://www.youtube.com/watch?v=RCJsST0xBCE)
- - [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started.html)
+ - [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started/)
+ - [Installing](https://nkdagility.com/learn/azure-devops-migration-tools/installation/)
+
  - [Documentation](https://nkdagility.com/learn/azure-devops-migration-tools/)
  - [Questions on Usage](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
-
-## Installing and running the tools
-
-These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.
-For a more detailed getting started guide please see the [documentation](https://nkdagility.com/docs/azure-devops-migration-tools/getting-started.html).
-
-### Option 1: Winget
-
-We use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) to host the tools, and you can use the command `winget install nkdAgility.AzureDevOpsMigrationTools` to install them on Windows 10 and Windows 11. 
-
-The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devopsmigration.exe` that lets you run it from anywhere using `devopsmigration init`.
-
-**NOTE: Do not install using an elevated command prompt!**
-
-### Option 2: Chocolatey
-
-We also deploy to [Chocolatey](https://chocolatey.org/packages/nkdagility.azuredevopsmigrationtools) and you can use the command `choco install vsts-sync-migrator` to install them on Windows Server. 
-
-The tools will be installed to `C:\Tools\MigrationTools\` which should be added to the path. You can run `devopsmigration.exe`
-
-### Option 3: Manual
-
-You can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
 ## Minimum Permission Requirements
 
@@ -148,39 +126,18 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
-- [v15.0.0](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v15.0.0) - Release v15! Query and CommonEnrichersConfig changes 
-- [v14.4.6](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v14.4.6) - Release v14! Migrate to winget and change exe name to `devopsmigration`
-- [v13.2.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v13.2.1) - Oct 9, 2023
-	- 13.2 - Added [ExportUsersForMapping](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/v1/Processors/TeamMigrationContext/) to export a json file with a list of users ready for a field mapping.
-	- 13.1 - Update all NuGet packages to the latest version.
-	- 13.0 - Update to .net 7.0 with all dependencies. Focus on documentation improvements to support future updates.
-- [v12.8.10](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v12.8.10) - Apr 25, 2023
-	- 12.1 - Make embedded images regex lazy
-	- 12.1 - Added a stop when there are area or iteration nodes in the source history that are not in the target. This causes missing data. System will now list the areas and iteration that are missing, and then stop. You can decide to add them manually, or add a field mapping.
-- [v11.12.23](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v11.12.23) - Jun 6, 2022
-	- v11.11 - Refactored revision manager to have more tests and support limiting the number of revisions. CollapseRevisions has been replaced by setting MaxRevisions to 1 and setting AttachRevisionHistory to true; MaxRevisions sets the maximum number of revisions that will be migrated. "First + Last*N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated. This is done after all of the existing revisions are created but before anything newer than that target is removed.
-	- v11.10 - Added ability to limit the number of revisions migrated with `MaxRevisions` on the `WorkItemMigration` processor. 0 = All, and any other number should migrate the first revision + the latest up to MAX.
-	- v11.9 - Dark launch of `Process` migration by @akanieski 
-	- v11.9 - Dark launch of `Pipelines` & `Builds` migration by @tomfrenzel
-	- v11.8 - As part of moving to the new architecture we moved to default newtonsoft type handling with `$type` properties instead of `ObjectType` ___To Migrate rename "ObjectType" to "$type" in your configuration!___
-	- v11.5 - Added more useful logging levels. Replace `"TelemetryEnableTrace": false` with `"LogLevel": "Verbose"` in the config. Verbose will only be logged to the logfile.
-	- v11.2.1 - Removed NodeMigrationContext and converted it to an enricher for Work Items. Still needs work, so that it migrates individual nodes, but currently migrates all.
-- [v10.2.13](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v10.2.13) - Sep 27, 2020 
-	- v10.1 - Changed config design to have only the Name and not FullName of the class. Remove `MigrationTools.Core.Configuration.FieldMap.` and `MigrationTools.Core.Configuration.Processing.` from the config leaving only the Name of the class in the ObjectType field.
-	- v10.0 - Start of the great refactor over to .NET Core and the REST API as the Object Model has been retired.
-- [v9.3.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v9.3.1) - Sep 7, 2020
-- v9.0 - Added support for migration between other language versions of Azure DevOps. Developed for German -> English
-- [v8.9.10](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v8.9.10) -Aug 6, 2020
-	- v8.9 - Added 'Collapse Revisions' feature to collapse and attache revisions instead of replaying them
-	- v8.8 - 'SkipToFinalRevisedWorkItemType' feature added to handle scenario when changing Work Item Type
-	- v8.7 - Support for inline images using a Personal Access Token added to the Source Project
-	- v8.6 - Support for fixing links from TFVC Changesets to Git Commits using a mapping file generated from a Git-TFS migration.
-	- v8.5 - Attachment Max size and linking work items to git repos between projects.
-	- v8.4 - Support for cross-project linking of work items between projects.
-	- v8.3 - Support for restarting the migration and syncing at the revision level.
-	- v8.2 - Merge Git commit Fixing into Work Item migration (requires repos to be migrated first, can be rerun)
-	- v8.0 - Merge of Work Item, Link, & attachment migrators into one.
-- [v7.5.74](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/7.5.74) Sep 18, 2019
-- [v6.3.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/6.3.1) Feb 23, 2017
+- [v15.1.7](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v15.1.7) - The latest release brings a host of enhancements and fixes designed to improve user experience and configuration options. Noteworthy features include a new GitHub Actions workflow for automatic updates to pull request titles, enhanced management of area and iteration paths using regex mapping, and a more streamlined query format for migration configurations. Users can now enjoy greater flexibility in configuring attachment processing, including options for export paths and size limits. Additionally, updates to authentication methods and improved logging for user retrieval processes have been implemented. The release also addresses various bugs and makes adjustments to enhance overall functionality.
+- [v14.4.7](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v14.4.7) - The latest major release brings a host of user-focused enhancements and improvements. Key changes include the adoption of Winget as the primary installation method, making it easier for users to get started. The main executable has been renamed to `devopsmigration.exe`, and new configuration options enhance customization capabilities, including parallel builds and test case timeouts. The command for initializing configurations has been updated for greater flexibility, and logging improvements provide better insights during migration operations. Subsequent updates have refined version detection, improved command line arguments, and introduced new configuration files to prevent blank issues. Enhanced logging and error handling further improve user experience, while package upgrades and better handling of specific fields streamline migration processes. Overall, these updates aim to enhance functionality, usability, and reliability for users.
+- [v13.2.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v13.2.1) - The latest updates bring a range of enhancements and new features aimed at improving user experience and functionality. A key addition is the `WorkItemMigrationContext` processor, which facilitates the migration of work items, including their history and attachments, between Azure DevOps instances. Users will find clearer documentation and a new configuration file to simplify work item type and field mappings. The introduction of the `ExportUsersForMapping` feature allows for easy JSON file exports for field mapping, while security is bolstered with an updated authentication mode. Users can now disable telemetry collection during migration, and various improvements have been made to migration behavior and configuration settings, enhancing the overall robustness and integrity of the migration tools.
+- [v12.8.10](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v12.8.10) - The latest major release brings a host of enhancements designed to improve user experience and streamline migration processes. New configuration options for migration processors offer greater flexibility, allowing users to define custom remapping rules for area and iteration paths. Significant improvements in field mapping configurations and enhanced documentation provide clearer guidance for users. The introduction of features like case-insensitive matching for regular expressions and new parameters for work item migration enhances functionality. Additionally, updates to logging, error handling, and overall documentation structure ensure a more robust and user-friendly experience. Various bug fixes further contribute to the reliability and clarity of the migration tools, making the overall process smoother for users.
+- [v11.9.55](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v11.9.55) - The latest major release introduces a variety of impactful changes designed to enhance user experience and streamline migration processes. Key features include a rebranding of the project to "MigrationTools," improved configuration options, and enhanced error handling for migration operations. Users can now limit revisions during work item migrations, customize field retrieval, and benefit from new logging capabilities for better traceability. The introduction of new interfaces and methods, along with refined documentation, supports improved work item management and configuration flexibility. Overall, these updates aim to provide a more efficient, user-friendly migration experience while addressing previous bugs and enhancing system performance.
+- [v10.2.13](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v10.2.13) - The latest updates to the Migration Tools suite introduce a range of impactful enhancements for users. New projects, such as "MigrationTools.Sinks.AzureDevOps," have been added, along with a revamped console UI for improved Azure DevOps integration. Configuration management has been enhanced, allowing for easier JSON file loading and new telemetry settings. The migration engine has been optimized for better work item handling, and logging has been clarified. Users will need to update their configuration files due to a namespace change and new parameters for work item migration. Subsequent updates further simplify the configuration process, improve field mapping options, and enhance documentation for migrating test artifacts. Overall, these changes provide users with greater flexibility, control, and usability in their migration tasks.
+- [v9.3.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v9.3.1) - The latest major release brings a host of user-focused enhancements and improvements. Key features include multi-language support for Azure DevOps migrations, allowing for greater flexibility in handling different language versions. Users will benefit from improved configuration documentation, which now includes new fields for language mapping of Area and Iteration paths. Subsequent updates have introduced customizable field mappings, conditional logic for excluding specific work item types, and enhanced error handling for better troubleshooting. Additionally, logging capabilities have been significantly upgraded, providing more structured output and insights into application performance. Overall, these changes aim to streamline the migration process and improve user experience.
+- [v8.9.10](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v8.9.10) - The latest major release introduces a range of impactful enhancements and features designed to improve user experience and streamline migration processes. Users can now take advantage of enhanced configuration options, including custom paths for configuration files and new modes for the `init` command. The migration process has been significantly refined with improved error handling, better logging, and new parameters for managing attachments and links. Notable features include the ability to sync changes post-migration, retry failed work item saves, and customize attachment handling. Additionally, the rebranding of the tool ensures users have access to accurate documentation and resources. Overall, these updates focus on providing greater control, efficiency, and clarity throughout the migration experience.
+- [7.5.74](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/7.5.74) - The latest major release brings a host of user-focused enhancements and features designed to improve performance and usability. Key updates include a framework upgrade that boosts application performance and compatibility, alongside dependency updates for improved functionality and security. New configuration options allow for greater flexibility during data migration, including filtering elements by tags and replaying work item revisions. Enhancements to error handling and logging, as well as improvements in attachment management, contribute to a more reliable user experience. Additionally, the introduction of online status checks for version updates ensures users stay informed about the latest changes while connected to the internet.
+- [6.3.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/6.3.1) - The latest major release brings a host of impactful changes for users. A key highlight is the rebranding of the command-line tool to `vstssyncmigrator`, accompanied by updated documentation to assist with the new command structure. Enhancements to attachment export and import migration contexts improve ID formatting, while the restructuring of project organization may necessitate updates to project references. Users will also benefit from improved global configuration documentation, with various processors now enabled by default for immediate functionality. New features include the `WorkItemQueryMigrationContext`, allowing for selective migration of work item queries, and the option to prefix project names in folder paths for better organization. Enhanced logging and an updated FAQ section further support users in managing their migration processes effectively.
+- [5.3.2](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/5.3.2) - The latest major release brings a host of impactful changes designed to enhance user experience and functionality. Key updates include a rebranding to "VSTS Sync Migration Tools" and a simplified command name for installation and uninstallation. Users can now benefit from the new `MultiValueConditionalMapConfig` class, which allows for more complex field mapping configurations. Version 5.1 introduces customizable user preferences and improved command-line functionality, while 5.3 enhances the migration process for test plans with a new method for handling test cases, updates to installation scripts for better package verification, and optimizations in field merging. Comprehensive new documentation supports these changes, ensuring users can easily adapt to the updated features and configurations.
+- [4.4.0](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/4.4.0) - The latest major release introduces a range of impactful enhancements aimed at improving user experience and flexibility during work item migration. A key feature is the new configuration option, `PrefixProjectToNodes`, which allows users to customize the prefixing of project names to area and iteration paths, as well as nodes, enhancing project structure management. The migration logic has been updated to support these options, streamlining the migration process. Additionally, users will benefit from improved documentation, including clearer installation instructions and new JSON configuration files. The release also includes an uninstall script for easier tool management and enhancements to caching and field exclusion during migrations, further refining the overall functionality.
+- [3.6.0.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/3.6.0.1) - The latest updates bring a host of enhancements designed to improve user experience and functionality. Key features include new configuration files for the VSTS Data Bulk Editor, allowing for tailored migration processes, and the introduction of classes for managing team settings. Users can now specify additional query criteria for attachment exports and customize employee picture URL formats. The migration process has been streamlined with improved telemetry tracking and error handling, while new documentation provides valuable context and guidance. Significant improvements to the TfsWitMigrator tool enhance work item tagging flexibility, and updates to the migration context for test plans and variables offer greater control during migrations. Overall, these changes aim to make data migration more efficient and user-friendly.
+- [0.5.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/0.5.1) - The latest update brings a range of enhancements designed to improve user experience. Users will benefit from increased performance and stability, alongside new features that simplify interactions. Additionally, numerous bugs identified in earlier releases have been resolved, contributing to a more seamless and dependable operation. This update focuses on creating a more efficient and user-friendly environment for all.
 
-- 

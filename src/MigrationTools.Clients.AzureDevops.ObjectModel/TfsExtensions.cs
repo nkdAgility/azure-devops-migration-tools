@@ -6,6 +6,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -13,9 +14,9 @@ namespace MigrationTools
 {
     public static class TfsExtensions
     {
-        public static TfsTeamProjectConfig AsTeamProjectConfig(this IMigrationClientConfig context)
+        public static TfsTeamProjectEndpointOptions AsTeamProjectConfig(this IEndpointOptions context)
         {
-            return (TfsTeamProjectConfig)context;
+            return (TfsTeamProjectEndpointOptions)context;
         }
 
         public static WorkItemData AsWorkItemData(this WorkItem context, Dictionary<string, FieldItem> fieldsOfRevision = null)

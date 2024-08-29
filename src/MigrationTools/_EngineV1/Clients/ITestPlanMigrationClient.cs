@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools._EngineV1.Clients
 {
     public interface ITestPlanMigrationClient
     {
-        IMigrationClientConfig Config { get; }
+        IEndpointOptions Options { get; set; }
 
-        void Configure(IMigrationClient migrationClient, bool bypassRules = true);
 
         List<TestPlanData> GetTestPlans();
 

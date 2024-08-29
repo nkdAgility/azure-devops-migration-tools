@@ -1,30 +1,38 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using MigrationTools.Helpers.Tests;
-using MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure.Shadows;
 using MigrationTools.Services;
-using MigrationTools.TestExtensions;
+using MigrationTools.Services.Shadows;
+using MigrationTools.Shadows;
+using MigrationTools.Tools;
+using MigrationTools.Tools.Shadows;
 
 namespace MigrationTools.Tests
 {
     internal static class ServiceProviderHelper
     {
+        [Obsolete]
         internal static ServiceProvider GetWorkItemMigrationProcessor()
         {
+            var configuration = new ConfigurationBuilder().Build();
+            var services = GetServiceCollection();
+            return services.BuildServiceProvider();
+        }
+
+        [Obsolete]
+        internal static ServiceCollection GetServiceCollection()
+        {
+            var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
-            services.AddMigrationToolServices();
+            services.AddMigrationToolServices(configuration);
 
-            // Containers
-            services.AddSingleton<ProcessorContainer>();
-            services.AddSingleton<TypeDefinitionMapContainer>();
-            services.AddSingleton<GitRepoMapContainer>();
-            services.AddSingleton<FieldMapContainer>();
-            services.AddSingleton<ChangeSetMappingContainer>();
 
             services.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
 
@@ -33,29 +41,17 @@ namespace MigrationTools.Tests
             services.AddTransient<ProcessorEnricherContainer>();
 
             // ProcessorEnrichers
-            services.AddSingleton<StringManipulatorEnricher>();
+            services.AddSingleton<StringManipulatorTool>();
 
-            //Endpoints
-            services.AddTransient<InMemoryWorkItemEndpoint>();
-            services.AddTransient<EndpointEnricherContainer>();
-            AddEndpoint(services, "Source");
-            AddEndpoint(services, "Target");
 
             services.AddSingleton<IMigrationToolVersionInfo, FakeMigrationToolVersionInfo>();
             services.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
+            services.AddTransient<MockSimpleFieldMap>();
+            services.AddTransient<MockSimpleFieldMapOptions>();
+            services.AddTransient<MockSimpleProcessor>();
 
-            return services.BuildServiceProvider();
+            return services;
         }
 
-        private static void AddEndpoint(IServiceCollection services, string name)
-        {
-            services.AddEndpoint(name, (provider) =>
-            {
-                var options = new InMemoryWorkItemEndpointOptions();
-                var endpoint = provider.GetRequiredService<InMemoryWorkItemEndpoint>();
-                endpoint.Configure(options);
-                return endpoint;
-            });
-        }
     }
 }

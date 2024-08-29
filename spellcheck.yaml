@@ -1,7 +1,9 @@
 matrix:
 - name: Markdown
   sources:
-  - '**/*.md'
+  - 'docs/**/*.md'
+  - 'src/**/*.md'
+  - '*.md'
   default_encoding: utf-8
   aspell:
     lang: en

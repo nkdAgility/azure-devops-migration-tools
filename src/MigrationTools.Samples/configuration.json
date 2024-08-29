@@ -26,7 +26,7 @@
   },
   "FieldMaps": [
     {
-      "ObjectType": "MultiValueConditionalMapConfig",
+      "ObjectType": "MultiValueConditionalMapOptions",
       "WorkItemTypeName": "*",
       "sourceFieldsAndValues": {
         "Field1": "Value1",
@@ -38,12 +38,12 @@
       }
     },
     {
-      "ObjectType": "FieldSkipMapConfig",
+      "ObjectType": "FieldSkipMapOptions",
       "WorkItemTypeName": "*",
       "targetField": "TfsMigrationTool.ReflectedWorkItemId"
     },
     {
-      "ObjectType": "FieldValueMapConfig",
+      "ObjectType": "FieldValueMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "targetField": "System.State",
@@ -59,13 +59,13 @@
       }
     },
     {
-      "ObjectType": "FieldtoFieldMapConfig",
+      "ObjectType": "FieldtoFieldMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank"
     },
     {
-      "ObjectType": "FieldtoFieldMultiMapConfig",
+      "ObjectType": "FieldtoFieldMultiMapOptions",
       "WorkItemTypeName": "*",
       "SourceToTargetMappings": {
         "SourceField1": "TargetField1",
@@ -73,13 +73,13 @@
       }
     },
     {
-      "ObjectType": "FieldtoTagMapConfig",
+      "ObjectType": "FieldtoTagMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "System.State",
       "formatExpression": "ScrumState:{0}"
     },
     {
-      "ObjectType": "FieldMergeMapConfig",
+      "ObjectType": "FieldMergeMapOptions",
       "WorkItemTypeName": "*",
       "sourceField1": "System.Description",
       "sourceField2": "Microsoft.VSTS.Common.AcceptanceCriteria",
@@ -88,7 +88,7 @@
       "doneMatch": "##DONE##"
     },
     {
-      "ObjectType": "RegexFieldMapConfig",
+      "ObjectType": "RegexFieldMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "COMPANY.PRODUCT.Release",
       "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
@@ -96,14 +96,14 @@
       "replacement": "$1"
     },
     {
-      "ObjectType": "FieldValuetoTagMapConfig",
+      "ObjectType": "FieldValuetoTagMapOptions",
       "WorkItemTypeName": "*",
       "sourceField": "Microsoft.VSTS.CMMI.Blocked",
       "pattern": "Yes",
       "formatExpression": "{0}"
     },
     {
-      "ObjectType": "TreeToTagMapConfig",
+      "ObjectType": "TreeToTagMapOptions",
       "WorkItemTypeName": "*",
       "toSkip": 3,
       "timeTravel": 1

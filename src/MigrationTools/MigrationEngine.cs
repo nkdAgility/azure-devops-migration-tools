@@ -8,8 +8,12 @@ using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
+using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Options;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
+
 
 namespace MigrationTools
 {
@@ -17,71 +21,50 @@ namespace MigrationTools
     {
         private readonly ILogger<MigrationEngine> _logger;
         private readonly IServiceProvider _services;
-        private IMigrationClient _source;
-        private IMigrationClient _target;
-        private NetworkCredentialsOptions _networkCredentials;
+        private IEndpoint _source;
+        private IEndpoint _target;
         private ITelemetryLogger _telemetryLogger;
-        private EngineConfiguration _engineConfiguration;
 
         public MigrationEngine(
             IServiceProvider services,
-            IOptions<NetworkCredentialsOptions> networkCredentials,
-            IOptions<EngineConfiguration> config,
-            TypeDefinitionMapContainer typeDefinitionMaps,
             ProcessorContainer processors,
-            GitRepoMapContainer gitRepoMaps,
-            ChangeSetMappingContainer changeSetMapps,
-            FieldMapContainer fieldMaps,
             ITelemetryLogger telemetry,
             ILogger<MigrationEngine> logger)
         {
             _logger = logger;
             _logger.LogInformation("Creating Migration Engine {SessionId}", telemetry.SessionId);
             _services = services;
-            FieldMaps = fieldMaps;
-            _networkCredentials = networkCredentials.Value;
-            TypeDefinitionMaps = typeDefinitionMaps;
             Processors = processors;
-            GitRepoMaps = gitRepoMaps;
-            ChangeSetMapps = changeSetMapps;
             _telemetryLogger = telemetry;
-            _engineConfiguration = config.Value;
         }
-
-        public ChangeSetMappingContainer ChangeSetMapps { get; }
         
-        public FieldMapContainer FieldMaps { get; }
-
-        public GitRepoMapContainer GitRepoMaps { get; }
 
         public ProcessorContainer Processors { get; }
 
-        public IMigrationClient Source
+        public IEndpoint Source
         {
             get
             {
                 if (_source is null)
                 {
-                    _source = GetMigrationClient(_engineConfiguration.Source, _networkCredentials.Source);
+                    _source = _services.GetKeyedService<IEndpoint>("Source"); 
                 }
                 return _source;
             }
         }
 
-        public IMigrationClient Target
+        public IEndpoint Target
         {
             get
             {
                 if (_target is null)
                 {
-                    _target = GetMigrationClient(_engineConfiguration.Target, _networkCredentials.Target);
+                    _target = _services.GetKeyedService<IEndpoint>("Target");
                 }
                 return _target;
             }
         }
-        
-        public TypeDefinitionMapContainer TypeDefinitionMaps { get; }
-
+    
         public ProcessingStatus Run()
         {
             _telemetryLogger.TrackEvent("EngineStart",
@@ -89,12 +72,11 @@ namespace MigrationTools
                     { "Engine", "Migration" }
                 },
                 new Dictionary<string, double> {
-                    { "Processors", Processors.Count },
-                    { "Mappings", FieldMaps.Count }
+                    { "Processors", Processors.Count }
                 });
             Stopwatch engineTimer = Stopwatch.StartNew();
 
-            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", _engineConfiguration.LogLevel);
+            _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", "unknown");
             _logger.LogInformation("                              Max Logfile: {FileLogLevel}. ", "Verbose");
             _logger.LogInformation("                              Max Console: {ConsoleLogLevel}. ", "Debug");
             _logger.LogInformation("                 Max Application Insights: {AILogLevel}. ", "Error");
@@ -102,14 +84,9 @@ namespace MigrationTools
 
             ProcessingStatus ps = ProcessingStatus.Running;
 
-            Processors.EnsureConfigured();
-            TypeDefinitionMaps.EnsureConfigured();
-            GitRepoMaps.EnsureConfigured();
-            ChangeSetMapps.EnsureConfigured();
-            FieldMaps.EnsureConfigured();
 
             _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-            foreach (_EngineV1.Containers.IProcessor process in Processors.Items)
+            foreach (IOldProcessor process in Processors.Processors)
             {
                 _logger.LogInformation("Processor: {ProcessorName}", process.Name);
                 Stopwatch processorTimer = Stopwatch.StartNew();
@@ -135,15 +112,7 @@ namespace MigrationTools
             return ps;
         }
 
-        private IMigrationClient GetMigrationClient(IMigrationClientConfig config, Credentials networkCredentials)
-        {
-            var credentials = CheckForNetworkCredentials(networkCredentials);
-            var client = _services.GetRequiredService<IMigrationClient>();
-            client.Configure(config, credentials);
-            return client;
-        }
-
-        private NetworkCredential CheckForNetworkCredentials(Credentials credentials)
+        private NetworkCredential CheckForNetworkCredentials(NetworkCredentials credentials)
         {
             NetworkCredential networkCredentials = null;
             if (!string.IsNullOrWhiteSpace(credentials?.UserName) && !string.IsNullOrWhiteSpace(credentials?.Password))

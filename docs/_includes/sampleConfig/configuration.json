@@ -1,118 +1,76 @@
 {
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
+  "Serilog": {
+    "MinimumLevel": "Information"
   },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "njp3kcec4nbev63fmbepvdpn35drawmonk5qf5yqsw77dgfwnjda",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": [
-    {
-      "$type": "TfsNodeStructureOptions",
-      "NodeBasePaths": [],
-      "AreaMaps": {
-        "^Skypoint Cloud$": "MigrationTest5"
+  "MigrationTools": {
+    "Version": "16.0",
+    "Source": {
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationSource1",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "AccessToken",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+
+      }
+    },
+    "Target": {
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationTest5",
+      "TfsVersion": "AzureDevOps",
+      "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "AccessToken",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
+    },
+    "CommonEnrichers": {
+      "TfsChangeSetMapping": {
+        "Enabled": true,
+        "File": "C:\\temp\\ChangeSetMappingFile.json"
       },
-      "IterationMaps": {
-        "^Skypoint Cloud\\\\Sprint 1$": "MigrationTest5\\Sprint 1"
-      },
-      "ShouldCreateMissingRevisionPaths": true,
-      "ReplicateAllExistingNodes": true
+      "TfsFieldMappings": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldToFieledMap",
+            "sourceField": "System.AcceptanceCriteria",
+            "targetField": "System.AcceptanceCriteria2"
+
+          },
+          {
+            "FieldMapType": "FieldToFieledMap",
+            "sourceField": "System.Description",
+            "targetField": "System.Description2"
+
+          }
+        ]
+      }
     },
-    {
-      "$type": "TfsWorkItemLinkEnricherOptions",
-      "Enabled": true,
-      "FilterIfLinkCountMatches": true,
-      "SaveAfterEachLinkIsAdded": false
-    },
-    {
-      "$type": "TfsRevisionManagerOptions",
-      "Enabled": true,
-      "ReplayRevisions": true,
-      "MaxRevisions": 0
-    },
-    {
-      "$type": "TfsAttachmentEnricherOptions",
-      "Enabled": true,
-      "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-      "MaxAttachmentSize": 480000000
-    },
-    {
-      "$type": "StringManipulatorEnricherOptions",
-      "Enabled": true,
-      "MaxStringLength": 1000000,
-      "Manipulators": [
-        {
-          "$type": "RegexStringManipulator",
-          "Enabled": true,
-          "Pattern": "[^( -~)\n\r\t]+",
-          "Replacement": "",
-          "Description": "Remove invalid characters from the end of the string"
-        }
-      ]
-    }
-  ],
-  "Processors": [
-    {
-      "$type": "WorkItemMigrationConfig",
-      "Enabled": true,
-      "UpdateCreatedDate": true,
-      "UpdateCreatedBy": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "LinkMigration": true,
-      "FixHtmlAttachmentLinks": false,
-      "SkipToFinalRevisedWorkItemType": false,
-      "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": false,
-      "PauseAfterEachWorkItem": false,
-      "AttachRevisionHistory": false,
-      "LinkMigrationSaveEachAsAdded": false,
-      "GenerateMigrationComment": true,
-      "WorkItemIDs": null,
-      "MaxGracefulFailures": 0,
-      "SkipRevisionWithInvalidIterationPath": false,
-      "SkipRevisionWithInvalidAreaPath": false
-    }
-  ],
-  "Version": "15.0",
-  "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
-  "Endpoints": {
-    "InMemoryWorkItemEndpoints": [
+    "Processors": [
       {
-        "Name": "Source",
-        "EndpointEnrichers": null
-      },
-      {
-        "Name": "Target",
-        "EndpointEnrichers": null
+        "ProcessorType": "WorkItemMigration",
+        "Enabled": true,
+        "UpdateCreatedDate": true,
+        "UpdateCreatedBy": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+        "FixHtmlAttachmentLinks": false,
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": false,
+        "PauseAfterEachWorkItem": false,
+        "AttachRevisionHistory": false,
+        "GenerateMigrationComment": true,
+        "WorkItemIDs": [],
+        "MaxGracefulFailures": 0,
+        "SkipRevisionWithInvalidIterationPath": false,
+        "SkipRevisionWithInvalidAreaPath": false
       }
     ]
   }

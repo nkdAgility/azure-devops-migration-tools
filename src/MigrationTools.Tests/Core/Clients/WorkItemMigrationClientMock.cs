@@ -4,6 +4,8 @@ using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
+using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.Clients.Tests
 {
@@ -11,9 +13,11 @@ namespace MigrationTools.Clients.Tests
     {
         private List<WorkItemData> list = new List<WorkItemData>();
 
-        public IMigrationClientConfig Config => throw new System.NotImplementedException();
+        public IEndpointOptions Config => throw new System.NotImplementedException();
 
         public ProjectData Project => throw new System.NotImplementedException();
+
+        public IEndpointOptions Options => throw new System.NotImplementedException();
 
         public void Configure(IMigrationClient migrationClient, bool bypassRules = true)
         {
@@ -117,12 +121,7 @@ namespace MigrationTools.Clients.Tests
             throw new System.NotImplementedException();
         }
 
-        List<WorkItemData> IWorkItemMigrationClient.GetWorkItems(string query)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IWorkItemMigrationClient target)
+        public List<WorkItemData> FilterWorkItemsThatAlreadyExist(List<WorkItemData> sourceWorkItems, IMigrationClient target)
         {
             throw new System.NotImplementedException();
         }
@@ -147,17 +146,22 @@ namespace MigrationTools.Clients.Tests
             throw new System.NotImplementedException();
         }
 
+        public List<int> GetWorkItemIds(string WIQLQuery)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        List<WorkItemData> IWorkItemMigrationClient.GetWorkItems(string WIQLQuery)
+        {
+            throw new System.NotImplementedException();
+        }
+
         ReflectedWorkItemId IWorkItemMigrationClient.CreateReflectedWorkItemId(WorkItemData workItem)
         {
             throw new System.NotImplementedException();
         }
 
         ReflectedWorkItemId IWorkItemMigrationClient.GetReflectedWorkItemId(WorkItemData workItem)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public List<int> GetWorkItemIds(string WIQLQuery)
         {
             throw new System.NotImplementedException();
         }

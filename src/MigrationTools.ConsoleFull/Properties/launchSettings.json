@@ -1,27 +1,39 @@
 {
   "profiles": {
+    "empty": {
+      "commandName": "Project"
+    },
+    "Execute -noconfig": {
+      "commandName": "Project",
+      "commandLineArgs": "execute"
+    },
     "execute": {
       "commandName": "Project",
       "commandLineArgs": "execute -c \"configuration.json\""
     },
-    "executepipe": {
+    "execute --help": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c configuration2-pipeline.json"
+      "commandLineArgs": "execute --help"
     },
-    "init": {
+    "init Options-Basic": {
       "commandName": "Project",
-      "commandLineArgs": "init --options Basic"
+      "commandLineArgs": "init --options Basic --overwrite"
     },
-    "execute2": {
+    "Config": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c configuration2.json"
+      "commandLineArgs": "config -c \"configuration.json\""
     },
-    "init2": {
+    "init Options-Reference": {
       "commandName": "Project",
-      "commandLineArgs": "init -c configuration2.json --options Fullv2"
+      "commandLineArgs": "init --options Reference -c configuration-ref.json --overwrite"
     },
-    "empty": {
-      "commandName": "Project"
+    "Upgrade": {
+      "commandName": "Project",
+      "commandLineArgs": "upgrade -c \"configuration.json\""
+    },
+    "Execute Classic": {
+      "commandName": "Project",
+      "commandLineArgs": "execute -c \"configuration-classic.json\""
     }
   }
 }

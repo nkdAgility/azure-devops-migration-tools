@@ -1,10 +1,12 @@
 ﻿using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.Tests
 {
-    public class FakeMigrationClientConfig : IMigrationClientConfig
+    public class FakeMigrationClientConfig : EndpointOptions
     {
-        public IMigrationClientConfig PopulateWithDefault()
+        public IEndpointOptions PopulateWithDefault()
         {
             return this;
         }

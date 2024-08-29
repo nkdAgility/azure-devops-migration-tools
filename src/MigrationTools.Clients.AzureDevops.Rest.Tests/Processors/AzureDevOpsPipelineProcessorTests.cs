@@ -5,16 +5,23 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Serilog.Events;
 using Serilog.Sinks.InMemory;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors.Tests
 {
     [TestClass()]
     public class AzureDevOpsPipelineProcessorTests : AzureDevOpsProcessorTests
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            Serilog.Sinks.InMemory.InMemorySink.Instance?.Dispose();
+        }
+
         [TestMethod(), TestCategory("L0")]
         public void AzureDevOpsPipelineProcessorTest()
         {
-            var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
+            var x = GetAzureDevOpsPipelineProcessor();
             Assert.IsNotNull(x);
         }
 
@@ -27,8 +34,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            x.Configure(y);
+            var x = GetAzureDevOpsPipelineProcessor(y);
             Assert.IsNotNull(x);
         }
 
@@ -41,8 +47,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            x.Configure(y);
+            var x = GetAzureDevOpsPipelineProcessor(y);
             Assert.IsNotNull(x);
         }
 
@@ -50,26 +55,23 @@ namespace MigrationTools.Processors.Tests
         public void AzureDevOpsPipelineProcessorNoEnrichersTest()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
-            var migrationConfig = GetAzureDevOpsPipelineProcessorOptions();
-            var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            processor.Configure(migrationConfig);
+            var processor = GetAzureDevOpsPipelineProcessor();
             processor.Execute();
             Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
         }
 
-        [TestMethod, TestCategory("L3")]        
+        [TestMethod, TestCategory("L3")]
         public void AzureDevOpsPipelineProcessorSelectedBuildDefinitionsTest()
         {
             var config = new AzureDevOpsPipelineProcessorOptions
             {
-                BuildPipelines = new List<string> { "Test1", "Test2"},
+                BuildPipelines = new List<string> { "Test1", "Test2" },
                 MigrateBuildPipelines = true,
                 Enabled = true,
                 SourceName = "Source",
                 TargetName = "Target",
             };
-            var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            processor.Configure(config);
+            var processor = GetAzureDevOpsPipelineProcessor(config);
 
             processor.Execute();
 
@@ -100,8 +102,7 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target",
             };
-            var processor = Services.GetRequiredService<AzureDevOpsPipelineProcessor>();
-            processor.Configure(config);
+            var processor = GetAzureDevOpsPipelineProcessor(config);
 
             processor.Execute();
 
@@ -118,7 +119,7 @@ namespace MigrationTools.Processors.Tests
                     GetValueFromProperty(le.Properties["DefinitionList"]).ToString() == "Test1;New release pipeline;Test3";
 
             Assert.AreEqual(1, InMemorySink.Instance.LogEvents.Count(migrationMessageFilter));
-            Assert.AreEqual(2, InMemorySink.Instance.LogEvents.Count(configuredMessageFilter));         
+            Assert.AreEqual(2, InMemorySink.Instance.LogEvents.Count(configuredMessageFilter));
         }
     }
 }

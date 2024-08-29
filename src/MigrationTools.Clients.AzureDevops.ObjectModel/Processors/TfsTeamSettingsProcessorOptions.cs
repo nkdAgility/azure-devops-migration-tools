@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
     public class TfsTeamSettingsProcessorOptions : ProcessorOptions
     {
+
         /// <summary>
         /// Migrate original team settings after their creation on target team project
         /// </summary>
@@ -34,20 +36,5 @@ namespace MigrationTools.Processors
         /// </summary>
         public List<string> Teams { get; set; }
 
-        public override Type ToConfigure => typeof(TfsTeamSettingsProcessor);
-
-        public override IProcessorOptions GetDefault()
-        {
-            return this;
-        }
-
-        public override void SetDefaults()
-        {
-            MigrateTeamSettings = true;
-            UpdateTeamSettings = true;
-            PrefixProjectToNodes = false;
-            SourceName = "sourceName";
-            TargetName = "targetName";
-        }
     }
 }

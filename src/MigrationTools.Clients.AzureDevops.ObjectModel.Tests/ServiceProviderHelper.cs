@@ -1,21 +1,30 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MigrationTools.Endpoints;
-using MigrationTools.Helpers.Tests;
 using MigrationTools.Services;
-using MigrationTools.TestExtensions;
+using MigrationTools.Services.Shadows;
+using MigrationTools.Shadows;
 
 namespace MigrationTools.Tests
 {
     public static class ServiceProviderHelper
     {
+        public static ServiceCollection GetMigrationToolServicesForUnitTests()
+        {
+            var configuration = new ConfigurationBuilder().Build();
+            var services = new ServiceCollection();
+            services.AddMigrationToolServicesForUnitTests();
+            return services;
+        }
+
         public static ServiceProvider GetServices()
         {
             var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
 
-            services.AddMigrationToolServices();
+            services.AddMigrationToolServices(configuration);
             services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(configuration);
             services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
             services.AddMigrationToolServicesLegacy();
@@ -33,11 +42,10 @@ namespace MigrationTools.Tests
 
         private static void AddTfsTeamEndpoint(IServiceCollection services, string name, string project)
         {
-            services.AddEndpoint(name, (provider) =>
+            services.AddKeyedSingleton<TfsTeamSettingsEndpoint>(name, (sp, key) =>
             {
-                var options = GetTfsTeamEndPointOptions(project);
-                var endpoint = provider.GetRequiredService<TfsTeamSettingsEndpoint>();
-                endpoint.Configure(options);
+                var options = GetTfsEndPointOptions(project);
+                var endpoint = ActivatorUtilities.CreateInstance<TfsTeamSettingsEndpoint>(sp, options);
                 return endpoint;
             });
         }
@@ -55,11 +63,10 @@ namespace MigrationTools.Tests
 
         private static void AddTfsEndpoint(IServiceCollection services, string name, string project)
         {
-            services.AddEndpoint(name, (provider) =>
+            services.AddKeyedSingleton<TfsEndpoint>(name, (sp, key) =>
             {
                 var options = GetTfsEndPointOptions(project);
-                var endpoint = provider.GetRequiredService<TfsEndpoint>();
-                endpoint.Configure(options);
+                var endpoint = ActivatorUtilities.CreateInstance<TfsEndpoint>(sp, options);
                 return endpoint;
             });
         }

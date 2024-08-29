@@ -19,37 +19,40 @@ layout: default
 
     {% assign mdInfo = page.topics | where: "topic", "introduction" | last %}
     <p>{{ mdInfo.markdown | markdownify }}</p>
-    
+
     <h2>Options</h2>
     <div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <tr>
-            <td>Parameter name</td>
-            <td>Type</td>
-            <td>Description</td>
-            <td>Default Value</td>
-        </tr>
-    {% assign options = page.options %}
-    {% for option in options %}
-        <tr>
-            <td>{{option.parameterName}}</td>
-            <td>{{option.type}}</td>
-            <td>{{option.description}}</td>
-            <td>{{option.defaultValue}}</td>
-        </tr>
+        <table class="table table-striped table-hover">
+            <tr>
+                <td>Parameter name</td>
+                <td>Type</td>
+                <td>Description</td>
+                <td>Default Value</td>
+            </tr>
+            {% assign options = page.options %}
+            {% for option in options %}
+            <tr>
+                <td>{{option.parameterName}}</td>
+                <td>{{option.type}}</td>
+                <td>{{option.description}}</td>
+                <td>{{option.defaultValue}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <h2>Examples</h2>
+    {% assign configurationSamples = page.configurationSamples %}
+    {% for sample in configurationSamples %}
+    <h3>{{sample.name}}</h3>
+    {% if sample.name == "Classic" %}
+    <p>We have moved to a new config format, but are still tying to get this here to generate :)! The sample below is generated and is still valid for the settings, but you will need to map it to the main format.</p>
+    {% endif %}
+    {% highlight json linenos %}
+    {{sample.code}}
+    {% endhighlight %}
     {% endfor %}
-</table>
-</div>
-
-<h2>Example</h2>
-<p>A basic sample for {{ page.className }} configuration.</p>
-    {% assign sample = page.configurationSamples | where: "name", "default" | last %}
-
-{% highlight json linenos %}
-{{sample.code}}
-{% endhighlight %}
-
-{% assign mdInfo = page.topics | where: "topic", "notes" | last %}
+    {% assign mdInfo = page.topics | where: "topic", "notes" | last %}
     <p>{{ mdInfo.markdown | markdownify }}</p>
 
     {{ content | inject_anchors }}

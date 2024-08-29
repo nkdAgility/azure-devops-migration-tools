@@ -15,7 +15,7 @@
         "Shared Parameter": "Shared Parameter"
     },
     "FieldMaps": [{
-        "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldSkipMapConfig",
+        "ObjectType": "VstsSyncMigrator.Engine.Configuration.FieldMap.FieldSkipMapOptions",
         "WorkItemTypeName": "*",
         "targetField": "TfsMigrationTool.ReflectedWorkItemId"
     }],

@@ -1,70 +1,79 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
-using MigrationTools.Options;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using Spectre.Console.Cli;
 using Serilog.Filters;
 using MigrationTools.Host.Commands;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using MigrationTools.Services;
 using Spectre.Console.Extensions.Hosting;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data;
+using static MigrationTools.ConfigurationExtensions;
+using MigrationTools.Options;
+using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
+using Microsoft.Extensions.Options;
+using System.Configuration;
+using Spectre.Console;
 
 namespace MigrationTools.Host
 {
 
-    
+
 
     public static class MigrationToolHost
     {
         static int logs = 1;
         private static bool LoggerHasBeenBuilt = false;
 
-        public static IHostBuilder CreateDefaultBuilder(string[] args)
+        public static IEnumerable<T> GetAll<T>(this IServiceProvider provider)
         {
-           var configFile =  CommandSettingsBase.ForceGetConfigFile(args);
+            var site = typeof(ServiceProvider).GetProperty("CallSiteFactory", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(provider);
+            var desc = site.GetType().GetField("_descriptors", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(site) as ServiceDescriptor[];
+            return desc.Select(s => provider.GetRequiredService(s.ServiceType)).OfType<T>();
+        }
+
+        public static IHostBuilder CreateDefaultBuilder(string[] args, Action<IConfigurator> extraCommands = null)
+        {
+            var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
+            string logsPath = CreateLogsPath();
+
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
+
+            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}"; // 
+
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
-                    string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [" + mtv.GetRunningVersion().versionString + "] {Message:lj}{NewLine}{Exception}"; // {SourceContext}
-                    string logsPath = CreateLogsPath();
-                    var logPath = Path.Combine(logsPath, $"migration-{logs}.log");
-
-                    var logLevel = hostingContext.Configuration.GetValue<LogEventLevel>("LogLevel");
-                    var levelSwitch = new LoggingLevelSwitch(logLevel);
-                    loggerConfiguration
-                        .MinimumLevel.ControlledBy(levelSwitch)
-                        .ReadFrom.Configuration(hostingContext.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.WithMachineName()
-                        .Enrich.WithProcessId()
-                        .WriteTo.File(logPath, LogEventLevel.Verbose, outputTemplate)
-                        .WriteTo.Logger(lc => lc
+                loggerConfiguration
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithProcessId()
+                    .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error)
+                    .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: outputTemplate)
+                    .WriteTo.File(new Serilog.Formatting.Json.JsonFormatter(), Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true)
+                    .WriteTo.Logger(lc => lc
                             .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
                             .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
-                            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
-                        .WriteTo.Logger(lc => lc
-                            .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration> (), new CustomConverter(), LogEventLevel.Error));
-                    logs++;
-                    LoggerHasBeenBuilt = true;                
+                            .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
+                    ;
+                    
+                LoggerHasBeenBuilt = true;
             });
 
             hostBuilder.ConfigureLogging((context, logBuilder) =>
@@ -72,39 +81,18 @@ namespace MigrationTools.Host
              })
             .ConfigureAppConfiguration(builder =>
             {
-                if (!string.IsNullOrEmpty(configFile) &&  File.Exists(configFile))
+                if (!string.IsNullOrEmpty(configFile) && File.Exists(configFile))
                 {
                     builder.AddJsonFile(configFile);
                 }
+                builder.AddEnvironmentVariables();
+                builder.AddCommandLine(args);
             });
 
             hostBuilder.ConfigureServices((context, services) =>
-             {
-                 services.AddOptions();
-                 services.Configure<EngineConfiguration>((config) =>
-                 {
-                     var sp = services.BuildServiceProvider();
-                     var logger = sp.GetService<ILoggerFactory>().CreateLogger<EngineConfiguration>();
-                     if (!File.Exists(configFile))
-                     {
-                         logger.LogCritical("The config file {ConfigFile} does not exist, nor does the default 'configuration.json'. Use '{ExecutableName}.exe init' to create a configuration file first", configFile, Assembly.GetEntryAssembly().GetName().Name);
-                         Environment.Exit(-1);
-                     }
-                     logger.LogInformation("Config Found, creating engine host");
-                     var reader = sp.GetRequiredService<IEngineConfigurationReader>();
-                     var parsed = reader.BuildFromFile(configFile);
-                     config.ChangeSetMappingFile = parsed.ChangeSetMappingFile;
-                     config.FieldMaps = parsed.FieldMaps;
-                     config.GitRepoMapping = parsed.GitRepoMapping;
-                     config.CommonEnrichersConfig = parsed.CommonEnrichersConfig;
-                     config.Processors = parsed.Processors;
-                     config.Source = parsed.Source;
-                     config.Target = parsed.Target;
-                     config.Version = parsed.Version;
-                     config.workaroundForQuerySOAPBugEnabled = parsed.workaroundForQuerySOAPBugEnabled;
-                     config.WorkItemTypeDefinition = parsed.WorkItemTypeDefinition;
-                 });
+            {
 
+                    services.AddOptions();
 
                  // Application Insights
                  ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
@@ -115,7 +103,7 @@ namespace MigrationTools.Host
                  //#endif
                  services.AddApplicationInsightsTelemetryWorkerService(aiso);
 
-                 // Services
+                 //// Services
                  services.AddTransient<IDetectOnlineService, DetectOnlineService>();
                  //services.AddTransient<IDetectVersionService, DetectVersionService>();
                  services.AddTransient<IDetectVersionService2, DetectVersionService2>();
@@ -123,22 +111,32 @@ namespace MigrationTools.Host
                  services.AddSingleton<IMigrationToolVersionInfo, MigrationToolVersionInfo>();
                  services.AddSingleton<IMigrationToolVersion, MigrationToolVersion>();
 
-
-                 // Config
-                 services.AddSingleton<IEngineConfigurationBuilder, EngineConfigurationBuilder>();
-                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as IEngineConfigurationReader);
-                 services.AddTransient((provider) => provider.GetRequiredService<IEngineConfigurationBuilder>() as ISettingsWriter);
-
-                 // Add Old v1Bits
+                 //// Add Old v1Bits
                  services.AddMigrationToolServicesLegacy();
-                 // New v2Bits
-                 services.AddMigrationToolServices();
+                 //// New v2Bits
+                 services.AddMigrationToolServices(context.Configuration, configFile);
              });
 
             hostBuilder.UseSpectreConsole(config =>
             {
-                config.AddCommand<Commands.ExecuteMigrationCommand>("execute");
-                config.AddCommand<Commands.InitMigrationCommand>("init");
+                config.AddCommand<Commands.ExecuteMigrationCommand>("execute")
+                            .WithDescription("Executes the enables processors specified in the configuration file.")
+                            .WithExample("execute -config \"configuration.json\"")
+                            .WithExample("execute -config \"configuration.json\" --skipVersionCheck ");
+                config.AddCommand<Commands.InitMigrationCommand>("init")
+                            .WithDescription("Creates an default configuration file")
+                            .WithExample("init -options Basic")
+                            .WithExample("init -options WorkItemTracking ")
+                            .WithExample("init -options Reference ");
+                config.AddCommand<Commands.UpgradeConfigCommand>("upgrade")
+                           .WithDescription("Atempts to upgrade your config from the old version to the new one. For each object we will load the defaults, then apply your config. This will only bring accross valid settings. This is 'best effort' and you will need to check all the values as we have changed a lot!")
+                           .WithExample("upgrade -config \"configuration.json\"");
+
+                //config.AddCommand<Commands.MigrationConfigCommand>("config")
+                //            .WithDescription("Creates or edits a configuration file")
+                //           .WithExample("config -config \"configuration.json\"");
+
+                extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });
             hostBuilder.UseConsoleLifetime();
@@ -162,5 +160,6 @@ namespace MigrationTools.Host
 
             return exportPath;
         }
+
     }
 }

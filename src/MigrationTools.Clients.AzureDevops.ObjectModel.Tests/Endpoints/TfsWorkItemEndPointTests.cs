@@ -1,29 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools.DataContracts;
+using MigrationTools.EndpointEnrichers;
+using MigrationTools.Enrichers;
 using MigrationTools.Options;
+using MigrationTools.Processors;
 using MigrationTools.Tests;
+using MigrationTools.Tools;
+using MigrationTools.Tools.Interfaces;
+using MigrationTools.Tools.Shadows;
+using MigrationTools.Shadows;
 
 namespace MigrationTools.Endpoints.Tests
 {
     [TestClass()]
     public class TfsWorkItemEndPointTests
     {
-        public ServiceProvider Services { get; private set; }
-
-        [TestInitialize]
-        public void Setup()
-        {
-            Services = ServiceProviderHelper.GetServices();
-        }
 
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = GetTfsWorkItemEndPoint();
             endpoint.GetWorkItems();
             Assert.IsNotNull(endpoint);
         }
@@ -31,16 +33,14 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointConfigureTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = GetTfsWorkItemEndPoint();
             Assert.IsNotNull(endpoint);
         }
 
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointGetWorkItemsTest()
         {
-            var endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = GetTfsWorkItemEndPoint();
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
             Assert.AreEqual(13, result.Count());
         }
@@ -48,8 +48,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod(), TestCategory("L3")]
         public void TfsWorkItemEndPointGetWorkItemsQueryTest()
         {
-            TfsWorkItemEndpoint endpoint = Services.GetRequiredService<TfsWorkItemEndpoint>();
-            endpoint.Configure(GetTfsWorkItemEndPointOptions("migrationSource1"));
+            var endpoint = GetTfsWorkItemEndPoint();
             QueryOptions qo = new QueryOptions()
             {
                 Query = "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
@@ -59,24 +58,44 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(13, result.Count());
         }
 
-        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(string project)
+        protected TfsWorkItemEndpoint GetTfsWorkItemEndPoint(string key = "Source", TfsWorkItemEndpointOptions options = null)
         {
-            return new TfsWorkItemEndpointOptions()
+            var services = new ServiceCollection();
+            services.AddMigrationToolServicesForUnitTests();
+            // Add required DI Bits
+            services.AddSingleton<ProcessorEnricherContainer>();
+            services.AddSingleton<EndpointEnricherContainer>();
+            services.AddSingleton<CommonTools>();
+            services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
+            services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
+            services.AddSingleton<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();
+            services.AddSingleton<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
+
+            // Add the Endpoints
+            services.AddKeyedSingleton(typeof(IEndpoint), key, (sp, key) =>
             {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
-                Project = "migrationSource1",
-                AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = TestingConstants.AccessToken,
-                Query = new Options.QueryOptions()
+                IOptions<TfsWorkItemEndpointOptions> wrappedOptions = Microsoft.Extensions.Options.Options.Create(new TfsWorkItemEndpointOptions()
                 {
-                    Query = "SELECT [System.Id], [System.Tags] " +
+                    Organisation = options != null? options.Organisation : "https://dev.azure.com/nkdagility-preview/",
+                    Project = options != null ? options.Project : "migrationSource1",
+                    AuthenticationMode = options != null ? options.AuthenticationMode : AuthenticationMode.AccessToken,
+                    AccessToken = options != null ? options.AccessToken : TestingConstants.AccessToken,
+                    Query = options != null ? options.Query : new Options.QueryOptions()
+                    {
+                        Query = "SELECT [System.Id], [System.Tags] " +
                             "FROM WorkItems " +
                             "WHERE [System.TeamProject] = @TeamProject " +
                                 "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') " +
                             "ORDER BY [System.ChangedDate] desc",
-                    Parameters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
-                }
-            };
+                        Parameters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
+                    }
+                });
+                return ActivatorUtilities.CreateInstance(sp, typeof(TfsWorkItemEndpoint), wrappedOptions);
+            });
+           
+            return (TfsWorkItemEndpoint)services.BuildServiceProvider().GetRequiredKeyedService<IEndpoint>(key);
         }
+
     }
 }

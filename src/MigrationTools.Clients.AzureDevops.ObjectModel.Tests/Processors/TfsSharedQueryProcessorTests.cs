@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Endpoints;
 using MigrationTools.Tests;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -12,7 +13,7 @@ namespace MigrationTools.Processors.Tests
         [TestMethod(), TestCategory("L0")]
         public void TfsSharedQueryProcessorTest()
         {
-            var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
+            var x = GetTfsSharedQueryProcessor();
             Assert.IsNotNull(x);
         }
 
@@ -23,12 +24,13 @@ namespace MigrationTools.Processors.Tests
             {
                 Enabled = true,
                 PrefixProjectToNodes = false,
+                RefName = "fortyTwo",
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
-            x.Configure(y);
+            var x = GetTfsSharedQueryProcessor(y);
             Assert.IsNotNull(x);
+            Assert.AreEqual("fortyTwo", x.Options.RefName);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -41,40 +43,9 @@ namespace MigrationTools.Processors.Tests
                 SourceName = "Source",
                 TargetName = "Target"
             };
-            var x = Services.GetRequiredService<TfsSharedQueryProcessor>();
-            x.Configure(y);
+            var x = GetTfsSharedQueryProcessor(y);
+            x.Execute();
             Assert.IsNotNull(x);
-        }
-
-        [TestMethod(), TestCategory("L3")]
-        public void TfsSharedQueryProcessorNoEnrichersTest()
-        {
-            // Senario 1 Migration from Tfs to Tfs with no Enrichers.
-            var migrationConfig = GetTfsSharedQueryProcessorOptions();
-            var processor = Services.GetRequiredService<TfsSharedQueryProcessor>();
-            processor.Configure(migrationConfig);
-            processor.Execute();
-            Assert.AreEqual(ProcessingStatus.Complete, processor.Status);
-        }
-
-        private static TfsWorkItemEndpointOptions GetTfsWorkItemEndPointOptions(string project)
-        {
-            return new TfsWorkItemEndpointOptions()
-            {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
-                Project = project,
-                AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = TestingConstants.AccessToken,
-                Query = new Options.QueryOptions()
-                {
-                    Query = "SELECT [System.Id], [System.Tags] " +
-                            "FROM WorkItems " +
-                            "WHERE [System.TeamProject] = @TeamProject " +
-                                "AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') " +
-                            "ORDER BY [System.ChangedDate] desc",
-                    Parameters = new Dictionary<string, string>() { { "TeamProject", project } }
-                }
-            };
         }
     }
 }

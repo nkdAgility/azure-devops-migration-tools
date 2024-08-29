@@ -2,36 +2,27 @@
     <ul class="bd-links-nav list-unstyled mb-0 pb-3 pb-md-2 pe-lg-2">
       <li class="mb-1">
         <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Getting Started</strong>
-          <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
             <li><a href="{{site.baseurl}}/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
             <li><a href="{{site.baseurl}}/getting-started/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Getting Started</a></li>
+            <li><a href="{{site.baseurl}}/installation/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Installation</a></li>
             <li><a href="{{site.baseurl}}/server-configuration/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Server Configuration</a></li>
             <li><a href="{{site.baseurl}}/changeset-migration/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Changeset Migration</a></li>
-          </ul>
+        </ul>
       </li>
       <li class="mb-1">
         <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Reference</strong>
         <ul class="bd-links-nav list-unstyled mb-0 pb-3 pb-md-2 pe-lg-2 ps-2">
-          <li class="mb-1">
-            <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v1</strong>
-              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
-                  <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v1/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
-                  {% include sidebar-collection.html collection = "reference" typeName = "Processors" architecture = "v1" %}
-                  {% include sidebar-collection.html collection = "reference" typeName = "FieldMaps" architecture = "v1" %}                  
-              </ul>
-          </li>
-          <li class="mb-1">
-            <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">v2</strong>
-              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
-                  <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/v2/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
-                  {% include sidebar-collection.html collection = "reference" typeName = "Processors" architecture = "v2" %}
-                  {% include sidebar-collection.html collection = "reference" typeName = "Endpoints" architecture = "v2" %}
-                  {% include sidebar-collection.html collection = "reference" typeName = "EndpointEnrichers" architecture = "v2" %}
-                  {% include sidebar-collection.html collection = "reference" typeName = "FieldMaps" architecture = "v2" %}
-                  {% include sidebar-collection.html collection = "reference" typeName = "MappingTools" architecture = "v2" %}
-                  {% include sidebar-collection.html collection = "reference" typeName = "ProcessorEnrichers" architecture = "v2" %}
-              </ul>
-          </li> 
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+                <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
+                {% include sidebar-collection.html collection = "reference" typeName = "Processors" %}
+                {% include sidebar-collection.html collection = "reference" typeName = "Endpoints" %}
+                {% include sidebar-collection.html collection = "reference" typeName = "EndpointEnrichers" %}
+                {% include sidebar-collection.html collection = "reference" typeName = "FieldMaps" %}
+                {% include sidebar-collection.html collection = "reference" typeName = "Tools" %}
+                {% include sidebar-collection.html collection = "reference" typeName = "ProcessorEnrichers" %}
+            </ul>
+         
         </ul>
       </li>   
       <li class="border-top my-3"></li>

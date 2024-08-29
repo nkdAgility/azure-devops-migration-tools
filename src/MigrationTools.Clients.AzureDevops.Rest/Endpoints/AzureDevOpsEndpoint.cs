@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using MigrationTools.DataContracts;
@@ -24,27 +25,9 @@ namespace MigrationTools.Endpoints
     {
         public override int Count => 0;
 
-        public AzureDevOpsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
-            : base(endpointEnrichers, telemetry, logger)
+        public AzureDevOpsEndpoint(IOptions<AzureDevOpsEndpointOptions> optipons, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
+            : base(optipons, endpointEnrichers, serviceProvider, telemetry, logger)
         {
-        }
-
-        public override void Configure(AzureDevOpsEndpointOptions options)
-        {
-            base.Configure(options);
-            Log.LogDebug("AzureDevOpsEndpoint::Configure");
-            if (string.IsNullOrEmpty(Options.Organisation))
-            {
-                throw new ArgumentNullException(nameof(Options.Organisation));
-            }
-            if (string.IsNullOrEmpty(Options.Project))
-            {
-                throw new ArgumentNullException(nameof(Options.Project));
-            }
-            if (string.IsNullOrEmpty(Options.AccessToken))
-            {
-                throw new ArgumentNullException(nameof(Options.AccessToken));
-            }
         }
 
         /// <summary>

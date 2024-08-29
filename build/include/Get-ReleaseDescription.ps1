@@ -4,6 +4,7 @@
     Some notes.
 #>
 # Helpers
+. ./build/include/OpenAI.ps1
 enum ExecutionMode {
     log = 0
     diff = 1
@@ -536,76 +537,5 @@ function Get-GitChanges
     $sw.Stop()    
     Write-Host "==============Get-GitChanges:END | Elapsed time: $($sw.Elapsed)"
     
-    return $result
-}
-function Get-OpenAIResponse {
-    param (
-
-        [Parameter(Mandatory=$false)]
-        [string]$system,
-        
-        # name of the output folder
-        [Parameter(Mandatory=$true)]
-        [string]$prompt,
-    
-        # name of the output folder
-        [Parameter(Mandatory=$true)]
-        [string]$OPEN_AI_KEY
-    )
-    Write-Host "==============Get-OpenAIResponse:START"
-    $sw = [Diagnostics.Stopwatch]::StartNew()
-    Write-Debug "-----------------------------------------"
-    # Set the API endpoint and API key
-    $apiUrl = "https://api.openai.com/v1/chat/completions"
-    Write-Debug "PARAMS:"
-    Write-Debug "apiUrl: $apiUrl"
-    Write-Debug "Prompt:"
-    Write-Debug $prompt
-    Write-Debug "-----------------------------------------"
-    # Create the body for the API request
-    Write-Host "Create the body for the API request..."
-    if ([string]::IsNullOrEmpty($system) ){
-        $system = "You are a technical expert assistant that generates high-quality, structured content based code, git diffs, or git logs using the GitMoji specification. You follow UK English conventions."
-    }
-
-    $body = @{
-        "model"       = "gpt-4-turbo"
-        "messages"    = @(
-            @{
-                "role"    = "system"
-                "content" = $system
-            },
-            @{
-                "role"    = "user"
-                "content" = $prompt
-            }
-        )
-        "temperature" = 0
-        "max_tokens"  = 2048
-    } | ConvertTo-Json
-    Write-Debug "-----------------------------------------"
-    Write-Debug "Body:"
-    Write-Debug $body
-    Write-Debug "-----------------------------------------"
-
-    Write-Debug "-----------------------------------------"
-    Write-Host "Sending request to the ChatGPT API..."
-    # Send the request to the ChatGPT API
-    $response = Invoke-RestMethod -Uri $apiUrl -Method Post -Headers @{
-        "Content-Type" = "application/json"
-        "Authorization" = "Bearer $OPEN_AI_KEY"
-    } -Body $body
-    
-    Write-Debug "-----------------------------------------"
-    Write-Debug "Extracting Output.."
-    # Extract and display the response content
-    $result = $response.choices[0].message.content
-    Write-Debug "-----------------------------------------"
-    Write-Debug "result:"
-    Write-Debug $result
-    Write-Debug "-----------------------------------------"
-    Write-Host "-----------------------------------------"
-    $sw.Stop()
-    Write-Host "==============Get-OpenAIResponse:END | Elapsed time: $($sw.Elapsed)"
     return $result
 }

@@ -40,11 +40,6 @@
             </summary>
             <returns>bool</returns>
         </member>
-        <member name="P:MigrationTools.Enrichers.IEnricherOptions.Enabled">
-            <summary>
-            Active the enricher if it true.
-            </summary>
-        </member>
         <member name="P:MigrationTools.Enrichers.ProcessorEnricherOptions.Enabled">
             <summary>
             If enabled this will run this migrator
@@ -56,54 +51,37 @@
             For internal use
             </summary>
         </member>
-        <member name="P:MigrationTools.Enrichers.StringManipulatorEnricherOptions.MaxStringLength">
+        <member name="P:MigrationTools.Options.IOptions.Enabled">
             <summary>
-            Max number of chars in a string. Applied last, and set to 1000000 by default.
-            </summary>
-            <default>1000000</default>
-        </member>
-        <member name="P:MigrationTools.Enrichers.StringManipulatorEnricherOptions.Manipulators">
-            <summary>
-            List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-            <default>{}</default>
-        </member>
-        <member name="P:MigrationTools.Options.IOptions.RefName">
-            <summary>
-            If you set a `RefName` then this configration will be added to a Catalog of configurations that can be refernced using tha `RefName` so tha tyou dont have to keep adding the ame items with the same configuration.
+            Will be used if enabled
             </summary>
         </member>
-        <member name="T:MigrationTools.ProcessorEnrichers.WorkItemProcessorEnrichers.StringManipulatorEnricher">
-            <summary>
-            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
-            </summary>
-        </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.SourceName">
+        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.SourceName">
             <summary>
             This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.TargetName">
+        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.TargetName">
             <summary>
             This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.IProcessorOptions.ProcessorEnrichers">
+        <member name="P:MigrationTools.Processors.Infrastructure.IProcessorOptions.Enrichers">
             <summary>
             List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.Enabled">
+        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.Enabled">
             <summary>
             If set to `true` then the processor will run. Set to `false` and the processor will not run.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.ProcessorEnrichers">
+        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.Enrichers">
             <summary>
             List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
             </summary>
         </member>
-        <member name="P:MigrationTools.Processors.ProcessorOptions.RefName">
+        <member name="P:MigrationTools.Processors.Infrastructure.ProcessorOptions.RefName">
             <summary>
             `Refname` will be used in the future to allow for using named Options without the need to copy all of the options.
             </summary>
@@ -113,89 +91,143 @@
             This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
             </summary>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldClearMapConfig">
+        <member name="T:MigrationTools.Tools.FieldClearMapOptions">
             <summary>
             Allows you to set an already populated field to Null. This will only work with fields that support null.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldLiteralMapConfig">
+        <member name="T:MigrationTools.Tools.FieldLiteralMapOptions">
             <summary>
             Sets a field on the `target` to b a specific value.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldMergeMapConfig">
+        <member name="T:MigrationTools.Tools.FieldMergeMapOptions">
             <summary>
             Ever wanted to merge two or three fields? This mapping will let you do just that.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldSkipMapConfig">
+        <member name="T:MigrationTools.Tools.FieldSkipMapOptions">
             <summary>
             Allows you to skip populating an existing field. Value in target with be reset to its OriginalValue.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldtoFieldMapConfig">
+        <member name="T:MigrationTools.Tools.FieldToFieldMapOptions">
             <summary>
             Just want to map one field to another? This is the one for you.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldtoFieldMultiMapConfig">
+        <member name="T:MigrationTools.Tools.FieldToFieldMultiMapOptions">
             <summary>
             Want to setup a bunch of field maps in a single go. Use this shortcut!
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldtoTagMapConfig">
+        <member name="T:MigrationTools.Tools.FieldToTagFieldMapOptions">
             <summary>
             Want to take a field and convert its value to a tag? Done...
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldValueMapConfig">
+        <member name="T:MigrationTools.Tools.FieldValueMapOptions">
             <summary>
             Need to map not just the field but also values? This is the default value mapper.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.FieldValuetoTagMapConfig">
+        <member name="T:MigrationTools.Tools.FieldValueToTagMapOptions">
             <summary>
             Need to create a Tag based on a field value? Just create a regex match and choose how to populate the target.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.MultiValueConditionalMapConfig">
+        <member name="T:MigrationTools.Tools.MultiValueConditionalMapOptions">
             <summary>
             ??? If you know how to use this please send a PR :)
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.RegexFieldMapConfig">
+        <member name="T:MigrationTools.Tools.RegexFieldMapOptions">
             <summary>
              I just need that bit of a field... need to send "2016.2" to two fields, one for year and one for release? Done.
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
         </member>
-        <member name="T:MigrationTools._EngineV1.Configuration.FieldMap.TreeToTagMapConfig">
+        <member name="T:MigrationTools.Tools.TreeToTagFieldMapOptions">
             <summary>
             Need to clear out those nasty Area tree hierarchies? This creates Tags for each node in the Area Path...
             </summary>
             <status>ready</status>
             <processingtarget>Work Item Field</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Tools.Infrastructure.FieldMapOptions.Enabled">
+            <summary>
+            If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.Infrastructure.IFieldMapOptions.ApplyTo">
+            <summary>
+            A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Tools.Infrastructure.EmbededImagesRepairToolBase`1.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
+            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
+        </member>
+        <member name="M:MigrationTools.Tools.Infrastructure.EmbededImagesRepairToolBase`1.GetImageFormat(System.Byte[])">
+            <summary>
+            Retrieve Image Format for a given byte array
+            </summary>
+            <param name="bytes">Image to check</param>
+            <remarks>From https://stackoverflow.com/a/9446045/1317161</remarks>
+            <returns>Image format</returns>
+        </member>
+        <member name="P:MigrationTools.Tools.Infrastructure.ToolOptions.Enabled">
+            <summary>
+            If set to `true` then the tool will run. Set to `false` and the processor will not run.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Tools.StringManipulatorTool">
+            <summary>
+            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.StringManipulatorToolOptions.MaxStringLength">
+            <summary>
+            Max number of chars in a string. Applied last, and set to 1000000 by default.
+            </summary>
+            <default>1000000</default>
+        </member>
+        <member name="P:MigrationTools.Tools.StringManipulatorToolOptions.Manipulators">
+            <summary>
+            List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+            <default>{}</default>
+        </member>
+        <member name="T:MigrationTools.Tools.WorkItemTypeMappingTool">
+            <summary>
+            Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.WorkItemTypeMappingToolOptions.Mappings">
+            <summary>
+            List of work item mappings. 
+            </summary>
+            <default>{}</default>
         </member>
         <member name="P:MigrationTools._EngineV1.Configuration.IProcessorConfig.Enabled">
             <summary>
@@ -209,384 +241,6 @@
             </summary>
             <param name="otherProcessors">List of already configured processors.</param>
         </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Domain">
-            <summary>
-            The source domain where the pictures should be exported. 
-            </summary>
-            <default>String.Empty</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Username">
-            <summary>
-            The user name of the user that is used to export the pictures.
-            </summary>
-            <default>String.Empty</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Password">
-            <summary>
-            The password of the user that is used to export the pictures.
-            </summary>
-            <default>String.Empty</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.PictureEmpIDFormat">
-            <summary>
-            TODO: You wpuld need to customise this for your system. Clone repo and run in Debug
-            </summary>
-            <default>String.Empty</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportProfilePictureFromADConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <!-- Badly formed XML comment ignored for member "P:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.OnlyListUsersInWorkItems" -->
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.ExportUsersForMappingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.FakeProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.FixGitCommitLinksConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.ImportProfilePictureConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.EnableTeamSettingsMigration">
-            <summary>
-            Migrate original team settings after their creation on target team project
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.FixTeamSettingsForExistingTeams">
-            <summary>
-            Reset the target team settings to match the source if the team exists
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TeamMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestConfigurationsMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.OnlyElementsWithTag">
-            <summary>
-            The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
-            </summary>
-            <default>`String.Empty`</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.TestPlanQuery">
-            <summary>
-            Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
-            </summary>
-            <default>`String.Empty`</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.RemoveAllLinks">
-            <summary>
-            ??Not sure what this does. Check code.
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.MigrationDelay">
-            <summary>
-            ??Not sure what this does. Check code.
-            </summary>
-            <default>0</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.Processor">
-            <summary>
-            Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.RemoveInvalidTestSuiteLinks">
-            <summary>
-            Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
-            </summary>
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestVariablesMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WIQLQuery">
-            <summary>
-            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-            </summary>
-            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WorkItemIDs">
-            <summary>
-            A list of work items to import
-            </summary>
-            <default>[]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.FilterWorkItemsThatAlreadyExistInTarget">
-            <summary>
-            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
-            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.PauseAfterEachWorkItem">
-            <summary>
-            Pause after each work item is migrated
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.WorkItemCreateRetryLimit">
-            <summary>
-            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
-            This allows for periodic network glitches not to end the process.
-            </summary>
-            <default>5</default>
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemDeleteConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UpdateCreatedDate">
-            <summary>
-            If this is enabled the creation process on the target project will create the items with the original creation date.
-            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
-            not the internal create date)
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.UpdateCreatedBy">
-            <summary>
-            If this is enabled the creation process on the target project will create the items with the original creation date.
-            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
-            not the internal create date)
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WIQLQuery">
-            <summary>
-            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-            </summary>
-            <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Enabled">
-            <summary>
-            If enabled then the processor will run
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.Processor">
-            <summary>
-            Name used to identify this processor
-            </summary>
-            <default>?</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.FixHtmlAttachmentLinks">
-            <summary>
-            **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
-            fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;
-            TFS should use integrated authentication.
-            </summary>
-            <default>?</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WorkItemCreateRetryLimit">
-            <summary>
-            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
-            This allows for periodic network glitches not to end the process.
-            </summary>
-            <default>5</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.FilterWorkItemsThatAlreadyExistInTarget">
-            <summary>
-            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
-            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.PauseAfterEachWorkItem">
-            <summary>
-            Pause after each work item is migrated
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.AttachRevisionHistory">
-            <summary>
-            This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
-            </summary>
-            <default>?</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.GenerateMigrationComment">
-            <summary>
-            If enabled, adds a comment recording the migration
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.WorkItemIDs">
-            <summary>
-            A list of work items to import
-            </summary>
-            <default>[]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.MaxGracefulFailures">
-            <summary>
-            The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
-            continue until the number of failed items reaches the configured value, after which the migration fails.
-            </summary>
-            <default>0</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidIterationPath">
-            <summary>
-            This will skip a revision if the source iteration has not been migrated i.e. it was deleted
-            </summary>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.SkipRevisionWithInvalidAreaPath">
-            <summary>
-            When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
-            </summary>
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemMigrationConfig.#ctor">
-            <summary>
-            Creates a new workitemmigrationconfig with default values
-            </summary>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WorkItemIDs">
-            <summary>
-            A list of work items to import
-            </summary>
-            <default>[]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WIQLQuery">
-            <summary>
-            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-            </summary>
-            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.FilterWorkItemsThatAlreadyExistInTarget">
-            <summary>
-            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
-            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.PauseAfterEachWorkItem">
-            <summary>
-            Pause after each work item is migrated
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.WorkItemCreateRetryLimit">
-            <summary>
-            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
-            This allows for periodic network glitches not to end the process.
-            </summary>
-            <default>5</default>
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemPostProcessingConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="F:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.sharedFolderName">
-            <summary>
-            The name of the shared folder, setting the default name
-            </summary>
-            <default>Shared Queries</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.PrefixProjectToNodes">
-            <summary>
-            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.SharedFolderName">
-            <summary>
-            The name of the shared folder, made a parameter incase it every needs to be edited
-            </summary>
-            <default>none</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.SourceToTargetFieldMappings">
-            <summary>
-            Any field mappings
-            </summary>
-            <default>none</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemQueryMigrationConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.AreaIterationPath">
-            <summary>
-            This is a required parameter. That define the root path of the iteration. To get the full path use `\` 
-            </summary>
-            <default>\</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.Enabled">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.Processor">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.WorkItemUpdateAreasAsTagsConfig.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="M:MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase.#ctor(System.IServiceProvider,Microsoft.Extensions.Logging.ILogger{MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase},MigrationTools.ITelemetryLogger)">
-            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
-        </member>
-        <member name="M:MigrationTools._EngineV1.Enrichers.EmbededImagesRepairEnricherBase.GetImageFormat(System.Byte[])">
-            <summary>
-            Retrieve Image Format for a given byte array
-            </summary>
-            <param name="bytes">Image to check</param>
-            <remarks>From https://stackoverflow.com/a/9446045/1317161</remarks>
-            <returns>Image format</returns>
-        </member>
         <member name="F:ThisAssembly.Git.IsDirty">
             <summary>
             Gets whether the current repository is dirty.
@@ -594,7 +248,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"true"
+            => @"false"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -604,37 +258,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"main"
+            => @"feature/configuration-builder"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"300540f"
+            => @"1c8f3d8c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"300540fc7d62b0bf663655e4c1836cfe669e9f5b"
+            => @"1c8f3d8ca42d0c1df90a95a3e37e24a50632cc34"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-14T10:15:08+01:00"
+            => @"2024-08-29T08:55:05+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"228"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.1.8-Preview.8"
+            => @"v15.2.1-228-g1c8f3d8c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.1.8-Preview.8"
+            => @"v15.2.1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -644,12 +298,12 @@
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Minor">
             <summary>
-            => @"1"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"8"
+            => @"1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
@@ -659,22 +313,22 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Minor">
             <summary>
-            => @"1"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"8"
+            => @"229"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.8"
+            => @""
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.8"
+            => @""
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

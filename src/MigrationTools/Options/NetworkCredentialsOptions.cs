@@ -1,12 +1,15 @@
-﻿namespace MigrationTools.Options
+﻿using System;
+
+namespace MigrationTools.Options
 {
+    [Obsolete]
     public class NetworkCredentialsOptions
     {
-        public Credentials Source { get; set; }
-        public Credentials Target { get; set; }
+        public NetworkCredentials Source { get; set; }
+        public NetworkCredentials Target { get; set; }
     }
 
-    public class Credentials
+    public class NetworkCredentials
     {
         public string Domain { get; set; }
         public string UserName { get; set; }

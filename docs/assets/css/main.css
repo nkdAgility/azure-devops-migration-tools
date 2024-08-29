@@ -38,3 +38,13 @@ pre {
         color: white;
         background: #713183;
     }
+
+.btn-nkdprimary {
+    background-color: #713183;
+    color: white;
+}
+
+.btn-nkdprimary:hover {
+    background-color: #54595F;
+    color: white;
+}

@@ -1,6 +1,9 @@
-﻿using MigrationTools._EngineV1.Clients;
+﻿using System;
+using MigrationTools._EngineV1.Clients;
 using MigrationTools._EngineV1.Containers;
+using MigrationTools.Endpoints;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools
 {
@@ -8,13 +11,5 @@ namespace MigrationTools
     {
         ProcessingStatus Run();
 
-        IMigrationClient Source { get; }
-
-        IMigrationClient Target { get; }
-
-        TypeDefinitionMapContainer TypeDefinitionMaps { get; }
-        GitRepoMapContainer GitRepoMaps { get; }
-        ChangeSetMappingContainer ChangeSetMapps { get; }
-        FieldMapContainer FieldMaps { get; }
     }
 }

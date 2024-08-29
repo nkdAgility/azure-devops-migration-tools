@@ -19,7 +19,7 @@ namespace VstsSyncMigrator.ConsoleApp
                 .ConfigureServices((context, services) =>
                 {
                     // New v2 Architecture fpr testing
-                    services.AddMigrationToolServicesForClientFileSystem();
+                    services.AddMigrationToolServicesForClientFileSystem(context.Configuration);
                     services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(context.Configuration);
                     services.AddMigrationToolServicesForClientAzureDevopsRest(context.Configuration);
 
@@ -27,6 +27,8 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
                     services.AddMigrationToolServicesForClientLegacyCore();
                 });
+
+       
 
             await hostBuilder.RunConsoleAsync();
         }
