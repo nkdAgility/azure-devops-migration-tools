@@ -65,12 +65,24 @@ namespace MigrationTools.Options
 
         public void AddOption(IOptions option)
         {
-            OptionsToInclude.Add(option);
+            if (option != null)
+            {
+                OptionsToInclude.Add(option);
+            } else
+            {
+                logger.LogWarning("Could not add option as it was null");
+            }
         }
 
         public void AddOption(IEnumerable<IOptions> options)
         {
-            OptionsToInclude.AddRange(options);
+            if (options != null)
+            {
+                OptionsToInclude.AddRange(options);
+            } else
+            {
+                logger.LogWarning("Could not add options as they were null");
+            }
         }
 
         public void AddOption(string optionName)
@@ -101,7 +113,10 @@ namespace MigrationTools.Options
             if (option != null)
             {
                 NamedOptionsToInclude.Add(key, option);
-            }            
+            } else
+            {
+                logger.LogWarning("Could not add option as it was null");
+            }
         }
 
         public void AddOption(string optionName, string key)
@@ -167,6 +182,11 @@ namespace MigrationTools.Options
 
         private JObject AddOptionToConfig(IConfiguration configuration, JObject configJson, IOptions option)
         {
+            if (option is null)
+            {
+                logger.LogWarning("Skipping Option: as it is null");
+                return configJson;
+            }
             if (option.ConfigurationMetadata.PathToInstance == null)
             {
                 logger.LogWarning("Skipping Option: {item} as it has no PathToInstance", option.GetType().Name);

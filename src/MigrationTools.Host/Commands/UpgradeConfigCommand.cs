@@ -104,7 +104,11 @@ namespace MigrationTools.Host.Commands
                         }
                         break;
                     case MigrationConfigSchema.v160:
-
+                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "MigrationTools:Endpoints:Source", "EndpointType"), "Source");
+                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "MigrationTools:Endpoints:Target", "EndpointType"), "Target");
+                        optionsBuilder.AddOption(ParseSectionListWithPathAsTypeToOption(configuration, "MigrationTools:CommonTools"));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "MigrationTools:CommonTools:FieldMappingTool:FieldMaps", "FieldMapType"));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "MigrationTools:Processors", "ProcessorType"));
                         break;
                 }
 
@@ -112,7 +116,7 @@ namespace MigrationTools.Host.Commands
                 configFile = AddSuffixToFileName(configFile, "-upgraded");
                 File.WriteAllText(configFile, json);
                 _logger.LogInformation("New {configFile} file has been created", configFile);
-                _logger.LogInformation(json);
+                Console.WriteLine(json);
 
                 _exitCode = 0;
             }
@@ -144,6 +148,22 @@ namespace MigrationTools.Host.Commands
                 }                
             }
             return option;
+        }
+
+        private List<IOptions> ParseSectionListWithPathAsTypeToOption(IConfiguration configuration, string path)
+        {
+            var optionsConfigList = configuration.GetSection(path);
+            List<IOptions> options = new List<IOptions>();
+            foreach (var childSection in optionsConfigList.GetChildren())
+            {
+                var optionTypeString = childSection.Key;
+                var option = GetOptionFromTypeString(configuration, childSection, optionTypeString);
+                if (option != null)
+                {
+                    options.Add(option);
+                }                
+            }
+            return options;
         }
 
         private List<IOptions> ParseSectionCollectionWithTypePropertyNameToList(IConfiguration configuration, string path, string typePropertyName)

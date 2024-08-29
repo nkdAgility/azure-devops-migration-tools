@@ -29,7 +29,7 @@
     },
     "Upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade -c \"configuration-classic2-pipeline.json\""
+      "commandLineArgs": "upgrade -c \"configuration.json\""
     },
     "Execute Classic": {
       "commandName": "Project",
