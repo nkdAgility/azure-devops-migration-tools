@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>MigrationTools.Clients.AzureDevops.ObjectModel</name>
+        <name>MigrationTools.Clients.TfsObjectModel</name>
     </assembly>
     <members>
         <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.OnlyElementsWithTag">

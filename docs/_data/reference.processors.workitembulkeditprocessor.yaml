@@ -78,5 +78,5 @@ options:
   defaultValue: '[]'
 status: missng XML code comments
 processingTarget: WorkItem
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemBulkEditProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemBulkEditProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemBulkEditProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemBulkEditProcessorOptions.cs

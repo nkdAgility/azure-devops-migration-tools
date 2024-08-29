@@ -74,8 +74,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: WorkItem
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemDeleteProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemDeleteProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemDeleteProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemDeleteProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/WorkItemDeleteProcessorOptions/

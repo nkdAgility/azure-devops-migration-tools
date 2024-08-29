@@ -9,7 +9,7 @@ architecture: v1
 options: []
 status: alpha
 processingTarget: Shared Queries
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/CreateTeamFoldersProcessor.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/CreateTeamFoldersProcessor.cs
 optionsClassFile: 
 
 redirectFrom:

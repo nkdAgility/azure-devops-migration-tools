@@ -58,8 +58,8 @@ options:
   defaultValue: '{}'
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsGitRepositoryTool.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsGitRepositoryToolOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsGitRepositoryToolOptions/

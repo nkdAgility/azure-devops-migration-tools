@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj" />
+    <ProjectReference Include="..\MigrationTools.Clients.TfsObjectModel\MigrationTools.Clients.TfsObjectModel.csproj" />
     <ProjectReference Include="..\MigrationTools.Shadows\MigrationTools.Shadows.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>

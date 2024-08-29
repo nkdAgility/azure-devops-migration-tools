@@ -59,8 +59,8 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportUsersForMappingProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportUsersForMappingProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportUsersForMappingProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportUsersForMappingProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/ExportUsersForMappingProcessorOptions/

@@ -37,7 +37,7 @@ class Program
         string dir = AppDomain.CurrentDomain.BaseDirectory;
         AppDomain currentDomain = AppDomain.CurrentDomain;
         currentDomain.Load("MigrationTools");
-        currentDomain.Load("MigrationTools.Clients.AzureDevops.ObjectModel");
+        currentDomain.Load("MigrationTools.Clients.TfsObjectModel");
         currentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
         currentDomain.Load("MigrationTools.Clients.FileSystem");
 

@@ -74,8 +74,8 @@ options:
   defaultValue: false
 status: Beta
 processingTarget: Teams
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsTeamSettingsProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsTeamSettingsProcessorOptions/

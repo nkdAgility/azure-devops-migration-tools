@@ -64,8 +64,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Endpoints/TfsWorkItemEndpoint.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Endpoints/TfsWorkItemEndpointOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsWorkItemEndpoint.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsWorkItemEndpointOptions.cs
 
 redirectFrom:
 - /Reference/Endpoints/TfsWorkItemEndpointOptions/

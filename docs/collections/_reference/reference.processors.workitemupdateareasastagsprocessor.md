@@ -54,8 +54,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Work Item
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/WorkItemUpdateAreasAsTagsProcessorOptions/

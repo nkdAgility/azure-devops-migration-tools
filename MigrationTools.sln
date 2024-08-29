@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.File
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Tests", "src\MigrationTools.Tests\MigrationTools.Tests.csproj", "{A679B3FF-1355-455F-853F-433A9CB1BE60}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.ObjectModel", "src\MigrationTools.Clients.AzureDevops.ObjectModel\MigrationTools.Clients.AzureDevops.ObjectModel.csproj", "{D58EEDFA-D74C-4E84-9C26-6D69521382FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.TfsObjectModel", "src\MigrationTools.Clients.TfsObjectModel\MigrationTools.Clients.TfsObjectModel.csproj", "{D58EEDFA-D74C-4E84-9C26-6D69521382FD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Host", "src\MigrationTools.Host\MigrationTools.Host.csproj", "{B400FC37-A4B7-4526-85DD-36784E3B56EC}"
 EndProject
@@ -71,7 +71,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.File
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Host.Tests", "src\MigrationTools.Host.Tests\MigrationTools.Host.Tests.csproj", "{6F51CE1D-FEBD-4F7F-A462-27A4745924F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.ObjectModel.Tests", "src\MigrationTools.Clients.AzureDevops.ObjectModel.Tests\MigrationTools.Clients.AzureDevops.ObjectModel.Tests.csproj", "{72FA4853-D840-480E-A6FD-670EF66E9D5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.TfsObjectModel.Tests", "src\MigrationTools.Clients.TfsObjectModel.Tests\MigrationTools.Clients.TfsObjectModel.Tests.csproj", "{72FA4853-D840-480E-A6FD-670EF66E9D5B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTools.Clients.AzureDevops.Rest.Tests", "src\MigrationTools.Clients.AzureDevops.Rest.Tests\MigrationTools.Clients.AzureDevops.Rest.Tests.csproj", "{70EA792C-E84C-4A5D-8280-FCC47F4AE150}"
 EndProject

@@ -119,8 +119,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsNodeStructureTool.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsNodeStructureToolOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureTool.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsNodeStructureToolOptions/

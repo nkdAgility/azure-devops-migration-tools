@@ -168,8 +168,8 @@ options:
   defaultValue: '[]'
 status: ready
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemMigrationProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemMigrationProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemMigrationProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/WorkItemMigrationProcessorOptions/

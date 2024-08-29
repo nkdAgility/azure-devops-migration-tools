@@ -78,5 +78,5 @@ options:
   defaultValue: '`String.Empty`'
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestPlansAndSuitesMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestPlansAndSuitesMigrationProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestPlansAndSuitesMigrationProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestPlansAndSuitesMigrationProcessorOptions.cs
