@@ -10,6 +10,7 @@
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
         "AllowCrossProjectLinking": false,
+        "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
         "Authentication": {
           "AuthenticationMode": "AccessToken",
           "AccessToken": "",

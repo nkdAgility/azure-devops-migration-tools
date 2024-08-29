@@ -1,21 +1,13 @@
 {% assign collection = site.collections | where: "label", include.collection | first %}
-<li class="mb-1">
-  <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">{{include.typeName}}</strong>
-  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-    <li class="align-items-center">
-      <a href="{{ site.baseurl }}/Reference/{{include.typeName}}/"
-        class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a>
-    </li>
-    {% if collection != null %} 
-    {% assign items = collection.docs | where: "typeName", include.typeName  | sort: "importance" %} 
-    {% if items != empty %} 
-    {% for item in items %}
-    <li class="align-items-center">
-      <a href="{{ site.baseurl }}{{ item.url }}"
-        class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ item.title }}</a>
-    </li>
-    {% endfor %} {% endif %} {% else %}
-    <li>No items</li>
-    {% endif %}
-  </ul>
+{% if collection != null %} 
+{% assign items = collection.docs | sort: "importance" %} 
+{% if items != empty %} 
+{% for item in items %}
+<li class="align-items-center">
+    <a href="{{ site.baseurl }}{{ item.url }}"
+    class="link-body-emphasis d-inline-flex text-decoration-none rounded">{{ item.title }}</a>
 </li>
+{% endfor %} {% endif %} {% else %}
+<li>No items</li>
+{% endif %}
+

@@ -11,38 +11,29 @@ If you want to perform a bulk edit or a migration then you need to start here. T
 
 Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 minutes. This tool is complicated and it's not always easy to discover what you need to do.
 
-## Install
+## Prerequisits
 
-In order to run the migration you will need to install the tools first.
+1. [Install](installation.md) the tools using your prefered method.
+1. Check that you have the required [Permissions](permissions.md) to run the tools.
+1. Get to grips with the [Configuration](./Reference/) to understand how to configure the tool. (you can skup this for now and come back to it later)
 
-1. Install [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
-1. Run `winget install nkdAgility.AzureDevOpsMigrationTools` from the [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) (Not eleveated) to install on Windows 10 and Windows 11. For other operating systems you can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
+## Getting Started
 
-Note: The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX` and a symbolic link to `devopsmigration.exe` that lets you run it from anywhere using `devopsmigration init`.
+This is going to be a crash course and I really recommend watching [What can go wrong and what can go right with a migration via Azure DevOps](https://youtu.be/3jYFD-6_kZk?si=xxvBoljBWjGAOVuv) and then [Basic Work Item Migration with the Azure DevOps Migration Tools](https://youtu.be/Qt1Ywu_KLrc?si=uEXjLS2pwe244ugV) before you get started! This will prep you for the journey ahead.
 
-**Note: There is a known issue with the winget package that it does not add the tools to the PATH if you use an elevated Terminal. You can add the tools to the PATH manually by adding `%Localappdata%\Microsoft\WinGet\Packages\nkdAgility.AzureDevOpsMigrationTools_Microsoft.Winget.Source_XXXXXXXXXX\tools` to the PATH.**
-
-## Upgrade
-
-1. Run `winget upgrade  nkdAgility.AzureDevOpsMigrationTools` to upgrade the tools.
-
-## Server configuration and setup
-
-Follow the [setup instructions](server-configuration.md) to make sure that you can run the tool against your environments and more importantly add the required custom field 'ReflectedWorkItemId'
-
-## Create a default configuration file
+### 1. Create a default configuration file
 
 1. Open your [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) in your chosen working folder
-2. Run `devopsmigration init` to create a default configuration
+2. Run `devopsmigration init --options Basic` to create a default configuration
 3. Open `configuration.json` from the current directory
 
-You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process template is:
+You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process will likley look somethig like:
 
 ```JSON
 {% include sampleConfig/configuration.json %}
 ```
 
-The default [WorkItemMigrationConfig](_reference/reference.v1.processors.workitempostprocessingcontext.md) processor will perform the following operations:
+The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfsworkitemmigrationprocessor.md) processor will perform the following operations:
 
 * Migrate iterations and sprints
 * Attachments

@@ -248,7 +248,7 @@
         </member>
         <member name="F:ThisAssembly.Git.IsDirtyString">
             <summary>
-            => @"false"
+            => @"true"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.RepositoryUrl">
@@ -258,77 +258,77 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"feature/configuration-builder"
+            => @"topic/docs-revamp"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"1c8f3d8c"
+            => @"97511b68"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"1c8f3d8ca42d0c1df90a95a3e37e24a50632cc34"
+            => @"97511b68d8d26d07e3a73695a4a4a5aeec41575c"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-29T08:55:05+01:00"
+            => @"2024-08-29T12:55:12+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"228"
+            => @"3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v15.2.1-228-g1c8f3d8c"
+            => @"v16.0.0-Preview.1-3-g97511b68"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v15.2.1"
+            => @"v16.0.0-Preview.1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
             <summary>
-            => @"15"
+            => @"16"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Minor">
             <summary>
-            => @"2"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Patch">
             <summary>
-            => @"1"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Major">
             <summary>
-            => @"15"
+            => @"16"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Minor">
             <summary>
-            => @"2"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"229"
+            => @"3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @""
+            => @"Preview.1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @""
+            => @"-Preview.1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">
