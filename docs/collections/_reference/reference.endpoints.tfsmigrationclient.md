@@ -99,8 +99,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Clients/TfsMigrationClient.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Clients/TfsMigrationClient.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Clients/TfsMigrationClient.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Clients/TfsMigrationClient.cs
 
 redirectFrom: []
 layout: reference

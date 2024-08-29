@@ -64,8 +64,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Queries
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsSharedQueryProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsSharedQueryProcessorOptions/

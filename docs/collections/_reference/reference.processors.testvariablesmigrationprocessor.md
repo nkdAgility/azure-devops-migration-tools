@@ -54,8 +54,8 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestVariablesMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/TestVariablesMigrationProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestVariablesMigrationProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestVariablesMigrationProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TestVariablesMigrationProcessorOptions/

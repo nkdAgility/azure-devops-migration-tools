@@ -9,7 +9,7 @@ architecture: v1
 options: []
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/FakeProcessor.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/FakeProcessor.cs
 optionsClassFile: 
 
 redirectFrom:

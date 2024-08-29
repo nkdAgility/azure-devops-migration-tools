@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <Product>MigrationTools.Clients.AzureDevops.ObjectModel</Product>
+    <Product>MigrationTools.Clients.TfsObjectModel</Product>
     <RootNamespace>MigrationTools</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>..\..\docs\Reference\Generated\MigrationTools.Clients.AzureDevops.ObjectModel.xml</DocumentationFile>
+    <DocumentationFile>..\..\docs\Reference\Generated\MigrationTools.Clients.TfsObjectModel.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

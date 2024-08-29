@@ -63,8 +63,8 @@ options:
   defaultValue: 480000000
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsAttachmentTool.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsAttachmentToolOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentTool.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsAttachmentToolOptions/

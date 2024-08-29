@@ -49,8 +49,8 @@ options:
   defaultValue: missng XML code comments
 status: alpha
 processingTarget: Profiles
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ImportProfilePictureProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ImportProfilePictureProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ImportProfilePictureProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ImportProfilePictureProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/ImportProfilePictureProcessorOptions/

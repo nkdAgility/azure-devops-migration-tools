@@ -66,7 +66,7 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/FieldMappingTool/FieldMaps/FieldValuetoTagMap.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldValuetoTagMap.cs
 optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldValuetoTagMapOptions.cs
 
 redirectFrom:

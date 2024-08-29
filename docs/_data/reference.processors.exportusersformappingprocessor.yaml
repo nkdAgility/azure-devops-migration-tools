@@ -7,19 +7,33 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 - name: sample
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "ExportUsersForMappingProcessor",
+            "Enabled": "True",
+            "OnlyListUsersInWorkItems": "True",
+            "SourceName": "Source",
+            "TargetName": "Target",
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+          }
+        ]
+      }
+    }
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
 - name: classic
   description: 
   code: >-
     {
       "$type": "ExportUsersForMappingProcessorOptions",
-      "Enabled": false,
-      "WIQLQuery": null,
+      "Enabled": true,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "OnlyListUsersInWorkItems": true,
       "Enrichers": null,
-      "SourceName": null,
-      "TargetName": null,
+      "SourceName": "Source",
+      "TargetName": "Target",
       "RefName": null
     }
   sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
@@ -58,5 +72,5 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportUsersForMappingProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportUsersForMappingProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportUsersForMappingProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportUsersForMappingProcessorOptions.cs

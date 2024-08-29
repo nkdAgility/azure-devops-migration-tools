@@ -74,8 +74,8 @@ options:
   defaultValue: '[]'
 status: preview
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemPostProcessingProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/WorkItemPostProcessingProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemPostProcessingProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemPostProcessingProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/WorkItemPostProcessingProcessorOptions/

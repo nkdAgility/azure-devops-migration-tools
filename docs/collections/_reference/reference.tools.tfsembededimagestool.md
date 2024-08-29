@@ -47,8 +47,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsEmbededImagesTool.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsEmbededImagesToolOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesTool.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsEmbededImagesToolOptions/

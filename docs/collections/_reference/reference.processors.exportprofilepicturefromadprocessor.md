@@ -69,8 +69,8 @@ options:
   defaultValue: String.Empty
 status: alpha
 processingTarget: Profiles
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportProfilePictureFromADProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Processors/ExportProfilePictureFromADProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportProfilePictureFromADProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportProfilePictureFromADProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/ExportProfilePictureFromADProcessorOptions/

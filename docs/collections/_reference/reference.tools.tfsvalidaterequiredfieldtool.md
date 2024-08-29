@@ -29,8 +29,8 @@ options:
   defaultValue: missng XML code comments
 status: missng XML code comments
 processingTarget: missng XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsValidateRequiredFieldTool.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsValidateRequiredFieldToolOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldTool.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsValidateRequiredFieldToolOptions/
