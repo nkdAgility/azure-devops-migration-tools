@@ -1,0 +1,588 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MigrationTools.Clients.TfsObjectModel</name>
+    </assembly>
+    <members>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.OnlyElementsWithTag">
+            <summary>
+            The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
+            </summary>
+            <default>`String.Empty`</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.TestPlanQuery">
+            <summary>
+            Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
+            </summary>
+            <default>`String.Empty`</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveAllLinks">
+            <summary>
+            ??Not sure what this does. Check code.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.MigrationDelay">
+            <summary>
+            ??Not sure what this does. Check code.
+            </summary>
+            <default>0</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveInvalidTestSuiteLinks">
+            <summary>
+            Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
+            </summary>
+            <default>false</default>
+            <summary>
+            Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+            </summary>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
+        </member>
+        <member name="T:MigrationTools.Processors.CreateTeamFolders">
+            <summary>
+            Creates folders in Sared Queries for each Team
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Shared Queries</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.ExportProfilePictureFromADProcessor">
+            <summary>
+            Downloads corporate images and updates TFS/Azure DevOps profiles
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Profiles</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.Domain">
+            <summary>
+            The source domain where the pictures should be exported. 
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.Username">
+            <summary>
+            The user name of the user that is used to export the pictures.
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.Password">
+            <summary>
+            The password of the user that is used to export the pictures.
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="P:MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions.PictureEmpIDFormat">
+            <summary>
+            TODO: You wpuld need to customise this for your system. Clone repo and run in Debug
+            </summary>
+            <default>String.Empty</default>
+        </member>
+        <member name="T:MigrationTools.Processors.ExportUsersForMappingProcessor">
+            <summary>
+            ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
+            Use `ExportUsersForMappingConfig` to configure.
+            </summary>
+            <status>ready</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:MigrationTools.Processors.ExportUsersForMappingProcessorOptions.OnlyListUsersInWorkItems" -->
+        <member name="T:MigrationTools.Processors.FakeProcessor">
+            <summary>
+            Note: this is only for internal usage. Don't use this in your configurations.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.ImportProfilePictureProcessor">
+            <summary>
+            Downloads corporate images and updates TFS/Azure DevOps profiles
+            </summary>
+            <status>alpha</status>
+            <processingtarget>Profiles</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.TestConfigurationsMigrationProcessor">
+            <summary>
+            This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.TestPlansAndSuitesMigrationProcessor">
+            <summary>
+            Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationProcessor.ApplyConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteEntry)">
+            <summary>
+            Apply configurations to a single test case entry on the target, by copying from the source
+            </summary>
+            <param name="sourceEntry"></param>
+            <param name="targetEntry"></param>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationProcessor.ApplyDefaultConfigurations(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase,Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase)">
+            <summary>
+            Sets default configurations on migrated test suites.
+            </summary>
+            <param name="source">The test suite to take as a source.</param>
+            <param name="target">The test suite to apply the default configurations to.</param>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationProcessor.FixWorkItemIdInQuery(Microsoft.TeamFoundation.TestManagement.Client.ITestSuiteBase)">
+            <summary>
+            Fix work item ID's in query based suites
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationProcessor.GetTargetIdentity(Microsoft.TeamFoundation.Framework.Client.IdentityDescriptor)">
+            <summary>
+            Retrieve the target identity for a given source descriptor
+            </summary>
+            <param name="sourceIdentityDescriptor">Source identity Descriptor</param>
+            <returns>Target Identity</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.TestPlansAndSuitesMigrationProcessor.RemoveInvalidLinks(Microsoft.TeamFoundation.TestManagement.Client.ITestPlan)">
+            <summary>
+            Remove invalid links
+            </summary>
+            <remarks>
+            VSTS cannot store some links which have an invalid URI Scheme. You will get errors like "The URL specified has a potentially unsafe URL protocol"
+            For myself, the issue were urls that pointed to TFVC:    "vstfs:///VersionControl/Changeset/19415"
+            Unfortunately the API does not seem to allow access to the "raw" data, so there's nowhere to retrieve this as far as I can find.
+            Should take care of https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+            </remarks>
+            <param name="targetPlan">The plan to remove invalid links drom</param>
+        </member>
+        <member name="T:MigrationTools.Processors.TestVariablesMigrationProcessor">
+            <summary>
+            This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`. 
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Suites &amp; Plans</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Processors.TestVariablesMigrationProcessorOptions.Enabled">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools.Processors.TestVariablesMigrationProcessorOptions.Processor">
+            <inheritdoc />
+        </member>
+        <member name="M:MigrationTools.Processors.TestVariablesMigrationProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="T:MigrationTools.Processors.TfsSharedQueryProcessor">
+            <summary>
+            The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Queries</processingtarget>
+        </member>
+        <member name="M:MigrationTools.Processors.TfsSharedQueryProcessor.MigrateFolder(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
+            <summary>
+            Define Query Folders under the current parent
+            </summary>
+            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
+            <param name="sourceFolder">The source folder in tree on source instance</param>
+            <param name="parentFolder">The target folder in tree on target instance</param>
+        </member>
+        <member name="M:MigrationTools.Processors.TfsSharedQueryProcessor.MigrateQuery(Microsoft.TeamFoundation.WorkItemTracking.Client.QueryHierarchy,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryDefinition,Microsoft.TeamFoundation.WorkItemTracking.Client.QueryFolder)">
+            <summary>
+            Add Query Definition under a specific Query Folder.
+            </summary>
+            <param name="targetHierarchy">The object that represents the whole of the target query tree</param>
+            <param name="query">Query Definition - Contains the Query Details</param>
+            <param name="parentFolder">Parent Folder</param>
+        </member>
+        <member name="T:MigrationTools.Processors.TfsSharedQueryProcessorOptions">
+            <summary>
+            The `TfsSharedQueryProcessor` enabled you to migrate queries from one location to another.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsSharedQueryProcessorOptions.PrefixProjectToNodes">
+            <summary>
+            Do we add the source project name into the folder path
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsSharedQueryProcessorOptions.SharedFolderName">
+            <summary>
+            The name of the shared folder, made a parameter incase it every needs to be edited
+            </summary>
+            <default>Shared Queries</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsSharedQueryProcessorOptions.SourceToTargetFieldMappings">
+            <summary>
+            Mapping of the source to the target
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.TfsTeamSettingsProcessor">
+            <summary>
+            Native TFS Processor, does not work with any other Endpoints.
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Teams</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.MigrateTeamSettings">
+            <summary>
+            Migrate original team settings after their creation on target team project
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.UpdateTeamSettings">
+            <summary>
+            Reset the target team settings to match the source if the team exists
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.PrefixProjectToNodes">
+            <summary>
+            Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.MigrateTeamCapacities">
+            <summary>
+            Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsTeamSettingsProcessorOptions.Teams">
+            <summary>
+            List of Teams to process. If this is `null` then all teams will be processed.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.TfsWorkItemMigrationProcessor">
+            <summary>
+            WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
+            Use `WorkItemMigrationConfig` to configure.
+            </summary>
+            <status>ready</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.UpdateCreatedDate">
+            <summary>
+            If this is enabled the creation process on the target project will create the items with the original creation date.
+            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
+            not the internal create date)
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.UpdateCreatedBy">
+            <summary>
+            If this is enabled the creation process on the target project will create the items with the original creation date.
+            (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
+            not the internal create date)
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.FixHtmlAttachmentLinks">
+            <summary>
+            **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
+            fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;
+            TFS should use integrated authentication.
+            </summary>
+            <default>?</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.AttachRevisionHistory">
+            <summary>
+            This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
+            </summary>
+            <default>?</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.GenerateMigrationComment">
+            <summary>
+            If enabled, adds a comment recording the migration
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.MaxGracefulFailures">
+            <summary>
+            The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
+            continue until the number of failed items reaches the configured value, after which the migration fails.
+            </summary>
+            <default>0</default>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.SkipRevisionWithInvalidIterationPath">
+            <summary>
+            This will skip a revision if the source iteration has not been migrated i.e. it was deleted
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions.SkipRevisionWithInvalidAreaPath">
+            <summary>
+            When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemBulkEditProcessor">
+            <summary>
+            This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
+            </summary>
+            <processingtarget>WorkItem</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemDeleteProcessor">
+            <summary>
+            The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.
+            **DANGER:** This is not a recoverable action and should be use with extream caution.
+            </summary>
+            <status>ready</status>
+            <processingtarget>WorkItem</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemPostProcessingProcessor">
+            <summary>
+            Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
+            </summary>
+            <status>preview</status>
+            <processingtarget>Work Items</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        </member>
+        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Processors.WorkItemPostProcessingProcessorOptions.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessor">
+            <summary>
+            A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Work Item</processingtarget>
+        </member>
+        <member name="P:MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions.AreaIterationPath">
+            <summary>
+            This is a required parameter. That define the root path of the iteration. To get the full path use `\` 
+            </summary>
+            <default>\</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsAttachmentToolOptions.ExportBasePath">
+            <summary>
+            `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
+            </summary>
+            <default>C:\temp\Migration\</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsAttachmentToolOptions.MaxAttachmentSize">
+            <summary>
+            `AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.
+            For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).
+            </summary>
+            <default>480000000</default>
+        </member>
+        <member name="M:MigrationTools.Tools.TfsEmbededImagesTool.FixEmbededImages(MigrationTools.DataContracts.WorkItemData,System.String,System.String,System.String)">
+            from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
+        </member>
+        <member name="P:MigrationTools.Tools.TfsGitRepositoryToolOptions.Mappings">
+            <summary>
+            List of work item mappings. 
+            </summary>
+            <default>{}</default>
+        </member>
+        <member name="T:MigrationTools.Tools.TfsNodeStructureTool">
+            <summary>
+            The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Tools.TfsNodeStructureTool.ShouldCreateNode(System.String,MigrationTools.Tools.TfsNodeStructureType)">
+            <summary>
+            Checks node-to-be-created with allowed BasePath's
+            </summary>
+            <param name="userFriendlyPath">The user-friendly path of the source node</param>
+            <returns>true/false</returns>
+        </member>
+        <member name="M:MigrationTools.Tools.TfsNodeStructureTool.CheckIsParentOfSelectedBasePath(System.String)">
+            <summary>
+            Checks whether a path is a parent of a selected base path (meaning we cannot skip it entirely)
+            </summary>
+            <param name="userFriendlyPath">The user-friendly path of the source node</param>
+            <returns>A boolean indicating whether the path is a parent of any positively selected base path.</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.Areas">
+            <summary>
+            Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
+            </summary>
+            <default>{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.Iterations">
+            <summary>
+            Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
+            </summary>
+            <default>{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsNodeStructureToolOptions.ShouldCreateMissingRevisionPaths">
+            <summary>
+            When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.NodeOptions.Filters">
+            <summary>
+            Using the Glob format you can specify a list of nodes that you want to match. This can be used to filter the main migration of current nodes. note: This does not negate the nees for all nodes in the history of a work item in scope for the migration MUST exist for the system to run, and this will be validated before the migration. e.g. add "migrationSource1\\Team 1,migrationSource1\\Team 1\\**" to match both the Team 1 node and all child nodes. 
+            </summary>
+            <default>["/"]</default>
+        </member>
+        <member name="P:MigrationTools.Tools.NodeOptions.Mappings">
+            <summary>
+            Remapping rules for nodes, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
+            that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
+            </summary>
+            <default>{}</default>
+        </member>
+        <member name="T:MigrationTools.Tools.TfsRevisionManagerTool">
+            <summary>
+            The TfsRevisionManagerTool manipulates the revisions of a work item to reduce the number of revisions that are migrated.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsRevisionManagerToolOptions.ReplayRevisions">
+            <summary>
+            You can choose to migrate the tip only (a single write) or all of the revisions (many writes).
+            If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsRevisionManagerToolOptions.MaxRevisions">
+            <summary>
+            Sets the maximum number of revisions that will be migrated. "First + Last N = Max".
+            If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
+            </summary>
+            <default>0</default>
+        </member>
+        <member name="T:MigrationTools.Tools.TfsTeamSettingsTool">
+            <summary>
+            The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.MigrateTeamSettings">
+            <summary>
+            Migrate original team settings after their creation on target team project
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.UpdateTeamSettings">
+            <summary>
+            Reset the target team settings to match the source if the team exists
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.MigrateTeamCapacities">
+            <summary>
+            Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsTeamSettingsToolOptions.Teams">
+            <summary>
+            List of Teams to process. If this is `null` then all teams will be processed.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Tools.TfsUserMappingTool">
+            <summary>
+            The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsUserMappingToolOptions.IdentityFieldsToCheck">
+            <summary>
+            This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsUserMappingToolOptions.UserMappingFile">
+            <summary>
+            This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsWorkItemLinkToolOptions.FilterIfLinkCountMatches">
+            <summary>
+            Skip validating links if the number of links in the source and the target matches!
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Tools.TfsWorkItemLinkToolOptions.SaveAfterEachLinkIsAdded">
+            <summary>
+            Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
+            </summary>
+            <default>false</default>
+        </member>
+    </members>
+</doc>
