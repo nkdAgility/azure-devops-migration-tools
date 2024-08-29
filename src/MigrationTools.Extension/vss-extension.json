@@ -56,12 +56,12 @@
   "badges": [
     {
       "href": "https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest",
-      "uri": "https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration",
+      "uri": "https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools",
       "description": "GitHub Release"
     },
     {
       "href": "https://github.com/nkdAgility/azure-devops-migration-tools/releases/",
-      "uri": "https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases",
+      "uri": "https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases",
       "description": "GitHub Pre-Release"
     },
     {

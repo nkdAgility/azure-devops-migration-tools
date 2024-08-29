@@ -1,6 +1,6 @@
 ![Azure DevOps Migration Tools from Naked Agility with Martin Hinshelwood](https://github.com/user-attachments/assets/997cc49f-cbe9-4f22-a8e1-49b529d0dff0)
-![GitHub release](https://img.shields.io/github/release/nkdAgility/vsts-sync-migration.svg)
-![GitHub pre-release](https://img.shields.io/github/v/release/nkdagility/vsts-sync-migration?include_prereleases)
+![GitHub release](https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools)
+![GitHub pre-release](https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases)
 
 [![Build Status](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_apis/build/status%2FMigrationTools-CIv2?branchName=main)](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_build/latest?definitionId=115&branchName=main)
 ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/nkdagility/AzureDevOps-Tools/115?compact_message&style=plastic&logo=azuredevops&label=Tests)
@@ -40,43 +40,54 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 Exceptions shipped to Application Insights and [Elmah.io](https://elmah.io) for analysis and improvement.
 
+## Compatability
 
-
-## What can you do with this tool?
-
-- Migrate `Work Items`, `Test Plans & Suites`, `Teams`, `Shared Queries`, `Pipelines`, and `Processes` between different `Team Projects` or `Organizations`.
-- Perform bulk edits on `Work Items` across an entire `Project`.
-
-**Important:** This tool is intended for experienced users familiar with TFS/Azure DevOps object models and debugging in Visual Studio. It was developed by over 30 contributors from the Azure DevOps community to handle various scenarios and edge cases. 
-
-**Support Options:** Community support is available on [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions). For paid support, consider our [Azure DevOps Migration Services](https://nkdagility.com/capabilities/azure-devops-migration-services/).
-
-### What versions of Azure DevOps & TFS do you support?
+These tools run on Windows and support connecting to Team Foundation Server 2013+, Azure DevOps Server, & Azure DevOps Services. They support both hosted and on-premise instances and can move data between any two.
 
 - Supports all versions of TFS 2013+ and all versions of Azure DevOps.
 - You can migrate from any TFS/Azure DevOps source to any TFS/Azure DevOps target.
 
-### Typical Uses of this tool
+## What do you get?
 
-- Merge multiple projects into a single project.
-- Split one project into several projects.
-- Change Process Templates.
-- Bulk edit Work Items.
-- Migrate Test Suites & Test Plans.
-- Migrate Builds & Pipelines (new).
-- Migrate between different language versions of TFS/Azure DevOps (new in v9.0).
-- Migrate Processes.
+- *Move* Work Items, Test Plans & Suits, and Pipelines between projects, collections, and even organizations.
+- *Merge* multiple projects into a single project even from different organizations.
+- *Split* one project into several projects even between projects, collections, and even organizations.
+- *Change* Process process from Agile to Scrum or any other template.
+- *Bulk edit* Work Items.
 
-**Note:** If you're migrating an entire collection to Azure DevOps Services, consider using Microsoft's [Azure DevOps Migration Service](https://azure.microsoft.com/services/devops/migrate/). If you need to change the Process Template, do so before moving to Azure DevOps Services.
+## What does this tool do?
+
+For the most part we support moving data between ((Azure DevOps Server | Team Foundation Server | Azure DevOps Services) <=> (Azure DevOps Server | Team Foundation Server | Azure DevOps Services)) for any version greater than 2013. 
+
+- `Work Items` (including links and attachments) with custom mappings for fields and types
+	- Copy Work Items between locations with history
+	- Bulk Edit in place of Work Items (Great for cleaning up data, process template changes)
+	- Optionaly includes `Teams`, `Shared Queries`
+- `Test Plans & Suites` 
+	- Copy Test Plans & Suites between locations
+	- Includes `Configurations`, `Shared Steps`, `Shared Parameters`
+- `Pipelines`
+	- Copy Pipelines between locations
+	- excludes XAML & Classic Builds & Release
+- `Processes`
+	- Copy Processes between locations
+
+**Note**: 'Locations' includes `Projects`, `Collections`, `Organizations`
+
+**Important:** This tool is intended for experienced users familiar with TFS/Azure DevOps object models and debugging in Visual Studio. It was developed by 100+ contributors from the Azure DevOps community to handle various scenarios and edge cases. _Not all cases are supported_.
+
+**Support Options:** Community support is available on [GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/discussions). For paid support, consider our [Azure DevOps Migration Services](https://nkdagility.com/capabilities/azure-devops-migration-services/).
 
 ## Quick Links
 
- - [Video Overview](https://www.youtube.com/watch?v=RCJsST0xBCE)
- - [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started/)
- - [Installing](https://nkdagility.com/learn/azure-devops-migration-tools/installation/)
+- [Documenation](https://nkdagility.com/docs/azure-devops-migration-tools/)] 
+- [Installation](https://nkdagility.com/learn/azure-devops-migration-tools/installation/)
+- [Getting Started](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started/)
+- [Reference](https://nkdagility.com/learn/azure-devops-migration-tools/Reference/)
+- [Community Support](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
+- [Commercial Support](https://nkdagility.com/capabilities/azure-devops-migration-services/)
 
- - [Documentation](https://nkdagility.com/learn/azure-devops-migration-tools/)
- - [Questions on Usage](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
+The documentation for the preview is on [Preview](https://nkdagility.com/docs/azure-devops-migration-tools/preview/)]
 
 ## Minimum Permission Requirements
 
@@ -126,6 +137,7 @@ We use these tools with our customers, and for fun, to do real world migrations 
 
 ## Change Log
 
+- [v16.0.0](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v16.0.0) - Enhanced configuration with support for command line, and environmental variable overrides.
 - [v15.1.7](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v15.1.7) - The latest release brings a host of enhancements and fixes designed to improve user experience and configuration options. Noteworthy features include a new GitHub Actions workflow for automatic updates to pull request titles, enhanced management of area and iteration paths using regex mapping, and a more streamlined query format for migration configurations. Users can now enjoy greater flexibility in configuring attachment processing, including options for export paths and size limits. Additionally, updates to authentication methods and improved logging for user retrieval processes have been implemented. The release also addresses various bugs and makes adjustments to enhance overall functionality.
 - [v14.4.7](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v14.4.7) - The latest major release brings a host of user-focused enhancements and improvements. Key changes include the adoption of Winget as the primary installation method, making it easier for users to get started. The main executable has been renamed to `devopsmigration.exe`, and new configuration options enhance customization capabilities, including parallel builds and test case timeouts. The command for initializing configurations has been updated for greater flexibility, and logging improvements provide better insights during migration operations. Subsequent updates have refined version detection, improved command line arguments, and introduced new configuration files to prevent blank issues. Enhanced logging and error handling further improve user experience, while package upgrades and better handling of specific fields streamline migration processes. Overall, these updates aim to enhance functionality, usability, and reliability for users.
 - [v13.2.1](https://github.com/nkdAgility/azure-devops-migration-tools/releases/tag/v13.2.1) - The latest updates bring a range of enhancements and new features aimed at improving user experience and functionality. A key addition is the `WorkItemMigrationContext` processor, which facilitates the migration of work items, including their history and attachments, between Azure DevOps instances. Users will find clearer documentation and a new configuration file to simplify work item type and field mappings. The introduction of the `ExportUsersForMapping` feature allows for easy JSON file exports for field mapping, while security is bolstered with an updated authentication mode. Users can now disable telemetry collection during migration, and various improvements have been made to migration behavior and configuration settings, enhancing the overall robustness and integrity of the migration tools.
