@@ -122,7 +122,7 @@ jobs:
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
-                    $docs_baseURL = "/learn/azure-devops-migration-tools/preview/"
+                    $docs_baseURL = "/learn/azure-devops-migration-tools/preview"
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
