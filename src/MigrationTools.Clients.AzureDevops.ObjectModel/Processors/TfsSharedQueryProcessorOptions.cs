@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MigrationTools.Endpoints;
+using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
@@ -26,17 +27,5 @@ namespace MigrationTools.Processors
         /// </summary>
         public Dictionary<string, string> SourceToTargetFieldMappings { get; set; }
 
-        public override Type ToConfigure => typeof(TfsSharedQueryProcessor);
-
-        public override IProcessorOptions GetDefault()
-        {
-            return this;
-        }
-
-        public override void SetDefaults()
-        {
-            SourceName = "sourceName";
-            TargetName = "targetName";
-        }
     }
 }

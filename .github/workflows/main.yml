@@ -12,13 +12,8 @@ on:
       branches: ["main"]
   workflow_dispatch:
     inputs:
-      ForceHasChanged_src:
-        description: 'Force the src folder to be considered changed'
-        required: false
-        default: false
-        type: boolean
-      ForceHasChanged_docs:
-        description: 'Force the docs folder to be considered changed'
+      ForceRelease:
+        description: 'Force a release! Use when changes hapen out of sync and `src` and `docs` folder changes are not detected.'
         required: false
         default: false
         type: boolean
@@ -53,12 +48,11 @@ jobs:
       nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
       nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
       nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
-      nkdAgility_HasChanged_src: ${{ steps.nkdagility.outputs.HasChanged_src }}
-      nkdAgility_HasChanged_docs: ${{ steps.nkdagility.outputs.HasChanged_docs }}
-      nkdAgility_HasChanged_automation: ${{ steps.nkdagility.outputs.HasChanged_automation }}
       nkdAgility_DocsDeployFolder: ${{ steps.nkdagility.outputs.docs_deploy_folder }}
+      nkdAgility_DocsBaseURL: ${{ steps.nkdagility.outputs.docs_baseURL }}
       nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
+      
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -96,13 +90,24 @@ jobs:
       env:
          GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
+            # Get Branch Name
+            Write-Output "::group::Get Branch Name"
+            Write-Output "-------------------------------------------"
+            $branchName = "${{ github.head_ref || github.ref_name }}"
+            Write-Output "We are running on: $branchName!"
+            $branchSafeName = $branchName.Replace("/", "-")
+            Write-Output "branchSafeName: $branchSafeName!"
+            Write-Output "-------------------------------------------"
+            Write-Output "::endgroup::"
             # Ring Setup
+            Write-Output "::group::Ring Control Setup"
             Write-Output "-------------------------------------------"
             Write-Output "Ring Control Setup"
             Write-Output "-------------------------------------------"
             $Ring = "Canary"
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
             $docs_deploy_folder = "./azure-devops-migration-tools/";
+            $docs_baseURL = "/learn/azure-devops-migration-tools"
             $RunCodeRelease = 'false'
             $RunDocsRelease = 'false'
             switch ($Env:GitVersion_PreReleaseLabel) {
@@ -110,18 +115,21 @@ jobs:
                     $Ring = "Release";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                     $docs_deploy_folder = "./azure-devops-migration-tools/"
+                    $docs_baseURL = "/learn/azure-devops-migration-tools"
                     $RunRelease = 'true'
                 }    
                 "Preview" {
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
-                    $RunRelease = (('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
+                    $docs_baseURL = "/learn/azure-devops-migration-tools/preview/"
+                    $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
-                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/"
+                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/$branchSafeName"
+                    $docs_baseURL = "/learn/azure-devops-migration-tools/canary/$branchSafeName"
                     $RunRelease = 'false'
                 }
             }
@@ -131,10 +139,14 @@ jobs:
             echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
             Write-Output "docs_deploy_folder=$docs_deploy_folder"
             echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
+            Write-Output "docs_baseURL=$docs_baseURL"
+            echo "docs_baseURL=$docs_baseURL" >> $env:GITHUB_OUTPUT
             Write-Output "RunRelease=$RunRelease"
             echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
+            Write-Output "::endgroup::"
             # Docs Setup
+            Write-Output "::group::Docs Setup"
             Write-Output "-------------------------------------------"
             Write-Output "Docs"
             Write-Output "-------------------------------------------"
@@ -142,8 +154,9 @@ jobs:
              Write-Output "docs_version_folder=$docs_version_folder"
             echo "docs_version_folder=$docs_version_folder" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
-
+            Write-Output "::endgroup::"
              # Get-ReleaseDescription
+            Write-Output "::group::Release Description Setup"
             Write-Output "-------------------------------------------"
             Write-Output "Get-ReleaseDescription"
             Write-Output "-------------------------------------------"
@@ -162,34 +175,7 @@ jobs:
             echo $description >> $env:GITHUB_OUTPUT
             echo "$EOF" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
-             # HasChanged Setup
-            Write-Output "-------------------------------------------"
-            Write-Output "HasChanged Setup"
-            Write-Output "-------------------------------------------"
-            if ('${{ steps.filter.outputs.src }}' -eq 'true') {
-                echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
-            } else {
-                if ('${{ inputs.ForceHasChanged_src }}' -eq 'true') {
-                    echo "HasChanged_src=true" >> $env:GITHUB_OUTPUT;
-                } else {
-                    echo "HasChanged_src=false" >> $env:GITHUB_OUTPUT;
-                }
-            }
-            if ('${{ steps.filter.outputs.docs }}' -eq 'true') {
-                echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
-            } else {
-                if ('${{ inputs.ForceHasChanged_docs }}' -eq 'true') {
-                    echo "HasChanged_docs=true" >> $env:GITHUB_OUTPUT;
-                } else {
-                    echo "HasChanged_docs=false" >> $env:GITHUB_OUTPUT;
-                }
-            }
-            if ('${{ steps.filter.outputs.automation }}' -eq 'true') {
-                echo "HasChanged_automation=true" >> $env:GITHUB_OUTPUT;
-            } else {
-                echo "HasChanged_automation=false" >> $env:GITHUB_OUTPUT;
-            }
-            Write-Output "-------------------------------------------"
+            Write-Output "::endgroup::"
 
     - uses: actions/upload-artifact@v4
       with:
@@ -202,7 +188,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: Setup
     steps:
-    - name: "Create Summery"
+    - name: "Show Summery"
       if: always()
       shell: pwsh
       id: nkdagility-summery
@@ -214,10 +200,8 @@ jobs:
                  - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
                  - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
                  - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
+                 - nkdAgility_DocsBaseURL: ${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
-                 - nkdAgility_HasChanged_src: ${{needs.Setup.outputs.nkdAgility_HasChanged_src}}
-                 - nkdAgility_HasChanged_docs: ${{needs.Setup.outputs.nkdAgility_HasChanged_docs}}
-                 - nkdAgility_HasChanged_automation: ${{needs.Setup.outputs.nkdAgility_HasChanged_automation}}
                  - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
                ### GitVersion
                  - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
@@ -230,6 +214,15 @@ jobs:
                  - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
                  - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
                  - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
+            "@
+            echo $markdown >> $Env:GITHUB_STEP_SUMMARY
+    - name: "Show Release Description"
+      if: always()
+      shell: pwsh
+      id: nkdAgility_ReleaseDescription
+      run: |
+            Write-Host "::debug::nkdAgility_ReleaseDescription | $Env:GITHUB_STEP_SUMMARY"
+            $markdown = @"
                ## nkdAgility_ReleaseDescription
                ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
             "@
@@ -330,6 +323,12 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
       - uses: actions/checkout@v3
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@8575951200e472d5f2d95c625da0c7bec8217c42 # v1.161.0
+        with:
+          ruby-version: '3.2' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          cache-version: 0 # Increment this number if you need to re-download cached gems
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/*.html"]'
@@ -343,8 +342,13 @@ jobs:
       - uses: igsekor/pyspelling-any@v1.0.4
         id: spellcheck
         name: Spellcheck
-      - name: Build Jekyll
-        uses: jerryjvl/jekyll-build-action@v1
+      - name: Build with Jekyll
+        # Outputs to the './_site' directory by default
+        run: bundle exec jekyll build --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}"
+        env:
+          JEKYLL_ENV: production
+      # - name: Build Jekyll
+      #   uses: jerryjvl/jekyll-build-action@v1
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site
@@ -512,8 +516,8 @@ jobs:
   DocsRelease:
     name: "Release to Docs"
     runs-on: ubuntu-latest
-    needs: [Setup, BuildDocs, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
+    needs: [Setup, BuildDocs]
+    if: ${{ success() }}
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
@@ -532,7 +536,7 @@ jobs:
           password: ${{ secrets.NKDAGILITY_LEARN_SFTP }}
           port: 2222
           # If true, outputs the results of the upload, without actually uploading.
-          dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
+          #dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
           # A list of folders to upload in the format of `folder/ => upload_folder/`
           uploads: | 
               ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}

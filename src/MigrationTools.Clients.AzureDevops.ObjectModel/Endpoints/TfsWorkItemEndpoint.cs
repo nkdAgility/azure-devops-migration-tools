@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.EndpointEnrichers;
@@ -11,19 +12,8 @@ namespace MigrationTools.Endpoints
 {
     public class TfsWorkItemEndpoint : GenericTfsEndpoint<TfsWorkItemEndpointOptions>, IWorkItemSourceEndpoint, IWorkItemTargetEndpoint
     {
-        public TfsWorkItemEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<TfsWorkItemEndpoint> logger)
-            : base(endpointEnrichers, telemetry, logger)
+        public TfsWorkItemEndpoint(IOptions<TfsWorkItemEndpointOptions> options, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<Endpoint<TfsWorkItemEndpointOptions>> logger) : base(options, endpointEnrichers, serviceProvider, telemetry, logger)
         {
-        }
-
-        public override void Configure(TfsWorkItemEndpointOptions options)
-        {
-            base.Configure(options);
-            Log.LogDebug("TfsWorkItemEndPoint::Configure");
-            if (string.IsNullOrEmpty(Options.Query?.Query))
-            {
-                throw new ArgumentNullException(nameof(Options.Query));
-            }
         }
 
         public void Filter(IEnumerable<WorkItemData> workItems)

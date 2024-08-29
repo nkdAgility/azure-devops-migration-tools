@@ -1,0 +1,130 @@
+optionsClassName: AzureDevOpsPipelineProcessorOptions
+optionsClassFullName: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "AzureDevOpsPipelineProcessor",
+            "BuildPipelines": "",
+            "Enabled": "False",
+            "MigrateBuildPipelines": "True",
+            "MigrateReleasePipelines": "True",
+            "MigrateServiceConnections": "True",
+            "MigrateTaskGroups": "True",
+            "MigrateVariableGroups": "True",
+            "ReleasePipelines": "",
+            "SourceName": "sourceName",
+            "TargetName": "targetName"
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Processors": [
+          {
+            "ProcessorType": "AzureDevOpsPipelineProcessor",
+            "BuildPipelines": "",
+            "Enabled": "False",
+            "MigrateBuildPipelines": "True",
+            "MigrateReleasePipelines": "True",
+            "MigrateServiceConnections": "True",
+            "MigrateTaskGroups": "True",
+            "MigrateVariableGroups": "True",
+            "ReleasePipelines": "",
+            "SourceName": "sourceName",
+            "TargetName": "targetName"
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
+- name: classic
+  description: 
+  code: >-
+    {
+      "$type": "AzureDevOpsPipelineProcessorOptions",
+      "Enabled": false,
+      "MigrateBuildPipelines": true,
+      "MigrateReleasePipelines": true,
+      "MigrateTaskGroups": true,
+      "MigrateVariableGroups": true,
+      "MigrateServiceConnections": true,
+      "BuildPipelines": null,
+      "ReleasePipelines": null,
+      "RepositoryNameMaps": null,
+      "Enrichers": null,
+      "SourceName": "sourceName",
+      "TargetName": "targetName",
+      "RefName": null
+    }
+  sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
+description: Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
+className: AzureDevOpsPipelineProcessor
+typeName: Processors
+architecture: 
+options:
+- parameterName: BuildPipelines
+  type: List
+  description: List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
+  defaultValue: missng XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: Enrichers
+  type: List
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
+  defaultValue: missng XML code comments
+- parameterName: MigrateBuildPipelines
+  type: Boolean
+  description: Migrate Build Pipelines
+  defaultValue: true
+- parameterName: MigrateReleasePipelines
+  type: Boolean
+  description: Migrate Release Pipelines
+  defaultValue: true
+- parameterName: MigrateServiceConnections
+  type: Boolean
+  description: Migrate Service Connections **secrets need to be entered manually**
+  defaultValue: true
+- parameterName: MigrateTaskGroups
+  type: Boolean
+  description: Migrate Task Groups
+  defaultValue: true
+- parameterName: MigrateVariableGroups
+  type: Boolean
+  description: Migrate Valiable Groups
+  defaultValue: true
+- parameterName: RefName
+  type: String
+  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
+  defaultValue: missng XML code comments
+- parameterName: ReleasePipelines
+  type: List
+  description: List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
+  defaultValue: missng XML code comments
+- parameterName: RepositoryNameMaps
+  type: Dictionary
+  description: Map of Source Repository to Target Repository Names
+  defaultValue: missng XML code comments
+- parameterName: SourceName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: TargetName
+  type: String
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+status: Beta
+processingTarget: Pipelines
+classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessorOptions.cs

@@ -1,0 +1,160 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Source": {
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationSource1",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "AccessToken",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+
+      }
+    },
+    "Target": {
+      "EndpointType": "TfsTeamProject",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationTest5",
+      "TfsVersion": "AzureDevOps",
+      "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+      "AllowCrossProjectLinking": false,
+      "AuthenticationMode": "AccessToken",
+      "PersonalAccessToken": "",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
+    },
+    "CommonEnrichers": {
+      "StringManipulatorEnricher": {
+        "Enabled": true,
+        "MaxStringLength": 1000000,
+        "Manipulators": [
+          {
+            "$type": "RegexStringManipulator",
+            "Enabled": true,
+            "Pattern": "[^( -~)\n\r\t]+",
+            "Replacement": "",
+            "Description": "Remove invalid characters from the end of the string"
+          }
+        ]
+      },
+      "TfsAttachmentEnricher": {
+        "RefName": "TfsAttachmentEnricher",
+        "Enabled": true,
+        "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+        "MaxRevisions": 480000000
+      },
+      "TfsChangeSetMapping": {
+        "Enabled": true,
+        "File": "C:\\temp\\ChangeSetMappingFile.json"
+      },
+      "TfsFieldMappings": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldToFieledMap",
+            "sourceField": "System.AcceptanceCriteria",
+            "targetField": "System.AcceptanceCriteria2"
+
+          },
+          {
+            "FieldMapType": "FieldToFieledMap",
+            "sourceField": "System.Description",
+            "targetField": "System.Description2"
+
+          }
+        ]
+      },
+      "TfsGitRepoMappings": {
+        "Enabled": true,
+        "WorkItemGitRepos": {
+          "sourceRepoName": "targetRepoName"
+        }
+      },
+      "TfsNodeStructure": {
+        "Enabled": true,
+        "NodeBasePaths": [],
+        "AreaMaps": {
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+        },
+        "IterationMaps": {
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManager": {
+        "Enabled": true,
+        "ReplayRevisions": true,
+        "MaxRevisions": 0
+      },
+      "TfsTeamSettingsEnricher": {
+        "Enabled": true,
+        "MigrateTeamSettings": true,
+        "UpdateTeamSettings": true,
+        "MigrateTeamCapacities": true,
+        "Teams": null
+      },
+      "TfsUserMappingEnricher": {
+        "Enabled": true,
+        "UserMappingFile": "C:\\temp\\userExport.json",
+        "IdentityFieldsToCheck": [
+          "System.AssignedTo",
+          "System.ChangedBy",
+          "System.CreatedBy",
+          "Microsoft.VSTS.Common.ActivatedBy",
+          "Microsoft.VSTS.Common.ResolvedBy",
+          "Microsoft.VSTS.Common.ClosedBy"
+        ]
+      },
+      "TfsWorkItemLinkEnricher": {
+        "Enabled": true,
+        "FilterIfLinkCountMatches": true,
+        "SaveAfterEachLinkIsAdded": false
+      },
+      "WorkItemTypeMappingEnricher": {
+        "Enabled": true,
+        "RefName": "Bob",
+        "WorkItemTypeDefinition": {
+          "User Story": "Product Backlog Item"
+        }
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "WorkItemMigration",
+        "Enabled": true,
+        "UpdateCreatedDate": true,
+        "UpdateCreatedBy": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+        "FixHtmlAttachmentLinks": false,
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": false,
+        "PauseAfterEachWorkItem": false,
+        "AttachRevisionHistory": false,
+        "GenerateMigrationComment": true,
+        "WorkItemIDs": [ 12 ],
+        "MaxGracefulFailures": 0,
+        "SkipRevisionWithInvalidIterationPath": false,
+        "SkipRevisionWithInvalidAreaPath": false
+      },
+      {
+        "ProcessorType": "WorkItemPostProcessing",
+        "Enabled": false,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": false,
+        "PauseAfterEachWorkItem": false
+      }
+    ]
+  }
+}

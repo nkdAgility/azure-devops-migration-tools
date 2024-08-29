@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,10 +20,7 @@ namespace MigrationTools.Host.Commands
         private readonly IHostApplicationLifetime _appLifetime;
         private readonly ITelemetryLogger Telemetery;
 
-
-        public ExecuteMigrationCommand(IServiceProvider services,
-            ILogger<ExecuteMigrationCommand> logger,
-            IHostApplicationLifetime appLifetime, ITelemetryLogger telemetryLogger, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, IMigrationToolVersion migrationToolVersion) : base(appLifetime, services, detectOnlineService, detectVersionService, logger, telemetryLogger, migrationToolVersion)
+        public ExecuteMigrationCommand(IHostApplicationLifetime appLifetime, IServiceProvider services, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<ExecuteMigrationCommandSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion, IConfiguration configuration) : base(appLifetime, services, detectOnlineService, detectVersionService, logger, telemetryLogger, migrationToolVersion, configuration)
         {
             Telemetery = telemetryLogger;
             _services = services;

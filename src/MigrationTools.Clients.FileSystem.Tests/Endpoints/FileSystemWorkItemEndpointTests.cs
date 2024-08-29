@@ -1,44 +1,55 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
+using MigrationTools.EndpointEnrichers;
+using MigrationTools.Enrichers;
 using MigrationTools.Tests;
+using MigrationTools.Tools;
+using MigrationTools.Tools.Interfaces;
+using MigrationTools.Tools.Shadows;
+using MigrationTools.Shadows;
+using System;
 
 namespace MigrationTools.Endpoints.Tests
 {
     [TestClass()]
     public class FileSystemWorkItemEndpointTests
     {
-        public ServiceProvider Services { get; private set; }
+
+        public IServiceProvider Services { get; private set; }
 
         [TestInitialize]
         public void Setup()
         {
-            Services = ServiceProviderHelper.GetServices();
+            Services = GetServices();
         }
 
         [TestMethod, TestCategory("L3")]
         public void ConfiguredTest()
         {
-            SetupStore("Source", 10);
-            FileSystemWorkItemEndpoint e = CreateEndpoint("Source");
+            FileSystemWorkItemEndpoint e = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Source");
+            CleanAndAdd(e, 10);
             Assert.AreEqual(10, e.Count);
         }
 
         [TestMethod, TestCategory("L3")]
         public void EmptyTest()
         {
-            SetupStore("Source", 0);
-            FileSystemWorkItemEndpoint e = CreateEndpoint("Source");
+            FileSystemWorkItemEndpoint e = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Source");
+            CleanAndAdd(e, 0);
             Assert.AreEqual(0, e.Count);
         }
 
         [TestMethod, TestCategory("L3")]
         public void FilterAllTest()
         {
-            SetupStore("Source", 10);
-            FileSystemWorkItemEndpoint e1 = CreateEndpoint("Source");
-            SetupStore("Target", 10);
-            FileSystemWorkItemEndpoint e2 = CreateEndpoint("Target");
+            FileSystemWorkItemEndpoint e1 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Source");
+            CleanAndAdd(e1, 10);
+            FileSystemWorkItemEndpoint e2 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Target");
+            CleanAndAdd(e2, 10);
+            
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(0, e1.Count);
         }
@@ -46,10 +57,10 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L3")]
         public void FilterHalfTest()
         {
-            SetupStore("Source", 20);
-            FileSystemWorkItemEndpoint e1 = CreateEndpoint("Source");
-            SetupStore("Target", 10);
-            FileSystemWorkItemEndpoint e2 = CreateEndpoint("Target");
+            FileSystemWorkItemEndpoint e1 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Source");
+            CleanAndAdd(e1, 20);
+            FileSystemWorkItemEndpoint e2 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Target");
+            CleanAndAdd(e2, 10);            
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
         }
@@ -57,10 +68,11 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L3")]
         public void PersistWorkItemExistsTest()
         {
-            SetupStore("Source", 20);
-            FileSystemWorkItemEndpoint e1 = CreateEndpoint("Source");
-            SetupStore("Target", 10);
-            FileSystemWorkItemEndpoint e2 = CreateEndpoint("Target");
+            FileSystemWorkItemEndpoint e1 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Source");
+            CleanAndAdd(e1, 20);
+            FileSystemWorkItemEndpoint e2 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Target");
+            CleanAndAdd(e2, 10);
+            
             foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
@@ -71,10 +83,10 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L3")]
         public void PersistWorkItemWithFilterTest()
         {
-            SetupStore("Source", 20);
-            FileSystemWorkItemEndpoint e1 = CreateEndpoint("Source");
-            SetupStore("Target", 10);
-            FileSystemWorkItemEndpoint e2 = CreateEndpoint("Target");
+            FileSystemWorkItemEndpoint e1 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Source");
+            CleanAndAdd(e1, 20);
+            FileSystemWorkItemEndpoint e2 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Target");
+            CleanAndAdd(e2, 10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
             foreach (WorkItemData item in e1.GetWorkItems())
@@ -84,26 +96,53 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(20, e2.Count);
         }
 
-        public void SetupStore(string direction, int count)
+        public void CleanAndAdd(FileSystemWorkItemEndpoint endpoint, int count)
         {
-            string path = string.Format(@".\Store\{0}\", direction.ToString());
-            if (System.IO.Directory.Exists(path))
+            if (System.IO.Directory.Exists(endpoint.Options.FileStore))
             {
-                System.IO.Directory.Delete(path, true);
+                System.IO.Directory.Delete(endpoint.Options.FileStore, true);
             }
-            FileSystemWorkItemEndpoint e = CreateEndpoint(direction);
             for (int i = 0; i < count; i++)
             {
-                e.PersistWorkItem(new WorkItemData() { Id = i.ToString() });
+                endpoint.PersistWorkItem(new WorkItemData() { Id = i.ToString() });
             }
         }
 
-        private FileSystemWorkItemEndpoint CreateEndpoint(string direction)
+        protected IServiceProvider GetServices()
         {
-            var options = new FileSystemWorkItemEndpointOptions() { FileStore = string.Format(@".\Store\{0}\", direction) };
-            FileSystemWorkItemEndpoint e = Services.GetRequiredService<FileSystemWorkItemEndpoint>();
-            e.Configure(options);
-            return e;
+            var services = new ServiceCollection();
+            services.AddMigrationToolServicesForUnitTests();
+
+            services.AddSingleton<ProcessorEnricherContainer>();
+            services.AddSingleton<EndpointEnricherContainer>();
+            services.AddSingleton<CommonTools>();
+            services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
+            services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
+
+            services.AddKeyedSingleton(typeof(IEndpoint), "Source", (sp, key) =>
+            {
+                IOptions<FileSystemWorkItemEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new FileSystemWorkItemEndpointOptions()
+                {
+                    FileStore = @".\Store\Source\"
+                });
+                var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(FileSystemWorkItemEndpoint), options);
+                return endpoint;
+            });
+
+            services.AddKeyedSingleton(typeof(IEndpoint), "Target", (sp, key) =>
+            {
+                IOptions<FileSystemWorkItemEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new FileSystemWorkItemEndpointOptions()
+                {
+                    FileStore = @".\Store\Target\"
+                });
+                var endpoint = ActivatorUtilities.CreateInstance(sp, typeof(FileSystemWorkItemEndpoint), options);
+                return endpoint;
+            });
+
+
+            return services.BuildServiceProvider();
         }
+
     }
 }

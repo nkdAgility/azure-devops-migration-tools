@@ -5,10 +5,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts.WorkItems;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
+using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {
@@ -16,34 +19,16 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
     {
         private OutboundLinkCheckingProcessorOptions _options;
 
-        public OutboundLinkCheckingProcessor(
-                    ProcessorEnricherContainer processorEnrichers,
-                    IEndpointFactory endpointFactory,
-                    IServiceProvider services,
-                    ITelemetryLogger telemetry,
-                    ILogger<Processor> logger)
-            : base(processorEnrichers, endpointFactory, services, telemetry, logger)
+        public OutboundLinkCheckingProcessor(IOptions<OutboundLinkCheckingProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
+
+        public new OutboundLinkCheckingProcessorOptions Options => (OutboundLinkCheckingProcessorOptions)base.Options;
 
         public new AzureDevOpsEndpoint Source => (AzureDevOpsEndpoint)base.Source;
 
         public new AzureDevOpsEndpoint Target => (AzureDevOpsEndpoint)base.Target;
 
-        public override void Configure(IProcessorOptions options)
-        {
-            base.Configure(options);
-            Log.LogInformation("AzureDevOpsPipelineProcessor::Configure");
-            _options = (OutboundLinkCheckingProcessorOptions)options;
-            if(string.IsNullOrEmpty(_options.WIQLQuery))
-            {
-                throw new Exception($"The {nameof(_options.WIQLQuery)} needs to be set");
-            }
-            if (string.IsNullOrEmpty(_options.ResultFileName))
-            {
-                throw new Exception($"The {nameof(_options.ResultFileName)} needs to be set");
-            }
-        }
 
         protected override void InternalExecute()
         {

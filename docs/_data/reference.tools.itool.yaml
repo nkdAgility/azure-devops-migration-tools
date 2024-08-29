@@ -1,0 +1,12 @@
+optionsClassName: 
+optionsClassFullName: 
+configurationSamples: []
+description: missng XML code comments
+className: ITool
+typeName: Tools
+architecture: v1
+options: []
+status: missng XML code comments
+processingTarget: missng XML code comments
+classFile: /src/MigrationTools/Tools/Infra/ITool.cs
+optionsClassFile: 

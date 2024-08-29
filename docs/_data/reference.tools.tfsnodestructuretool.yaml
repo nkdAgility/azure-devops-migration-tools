@@ -1,0 +1,122 @@
+optionsClassName: TfsNodeStructureToolOptions
+optionsClassFullName: MigrationTools.Tools.TfsNodeStructureToolOptions
+configurationSamples:
+- name: defaults
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "Areas": {
+              "Filters": null,
+              "Mappings": null
+            },
+            "Enabled": "True",
+            "Iterations": {
+              "Filters": null,
+              "Mappings": null
+            },
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+- name: sample
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "Areas": {
+              "Filters": [
+                "*\\Team 1,*\\Team 1\\**"
+              ],
+              "Mappings": {
+                "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+                "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
+              }
+            },
+            "Enabled": "True",
+            "Iterations": {
+              "Filters": [
+                "*\\Sprint*",
+                "*\\Sprint*\\**"
+              ],
+              "Mappings": {
+                "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+                "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
+              }
+            },
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+- name: classic
+  description: 
+  code: >-
+    {
+      "$type": "TfsNodeStructureToolOptions",
+      "Enabled": true,
+      "Areas": {
+        "Filters": [
+          "*\\Team 1,*\\Team 1\\**"
+        ],
+        "Mappings": {
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
+        }
+      },
+      "Iterations": {
+        "Filters": [
+          "*\\Sprint*",
+          "*\\Sprint*\\**"
+        ],
+        "Mappings": {
+          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
+          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
+          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
+        }
+      },
+      "ShouldCreateMissingRevisionPaths": true,
+      "ReplicateAllExistingNodes": true
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+description: The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
+className: TfsNodeStructureTool
+typeName: Tools
+architecture: 
+options:
+- parameterName: Areas
+  type: NodeOptions
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: missng XML code comments
+- parameterName: Iterations
+  type: NodeOptions
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
+- parameterName: ReplicateAllExistingNodes
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: ShouldCreateMissingRevisionPaths
+  type: Boolean
+  description: When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
+  defaultValue: missng XML code comments
+status: missng XML code comments
+processingTarget: missng XML code comments
+classFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsNodeStructureTool.cs
+optionsClassFile: /src/MigrationTools.Clients.AzureDevops.ObjectModel/Tools/TfsNodeStructureToolOptions.cs

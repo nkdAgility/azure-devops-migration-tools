@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using Microsoft.TeamFoundation.Work.WebApi;
@@ -8,8 +10,7 @@ namespace MigrationTools.Endpoints
 {
     public class TfsTeamSettingsEndpoint : GenericTfsEndpoint<TfsTeamSettingsEndpointOptions>, ISourceEndPoint, ITargetEndPoint
     {
-        public TfsTeamSettingsEndpoint(EndpointEnricherContainer endpointEnrichers, ITelemetryLogger telemetry, ILogger<TfsTeamSettingsEndpoint> logger)
-            : base(endpointEnrichers, telemetry, logger)
+        public TfsTeamSettingsEndpoint(IOptions<TfsTeamSettingsEndpointOptions> options, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<Endpoint<TfsTeamSettingsEndpointOptions>> logger) : base(options, endpointEnrichers, serviceProvider, telemetry, logger)
         {
         }
 

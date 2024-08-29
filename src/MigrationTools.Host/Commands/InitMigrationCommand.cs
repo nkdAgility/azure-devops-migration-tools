@@ -1,34 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elmah.Io.Client;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
     internal class InitMigrationCommand : AsyncCommand<InitMigrationCommandSettings>
     {
-        private readonly IEngineConfigurationBuilder _configurationBuilder;
-        private readonly ISettingsWriter _settingWriter;
+        public IServiceProvider Services { get; }
+
         private readonly ILogger _logger;
         private readonly ITelemetryLogger Telemetery;
         private readonly IHostApplicationLifetime _appLifetime;
 
         public InitMigrationCommand(
-            IEngineConfigurationBuilder configurationBuilder,
-            ISettingsWriter settingsWriter,
+            IServiceProvider services,
             ILogger<InitMigrationCommand> logger,
             ITelemetryLogger telemetryLogger,
             IHostApplicationLifetime appLifetime)
         {
-            _configurationBuilder = configurationBuilder;
-            _settingWriter = settingsWriter;
+            Services = services;
             _logger = logger;
             Telemetery = telemetryLogger;
             _appLifetime = appLifetime;
@@ -44,45 +50,67 @@ namespace MigrationTools.Host.Commands
                 string configFile = settings.ConfigFile;
                 if (string.IsNullOrEmpty(configFile))
                 {
-                    configFile = "configuration.json";
+                    configFile = $"configuration-{settings.Options.ToString()}.json";
                 }
                 _logger.LogInformation("ConfigFile: {configFile}", configFile);
                 if (File.Exists(configFile))
                 {
-                    _logger.LogInformation("Deleting old configuration.json reference file");
-                    File.Delete(configFile);
+                    if (settings.Overwrite)
+                    {
+                        File.Delete(configFile);
+                    }
+                    else
+                    {
+                        _logger.LogCritical($"The config file {configFile} already exists, pick a new name. Or Set --overwrite");
+                        Environment.Exit(1);
+                    }
                 }
                 if (!File.Exists(configFile))
                 {
+                    var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
+
                     _logger.LogInformation("Populating config with {Options}", settings.Options.ToString());
-                    EngineConfiguration config;
+
+                    OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
+
                     switch (settings.Options)
                     {
                         case OptionsMode.Reference:
-                            config = _configurationBuilder.BuildReference();
+                            optionsBuilder.AddAllOptions();
                             break;
                         case OptionsMode.Basic:
-                            config = _configurationBuilder.BuildGettingStarted();
+                            optionsBuilder.AddOption("TfsWorkItemMigrationProcessor");
+                            optionsBuilder.AddOption("FieldMappingTool");
+                            optionsBuilder.AddOption("FieldLiteralMap");
+                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Source");
+                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Target");
                             break;
-
                         case OptionsMode.WorkItemTracking:
-                            config = _configurationBuilder.BuildWorkItemMigration();
+                            optionsBuilder.AddOption("TfsWorkItemMigrationProcessor");
+                            optionsBuilder.AddOption("FieldMappingTool");
+                            optionsBuilder.AddOption("FieldLiteralMap");
+                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Source");
+                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Target");
                             break;
-
-                        case OptionsMode.Fullv2:
-                            config = _configurationBuilder.BuildDefault2();
+                        case OptionsMode.PipelineProcessor:
+                            optionsBuilder.AddOption("AzureDevOpsPipelineProcessor");
+                            optionsBuilder.AddOption("AzureDevOpsEndpoint", "Source");
+                            optionsBuilder.AddOption("AzureDevOpsEndpoint", "Target");
                             break;
-
-                        case OptionsMode.WorkItemTrackingv2:
-                            config = _configurationBuilder.BuildWorkItemMigration2();
-                            break;
-
                         default:
-                            config = _configurationBuilder.BuildGettingStarted();
+                            optionsBuilder.AddAllOptions();
                             break;
                     }
-                    _settingWriter.WriteSettings(config, configFile);
-                    _logger.LogInformation($"New {configFile} file has been created");
+
+                    string json = optionsBuilder.Build();
+
+                    File.WriteAllText(configFile, json);
+                    _logger.LogInformation("New {configFile} file has been created", configFile);
+                    _logger.LogInformation(json);
+
                 }
                 _exitCode = 0;
             }

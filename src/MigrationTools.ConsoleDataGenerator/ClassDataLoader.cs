@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
+using MigrationTools;
+using System.Configuration;
+using Newtonsoft.Json;
+using MigrationTools.Tools.Infrastructure;
+using System.Security.AccessControl;
+using Microsoft.Extensions.Options;
+using MigrationTools.Processors;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -15,110 +23,103 @@ namespace MigrationTools.ConsoleDataGenerator
         private DataSerialization saveData;
         private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
         private static CodeFileFinder codeFinder = new CodeFileFinder("../../../../../src/");
-        public ClassDataLoader(DataSerialization saveData) {
+        private IConfiguration configuration;
+        public ClassDataLoader(DataSerialization saveData, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        {
 
             this.saveData = saveData;
+            this.configuration = configuration;
         }
 
-        [Obsolete("Please use GetClassData instead")]
-        public ClassGroup GetClassGroup(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
+        public List<ClassData> GetClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName)
+            where TOptionsInterface : IOptions
         {
             Console.WriteLine();
-            Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile:: {dataTypeName}");
-            ClassGroup data = new ClassGroup();
-            data.Name = dataTypeName;
-            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
-            Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile:: ----------- Found {founds.Count}");
-
-            // Each File
-            foreach (var item in founds)
-            {
-                DataItem dataItem = new DataItem();
-
-                Console.WriteLine($"ClassDataLoader::BuildJekyllDataFile::-PROCESS {item.Name}");
-                dataItem.classData = CreateClassData(targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd);
-            }
-            Console.WriteLine("ClassDataLoader::BuildJekyllDataFile:: -----------");
-            return data;
-        }
-
-        public List<ClassData> GetClassData(List<Type> targetTypes, List<Type> allTypes, Type type, string apiVersion, string dataTypeName, bool findConfig = true, string configEnd = "Options")
-        {
-            Console.WriteLine();
-            Console.WriteLine($"ClassDataLoader::populateClassData:: {dataTypeName}");
+            Console.WriteLine($"ClassDataLoader::GetOptionsData:: {dataTypeName}");
             List<ClassData> data = new List<ClassData>();
-            var founds = targetTypes.Where(t => type.IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
-            Console.WriteLine($"ClassDataLoader::populateClassData:: ----------- Found {founds.Count}");
+            var founds = allTypes.Where(t => typeof(TOptionsInterface).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface && t.IsPublic).OrderBy(t => t.Name).ToList();
+            Console.WriteLine($"ClassDataLoader::GetOptionsData:: ----------- Found {founds.Count}");
             // Each File
             foreach (var item in founds)
             {
-                Console.WriteLine($"ClassDataLoader::populateClassData::-PROCESS {item.Name}");
-                data.Add(CreateClassData(targetTypes, allTypes, apiVersion, dataTypeName, item, findConfig, configEnd));
+                Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions::-PROCESS {item.Name}");
+                var itemData = CreateClassDataFromOptions<TOptionsInterface>(allTypes, dataTypeName, item);
+                if (itemData != null)
+                {
+                    data.Add(itemData);
+                }
+                else
+                {
+                    Console.WriteLine($"BOOM::CreateClassDataFromOptions");
+                }
+
             }
-            Console.WriteLine("ClassDataLoader::populateClassData:: -----------");
+            Console.WriteLine("ClassDataLoader::GetOptionsData:: -----------");
             return data;
         }
 
-        private ClassData CreateClassData(List<Type> targetTypes, List<Type> allTypes, string apiVersion, string dataTypeName, Type item, bool findConfig = true, string configEnd = "Options")
+        private ClassData CreateClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName, Type optionInFocus)
+            where TOptionsInterface : IOptions
         {
-            Type typeOption = item;
-            string objectName = item.Name;
+           var oConfig =  GetOptionsConfiguration(optionInFocus);
+            var typeOftargetOfOption = allTypes.Where(t => t.Name == oConfig.OptionFor && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            if (typeOftargetOfOption == null)
+            {
+                Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions:: {optionInFocus.Name} - {oConfig.OptionFor} not found");
+                return null;
+            }
             ClassData data = new ClassData();
-            data.ClassName = item.Name;
-            data.ClassFile = codeFinder.FindCodeFile(item);
+            data.ClassName = typeOftargetOfOption.Name;
+            data.ClassFile = codeFinder.FindCodeFile(typeOftargetOfOption);
             data.TypeName = dataTypeName;
-            data.Architecture = apiVersion;
-            data.Description = codeDocs.GetTypeData(item);
-            data.Status = codeDocs.GetTypeData(item, "status");
-            data.ProcessingTarget = codeDocs.GetTypeData(item, "processingtarget");
-            if (findConfig)
-            {
-                objectName = objectName.Replace("Context", "");
-                typeOption = allTypes.Where(t => t.Name == $"{objectName}{configEnd}" && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            data.Description = codeDocs.GetTypeData(typeOftargetOfOption);
+            data.Status = codeDocs.GetTypeData(typeOftargetOfOption, "status");
+            data.ProcessingTarget = codeDocs.GetTypeData(typeOftargetOfOption, "processingtarget");
 
-            }
-            else
+            if (optionInFocus != null)
             {
-                data.OptionsClassName = "";
-                data.OptionsClassFullName = "";
-                Console.WriteLine("No config");
-            }
+                TOptionsInterface instanceOfOption = (TOptionsInterface)Activator.CreateInstance(optionInFocus);
 
-            if (typeOption != null)
-            {
-                data.OptionsClassFullName = typeOption.FullName;
-                data.OptionsClassName = typeOption.Name;
-                data.OptionsClassFile = codeFinder.FindCodeFile(typeOption);
-                object targetItem = null;
-                if (typeOption.GetInterfaces().Contains(typeof(IProcessorConfig)))
+                data.OptionsClassFullName = optionInFocus.FullName;
+                data.OptionsClassName = optionInFocus.Name;
+                data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
+                ///bind Item or Defaults
+                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToDefault))
                 {
-                    Console.WriteLine("Processing as IProcessorConfig");
-                    var options = (IProcessorConfig)Activator.CreateInstance(typeOption);
-                    targetItem = options;
+                    IConfigurationSection mainOrDefaultSection;
+                    Console.WriteLine("Processing as ConfigurationSectionName");
+                    mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToDefault);
+                    if (mainOrDefaultSection.Exists())
+                    {
+                        mainOrDefaultSection.Bind(instanceOfOption);
+                        var json = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection, instanceOfOption);
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = json.Trim() });
+                    } else
+                    {
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = "There are no defaults! Check the sample for options!" });
+                    }
                 }
-                if (typeOption.GetInterfaces().Contains(typeof(IOptions)))
-                {
-                    Console.WriteLine("Processing as IOptions");
-                    var options = (IOptions)Activator.CreateInstance(typeOption);
-                    options.SetDefaults();
-                    targetItem = options;
-                }
-                if (typeOption.GetInterfaces().Contains(typeof(IFieldMapConfig)))
-                {
-                    Console.WriteLine("Processing as IFieldMapConfig");
-                    var options = (IFieldMapConfig)Activator.CreateInstance(typeOption);
-                    options.SetExampleConfigDefaults();
-                    targetItem = options;
-                }
-                if (targetItem != null)
+                if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToSample))
                 {
                     Console.WriteLine("targetItem");
-                    JObject joptions = (JObject)JToken.FromObject(targetItem);
-
-                    data.Options = populateOptions(targetItem, joptions);
-                    data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "default", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(targetItem) });
+                    IConfigurationSection sampleSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToSample);
+                    sampleSection.Bind(instanceOfOption);
+                    if (sampleSection.Exists())
+                    {
+                        var json = ConvertSectionWithPathToJson(configuration, sampleSection, instanceOfOption);
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = json.Trim() });
+                    }
+                    else
+                    {
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = "There is no sample, but you can check the classic below for a general feel." });
+                    }
                 }
-
+                data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
+                if (instanceOfOption != null)
+                {
+                    JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
+                    data.Options = populateOptions(instanceOfOption, joptions);
+                }
             }
             else
             {
@@ -126,7 +127,6 @@ namespace MigrationTools.ConsoleDataGenerator
             }
             return data;
         }
-
 
         private List<OptionsItem> populateOptions(object item, JObject joptions)
         {
@@ -145,6 +145,110 @@ namespace MigrationTools.ConsoleDataGenerator
                 }
             }
             return options;
+        }
+
+        static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section, IOptions option = null)
+        {
+            var pathSegments = option == null ? section.Path.Split(':') : option.ConfigurationMetadata.PathToInstance.Split(':');
+            JObject root = new JObject();
+            JObject currentObject = root;
+
+            // Walk down the path from the root to the target section
+            for (int i = 0; i < pathSegments.Length; i++)
+            {
+                string key = pathSegments[i];
+                IConfigurationSection currentSection = configuration.GetSection(string.Join(':', pathSegments, 0, i + 1));
+
+                if (i < pathSegments.Length - 1)
+                {
+                    // Create nested objects for intermediate segments
+                    if (currentObject[key] == null)
+                    {
+                        currentObject[key] = new JObject();
+                    }
+                    currentObject = (JObject)currentObject[key];
+                }
+                else
+                {
+                    // We are at the target section, serialize its children
+                    JToken sectionObject = ConvertSectionToJson(section);
+
+                    if (option != null && option.ConfigurationMetadata.IsCollection)
+                    {
+                        // Handle as a collection
+                        if (currentObject[key] == null)
+                        {
+                            currentObject[key] = new JArray();
+                        }
+                        if (currentObject[key] is JArray array)
+                        {
+                            JObject itemObject = sectionObject as JObject ?? new JObject();
+                            // Add ObjectName and OptionFor to the object
+                            itemObject.AddFirst(new JProperty(option.ConfigurationMetadata.ObjectName, option.ConfigurationMetadata.OptionFor));
+                            array.Add(itemObject);
+                        }
+                    }
+                    else
+                    {
+                        // Handle as a regular object
+                        currentObject[key] = sectionObject;
+                    }
+                }
+            }
+
+            return root.ToString(Formatting.Indented);
+        }
+
+        static JToken ConvertSectionToJson(IConfigurationSection section)
+        {
+            // Check if all children are numbers to identify arrays
+            var children = section.GetChildren().ToList();
+            if (children.All(c => int.TryParse(c.Key, out _)))
+            {
+                // Treat it as an array
+                JArray array = new JArray();
+                foreach (var child in children)
+                {
+                    if (child.GetChildren().Any())
+                    {
+                        // Add nested objects to the array
+                        array.Add(ConvertSectionToJson(child));
+                    }
+                    else
+                    {
+                        // Add values to the array
+                        array.Add(child.Value);
+                    }
+                }
+                return array;
+            }
+            else
+            {
+                // Treat it as an object
+                JObject obj = new JObject();
+                foreach (var child in children)
+                {
+                    if (child.GetChildren().Any())
+                    {
+                        // Recursively process nested objects
+                        obj[child.Key] = ConvertSectionToJson(child);
+                    }
+                    else
+                    {
+                        // Add values to the object
+                        obj[child.Key] = child.Value;
+                    }
+                }
+                return obj;
+            }
+        }
+
+
+        public static ConfigurationMetadata GetOptionsConfiguration(Type option)
+        {
+            // ActivatorUtilities.CreateInstance(option);
+            IOptions optionInsance = (IOptions)Activator.CreateInstance(option);
+            return optionInsance.ConfigurationMetadata;
         }
 
     }

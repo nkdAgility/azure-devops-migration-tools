@@ -171,20 +171,11 @@ These tools are build by naked Agility Limited's DevOps & Agility consultants to
 **Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get you started in 30 minutes. This tool is complicated and its not always easy to discover what you need to do.**
 
 
-## Processors (v1 Architecture)
+## Processors 
 
-There are a number processors that can be used to migrate, or process, different sorts of data in different ways. Which one is right for you depends on the situation at hand. 
-Most of these processors need to be run in order. If you try to migrate work items before you have migrated Area and Iterations then ***bang*** you need to go back.
 
-{% include content-collection-table.html collection = "reference" typeName = "Processors" architecture = "v1" %}
 
-## Processors (v2 Architecture) [ PREVIEW ]
-
-**_These are experimental processors that should replace those above. We are interested in feedback of the new format of the config, as well as the functionality._**
-
-The new processor configuration is designed to allow the Migration Tools to support different Source and targets than just TFS/Azure DevOps, and we moved the Endpoints to the processor to allow both Object Model & REST in different processors.
-
-{% include content-collection-table.html collection = "reference" typeName = "Processors" architecture = "v2" %}
+{% include content-collection-table.html collection = "reference" typeName = "Processors" %}
 
 
 ## Field Maps
@@ -193,7 +184,7 @@ By default, when you are moving from source to target the system will map all of
 
 However sometimes you want to move data to another field, or use a regex to parse out just the bits that you want. To help we have built a number of mapping tools that should give you the versatility you need.
 
-{% include content-collection-table.html collection = "reference" typeName = "FieldMaps" architecture = "v1" %}
+{% include content-collection-table.html collection = "reference" typeName = "FieldMaps" %}
 
 ## Code (TFVC)
 

@@ -9,6 +9,9 @@
 {
     background-color: #713183;
 }
+.bg-brand-secondary {
+    background-color: #54595F;
+}
 
 .bg-brand-menu
 {
@@ -17,4 +20,31 @@
 
 pre {
     max-width: 1024px;;
+}
+
+.navbar-brand-topbaritem {
+    font-size: 0.9em;
+}
+
+.nkda-text-primary {
+    color: #713183;
+}
+
+.nkda-main-menu-item {
+
+}
+
+    .nkda-main-menu-item:hover {
+        color: white;
+        background: #713183;
+    }
+
+.btn-nkdprimary {
+    background-color: #713183;
+    color: white;
+}
+
+.btn-nkdprimary:hover {
+    background-color: #54595F;
+    color: white;
 }

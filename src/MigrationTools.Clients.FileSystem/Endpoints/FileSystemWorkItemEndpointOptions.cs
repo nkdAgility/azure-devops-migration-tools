@@ -1,4 +1,6 @@
-﻿namespace MigrationTools.Endpoints
+﻿using MigrationTools.Endpoints.Infrastructure;
+
+namespace MigrationTools.Endpoints
 {
     public class FileSystemWorkItemEndpointOptions : EndpointOptions
     {
