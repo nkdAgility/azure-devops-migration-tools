@@ -12,6 +12,13 @@
         </li>
         <li><hr /></li>
         <li class="mb-1">
+            <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">How-To</strong>
+            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
+                {% include sidebar-collection.html collection = "howto" %}
+            </ul>
+        </li>
+        <li><hr /></li>
+        <li class="mb-1">
             <strong class="bd-links-heading d-flex w-100 align-items-center fw-semibold">Support</strong>
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
                 <li><a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Community Support</a></li>
@@ -24,12 +31,14 @@
             <ul class="bd-links-nav list-unstyled mb-0 pb-3 pb-md-2 pe-lg-2 ps-2">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ps-2">
                     <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">Overview</a></li>
-                    {% include sidebar-collection.html collection = "reference" typeName = "Processors" %}
-                    {% include sidebar-collection.html collection = "reference" typeName = "Endpoints" %}
-                    {% include sidebar-collection.html collection = "reference" typeName = "EndpointEnrichers" %}
-                    {% include sidebar-collection.html collection = "reference" typeName = "FieldMaps" %}
-                    {% include sidebar-collection.html collection = "reference" typeName = "Tools" %}
-                    {% include sidebar-collection.html collection = "reference" typeName = "ProcessorEnrichers" %}
+                    <li class="align-items-center"><a href="{{ site.baseurl }}/Reference/reflectedworkItemid/" class="link-body-emphasis d-inline-flex text-decoration-none rounded">ReflectedWorkItemId</a></li>
+                    <li><hr /></li>
+                    {% include sidebar-collection-reference.html collection = "reference" typeName = "Processors" %}
+                    {% include sidebar-collection-reference.html collection = "reference" typeName = "Endpoints" %}
+                    {% include sidebar-collection-reference.html collection = "reference" typeName = "EndpointEnrichers" %}
+                    {% include sidebar-collection-reference.html collection = "reference" typeName = "FieldMaps" %}
+                    {% include sidebar-collection-reference.html collection = "reference" typeName = "Tools" %}
+                    {% include sidebar-collection-reference.html collection = "reference" typeName = "ProcessorEnrichers" %}
                 </ul>
 
             </ul>

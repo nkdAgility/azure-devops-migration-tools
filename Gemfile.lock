@@ -111,6 +111,7 @@ GEM
       unicode-display_width (>= 1.1.1, < 3)
     unicode-display_width (2.5.0)
     uri (0.13.0)
+    wdm (0.2.0)
     webrick (1.8.1)
 
 PLATFORMS
@@ -130,6 +131,7 @@ DEPENDENCIES
   kramdown
   pygments.rb
   rouge
+  wdm
 
 BUNDLED WITH
    2.5.17

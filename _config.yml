@@ -16,6 +16,8 @@ collections_dir: collections
 collections:
  reference:
    output: true
+ howto:
+    output: true
 
 exclude:
  - "**/*template*.md"

@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 
 # gem "rails"
-gem 'jekyll-relative-links'
+gem 'jekyll-relative-links' 
 gem 'jekyll-seo-tag'
 gem 'jekyll-sitemap'
 gem 'jekyll-toc'
@@ -15,3 +15,4 @@ gem 'jekyll-redirect-from'
 gem 'rouge'
 gem 'kramdown'
 gem 'pygments.rb'
+gem 'wdm'
