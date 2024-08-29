@@ -41,13 +41,13 @@ namespace MigrationTools.Processors.Infrastructure
                     if (processorTypeString == null)
                     {
                         Log.Warning("There was no value for {optionTypeName} from {sectionKey}", objectTypePropertyName, processorSection.Key);
-                        throw new Exception();
+                        throw new InvalidProcessorException($"Your processor at `{processorSection.Path}` in the config does not have a property called {objectTypePropertyName} that is required to sucessfully detect the type and load it. ");
                     }
                     var processorType = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IProcessorOptions>().WithNameString(processorTypeString);
                     if (processorType == null)
                     {
-                        Log.Warning("There was no match for {optionTypeName} from {sectionKey}", objectTypePropertyName, processorSection.Key);
-                        throw new Exception();
+                        Log.Warning($"The value of {objectTypePropertyName} for your processor at `{processorSection.Path}` may have an error as were were unable to find a type that matches {processorTypeString}! Please check the spelling, and that its a processor listed in the documentation.");
+                        throw new InvalidProcessorException();
                     }
 
                     IProcessorOptions processorOption = Activator.CreateInstance(processorType) as IProcessorOptions;
