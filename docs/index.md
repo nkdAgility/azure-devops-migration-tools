@@ -3,7 +3,7 @@ title: Azure DevOps Migration Tools
 layout: page
 pageType: index
 template: index-template.md
-toc: true
+toc: false
 pageStatus: published
 discussionId: 
 ---
