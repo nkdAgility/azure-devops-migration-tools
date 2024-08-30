@@ -62,10 +62,6 @@ For the most part we support moving data between `((Azure DevOps Server | Team F
 - [Community Support](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
 - [Commercial Support](https://nkdagility.com/capabilities/azure-devops-migration-services/)
 
-## Tutorials
-
-- [Video Overview](https://youtu.be/RCJsST0xBCE)
-
 The documentation for the preview is on [Preview](https://nkdagility.com/docs/azure-devops-migration-tools/preview/)]
 
 #### External Walkthroughs and Reviews
