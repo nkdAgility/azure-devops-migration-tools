@@ -5,6 +5,8 @@ pageType: index
 toc: true
 pageStatus: published
 discussionId: 
+redirect_from:
+  - /permissions/
 ---
 
 The permissions are courently governed by the needs of the [TFS Client Object Model](https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/dotnet-client-libraries?view=azure-devops) from Microsoft. Microsoft [Announced the deprecation of the WIT and Test Client OM](https://devblogs.microsoft.com/devops/announcing-the-deprecation-of-the-wit-and-test-client-om-at-jan-1-2020-2/) in 2020, however this is still the only way to interact with versions of TFS from 2010 to 2018 with any consistantcy. We are working on moving our tools to the REST API, but this is a large task and will take some time.
