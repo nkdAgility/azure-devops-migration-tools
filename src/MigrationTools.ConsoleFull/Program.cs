@@ -1,7 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.TeamFoundation.TestManagement.WebApi;
 using MigrationTools;
 using MigrationTools.Host;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -10,7 +15,8 @@ namespace VstsSyncMigrator.ConsoleApp
         public static async Task Main(string[] args)
         {
             var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args);
-            if(hostBuilder is null)
+
+            if (hostBuilder is null)
             {
                 return;
             }
@@ -27,10 +33,11 @@ namespace VstsSyncMigrator.ConsoleApp
                     services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
                     services.AddMigrationToolServicesForClientLegacyCore();
                 });
-
-       
+ 
 
             await hostBuilder.RunConsoleAsync();
         }
+
+       
     }
 }

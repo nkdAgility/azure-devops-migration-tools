@@ -31,6 +31,7 @@ namespace MigrationTools.Host
             AnsiConsole.WriteLine();
             AnsiConsole.WriteLine();
             AnsiConsole.Write(new Markup($"[red]Exiting...[/]"));
+            AnsiConsole.WriteLine();
         }
 
         internal static void AsciiLogo(string thisVersion, Serilog.ILogger logger)

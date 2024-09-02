@@ -29,7 +29,7 @@
     },
     "Upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade -c \"configuration.json\""
+      "commandLineArgs": "upgrade -c \"configuration.json\" --disableTelemetry"
     },
     "Execute Classic": {
       "commandName": "Project",
