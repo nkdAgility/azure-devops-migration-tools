@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.3.0" />
     <PackageReference Include="Elmah.Io.Client" Version="5.1.76" />
     <PackageReference Include="GitInfo" Version="3.3.5">
       <PrivateAssets>all</PrivateAssets>
@@ -42,12 +43,17 @@
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.22.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="19.225.1" />
     <PackageReference Include="Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi" Version="19.225.1" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Process" Version="0.5.0-beta.6" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
     <PackageReference Include="Serilog" Version="4.0.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
@@ -62,6 +68,10 @@
 
   <ItemGroup>
     <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Host\" />
   </ItemGroup>
 
 </Project>
