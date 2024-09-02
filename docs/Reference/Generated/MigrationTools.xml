@@ -258,32 +258,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"feature/OpenTelemetry"
+            => @"topic/update-docs-2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"803de11b"
+            => @"26082d82"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"803de11bbcfb055ccf1ac358a06d24b4f80f3a5d"
+            => @"26082d82552f59963aad53b364d73bb74bf60803"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-08-29T21:59:31+01:00"
+            => @"2024-08-30T09:13:07+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"6"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.0-Preview.4"
+            => @"v16.0.0-Preview.4-6-g26082d82"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -318,7 +318,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"0"
+            => @"6"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
