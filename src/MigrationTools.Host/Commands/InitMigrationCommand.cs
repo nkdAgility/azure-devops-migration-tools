@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,40 +14,31 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Host.Services;
 using MigrationTools.Options;
+using MigrationTools.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class InitMigrationCommand : AsyncCommand<InitMigrationCommandSettings>
+    internal class InitMigrationCommand : CommandBase<InitMigrationCommandSettings>
     {
-        public IServiceProvider Services { get; }
 
         private readonly ILogger _logger;
-        private readonly ITelemetryLogger Telemetery;
-        private readonly IHostApplicationLifetime _appLifetime;
 
-        public InitMigrationCommand(
-            IServiceProvider services,
-            ILogger<InitMigrationCommand> logger,
-            ITelemetryLogger telemetryLogger,
-            IHostApplicationLifetime appLifetime)
+        public InitMigrationCommand(IHostApplicationLifetime appLifetime, IServiceProvider services, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<InitMigrationCommandSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion, IConfiguration configuration, ActivitySource activitySource) : base(appLifetime, services, detectOnlineService, detectVersionService, logger, telemetryLogger, migrationToolVersion, configuration, activitySource)
         {
-            Services = services;
             _logger = logger;
-            Telemetery = telemetryLogger;
-            _appLifetime = appLifetime;
         }
 
-
-        public override async Task<int> ExecuteAsync(CommandContext context, InitMigrationCommandSettings settings)
+        internal override async Task<int> ExecuteInternalAsync(CommandContext context, InitMigrationCommandSettings settings)
         {
             int _exitCode;
             try
             {
-                Telemetery.TrackEvent(new EventTelemetry("InitCommand"));
+                TelemetryLogger.TrackEvent(new EventTelemetry("InitCommand"));
                 string configFile = settings.ConfigFile;
                 if (string.IsNullOrEmpty(configFile))
                 {
@@ -116,14 +108,14 @@ namespace MigrationTools.Host.Commands
             }
             catch (Exception ex)
             {
-                Telemetery.TrackException(ex, null, null);
+                TelemetryLogger.TrackException(ex, null, null);
                 _logger.LogError(ex, "Unhandled exception!");
                 _exitCode = 1;
             }
             finally
             {
                 // Stop the application once the work is done
-                _appLifetime.StopApplication();
+                Lifetime.StopApplication();
             }
             return _exitCode;
         }
