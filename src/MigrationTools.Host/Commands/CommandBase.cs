@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -64,24 +63,30 @@ namespace MigrationTools.Host.Commands
 
         public sealed override async Task<int> ExecuteAsync(CommandContext context, TSettings settings)
         {
+            // Disable Telemetry
+            if (settings.DisableTelemetry)
+            {
+                Log.Debug("Disabling Telemetry {CommandName}", this.GetType().Name);
+                CommandActivity.AddTag("DisableTelemetry", settings.DisableTelemetry);
+                CommandActivity.Stop();
+                ActivitySourceProvider.DisableActivitySource();
+            }
+            //Enable Debug Trace
+            if (settings.DebugTrace)
+            {
+                Log.Debug("Enabling Telemetry DebugTrace {CommandName}", this.GetType().Name);
+                ActivitySourceProvider.EnableTelemeteryDebug();
+            }
+
             using (CommandActivity = ActivitySource.StartActivity(this.GetType().Name))
             {
+                CommandActivity.SetTagsFromObject(settings);
                 CommandActivity?.Start();
    
-                // Disable Telemetry
-                TelemetryConfiguration ai = Services.GetService<TelemetryConfiguration>();
-                ai.DisableTelemetry = settings.DisableTelemetry;
-                if (settings.DisableTelemetry)
-                {
-                    Log.Debug("Disabling Telemetry {CommandName}", this.GetType().Name);
-                    CommandActivity.AddTag("DisableTelemetry", settings.DisableTelemetry);
-                    CommandActivity.Stop();
-                    ActivitySourceProvider.DisableActivitySource();
-                }
-                
+               
                 // Run the command
-                Log.Debug("Starting {CommandName}", this.GetType().Name);
-                TelemetryLogger.TrackEvent(this.GetType().Name);
+                Log.Verbose("Starting {CommandName}", this.GetType().Name);
+                CommandActivity.AddEvent(new ActivityEvent("Starting"));
                 RunStartupLogic(settings);
                 try
                 {
@@ -92,7 +97,7 @@ namespace MigrationTools.Host.Commands
                 catch (Exception ex)
                 {
                     CommandActivity.RecordException(ex);
-                    TelemetryLogger.TrackException(ex, null, null);
+                    TelemetryLogger.TrackException(ex, CommandActivity.Tags);
                     _logger.LogError(ex, "Unhandled exception!");
                     return -1;
                 }

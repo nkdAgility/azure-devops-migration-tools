@@ -10,12 +10,13 @@ using MigrationTools.Tools.Interfaces;
 using MigrationTools.Tools.Shadows;
 using MigrationTools.Shadows;
 using MigrationTools.Endpoints;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools.Endpoints.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.Services.Commerce;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -104,6 +105,7 @@ namespace MigrationTools.Processors.Tests
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
+            services.TryAddScoped<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();
 
             services.AddSingleton<TfsSharedQueryProcessor>();
 

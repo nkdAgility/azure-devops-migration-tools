@@ -1,14 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.ApplicationInsights.WorkerService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Host.CustomDiagnostics;
 using MigrationTools.Host.Services;
 using Serilog;
 using Serilog.Events;
@@ -70,7 +65,6 @@ namespace MigrationTools.Host
                     .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
                     .Enrich.FromLogContext()
                     .Enrich.WithProcessId()
-                    .WriteTo.ApplicationInsights(services.GetService<TelemetryConfiguration>(), new CustomConverter(), LogEventLevel.Error)
                     .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: outputTemplate)
                     .WriteTo.File(new Serilog.Formatting.Json.JsonFormatter(), Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true)
                     .WriteTo.Logger(lc => lc
@@ -101,15 +95,6 @@ namespace MigrationTools.Host
             {
 
                services.AddOptions();
-
-                // Application Insights
-                ApplicationInsightsServiceOptions aiso = new ApplicationInsightsServiceOptions();
-                aiso.ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                aiso.ConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/;ApplicationId=9146fe72-5c18-48d7-a0f2-8fb891ef1277";
-                //# if DEBUG
-                //aiso.DeveloperMode = true;
-                //#endif
-                services.AddApplicationInsightsTelemetryWorkerService(aiso);
 
                 //// Services
                 services.AddTransient<IDetectOnlineService, DetectOnlineService>();
@@ -168,20 +153,6 @@ namespace MigrationTools.Host
             }
 
             return exportPath;
-        }
-
-        private static MeterProvider _meterProvider;
-        private static TracerProvider _tracerProvider;
-
-        static void FlushAndCloseTelemetry()
-        {
-            // Flush and dispose of the tracer provider
-            _tracerProvider?.ForceFlush();
-            _tracerProvider?.Dispose();
-
-            // Flush and dispose of the meter provider
-            _tracerProvider?.ForceFlush();
-            _tracerProvider?.Dispose();
         }
 
     }

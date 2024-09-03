@@ -63,7 +63,7 @@ namespace MigrationTools.Host.Commands
             catch (Exception ex)
             {
                 CommandActivity.RecordException(ex);
-                Telemetery.TrackException(ex, null, null);
+                Telemetery.TrackException(ex, null);
                 _logger.LogError(ex, "Unhandled exception!");
 
                 _exitCode = 1;

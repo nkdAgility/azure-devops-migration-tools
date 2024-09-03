@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,9 +15,10 @@ using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Options;
+using MigrationTools.Services;
 using Serilog;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public class TfsTeamProjectEndpoint : Endpoint<TfsTeamProjectEndpointOptions>, IMigrationClient // TODO: Rename IMigrationClient to ITfsTeamProjectEndpoint
     {
@@ -73,21 +74,20 @@ namespace MigrationTools._EngineV1.Clients
         {
             if (_collection == null)
             {
-                Telemetry.TrackEvent("TeamProjectContext.EnsureCollection",
-                    new Dictionary<string, string> {
-                          { "Name", Options.Project},
-                          { "Target Project", Options.Project},
-                          { "Target Collection",Options.Collection.ToString() },
-                           { "ReflectedWorkItemID Field Name",Options.ReflectedWorkItemIDFieldName }
-                    }, null);
                 _collection = GetDependantTfsCollection();
             }
         }
 
         private TfsTeamProjectCollection GetDependantTfsCollection()
         {
-            var startTime = DateTime.UtcNow;
-            var timer = System.Diagnostics.Stopwatch.StartNew();
+            using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("GetDependantTfsCollection", ActivityKind.Client))
+            {
+                activity?.SetTagsFromOptions(Options);
+                activity?.SetTag("url.full", Options.Collection);
+                activity?.SetTag("server.address", Options.Collection);
+                activity?.SetTag("http.request.method", "GET");
+                activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
             TfsTeamProjectCollection y = null;
             try
             {
@@ -131,29 +131,25 @@ namespace MigrationTools._EngineV1.Clients
                 Log.LogDebug("MigrationClient: Connecting to {CollectionUrl} ", Options.Collection);
                 Log.LogTrace("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
                 y.EnsureAuthenticated();
-                timer.Stop();
-                Log.LogInformation("Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "200", true));
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Ok);
+                    activity?.SetTag("http.response.status_code", "200");
+                    Log.LogInformation("Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
             }
             catch (TeamFoundationServerUnauthorizedException ex)
             {
-                timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "401", false));
-                Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.Authentication.AuthenticationMode);
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    activity?.SetTag("http.response.status_code", "401");
+                    Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.Authentication.AuthenticationMode);
                 Environment.Exit(-1);
             }
             catch (Exception ex)
             {
-                timer.Stop();
-                Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Collection.ToString(), "GetWorkItem", null, startTime, timer.Elapsed, "500", false));
-                Telemetry.TrackException(ex,
-                       new Dictionary<string, string> {
-                            { "CollectionUrl", Options.Collection.ToString() },
-                            { "TeamProjectName",  Options.Project}
-                       },
-                       new Dictionary<string, double> {
-                            { "Time",timer.ElapsedMilliseconds }
-                       });
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    activity?.SetTag("http.response.status_code", "500");
+                    Telemetry.TrackException(ex, activity?.Tags);
                 Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, Options.Authentication.AuthenticationMode);
                 switch (Options.Authentication.AuthenticationMode)
                 {
@@ -166,6 +162,7 @@ namespace MigrationTools._EngineV1.Clients
                 Environment.Exit(-1);
             }
             return y;
+            }
         }
 
         public T GetService<T>()

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.ApplicationInsights.Channel;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
@@ -47,7 +46,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
                             { "Source", source.ToWorkItem().Id.ToString() },
                             { "Target",  target.ToWorkItem().Id.ToString()}
                        });
-                Telemetry.TrackException(ex, null, null);
+                Telemetry.TrackException(ex, null);
             }
         }
 

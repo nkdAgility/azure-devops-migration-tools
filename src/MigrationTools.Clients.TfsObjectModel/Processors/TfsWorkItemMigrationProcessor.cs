@@ -2,14 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.Channel;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,7 +22,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Containers;
@@ -32,11 +31,13 @@ using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools;
 using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
+using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Processors
 {
@@ -57,8 +58,6 @@ namespace MigrationTools.Processors
         private List<string> _ignore;
 
         private ILogger contextLog;
-        private IDictionary<string, double> processWorkItemMetrics = null;
-        private IDictionary<string, string> processWorkItemParamiters = null;
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
@@ -86,8 +85,13 @@ namespace MigrationTools.Processors
             workItemLog.Write(level, workItemLogTemplate + message);
         }
 
+        private static readonly Meter WorkItemMeter = new Meter("MigrationTools.WorkItemProcessor");
+        private static readonly Counter<long> WorkItemsProcessedCounter = WorkItemMeter.CreateCounter<long>("work_items_processed_total");
+        private static readonly Histogram<double> WorkItemProcessingDurationHistogram = WorkItemMeter.CreateHistogram<double>("work_item_processing_duration");
+
         protected override void InternalExecute()
         {
+
             Log.LogDebug("WorkItemMigrationContext::InternalExecute ");
             if (Options == null)
             {
@@ -100,13 +104,12 @@ namespace MigrationTools.Processors
             if (CommonTools.TeamSettings.Enabled)
             {
                 CommonTools.TeamSettings.ProcessorExecutionBegin(this);
-            } else
+            }
+            else
             {
                 Log.LogWarning("WorkItemMigrationContext::InternalExecute: teamSettingsEnricher is disabled!");
             }
-            
 
-            var stopwatch = Stopwatch.StartNew();
             _itemsInError = new List<string>();
 
             try
@@ -160,7 +163,7 @@ namespace MigrationTools.Processors
                 _totalWorkItem = sourceWorkItems.Count;
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
-
+                    var stopwatch = Stopwatch.StartNew();
                     var sourceWorkItem = TfsExtensions.ToWorkItem(sourceWorkItemData);
                     workItemLog = contextLog.ForContext("SourceWorkItemId", sourceWorkItem.Id);
                     using (LogContext.PushProperty("sourceWorkItemTypeName", sourceWorkItem.Type.Name))
@@ -173,6 +176,11 @@ namespace MigrationTools.Processors
                         try
                         {
                             ProcessWorkItemAsync(sourceWorkItemData, Options.WorkItemCreateRetryLimit).Wait();
+
+                            stopwatch.Stop();
+                            var processingTime = stopwatch.Elapsed.TotalMilliseconds;
+                            WorkItemsProcessedCounter.Add(1, new KeyValuePair<string, object?>("workItemType", sourceWorkItemData.Type));
+                            WorkItemProcessingDurationHistogram.Record(processingTime, new KeyValuePair<string, object?>("workItemType", sourceWorkItemData.Type));
                             if (Options.PauseAfterEachWorkItem)
                             {
                                 Console.WriteLine("Do you want to continue? (y/n)");
@@ -205,16 +213,15 @@ namespace MigrationTools.Processors
             {
                 if (Options.FixHtmlAttachmentLinks)
                 {
-                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
+                    CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
                 }
 
-                stopwatch.Stop();
 
                 if (_itemsInError.Count > 0)
                 {
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
-                contextLog.Information("DONE in {Elapsed}", stopwatch.Elapsed.ToString("c"));
+
             }
         }
 
@@ -228,7 +235,7 @@ namespace MigrationTools.Processors
             {
                 Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist in the target. This will not cause any errors, but may result in disconnected users that could have been mapped. Use the ExportUsersForMapping processor to create a list of mappable users. Then Import using ", usersToMap.Count);
             }
-           
+
         }
 
         //private void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems)
@@ -257,7 +264,7 @@ namespace MigrationTools.Processors
         {
             contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
 
-            var result =  CommonTools.ValidateRequiredField.ValidatingRequiredField(this,
+            var result = CommonTools.ValidateRequiredField.ValidatingRequiredField(this,
                 Target.Options.ReflectedWorkItemIDFieldName, sourceWorkItems);
             if (!result)
             {
@@ -271,8 +278,7 @@ namespace MigrationTools.Processors
         private void ValiddateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
-            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
-            // get list of all work item types
+                     // get list of all work item types
             List<String> sourceWorkItemTypes = sourceWorkItems.SelectMany(x => x.Revisions.Values)
             //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
             .Select(x => x.Type)
@@ -293,7 +299,7 @@ namespace MigrationTools.Processors
                 foreach (var missingWorkItemType in missingWorkItemTypes)
                 {
                     bool thisTypeMapped = true;
-                    if (!workItemTypeMappingTool.Mappings.ContainsKey(missingWorkItemType))
+                    if (!CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(missingWorkItemType))
                     {
                         thisTypeMapped = false;
                     }
@@ -335,30 +341,37 @@ namespace MigrationTools.Processors
 
         private WorkItemData CreateWorkItem_Shell(ProjectData destProject, WorkItemData currentRevisionWorkItem, string destType)
         {
-            WorkItem newwit;
-            var newWorkItemstartTime = DateTime.UtcNow;
-            var newWorkItemTimer = Stopwatch.StartNew();
-            if (destProject.ToProject().WorkItemTypes.Contains(destType))
+            using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("CreateWorkItem_Shell", ActivityKind.Client))
             {
-                newwit = destProject.ToProject().WorkItemTypes[destType].NewWorkItem();
+                activity?.SetTagsFromOptions(Options);
+                activity?.SetTag("http.request.method", "GET");
+                activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
+
+                WorkItem newwit;
+                if (destProject.ToProject().WorkItemTypes.Contains(destType))
+                {
+                    newwit = destProject.ToProject().WorkItemTypes[destType].NewWorkItem();
+                }
+                else
+                {
+                    throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
+                }
+                activity?.Stop();
+                activity?.SetStatus(ActivityStatusCode.Ok);
+                activity?.SetTag("http.response.status_code", "200");
+                if (Options.UpdateCreatedBy)
+                {
+                    newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value;
+                    workItemLog.Debug("Setting 'System.CreatedBy'={SystemCreatedBy}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value);
+                }
+                if (Options.UpdateCreatedDate)
+                {
+                    newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value;
+                    workItemLog.Debug("Setting 'System.CreatedDate'={SystemCreatedDate}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value);
+                }
+                return newwit.AsWorkItemData();
             }
-            else
-            {
-                throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
-            }
-            newWorkItemTimer.Stop();
-            Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Target.Options.Collection.ToString(), "NewWorkItem", null, newWorkItemstartTime, newWorkItemTimer.Elapsed, "200", true));
-            if (Options.UpdateCreatedBy)
-            {
-                newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value;
-                workItemLog.Debug("Setting 'System.CreatedBy'={SystemCreatedBy}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value);
-            }
-            if (Options.UpdateCreatedDate)
-            {
-                newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value;
-                workItemLog.Debug("Setting 'System.CreatedDate'={SystemCreatedDate}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value);
-            }
-            return newwit.AsWorkItemData();
         }
 
         private void PopulateIgnoreList()
@@ -407,7 +420,7 @@ namespace MigrationTools.Processors
             if (newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
             {
                 newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
-            }            
+            }
             newWorkItem.State = oldWorkItem.State;
             if (newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
             {
@@ -444,7 +457,7 @@ namespace MigrationTools.Processors
                             break;
                     }
 
-                } 
+                }
             }
 
             if (CommonTools.NodeStructure.Enabled)
@@ -497,16 +510,18 @@ namespace MigrationTools.Processors
 
         private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retries = 0)
         {
-            var witStopWatch = Stopwatch.StartNew();
-            var startTime = DateTime.Now;
-            processWorkItemMetrics = new Dictionary<string, double>();
-            processWorkItemParamiters = new Dictionary<string, string>();
-            AddParameter("SourceURL", processWorkItemParamiters, Source.Options.Collection.ToString());
-            AddParameter("SourceWorkItem", processWorkItemParamiters, sourceWorkItem.Id);
-            AddParameter("TargetURL", processWorkItemParamiters, Target.Options.Collection.ToString());
-            AddParameter("TargetProject", processWorkItemParamiters, Target.WorkItems.Project.Name);
-            AddParameter("RetryLimit", processWorkItemParamiters, retryLimit.ToString());
-            AddParameter("RetryNumber", processWorkItemParamiters, retries.ToString());
+            using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("ProcessWorkItemAsync", ActivityKind.Client))
+            {
+                activity?.SetTagsFromOptions(Options);
+                activity?.SetTag("http.request.method", "GET");
+                activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
+                activity?.SetTag("SourceURL", Source.Options.Collection.ToString());
+                activity?.SetTag("SourceWorkItem", sourceWorkItem.Id);
+                activity?.SetTag("TargetURL", Target.Options.Collection.ToString());
+                activity?.SetTag("TargetProject", Target.WorkItems.Project.Name);
+                activity?.SetTag("RetryLimit", retryLimit.ToString());
+                activity?.SetTag("RetryNumber", retries.ToString());                
             Log.LogDebug("######################################################################################");
             Log.LogDebug("ProcessWorkItem: {sourceWorkItemId}", sourceWorkItem.Id);
             Log.LogDebug("######################################################################################");
@@ -525,7 +540,8 @@ namespace MigrationTools.Processors
                     if (targetWorkItem == null)
                     {
                         targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
-                        AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
+                            activity?.SetTag("Revisions", revisionsToMigrate.Count);
+
                     }
                     else
                     {
@@ -536,7 +552,7 @@ namespace MigrationTools.Processors
                             ProcessHTMLFieldAttachements(targetWorkItem);
                             ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                             TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
-                            processWorkItemMetrics.Add("Revisions", 0);
+                                activity?.SetTag("Revisions", 0);
                         }
                         else
                         {
@@ -546,13 +562,8 @@ namespace MigrationTools.Processors
                                 });
 
                             targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem);
-
-                            AddMetric("Revisions", processWorkItemMetrics, revisionsToMigrate.Count);
-                            AddMetric("SyncRev", processWorkItemMetrics, revisionsToMigrate.Count);
                         }
                     }
-                    AddParameter("TargetWorkItem", processWorkItemParamiters, targetWorkItem.ToWorkItem().Revisions.Count.ToString());
-
                     if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
                     {
                         targetWorkItem.SaveToAzureDevOps();
@@ -600,16 +611,14 @@ namespace MigrationTools.Processors
             }
             catch (Exception ex)
             {
+                activity?.Stop();
+                activity?.SetStatus(ActivityStatusCode.Error);
+                activity?.SetTag("http.response.status_code", "502");
                 Log.LogError(ex, ex.ToString());
-                Telemetry.TrackRequest("ProcessWorkItem", startTime, witStopWatch.Elapsed, "502", false);
-                Telemetry.TrackException(ex);
+                Telemetry.TrackException(ex, activity.Tags);
                 throw ex;
             }
-            witStopWatch.Stop();
-            _elapsedms += witStopWatch.ElapsedMilliseconds;
-            processWorkItemMetrics.Add("ElapsedTimeMS", _elapsedms);
-
-            var average = new TimeSpan(0, 0, 0, 0, (int)(_elapsedms / _current));
+            var average = new TimeSpan(0, 0, 0, 0, (int)(activity.Duration.TotalMilliseconds / _current));
             var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
             TraceWriteLine(LogEventLevel.Information,
                 "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
@@ -617,11 +626,13 @@ namespace MigrationTools.Processors
                     {"average", average},
                     {"remaining", remaining}
                 });
-            Telemetry.TrackEvent("WorkItemMigrated", processWorkItemParamiters, processWorkItemMetrics);
-            Telemetry.TrackRequest("ProcessWorkItem", startTime, witStopWatch.Elapsed, "200", true);
+                activity?.Stop();
+                activity?.SetStatus(ActivityStatusCode.Error);
+                activity?.SetTag("http.response.status_code", "200");
 
             _current++;
             _count--;
+            }
         }
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
@@ -630,7 +641,7 @@ namespace MigrationTools.Processors
             {
                 TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", CommonTools.Attachment.Enabled } });
                 CommonTools.Attachment.ProcessAttachemnts(this, sourceWorkItem, targetWorkItem, save);
-                AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.ToWorkItem().AttachedFileCount);
+                //AddMetric("Attachments", processWorkItemMetrics, targetWorkItem.ToWorkItem().AttachedFileCount);
             }
         }
 
@@ -640,11 +651,11 @@ namespace MigrationTools.Processors
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", CommonTools.WorkItemLink.Enabled } });
                 CommonTools.WorkItemLink.Enrich(this, sourceWorkItem, targetWorkItem);
-                AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
+                //AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
                 int fixedLinkCount = CommonTools.GitRepository.Enrich(this, sourceWorkItem, targetWorkItem);
-                AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
+               // AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
-            else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case" )
+            else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case")
             {
                 CommonTools.WorkItemLink.MigrateSharedSteps(this, sourceWorkItem, targetWorkItem);
                 CommonTools.WorkItemLink.MigrateSharedParameters(this, sourceWorkItem, targetWorkItem);
@@ -653,7 +664,6 @@ namespace MigrationTools.Processors
 
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
             try
             {
                 //If work item hasn't been created yet, create a shell
@@ -667,9 +677,9 @@ namespace MigrationTools.Processors
                         TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
                     }
 
-                    if (workItemTypeMappingTool.Mappings.ContainsKey(targetType))
+                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(targetType))
                     {
-                        targetType = workItemTypeMappingTool.Mappings[targetType];
+                        targetType = CommonTools.WorkItemTypeMapping.Mappings[targetType];
                     }
                     targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, targetType);
                 }
@@ -690,9 +700,9 @@ namespace MigrationTools.Processors
 
                     // Decide on WIT
                     var destType = currentRevisionWorkItem.Type;
-                    if (workItemTypeMappingTool.Mappings.ContainsKey(destType))
+                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(destType))
                     {
-                        destType = workItemTypeMappingTool.Mappings[destType];
+                        destType = CommonTools.WorkItemTypeMapping.Mappings[destType];
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 
@@ -871,14 +881,15 @@ namespace MigrationTools.Processors
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             var closedDateField = "System.ClosedDate";
-            if (targetWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate")) {
+            if (targetWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate"))
+            {
                 closedDateField = "Microsoft.VSTS.Common.ClosedDate";
             }
             Log.LogDebug("CheckClosedDateIsValid::ClosedDate field is {closedDateField}", closedDateField);
             if (targetWorkItem.ToWorkItem().Fields[closedDateField].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
             {
                 Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
-                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);            
+                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
             }
             if (!sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
             {

@@ -10,32 +10,14 @@ namespace MigrationTools.Services
 
         public string SessionId => throw new NotImplementedException();
 
-        public void CloseAndFlush()
+        public void TrackException(Exception ex, IDictionary<string, string> properties = null)
         {
+            throw new NotImplementedException();
         }
 
-        public void TrackDependency(DependencyTelemetry dependencyTelemetry)
+        public void TrackException(Exception ex, IEnumerable<KeyValuePair<string, string>> properties = null)
         {
-        }
-
-        public void TrackEvent(EventTelemetry eventTelemetry)
-        {
-        }
-
-        public void TrackEvent(string name)
-        {
-        }
-
-        public void TrackEvent(string name, IDictionary<string, string> properties, IDictionary<string, double> measurements)
-        {
-        }
-
-        public void TrackException(Exception ex, IDictionary<string, string> properties, IDictionary<string, double> measurements)
-        {
-        }
-
-        public void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success)
-        {
+            throw new NotImplementedException();
         }
     }
 }

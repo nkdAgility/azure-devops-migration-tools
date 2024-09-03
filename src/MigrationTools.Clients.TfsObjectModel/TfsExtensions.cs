@@ -37,6 +37,7 @@ namespace MigrationTools
             {
                 // internalObject = context.internalObject
                 // TODO: Had to revert to calling revision load again untill WorkItemMigrationContext.PopulateWorkItem can be updated to pull from WorkItemData
+
                 internalObject = originalWi.Store.GetWorkItem(originalWi.Id, rev)
             };
 

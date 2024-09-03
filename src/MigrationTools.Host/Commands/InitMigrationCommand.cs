@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Elmah.Io.Client;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,7 +37,6 @@ namespace MigrationTools.Host.Commands
             int _exitCode;
             try
             {
-                TelemetryLogger.TrackEvent(new EventTelemetry("InitCommand"));
                 string configFile = settings.ConfigFile;
                 if (string.IsNullOrEmpty(configFile))
                 {
@@ -108,7 +106,7 @@ namespace MigrationTools.Host.Commands
             }
             catch (Exception ex)
             {
-                TelemetryLogger.TrackException(ex, null, null);
+                TelemetryLogger.TrackException(ex, CommandActivity.Tags);
                 _logger.LogError(ex, "Unhandled exception!");
                 _exitCode = 1;
             }

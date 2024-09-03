@@ -1,4 +1,4 @@
-﻿namespace MigrationTools._EngineV1.Clients
+﻿namespace MigrationTools.Clients
 {
     public interface IWorkItemQueryBuilderFactory
     {

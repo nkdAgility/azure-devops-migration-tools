@@ -47,7 +47,7 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "{LogTypeName}: Unable load list of identities from target collection.", LogTypeName);
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                     return new List<TeamFoundationIdentity>();
                 }
             });
@@ -137,7 +137,7 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "{LogTypeName}: Unable to fix embedded mention links on field {fieldName} on target work item {targetWorkItemId} from {oldTfsurl} to {newTfsurl}", LogTypeName, field.Name, targetWorkItem.Id, oldTfsurl, newTfsurl);
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                 }
             }
 

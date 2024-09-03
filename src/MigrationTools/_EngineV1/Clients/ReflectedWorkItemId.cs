@@ -1,7 +1,7 @@
 ﻿using System;
 using MigrationTools.DataContracts;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public abstract class ReflectedWorkItemId
     {

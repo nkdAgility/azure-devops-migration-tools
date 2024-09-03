@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 
 namespace MigrationTools.Processors.Infrastructure
 {

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Work.WebApi;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -452,7 +452,7 @@ namespace MigrationTools.Tools
             {
                 Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to different language versions. Validate that '{0}' is the correct name in your version. ", localizedTreeTypeName), ex);
                 Log.LogError(ex2, "Unable to load Common Structure for Target.");
-                Telemetry.TrackException(ex2, null, null);
+                Telemetry.TrackException(ex2, null);
                 throw ex2;
             }
 

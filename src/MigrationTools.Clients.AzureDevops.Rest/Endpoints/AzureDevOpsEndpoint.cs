@@ -17,7 +17,6 @@ using MigrationTools.DataContracts.Process;
 using MigrationTools.EndpointEnrichers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace MigrationTools.Endpoints
 {

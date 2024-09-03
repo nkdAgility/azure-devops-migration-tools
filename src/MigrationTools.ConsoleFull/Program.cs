@@ -7,6 +7,9 @@ using MigrationTools;
 using MigrationTools.Host;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using MigrationTools.Services;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -14,30 +17,31 @@ namespace VstsSyncMigrator.ConsoleApp
     {
         public static async Task Main(string[] args)
         {
-            var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args);
-
-            if (hostBuilder is null)
+            using (var CommandActivity = ActivitySourceProvider.GetActivitySource().StartActivity("MigrationToolsCli"))
             {
-                return;
-            }
+                var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args);
 
-            hostBuilder
-                .ConfigureServices((context, services) =>
+                if (hostBuilder is null)
                 {
-                    // New v2 Architecture fpr testing
-                    services.AddMigrationToolServicesForClientFileSystem(context.Configuration);
-                    services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(context.Configuration);
-                    services.AddMigrationToolServicesForClientAzureDevopsRest(context.Configuration);
+                    return;
+                }
 
-                    // v1 Architecture (Legacy)
-                    services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
-                    services.AddMigrationToolServicesForClientLegacyCore();
-                });
- 
+                hostBuilder
+                    .ConfigureServices((context, services) =>
+                    {
+                        // New v2 Architecture fpr testing
+                        services.AddMigrationToolServicesForClientFileSystem(context.Configuration);
+                        services.AddMigrationToolServicesForClientAzureDevOpsObjectModel(context.Configuration);
+                        services.AddMigrationToolServicesForClientAzureDevopsRest(context.Configuration);
 
-            await hostBuilder.RunConsoleAsync();
+                        // v1 Architecture (Legacy)
+                        services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
+                        services.AddMigrationToolServicesForClientLegacyCore();
+                    });
+                await hostBuilder.RunConsoleAsync();
+            }
         }
 
-       
+
     }
 }

@@ -11,6 +11,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
+using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
@@ -27,7 +28,7 @@ namespace MigrationTools.Tools
 
         public bool ValidatingRequiredField(TfsProcessor processor, string fieldToFind, List<WorkItemData> sourceWorkItems)
         {
-            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
+            var workItemTypeMappingTool = Services.GetRequiredService<IWorkItemTypeMappingTool>();
             var sourceWorkItemTypes = sourceWorkItems.Select(wid => wid.ToWorkItem().Type).Distinct();
             var targetTypes = processor.Target.WorkItems.Project.ToProject().WorkItemTypes;
             var result = true;

@@ -1,21 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Services.Common;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Containers;
-using MigrationTools.Options;
-using MigrationTools.Processors;
-using MigrationTools.Processors.Infrastructure;
 using Newtonsoft.Json.Linq;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -48,7 +38,6 @@ namespace MigrationTools.Host.Commands
 
             try
             {
-                Telemetery.TrackEvent(new EventTelemetry("MigrationConfigCommand"));
                 string configFile = settings.ConfigFile;
                 if (string.IsNullOrEmpty(configFile))
                 {
@@ -108,7 +97,7 @@ namespace MigrationTools.Host.Commands
             }
             catch (Exception ex)
             {
-                Telemetery.TrackException(ex, null, null);
+                Telemetery.TrackException(ex, null);
                 _logger.LogError(ex, "Unhandled exception!");
                 _exitCode = 1;
             }
