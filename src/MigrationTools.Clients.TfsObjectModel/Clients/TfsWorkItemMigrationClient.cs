@@ -31,7 +31,18 @@ namespace MigrationTools.Clients
         {
             _telemetry = telemetry;
             _workItemQueryBuilderFactory = workItemQueryBuilderFactory;
-            InnerConfigure(migrationClient);
+            _bypassRules = WorkItemStoreFlags.BypassRules;
+
+            Lazy<WorkItemStore> _wistore = new Lazy<WorkItemStore>(() =>
+            {
+                Console.WriteLine("Initializing expensive WorkItemStore...");
+                return GetWorkItemStore();
+            });
+            Lazy<ProjectData> _project = new Lazy<ProjectData>(() =>
+            {
+                Console.WriteLine("Initializing expensive ProjectData from WorkItemStore...");
+                return GetProject();
+            });
         }
 
         new TfsTeamProjectEndpointOptions Options => (TfsTeamProjectEndpointOptions)base.Options;
@@ -243,12 +254,7 @@ namespace MigrationTools.Clients
             }
         }
 
-        protected void InnerConfigure(IMigrationClient migrationClient, bool bypassRules = true)
-        {
-            _bypassRules = bypassRules ? WorkItemStoreFlags.BypassRules : WorkItemStoreFlags.None;
-            _wistore = GetWorkItemStore();
-            _project = GetProject();
-        }
+ 
 
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
         {

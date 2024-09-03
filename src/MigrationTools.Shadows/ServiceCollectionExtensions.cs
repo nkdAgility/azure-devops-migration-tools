@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MigrationTools.Clients;
+using MigrationTools.Clients.Shadows;
 using MigrationTools.Services;
 using MigrationTools.Services.Shadows;
 using Serilog;
@@ -29,6 +31,7 @@ namespace MigrationTools.Shadows
             // Add Telemitery Adapter
             context.AddSingleton<ITelemetryLogger, TelemetryLoggerFake>();
             context.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
+            context.AddSingleton<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactoryFake>();
         }
     }
 }

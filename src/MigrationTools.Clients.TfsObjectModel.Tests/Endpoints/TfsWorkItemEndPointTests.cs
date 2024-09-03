@@ -15,6 +15,9 @@ using MigrationTools.Tools;
 using MigrationTools.Tools.Interfaces;
 using MigrationTools.Tools.Shadows;
 using MigrationTools.Shadows;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using System.Text;
 
 namespace MigrationTools.Endpoints.Tests
 {
@@ -95,6 +98,85 @@ namespace MigrationTools.Endpoints.Tests
             });
            
             return (TfsWorkItemEndpoint)services.BuildServiceProvider().GetRequiredKeyedService<IEndpoint>(key);
+        }
+
+
+        [TestMethod(), TestCategory("L1")]
+        public void TfsWorkItemEndPoint_EnvironmentOverrideTest()
+        {
+            Environment.SetEnvironmentVariable("MigrationTools__Endpoints__Source__Authentication__AccessToken", "654321");
+            IConfigurationBuilder configBuilder = GetSourceTargetBasicConfig();
+            var configuration = configBuilder.AddEnvironmentVariables().Build();
+            // Create services
+            IServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<EndpointEnricherContainer>();
+            serviceCollection.AddMigrationToolServicesForUnitTests();
+            serviceCollection.AddConfiguredEndpoints(configuration);
+            // Create a service provider from the service collection
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            var endpoint = serviceProvider.GetKeyedService<IEndpoint>("Source");
+            Assert.IsNotNull(endpoint, "Endpoint not found.");
+            Endpoint<TfsTeamProjectEndpointOptions> endpoint1 = endpoint as Endpoint<TfsTeamProjectEndpointOptions>;
+            // Validate that the correct number of endpoints are registered
+            Assert.AreEqual("654321", endpoint1.Options.Authentication.AccessToken, "Token not passed.");
+
+        }
+
+        private static IConfigurationBuilder GetSourceTargetBasicConfig()
+        {
+            // Create Config
+            var json = @"
+            {
+              ""MigrationTools"": {
+                ""Version"": ""16.0"",
+                ""Endpoints"": {
+                  ""Source"": {
+                    ""EndpointType"": ""TfsTeamProjectEndpoint"",
+                    ""Collection"": ""https://dev.azure.com/nkdagility-preview/"",
+                    ""Project"": ""migrationSource1"",
+                    ""AllowCrossProjectLinking"": false,
+                    ""ReflectedWorkItemIDFieldName"": ""Custom.ReflectedWorkItemId"",
+                    ""Authentication"": {
+                      ""AuthenticationMode"": ""AccessToken"",
+                      ""AccessToken"": ""123456"",
+                      ""NetworkCredentials"": {
+                        ""UserName"": """",
+                        ""Password"": """",
+                        ""Domain"": """"
+                      }
+                    },
+                    ""LanguageMaps"": {
+                      ""AreaPath"": ""Area"",
+                      ""IterationPath"": ""Iteration""
+                    }
+                  },
+                  ""Target"": {
+                    ""EndpointType"": ""TfsTeamProjectEndpoint"",
+                    ""Collection"": ""https://dev.azure.com/nkdagility-preview/"",
+                    ""Project"": ""migrationTest5"",
+                    ""TfsVersion"": ""AzureDevOps"",
+                    ""Authentication"": {
+                      ""AuthenticationMode"": ""AccessToken"",
+                      ""AccessToken"": ""none"",
+                      ""NetworkCredentials"": {
+                        ""UserName"": """",
+                        ""Password"": """",
+                        ""Domain"": """"
+                      }
+                    },
+                    ""ReflectedWorkItemIDFieldName"": ""nkdScrum.ReflectedWorkItemId"",
+                    ""AllowCrossProjectLinking"": false,
+                    ""LanguageMaps"": {
+                      ""AreaPath"": ""Area"",
+                      ""IterationPath"": ""Iteration""
+                    }
+                  }
+                },  
+              }
+            }";
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+            var configBuilder = new ConfigurationBuilder().AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(json)));
+            return configBuilder;
         }
 
     }
