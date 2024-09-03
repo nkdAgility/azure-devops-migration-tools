@@ -23,8 +23,8 @@ namespace MigrationTools.Clients
         private ITelemetryLogger _telemetry;
         private readonly IWorkItemQueryBuilderFactory _workItemQueryBuilderFactory;
         private WorkItemStoreFlags _bypassRules;
-        private ProjectData _project;
-        private WorkItemStore _wistore;
+        private Lazy<ProjectData> _project;
+        private Lazy<WorkItemStore> _wistore;
 
         public TfsWorkItemMigrationClient(IOptions<TfsTeamProjectEndpointOptions> options, IMigrationClient migrationClient, IWorkItemQueryBuilderFactory workItemQueryBuilderFactory, ITelemetryLogger telemetry)
             : base(options, migrationClient, telemetry)
@@ -33,12 +33,12 @@ namespace MigrationTools.Clients
             _workItemQueryBuilderFactory = workItemQueryBuilderFactory;
             _bypassRules = WorkItemStoreFlags.BypassRules;
 
-            Lazy<WorkItemStore> _wistore = new Lazy<WorkItemStore>(() =>
+            _wistore = new Lazy<WorkItemStore>(() =>
             {
                 Console.WriteLine("Initializing expensive WorkItemStore...");
                 return GetWorkItemStore();
             });
-            Lazy<ProjectData> _project = new Lazy<ProjectData>(() =>
+            _project = new Lazy<ProjectData>(() =>
             {
                 Console.WriteLine("Initializing expensive ProjectData from WorkItemStore...");
                 return GetProject();
@@ -46,8 +46,8 @@ namespace MigrationTools.Clients
         }
 
         new TfsTeamProjectEndpointOptions Options => (TfsTeamProjectEndpointOptions)base.Options;
-        public override ProjectData Project { get { return _project; } }
-        public WorkItemStore Store { get { return _wistore; } }
+        public override ProjectData Project { get { return _project.Value; } }
+        public WorkItemStore Store { get { return _wistore.Value; } }
 
         public List<WorkItemData> FilterExistingWorkItems(
             List<WorkItemData> sourceWorkItems,
