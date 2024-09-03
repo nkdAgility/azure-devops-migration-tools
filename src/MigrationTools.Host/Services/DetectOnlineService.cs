@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
+using MigrationTools.Services;
 using Serilog;
 
 namespace MigrationTools.Host.Services
@@ -21,39 +21,51 @@ namespace MigrationTools.Host.Services
         public bool IsOnline()
         {
             _logger.LogDebug("DetectOnlineService::IsOnline");
-            DateTime startTime = DateTime.Now;
-            Stopwatch mainTimer = Stopwatch.StartNew();
-            //////////////////////////////////
-            bool isOnline = false;
-            string responce = "none";
-            try
+            using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("DetectOnlineService:IsOnline", ActivityKind.Client))
             {
-                Ping myPing = new Ping();
-                String host = "8.8.4.4";
-                byte[] buffer = new byte[32];
-                int timeout = 1000;
-                PingOptions pingOptions = new PingOptions();
-                PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
-                responce = reply.Status.ToString();
-                if (reply.Status == IPStatus.Success)
+                activity?.SetTag("url.full", "8.8.4.4");
+                activity?.SetTag("server.address", "8.8.4.4");
+                activity?.SetTag("http.request.method", "GET");
+                
+                activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(1));
+
+                DateTime startTime = DateTime.Now;
+                Stopwatch mainTimer = Stopwatch.StartNew();
+                //////////////////////////////////
+                bool isOnline = false;
+                string responce = "none";
+                try
                 {
-                    isOnline = true;
+                    Ping myPing = new Ping();
+                    String host = "8.8.4.4";
+                    byte[] buffer = new byte[32];
+                    int timeout = 1000;
+                    PingOptions pingOptions = new PingOptions();
+                    PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
+                    responce = reply.Status.ToString();
+                    if (reply.Status == IPStatus.Success)
+                    {
+                        isOnline = true;
+                    }
+                    mainTimer.Stop();
+                    activity.SetStatus(ActivityStatusCode.Ok);
+                    activity?.SetTag("http.response.status_code", responce);
                 }
+                catch (Exception ex)
+                {
+                    mainTimer.Stop();
+                    // Likley no network is even available
+                    Log.Error(ex, "Error checking if we are online.");
+                    responce = "error";
+                    isOnline = false;
+                    activity.SetStatus(ActivityStatusCode.Error);
+                    activity?.SetTag("http.response.status_code", "500");
+                }
+                /////////////////
                 mainTimer.Stop();
-                _Telemetry.TrackDependency(new DependencyTelemetry("Ping", "GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, true));
+                return isOnline;
             }
-            catch (Exception ex)
-            {
-                mainTimer.Stop();
-                // Likley no network is even available
-                Log.Error(ex, "Error checking if we are online.");
-                responce = "error";
-                isOnline = false;
-                _Telemetry.TrackDependency(new DependencyTelemetry("Ping", "GoogleDNS", "IsOnline", null, startTime, mainTimer.Elapsed, responce, false));
-            }
-            /////////////////
-            mainTimer.Stop();
-            return isOnline;
         }
     }
 }

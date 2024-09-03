@@ -27,6 +27,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Enrichers;
+using System.Diagnostics.Metrics;
 
 namespace MigrationTools.Processors
 {
@@ -50,8 +51,15 @@ namespace MigrationTools.Processors
         private int _totalPlans = 0;
         private int _totalTestCases = 0;
 
+
+        private static readonly Meter _meter = new Meter("MigrationTools.TestPlansAndSuitesMigrationProcessor", "1.0.0");
+        private static readonly Counter<int> _testPlansCounter = _meter.CreateCounter<int>("test_plans_count");
+        private static readonly Counter<int> _testSuitesCounter = _meter.CreateCounter<int>("test_suites_count");
+        private static readonly Counter<int> _testCasesCounter = _meter.CreateCounter<int>("test_cases_count");
+
         public TestPlansAndSuitesMigrationProcessor(IOptions<TestPlansAndSuitesMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
+       
         }
 
         new TestPlansAndSuitesMigrationProcessorOptions Options => (TestPlansAndSuitesMigrationProcessorOptions)base.Options;
@@ -96,7 +104,7 @@ namespace MigrationTools.Processors
             foreach (ITestPlan sourcePlan in toProcess)
             {
                 _currentPlan++;
-
+                _testPlansCounter.Add(1);
                 if (CanSkipElementBecauseOfTags(sourcePlan.Id))
                 {
                     Log.LogInformation("TestPlansAndSuitesMigrationContext: Skipping Test Plan {Id}:'{Name}' as is not tagged with '{Tag}'.", sourcePlan.Id, sourcePlan.Name, Options.OnlyElementsWithTag);
@@ -181,9 +189,6 @@ namespace MigrationTools.Processors
             targetPlan.Save();
             InnerLog(source, string.Format("    SAVED {0} : {1} - {2} ", target.TestSuiteType.ToString(), target.Id, target.Title), 15);
 
-            metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
-            Telemetry.TrackEvent("MigrateTestCases", parameters, metrics);
-            Telemetry.TrackRequest("MigrateTestCases", starttime, stopwatch.Elapsed, "200", true);
             stopwatch.Stop();
             _totalTestCases = 0;
             _currentTestCases = 0;
@@ -256,7 +261,6 @@ namespace MigrationTools.Processors
                 {
                     InnerLog(sourceSuite, $"Work Item for Test Case {sourceTce.Title} cannot be found in target. Has it been migrated?", 5);
                 }
-                Telemetry.TrackRequest("ApplyConfigurationsAndAssignTesters", starttime, stopwatch.Elapsed, "200", true);
             }
             _totalTestCases = 0;
             _currentTestCases = 0;
@@ -834,9 +838,6 @@ namespace MigrationTools.Processors
         {
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
-            var metrics = new Dictionary<string, double>();
-            var parameters = new Dictionary<string, string>();
-            AddParameter("PlanId", parameters, sourcePlan.Id.ToString());
             ////////////////////////////////////
             var newPlanName = $"{sourcePlan.Name}";
             InnerLog(sourcePlan, $"Process Plan {newPlanName}", 0, true);
@@ -885,7 +886,6 @@ namespace MigrationTools.Processors
                 __currentSuite = 0;
                 __totalSuites = sourcePlan.RootSuite.Entries.Count;
                 InnerLog(sourcePlan, $"Source Plan has {__totalSuites} Suites", 5);
-                metrics.Add("SubSuites", __totalSuites);
                 foreach (var sourceSuiteChild in sourcePlan.RootSuite.SubSuites)
                 {
                     __currentSuite++;
@@ -913,13 +913,11 @@ namespace MigrationTools.Processors
             }
            
             ///////////////////////////////////////////////
-            metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
-            Telemetry.TrackEvent("MigrateTestPlan", parameters, metrics);
-            Telemetry.TrackRequest("MigrateTestPlan", starttime, stopwatch.Elapsed, "200", true);
         }
 
         private void ProcessTestSuite(ITestSuiteBase sourceSuite, ITestSuiteBase targetParent, ITestPlan targetPlan)
         {
+            _testSuitesCounter.Add(1);
             if (CanSkipElementBecauseOfTags(sourceSuite.Id))
                 return;
             //////////////////////////////////////////
@@ -929,10 +927,6 @@ namespace MigrationTools.Processors
                 System.Threading.Thread.Sleep(Options.MigrationDelay);
             }
             var starttime = DateTime.Now;
-            var metrics = new Dictionary<string, double>();
-            var parameters = new Dictionary<string, string>();
-            AddParameter("SuiteId", parameters, sourceSuite.Id.ToString());
-            AddParameter("TestSuiteType", parameters, sourceSuite.TestSuiteType.ToString());
             ////////////////////////////////////
 
             InnerLog(sourceSuite, $"    Processing {sourceSuite.TestSuiteType} : {sourceSuite.Id} - {sourceSuite.Title} ", 5);
@@ -1036,10 +1030,6 @@ namespace MigrationTools.Processors
                 }
             }
             ///////////////////////////////////////////////
-
-            metrics.Add("ElapsedMS", stopwatch.ElapsedMilliseconds);
-            Telemetry.TrackEvent("MigrateTestSuite", parameters, metrics);
-            Telemetry.TrackRequest("MigrateTestSuite", starttime, stopwatch.Elapsed, "200", true);
         }
 
         /// <summary>

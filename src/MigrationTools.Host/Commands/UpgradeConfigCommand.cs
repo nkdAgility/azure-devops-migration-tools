@@ -11,7 +11,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -47,67 +46,68 @@ namespace MigrationTools.Host.Commands
 
         internal override async Task<int> ExecuteInternalAsync(CommandContext context, UpgradeConfigCommandSettings settings)
         {
-            CommandActivity.AddTag("CommandSettings", settings);
+            CommandActivity.SetTagsFromObject(settings);
             int _exitCode = 0;
-                TelemetryLogger.TrackEvent(new EventTelemetry("UpgradeConfigCommand"));
-                string configFile = settings.ConfigFile;
-                if (string.IsNullOrEmpty(configFile))
-                {
-                    configFile = "configuration.json";
-                }
-                _logger.LogInformation("ConfigFile: {configFile}", configFile);
+            string configFile = settings.ConfigFile;
+            if (string.IsNullOrEmpty(configFile))
+            {
+                configFile = "configuration.json";
+            }
+            _logger.LogInformation("ConfigFile: {configFile}", configFile);
 
-                //// Load configuration
-                //var configuration = new ConfigurationBuilder()
-                //    .SetBasePath(Directory.GetCurrentDirectory())
-                //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                //    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
-                //    .Build();
+            //// Load configuration
+            //var configuration = new ConfigurationBuilder()
+            //    .SetBasePath(Directory.GetCurrentDirectory())
+            //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            //    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
+            //    .Build();
 
-                classNameChangeLog.Add("WorkItemMigrationContext", "TfsWorkItemMigrationProcessor");
-                classNameChangeLog.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");
-                classNameChangeLog.Add("WorkItemGitRepoMappingTool", "TfsGitRepositoryTool");
-                classNameChangeLog.Add("WorkItemFieldMappingTool", "FieldMappingTool");
+            classNameChangeLog.Add("WorkItemMigrationContext", "TfsWorkItemMigrationProcessor");
+            classNameChangeLog.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");
+            classNameChangeLog.Add("WorkItemGitRepoMappingTool", "TfsGitRepositoryTool");
+            classNameChangeLog.Add("WorkItemFieldMappingTool", "FieldMappingTool");
 
-                OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
+            OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
 
-                var schemaVersion = VersionOptions.ConfigureOptions.GetMigrationConfigVersion(Configuration);
-                CommandActivity?.AddTag("SchemaVersion", schemaVersion.schema.ToString());
-                    switch (schemaVersion.schema)
+            var schemaVersion = VersionOptions.ConfigureOptions.GetMigrationConfigVersion(Configuration);
+            CommandActivity?.AddTag("SchemaVersion", schemaVersion.schema.ToString());
+            CommandActivity.AddEvent(new ActivityEvent($"UpgradeConfigCommand.{schemaVersion.schema.ToString()}"));
+            switch (schemaVersion.schema)
+            {
+                case MigrationConfigSchema.v1:
+                case MigrationConfigSchema.v150:
+                    CommandActivity.AddEvent(new ActivityEvent("UpgradeConfigCommand.v150"));
+                    // ChangeSetMappingFile
+                    optionsBuilder.AddOption(ParseV1TfsChangeSetMappingToolOptions(Configuration));
+                    optionsBuilder.AddOption(ParseV1TfsGitRepoMappingOptions(Configuration));
+                    optionsBuilder.AddOption(ParseV1FieldMaps(Configuration));
+                    optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "Processors", "$type"));
+                    optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "CommonEnrichersConfig", "$type"));
+                    if (!IsSectionNullOrEmpty(Configuration.GetSection("Source")) || !IsSectionNullOrEmpty(Configuration.GetSection("Target")))
                     {
-                        case MigrationConfigSchema.v1:
-                        case MigrationConfigSchema.v150:
-
-                            // ChangeSetMappingFile
-                            optionsBuilder.AddOption(ParseV1TfsChangeSetMappingToolOptions(Configuration));
-                            optionsBuilder.AddOption(ParseV1TfsGitRepoMappingOptions(Configuration));
-                            optionsBuilder.AddOption(ParseV1FieldMaps(Configuration));
-                            optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "Processors", "$type"));
-                            optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "CommonEnrichersConfig", "$type"));
-                            if (!IsSectionNullOrEmpty(Configuration.GetSection("Source")) || !IsSectionNullOrEmpty(Configuration.GetSection("Target")))
-                            {
-                                optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "Source", "$type"), "Source");
-                                optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "Target", "$type"), "Target");
-                            }
-                            else
-                            {
-                                optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(Configuration, "Endpoints:AzureDevOpsEndpoints", "Source"), "Source");
-                                optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(Configuration, "Endpoints:AzureDevOpsEndpoints", "Target"), "Target");
-                            }
-                            break;
-                        case MigrationConfigSchema.v160:
-                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "MigrationTools:Endpoints:Source", "EndpointType"), "Source");
-                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "MigrationTools:Endpoints:Target", "EndpointType"), "Target");
-                            optionsBuilder.AddOption(ParseSectionListWithPathAsTypeToOption(Configuration, "MigrationTools:CommonTools"));
-                            optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "MigrationTools:CommonTools:FieldMappingTool:FieldMaps", "FieldMapType"));
-                            optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "MigrationTools:Processors", "ProcessorType"));
-                            break;
+                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "Source", "$type"), "Source");
+                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "Target", "$type"), "Target");
                     }
-                string json = optionsBuilder.Build();
-                configFile = AddSuffixToFileName(configFile, "-upgraded");
-                File.WriteAllText(configFile, json);
-                _logger.LogInformation("New {configFile} file has been created", configFile);
-                Console.WriteLine(json);            
+                    else
+                    {
+                        optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(Configuration, "Endpoints:AzureDevOpsEndpoints", "Source"), "Source");
+                        optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(Configuration, "Endpoints:AzureDevOpsEndpoints", "Target"), "Target");
+                    }
+                    break;
+                case MigrationConfigSchema.v160:
+
+                    optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "MigrationTools:Endpoints:Source", "EndpointType"), "Source");
+                    optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "MigrationTools:Endpoints:Target", "EndpointType"), "Target");
+                    optionsBuilder.AddOption(ParseSectionListWithPathAsTypeToOption(Configuration, "MigrationTools:CommonTools"));
+                    optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "MigrationTools:CommonTools:FieldMappingTool:FieldMaps", "FieldMapType"));
+                    optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "MigrationTools:Processors", "ProcessorType"));
+                    break;
+            }
+            string json = optionsBuilder.Build();
+            configFile = AddSuffixToFileName(configFile, "-upgraded");
+            File.WriteAllText(configFile, json);
+            _logger.LogInformation("New {configFile} file has been created", configFile);
+            Console.WriteLine(json);
             return _exitCode;
         }
 

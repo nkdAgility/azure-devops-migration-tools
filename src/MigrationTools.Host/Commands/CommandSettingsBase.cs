@@ -18,6 +18,10 @@ namespace MigrationTools.Host.Commands
         [CommandOption("--disableTelemetry")]
         public bool DisableTelemetry { get; set; }
 
+        [Description("Enabled additional trace")]
+        [CommandOption("--debugTrace")]
+        public bool DebugTrace { get; set; }
+
         [Description("Add this paramiter to turn version check off")]
         [CommandOption("--skipVersionCheck")]
         public bool skipVersionCheck { get; set; }

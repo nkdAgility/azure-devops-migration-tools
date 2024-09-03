@@ -75,7 +75,7 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "AttachmentMigrationEnricher:Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name);
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                 }
             }
             if (save)
@@ -120,7 +120,7 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "Exception downloading attachements");
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                     return null;
                 }
             }

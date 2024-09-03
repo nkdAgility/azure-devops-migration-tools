@@ -137,7 +137,7 @@ namespace MigrationTools.Tools
                 }
                 catch (Exception ex)
                 {
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                     Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Failed With {Exception}", user, ex.Message);
                 }
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.ApplicationInsights.WorkerService;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Services;
 using MigrationTools.Services.Shadows;
 using Serilog;
@@ -12,13 +11,12 @@ namespace MigrationTools.Shadows
     {
         public static void AddMigrationToolServicesForUnitTests(this IServiceCollection context)
         {
-            // Add Fake AI Endpoint
-            var aiOptions = new ApplicationInsightsServiceOptions
-            {
-                EndpointAddress = "http://localhost:8888/v2/track"
-            };
-            context.AddApplicationInsightsTelemetryWorkerService(aiOptions);
-            context.AddSingleton<ITelemetryLogger, TelemetryClientAdapter>();
+            //// Add Fake AI Endpoint
+            //var aiOptions = new ApplicationInsightsServiceOptions
+            //{
+            //    EndpointAddress = "http://localhost:8888/v2/track"
+            //};
+            //context.AddApplicationInsightsTelemetryWorkerService(aiOptions);
             // Logging for Unit Tests
             var loggers = new LoggerConfiguration().MinimumLevel.Verbose().Enrich.FromLogContext();
             loggers.WriteTo.Logger(logger => logger

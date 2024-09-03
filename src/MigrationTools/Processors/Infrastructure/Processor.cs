@@ -9,6 +9,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Enrichers;
+using MigrationTools.Services;
 using MigrationTools.Tools;
 
 namespace MigrationTools.Processors.Infrastructure
@@ -54,6 +55,8 @@ namespace MigrationTools.Processors.Infrastructure
 
         public virtual ProcessorType Type => ProcessorType.AddHock;
 
+        public Activity ProcessorActivity { get; private set; }
+
         public IEndpoint GetEndpoint(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -79,53 +82,44 @@ namespace MigrationTools.Processors.Infrastructure
 
         public void Execute()
         {
-            Telemetry.TrackEvent(this.Name);
-            Log.LogInformation("Migration Context Start: {MigrationContextname} ", Name);
-            DateTime start = DateTime.Now;
-            var executeTimer = Stopwatch.StartNew();
-            //////////////////////////////////////////////////
-            try
+            using (ProcessorActivity = ActivitySourceProvider.ActivitySource.StartActivity($"{this.GetType().Name}", ActivityKind.Internal))
             {
-                if (Options == null)
-                {
-                    Log.LogError("Processor::Execute: Processer base has not been configured. Options does not exist!");
-                    throw new InvalidOperationException("Processer base has not been configured.");
-                }
-                if (string.IsNullOrEmpty(Options.SourceName) || string.IsNullOrEmpty(Options.TargetName))
-                {
-                   Log.LogCritical("Processor::Execute: Processer base has not been configured. Source or Target is null! You need to set both 'SourceName' and 'TargetName' on the processer to a valid 'Endpoint' entry.");
-                   Environment.Exit(-200);
-                }
-                Status = ProcessingStatus.Running;
-                InternalExecute();
-                Status = ProcessingStatus.Complete;
-                executeTimer.Stop();
+                ProcessorActivity.SetTagsFromOptions(Options);
 
-                Log.LogInformation(" Migration Processor Complete {MigrationContextname} ", Name);
-            }
-            catch (Exception ex)
-            {
-                Status = ProcessingStatus.Failed;
-                executeTimer.Stop();
 
-                Telemetry.TrackException(ex,
-                    new Dictionary<string, string>
+                Log.LogInformation("Migration Context Start: {MigrationContextname} ", Name);
+                //////////////////////////////////////////////////
+                try
+                {
+                    if (Options == null)
                     {
-                        {"Name", Name},
-                        //{"Target", Engine.Target.Config.ToString()},
-                        //{"Source", Engine.Source.Config.ToString()},
-                        {"Status", Status.ToString()}
-                    },
-                    new Dictionary<string, double>
+                        Log.LogError("Processor::Execute: Processer base has not been configured. Options does not exist!");
+                        throw new InvalidOperationException("Processer base has not been configured.");
+                    }
+                    if (string.IsNullOrEmpty(Options.SourceName) || string.IsNullOrEmpty(Options.TargetName))
                     {
-                        {"MigrationContextTime", executeTimer.ElapsedMilliseconds}
-                    });
-                Log.LogCritical(ex, "Error while running {MigrationContextname}", Name);
-            }
-            finally
-            {
-                Log.LogInformation("{ProcessorName} completed in {ProcessorDuration} ", Name, executeTimer.Elapsed.ToString("c"));
-                Telemetry.TrackRequest(Name, start, executeTimer.Elapsed, Status.ToString(), (Status == ProcessingStatus.Complete));
+                        Log.LogCritical("Processor::Execute: Processer base has not been configured. Source or Target is null! You need to set both 'SourceName' and 'TargetName' on the processer to a valid 'Endpoint' entry.");
+                        Environment.Exit(-200);
+                    }
+                    Status = ProcessingStatus.Running;
+                    InternalExecute();
+                    Status = ProcessingStatus.Complete;
+
+
+                    Log.LogInformation(" Migration Processor Complete {MigrationContextname} ", Name);
+                }
+                catch (Exception ex)
+                {
+                    Status = ProcessingStatus.Failed;
+                    ProcessorActivity.SetStatus(ActivityStatusCode.Error);
+                    Telemetry.TrackException(ex, ProcessorActivity.Tags);
+                    Log.LogCritical(ex, "Error while running {MigrationContextname}", Name);
+                }
+                finally
+                {
+                    Log.LogInformation("{ProcessorName} completed in {ProcessorDuration} ", Name, ProcessorActivity.Duration.ToString("c"));
+                }
+
             }
         }
 

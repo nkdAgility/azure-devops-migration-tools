@@ -191,7 +191,7 @@ namespace MigrationTools.Tools
                     }
                     catch (Exception ex)
                     {
-                        Telemetry.TrackException(ex, null, null);
+                        Telemetry.TrackException(ex, null);
                         // Ignore this link because the TFS server didn't recognize its type (There's no point in crashing the rest of the migration due to a link)
                         if (ex.Message.Contains("Unrecognized Resource link"))
                         {
@@ -242,7 +242,7 @@ namespace MigrationTools.Tools
                 }
                 catch (Exception ex)
                 {
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                     Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                     return;
                 }
@@ -252,7 +252,7 @@ namespace MigrationTools.Tools
                 }
                 catch (Exception ex)
                 {
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                     Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
                     return;
                 }

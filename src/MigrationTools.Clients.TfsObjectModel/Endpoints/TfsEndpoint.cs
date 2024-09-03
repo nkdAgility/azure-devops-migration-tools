@@ -1,11 +1,12 @@
 ﻿using System;
-using Microsoft.ApplicationInsights.DataContracts;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.VisualStudio.Services.Common;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Services;
 
 namespace MigrationTools.Endpoints
 {
@@ -62,71 +63,94 @@ namespace MigrationTools.Endpoints
 
         private TfsTeamProjectCollection GetTfsCollection()
         {
-            if (_Collection is null)
+            using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("GetTfsCollection", ActivityKind.Client))
             {
-                var startTime = DateTime.UtcNow;
-                var timer = System.Diagnostics.Stopwatch.StartNew();
-                VssCredentials vssCredentials;
-                try
+                activity?.SetTagsFromOptions(Options);
+                activity?.SetTag("url.full", Options.Organisation);
+                activity?.SetTag("server.address", Options.Organisation);
+                activity?.SetTag("http.request.method", "GET");
+                activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
+
+                if (_Collection is null)
                 {
-                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection:AuthenticationMode({0})", Options.AuthenticationMode.ToString());
-                    switch (Options.AuthenticationMode)
+                    VssCredentials vssCredentials;
+                    try
                     {
-                        case AuthenticationMode.AccessToken:
-                            Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting Using PAT Authentication ", Options.Organisation);
-                            vssCredentials = new VssBasicCredential(string.Empty, Options.AccessToken);
-                            _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation), vssCredentials);
-                            break;
+                        Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection:AuthenticationMode({0})", Options.AuthenticationMode.ToString());
+                        switch (Options.AuthenticationMode)
+                        {
+                            case AuthenticationMode.AccessToken:
+                                Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting Using PAT Authentication ", Options.Organisation);
+                                vssCredentials = new VssBasicCredential(string.Empty, Options.AccessToken);
+                                _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation), vssCredentials);
+                                break;
 
-                        case AuthenticationMode.Prompt:
-                            Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Organisation);
-                            _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation));
-                            break;
+                            case AuthenticationMode.Prompt:
+                                Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Organisation);
+                                _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation));
+                                break;
 
-                        default:
-                            Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Organisation);
-                            _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation));
-                            break;
+                            default:
+                                Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Organisation);
+                                _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation));
+                                break;
+                        }
+                        Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connected ");
+                        Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: validating security for {@AuthorizedIdentity} ", _Collection.AuthorizedIdentity);
+                        _Collection.EnsureAuthenticated();
+
+                        Log.LogInformation("TfsWorkItemEndPoint::GetTfsCollection: Access granted to {CollectionUrl} for {Name} ({Account})", Options.Organisation, _Collection.AuthorizedIdentity.DisplayName, _Collection.AuthorizedIdentity.UniqueName);
+                        activity?.Stop();
+                        activity?.SetStatus(ActivityStatusCode.Ok);
+                        activity?.SetTag("http.response.status_code", "200");
                     }
-                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connected ");
-                    Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: validating security for {@AuthorizedIdentity} ", _Collection.AuthorizedIdentity);
-                    _Collection.EnsureAuthenticated();
-                    timer.Stop();
-                    Log.LogInformation("TfsWorkItemEndPoint::GetTfsCollection: Access granted to {CollectionUrl} for {Name} ({Account})", Options.Organisation, _Collection.AuthorizedIdentity.DisplayName, _Collection.AuthorizedIdentity.UniqueName);
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetTfsCollection", null, startTime, timer.Elapsed, "200", true));
+                    catch (Exception ex)
+                    {
+
+                        activity?.Stop();
+                        activity?.SetStatus(ActivityStatusCode.Error);
+                        activity?.SetTag("http.response.status_code", "500");
+                        Telemetry.TrackException(ex, null);
+                        Log.LogError(ex, "Unable to connect to {Organisation}", Options.Organisation);
+                        throw;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    timer.Stop();
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetTfsCollection", null, startTime, timer.Elapsed, "500", false));
-                    Telemetry.TrackException(ex, null, null);
-                    Log.LogError(ex, "Unable to connect to {Organisation}", Options.Organisation);
-                    throw;
-                }
+                return _Collection;
             }
-            return _Collection;
         }
 
         private WorkItemStore GetWorkItemStore(TfsTeamProjectCollection tfs, WorkItemStoreFlags bypassRules)
         {
             if (_Store is null)
             {
-                var startTime = DateTime.UtcNow;
-                var timer = System.Diagnostics.Stopwatch.StartNew();
-                try
+                using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("GetWorkItemStore", ActivityKind.Client))
                 {
-                    _Store = new WorkItemStore(tfs, bypassRules);
-                }
-                catch (Exception ex)
-                {
-                    Telemetry.TrackException(ex, null, null);
-                    Log.LogError(ex, "Unable to connect to {Organisation} Store", Options.Organisation);
-                    throw;
-                }
-                finally
-                {
-                    timer.Stop();
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetWorkItemStore", null, startTime, timer.Elapsed, "200", true));
+                    activity?.SetTagsFromOptions(Options);
+                    activity?.SetTag("url.full", Options.Organisation);
+                    activity?.SetTag("server.address", Options.Organisation);
+                    activity?.SetTag("http.request.method", "GET");
+                    activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                    activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
+                    try
+                    {
+                        _Store = new WorkItemStore(tfs, bypassRules);
+                        activity?.Stop();
+                        activity?.SetStatus(ActivityStatusCode.Ok);
+                        activity?.SetTag("http.response.status_code", "200");
+                    }
+                    catch (Exception ex)
+                    {
+                        Telemetry.TrackException(ex, null);
+                        Log.LogError(ex, "Unable to connect to {Organisation} Store", Options.Organisation);
+                        throw;
+                    }
+                    finally
+                    {
+                        activity?.Stop();
+                        activity?.SetStatus(ActivityStatusCode.Error);
+                        activity?.SetTag("http.response.status_code", "500");
+                    }
                 }
             }
 
@@ -139,14 +163,29 @@ namespace MigrationTools.Endpoints
             var timer = System.Diagnostics.Stopwatch.StartNew();
             if (_Project is null)
             {
-                if (TfsStore.Projects.Contains(Options.Project))
+                using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("GetTfsProject", ActivityKind.Client))
                 {
-                    _Project = TfsStore.Projects[Options.Project];
-                }
-                else
-                {
-                    Telemetry.TrackDependency(new DependencyTelemetry("TfsObjectModel", Options.Organisation, "GetTfsProject", null, startTime, timer.Elapsed, "500", false));
-                    Log.LogError(new InvalidFieldValueException(), "Unable to find to {Project}", Options.Project);
+                    activity?.SetTagsFromOptions(Options);
+                    activity?.SetTag("url.full", Options.Organisation);
+                    activity?.SetTag("server.address", Options.Organisation);
+                    activity?.SetTag("http.request.method", "GET");
+                    activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                    activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
+
+
+                    if (TfsStore.Projects.Contains(Options.Project))
+                    {
+                        _Project = TfsStore.Projects[Options.Project];
+                        activity?.Stop();
+                        activity?.SetStatus(ActivityStatusCode.Ok);
+                        activity?.SetTag("http.response.status_code", "200");
+                    }
+                    else
+                    {
+                        activity?.Stop();
+                        activity?.SetStatus(ActivityStatusCode.Error);
+                        Log.LogError(new InvalidFieldValueException(), "Unable to find to {Project}", Options.Project);
+                    }
                 }
             }
             return _Project;

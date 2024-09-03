@@ -108,7 +108,7 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "EmbededImagesRepairEnricher: Unable to fix HTML field attachments for work item {wiId} from {oldTfsurl} to {newTfsurl}", wi.Id, oldTfsurl, newTfsurl);
-                    Telemetry.TrackException(ex, null, null);
+                    Telemetry.TrackException(ex, null);
                 }
             }
         }

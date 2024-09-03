@@ -1,34 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
 using Elmah.Io.Client;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using MigrationTools.Services;
 
 namespace MigrationTools
 {
     public class TelemetryClientAdapter : ITelemetryLogger
     {
-        private TelemetryClient _telemetryClient;
         private static IElmahioAPI elmahIoClient;
         private static IMigrationToolVersion _MigrationToolVersion;
 
-        public TelemetryClientAdapter(TelemetryConfiguration telemetryConfiguration, IMigrationToolVersion migrationToolVersion)
+        public TelemetryClientAdapter(IMigrationToolVersion migrationToolVersion)
         {
-            TelemetryClient telemetryClient = new TelemetryClient(telemetryConfiguration);
-            _MigrationToolVersion = migrationToolVersion;
-            telemetryClient.Context.Session.Id = Guid.NewGuid().ToString();
-            telemetryClient.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
-            if (!(System.Reflection.Assembly.GetEntryAssembly() is null))
-            {
-                telemetryClient.Context.Component.Version = migrationToolVersion.GetRunningVersion().versionString;
-            }
-            _telemetryClient = telemetryClient;
 
             elmahIoClient = ElmahioAPI.Create("7589821e832a4ae1a1170f8201def634", new ElmahIoOptions
             {
@@ -39,43 +27,12 @@ namespace MigrationTools
 
         }
 
-        public string SessionId
-        {
-            get
-            {
-                return _telemetryClient.Context.Session.Id;
-            }
-        }
+        private static string _sessionid = Guid.NewGuid().ToString();
 
-        public void CloseAndFlush()
-        {
-            _telemetryClient.Flush();
-        }
+        public string SessionId => _sessionid;
 
-        public void TrackDependency(DependencyTelemetry dependencyTelemetry)
+        public void TrackException(Exception ex, IDictionary<string, string> properties)
         {
-            _telemetryClient.TrackDependency(dependencyTelemetry);
-        }
-
-        public void TrackEvent(EventTelemetry eventTelemetry)
-        {
-            _telemetryClient.TrackEvent(eventTelemetry);
-        }
-
-        public void TrackEvent(string name)
-        {
-            _telemetryClient.TrackEvent(name);
-        }
-
-        public void TrackEvent(string name, IDictionary<string, string> properties, IDictionary<string, double> measurements)
-        {
-            _telemetryClient.TrackEvent(name, properties, measurements);
-        }
-
-        public void TrackException(Exception ex, IDictionary<string, string> properties, IDictionary<string, double> measurements)
-        {
-            _telemetryClient.TrackException(ex, properties, measurements);
-
             var baseException = ex.GetBaseException();
             var createMessage = new CreateMessage
             {
@@ -105,20 +62,14 @@ namespace MigrationTools
                 }
 
             }
-            if (measurements != null)
-            {
-                foreach (var measurement in measurements)
-                {
-                    createMessage.Data.Add(new Item(measurement.Key, measurement.Value.ToString()));
-                }
-            }
            var result = elmahIoClient.Messages.CreateAndNotify(new Guid("24086b6d-4f58-47f4-8ac7-68d8bc05ca9e"), createMessage);
             Console.WriteLine($"Error logged to Elmah.io");
         }
 
-        public void TrackRequest(string name, DateTimeOffset startTime, TimeSpan duration, string responseCode, bool success)
+        public void TrackException(Exception ex, IEnumerable<KeyValuePair<string, string>> properties = null)
         {
-            _telemetryClient.TrackRequest(name, startTime, duration, responseCode, success);
+            TrackException(ex, properties.ToDictionary(k => k.Key, v => v.Value));
         }
+
     }
 }

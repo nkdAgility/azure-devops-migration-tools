@@ -9,7 +9,7 @@
     },
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c \"configuration.json\""
+      "commandLineArgs": "execute -c \"configuration.json\" --debugTrace"
     },
     "execute --help": {
       "commandName": "Project",
@@ -29,7 +29,7 @@
     },
     "Upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade -c \"configuration.json\" --disableTelemetry"
+      "commandLineArgs": "upgrade -c \"configuration.json\" --debugTrace"
     },
     "Execute Classic": {
       "commandName": "Project",
