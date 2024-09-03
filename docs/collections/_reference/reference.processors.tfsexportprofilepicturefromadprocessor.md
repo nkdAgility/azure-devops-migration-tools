@@ -1,20 +1,20 @@
 ---
-optionsClassName: ExportProfilePictureFromADProcessorOptions
-optionsClassFullName: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
+optionsClassName: TfsExportProfilePictureFromADProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsExportProfilePictureFromADProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsExportProfilePictureFromADProcessorOptions
 - name: sample
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
-  sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsExportProfilePictureFromADProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "ExportProfilePictureFromADProcessorOptions",
+      "$type": "TfsExportProfilePictureFromADProcessorOptions",
       "Enabled": false,
       "Domain": null,
       "Username": null,
@@ -25,9 +25,9 @@ configurationSamples:
       "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools.Processors.ExportProfilePictureFromADProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsExportProfilePictureFromADProcessorOptions
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
-className: ExportProfilePictureFromADProcessor
+className: TfsExportProfilePictureFromADProcessor
 typeName: Processors
 architecture: 
 options:
@@ -69,25 +69,25 @@ options:
   defaultValue: String.Empty
 status: alpha
 processingTarget: Profiles
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportProfilePictureFromADProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportProfilePictureFromADProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
 
 redirectFrom:
-- /Reference/Processors/ExportProfilePictureFromADProcessorOptions/
+- /Reference/Processors/TfsExportProfilePictureFromADProcessorOptions/
 layout: reference
 toc: true
-permalink: /Reference/Processors/ExportProfilePictureFromADProcessor/
-title: ExportProfilePictureFromADProcessor
+permalink: /Reference/Processors/TfsExportProfilePictureFromADProcessor/
+title: TfsExportProfilePictureFromADProcessor
 categories:
 - Processors
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/ExportProfilePictureFromADProcessor-notes.md
+  path: /docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/ExportProfilePictureFromADProcessor-introduction.md
+  path: /docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-introduction.md
   exists: false
   markdown: ''
 

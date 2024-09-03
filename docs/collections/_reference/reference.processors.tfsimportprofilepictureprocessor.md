@@ -1,28 +1,29 @@
-optionsClassName: ImportProfilePictureProcessorOptions
-optionsClassFullName: MigrationTools.Processors.ImportProfilePictureProcessorOptions
+---
+optionsClassName: TfsImportProfilePictureProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsImportProfilePictureProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsImportProfilePictureProcessorOptions
 - name: sample
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
-  sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsImportProfilePictureProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "ImportProfilePictureProcessorOptions",
+      "$type": "TfsImportProfilePictureProcessorOptions",
       "Enabled": false,
       "Enrichers": null,
       "SourceName": null,
       "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools.Processors.ImportProfilePictureProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsImportProfilePictureProcessorOptions
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
-className: ImportProfilePictureProcessor
+className: TfsImportProfilePictureProcessor
 typeName: Processors
 architecture: 
 options:
@@ -48,5 +49,26 @@ options:
   defaultValue: missng XML code comments
 status: alpha
 processingTarget: Profiles
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ImportProfilePictureProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ImportProfilePictureProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
+
+redirectFrom:
+- /Reference/Processors/TfsImportProfilePictureProcessorOptions/
+layout: reference
+toc: true
+permalink: /Reference/Processors/TfsImportProfilePictureProcessor/
+title: TfsImportProfilePictureProcessor
+categories:
+- Processors
+- 
+topics:
+- topic: notes
+  path: /docs/Reference/Processors/TfsImportProfilePictureProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /docs/Reference/Processors/TfsImportProfilePictureProcessor-introduction.md
+  exists: false
+  markdown: ''
+
+---

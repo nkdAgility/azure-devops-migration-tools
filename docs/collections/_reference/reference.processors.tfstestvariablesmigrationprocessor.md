@@ -1,20 +1,20 @@
 ---
-optionsClassName: TestVariablesMigrationProcessorOptions
-optionsClassFullName: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
+optionsClassName: TfsTestVariablesMigrationProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
 - name: sample
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
-  sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "TestVariablesMigrationProcessorOptions",
+      "$type": "TfsTestVariablesMigrationProcessorOptions",
       "Enabled": false,
       "Processor": "TestVariablesMigrationContext",
       "Enrichers": null,
@@ -22,9 +22,9 @@ configurationSamples:
       "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools.Processors.TestVariablesMigrationProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
 description: This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.
-className: TestVariablesMigrationProcessor
+className: TfsTestVariablesMigrationProcessor
 typeName: Processors
 architecture: 
 options:
@@ -54,25 +54,25 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestVariablesMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestVariablesMigrationProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessorOptions.cs
 
 redirectFrom:
-- /Reference/Processors/TestVariablesMigrationProcessorOptions/
+- /Reference/Processors/TfsTestVariablesMigrationProcessorOptions/
 layout: reference
 toc: true
-permalink: /Reference/Processors/TestVariablesMigrationProcessor/
-title: TestVariablesMigrationProcessor
+permalink: /Reference/Processors/TfsTestVariablesMigrationProcessor/
+title: TfsTestVariablesMigrationProcessor
 categories:
 - Processors
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TestVariablesMigrationProcessor-notes.md
+  path: /docs/Reference/Processors/TfsTestVariablesMigrationProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TestVariablesMigrationProcessor-introduction.md
+  path: /docs/Reference/Processors/TfsTestVariablesMigrationProcessor-introduction.md
   exists: false
   markdown: ''
 

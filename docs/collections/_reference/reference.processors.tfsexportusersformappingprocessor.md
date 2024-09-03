@@ -1,44 +1,31 @@
-optionsClassName: ExportUsersForMappingProcessorOptions
-optionsClassFullName: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
+---
+optionsClassName: TfsExportUsersForMappingProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsExportUsersForMappingProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsExportUsersForMappingProcessorOptions
 - name: sample
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "ExportUsersForMappingProcessor",
-            "Enabled": "True",
-            "OnlyListUsersInWorkItems": "True",
-            "SourceName": "Source",
-            "TargetName": "Target",
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
+  code: There is no sample, but you can check the classic below for a general feel.
+  sampleFor: MigrationTools.Processors.TfsExportUsersForMappingProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "ExportUsersForMappingProcessorOptions",
-      "Enabled": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+      "$type": "TfsExportUsersForMappingProcessorOptions",
+      "Enabled": false,
+      "WIQLQuery": null,
       "OnlyListUsersInWorkItems": true,
       "Enrichers": null,
-      "SourceName": "Source",
-      "TargetName": "Target",
+      "SourceName": null,
+      "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools.Processors.ExportUsersForMappingProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsExportUsersForMappingProcessorOptions
 description: ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.
-className: ExportUsersForMappingProcessor
+className: TfsExportUsersForMappingProcessor
 typeName: Processors
 architecture: 
 options:
@@ -72,5 +59,26 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportUsersForMappingProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/ExportUsersForMappingProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
+
+redirectFrom:
+- /Reference/Processors/TfsExportUsersForMappingProcessorOptions/
+layout: reference
+toc: true
+permalink: /Reference/Processors/TfsExportUsersForMappingProcessor/
+title: TfsExportUsersForMappingProcessor
+categories:
+- Processors
+- 
+topics:
+- topic: notes
+  path: /docs/Reference/Processors/TfsExportUsersForMappingProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /docs/Reference/Processors/TfsExportUsersForMappingProcessor-introduction.md
+  exists: false
+  markdown: ''
+
+---

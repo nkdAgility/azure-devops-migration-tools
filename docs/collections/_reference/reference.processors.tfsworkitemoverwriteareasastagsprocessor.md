@@ -1,19 +1,20 @@
-optionsClassName: WorkItemUpdateAreasAsTagsProcessorOptions
-optionsClassFullName: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
+---
+optionsClassName: TfsWorkItemOverwriteAreasAsTagsProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsWorkItemOverwriteAreasAsTagsProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteAreasAsTagsProcessorOptions
 - name: sample
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
-  sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteAreasAsTagsProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "WorkItemUpdateAreasAsTagsProcessorOptions",
+      "$type": "TfsWorkItemOverwriteAreasAsTagsProcessorOptions",
       "Enabled": false,
       "AreaIterationPath": null,
       "Enrichers": null,
@@ -21,9 +22,9 @@ configurationSamples:
       "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools.Processors.WorkItemUpdateAreasAsTagsProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteAreasAsTagsProcessorOptions
 description: A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
-className: WorkItemUpdateAreasAsTagsProcessor
+className: TfsWorkItemOverwriteAreasAsTagsProcessor
 typeName: Processors
 architecture: 
 options:
@@ -53,5 +54,26 @@ options:
   defaultValue: missng XML code comments
 status: Beta
 processingTarget: Work Item
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemUpdateAreasAsTagsProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteAreasAsTagsProcessorOptions.cs
+
+redirectFrom:
+- /Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessorOptions/
+layout: reference
+toc: true
+permalink: /Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor/
+title: TfsWorkItemOverwriteAreasAsTagsProcessor
+categories:
+- Processors
+- 
+topics:
+- topic: notes
+  path: /docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-introduction.md
+  exists: false
+  markdown: ''
+
+---

@@ -1,20 +1,20 @@
 ---
-optionsClassName: TestPlansAndSuitesMigrationProcessorOptions
-optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
+optionsClassName: TfsTestPlansAndSuitesMigrationProcessorOptions
+optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 - name: sample
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
-  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "TestPlansAndSuitesMigrationProcessorOptions",
+      "$type": "TfsTestPlansAndSuitesMigrationProcessorOptions",
       "Enabled": false,
       "OnlyElementsWithTag": null,
       "TestPlanQuery": null,
@@ -27,9 +27,9 @@ configurationSamples:
       "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
-className: TestPlansAndSuitesMigrationProcessor
+className: TfsTestPlansAndSuitesMigrationProcessor
 typeName: Processors
 architecture: 
 options:
@@ -79,73 +79,25 @@ options:
   defaultValue: '`String.Empty`'
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestPlansAndSuitesMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TestPlansAndSuitesMigrationProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPlansAndSuitesMigrationProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPlansAndSuitesMigrationProcessorOptions.cs
 
 redirectFrom:
-- /Reference/Processors/TestPlansAndSuitesMigrationProcessorOptions/
+- /Reference/Processors/TfsTestPlansAndSuitesMigrationProcessorOptions/
 layout: reference
 toc: true
-permalink: /Reference/Processors/TestPlansAndSuitesMigrationProcessor/
-title: TestPlansAndSuitesMigrationProcessor
+permalink: /Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor/
+title: TfsTestPlansAndSuitesMigrationProcessor
 categories:
 - Processors
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TestPlansAndSuitesMigrationProcessor-notes.md
-  exists: true
-  markdown: >2-
-
-    ## Additional Samples & Info
-
-
-    To run a full plans and suits you should run the three processors in this order below.  `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
-
-
-    ```json
-
-    "Processors": [
-        {
-          "$type": "TestVariablesMigrationConfig",
-          "Enabled": false
-        },
-        {
-          "$type": "TestConfigurationsMigrationConfig",
-          "Enabled": true
-        },
-        {
-          "$type": "TestPlansAndSuitesMigrationConfig",
-          "Enabled": true,
-          "PrefixProjectToNodes": false,
-          "OnlyElementsWithTag": null,
-          "TestPlanQueryBit": null,
-          "RemoveAllLinks": false,
-          "MigrationDelay": 0,
-          "UseCommonNodeStructureEnricherConfig": false,
-          "NodeBasePaths": [],
-          "AreaMaps": null,
-          "IterationMaps": null,
-          "RemoveInvalidTestSuiteLinks": false,
-          "FilterCompleted": false
-        }
-    ]
-
-    ```
-
-    ## Known working TestPlanQueryBit filter fields names
-
-
-    `AreaPath`, `PlanName` and `PlanState`
-
-
-    ```json
-
-    "TestPlanQueryBit": "PlanName = 'ABC'"
-
-    ```
+  path: /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-notes.md
+  exists: false
+  markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TestPlansAndSuitesMigrationProcessor-introduction.md
+  path: /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-introduction.md
   exists: false
   markdown: ''
 

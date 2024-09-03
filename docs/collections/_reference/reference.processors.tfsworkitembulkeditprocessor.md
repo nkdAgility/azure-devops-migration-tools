@@ -1,23 +1,24 @@
 ---
-optionsClassName: WorkItemPostProcessingProcessorOptions
-optionsClassFullName: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
+optionsClassName: TfsWorkItemBulkEditProcessorOptions
+optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TfsWorkItemBulkEditProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsWorkItemBulkEditProcessorOptions
 - name: sample
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
-  sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsWorkItemBulkEditProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "WorkItemPostProcessingProcessorOptions",
+      "$type": "TfsWorkItemBulkEditProcessorOptions",
       "Enabled": false,
-      "WorkItemIDs": null,
+      "WhatIf": false,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+      "WorkItemIDs": null,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "WorkItemCreateRetryLimit": 0,
@@ -26,9 +27,9 @@ configurationSamples:
       "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools.Processors.WorkItemPostProcessingProcessorOptions
-description: Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
-className: WorkItemPostProcessingProcessor
+  sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsWorkItemBulkEditProcessorOptions
+description: This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
+className: TfsWorkItemBulkEditProcessor
 typeName: Processors
 architecture: 
 options:
@@ -60,6 +61,10 @@ options:
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
+- parameterName: WhatIf
+  type: Boolean
+  description: missng XML code comments
+  defaultValue: missng XML code comments
 - parameterName: WIQLQuery
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
@@ -72,27 +77,27 @@ options:
   type: IList
   description: A list of work items to import
   defaultValue: '[]'
-status: preview
-processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemPostProcessingProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemPostProcessingProcessorOptions.cs
+status: missng XML code comments
+processingTarget: WorkItem
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessorOptions.cs
 
 redirectFrom:
-- /Reference/Processors/WorkItemPostProcessingProcessorOptions/
+- /Reference/Processors/TfsWorkItemBulkEditProcessorOptions/
 layout: reference
 toc: true
-permalink: /Reference/Processors/WorkItemPostProcessingProcessor/
-title: WorkItemPostProcessingProcessor
+permalink: /Reference/Processors/TfsWorkItemBulkEditProcessor/
+title: TfsWorkItemBulkEditProcessor
 categories:
 - Processors
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/WorkItemPostProcessingProcessor-notes.md
+  path: /docs/Reference/Processors/TfsWorkItemBulkEditProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/WorkItemPostProcessingProcessor-introduction.md
+  path: /docs/Reference/Processors/TfsWorkItemBulkEditProcessor-introduction.md
   exists: false
   markdown: ''
 

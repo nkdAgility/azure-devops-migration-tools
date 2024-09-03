@@ -1,19 +1,20 @@
-optionsClassName: WorkItemDeleteProcessorOptions
-optionsClassFullName: MigrationTools.Processors.WorkItemDeleteProcessorOptions
+---
+optionsClassName: TfsWorkItemDeleteProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsWorkItemDeleteProcessorOptions
 configurationSamples:
 - name: defaults
   description: 
   code: There are no defaults! Check the sample for options!
-  sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsWorkItemDeleteProcessorOptions
 - name: sample
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
-  sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsWorkItemDeleteProcessorOptions
 - name: classic
   description: 
   code: >-
     {
-      "$type": "WorkItemDeleteProcessorOptions",
+      "$type": "TfsWorkItemDeleteProcessorOptions",
       "Enabled": false,
       "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "WorkItemIDs": null,
@@ -25,9 +26,9 @@ configurationSamples:
       "TargetName": null,
       "RefName": null
     }
-  sampleFor: MigrationTools.Processors.WorkItemDeleteProcessorOptions
+  sampleFor: MigrationTools.Processors.TfsWorkItemDeleteProcessorOptions
 description: The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.
-className: WorkItemDeleteProcessor
+className: TfsWorkItemDeleteProcessor
 typeName: Processors
 architecture: 
 options:
@@ -73,5 +74,26 @@ options:
   defaultValue: missng XML code comments
 status: ready
 processingTarget: WorkItem
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemDeleteProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemDeleteProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessorOptions.cs
+
+redirectFrom:
+- /Reference/Processors/TfsWorkItemDeleteProcessorOptions/
+layout: reference
+toc: true
+permalink: /Reference/Processors/TfsWorkItemDeleteProcessor/
+title: TfsWorkItemDeleteProcessor
+categories:
+- Processors
+- 
+topics:
+- topic: notes
+  path: /docs/Reference/Processors/TfsWorkItemDeleteProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /docs/Reference/Processors/TfsWorkItemDeleteProcessor-introduction.md
+  exists: false
+  markdown: ''
+
+---

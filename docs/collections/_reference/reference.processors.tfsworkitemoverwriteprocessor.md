@@ -1,91 +1,42 @@
-optionsClassName: WorkItemMigrationProcessorOptions
-optionsClassFullName: MigrationTools.Processors.WorkItemMigrationProcessorOptions
+---
+optionsClassName: TfsWorkItemOverwriteProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsWorkItemOverwriteProcessorOptions
 configurationSamples:
-- name: confinguration.json
-  description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Processors": [
-          {
-            "ProcessorType": "WorkItemMigrationProcessor",
-            "Enabled": false,
-            "UpdateCreatedDate": true,
-            "UpdateCreatedBy": true,
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-            "FixHtmlAttachmentLinks": true,
-            "WorkItemCreateRetryLimit": 5,
-            "FilterWorkItemsThatAlreadyExistInTarget": false,
-            "PauseAfterEachWorkItem": false,
-            "AttachRevisionHistory": false,
-            "GenerateMigrationComment": true,
-            "WorkItemIDs": null,
-            "MaxGracefulFailures": 0,
-            "SkipRevisionWithInvalidIterationPath": false,
-            "SkipRevisionWithInvalidAreaPath": false,
-            "Enrichers": null,
-            "ProcessorEnrichers": null,
-            "SourceName": null,
-            "TargetName": null,
-            "RefName": null
-          }
-        ]
-      }
-    }
-  sampleFor: MigrationTools.Processors.WorkItemMigrationProcessorOptions
 - name: defaults
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "ProcessorDefaults": {
-          "WorkItemMigrationProcessor": {
-            "AttachRevisionHistory": "False",
-            "Enabled": "False",
-            "FilterWorkItemsThatAlreadyExistInTarget": "False",
-            "FixHtmlAttachmentLinks": "True",
-            "GenerateMigrationComment": "True",
-            "MaxGracefulFailures": "0",
-            "PauseAfterEachWorkItem": "False",
-            "SkipRevisionWithInvalidAreaPath": "False",
-            "SkipRevisionWithInvalidIterationPath": "False",
-            "UpdateCreatedBy": "True",
-            "UpdateCreatedDate": "True",
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-            "WorkItemCreateRetryLimit": "5",
-            "WorkItemIDs": null
-          }
-        }
-      }
-    }
-  sampleFor: MigrationTools.Processors.WorkItemMigrationProcessorOptions
-- name: Classic
+  code: There are no defaults! Check the sample for options!
+  sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteProcessorOptions
+- name: sample
+  description: 
+  code: There is no sample, but you can check the classic below for a general feel.
+  sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteProcessorOptions
+- name: classic
   description: 
   code: >-
     {
-      "$type": "WorkItemMigrationProcessorOptions",
+      "$type": "TfsWorkItemOverwriteProcessorOptions",
       "Enabled": false,
-      "UpdateCreatedDate": true,
-      "UpdateCreatedBy": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-      "FixHtmlAttachmentLinks": true,
-      "WorkItemCreateRetryLimit": 5,
+      "UpdateCreatedDate": false,
+      "UpdateCreatedBy": false,
+      "WIQLQuery": null,
+      "FixHtmlAttachmentLinks": false,
+      "WorkItemCreateRetryLimit": 0,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "AttachRevisionHistory": false,
-      "GenerateMigrationComment": true,
+      "GenerateMigrationComment": false,
       "WorkItemIDs": null,
       "MaxGracefulFailures": 0,
       "SkipRevisionWithInvalidIterationPath": false,
       "SkipRevisionWithInvalidAreaPath": false,
       "Enrichers": null,
-      "ProcessorEnrichers": null,
       "SourceName": null,
-      "TargetName": null
+      "TargetName": null,
+      "RefName": null
     }
-  sampleFor: MigrationTools.Processors.WorkItemMigrationProcessorOptions
-description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
-className: WorkItemMigrationProcessor
+  sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteProcessorOptions
+description: Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
+className: TfsWorkItemOverwriteProcessor
 typeName: Processors
 architecture: 
 options:
@@ -99,7 +50,7 @@ options:
   defaultValue: missng XML code comments
 - parameterName: Enrichers
   type: List
-  description: A list of enrichers that can augment the proccessing of the data
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missng XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
@@ -121,10 +72,6 @@ options:
   type: Boolean
   description: Pause after each work item is migrated
   defaultValue: false
-- parameterName: ProcessorEnrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missng XML code comments
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
@@ -165,7 +112,28 @@ options:
   type: IList
   description: A list of work items to import
   defaultValue: '[]'
-status: ready
+status: preview
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/WorkItemMigrationProcessorOptions.cs
+classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessor.cs
+optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessorOptions.cs
+
+redirectFrom:
+- /Reference/Processors/TfsWorkItemOverwriteProcessorOptions/
+layout: reference
+toc: true
+permalink: /Reference/Processors/TfsWorkItemOverwriteProcessor/
+title: TfsWorkItemOverwriteProcessor
+categories:
+- Processors
+- 
+topics:
+- topic: notes
+  path: /docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /docs/Reference/Processors/TfsWorkItemOverwriteProcessor-introduction.md
+  exists: false
+  markdown: ''
+
+---
