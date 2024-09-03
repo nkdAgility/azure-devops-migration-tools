@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.TestManagement.Client;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;

@@ -5,7 +5,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     // TODO: Rename IMigrationClient to ITfsTeamProjectEndpoint
     public interface IMigrationClient

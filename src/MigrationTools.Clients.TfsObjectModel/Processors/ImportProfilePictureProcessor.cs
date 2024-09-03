@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;

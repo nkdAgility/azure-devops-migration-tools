@@ -1,6 +1,6 @@
 ---
 optionsClassName: TfsMigrationClient
-optionsClassFullName: MigrationTools._EngineV1.Clients.TfsMigrationClient
+optionsClassFullName: MigrationTools.Clients.TfsMigrationClient
 configurationSamples:
 - name: defaults
   description: 
@@ -12,7 +12,7 @@ configurationSamples:
         }
       }
     }
-  sampleFor: MigrationTools._EngineV1.Clients.TfsMigrationClient
+  sampleFor: MigrationTools.Clients.TfsMigrationClient
 - name: sample
   description: 
   code: >-
@@ -23,7 +23,7 @@ configurationSamples:
         }
       }
     }
-  sampleFor: MigrationTools._EngineV1.Clients.TfsMigrationClient
+  sampleFor: MigrationTools.Clients.TfsMigrationClient
 - name: classic
   description: 
   code: >-
@@ -55,7 +55,7 @@ configurationSamples:
       "Name": null,
       "EndpointEnrichers": null
     }
-  sampleFor: MigrationTools._EngineV1.Clients.TfsMigrationClient
+  sampleFor: MigrationTools.Clients.TfsMigrationClient
 description: missng XML code comments
 className: TfsMigrationClient
 typeName: Endpoints

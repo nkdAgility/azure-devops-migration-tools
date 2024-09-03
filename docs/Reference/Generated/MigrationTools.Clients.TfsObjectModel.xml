@@ -4,74 +4,6 @@
         <name>MigrationTools.Clients.TfsObjectModel</name>
     </assembly>
     <members>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.OnlyElementsWithTag">
-            <summary>
-            The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
-            </summary>
-            <default>`String.Empty`</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.TestPlanQuery">
-            <summary>
-            Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
-            </summary>
-            <default>`String.Empty`</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveAllLinks">
-            <summary>
-            ??Not sure what this does. Check code.
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.MigrationDelay">
-            <summary>
-            ??Not sure what this does. Check code.
-            </summary>
-            <default>0</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveInvalidTestSuiteLinks">
-            <summary>
-            Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
-            </summary>
-            <default>false</default>
-            <summary>
-            Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
-            </summary>
-        </member>
-        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
-            <inheritdoc />
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WIQLQuery">
-            <summary>
-            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-            </summary>
-            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WorkItemIDs">
-            <summary>
-            A list of work items to import
-            </summary>
-            <default>[]</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.FilterWorkItemsThatAlreadyExistInTarget">
-            <summary>
-            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
-            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
-            </summary>
-            <default>true</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.PauseAfterEachWorkItem">
-            <summary>
-            Pause after each work item is migrated
-            </summary>
-            <default>false</default>
-        </member>
-        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WorkItemCreateRetryLimit">
-            <summary>
-            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
-            This allows for periodic network glitches not to end the process.
-            </summary>
-            <default>5</default>
-        </member>
         <member name="T:MigrationTools.Processors.CreateTeamFolders">
             <summary>
             Creates folders in Sared Queries for each Team
@@ -438,6 +370,74 @@
             This is a required parameter. That define the root path of the iteration. To get the full path use `\` 
             </summary>
             <default>\</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.OnlyElementsWithTag">
+            <summary>
+            The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
+            </summary>
+            <default>`String.Empty`</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.TestPlanQuery">
+            <summary>
+            Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
+            </summary>
+            <default>`String.Empty`</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveAllLinks">
+            <summary>
+            ??Not sure what this does. Check code.
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.MigrationDelay">
+            <summary>
+            ??Not sure what this does. Check code.
+            </summary>
+            <default>0</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.RemoveInvalidTestSuiteLinks">
+            <summary>
+            Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
+            </summary>
+            <default>false</default>
+            <summary>
+            Remove Invalid Links, see https://github.com/nkdAgility/azure-devops-migration-tools/issues/178
+            </summary>
+        </member>
+        <member name="M:MigrationTools._EngineV1.Configuration.Processing.TestPlansAndSuitesMigrationProcessorOptions.IsProcessorCompatible(System.Collections.Generic.IReadOnlyList{MigrationTools._EngineV1.Configuration.IProcessorConfig})">
+            <inheritdoc />
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WIQLQuery">
+            <summary>
+            A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
+            </summary>
+            <default>AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WorkItemIDs">
+            <summary>
+            A list of work items to import
+            </summary>
+            <default>[]</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.FilterWorkItemsThatAlreadyExistInTarget">
+            <summary>
+            This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+            While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.PauseAfterEachWorkItem">
+            <summary>
+            Pause after each work item is migrated
+            </summary>
+            <default>false</default>
+        </member>
+        <member name="P:MigrationTools._EngineV1.Configuration.Processing.WorkItemBulkEditProcessorOptions.WorkItemCreateRetryLimit">
+            <summary>
+            **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+            This allows for periodic network glitches not to end the process.
+            </summary>
+            <default>5</default>
         </member>
         <member name="P:MigrationTools.Tools.TfsAttachmentToolOptions.ExportBasePath">
             <summary>

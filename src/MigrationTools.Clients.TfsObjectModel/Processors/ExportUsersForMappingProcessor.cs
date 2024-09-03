@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 

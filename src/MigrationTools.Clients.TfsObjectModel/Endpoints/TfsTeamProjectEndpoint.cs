@@ -18,7 +18,7 @@ using MigrationTools.Options;
 using MigrationTools.Services;
 using Serilog;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public class TfsTeamProjectEndpoint : Endpoint<TfsTeamProjectEndpointOptions>, IMigrationClient // TODO: Rename IMigrationClient to ITfsTeamProjectEndpoint
     {

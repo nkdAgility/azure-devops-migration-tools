@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Work.WebApi;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;

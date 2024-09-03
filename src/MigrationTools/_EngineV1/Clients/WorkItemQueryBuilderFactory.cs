@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public class WorkItemQueryBuilderFactory : IWorkItemQueryBuilderFactory
     {

@@ -9,7 +9,7 @@ using Microsoft.TeamFoundation;
 using Microsoft.TeamFoundation.Git.Client;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;

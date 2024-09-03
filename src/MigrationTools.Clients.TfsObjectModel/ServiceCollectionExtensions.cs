@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;

@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Enrichers;

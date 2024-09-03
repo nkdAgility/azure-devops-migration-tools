@@ -22,7 +22,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools._EngineV1.Containers;

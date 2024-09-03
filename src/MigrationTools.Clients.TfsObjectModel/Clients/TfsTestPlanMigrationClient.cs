@@ -7,7 +7,7 @@ using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Options;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public class TfsTestPlanMigrationClient : ITestPlanMigrationClient
     {

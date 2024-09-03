@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public abstract class WorkItemQueryBase : IWorkItemQuery
     {

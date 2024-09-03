@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using MigrationTools.DataContracts;
 using Serilog;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public class TfsReflectedWorkItemId : ReflectedWorkItemId
     {

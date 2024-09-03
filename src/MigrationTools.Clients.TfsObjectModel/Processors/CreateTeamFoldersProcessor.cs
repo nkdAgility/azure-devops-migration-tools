@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools;
-using MigrationTools._EngineV1.Clients;
+using MigrationTools.Clients;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;

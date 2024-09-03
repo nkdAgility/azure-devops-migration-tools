@@ -8,7 +8,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Services;
 using Serilog;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public class TfsWorkItemQuery : WorkItemQueryBase
     {

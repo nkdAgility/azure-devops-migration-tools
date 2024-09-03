@@ -16,7 +16,7 @@ using MigrationTools.Services;
 using OpenTelemetry.Metrics;
 using Serilog;
 
-namespace MigrationTools._EngineV1.Clients
+namespace MigrationTools.Clients
 {
     public class TfsWorkItemMigrationClient : WorkItemMigrationClientBase
     {
