@@ -15,7 +15,7 @@ namespace MigrationTools.Services.Shadows
 
         public void TrackException(Exception ex, IEnumerable<KeyValuePair<string, string>> properties = null)
         {
-            throw new NotImplementedException();
+          
         }
     }
 }

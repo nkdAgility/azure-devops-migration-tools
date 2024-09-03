@@ -26,7 +26,7 @@ namespace MigrationTools._EngineV1.Clients
         private ProjectData _project;
         private WorkItemStore _wistore;
 
-        public TfsWorkItemMigrationClient(IOptions<TfsTeamProjectEndpointOptions> options, IMigrationClient migrationClient, IWorkItemQueryBuilderFactory workItemQueryBuilderFactory, ITelemetryLogger telemetry, MeterProvider meterProvider)
+        public TfsWorkItemMigrationClient(IOptions<TfsTeamProjectEndpointOptions> options, IMigrationClient migrationClient, IWorkItemQueryBuilderFactory workItemQueryBuilderFactory, ITelemetryLogger telemetry)
             : base(options, migrationClient, telemetry)
         {
             _telemetry = telemetry;
