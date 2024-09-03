@@ -148,6 +148,7 @@ namespace MigrationTools.Services
                             .AddSource(ActivitySourceProvider.ActivitySourceName) // Register your custom ActivitySource
                             //.AddConsoleExporter() // Export traces to console
                             .AddProcessor(new ActivitySourceProvider.ActivityFilteringProcessor())
+                            .AddHttpClientInstrumentation()
                             .SetErrorStatusOnException()
                             .AddAzureMonitorTraceExporter(options =>
                             {
@@ -159,6 +160,7 @@ namespace MigrationTools.Services
                     {
                         builder
                              .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(entryAssemblyName, serviceVersion: versionString))
+                             .AddHttpClientInstrumentation()
                              .AddRuntimeInstrumentation()
                              .AddProcessInstrumentation()
                              //.AddConsoleExporter() // Export metrics to console
