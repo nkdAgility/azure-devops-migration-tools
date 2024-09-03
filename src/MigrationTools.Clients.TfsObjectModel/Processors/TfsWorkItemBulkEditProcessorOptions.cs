@@ -6,7 +6,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
-    public class WorkItemBulkEditProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
+    public class TfsWorkItemBulkEditProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
         public bool WhatIf { get; set; }
 
@@ -46,7 +46,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public int WorkItemCreateRetryLimit { get; set; }
 
 
-        public WorkItemBulkEditProcessorOptions()
+        public TfsWorkItemBulkEditProcessorOptions()
         {
             WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdFieldName] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
         }

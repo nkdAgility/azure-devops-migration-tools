@@ -22,11 +22,11 @@ namespace MigrationTools.Processors
     public class TfsWorkItemBulkEditProcessor : TfsProcessor
     {
 
-        public TfsWorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemBulkEditProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemBulkEditProcessor(IOptions<TfsWorkItemBulkEditProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemBulkEditProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
-        new WorkItemBulkEditProcessorOptions Options => (WorkItemBulkEditProcessorOptions)base.Options;
+        new TfsWorkItemBulkEditProcessorOptions Options => (TfsWorkItemBulkEditProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 

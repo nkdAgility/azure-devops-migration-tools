@@ -89,9 +89,10 @@ namespace MigrationTools.Host.Commands
             classNameChangeLog.Add("WorkItemDeleteProcessor", "TfsWorkItemDeleteProcessor");
             classNameChangeLog.Add("WorkItemPostProcessingContext", "TfsWorkItemOverwriteProcessor");
             classNameChangeLog.Add("WorkItemPostProcessingProcessor", "TfsWorkItemOverwriteProcessor");
-
             classNameChangeLog.Add("WorkItemUpdateAreasAsTagsContext", "TfsWorkItemOverwriteProcessor");
             classNameChangeLog.Add("WorkItemUpdateAreasAsTagsProcessor", "TfsWorkItemOverwriteProcessor");
+
+
 
             OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
 
