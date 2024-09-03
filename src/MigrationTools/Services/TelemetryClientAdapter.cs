@@ -17,7 +17,7 @@ namespace MigrationTools
 
         public TelemetryClientAdapter(IMigrationToolVersion migrationToolVersion)
         {
-
+            _MigrationToolVersion = migrationToolVersion;
             elmahIoClient = ElmahioAPI.Create("7589821e832a4ae1a1170f8201def634", new ElmahIoOptions
             {
                 Timeout = TimeSpan.FromSeconds(30),
@@ -68,6 +68,11 @@ namespace MigrationTools
 
         public void TrackException(Exception ex, IEnumerable<KeyValuePair<string, string>> properties = null)
         {
+            if (properties == null)
+            {
+                TrackException(ex, null);
+                return;
+            }
             TrackException(ex, properties.ToDictionary(k => k.Key, v => v.Value));
         }
 

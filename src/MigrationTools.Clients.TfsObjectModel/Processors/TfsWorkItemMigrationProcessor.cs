@@ -37,6 +37,7 @@ using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
+using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Processors
 {
@@ -60,12 +61,12 @@ namespace MigrationTools.Processors
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
-        public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemOverwriteProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
             contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
         }
 
-        new TfsWorkItemOverwriteProcessorOptions Options => (TfsWorkItemOverwriteProcessorOptions)base.Options;
+        new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 
@@ -277,8 +278,7 @@ namespace MigrationTools.Processors
         private void ValiddateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
-            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
-            // get list of all work item types
+                     // get list of all work item types
             List<String> sourceWorkItemTypes = sourceWorkItems.SelectMany(x => x.Revisions.Values)
             //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
             .Select(x => x.Type)
@@ -299,7 +299,7 @@ namespace MigrationTools.Processors
                 foreach (var missingWorkItemType in missingWorkItemTypes)
                 {
                     bool thisTypeMapped = true;
-                    if (!workItemTypeMappingTool.Mappings.ContainsKey(missingWorkItemType))
+                    if (!CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(missingWorkItemType))
                     {
                         thisTypeMapped = false;
                     }
@@ -664,7 +664,6 @@ namespace MigrationTools.Processors
 
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
-            var workItemTypeMappingTool = Services.GetRequiredService<WorkItemTypeMappingTool>();
             try
             {
                 //If work item hasn't been created yet, create a shell
@@ -678,9 +677,9 @@ namespace MigrationTools.Processors
                         TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
                     }
 
-                    if (workItemTypeMappingTool.Mappings.ContainsKey(targetType))
+                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(targetType))
                     {
-                        targetType = workItemTypeMappingTool.Mappings[targetType];
+                        targetType = CommonTools.WorkItemTypeMapping.Mappings[targetType];
                     }
                     targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, targetType);
                 }
@@ -701,9 +700,9 @@ namespace MigrationTools.Processors
 
                     // Decide on WIT
                     var destType = currentRevisionWorkItem.Type;
-                    if (workItemTypeMappingTool.Mappings.ContainsKey(destType))
+                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(destType))
                     {
-                        destType = workItemTypeMappingTool.Mappings[destType];
+                        destType = CommonTools.WorkItemTypeMapping.Mappings[destType];
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 

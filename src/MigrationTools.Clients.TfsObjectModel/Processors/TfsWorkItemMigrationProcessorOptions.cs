@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 namespace MigrationTools.Processors
 {
 
-    public class TfsWorkItemOverwriteProcessorOptions : ProcessorOptions,  IWorkItemProcessorConfig
+    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions,  IWorkItemProcessorConfig
     {
 
 
