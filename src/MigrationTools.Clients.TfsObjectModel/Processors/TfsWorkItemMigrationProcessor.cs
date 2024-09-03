@@ -60,12 +60,12 @@ namespace MigrationTools.Processors
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
-        public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemOverwriteProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
             contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
         }
 
-        new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
+        new TfsWorkItemOverwriteProcessorOptions Options => (TfsWorkItemOverwriteProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 

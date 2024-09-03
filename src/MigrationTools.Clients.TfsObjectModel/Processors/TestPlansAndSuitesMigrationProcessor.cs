@@ -36,7 +36,7 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestPlansAndSuitesMigrationProcessor : TfsProcessor
+    public class TfsTestPlansAndSuitesMigrationProcessor : TfsProcessor
     {
         private int __currentSuite = 0;
         private int __totalSuites = 0;
@@ -57,12 +57,12 @@ namespace MigrationTools.Processors
         private static readonly Counter<int> _testSuitesCounter = _meter.CreateCounter<int>("test_suites_count");
         private static readonly Counter<int> _testCasesCounter = _meter.CreateCounter<int>("test_cases_count");
 
-        public TestPlansAndSuitesMigrationProcessor(IOptions<TestPlansAndSuitesMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsTestPlansAndSuitesMigrationProcessor(IOptions<TfsTestPlansAndSuitesMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
        
         }
 
-        new TestPlansAndSuitesMigrationProcessorOptions Options => (TestPlansAndSuitesMigrationProcessorOptions)base.Options;
+        new TfsTestPlansAndSuitesMigrationProcessorOptions Options => (TfsTestPlansAndSuitesMigrationProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 

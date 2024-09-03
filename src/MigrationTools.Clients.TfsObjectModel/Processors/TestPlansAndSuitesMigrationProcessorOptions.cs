@@ -5,7 +5,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
-    public class TestPlansAndSuitesMigrationProcessorOptions : ProcessorOptions
+    public class TfsTestPlansAndSuitesMigrationProcessorOptions : ProcessorOptions
     {
         /// <summary>
         /// The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
@@ -49,7 +49,7 @@ namespace MigrationTools._EngineV1.Configuration.Processing
             return true;
         }
 
-        public TestPlansAndSuitesMigrationProcessorOptions()
+        public TfsTestPlansAndSuitesMigrationProcessorOptions()
         {
             MigrationDelay = 0;
             RemoveAllLinks = false;

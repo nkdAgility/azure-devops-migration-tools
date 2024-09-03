@@ -7,7 +7,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
-    public class EmptyProcessorOptions : ProcessorOptions
+    public class TfsEmptyProcessorOptions : ProcessorOptions
     {
 
         }

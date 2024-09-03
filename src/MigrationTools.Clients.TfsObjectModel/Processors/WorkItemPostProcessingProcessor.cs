@@ -24,9 +24,9 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class WorkItemPostProcessingProcessor : TfsProcessor
+    public class TfsWorkItemOverwriteProcessor : TfsProcessor
     {
-        public WorkItemPostProcessingProcessor(IOptions<WorkItemPostProcessingProcessorOptions> options, TfsCommonTools tfsStaticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemPostProcessingProcessor> logger) : base(options, tfsStaticTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemOverwriteProcessor(IOptions<WorkItemPostProcessingProcessorOptions> options, TfsCommonTools tfsStaticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemOverwriteProcessor> logger) : base(options, tfsStaticTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

@@ -19,10 +19,10 @@ namespace MigrationTools.Processors
     /// This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
     /// </summary>
     /// <processingtarget>WorkItem</processingtarget>
-    public class WorkItemBulkEditProcessor : TfsProcessor
+    public class TfsWorkItemBulkEditProcessor : TfsProcessor
     {
 
-        public WorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<WorkItemBulkEditProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemBulkEditProcessor(IOptions<WorkItemBulkEditProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemBulkEditProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

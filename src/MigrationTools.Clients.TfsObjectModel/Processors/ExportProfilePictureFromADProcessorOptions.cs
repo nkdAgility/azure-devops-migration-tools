@@ -5,7 +5,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
-    public class ExportProfilePictureFromADProcessorOptions : ProcessorOptions
+    public class TfsExportProfilePictureFromADProcessorOptions : ProcessorOptions
     {
 
 

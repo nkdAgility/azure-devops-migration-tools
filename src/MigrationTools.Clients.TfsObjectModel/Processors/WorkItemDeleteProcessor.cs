@@ -23,14 +23,14 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>WorkItem</processingtarget>
-    public class WorkItemDeleteProcessor : TfsProcessor
+    public class TfsWorkItemDeleteProcessor : TfsProcessor
     {
 
-        public WorkItemDeleteProcessor(IOptions<WorkItemDeleteProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemDeleteProcessor(IOptions<TfsWorkItemDeleteProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
-        new WorkItemDeleteProcessorOptions Options => (WorkItemDeleteProcessorOptions)base.Options;
+        new TfsWorkItemDeleteProcessorOptions Options => (TfsWorkItemDeleteProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 

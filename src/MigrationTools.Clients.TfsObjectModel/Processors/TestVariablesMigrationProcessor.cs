@@ -20,13 +20,13 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestVariablesMigrationProcessor : Processor
+    public class TfsTestVariablesMigrationProcessor : Processor
     {
-        public TestVariablesMigrationProcessor(IOptions<TestVariablesMigrationProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
+        public TfsTestVariablesMigrationProcessor(IOptions<TfsTestVariablesMigrationProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
-        new TestVariablesMigrationProcessorOptions Options => (TestVariablesMigrationProcessorOptions)base.Options;
+        new TfsTestVariablesMigrationProcessorOptions Options => (TfsTestVariablesMigrationProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 

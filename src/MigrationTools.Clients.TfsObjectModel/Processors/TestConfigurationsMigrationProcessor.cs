@@ -17,16 +17,16 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>
-    public class TestConfigurationsMigrationProcessor : TfsProcessor
+    public class TfsTestConfigurationsMigrationProcessor : TfsProcessor
     {
-        public TestConfigurationsMigrationProcessor(IOptions<TestConfigurationsMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsTestConfigurationsMigrationProcessor(IOptions<TfsTestConfigurationsMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
 
         // http://blogs.microsoft.co.il/shair/2015/02/02/tfs-api-part-56-test-configurations/
 
-        new TestConfigurationsMigrationProcessorOptions Options => (TestConfigurationsMigrationProcessorOptions)base.Options;
+        new TfsTestConfigurationsMigrationProcessorOptions Options => (TfsTestConfigurationsMigrationProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 

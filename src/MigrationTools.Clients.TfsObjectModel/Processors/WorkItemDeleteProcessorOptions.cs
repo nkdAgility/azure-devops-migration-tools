@@ -6,11 +6,11 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
-    public class WorkItemDeleteProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
+    public class TfsWorkItemDeleteProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
 
 
-        public WorkItemDeleteProcessorOptions()
+        public TfsWorkItemDeleteProcessorOptions()
         {
             Enabled = false;
             WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";

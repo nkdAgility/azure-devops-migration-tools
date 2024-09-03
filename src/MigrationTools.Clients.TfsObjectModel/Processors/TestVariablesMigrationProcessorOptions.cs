@@ -5,7 +5,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
-    public class TestVariablesMigrationProcessorOptions : ProcessorOptions
+    public class TfsTestVariablesMigrationProcessorOptions : ProcessorOptions
     {
         /// <inheritdoc />
         public bool Enabled { get; set; }

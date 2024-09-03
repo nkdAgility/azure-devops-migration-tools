@@ -7,7 +7,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
-    public class WorkItemUpdateAreasAsTagsProcessorOptions : ProcessorOptions
+    public class TfsWorkItemOverwriteAreasAsTagsProcessorOptions : ProcessorOptions
     {
 
         /// <summary>

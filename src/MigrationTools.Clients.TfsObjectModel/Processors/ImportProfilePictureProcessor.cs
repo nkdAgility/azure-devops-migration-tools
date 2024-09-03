@@ -25,17 +25,17 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Profiles</processingtarget>
-    public class ImportProfilePictureProcessor : TfsProcessor
+    public class TfsImportProfilePictureProcessor : TfsProcessor
     {
         private readonly IIdentityManagementService2 ims2;
 
-        public ImportProfilePictureProcessor(IOptions<ImportProfilePictureProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsImportProfilePictureProcessor(IOptions<TfsImportProfilePictureProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
             //http://www.codeproject.com/Articles/18102/Howto-Almost-Everything-In-Active-Directory-via-C
             ims2 = (IIdentityManagementService2)Target.GetService<IIdentityManagementService2>();
         }
 
-        new ImportProfilePictureProcessorOptions Options => (ImportProfilePictureProcessorOptions)base.Options;
+        new TfsImportProfilePictureProcessorOptions Options => (TfsImportProfilePictureProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 

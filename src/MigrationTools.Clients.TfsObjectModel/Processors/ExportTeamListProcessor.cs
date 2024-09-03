@@ -17,9 +17,9 @@ using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
-    public class ExportTeamListProcessor : TfsProcessor
+    public class TfsExportTeamListProcessor : TfsProcessor
     {
-        public ExportTeamListProcessor(IOptions<EmptyProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsExportTeamListProcessor(IOptions<TfsEmptyProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

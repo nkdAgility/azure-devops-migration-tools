@@ -16,9 +16,9 @@ namespace MigrationTools.Processors
     /// <summary>
     /// Note: this is only for internal usage. Don't use this in your configurations.
     /// </summary>
-    public class FakeProcessor : TfsProcessor
+    public class TfsFakeProcessor : TfsProcessor
     {
-        public FakeProcessor(IOptions<EmptyProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsFakeProcessor(IOptions<TfsEmptyProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 

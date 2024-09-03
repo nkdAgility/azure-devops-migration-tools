@@ -66,6 +66,32 @@ namespace MigrationTools.Host.Commands
             classNameChangeLog.Add("TfsTeamProjectConfig", "TfsTeamProjectEndpoint");
             classNameChangeLog.Add("WorkItemGitRepoMappingTool", "TfsGitRepositoryTool");
             classNameChangeLog.Add("WorkItemFieldMappingTool", "FieldMappingTool");
+            classNameChangeLog.Add("CreateTeamFolders", "TfsCreateTeamFoldersProcessor");
+            classNameChangeLog.Add("ExportProfilePicture", "TfsExportProfilePictureFromADProcessor");
+            classNameChangeLog.Add("ExportProfilePictureFromAD", "TfsExportProfilePictureFromADProcessor");
+            classNameChangeLog.Add("ImportProfilePicture", "TfsImportProfilePictureProcessor");
+            classNameChangeLog.Add("ImportProfilePictureFromAD", "TfsImportProfilePictureProcessor");
+            classNameChangeLog.Add("ExportUsersForMapping", "TfsExportUsersForMappingProcessor");
+            classNameChangeLog.Add("ExportUsersForMappingContext", "TfsExportUsersForMappingProcessor");
+            classNameChangeLog.Add("ExportTeamListProcessor", "TfsExportTeamListProcessor");
+            classNameChangeLog.Add("ExportTeamList", "TfsExportTeamListProcessor");
+            classNameChangeLog.Add("ExportUsersForMappingProcessor", "TfsExportUsersForMappingProcessor");
+            classNameChangeLog.Add("ExportUsersForMapping", "TfsExportUsersForMappingProcessor");
+            classNameChangeLog.Add("TestConfigurationsMigrationProcessor", "TfsTestConfigurationsMigrationProcessor");
+            classNameChangeLog.Add("TestConfigurationsMigrationContext", "TfsTestConfigurationsMigrationProcessor");
+            classNameChangeLog.Add("TestPlansAndSuitesMigrationProcessor", "TfsTestPlansAndSuitesMigrationProcessor");
+            classNameChangeLog.Add("TestPlansAndSuitesMigrationContext", "TfsTestPlansAndSuitesMigrationProcessor");
+            classNameChangeLog.Add("TestVariablesMigrationProcessor", "TfsTestVariablesMigrationProcessor");
+            classNameChangeLog.Add("TestVariablesMigrationContext", "TfsTestVariablesMigrationProcessor");
+            classNameChangeLog.Add("WorkItemBulkEditProcessor", "TfsWorkItemBulkEditProcessor");
+            classNameChangeLog.Add("WorkItemUpdate", "TfsWorkItemBulkEditProcessor");
+            classNameChangeLog.Add("WorkItemDelete", "TfsWorkItemDeleteProcessor");
+            classNameChangeLog.Add("WorkItemDeleteProcessor", "TfsWorkItemDeleteProcessor");
+            classNameChangeLog.Add("WorkItemPostProcessingContext", "TfsWorkItemOverwriteProcessor");
+            classNameChangeLog.Add("WorkItemPostProcessingProcessor", "TfsWorkItemOverwriteProcessor");
+
+            classNameChangeLog.Add("WorkItemUpdateAreasAsTagsContext", "TfsWorkItemOverwriteProcessor");
+            classNameChangeLog.Add("WorkItemUpdateAreasAsTagsProcessor", "TfsWorkItemOverwriteProcessor");
 
             OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
 

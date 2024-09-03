@@ -36,18 +36,18 @@ namespace MigrationTools
         public static void AddMigrationToolServicesForClientLegacyCore(this IServiceCollection context)
         {
             context.AddSingleton<TfsWorkItemMigrationProcessor>();
-            context.AddSingleton<TestConfigurationsMigrationProcessor>();
-            context.AddSingleton<TestPlansAndSuitesMigrationProcessor>();
-            context.AddSingleton<TestVariablesMigrationProcessor>();
-            context.AddSingleton<WorkItemPostProcessingProcessor>();
-            context.AddSingleton<ExportUsersForMappingProcessor>();
-            context.AddSingleton<CreateTeamFolders>();
-            context.AddSingleton<ExportProfilePictureFromADProcessor>();
-            context.AddSingleton<ExportTeamListProcessor>();
-            context.AddSingleton<ImportProfilePictureProcessor>();
-            context.AddSingleton<WorkItemDeleteProcessor>();
-            context.AddSingleton<WorkItemBulkEditProcessor>();
-            context.AddSingleton<WorkItemUpdateAreasAsTagsProcessor>();
+            context.AddSingleton<TfsTestConfigurationsMigrationProcessor>();
+            context.AddSingleton<TfsTestPlansAndSuitesMigrationProcessor>();
+            context.AddSingleton<TfsTestVariablesMigrationProcessor>();
+            context.AddSingleton<TfsWorkItemOverwriteProcessor>();
+            context.AddSingleton<TfsExportUsersForMappingProcessor>();
+            context.AddSingleton<TfsCreateTeamFoldersProcessor>();
+            context.AddSingleton<TfsExportProfilePictureFromADProcessor>();
+            context.AddSingleton<TfsExportTeamListProcessor>();
+            context.AddSingleton<TfsImportProfilePictureProcessor>();
+            context.AddSingleton<TfsWorkItemDeleteProcessor>();
+            context.AddSingleton<TfsWorkItemBulkEditProcessor>();
+            context.AddSingleton<TfsWorkItemOverwriteAreasAsTagsProcessor>();
 
         }
 

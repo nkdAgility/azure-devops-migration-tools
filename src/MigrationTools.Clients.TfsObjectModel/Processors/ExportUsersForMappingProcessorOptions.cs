@@ -5,7 +5,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
-    public class ExportUsersForMappingProcessorOptions : ProcessorOptions
+    public class TfsExportUsersForMappingProcessorOptions : ProcessorOptions
     {
 
         public string WIQLQuery { get; set; }

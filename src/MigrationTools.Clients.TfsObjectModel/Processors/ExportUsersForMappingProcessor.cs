@@ -27,14 +27,14 @@ namespace MigrationTools.Processors
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>
-    public class ExportUsersForMappingProcessor : TfsProcessor
+    public class TfsExportUsersForMappingProcessor : TfsProcessor
     {
-        public ExportUsersForMappingProcessor(IOptions<ExportUsersForMappingProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<ExportUsersForMappingProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsExportUsersForMappingProcessor(IOptions<TfsExportUsersForMappingProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsExportUsersForMappingProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
 
-        new ExportUsersForMappingProcessorOptions Options => (ExportUsersForMappingProcessorOptions)base.Options;
+        new TfsExportUsersForMappingProcessorOptions Options => (TfsExportUsersForMappingProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 
