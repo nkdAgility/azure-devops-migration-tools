@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Services.Common;
+using MigrationTools.Options;
 using Newtonsoft.Json.Linq;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -46,14 +48,12 @@ namespace MigrationTools.Host.Commands
                 _logger.LogInformation("ConfigFile: {configFile}", configFile);
 
                 // Load configuration
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(AppContext.BaseDirectory)
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile(configFile, optional: true, reloadOnChange: true)
-                    .Build();
+                OptionsConfigurationBuilder optionsBuilder = _services.GetRequiredService<OptionsConfigurationBuilder>();
+                OptionsConfigurationUpgrader optionsUpgrader = _services.GetRequiredService<OptionsConfigurationUpgrader>();
+                optionsUpgrader.UpgradeConfiguration(optionsBuilder);
 
-                var json = File.ReadAllText(configFile);
-                var jsonObj = JObject.Parse(json);
+                // Dispay Current Options
+                DisplayCurrentOptions();
 
 
                 var configurationEditorOptions = new[]
@@ -107,6 +107,28 @@ namespace MigrationTools.Host.Commands
                 _appLifetime.StopApplication();
             }
             return _exitCode;
+        }
+
+        private void DisplayCurrentOptions()
+        {
+            var layout = new Layout("Root")
+             .SplitColumns(
+                 new Layout("Left"),
+                 new Layout("Right")
+                     .SplitRows(
+                         new Layout("Top"),
+                         new Layout("Bottom")));
+
+                    // Update the left column
+                    layout["Left"].Update(
+                        new Panel(
+                            Align.Center(
+                                new Markup("Hello [blue]World![/]"),
+                                VerticalAlignment.Middle))
+                            .Expand());
+
+            // Render the layout
+            AnsiConsole.Write(layout);
         }
 
         private void SelectTemplateToApply()

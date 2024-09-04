@@ -17,6 +17,14 @@ using Serilog.Core;
 
 namespace MigrationTools.Options
 {
+
+    public class OptionItem
+    {
+        string typeName { get; set; }
+        string key { get; set; }
+        IOptions Option { get; set; }
+    }
+
     public  class OptionsConfigurationBuilder
     {
         readonly ILogger logger;
