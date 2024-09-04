@@ -57,11 +57,6 @@ namespace MigrationTools.Host.Commands
                 }
                 if (!File.Exists(configFile))
                 {
-                    var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .Build();
-
                     _logger.LogInformation("Populating config with {Options}", settings.Options.ToString());
 
                     OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();

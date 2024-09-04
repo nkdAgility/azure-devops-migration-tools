@@ -120,14 +120,12 @@ namespace MigrationTools.Host
                             .WithExample("execute -config \"configuration.json\" --skipVersionCheck ");
                 config.AddCommand<Commands.InitMigrationCommand>("init")
                             .WithDescription("Creates an default configuration file")
-                            .WithExample("init -options Basic")
-                            .WithExample("init -options WorkItemTracking ")
-                            .WithExample("init -options Reference ");
+                            .WithExample("init -options Basic");
                 config.AddCommand<Commands.UpgradeConfigCommand>("upgrade")
                            .WithDescription("Atempts to upgrade your config from the old version to the new one. For each object we will load the defaults, then apply your config. This will only bring accross valid settings. This is 'best effort' and you will need to check all the values as we have changed a lot!")
                            .WithExample("upgrade -config \"configuration.json\"");
 
-                //config.AddCommand<Commands.MigrationConfigCommand>("config")
+                //config.AddCommand<Commands.ConfigurationBuilderCommand>("builder")
                 //            .WithDescription("Creates or edits a configuration file")
                 //           .WithExample("config -config \"configuration.json\"");
 

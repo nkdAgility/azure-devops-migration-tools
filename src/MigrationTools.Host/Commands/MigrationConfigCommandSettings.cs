@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class MigrationConfigCommandSettings : CommandSettingsBase
+    internal class ConfigurationBuilderCommandSettings : CommandSettingsBase
     {
   
     }

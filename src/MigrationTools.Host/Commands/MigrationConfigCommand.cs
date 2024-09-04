@@ -12,14 +12,14 @@ using Spectre.Console.Cli;
 
 namespace MigrationTools.Host.Commands
 {
-    internal class MigrationConfigCommand : AsyncCommand<MigrationConfigCommandSettings>
+    internal class ConfigurationBuilderCommand : AsyncCommand<ConfigurationBuilderCommandSettings>
     {
         private IServiceProvider _services;
         private readonly ILogger _logger;
         private readonly ITelemetryLogger Telemetery;
         private readonly IHostApplicationLifetime _appLifetime;
 
-        public MigrationConfigCommand(
+        public ConfigurationBuilderCommand(
             IServiceProvider services,
             ILogger<InitMigrationCommand> logger,
             ITelemetryLogger telemetryLogger,
@@ -32,7 +32,7 @@ namespace MigrationTools.Host.Commands
         }
 
 
-        public override async Task<int> ExecuteAsync(CommandContext context, MigrationConfigCommandSettings settings)
+        public override async Task<int> ExecuteAsync(CommandContext context, ConfigurationBuilderCommandSettings settings)
         {
             int _exitCode;
 
@@ -47,7 +47,7 @@ namespace MigrationTools.Host.Commands
 
                 // Load configuration
                 var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .AddJsonFile(configFile, optional: true, reloadOnChange: true)
                     .Build();

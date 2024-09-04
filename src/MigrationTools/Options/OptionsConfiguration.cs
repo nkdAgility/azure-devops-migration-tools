@@ -168,7 +168,7 @@ namespace MigrationTools.Options
             {
                 var hardPath = $"MigrationTools:Endpoints:{key}";
                 logger.LogDebug("Building Option: {item} to {hardPath}", option.GetType().Name, hardPath);
-                configJson = OptionsConfigurationBuilder.AddOptionsToConfiguration(configJson, option, hardPath, true);
+                configJson = OptionsConfigurationCompiler.AddOptionsToConfiguration(configJson, option, hardPath, true);
                 
             }
             catch (Exception)
@@ -195,7 +195,7 @@ namespace MigrationTools.Options
             try
             {
                 logger.LogDebug("Building Option: {item} to {path}", option.GetType().Name, option.ConfigurationMetadata.PathToInstance);
-                configJson = OptionsConfigurationBuilder.AddOptionsToConfiguration(configJson, option, false);
+                configJson = OptionsConfigurationCompiler.AddOptionsToConfiguration(configJson, option, false);
                 
             }
             catch (Exception)

@@ -258,37 +258,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"fix/WITDataStore64-missing"
+            => @"main"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"bafb2485"
+            => @"b8619076"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"bafb2485ee0926f0443ede89e1e0204fc50f8aae"
+            => @"b86190765c571122bf2123e6c77ccab307b81025"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-04T08:45:13+01:00"
+            => @"2024-09-04T09:21:49+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"2"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.0-Preview.7-2-gbafb2485"
+            => @"v16.0.0-Preview.9"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v16.0.0-Preview.7"
+            => @"v16.0.0-Preview.9"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -318,17 +318,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"2"
+            => @"0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.7"
+            => @"Preview.9"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.7"
+            => @"-Preview.9"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">
