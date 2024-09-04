@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MigrationTools.Processors
 {
-    public class TfsWorkItemPostProcessingProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
+    public class TfsWorkItemOverwriteProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace MigrationTools.Processors
         public int WorkItemCreateRetryLimit { get; set; }
 
 
-        public TfsWorkItemPostProcessingProcessorOptions()
+        public TfsWorkItemOverwriteProcessorOptions()
         {
             WIQLQuery = @"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdField] = ''  AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc";
         }

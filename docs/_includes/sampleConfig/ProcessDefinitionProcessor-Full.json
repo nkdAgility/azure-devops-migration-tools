@@ -1,51 +1,62 @@
 {
-  "Version": "12.8",
-  "ChangeSetMappingFile": null,
-  "Source": null,
-  "Target": null,
-  "FieldMaps": [],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": null,
-  "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": null,
-  "Endpoints": {
-    "AzureDevOpsEndpoints": [
-      {
-        "name": "Source",
-        "$type": "AzureDevOpsEndpointOptions",
-        "Organisation": "https://dev.azure.com/xxxx",
-        "Project": "SAM",
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "0.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "AzureDevOpsEndpoint",
         "AuthenticationMode": "AccessToken",
         "AccessToken": "xxxxx",
-        "EndpointEnrichers": null
-      },
-      {
-        "Name": "Target",
-        "$type": "AzureDevOpsEndpointOptions",
         "Organisation": "https://dev.azure.com/xxxx",
         "Project": "SAM",
+        "ReflectedWorkItemIdField": null,
+        "EndpointEnrichers": null
+      },
+      "Target": {
+        "EndpointType": "AzureDevOpsEndpoint",
         "AuthenticationMode": "AccessToken",
         "AccessToken": "xxxx",
+        "Organisation": "https://dev.azure.com/xxxx",
+        "Project": "SAM",
+        "ReflectedWorkItemIdField": null,
         "EndpointEnrichers": null
       }
-    ]
-  },
-  "Processors": [
-    {
-      "$type": "ProcessDefinitionProcessorOptions",
-      "Enabled": true,
-      "Processes": {
-        "Agile SAM - Migration Template": [
-          "User Story"
-        ]
+    },
+    "Processors": [
+      {
+        "ProcessorType": "ProcessDefinitionProcessor",
+        "Enabled": true,
+        "Processes": {
+          "Agile SAM - Migration Template": [
+            "User Story"
+          ]
+        },
+        "ProcessMaps": {
+          "Agile SAM - Migration Template": "SAM Agile Migrator"
+        },
+        "UpdateProcessDetails": true,
+        "MaxDegreeOfParallelism": 0,
+        "Enrichers": null,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "RefName": null
+      }
+    ],
+    "CommonTools": {
+      "TfsChangeSetMappingTool": {
+        "Enabled": true,
+        "ChangeSetMappingFile": ""
       },
-      "ProcessMaps": {
-        "Agile SAM - Migration Template": "SAM Agile Migrator"
+      "TfsGitRepositoryTool": {
+        "Enabled": true,
+        "Mappings": null
       },
-      "SourceName": "Source",
-      "TargetName": "Target",
-      "UpdateProcessDetails": true
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": []
+      }
     }
-  ]
+  }
 }

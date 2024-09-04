@@ -12,7 +12,7 @@ configurationSamples:
             "TfsEndpoint": {
               "AllowCrossProjectLinking": "False",
               "Authentication": {
-                "AccessToken": "12345",
+                "AccessToken": "",
                 "AuthenticationMode": "AccessToken",
                 "NetworkCredentials": {
                   "Domain": "",
@@ -77,9 +77,9 @@ configurationSamples:
         "NetworkCredentials": {
           "Domain": "",
           "UserName": "",
-          "Password": ""
+          "Password": "** removed as a secret ***"
         },
-        "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad"
+        "AccessToken": "** removed as a secret ***"
       },
       "ReflectedWorkItemIdField": null,
       "AllowCrossProjectLinking": false,

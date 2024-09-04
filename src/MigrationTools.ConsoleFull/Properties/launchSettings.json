@@ -17,7 +17,7 @@
     },
     "init Options-Basic": {
       "commandName": "Project",
-      "commandLineArgs": "init --options Basic --overwrite"
+      "commandLineArgs": "init --options Basic --overwrite -c configuration-basic.json "
     },
     "init Options-Reference": {
       "commandName": "Project",
@@ -25,7 +25,7 @@
     },
     "Upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade -c \"configuration.json\" --debugTrace"
+      "commandLineArgs": "upgrade -c \"C:\\Users\\MartinHinshelwoodNKD\\source\\repos\\azure-devops-migration-tools\\docs\\_includes\\sampleConfig\\configuration-full.json\" --debugTrace"
     },
     "Execute Classic": {
       "commandName": "Project",

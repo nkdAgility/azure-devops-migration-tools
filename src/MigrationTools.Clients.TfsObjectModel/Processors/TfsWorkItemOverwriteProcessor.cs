@@ -26,11 +26,11 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Items</processingtarget>
     public class TfsWorkItemOverwriteProcessor : TfsProcessor
     {
-        public TfsWorkItemOverwriteProcessor(IOptions<TfsWorkItemPostProcessingProcessorOptions> options, TfsCommonTools tfsStaticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemOverwriteProcessor> logger) : base(options, tfsStaticTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemOverwriteProcessor(IOptions<TfsWorkItemOverwriteProcessorOptions> options, TfsCommonTools tfsStaticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemOverwriteProcessor> logger) : base(options, tfsStaticTools, processorEnrichers, services, telemetry, logger)
         {
         }
 
-        new TfsWorkItemPostProcessingProcessorOptions Options => (TfsWorkItemPostProcessingProcessorOptions)base.Options;
+        new TfsWorkItemOverwriteProcessorOptions Options => (TfsWorkItemOverwriteProcessorOptions)base.Options;
 
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 
