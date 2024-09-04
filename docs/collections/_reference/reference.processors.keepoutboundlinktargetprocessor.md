@@ -18,7 +18,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "9fe99d20-153f-4861-9eee-c0cc7ab8de4d",
+      "TargetLinksToKeepProject": "5f1e7946-3c7a-4168-866b-8d1451f41fe3",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,

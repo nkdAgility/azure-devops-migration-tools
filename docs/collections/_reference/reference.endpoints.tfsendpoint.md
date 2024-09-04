@@ -4,23 +4,89 @@ optionsClassFullName: MigrationTools.Endpoints.TfsEndpointOptions
 configurationSamples:
 - name: defaults
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Endpoints": {
+          "#KEY#": {
+            "TfsEndpoint": {
+              "AllowCrossProjectLinking": "False",
+              "Authentication": {
+                "AccessToken": "12345",
+                "AuthenticationMode": "AccessToken",
+                "NetworkCredentials": {
+                  "Domain": "",
+                  "Password": "",
+                  "UserName": ""
+                }
+              },
+              "AuthenticationMode": "AccessToken",
+              "Collection": "",
+              "EndpointType": "TfsTeamProjectEndpoint",
+              "LanguageMaps": {
+                "AreaPath": "Area",
+                "IterationPath": "Iteration"
+              },
+              "Project": ""
+            }
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Endpoints.TfsEndpointOptions
 - name: sample
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Endpoints": {
+          "#KEY#": {
+            "TfsEndpoint": {
+              "AllowCrossProjectLinking": "False",
+              "Authentication": {
+                "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+                "AuthenticationMode": "AccessToken",
+                "NetworkCredentials": {
+                  "Domain": "",
+                  "Password": "",
+                  "UserName": ""
+                }
+              },
+              "Collection": "https://dev.azure.com/nkdagility-preview/",
+              "EndpointType": "TfsTeamProjectEndpoint",
+              "LanguageMaps": {
+                "AreaPath": "Area",
+                "IterationPath": "Iteration"
+              },
+              "Project": "migrationSource1"
+            }
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Endpoints.TfsEndpointOptions
 - name: classic
   description: 
   code: >-
     {
       "$type": "TfsEndpointOptions",
-      "Organisation": null,
-      "Project": null,
-      "AuthenticationMode": "AccessToken",
-      "AccessToken": null,
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationSource1",
+      "Authentication": {
+        "AuthenticationMode": "AccessToken",
+        "NetworkCredentials": {
+          "Domain": "",
+          "UserName": "",
+          "Password": ""
+        },
+        "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad"
+      },
       "ReflectedWorkItemIdField": null,
-      "LanguageMaps": null,
+      "AllowCrossProjectLinking": false,
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      },
       "EndpointEnrichers": null
     }
   sampleFor: MigrationTools.Endpoints.TfsEndpointOptions
@@ -29,12 +95,16 @@ className: TfsEndpoint
 typeName: Endpoints
 architecture: 
 options:
-- parameterName: AccessToken
-  type: String
+- parameterName: AllowCrossProjectLinking
+  type: Boolean
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: AuthenticationMode
-  type: AuthenticationMode
+- parameterName: Authentication
+  type: TfsAuthenticationOptions
+  description: missng XML code comments
+  defaultValue: missng XML code comments
+- parameterName: Collection
+  type: Uri
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: EndpointEnrichers
@@ -43,10 +113,6 @@ options:
   defaultValue: missng XML code comments
 - parameterName: LanguageMaps
   type: TfsLanguageMapOptions
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-- parameterName: Organisation
-  type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
 - parameterName: Project
