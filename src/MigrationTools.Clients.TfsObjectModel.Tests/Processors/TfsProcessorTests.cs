@@ -51,10 +51,13 @@ namespace MigrationTools.Processors.Tests
             {
                 IOptions<TfsTeamSettingsEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamSettingsEndpointOptions()
                 {
-                    Organisation = "https://dev.azure.com/nkdagility-preview/",
+                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
                     Project = "migrationSource1",
-                    AccessToken = TestingConstants.AccessToken,
-                    AuthenticationMode = AuthenticationMode.AccessToken,
+                    Authentication = new TfsAuthenticationOptions()
+                    {
+                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AccessToken = TestingConstants.AccessToken
+                    },
                     ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId",
                 });
                return ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), options);
@@ -63,10 +66,13 @@ namespace MigrationTools.Processors.Tests
             {
                 IOptions<TfsTeamSettingsEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamSettingsEndpointOptions()
                 {
-                    Organisation = "https://dev.azure.com/nkdagility-preview/",
+                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
                     Project = "migrationTarget1",
-                    AccessToken = TestingConstants.AccessToken,
-                    AuthenticationMode = AuthenticationMode.AccessToken,
+                    Authentication = new TfsAuthenticationOptions()
+                    {
+                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AccessToken = TestingConstants.AccessToken
+                    },
                     ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId",
                 });
                 return ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), options);

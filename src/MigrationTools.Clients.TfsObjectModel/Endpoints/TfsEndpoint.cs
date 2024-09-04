@@ -66,8 +66,8 @@ namespace MigrationTools.Endpoints
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("GetTfsCollection", ActivityKind.Client))
             {
                 activity?.SetTagsFromOptions(Options);
-                activity?.SetTag("url.full", Options.Organisation);
-                activity?.SetTag("server.address", Options.Organisation);
+                activity?.SetTag("url.full", Options.Collection);
+                activity?.SetTag("server.address", Options.Collection);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
                 activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
@@ -77,30 +77,30 @@ namespace MigrationTools.Endpoints
                     VssCredentials vssCredentials;
                     try
                     {
-                        Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection:AuthenticationMode({0})", Options.AuthenticationMode.ToString());
-                        switch (Options.AuthenticationMode)
+                        Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection:AuthenticationMode({0})", Options?.Authentication?.AuthenticationMode.ToString());
+                        switch (Options?.Authentication?.AuthenticationMode)
                         {
                             case AuthenticationMode.AccessToken:
-                                Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting Using PAT Authentication ", Options.Organisation);
-                                vssCredentials = new VssBasicCredential(string.Empty, Options.AccessToken);
-                                _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation), vssCredentials);
+                                Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting Using PAT Authentication ", Options.Collection);
+                                vssCredentials = new VssBasicCredential(string.Empty, Options?.Authentication?.AccessToken);
+                                _Collection = new TfsTeamProjectCollection(Options.Collection, vssCredentials);
                                 break;
 
                             case AuthenticationMode.Prompt:
-                                Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Organisation);
-                                _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation));
+                                Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Collection);
+                                _Collection = new TfsTeamProjectCollection(Options.Collection);
                                 break;
 
                             default:
-                                Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Organisation);
-                                _Collection = new TfsTeamProjectCollection(new Uri(Options.Organisation));
+                                Log.LogDebug("TfsWorkItemEndPoint::EnsureDataSource: Connecting Using Interactive Authentication ", Options.Collection);
+                                _Collection = new TfsTeamProjectCollection(Options.Collection);
                                 break;
                         }
                         Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connected ");
                         Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: validating security for {@AuthorizedIdentity} ", _Collection.AuthorizedIdentity);
                         _Collection.EnsureAuthenticated();
 
-                        Log.LogInformation("TfsWorkItemEndPoint::GetTfsCollection: Access granted to {CollectionUrl} for {Name} ({Account})", Options.Organisation, _Collection.AuthorizedIdentity.DisplayName, _Collection.AuthorizedIdentity.UniqueName);
+                        Log.LogInformation("TfsWorkItemEndPoint::GetTfsCollection: Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, _Collection.AuthorizedIdentity.DisplayName, _Collection.AuthorizedIdentity.UniqueName);
                         activity?.Stop();
                         activity?.SetStatus(ActivityStatusCode.Ok);
                         activity?.SetTag("http.response.status_code", "200");
@@ -112,7 +112,7 @@ namespace MigrationTools.Endpoints
                         activity?.SetStatus(ActivityStatusCode.Error);
                         activity?.SetTag("http.response.status_code", "500");
                         Telemetry.TrackException(ex, null);
-                        Log.LogError(ex, "Unable to connect to {Organisation}", Options.Organisation);
+                        Log.LogError(ex, "Unable to connect to {Organisation}", Options?.Collection);
                         throw;
                     }
                 }
@@ -127,8 +127,8 @@ namespace MigrationTools.Endpoints
                 using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("GetWorkItemStore", ActivityKind.Client))
                 {
                     activity?.SetTagsFromOptions(Options);
-                    activity?.SetTag("url.full", Options.Organisation);
-                    activity?.SetTag("server.address", Options.Organisation);
+                    activity?.SetTag("url.full", Options?.Collection);
+                    activity?.SetTag("server.address", Options?.Collection);
                     activity?.SetTag("http.request.method", "GET");
                     activity?.SetTag("migrationtools.client", "TfsObjectModel");
                     activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
@@ -142,7 +142,7 @@ namespace MigrationTools.Endpoints
                     catch (Exception ex)
                     {
                         Telemetry.TrackException(ex, null);
-                        Log.LogError(ex, "Unable to connect to {Organisation} Store", Options.Organisation);
+                        Log.LogError(ex, "Unable to connect to {Organisation} Store", Options.Collection);
                         throw;
                     }
                     finally
@@ -166,8 +166,8 @@ namespace MigrationTools.Endpoints
                 using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("GetTfsProject", ActivityKind.Client))
                 {
                     activity?.SetTagsFromOptions(Options);
-                    activity?.SetTag("url.full", Options.Organisation);
-                    activity?.SetTag("server.address", Options.Organisation);
+                    activity?.SetTag("url.full", Options.Collection);
+                    activity?.SetTag("server.address", Options.Collection);
                     activity?.SetTag("http.request.method", "GET");
                     activity?.SetTag("migrationtools.client", "TfsObjectModel");
                     activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));

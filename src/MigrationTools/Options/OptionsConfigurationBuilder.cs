@@ -7,31 +7,31 @@ using System.Text;
 using Elmah.Io.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.VisualStudio.Services.Audit;
 using Microsoft.VisualStudio.Services.Common.CommandLine;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json.Linq;
 using Serilog.Core;
 
 namespace MigrationTools.Options
 {
 
-    public class OptionItem
-    {
-        string typeName { get; set; }
-        string key { get; set; }
-        IOptions Option { get; set; }
-    }
+  
 
     public  class OptionsConfigurationBuilder
     {
+        
+
         readonly ILogger logger;
         readonly IConfiguration configuration;
+        
 
-        private List<IOptions> OptionsToInclude { get; }
-        private Dictionary<string, IOptions> NamedOptionsToInclude { get; }
+        OptionsContainer optionsContainer;
 
         private List<Type> catalogue;
 
@@ -42,32 +42,25 @@ namespace MigrationTools.Options
         {
             this.configuration = configuration;
             this.logger = logger;
-            OptionsToInclude = new List<IOptions>();
-            NamedOptionsToInclude = new Dictionary<string, IOptions>();
+            optionsContainer = new OptionsContainer();
             catalogue = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().ToList();
+        }
+
+        public IReadOnlyList<OptionItem> GetOptions()
+        {
+            return optionsContainer.GetOptions();
+        }
+
+        public IReadOnlyList<OptionItem> GetOptions(OptionItemType optionType)
+        {
+            return optionsContainer.GetOptions(optionType);
         }
 
         public void AddAllOptions()
         {
-            var keyGen = new KeyGenerator();
-
             foreach (var optionType in catalogue)
             {
-                switch (optionType)
-                {
-                    case Type t when typeof(IEndpointOptions).IsAssignableFrom(t):
-                        AddOption(optionType.Name, keyGen.GetNextKey());
-                        break;
-                    case Type t when typeof(IProcessorEnricherOptions).IsAssignableFrom(t):
-                        logger.LogWarning("Skipping ProcessorEnricherOptions: {optionType}", optionType.Name);
-                        break;
-                    case Type t when typeof(IEndpointEnricherOptions).IsAssignableFrom(t):
-                        logger.LogWarning("Skipping ProcessorEnricherOptions: {optionType}", optionType.Name);
-                        break;
-                    default:
-                        AddOption(optionType.Name);
-                        break;
-                }
+                optionsContainer.AddOption(new OptionItem(CreateOptionFromType(optionType)));
             }
         }
 
@@ -75,10 +68,23 @@ namespace MigrationTools.Options
         {
             if (option != null)
             {
-                OptionsToInclude.Add(option);
+                optionsContainer.AddOption(new OptionItem(option));
+            }
+            else
+            {
+                logger.LogWarning("Could not add Option as it was null!");
+            }
+        }
+
+
+        public void AddOption(OptionItem option)
+        {
+            if (option != null && option.Option !=null )
+            {
+                optionsContainer.AddOption(option);
             } else
             {
-                logger.LogWarning("Could not add option as it was null");
+                logger.LogWarning("Could not add OptionItem as it was null or its IOption was!");
             }
         }
 
@@ -86,7 +92,10 @@ namespace MigrationTools.Options
         {
             if (options != null)
             {
-                OptionsToInclude.AddRange(options);
+                foreach (var item in options)
+                {
+                    AddOption(item);
+                }
             } else
             {
                 logger.LogWarning("Could not add options as they were null");
@@ -95,17 +104,13 @@ namespace MigrationTools.Options
 
         public void AddOption(string optionName)
         {
+            AddOption(CreateOptionFromString(optionName));            
+        }
+        private IOptions CreateOptionFromString(string optionName)
+        {
             optionName = optionName.Replace("Options", "");
             var optionType = catalogue.FirstOrDefault(x => x.Name.StartsWith(optionName));
-            if (optionType == null)
-            {
-                logger.LogWarning("Could not find option type for {optionName}", optionName);
-            } else
-            {
-                logger.LogDebug("Adding {optionName}", optionName);
-                OptionsToInclude.Add(CreateOptionFromType(optionType));
-            }
-            
+            return CreateOptionFromType(optionType);
         }
 
         private IOptions CreateOptionFromType(Type optionType)
@@ -120,7 +125,7 @@ namespace MigrationTools.Options
         {
             if (option != null)
             {
-                NamedOptionsToInclude.Add(key, option);
+                optionsContainer.AddOption(new OptionItem(key, option));
             } else
             {
                 logger.LogWarning("Could not add option as it was null");
@@ -129,17 +134,7 @@ namespace MigrationTools.Options
 
         public void AddOption(string optionName, string key)
         {
-            optionName = optionName.Replace("Options", "");
-            var optionType = catalogue.FirstOrDefault(x => x.Name.StartsWith(optionName));
-            if (optionType == null)
-            {
-                logger.LogWarning("Could not find option type for {optionName}", optionName);
-            }
-            else
-            {
-                logger.LogDebug("Adding {optionName} as {key}", optionName, key);
-                NamedOptionsToInclude.Add(key, CreateOptionFromType(optionType));
-            }            
+            optionsContainer.AddOption(new OptionItem(key, CreateOptionFromString(optionName)));     
         }
 
         public string Build()
@@ -154,13 +149,17 @@ namespace MigrationTools.Options
             configJson["MigrationTools"]["Endpoints"] = new JObject();
             configJson["MigrationTools"]["Processors"] = new JArray();
             configJson["MigrationTools"]["CommonTools"] = new JObject();
-            foreach (var item in OptionsToInclude)
+            foreach (var item in optionsContainer.GetOptions())
             {
-                configJson = AddOptionToConfig(configuration, configJson, item);
-            }
-            foreach (var item in NamedOptionsToInclude)
-            {
-                configJson = AddNamedOptionToConfig(configuration, configJson, item.Key, item.Value);
+                if (item.IsKeyRequired)
+                {
+                    configJson = AddNamedOptionToConfig(configuration, configJson, item.key, item.Option);
+                }
+                else
+                {
+                    configJson = AddOptionToConfig(configuration, configJson, item.Option);
+                }
+               
             }
             return configJson.ToString(Newtonsoft.Json.Formatting.Indented);
         }
@@ -221,11 +220,147 @@ namespace MigrationTools.Options
     public class KeyGenerator
     {
         private int _counter = 1;
+        private Dictionary<string, int> _nameCounters = new Dictionary<string, int>();
 
+        // Generate a key without a name (global counter)
         public string GetNextKey()
         {
             _counter++;
-            return $"Key{_counter}";
+            return $"Refname{_counter}";
+        }
+
+        // Generate a key for a specific name (name-based counter)
+        public string GetNextKey(string name)
+        {
+            // Check if the name already exists in the dictionary
+            if (!_nameCounters.ContainsKey(name))
+            {
+                // If not, initialize its counter to 1
+                _nameCounters[name] = 1;
+            }
+            else
+            {
+                // Increment the counter for the given name
+                _nameCounters[name]++;
+            }
+
+            return $"{name}Refname{_nameCounters[name]}";
         }
     }
+
+
+    public enum OptionItemType
+    {
+        Unknown,
+        Processor,
+        EndpointEnricher,
+        ProcessorEnricher,
+        Endpoint,
+        Tool,
+    }
+
+    public class OptionItem
+    {
+        private static readonly KeyGenerator keyGen = new KeyGenerator();
+        public OptionItemType Type { get; set; }
+        public bool IsKeyRequired { get; }
+        public string key { get; set; }
+        public IOptions Option { get; set; }
+
+        public OptionItem(string key, IOptions option)
+        {
+            Type = GetOptionItemType(option);
+            IsKeyRequired = GetOptionItemKeyRequired(option);
+            this.key = key;
+            Option = option;
+        }
+
+        public OptionItem(IOptions option)
+        {
+            Type = GetOptionItemType(option);
+            IsKeyRequired = GetOptionItemKeyRequired(option);
+            this.key = keyGen.GetNextKey(Type.ToString());
+            Option = option;
+        }
+
+        private static OptionItemType GetOptionItemType(IOptions option)
+        {
+            OptionItemType optionItemType;
+            var optionType = option.GetType();
+            switch (optionType)
+            {
+                case Type t when typeof(IEndpointOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.Endpoint;
+                    break;
+                case Type t when typeof(IProcessorEnricherOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.ProcessorEnricher;
+                    break;
+                case Type t when typeof(IEndpointEnricherOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.EndpointEnricher;
+                    break;
+                case Type t when typeof(IProcessorOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.Processor;
+                    break;
+                case Type t when typeof(IToolOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.Tool;
+                    break;
+                default:
+                    optionItemType = OptionItemType.Unknown;
+                    break;
+            }
+
+            return optionItemType;
+        }
+        private static bool GetOptionItemKeyRequired(IOptions option)
+        {
+            var optionType = option.GetType();
+            switch (optionType)
+            {
+                case Type t when typeof(IEndpointOptions).IsAssignableFrom(t):
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+
+    }
+
+    internal class OptionsContainer
+    {
+        private List<OptionItem> OptionsToInclude { get; }
+
+        public OptionsContainer()
+        {
+            OptionsToInclude = new List<OptionItem>();
+        }
+
+        public void AddOption(OptionItem option)
+        {
+            if (option != null)
+            {
+                OptionsToInclude.Add(option);
+            }
+        }
+
+        public IReadOnlyList<OptionItem> GetOptions()
+        {
+            return OptionsToInclude
+                .Select(option => option)
+                .ToList()
+                .AsReadOnly();
+        }
+
+        public IReadOnlyList<OptionItem> GetOptions(OptionItemType optionType)
+        {
+            return OptionsToInclude
+                .Where(option => option.Type == optionType)
+                .Select(option => option)
+                .ToList()
+                .AsReadOnly();
+        }
+
+
+    }
+
 }

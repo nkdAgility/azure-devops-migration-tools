@@ -80,7 +80,7 @@ The global configuration created by the `init` command look something like this:
             "Domain": ""
           }
         },
-        "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+        "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "LanguageMaps": {
           "AreaPath": "Area",
@@ -227,7 +227,7 @@ Both the `Source` and `Target` entries hold the collection URL and the Team Proj
 
 For multi Language support you can add the name used in the source and target for both 'Area' and 'Iteration'. This allows a migration from one language version of TFS / Azure DevOps to another.
 
-#### ReflectedWorkItemIDFieldName
+#### ReflectedWorkItemIdField
 
 This is the field that will be used to store the state for the migration . See [Server Configuration](server-configuration.md)
 

@@ -20,7 +20,7 @@ This will migrate all of the work items, while also populating `IntegrationBuild
 
 The important bits:
 
-- Target ReflectedWorkItemIDFieldName is your main Custom field.
+- Target ReflectedWorkItemIdField is your main Custom field.
 - Field map copies the `ReflectedWorkItemId` to `Microsoft.VSTS.Build.IntegrationBuild`
 - Exclude all test based work items from the query
 
@@ -44,7 +44,7 @@ The important bits:
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTest5",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "XXXXXXXXXXXXXX",
@@ -87,7 +87,7 @@ This will migrate Test Cases while fixing the links to the Shared bits that can'
 
 The important bits:
 
-- Target ReflectedWorkItemIDFieldName is a common field that is available on the non-customisable work items
+- Target ReflectedWorkItemIdField is a common field that is available on the non-customisable work items
 - Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only
 - The query includes only the Test items that we can migrate as work items (No Suits or Plans)
 
@@ -110,7 +110,7 @@ The important bits:
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTest5",
-    "ReflectedWorkItemIDFieldName": "Microsoft.VSTS.Build.IntegrationBuild",
+    "ReflectedWorkItemIdField": "Microsoft.VSTS.Build.IntegrationBuild",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "XXXXXXXXXXXXXX",
@@ -172,7 +172,7 @@ The important bits:
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTest5",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "XXXXXXXXXXXXXX",
@@ -232,7 +232,7 @@ The important bits:
     "$type": "TfsTeamProjectConfig",
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTest5",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "AuthenticationMode": "Prompt",
     "PersonalAccessToken": "XXXXXXXXXXXXXX",

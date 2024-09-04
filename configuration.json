@@ -10,7 +10,7 @@
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
         "AllowCrossProjectLinking": false,
-        "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "Authentication": {
           "AuthenticationMode": "AccessToken",
           "AccessToken": "",
@@ -39,7 +39,7 @@
             "Domain": ""
           }
         },
-        "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+        "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "LanguageMaps": {
           "AreaPath": "Area",

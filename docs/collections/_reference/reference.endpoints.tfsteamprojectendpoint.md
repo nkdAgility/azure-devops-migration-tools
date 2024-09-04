@@ -81,7 +81,7 @@ configurationSamples:
         },
         "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad"
       },
-      "ReflectedWorkItemIDFieldName": null,
+      "ReflectedWorkItemIdField": null,
       "AllowCrossProjectLinking": false,
       "LanguageMaps": {
         "AreaPath": "Area",
@@ -119,7 +119,7 @@ options:
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments
-- parameterName: ReflectedWorkItemIDFieldName
+- parameterName: ReflectedWorkItemIdField
   type: String
   description: missng XML code comments
   defaultValue: missng XML code comments

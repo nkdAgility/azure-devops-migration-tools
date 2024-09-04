@@ -265,7 +265,7 @@ namespace MigrationTools.Processors
             contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
 
             var result = CommonTools.ValidateRequiredField.ValidatingRequiredField(this,
-                Target.Options.ReflectedWorkItemIDFieldName, sourceWorkItems);
+                Target.Options.ReflectedWorkItemIdField, sourceWorkItems);
             if (!result)
             {
                 var ex = new InvalidFieldValueException(
@@ -789,16 +789,16 @@ namespace MigrationTools.Processors
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
 
                     var reflectedUri = (TfsReflectedWorkItemId)Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
-                    if (!targetWorkItem.ToWorkItem().Fields.Contains(Target.Options.ReflectedWorkItemIDFieldName))
+                    if (!targetWorkItem.ToWorkItem().Fields.Contains(Target.Options.ReflectedWorkItemIdField))
                     {
-                        var ex = new InvalidOperationException("ReflectedWorkItemIDField Field Missing");
+                        var ex = new InvalidOperationException("ReflectedWorkItemIdField Field Missing");
                         Log.LogError(ex,
                             " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}",
                             targetWorkItem.Type,
-                            Target.Options.ReflectedWorkItemIDFieldName);
+                            Target.Options.ReflectedWorkItemIdField);
                         throw ex;
                     }
-                    targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIDFieldName].Value = reflectedUri.ToString();
+                    targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri.ToString();
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
@@ -837,7 +837,7 @@ namespace MigrationTools.Processors
 
                     if (Options.GenerateMigrationComment)
                     {
-                        var reflectedUri = targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIDFieldName].Value;
+                        var reflectedUri = targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value;
                         var history = new StringBuilder();
                         history.Append(
                             $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");

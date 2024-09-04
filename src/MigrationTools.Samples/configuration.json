@@ -5,7 +5,7 @@
   "Source": {
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationSource1",
-    "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "",
     "LanguageMaps": {
@@ -16,7 +16,7 @@
   "Target": {
     "Collection": "https://dev.azure.com/nkdagility-preview/",
     "Project": "migrationTarget1",
-    "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+    "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
     "AllowCrossProjectLinking": false,
     "PersonalAccessToken": "",
     "LanguageMaps": {

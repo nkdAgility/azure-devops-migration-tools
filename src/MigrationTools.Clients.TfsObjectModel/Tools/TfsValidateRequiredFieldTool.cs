@@ -67,13 +67,13 @@ namespace MigrationTools.Tools
         //{
         //    //Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
         //    var fields = _witClient.GetFieldsAsync(Engine.Target.Config.AsTeamProjectConfig().Project).Result;
-        //    bool rwiidFieldExists = fields.Any(x => x.ReferenceName == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName || x.Name == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+        //    bool rwiidFieldExists = fields.Any(x => x.ReferenceName == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField || x.Name == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField);
         //    contextLog.Information("Found {FieldsFoundCount} work item fields.", fields.Count.ToString("n0"));
         //    if (rwiidFieldExists)
-        //        contextLog.Information("Found '{ReflectedWorkItemIDFieldName}' in this project, proceeding.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+        //        contextLog.Information("Found '{ReflectedWorkItemIdField}' in this project, proceeding.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField);
         //    else
         //    {
-        //        contextLog.Information("Config file specifies '{ReflectedWorkItemIDFieldName}', which wasn't found.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIDFieldName);
+        //        contextLog.Information("Config file specifies '{ReflectedWorkItemIdField}', which wasn't found.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField);
         //        contextLog.Information("Instead, found:");
         //        foreach (var field in fields.OrderBy(x => x.Name))
         //            contextLog.Information("{FieldType} - {FieldName} - {FieldRefName}", field.Type.ToString().PadLeft(15), field.Name.PadRight(20), field.ReferenceName ?? "");
