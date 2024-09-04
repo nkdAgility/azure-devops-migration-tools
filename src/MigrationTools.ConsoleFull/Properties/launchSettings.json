@@ -9,7 +9,7 @@
     },
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c \"configuration.json\" --debugTrace"
+      "commandLineArgs": "execute -c \"configuration.json\" --disableTelemetry --debugTrace"
     },
     "execute --help": {
       "commandName": "Project",
