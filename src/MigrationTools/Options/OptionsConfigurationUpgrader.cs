@@ -59,8 +59,6 @@ namespace MigrationTools.Options
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("OptionsConfigurationUpgrader::UpgradeConfiguration"))
             {
-
-
                 if (optionsBuilder == null)
                 {
                     optionsBuilder = this.Services.GetService<OptionsConfigurationBuilder>();

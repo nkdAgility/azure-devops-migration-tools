@@ -11,6 +11,7 @@ namespace MigrationTools.Options
 
 public static class OptionsConfigurationCompiler
     {
+
     public static IOptions LoadConfiguration(string filePath, IOptions options, bool isCollection = false)
     {
         var optionsConfig = options.ConfigurationMetadata;
