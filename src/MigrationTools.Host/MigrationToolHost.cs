@@ -81,6 +81,8 @@ namespace MigrationTools.Host
              })
             .ConfigureAppConfiguration(builder =>
             {
+                builder.SetBasePath(AppContext.BaseDirectory);
+                //builder.AddJsonFile("appsettings.json", optional: false);
                 if (!string.IsNullOrEmpty(configFile) && File.Exists(configFile))
                 {
                     builder.AddJsonFile(configFile);
