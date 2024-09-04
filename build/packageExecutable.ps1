@@ -75,11 +75,31 @@ New-Item -Path $outfolder -Name "/MigrationTools/" -ItemType Directory
 New-Item -Path $outfolder -Name "/MigrationTools/preview/" -ItemType Directory
 New-Item  -Path $outfolder -Name "/MigrationTools/ConfigSamples/" -ItemType Directory
 Write-Output "----------------------------------------"
+Write-Output "Validating Contents of  ./src/MigrationTools.ConsoleFull/bin/Debug/net472/*"
+$foundFiles = Get-ChildItem -Path "./src/MigrationTools.ConsoleFull/bin/Debug/net472/" -Recurse -Filter '*WITDataStore*' | ForEach-Object { $_.FullName }
+if ($foundFiles -eq $null) {
+    Write-Output "No WITDataStore found"
+    exit 1
+} else {
+    Write-Output "Found WITDataStore"
+}
+$foundFiles
+Write-Output "----------------------------------------"
 # Copy Files
 Write-Output "Copy files to $outfolder/MigrationTools/"
 Copy-Item  -Path "./src/MigrationTools.ConsoleFull/bin/Debug/net472/*" -Destination "$outfolder/MigrationTools/" -Recurse
 Copy-Item  -Path "./src/MigrationTools.ConsoleCore/bin/Debug/net8.0/*" -Destination "$outfolder/MigrationTools/preview/" -Recurse
 Copy-Item  -Path "./src/MigrationTools.Samples/*" -Destination "$outfolder/MigrationTools/ConfigSamples/" -Recurse 
+Write-Output "----------------------------------------"
+Write-Output "Validating Contents of  $outfolder/MigrationTools/"
+$foundFiles = Get-ChildItem -Path "$outfolder/MigrationTools/" -Recurse -Filter '*WITDataStore*' | ForEach-Object { $_.FullName }
+if ($foundFiles -eq $null) {
+    Write-Output "No WITDataStore found"
+    exit 1
+} else {
+    Write-Output "Found WITDataStore"
+}
+$foundFiles
 Write-Output "----------------------------------------"
 # Create Zip
 7z a -tzip  $OutputFullName $outfolder/MigrationTools/**

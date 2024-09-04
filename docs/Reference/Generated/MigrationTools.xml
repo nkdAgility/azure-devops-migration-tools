@@ -258,37 +258,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"topic/enable-upgrade-telemetery"
+            => @"fix/WITDataStore64-missing"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"9da18171"
+            => @"bafb2485"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"9da18171b9a1938f37b1bf62e4ac8a7e63e2706e"
+            => @"bafb2485ee0926f0443ede89e1e0204fc50f8aae"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-03T15:15:23+01:00"
+            => @"2024-09-04T08:45:13+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"7"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.0-Preview.6-7-g9da18171"
+            => @"v16.0.0-Preview.7-2-gbafb2485"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v16.0.0-Preview.6"
+            => @"v16.0.0-Preview.7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -318,17 +318,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"7"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.6"
+            => @"Preview.7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.6"
+            => @"-Preview.7"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">
