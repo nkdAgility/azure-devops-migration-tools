@@ -57,33 +57,32 @@ namespace MigrationTools.Host.Commands
             Services = services;
             Configuration = configuration;
             this.ActivitySource = activitySource;
+
         }
 
         public Activity CommandActivity { get; private set; }
 
         public sealed override async Task<int> ExecuteAsync(CommandContext context, TSettings settings)
         {
-            // Disable Telemetry
-            if (settings.DisableTelemetry)
-            {
-                Log.Debug("Disabling Telemetry {CommandName}", this.GetType().Name);
-                CommandActivity.AddTag("DisableTelemetry", settings.DisableTelemetry);
-                CommandActivity.Stop();
-                ActivitySourceProvider.DisableActivitySource();
-            }
-            //Enable Debug Trace
-            if (settings.DebugTrace)
-            {
-                Log.Debug("Enabling Telemetry DebugTrace {CommandName}", this.GetType().Name);
-                ActivitySourceProvider.EnableTelemeteryDebug();
-            }
-
             using (CommandActivity = ActivitySource.StartActivity(this.GetType().Name))
             {
                 CommandActivity.SetTagsFromObject(settings);
                 CommandActivity?.Start();
-   
-               
+                // Disable Telemetry
+                if (settings.DisableTelemetry)
+                {
+                    Log.Debug("Disabling Telemetry {CommandName}", this.GetType().Name);
+                    CommandActivity.AddTag("DisableTelemetry", settings.DisableTelemetry);
+                    CommandActivity.Stop();
+                    ActivitySourceProvider.DisableActivitySource();
+                }
+                //Enable Debug Trace
+                if (settings.DebugTrace)
+                {
+                    Log.Debug("Enabling Telemetry DebugTrace {CommandName}", this.GetType().Name);
+                    ActivitySourceProvider.EnableTelemeteryDebug();
+                }
+
                 // Run the command
                 Log.Verbose("Starting {CommandName}", this.GetType().Name);
                 CommandActivity.AddEvent(new ActivityEvent("Starting"));
@@ -119,73 +118,73 @@ namespace MigrationTools.Host.Commands
 
         public void RunStartupLogic(TSettings settings)
         {
-                ApplicationStartup(settings);
-                if (!settings.skipVersionCheck && _detectOnlineService.IsOnline())
+            ApplicationStartup(settings);
+            if (!settings.skipVersionCheck && _detectOnlineService.IsOnline())
+            {
+                _logger.LogTrace("Package Management Info:");
+                Log.Debug("     IsPackageManagerInstalled: {IsPackageManagerInstalled}", _detectVersionService.IsPackageManagerInstalled);
+                Log.Debug("     IsPackageInstalled: {IsPackageInstalled}", _detectVersionService.IsPackageInstalled);
+                Log.Debug("     IsUpdateAvailable: {IsUpdateAvailable}", _detectVersionService.IsUpdateAvailable);
+                Log.Debug("     IsNewLocalVersionAvailable: {IsNewLocalVersionAvailable}", _detectVersionService.IsNewLocalVersionAvailable);
+                Log.Debug("     IsRunningInDebug: {IsRunningInDebug}", _detectVersionService.IsRunningInDebug);
+                Log.Verbose("Full version data: ${_detectVersionService}", _detectVersionService);
+
+                Log.Information("Verion Info:");
+                Log.Information("     Running: {RunningVersion}", _detectVersionService.RunningVersion);
+                Log.Information("     Installed: {InstalledVersion}", _detectVersionService.InstalledVersion);
+                Log.Information("     Available: {AvailableVersion}", _detectVersionService.AvailableVersion);
+
+                if (_detectVersionService.RunningVersion.Major == 0)
                 {
-                    _logger.LogTrace("Package Management Info:");
-                    Log.Debug("     IsPackageManagerInstalled: {IsPackageManagerInstalled}", _detectVersionService.IsPackageManagerInstalled);
-                    Log.Debug("     IsPackageInstalled: {IsPackageInstalled}", _detectVersionService.IsPackageInstalled);
-                    Log.Debug("     IsUpdateAvailable: {IsUpdateAvailable}", _detectVersionService.IsUpdateAvailable);
-                    Log.Debug("     IsNewLocalVersionAvailable: {IsNewLocalVersionAvailable}", _detectVersionService.IsNewLocalVersionAvailable);
-                    Log.Debug("     IsRunningInDebug: {IsRunningInDebug}", _detectVersionService.IsRunningInDebug);
-                    Log.Verbose("Full version data: ${_detectVersionService}", _detectVersionService);
+                    Log.Information("Git Info:");
+                    Log.Information("     Repo: {GitRepositoryUrl}", ThisAssembly.Git.RepositoryUrl);
+                    Log.Information("     Tag: {GitTag}", ThisAssembly.Git.Tag);
+                    Log.Information("     Branch: {GitBranch}", ThisAssembly.Git.Branch);
+                    Log.Information("     Commits: {GitCommits}", ThisAssembly.Git.Commits);
 
-                    Log.Information("Verion Info:");
-                    Log.Information("     Running: {RunningVersion}", _detectVersionService.RunningVersion);
-                    Log.Information("     Installed: {InstalledVersion}", _detectVersionService.InstalledVersion);
-                    Log.Information("     Available: {AvailableVersion}", _detectVersionService.AvailableVersion);
+                }
 
-                    if (_detectVersionService.RunningVersion.Major == 0)
-                    {
-                        Log.Information("Git Info:");
-                        Log.Information("     Repo: {GitRepositoryUrl}", ThisAssembly.Git.RepositoryUrl);
-                        Log.Information("     Tag: {GitTag}", ThisAssembly.Git.Tag);
-                        Log.Information("     Branch: {GitBranch}", ThisAssembly.Git.Branch);
-                        Log.Information("     Commits: {GitCommits}", ThisAssembly.Git.Commits);
-
-                    }
-
-                    if (!_detectVersionService.IsPackageManagerInstalled)
-                    {
-                        Log.Warning("Windows Client: The Windows Package Manager is not installed, we use it to determine if you have the latest version, and to make sure that this application is up to date. You can download and install it from https://aka.ms/getwinget. After which you can call `winget install {PackageId}` from the Windows Terminal to get a manged version of this program.", _detectVersionService.PackageId);
-                        Log.Warning("Windows Server: If you are running on Windows Server you can use the experimental version of Winget, or you can still use Chocolatey to manage the install. Install chocolatey from https://chocolatey.org/install and then use `choco install vsts-sync-migrator` to install, and `choco upgrade vsts-sync-migrator` to upgrade to newer versions.", _detectVersionService.PackageId);
-                    }
-                    else
-                    {
-                        if (!_detectVersionService.IsRunningInDebug)
-                        {
-                            if (!_detectVersionService.IsPackageInstalled)
-                            {
-                                Log.Information("It looks like this application has been installed from a zip, would you like to use the managed version?");
-                                Console.WriteLine("Do you want exit and install the managed version? (y/n)");
-                                if (Console.ReadKey().Key == ConsoleKey.Y)
-                                {
-                                    Thread.Sleep(2000);
-                                    Environment.Exit(0);
-                                }
-                            }
-                            if (_detectVersionService.IsUpdateAvailable && _detectVersionService.IsPackageInstalled)
-                            {
-                                Log.Information("It looks like an updated version is available from Winget, would you like to exit and update?");
-                                Console.WriteLine("Do you want to exit and update? (y/n)");
-                                if (Console.ReadKey().Key == ConsoleKey.Y)
-                                {
-                                    Thread.Sleep(2000);
-                                    Environment.Exit(0);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Log.Information("Running in Debug! No further version checkes.....");
-                        }
-                    }
+                if (!_detectVersionService.IsPackageManagerInstalled)
+                {
+                    Log.Warning("Windows Client: The Windows Package Manager is not installed, we use it to determine if you have the latest version, and to make sure that this application is up to date. You can download and install it from https://aka.ms/getwinget. After which you can call `winget install {PackageId}` from the Windows Terminal to get a manged version of this program.", _detectVersionService.PackageId);
+                    Log.Warning("Windows Server: If you are running on Windows Server you can use the experimental version of Winget, or you can still use Chocolatey to manage the install. Install chocolatey from https://chocolatey.org/install and then use `choco install vsts-sync-migrator` to install, and `choco upgrade vsts-sync-migrator` to upgrade to newer versions.", _detectVersionService.PackageId);
                 }
                 else
                 {
-                    /// not online or you have specified not to
-                    Log.Warning("You are either not online or have chosen `skipVersionCheck`. We will not check for a newer version of the tools.", _detectVersionService.PackageId);
+                    if (!_detectVersionService.IsRunningInDebug)
+                    {
+                        if (!_detectVersionService.IsPackageInstalled)
+                        {
+                            Log.Information("It looks like this application has been installed from a zip, would you like to use the managed version?");
+                            Console.WriteLine("Do you want exit and install the managed version? (y/n)");
+                            if (Console.ReadKey().Key == ConsoleKey.Y)
+                            {
+                                Thread.Sleep(2000);
+                                Environment.Exit(0);
+                            }
+                        }
+                        if (_detectVersionService.IsUpdateAvailable && _detectVersionService.IsPackageInstalled)
+                        {
+                            Log.Information("It looks like an updated version is available from Winget, would you like to exit and update?");
+                            Console.WriteLine("Do you want to exit and update? (y/n)");
+                            if (Console.ReadKey().Key == ConsoleKey.Y)
+                            {
+                                Thread.Sleep(2000);
+                                Environment.Exit(0);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Log.Information("Running in Debug! No further version checkes.....");
+                    }
                 }
+            }
+            else
+            {
+                /// not online or you have specified not to
+                Log.Warning("You are either not online or have chosen `skipVersionCheck`. We will not check for a newer version of the tools.", _detectVersionService.PackageId);
+            }
         }
 
 

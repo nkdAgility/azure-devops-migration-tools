@@ -1,241 +1,366 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using Elmah.Io.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.TeamFoundation.Framework.Common;
+using Microsoft.VisualStudio.Services.Audit;
+using Microsoft.VisualStudio.Services.Common.CommandLine;
+using MigrationTools.EndpointEnrichers;
+using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json.Linq;
+using Serilog.Core;
 
 namespace MigrationTools.Options
 {
 
+  
 
-public static class OptionsConfigurationBuilder
-{
-    public static IOptions LoadConfiguration(string filePath, IOptions options, bool isCollection = false)
+    public  class OptionsConfigurationBuilder
     {
-        var optionsConfig = options.ConfigurationMetadata;
-        JObject json = File.Exists(filePath) ? JObject.Parse(File.ReadAllText(filePath)) : new JObject();
+        
 
-        // Determine the path based on whether this is a collection or a section
-        string path = optionsConfig.PathToInstance;
+        readonly ILogger logger;
+        readonly IConfiguration configuration;
+        
 
-        if (isCollection)
+        OptionsContainer optionsContainer;
+
+        private List<Type> catalogue;
+
+        public OptionsConfigurationBuilder(
+            IConfiguration configuration,
+            ILogger<OptionsConfigurationBuilder> logger,
+            ITelemetryLogger telemetryLogger)
         {
-            // Load from a collection
-            var collection = json.SelectToken(path.Replace(":", ".")) as JArray;
-
-            var item = collection?.FirstOrDefault(p => p[optionsConfig.ObjectName]?.ToString() == optionsConfig.OptionFor);
-
-            return item != null ? item.ToObject(options.GetType()) as IOptions : Activator.CreateInstance(options.GetType()) as IOptions;
+            this.configuration = configuration;
+            this.logger = logger;
+            optionsContainer = new OptionsContainer();
+            catalogue = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().ToList();
         }
-        else
-        {
-            // Load from a section
-            var section = json.SelectToken(path.Replace(":", "."));
 
-            return section != null ? section.ToObject(options.GetType()) as IOptions : Activator.CreateInstance(options.GetType()) as IOptions;
+        public IReadOnlyList<OptionItem> GetOptions()
+        {
+            return optionsContainer.GetOptions();
         }
-    }
 
-    public static void SaveConfiguration(string filePath, IOptions options, bool isCollection = false)
-    {
-        JObject json = File.Exists(filePath) ? JObject.Parse(File.ReadAllText(filePath)) : new JObject();
-
-        // Determine the path based on whether this is a collection or a section
-        string path = options.ConfigurationMetadata.PathToInstance;
-
-        string[] pathParts = path.Split(':');
-        JObject currentSection = json;
-
-        // Build the JSON structure for the section or collection
-        for (int i = 0; i < pathParts.Length; i++)
+        public IReadOnlyList<OptionItem> GetOptions(OptionItemType optionType)
         {
-            if (i == pathParts.Length - 1 && isCollection)
+            return optionsContainer.GetOptions(optionType);
+        }
+
+        public void AddAllOptions()
+        {
+            foreach (var optionType in catalogue)
             {
-                // If it's a collection, create or find the JArray
-                if (currentSection[pathParts[i]] == null)
-                {
-                    currentSection[pathParts[i]] = new JArray();
-                }
+                optionsContainer.AddOption(new OptionItem(CreateOptionFromType(optionType)));
+            }
+        }
 
-                var collectionArray = (JArray)currentSection[pathParts[i]];
-
-                // Check if the object already exists in the collection
-                var existingItem = collectionArray.FirstOrDefault(p => p[options.ConfigurationMetadata.ObjectName]?.ToString() == options.ConfigurationMetadata.OptionFor);
-
-                if (existingItem != null)
-                {
-                    // Update the existing item
-                    var index = collectionArray.IndexOf(existingItem);
-                    collectionArray[index] = JObject.FromObject(options);
-                }
-                else
-                {
-                    // Add the new item to the collection
-                    var newItem = JObject.FromObject(options);
-                    newItem[options.ConfigurationMetadata.ObjectName] = options.ConfigurationMetadata.OptionFor;
-                    collectionArray.Add(newItem);
-                }
+        public void AddOption(IOptions option)
+        {
+            if (option != null)
+            {
+                optionsContainer.AddOption(new OptionItem(option));
             }
             else
             {
-                // Create or navigate to the JObject for the section
-                if (currentSection[pathParts[i]] == null)
+                logger.LogWarning("Could not add Option as it was null!");
+            }
+        }
+
+
+        public void AddOption(OptionItem option)
+        {
+            if (option != null && option.Option !=null )
+            {
+                optionsContainer.AddOption(option);
+            } else
+            {
+                logger.LogWarning("Could not add OptionItem as it was null or its IOption was!");
+            }
+        }
+
+        public void AddOption(IEnumerable<IOptions> options)
+        {
+            if (options != null)
+            {
+                foreach (var item in options)
                 {
-                    currentSection[pathParts[i]] = new JObject();
+                    AddOption(item);
                 }
-                currentSection = (JObject)currentSection[pathParts[i]];
+            } else
+            {
+                logger.LogWarning("Could not add options as they were null");
             }
         }
 
-        // If it's not a collection, replace the content directly in the final section
-        if (!isCollection)
+        public void AddOption(string optionName)
         {
-            currentSection.Replace(JObject.FromObject(options));
+            AddOption(CreateOptionFromString(optionName));            
+        }
+        private IOptions CreateOptionFromString(string optionName)
+        {
+            optionName = optionName.Replace("Options", "");
+            var optionType = catalogue.FirstOrDefault(x => x.Name.StartsWith(optionName));
+            return CreateOptionFromType(optionType);
         }
 
-        // Save the updated JSON file
-        File.WriteAllText(filePath, json.ToString(Newtonsoft.Json.Formatting.Indented));
-    }
-
-    public static List<IOptions> LoadAll(string filePath, IOptions templateOption)
-    {
-        var optionsConfig = templateOption.ConfigurationMetadata;
-        JObject json = File.Exists(filePath) ? JObject.Parse(File.ReadAllText(filePath)) : new JObject();
-
-        var foundOptions = new List<IOptions>();
-
-        // Recursively search through the entire JSON hierarchy
-        SearchForOptions(json, optionsConfig, foundOptions, templateOption.GetType());
-
-        return foundOptions;
-    }
-
-    private static void SearchForOptions(JToken token, ConfigurationMetadata config, List<IOptions> foundTools, Type optionType)
-    {
-        if (token is JObject obj)
+        private IOptions CreateOptionFromType(Type optionType)
         {
-            // Check if this object has the appropriate property with the value matching the config
-            if (obj.TryGetValue(config.ObjectName, out JToken fieldTypeToken) && fieldTypeToken.ToString() == config.OptionFor)
-            {
-                // Deserialize the JObject into an IOptions object
-                var options = obj.ToObject(optionType) as IOptions;
-                foundTools.Add(options);
-            }
+            IOptions instanceOfOption = (IOptions)Activator.CreateInstance(optionType);
+            var section = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToSample);
+            section.Bind(instanceOfOption);
+            return instanceOfOption;
+        }
 
-            // Recursively search child objects
-            foreach (var property in obj.Properties())
+        public void AddOption(IOptions option, string key)
+        {
+            if (option != null)
             {
-                SearchForOptions(property.Value, config, foundTools, optionType);
+                optionsContainer.AddOption(new OptionItem(key, option));
+            } else
+            {
+                logger.LogWarning("Could not add option as it was null");
             }
         }
-        else if (token is JArray array)
+
+        public void AddOption(string optionName, string key)
         {
-            // Recursively search elements in the array
-            foreach (var item in array)
+            optionsContainer.AddOption(new OptionItem(key, CreateOptionFromString(optionName)));     
+        }
+
+        public string Build()
+        {
+            logger.LogInformation("Building Configuration");
+            JObject configJson = new JObject();
+            configJson["Serilog"] = new JObject();
+            configJson["Serilog"]["MinimumLevel"] = $"Information";
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            configJson["MigrationTools"] = new JObject();
+            configJson["MigrationTools"]["Version"] = $"{version.Major}.{version.Minor}";
+            configJson["MigrationTools"]["Endpoints"] = new JObject();
+            configJson["MigrationTools"]["Processors"] = new JArray();
+            configJson["MigrationTools"]["CommonTools"] = new JObject();
+            foreach (var item in optionsContainer.GetOptions())
             {
-                SearchForOptions(item, config, foundTools, optionType);
-            }
-        }
-    }
-
-    public static string CreateNewConfigurationJson(IOptions options, string path, string objectName, string optionFor, bool isCollection = false, bool shouldAddObjectName = false)
-    {
-        // Load existing configuration from a file or create a new JObject if necessary
-        JObject configJson = new JObject();
-
-        // Add or update the options in the configuration using the new method signature
-        configJson = AddOptionsToConfiguration(configJson, options, path, objectName, optionFor, isCollection, shouldAddObjectName);
-
-        // Return the updated JSON as a formatted string
-        return configJson.ToString(Newtonsoft.Json.Formatting.Indented);
-    }
-
-
-        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, bool shouldAddObjectName = false)
-        {
-            return AddOptionsToConfiguration(configJson, iOption, iOption.ConfigurationMetadata.PathToInstance, shouldAddObjectName);
-        }
-
-        public static JObject AddOptionsToConfiguration(JObject configJson, IOptions iOption, string sectionPath, bool shouldAddObjectName = false)
-        {
-            return AddOptionsToConfiguration(configJson, iOption, sectionPath, iOption.ConfigurationMetadata.ObjectName, iOption.ConfigurationMetadata.OptionFor, iOption.ConfigurationMetadata.IsCollection, shouldAddObjectName);
-        }
-
-        public static JObject AddOptionsToConfiguration(
-        JObject configJson,
-        IOptions options,
-        string path,
-        string objectName,
-        string optionFor,
-        bool isCollection = false,
-        bool shouldAddObjectName = false)
-    {
-        // Initialize the JObject if it was null
-        if (configJson == null)
-        {
-            configJson = new JObject();
-        }
-
-        // Split the path into its components
-        string[] pathParts = path.Split(':');
-        JObject currentSection = configJson;
-
-        // Traverse or create the JSON structure for the section or collection
-        for (int i = 0; i < pathParts.Length; i++)
-        {
-            // If this is the last part of the path
-            if (i == pathParts.Length - 1)
-            {
-                if (isCollection)
+                if (item.IsKeyRequired)
                 {
-                    // Ensure we have a JArray at this position
-                    if (currentSection[pathParts[i]] == null)
-                    {
-                        currentSection[pathParts[i]] = new JArray();
-                    }
-
-                    // Add the options object as part of the collection
-                    var collectionArray = (JArray)currentSection[pathParts[i]];
-                    var optionsObject = JObject.FromObject(options);
-                    // Always add object name for collections
-                    optionsObject.AddFirst(new JProperty(objectName, optionFor));
-                    collectionArray.Add(optionsObject);
+                    configJson = AddNamedOptionToConfig(configuration, configJson, item.key, item.Option);
                 }
                 else
                 {
-                    // We're at the last part of the path, so add the options object here
-                    var optionsObject = new JObject();
-
-                    // Add the object name and options
-                    if (shouldAddObjectName)
-                    {
-                        optionsObject[objectName] = optionFor;
-                    }
-
-                    // Add the other properties from the options object
-                    optionsObject.Merge(JObject.FromObject(options), new JsonMergeSettings
-                    {
-                        MergeArrayHandling = MergeArrayHandling.Concat
-                    });
-
-                    // Replace or add the object in the current section
-                    currentSection[pathParts[i]] = optionsObject;
+                    configJson = AddOptionToConfig(configuration, configJson, item.Option);
                 }
+               
+            }
+            return configJson.ToString(Newtonsoft.Json.Formatting.Indented);
+        }
+
+        private JObject AddNamedOptionToConfig(IConfiguration configuration, JObject configJson, string key, IOptions option)
+        {
+            if (option.ConfigurationMetadata.PathToInstance == null)
+            {
+                logger.LogWarning("Skipping Option: {item} with {key} as it has no PathToInstance", option.GetType().Name, key);
+                return configJson;
+            }
+            try
+            {
+                var hardPath = $"MigrationTools:Endpoints:{key}";
+                logger.LogDebug("Building Option: {item} to {hardPath}", option.GetType().Name, hardPath);
+                configJson = OptionsConfigurationCompiler.AddOptionsToConfiguration(configJson, option, hardPath, true);
+                
+            }
+            catch (Exception)
+            {
+
+                logger.LogWarning("FAILED!! Adding Option: {item}", option.GetType().FullName);
+            }
+
+            return configJson;
+        }
+
+        private JObject AddOptionToConfig(IConfiguration configuration, JObject configJson, IOptions option)
+        {
+            if (option is null)
+            {
+                logger.LogWarning("Skipping Option: as it is null");
+                return configJson;
+            }
+            if (option.ConfigurationMetadata.PathToInstance == null)
+            {
+                logger.LogWarning("Skipping Option: {item} as it has no PathToInstance", option.GetType().Name);
+                return configJson;
+            }
+            try
+            {
+                logger.LogDebug("Building Option: {item} to {path}", option.GetType().Name, option.ConfigurationMetadata.PathToInstance);
+                configJson = OptionsConfigurationCompiler.AddOptionsToConfiguration(configJson, option, false);
+                
+            }
+            catch (Exception)
+            {
+
+                logger.LogWarning("FAILED!! Adding Option: {item}", option.GetType().FullName);
+            }
+
+            return configJson;
+        }
+
+        
+    }
+
+    public class KeyGenerator
+    {
+        private int _counter = 1;
+        private Dictionary<string, int> _nameCounters = new Dictionary<string, int>();
+
+        // Generate a key without a name (global counter)
+        public string GetNextKey()
+        {
+            _counter++;
+            return $"Refname{_counter}";
+        }
+
+        // Generate a key for a specific name (name-based counter)
+        public string GetNextKey(string name)
+        {
+            // Check if the name already exists in the dictionary
+            if (!_nameCounters.ContainsKey(name))
+            {
+                // If not, initialize its counter to 1
+                _nameCounters[name] = 1;
             }
             else
             {
-                // Traverse or create the JObject for the current section
-                if (currentSection[pathParts[i]] == null)
-                {
-                    currentSection[pathParts[i]] = new JObject();
-                }
-                currentSection = (JObject)currentSection[pathParts[i]];
+                // Increment the counter for the given name
+                _nameCounters[name]++;
+            }
+
+            return $"{name}Refname{_nameCounters[name]}";
+        }
+    }
+
+
+    public enum OptionItemType
+    {
+        Unknown,
+        Processor,
+        EndpointEnricher,
+        ProcessorEnricher,
+        Endpoint,
+        Tool,
+    }
+
+    public class OptionItem
+    {
+        private static readonly KeyGenerator keyGen = new KeyGenerator();
+        public OptionItemType Type { get; set; }
+        public bool IsKeyRequired { get; }
+        public string key { get; set; }
+        public IOptions Option { get; set; }
+
+        public OptionItem(string key, IOptions option)
+        {
+            Type = GetOptionItemType(option);
+            IsKeyRequired = GetOptionItemKeyRequired(option);
+            this.key = key;
+            Option = option;
+        }
+
+        public OptionItem(IOptions option)
+        {
+            Type = GetOptionItemType(option);
+            IsKeyRequired = GetOptionItemKeyRequired(option);
+            this.key = keyGen.GetNextKey(Type.ToString());
+            Option = option;
+        }
+
+        private static OptionItemType GetOptionItemType(IOptions option)
+        {
+            OptionItemType optionItemType;
+            var optionType = option.GetType();
+            switch (optionType)
+            {
+                case Type t when typeof(IEndpointOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.Endpoint;
+                    break;
+                case Type t when typeof(IProcessorEnricherOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.ProcessorEnricher;
+                    break;
+                case Type t when typeof(IEndpointEnricherOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.EndpointEnricher;
+                    break;
+                case Type t when typeof(IProcessorOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.Processor;
+                    break;
+                case Type t when typeof(IToolOptions).IsAssignableFrom(t):
+                    optionItemType = OptionItemType.Tool;
+                    break;
+                default:
+                    optionItemType = OptionItemType.Unknown;
+                    break;
+            }
+
+            return optionItemType;
+        }
+        private static bool GetOptionItemKeyRequired(IOptions option)
+        {
+            var optionType = option.GetType();
+            switch (optionType)
+            {
+                case Type t when typeof(IEndpointOptions).IsAssignableFrom(t):
+                    return true;
+                default:
+                    return false;
             }
         }
 
-        // Return the modified JObject
-        return configJson;
+
     }
-}
+
+    internal class OptionsContainer
+    {
+        private List<OptionItem> OptionsToInclude { get; }
+
+        public OptionsContainer()
+        {
+            OptionsToInclude = new List<OptionItem>();
+        }
+
+        public void AddOption(OptionItem option)
+        {
+            if (option != null)
+            {
+                OptionsToInclude.Add(option);
+            }
+        }
+
+        public IReadOnlyList<OptionItem> GetOptions()
+        {
+            return OptionsToInclude
+                .Select(option => option)
+                .ToList()
+                .AsReadOnly();
+        }
+
+        public IReadOnlyList<OptionItem> GetOptions(OptionItemType optionType)
+        {
+            return OptionsToInclude
+                .Where(option => option.Type == optionType)
+                .Select(option => option)
+                .ToList()
+                .AsReadOnly();
+        }
+
+
+    }
+
 }

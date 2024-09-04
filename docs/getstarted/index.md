@@ -56,7 +56,7 @@ The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfswo
     for the `PersonalAccessToken` attribute, or set the
     `PersonalAccessTokenVariableName` to the name of an environment variable containing your PAT.
 
-4. Adjust the value of the `ReflectedWorkItemIDFieldName` attribute (field name of the migration tracking field) for Source and Target
+4. Adjust the value of the `ReflectedWorkItemIdField` attribute (field name of the migration tracking field) for Source and Target
 
    For example: `TfsMigrationTool.ReflectedWorkItemId` for TFS, `ReflectedWorkItemId` for VSTS, or `Custom.ReflectedWorkItemId` for Azure DevOps
 

@@ -25,7 +25,7 @@ In your configuration file under `MigrationTools:Endpoints` there willbe both a 
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
         "AllowCrossProjectLinking": false,
-        "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "Authentication": {
           "AuthenticationMode": "AccessToken",
           "AccessToken": "alakjhsaggdsad67869asdjksafksldjhgsjkdghsdkfhskdf",

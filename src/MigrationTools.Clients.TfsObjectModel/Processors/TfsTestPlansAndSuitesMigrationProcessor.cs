@@ -361,7 +361,7 @@ namespace MigrationTools.Processors
         {
             var sourceWI = Source.WorkItems.GetWorkItem(sourceWIId.ToString());
             var targetWI = Target.WorkItems.GetWorkItem(targetWIId.ToString());
-            targetWI.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIDFieldName].Value = Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
+            targetWI.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = Source.WorkItems.CreateReflectedWorkItemId(sourceWI).ToString();
             targetWI.SaveToAzureDevOps();
         }
 
@@ -592,7 +592,7 @@ namespace MigrationTools.Processors
                 //Get Target ReflectedWorkItemId
                 var targetWI = Target.WorkItems.GetWorkItem(testSuit.Id.ToString());
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::TargetWorkItem[{workItemId]", targetWI.Id);
-                string workItemReflectedId = (string)targetWI.Fields[Target.Options.ReflectedWorkItemIDFieldName].Value;
+                string workItemReflectedId = (string)targetWI.Fields[Target.Options.ReflectedWorkItemIdField].Value;
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindSuiteEntry::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);
                 //Compaire
                 if (workItemReflectedId != expectedReflectedId)
@@ -620,12 +620,12 @@ namespace MigrationTools.Processors
                 //Get Target ReflectedWorkItemId
                 var targetWI = Target.WorkItems.GetWorkItem(testPlan.Id.ToString());
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId]", targetWI.Id);
-                if (!targetWI.Fields.ContainsKey(Target.Options.ReflectedWorkItemIDFieldName))
+                if (!targetWI.Fields.ContainsKey(Target.Options.ReflectedWorkItemIdField))
                 {
-                    Log.LogError("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId} does not have ReflectedWorkItemId field {ReflectedWorkItemIDFieldName}", targetWI.Id, Target.Options.ReflectedWorkItemIDFieldName);
+                    Log.LogError("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId} does not have ReflectedWorkItemId field {ReflectedWorkItemIdField}", targetWI.Id, Target.Options.ReflectedWorkItemIdField);
                     Environment.Exit(-1);
                 }
-                string workItemReflectedId = (string)targetWI.Fields[Target.Options.ReflectedWorkItemIDFieldName].Value;
+                string workItemReflectedId = (string)targetWI.Fields[Target.Options.ReflectedWorkItemIdField].Value;
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);
                 //Compaire
                 if (workItemReflectedId != expectedReflectedId)

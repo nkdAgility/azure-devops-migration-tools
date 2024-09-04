@@ -195,7 +195,7 @@
         "publishedAt": "2020-09-22T13:07:25Z",
         "tagName": "v10.2.4",
         "version": "10.2.4",
-        "description": "The recent changes include an update to the `configuration.json` file, where the `ReflectedWorkItemIDFieldName` has been modified to `nkdScrum.ReflectedWorkItemId`, and various code files have been refactored to replace the `TelemetryClient` with a new `ITelemetryLogger` interface, enhancing telemetry logging capabilities throughout the application. Additionally, several methods now utilize this new telemetry interface for tracking events, exceptions, and dependencies, which may improve the overall logging and monitoring experience for users."
+        "description": "The recent changes include an update to the `configuration.json` file, where the `ReflectedWorkItemIdField` has been modified to `nkdScrum.ReflectedWorkItemId`, and various code files have been refactored to replace the `TelemetryClient` with a new `ITelemetryLogger` interface, enhancing telemetry logging capabilities throughout the application. Additionally, several methods now utilize this new telemetry interface for tracking events, exceptions, and dependencies, which may improve the overall logging and monitoring experience for users."
       },
       {
         "name": "v10.2.3",
@@ -815,7 +815,7 @@
         "publishedAt": "2020-10-09T08:44:35Z",
         "tagName": "v11.5.18",
         "version": "11.5.18",
-        "description": "The recent changes include the introduction of a new configuration structure, replacing the previous `TeamProjectConfig` with an interface `IMigrationClientConfig`, which allows for more flexible configuration management. The configuration now includes an `ObjectType` field, and various properties such as `Collection`, `Project`, and `ReflectedWorkItemIDFieldName` have been updated to utilize this new interface. Additionally, several methods and properties across the codebase have been modified to reference the new configuration structure, ensuring that the migration tools can now handle configurations more dynamically and robustly."
+        "description": "The recent changes include the introduction of a new configuration structure, replacing the previous `TeamProjectConfig` with an interface `IMigrationClientConfig`, which allows for more flexible configuration management. The configuration now includes an `ObjectType` field, and various properties such as `Collection`, `Project`, and `ReflectedWorkItemIdField` have been updated to utilize this new interface. Additionally, several methods and properties across the codebase have been modified to reference the new configuration structure, ensuring that the migration tools can now handle configurations more dynamically and robustly."
       },
       {
         "name": "v11.5.17",
@@ -1302,7 +1302,7 @@
         "publishedAt": "2020-11-14T22:21:30Z",
         "tagName": "v11.7.5",
         "version": "11.7.5",
-        "description": "The recent changes in the `WorkItemMigrationContext.cs` file introduce a validation check to ensure that the target work item contains the specified `ReflectedWorkItemIDFieldName` field; if the field is missing, an error is logged and an exception is thrown, preventing the migration process from proceeding without the necessary configuration."
+        "description": "The recent changes in the `WorkItemMigrationContext.cs` file introduce a validation check to ensure that the target work item contains the specified `ReflectedWorkItemIdField` field; if the field is missing, an error is logged and an exception is thrown, preventing the migration process from proceeding without the necessary configuration."
       },
       {
         "name": "v11.7.4",
@@ -3392,7 +3392,7 @@
         "publishedAt": "2019-09-18T08:46:33Z",
         "tagName": "7.5.74",
         "version": "7.5.74",
-        "description": "The recent changes include an update to the `next-version` in the `GitVersion.yml` file from 7.5.0 to 8.0.0, the addition of a new configuration option `ReplayRevisions` in the `WorkItemMigrationConfig` class, and modifications to the documentation to clarify the configuration requirements for the `ReflectedWorkItemIDFieldName` in both source and target configurations, enhancing user guidance on customization and setup."
+        "description": "The recent changes include an update to the `next-version` in the `GitVersion.yml` file from 7.5.0 to 8.0.0, the addition of a new configuration option `ReplayRevisions` in the `WorkItemMigrationConfig` class, and modifications to the documentation to clarify the configuration requirements for the `ReflectedWorkItemIdField` in both source and target configurations, enhancing user guidance on customization and setup."
       },
       {
         "name": "7.5.73",
@@ -3406,7 +3406,7 @@
         "publishedAt": "2019-09-17T09:36:45Z",
         "tagName": "7.5.72",
         "version": "7.5.72",
-        "description": "This release includes several updates to the configuration options for the Azure DevOps Migration Tools, notably consolidating the handling of the `ReflectedWorkItemIDFieldName` within the `TeamProjectConfig` class, which now directly includes this field. Additionally, various references to project names have been updated to utilize the new configuration structure, ensuring consistency across the codebase. The documentation has also been corrected to reflect the proper spelling of \"recommended\" in the installation instructions."
+        "description": "This release includes several updates to the configuration options for the Azure DevOps Migration Tools, notably consolidating the handling of the `ReflectedWorkItemIdField` within the `TeamProjectConfig` class, which now directly includes this field. Additionally, various references to project names have been updated to utilize the new configuration structure, ensuring consistency across the codebase. The documentation has also been corrected to reflect the proper spelling of \"recommended\" in the installation instructions."
       },
       {
         "name": "7.5.71",
@@ -3728,7 +3728,7 @@
         "publishedAt": "2018-02-21T18:12:24Z",
         "tagName": "7.5.26",
         "version": "7.5.26",
-        "description": "This release introduces a new configuration option, `SourceReflectedWorkItemIDFieldName`, allowing users to specify a different field name for reflected work item IDs in the source project, enhancing flexibility in migration setups. Additionally, several methods have been updated to handle string comparisons and file operations more robustly, ensuring improved reliability when processing work items and attachments."
+        "description": "This release introduces a new configuration option, `SourceReflectedWorkItemIdField`, allowing users to specify a different field name for reflected work item IDs in the source project, enhancing flexibility in migration setups. Additionally, several methods have been updated to handle string comparisons and file operations more robustly, ensuring improved reliability when processing work items and attachments."
       },
       {
         "name": "7.5.25",

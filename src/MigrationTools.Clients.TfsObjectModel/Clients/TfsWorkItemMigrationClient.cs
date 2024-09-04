@@ -148,12 +148,12 @@ namespace MigrationTools.Clients
             Log.Debug("GetReflectedWorkItemId: START");
             var local = workItem.ToWorkItem();
 
-            if (!local.Fields.Contains(Options.ReflectedWorkItemIDFieldName))
+            if (!local.Fields.Contains(Options.ReflectedWorkItemIdField))
             {
                 Log.Debug("GetReflectedWorkItemId: END - no reflected work item id on work item");
                 return null;
             }
-            string rwiid = local.Fields[Options.ReflectedWorkItemIDFieldName].Value.ToString();
+            string rwiid = local.Fields[Options.ReflectedWorkItemIdField].Value.ToString();
             if (!string.IsNullOrEmpty(rwiid))
             {
                 Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField and has value");
@@ -249,7 +249,7 @@ namespace MigrationTools.Clients
                 var wiqb = _workItemQueryBuilderFactory.Create();
                 wiqb.Query = WIQLQuery;
                 wiqb.AddParameter("TeamProject", Options.Project);
-                wiqb.AddParameter("ReflectedWorkItemIdFieldName", Options.ReflectedWorkItemIDFieldName);
+                wiqb.AddParameter("ReflectedWorkItemIdField", Options.ReflectedWorkItemIdField);
                 return wiqb.BuildWIQLQuery(MigrationClient);
             }
         }
@@ -273,7 +273,7 @@ namespace MigrationTools.Clients
                     var workItemQueryBuilder = CreateReflectedWorkItemQuery(refId.ToString());
                     var query = workItemQueryBuilder.BuildWIQLQuery(MigrationClient);
                     var items = query.GetWorkItems();
-                    var reflectedFielName = Options.ReflectedWorkItemIDFieldName;
+                    var reflectedFielName = Options.ReflectedWorkItemIdField;
                     foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[reflectedFielName].Value.ToString() == refId.ToString());
                     if (cache && foundWorkItem is not null)
                     {
@@ -296,7 +296,7 @@ namespace MigrationTools.Clients
                 workItemQueryBuilder.AddParameter("TeamProject", Options.Project);
             }
 
-            queryBuilder.AppendFormat("[{0}] = @idToFind", Options.ReflectedWorkItemIDFieldName);
+            queryBuilder.AppendFormat("[{0}] = @idToFind", Options.ReflectedWorkItemIdField);
             workItemQueryBuilder.AddParameter("idToFind", refId);
             workItemQueryBuilder.Query = queryBuilder.ToString();
             return workItemQueryBuilder;

@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Services;
 using MigrationTools.Services.Shadows;
 using MigrationTools.Shadows;
@@ -54,10 +56,13 @@ namespace MigrationTools.Tests
         {
             return new TfsTeamSettingsEndpointOptions()
             {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
+                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
                 Project = project,
-                AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = TestingConstants.AccessToken,
+                Authentication = new TfsAuthenticationOptions()
+                {
+                    AuthenticationMode = AuthenticationMode.AccessToken,
+                    AccessToken = TestingConstants.AccessToken,
+                }
             };
         }
 
@@ -75,10 +80,13 @@ namespace MigrationTools.Tests
         {
             return new TfsEndpointOptions()
             {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
+                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
                 Project = project,
-                AuthenticationMode = AuthenticationMode.AccessToken,
-                AccessToken = TestingConstants.AccessToken,
+                Authentication = new TfsAuthenticationOptions()
+                {
+                    AuthenticationMode = AuthenticationMode.AccessToken,
+                    AccessToken = TestingConstants.AccessToken,
+                }
             };
         }
     }

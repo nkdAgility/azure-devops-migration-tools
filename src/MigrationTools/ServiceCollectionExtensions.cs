@@ -28,7 +28,11 @@ namespace MigrationTools
 
         public static void AddMigrationToolServices(this IServiceCollection context, IConfiguration configuration, string configFile = "configuration.json")
         {
-            context.AddSingleton<OptionsConfiguration>();
+            // Infra
+            context.AddSingleton<OptionsConfigurationBuilder>();
+            context.AddSingleton<OptionsConfigurationUpgrader>();
+
+
             context.AddConfiguredEndpoints(configuration);
             //Containers
             context.AddTransient<ProcessorEnricherContainer>();

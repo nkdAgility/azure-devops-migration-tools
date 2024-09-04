@@ -22,7 +22,7 @@
       "Collection": "https://dev.azure.com/nkdagility-preview/",
       "Project": "migrationTest5",
       "TfsVersion": "AzureDevOps",
-      "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
+      "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
       "AllowCrossProjectLinking": false,
       "AuthenticationMode": "AccessToken",
       "PersonalAccessToken": "",

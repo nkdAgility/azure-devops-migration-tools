@@ -40,7 +40,7 @@ namespace MigrationTools.Host.Commands
                 string configFile = settings.ConfigFile;
                 if (string.IsNullOrEmpty(configFile))
                 {
-                    configFile = $"configuration-{settings.Options.ToString()}.json";
+                    configFile = $"configuration-{settings.Template.ToString()}.json";
                 }
                 _logger.LogInformation("ConfigFile: {configFile}", configFile);
                 if (File.Exists(configFile))
@@ -57,44 +57,10 @@ namespace MigrationTools.Host.Commands
                 }
                 if (!File.Exists(configFile))
                 {
-                    var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .Build();
+                    _logger.LogInformation("Populating config with {Options}", settings.Template.ToString());
 
-                    _logger.LogInformation("Populating config with {Options}", settings.Options.ToString());
-
-                    OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
-
-                    switch (settings.Options)
-                    {
-                        case OptionsMode.Reference:
-                            optionsBuilder.AddAllOptions();
-                            break;
-                        case OptionsMode.Basic:
-                            optionsBuilder.AddOption("TfsWorkItemMigrationProcessor");
-                            optionsBuilder.AddOption("FieldMappingTool");
-                            optionsBuilder.AddOption("FieldLiteralMap");
-                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Source");
-                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Target");
-                            break;
-                        case OptionsMode.WorkItemTracking:
-                            optionsBuilder.AddOption("TfsWorkItemMigrationProcessor");
-                            optionsBuilder.AddOption("FieldMappingTool");
-                            optionsBuilder.AddOption("FieldLiteralMap");
-                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Source");
-                            optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Target");
-                            break;
-                        case OptionsMode.PipelineProcessor:
-                            optionsBuilder.AddOption("AzureDevOpsPipelineProcessor");
-                            optionsBuilder.AddOption("AzureDevOpsEndpoint", "Source");
-                            optionsBuilder.AddOption("AzureDevOpsEndpoint", "Target");
-                            break;
-                        default:
-                            optionsBuilder.AddAllOptions();
-                            break;
-                    }
-
+                    OptionsConfigurationBuilder optionsBuilder = Services.GetService<OptionsConfigurationBuilder>();
+                    optionsBuilder.ApplyTemplate(settings.Template);
                     string json = optionsBuilder.Build();
 
                     File.WriteAllText(configFile, json);

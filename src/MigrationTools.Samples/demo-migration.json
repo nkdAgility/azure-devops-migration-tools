@@ -8,7 +8,7 @@
         "Collection": "https://tfs.test.company.com/tfs/coll1/",
         "Name": "ProjectName_New"
     },
-    "ReflectedWorkItemIDFieldName": "TfsMigrationTool.ReflectedWorkItemId",
+    "ReflectedWorkItemIdField": "TfsMigrationTool.ReflectedWorkItemId",
     "WorkItemTypeDefinition": {
         "Bug": "Bug",
         "User Story": "User Story",

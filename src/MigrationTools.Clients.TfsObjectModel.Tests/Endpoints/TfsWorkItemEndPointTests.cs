@@ -18,6 +18,7 @@ using MigrationTools.Shadows;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using System.Text;
+using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.Endpoints.Tests
 {
@@ -80,10 +81,13 @@ namespace MigrationTools.Endpoints.Tests
             {
                 IOptions<TfsWorkItemEndpointOptions> wrappedOptions = Microsoft.Extensions.Options.Options.Create(new TfsWorkItemEndpointOptions()
                 {
-                    Organisation = options != null? options.Organisation : "https://dev.azure.com/nkdagility-preview/",
+                    Collection = options != null? options.Collection : new Uri("https://dev.azure.com/nkdagility-preview/"),
                     Project = options != null ? options.Project : "migrationSource1",
-                    AuthenticationMode = options != null ? options.AuthenticationMode : AuthenticationMode.AccessToken,
-                    AccessToken = options != null ? options.AccessToken : TestingConstants.AccessToken,
+                    Authentication = new TfsAuthenticationOptions()
+                    {
+                        AccessToken = options != null ? options.Authentication.AccessToken : TestingConstants.AccessToken,
+                        AuthenticationMode = options != null ? options.Authentication.AuthenticationMode : AuthenticationMode.AccessToken
+                    },
                     Query = options != null ? options.Query : new Options.QueryOptions()
                     {
                         Query = "SELECT [System.Id], [System.Tags] " +
@@ -135,7 +139,7 @@ namespace MigrationTools.Endpoints.Tests
                     ""Collection"": ""https://dev.azure.com/nkdagility-preview/"",
                     ""Project"": ""migrationSource1"",
                     ""AllowCrossProjectLinking"": false,
-                    ""ReflectedWorkItemIDFieldName"": ""Custom.ReflectedWorkItemId"",
+                    ""ReflectedWorkItemIdField"": ""Custom.ReflectedWorkItemId"",
                     ""Authentication"": {
                       ""AuthenticationMode"": ""AccessToken"",
                       ""AccessToken"": ""123456"",
@@ -164,7 +168,7 @@ namespace MigrationTools.Endpoints.Tests
                         ""Domain"": """"
                       }
                     },
-                    ""ReflectedWorkItemIDFieldName"": ""nkdScrum.ReflectedWorkItemId"",
+                    ""ReflectedWorkItemIdField"": ""nkdScrum.ReflectedWorkItemId"",
                     ""AllowCrossProjectLinking"": false,
                     ""LanguageMaps"": {
                       ""AreaPath"": ""Area"",

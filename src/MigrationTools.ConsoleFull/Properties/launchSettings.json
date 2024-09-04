@@ -9,7 +9,7 @@
     },
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c \"configuration.json\" --debugTrace"
+      "commandLineArgs": "execute -c \"configuration.json\" --disableTelemetry --debugTrace"
     },
     "execute --help": {
       "commandName": "Project",
@@ -18,10 +18,6 @@
     "init Options-Basic": {
       "commandName": "Project",
       "commandLineArgs": "init --options Basic --overwrite"
-    },
-    "Config": {
-      "commandName": "Project",
-      "commandLineArgs": "config -c \"configuration.json\""
     },
     "init Options-Reference": {
       "commandName": "Project",
@@ -34,6 +30,10 @@
     "Execute Classic": {
       "commandName": "Project",
       "commandLineArgs": "execute -c \"configuration-classic.json\""
+    },
+    "Builder with Config": {
+      "commandName": "Project",
+      "commandLineArgs": "builder -c \"configuration.json\""
     }
   }
 }
