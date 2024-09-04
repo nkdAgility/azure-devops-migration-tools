@@ -57,7 +57,7 @@ namespace MigrationTools.Host.Commands
 
             OptionsConfigurationBuilder optionsBuilder = Services.GetRequiredService<OptionsConfigurationBuilder>();
             OptionsConfigurationUpgrader optionsUpgrader = Services.GetRequiredService<OptionsConfigurationUpgrader>();
-            optionsUpgrader.UpgradeConfiguration(optionsBuilder);
+            optionsUpgrader.UpgradeConfiguration(optionsBuilder, configFile);
             string json = optionsBuilder.Build();
             configFile = AddSuffixToFileName(configFile, "-upgraded");
             File.WriteAllText(configFile, json);

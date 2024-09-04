@@ -23,12 +23,6 @@ namespace MigrationTools.Options
                     optionsBuilder.AddAllOptions();
                     break;
                 case OptionsConfigurationTemplate.Basic:
-                    optionsBuilder.AddOption("TfsWorkItemMigrationProcessor");
-                    optionsBuilder.AddOption("FieldMappingTool");
-                    optionsBuilder.AddOption("FieldLiteralMap");
-                    optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Source");
-                    optionsBuilder.AddOption("TfsTeamProjectEndpoint", "Target");
-                    break;
                 case OptionsConfigurationTemplate.WorkItemTracking:
                     optionsBuilder.AddOption("TfsWorkItemMigrationProcessor");
                     optionsBuilder.AddOption("FieldMappingTool");
@@ -38,8 +32,8 @@ namespace MigrationTools.Options
                     break;
                 case OptionsConfigurationTemplate.PipelineProcessor:
                     optionsBuilder.AddOption("AzureDevOpsPipelineProcessor");
-                    optionsBuilder.AddOption("AzureDevOpsEndpoint", "Source");
-                    optionsBuilder.AddOption("AzureDevOpsEndpoint", "Target");
+                    optionsBuilder.AddOption("AzureDevOpsEndpoint", "PipelineSource");
+                    optionsBuilder.AddOption("AzureDevOpsEndpoint", "PipelineTarget");
                     break;
                 default:
                     optionsBuilder.AddAllOptions();

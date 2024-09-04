@@ -30,11 +30,8 @@ namespace MigrationTools.Options
     public class OptionsConfigurationUpgrader
     {
         public IServiceProvider Services { get; }
-        public IConfiguration Configuration { get; }
 
         readonly ILogger _logger;
-
-
         private static Dictionary<string, string> classNameChangeLog = new Dictionary<string, string>();
 
         private List<Type> catalogue;
@@ -45,7 +42,6 @@ namespace MigrationTools.Options
             ITelemetryLogger telemetryLogger, IServiceProvider services)
         {
             this.Services = services;
-            this.Configuration = configuration;
             this._logger = logger;
             catalogue = AppDomain.CurrentDomain.GetMigrationToolsTypes().WithInterface<IOptions>().ToList();
             configuration.GetSection("MigrationTools:Infrastructure:ClassNameChangeMappings").Bind(classNameChangeLog);
@@ -55,7 +51,7 @@ namespace MigrationTools.Options
             }
         }
 
-        public OptionsConfigurationBuilder UpgradeConfiguration(OptionsConfigurationBuilder optionsBuilder)
+        public OptionsConfigurationBuilder UpgradeConfiguration(OptionsConfigurationBuilder optionsBuilder, string configurationFile)
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("OptionsConfigurationUpgrader::UpgradeConfiguration"))
             {
@@ -64,7 +60,19 @@ namespace MigrationTools.Options
                     optionsBuilder = this.Services.GetService<OptionsConfigurationBuilder>();
                 }
 
-                var schemaVersion = VersionOptions.ConfigureOptions.GetMigrationConfigVersion(Configuration);
+                if (string.IsNullOrEmpty(configurationFile))
+                {
+                    configurationFile = "configuration.json";
+                }
+                _logger.LogInformation("Importing: {configFile}", configurationFile);
+
+                // Load configuration
+                var configuration = new ConfigurationBuilder()
+                    .AddJsonFile(configurationFile, optional: false, reloadOnChange: false)
+                    .Build();
+
+
+                var schemaVersion = VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration);
                 activity?.AddTag("SchemaVersion", schemaVersion.schema.ToString());
                 activity.AddEvent(new ActivityEvent($"UpgradeConfigCommand.{schemaVersion.schema.ToString()}"));
                 switch (schemaVersion.schema)
@@ -73,29 +81,29 @@ namespace MigrationTools.Options
                     case MigrationConfigSchema.v150:
                         activity.AddEvent(new ActivityEvent("UpgradeConfigCommand.v150"));
                         // ChangeSetMappingFile
-                        optionsBuilder.AddOption(ParseV1TfsChangeSetMappingToolOptions(Configuration));
-                        optionsBuilder.AddOption(ParseV1TfsGitRepoMappingOptions(Configuration));
-                        optionsBuilder.AddOption(ParseV1FieldMaps(Configuration));
-                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "Processors", "$type"));
-                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "CommonEnrichersConfig", "$type"));
-                        if (!IsSectionNullOrEmpty(Configuration.GetSection("Source")) || !IsSectionNullOrEmpty(Configuration.GetSection("Target")))
+                        optionsBuilder.AddOption(ParseV1TfsChangeSetMappingToolOptions(configuration));
+                        optionsBuilder.AddOption(ParseV1TfsGitRepoMappingOptions(configuration));
+                        optionsBuilder.AddOption(ParseV1FieldMaps(configuration));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "Processors", "$type"));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "CommonEnrichersConfig", "$type"));
+                        if (!IsSectionNullOrEmpty(configuration.GetSection("Source")) || !IsSectionNullOrEmpty(configuration.GetSection("Target")))
                         {
-                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "Source", "$type"), "Source");
-                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "Target", "$type"), "Target");
+                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "Source", "$type"), "Source");
+                            optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "Target", "$type"), "Target");
                         }
                         else
                         {
-                            optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(Configuration, "Endpoints:AzureDevOpsEndpoints", "Source"), "Source");
-                            optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(Configuration, "Endpoints:AzureDevOpsEndpoints", "Target"), "Target");
+                            optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(configuration, "Endpoints:AzureDevOpsEndpoints", "Source"), "Source");
+                            optionsBuilder.AddOption(ParseSectionCollectionWithPathAsTypeToOption(configuration, "Endpoints:AzureDevOpsEndpoints", "Target"), "Target");
                         }
                         break;
                     case MigrationConfigSchema.v160:
 
-                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "MigrationTools:Endpoints:Source", "EndpointType"), "Source");
-                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(Configuration, "MigrationTools:Endpoints:Target", "EndpointType"), "Target");
-                        optionsBuilder.AddOption(ParseSectionListWithPathAsTypeToOption(Configuration, "MigrationTools:CommonTools"));
-                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "MigrationTools:CommonTools:FieldMappingTool:FieldMaps", "FieldMapType"));
-                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(Configuration, "MigrationTools:Processors", "ProcessorType"));
+                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "MigrationTools:Endpoints:Source", "EndpointType"), "Source");
+                        optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "MigrationTools:Endpoints:Target", "EndpointType"), "Target");
+                        optionsBuilder.AddOption(ParseSectionListWithPathAsTypeToOption(configuration, "MigrationTools:CommonTools"));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "MigrationTools:CommonTools:FieldMappingTool:FieldMaps", "FieldMapType"));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "MigrationTools:Processors", "ProcessorType"));
                         break;
                 }
                 return optionsBuilder;
@@ -142,7 +150,7 @@ namespace MigrationTools.Options
             {
                 var optionTypeString = childSection.GetValue<string>(typePropertyName);
                 var newOptionTypeString = ParseOptionsType(optionTypeString);
-                _logger.LogInformation("Upgrading {group} item {old} to {new}", path, optionTypeString, newOptionTypeString);
+                _logger.LogDebug("Upgrading {group} item {old} to {new}", path, optionTypeString, newOptionTypeString);
                 var option = GetOptionWithDefaults(configuration, newOptionTypeString);
                 childSection.Bind(option);
                 options.Add(option);
@@ -154,7 +162,7 @@ namespace MigrationTools.Options
         private List<IOptions> ParseV1FieldMaps(IConfiguration configuration)
         {
             List<IOptions> options = new List<IOptions>();
-            _logger.LogInformation("Upgrading {old} to {new}", "FieldMaps", "FieldMappingToolOptions");
+            _logger.LogDebug("Upgrading {old} to {new}", "FieldMaps", "FieldMappingToolOptions");
             var toolOption = GetOptionWithDefaults(configuration, ParseOptionsType("FieldMappingToolOptions"));
             toolOption.Enabled = true;
             options.Add(toolOption);
@@ -175,7 +183,7 @@ namespace MigrationTools.Options
         private IOptions GetOptionFromTypeString(IConfiguration configuration, IConfigurationSection optionsConfig, string optionTypeString)
         {
             var newOptionTypeString = ParseOptionsType(optionTypeString);
-            _logger.LogInformation("Upgrading to {old} to {new}", optionTypeString, newOptionTypeString);
+            _logger.LogDebug("Upgrading to {old} to {new}", optionTypeString, newOptionTypeString);
             IOptions sourceOptions;
             sourceOptions = GetOptionWithDefaults(configuration, newOptionTypeString);
             optionsConfig.Bind(sourceOptions);

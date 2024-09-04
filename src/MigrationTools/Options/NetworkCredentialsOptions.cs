@@ -1,4 +1,6 @@
 ﻿using System;
+using MigrationTools.Options.Infrastructure;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Options
 {
@@ -13,6 +15,8 @@ namespace MigrationTools.Options
     {
         public string Domain { get; set; }
         public string UserName { get; set; }
+
+        [JsonConverter(typeof(DefaultOnlyConverter<string>), "** removed as a secret ***")]
         public string Password { get; set; }
     }
 }

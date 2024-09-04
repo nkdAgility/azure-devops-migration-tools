@@ -1,6 +1,6 @@
 {
   "Serilog": {
-    "MinimumLevel": "Debug"
+    "MinimumLevel": "Information"
   },
   "MigrationTools": {
     "Version": "16.0",
@@ -96,7 +96,7 @@
           }
         ]
       },
-      "GitRepoMappingTool": {
+      "TfsGitRepositoryTool": {
         "Enabled": true,
         "Mappings": {
           "Source Repo Name": "Target Repo Name"

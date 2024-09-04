@@ -19,10 +19,6 @@
       "commandName": "Project",
       "commandLineArgs": "init --options Basic --overwrite"
     },
-    "Config": {
-      "commandName": "Project",
-      "commandLineArgs": "config -c \"configuration.json\""
-    },
     "init Options-Reference": {
       "commandName": "Project",
       "commandLineArgs": "init --options Reference -c configuration-ref.json --overwrite"
@@ -34,6 +30,10 @@
     "Execute Classic": {
       "commandName": "Project",
       "commandLineArgs": "execute -c \"configuration-classic.json\""
+    },
+    "Builder with Config": {
+      "commandName": "Project",
+      "commandLineArgs": "builder -c \"configuration.json\""
     }
   }
 }
