@@ -17,7 +17,7 @@ using Serilog.Core;
 
 namespace MigrationTools.Options
 {
-    public  class OptionsConfiguration
+    public  class OptionsConfigurationBuilder
     {
         readonly ILogger logger;
         readonly IConfiguration configuration;
@@ -27,9 +27,9 @@ namespace MigrationTools.Options
 
         private List<Type> catalogue;
 
-        public OptionsConfiguration(
+        public OptionsConfigurationBuilder(
             IConfiguration configuration,
-            ILogger<OptionsConfiguration> logger,
+            ILogger<OptionsConfigurationBuilder> logger,
             ITelemetryLogger telemetryLogger)
         {
             this.configuration = configuration;

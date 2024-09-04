@@ -41,7 +41,7 @@ namespace MigrationTools.Options
 
         public OptionsConfigurationUpgrader(
             IConfiguration configuration,
-            ILogger<OptionsConfiguration> logger,
+            ILogger<OptionsConfigurationBuilder> logger,
             ITelemetryLogger telemetryLogger, IServiceProvider services)
         {
             this.Services = services;
@@ -55,7 +55,7 @@ namespace MigrationTools.Options
             }
         }
 
-        public OptionsConfiguration UpgradeConfiguration(OptionsConfiguration optionsBuilder)
+        public OptionsConfigurationBuilder UpgradeConfiguration(OptionsConfigurationBuilder optionsBuilder)
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("OptionsConfigurationUpgrader::UpgradeConfiguration"))
             {
@@ -63,7 +63,7 @@ namespace MigrationTools.Options
 
                 if (optionsBuilder == null)
                 {
-                    optionsBuilder = this.Services.GetService<OptionsConfiguration>();
+                    optionsBuilder = this.Services.GetService<OptionsConfigurationBuilder>();
                 }
 
                 var schemaVersion = VersionOptions.ConfigureOptions.GetMigrationConfigVersion(Configuration);

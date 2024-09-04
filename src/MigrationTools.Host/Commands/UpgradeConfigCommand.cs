@@ -55,7 +55,7 @@ namespace MigrationTools.Host.Commands
             }
             _logger.LogInformation("ConfigFile: {configFile}", configFile);
 
-            OptionsConfiguration optionsBuilder = Services.GetRequiredService<OptionsConfiguration>();
+            OptionsConfigurationBuilder optionsBuilder = Services.GetRequiredService<OptionsConfigurationBuilder>();
             OptionsConfigurationUpgrader optionsUpgrader = Services.GetRequiredService<OptionsConfigurationUpgrader>();
 
             optionsUpgrader.UpgradeConfiguration(optionsBuilder);

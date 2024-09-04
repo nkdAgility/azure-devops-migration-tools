@@ -59,7 +59,7 @@ namespace MigrationTools.Host.Commands
                 {
                     _logger.LogInformation("Populating config with {Options}", settings.Options.ToString());
 
-                    OptionsConfiguration optionsBuilder = Services.GetService<OptionsConfiguration>();
+                    OptionsConfigurationBuilder optionsBuilder = Services.GetService<OptionsConfigurationBuilder>();
 
                     switch (settings.Options)
                     {

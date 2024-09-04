@@ -29,7 +29,7 @@ namespace MigrationTools
         public static void AddMigrationToolServices(this IServiceCollection context, IConfiguration configuration, string configFile = "configuration.json")
         {
             // Infra
-            context.AddSingleton<OptionsConfiguration>();
+            context.AddSingleton<OptionsConfigurationBuilder>();
             context.AddSingleton<OptionsConfigurationUpgrader>();
 
 

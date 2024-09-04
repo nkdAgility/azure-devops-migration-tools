@@ -258,32 +258,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"main"
+            => @"topic/config-builder"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"b8619076"
+            => @"2fc40644"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"b86190765c571122bf2123e6c77ccab307b81025"
+            => @"2fc406443fd9372200d117e0dd124d16579a4638"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-04T09:21:49+01:00"
+            => @"2024-09-04T11:25:39+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.0-Preview.9"
+            => @"v16.0.0-Preview.9-2-g2fc40644"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -318,7 +318,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"0"
+            => @"2"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
