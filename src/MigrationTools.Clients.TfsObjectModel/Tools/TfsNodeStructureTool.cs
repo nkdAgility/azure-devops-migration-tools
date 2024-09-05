@@ -17,6 +17,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.FieldMaps;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json;
 using Serilog.Context;
@@ -62,10 +63,12 @@ namespace MigrationTools.Tools
         private string _targetProjectName;
         private KeyValuePair<string, string>? _lastResortRemapRule;
 
+        public WorkItemMetrics workItemMetrics { get; private set; }
+
         public TfsNodeStructureTool(IOptions<TfsNodeStructureToolOptions> options, IServiceProvider services, ILogger<TfsNodeStructureTool> logger, ITelemetryLogger telemetryLogger)
             : base(options, services, logger, telemetryLogger)
         {
-
+            workItemMetrics = services.GetRequiredService<WorkItemMetrics>();
         }
 
         public void ApplySettings(TfsNodeStructureToolSettings settings)

@@ -58,7 +58,7 @@ options:
 status: missng XML code comments
 processingTarget: missng XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMap.cs
-optionsClassFile: ''
+optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMapOptions.cs
 
 redirectFrom:
 - /Reference/FieldMaps/TreeToTagFieldMapOptions/

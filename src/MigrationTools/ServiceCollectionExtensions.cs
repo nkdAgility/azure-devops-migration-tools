@@ -11,6 +11,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Interfaces;
 using Serilog;
@@ -32,6 +33,8 @@ namespace MigrationTools
             context.AddSingleton<OptionsConfigurationBuilder>();
             context.AddSingleton<OptionsConfigurationUpgrader>();
 
+
+            
 
             context.AddConfiguredEndpoints(configuration);
             //Containers

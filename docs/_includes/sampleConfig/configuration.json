@@ -4,59 +4,139 @@
   },
   "MigrationTools": {
     "Version": "16.0",
-    "Source": {
-      "EndpointType": "TfsTeamProject",
-      "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "migrationSource1",
-      "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": "",
-      "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
-
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "AllowCrossProjectLinking": false,
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "",
+          "NetworkCredentials": {
+            "UserName": "",
+            "Password": "",
+            "Domain": ""
+          }
+        },
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "TfsVersion": "AzureDevOps",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "",
+          "NetworkCredentials": {
+            "UserName": "",
+            "Password": "",
+            "Domain": ""
+          }
+        },
+        "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
       }
     },
-    "Target": {
-      "EndpointType": "TfsTeamProject",
-      "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "migrationTest5",
-      "TfsVersion": "AzureDevOps",
-      "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
-      "AllowCrossProjectLinking": false,
-      "AuthenticationMode": "AccessToken",
-      "PersonalAccessToken": "",
-      "LanguageMaps": {
-        "AreaPath": "Area",
-        "IterationPath": "Iteration"
-      }
-    },
-    "CommonEnrichers": {
-      "TfsChangeSetMapping": {
+    "CommonTools": {
+      "WorkItemTypeMappingTool": {
+        "Enabled": true,
+        "Mappings": {
+          "User Story": "Product Backlog Item"
+        }
+      },
+      "StringManipulatorTool": {
+        "Enabled": true,
+        "MaxStringLength": 1000000,
+        "Manipulators": [
+          {
+            "$type": "RegexStringManipulator",
+            "Enabled": true,
+            "Pattern": "[^( -~)\n\r\t]+",
+            "Replacement": "",
+            "Description": "Remove invalid characters from the end of the string"
+          }
+        ]
+      },
+      "TfsAttachmentTool": {
+        "RefName": "TfsAttachmentTool",
+        "Enabled": true,
+        "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+        "MaxRevisions": 480000000
+      },
+      "TfsChangeSetMappingTool": {
         "Enabled": true,
         "File": "C:\\temp\\ChangeSetMappingFile.json"
       },
-      "TfsFieldMappings": {
+      "FieldMappingTool": {
         "Enabled": true,
         "FieldMaps": [
           {
-            "FieldMapType": "FieldToFieledMap",
+            "FieldMapType": "FieldtoFieldMap",
+            "ApplyTo": [ "SomeWorkItemType" ],
             "sourceField": "System.AcceptanceCriteria",
             "targetField": "System.AcceptanceCriteria2"
 
           },
           {
-            "FieldMapType": "FieldToFieledMap",
+            "FieldMapType": "FieldtoFieldMap",
+            "ApplyTo": [ "SomeWorkItemType" ],
             "sourceField": "System.Description",
             "targetField": "System.Description2"
 
           }
         ]
+      },
+      "TfsGitRepositoryTool": {
+        "Enabled": true,
+        "Mappings": {
+          "Source Repo Name": "Target Repo Name"
+        }
+      },
+      "TfsNodeStructureTool": {
+        "Enabled": true,
+        "Areas": {
+          "Filters": [ " *\\Team 1,*\\Team 1\\**" ],
+          "Mappings": {
+            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+          }
+        },
+        "Iterations": {
+          "Filters": [],
+          "Mappings": {
+            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
+            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
+          }
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManagerTool": {
+        "Enabled": true,
+        "ReplayRevisions": true,
+        "MaxRevisions": 0
+      },
+      "TfsTeamSettingsTool": {
+        "Enabled": true,
+        "MigrateTeamSettings": true,
+        "UpdateTeamSettings": true,
+        "MigrateTeamCapacities": true,
+        "Teams": [ "Team 1", "Team 2" ]
       }
     },
     "Processors": [
       {
-        "ProcessorType": "WorkItemMigration",
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
         "Enabled": true,
         "UpdateCreatedDate": true,
         "UpdateCreatedBy": true,
@@ -67,7 +147,7 @@
         "PauseAfterEachWorkItem": false,
         "AttachRevisionHistory": false,
         "GenerateMigrationComment": true,
-        "WorkItemIDs": [],
+        "WorkItemIDs": [ 12 ],
         "MaxGracefulFailures": 0,
         "SkipRevisionWithInvalidIterationPath": false,
         "SkipRevisionWithInvalidAreaPath": false

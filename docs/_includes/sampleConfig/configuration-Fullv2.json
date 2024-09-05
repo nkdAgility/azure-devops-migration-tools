@@ -1,78 +1,36 @@
 {
-  "ChangeSetMappingFile": null,
-  "Source": null,
-  "Target": null,
-  "FieldMaps": [],
-  "GitRepoMapping": null,
-  "LogLevel": "Information",
-  "CommonEnrichersConfig": null,
-  "Processors": [
-    {
-      "$type": "WorkItemTrackingProcessorOptions",
-      "Enabled": true,
-      "ReplayRevisions": true,
-      "PrefixProjectToNodes": false,
-      "CollapseRevisions": false,
-      "WorkItemCreateRetryLimit": 5,
-      "ProcessorEnrichers": [
-        {
-          "$type": "PauseAfterEachItemOptions",
-          "Enabled": true
-        },
-        {
-          "$type": "AppendMigrationToolSignatureFooterOptions",
-          "Enabled": true
-        },
-        {
-          "$type": "FilterWorkItemsThatAlreadyExistInTargetOptions",
-          "Enabled": true,
-          "Query": {
-            "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc",
-            "Parameters": null
-          }
-        },
-        {
-          "$type": "SkipToFinalRevisedWorkItemTypeOptions",
-          "Enabled": true
-        },
-        {
-          "$type": "TfsValidateRequiredFieldOptions",
-          "Enabled": true
-        },
-        {
-          "$type": "TfsNodeStructureOptions",
-          "Enabled": true,
-          "PrefixProjectToNodes": false,
-          "NodeBasePaths": null,
-          "AreaMaps": {},
-          "IterationMaps": {}
-        },
-        {
-          "$type": "TfsRevisionManagerOptions",
-          "Enabled": true,
-          "ReplayRevisions": false,
-          "MaxRevisions": 0
-        }
-      ],
-      "SourceName": "Source",
-      "TargetName": "Target"
-    }
-  ],
-  "Version": "0.0",
-  "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
+  "Serilog": {
+    "MinimumLevel": "Information"
   },
-  "Endpoints": {
-    "InMemoryWorkItemEndpoints": [
+  "MigrationTools": {
+    "Version": "0.0",
+    "Endpoints": {},
+    "Processors": [
       {
-        "Name": "Source",
-        "EndpointEnrichers": null
-      },
-      {
-        "Name": "Target",
-        "EndpointEnrichers": null
+        "ProcessorType": "WorkItemTrackingProcessor",
+        "Enabled": true,
+        "ReplayRevisions": true,
+        "CollapseRevisions": false,
+        "WorkItemCreateRetryLimit": 5,
+        "Enrichers": null,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "RefName": null
       }
-    ]
+    ],
+    "CommonTools": {
+      "TfsChangeSetMappingTool": {
+        "Enabled": true,
+        "ChangeSetMappingFile": ""
+      },
+      "TfsGitRepositoryTool": {
+        "Enabled": true,
+        "Mappings": null
+      },
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": []
+      }
+    }
   }
 }

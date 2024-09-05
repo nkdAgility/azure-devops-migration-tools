@@ -61,9 +61,12 @@ namespace MigrationTools.Processors
         private ILogger workItemLog;
         private List<string> _itemsInError;
 
+        public WorkItemMetrics workItemMetrics { get; private set; }
+
         public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
             contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
+            workItemMetrics = services.GetRequiredService<WorkItemMetrics>();
         }
 
         new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
@@ -85,9 +88,6 @@ namespace MigrationTools.Processors
             workItemLog.Write(level, workItemLogTemplate + message);
         }
 
-        private static readonly Meter WorkItemMeter = new Meter("MigrationTools.WorkItemProcessor");
-        private static readonly Counter<long> WorkItemsProcessedCounter = WorkItemMeter.CreateCounter<long>("work_items_processed_total");
-        private static readonly Histogram<double> WorkItemProcessingDurationHistogram = WorkItemMeter.CreateHistogram<double>("work_item_processing_duration");
 
         protected override void InternalExecute()
         {
@@ -161,8 +161,10 @@ namespace MigrationTools.Processors
                 _count = sourceWorkItems.Count;
                 _elapsedms = 0;
                 _totalWorkItem = sourceWorkItems.Count;
+                ProcessorActivity.SetTag("source_workitems_to_process", sourceWorkItems.Count);
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
+                    
                     var stopwatch = Stopwatch.StartNew();
                     var sourceWorkItem = TfsExtensions.ToWorkItem(sourceWorkItemData);
                     workItemLog = contextLog.ForContext("SourceWorkItemId", sourceWorkItem.Id);
@@ -179,8 +181,8 @@ namespace MigrationTools.Processors
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
-                            WorkItemsProcessedCounter.Add(1, new KeyValuePair<string, object?>("workItemType", sourceWorkItemData.Type));
-                            WorkItemProcessingDurationHistogram.Record(processingTime, new KeyValuePair<string, object?>("workItemType", sourceWorkItemData.Type));
+                            workItemMetrics.WorkItemsProcessedCount.Add(1, new KeyValuePair<string, object?>("workItemType", sourceWorkItemData.Type));
+                            workItemMetrics.ProcessingDuration.Record(processingTime, new KeyValuePair<string, object?>("workItemType", sourceWorkItemData.Type));
                             if (Options.PauseAfterEachWorkItem)
                             {
                                 Console.WriteLine("Do you want to continue? (y/n)");
@@ -278,7 +280,7 @@ namespace MigrationTools.Processors
         private void ValiddateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
-                     // get list of all work item types
+            // get list of all work item types
             List<String> sourceWorkItemTypes = sourceWorkItems.SelectMany(x => x.Revisions.Values)
             //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
             .Select(x => x.Type)
@@ -521,117 +523,118 @@ namespace MigrationTools.Processors
                 activity?.SetTag("TargetURL", Target.Options.Collection.ToString());
                 activity?.SetTag("TargetProject", Target.WorkItems.Project.Name);
                 activity?.SetTag("RetryLimit", retryLimit.ToString());
-                activity?.SetTag("RetryNumber", retries.ToString());                
-            Log.LogDebug("######################################################################################");
-            Log.LogDebug("ProcessWorkItem: {sourceWorkItemId}", sourceWorkItem.Id);
-            Log.LogDebug("######################################################################################");
-            try
-            {
-                if (sourceWorkItem.Type != "Test Plan" && sourceWorkItem.Type != "Test Suite")
+                activity?.SetTag("RetryNumber", retries.ToString());
+                Log.LogDebug("######################################################################################");
+                Log.LogDebug("ProcessWorkItem: {sourceWorkItemId}", sourceWorkItem.Id);
+                Log.LogDebug("######################################################################################");
+                try
                 {
-                    var targetWorkItem = Target.WorkItems.FindReflectedWorkItem(sourceWorkItem, false);
-                    ///////////////////////////////////////////////
-                    TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
-                        new Dictionary<string, object>(){
+                    if (sourceWorkItem.Type != "Test Plan" && sourceWorkItem.Type != "Test Suite")
+                    {
+                        workItemMetrics.RevisionsPerWorkItem.Record(sourceWorkItem.Rev);
+                        var targetWorkItem = Target.WorkItems.FindReflectedWorkItem(sourceWorkItem, false);
+                        ///////////////////////////////////////////////
+                        TraceWriteLine(LogEventLevel.Information, "Work Item has {sourceWorkItemRev} revisions and revision migration is set to {ReplayRevisions}",
+                            new Dictionary<string, object>(){
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", CommonTools.RevisionManager.ReplayRevisions }}
-                        );
-                    List<RevisionItem> revisionsToMigrate = CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
-                    if (targetWorkItem == null)
-                    {
-                        targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
+                            );
+                        List<RevisionItem> revisionsToMigrate = CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
+                        if (targetWorkItem == null)
+                        {
+                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
                             activity?.SetTag("Revisions", revisionsToMigrate.Count);
 
-                    }
-                    else
-                    {
-                        if (revisionsToMigrate.Count == 0)
-                        {
-                            ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                            ProcessWorkItemLinks(Source.WorkItems, Target.WorkItems, sourceWorkItem, targetWorkItem);
-                            ProcessHTMLFieldAttachements(targetWorkItem);
-                            ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
-                            TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
-                                activity?.SetTag("Revisions", 0);
                         }
                         else
                         {
-                            TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisions detected",
-                                new Dictionary<string, object>(){
+                            if (revisionsToMigrate.Count == 0)
+                            {
+                                ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                                ProcessWorkItemLinks(Source.WorkItems, Target.WorkItems, sourceWorkItem, targetWorkItem);
+                                ProcessHTMLFieldAttachements(targetWorkItem);
+                                ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
+                                TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
+                                activity?.SetTag("Revisions", 0);
+                            }
+                            else
+                            {
+                                TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisions detected",
+                                    new Dictionary<string, object>(){
                                     { "revisionsToMigrateCount", revisionsToMigrate.Count }
-                                });
+                                    });
 
-                            targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem);
+                                targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, targetWorkItem);
+                            }
+                        }
+                        if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
+                        {
+                            targetWorkItem.SaveToAzureDevOps();
+                        }
+                        if (targetWorkItem != null)
+                        {
+                            targetWorkItem.ToWorkItem().Close();
+                        }
+                        if (sourceWorkItem != null)
+                        {
+                            sourceWorkItem.ToWorkItem().Close();
                         }
                     }
-                    if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
+                    else
                     {
-                        targetWorkItem.SaveToAzureDevOps();
-                    }
-                    if (targetWorkItem != null)
-                    {
-                        targetWorkItem.ToWorkItem().Close();
-                    }
-                    if (sourceWorkItem != null)
-                    {
-                        sourceWorkItem.ToWorkItem().Close();
-                    }
-                }
-                else
-                {
-                    TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ",
-                        new Dictionary<string, object>() {
+                        TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ",
+                            new Dictionary<string, object>() {
                             {"sourceWorkItemTypeName", sourceWorkItem.Type },
                             {"sourceWorkItemId", sourceWorkItem.Id }
-                        });
+                            });
+                    }
                 }
-            }
-            catch (WebException ex)
-            {
-                Log.LogError(ex, "Some kind of internet pipe blockage");
-                if (retries < retryLimit)
+                catch (WebException ex)
                 {
-                    TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
-                        new Dictionary<string, object>() {
+                    Log.LogError(ex, "Some kind of internet pipe blockage");
+                    if (retries < retryLimit)
+                    {
+                        TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
+                            new Dictionary<string, object>() {
                             {"retrys", retries }
-                        });
-                    System.Threading.Thread.Sleep(new TimeSpan(0, 0, retries));
-                    retries++;
-                    TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
-                        new Dictionary<string, object>() {
+                            });
+                        System.Threading.Thread.Sleep(new TimeSpan(0, 0, retries));
+                        retries++;
+                        TraceWriteLine(LogEventLevel.Warning, "RETRY {Retrys}/{RetryLimit} ",
+                            new Dictionary<string, object>() {
                             {"Retrys", retries },
                             {"RetryLimit", retryLimit }
-                        });
-                    await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retries);
+                            });
+                        await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retries);
+                    }
+                    else
+                    {
+                        TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    activity?.SetTag("http.response.status_code", "502");
+                    Log.LogError(ex, ex.ToString());
+                    Telemetry.TrackException(ex, activity.Tags);
+                    throw ex;
                 }
-            }
-            catch (Exception ex)
-            {
-                activity?.Stop();
-                activity?.SetStatus(ActivityStatusCode.Error);
-                activity?.SetTag("http.response.status_code", "502");
-                Log.LogError(ex, ex.ToString());
-                Telemetry.TrackException(ex, activity.Tags);
-                throw ex;
-            }
-            var average = new TimeSpan(0, 0, 0, 0, (int)(activity.Duration.TotalMilliseconds / _current));
-            var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
-            TraceWriteLine(LogEventLevel.Information,
-                "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
-                new Dictionary<string, object>() {
+                var average = new TimeSpan(0, 0, 0, 0, (int)(activity.Duration.TotalMilliseconds / _current));
+                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
+                TraceWriteLine(LogEventLevel.Information,
+                    "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
+                    new Dictionary<string, object>() {
                     {"average", average},
                     {"remaining", remaining}
-                });
+                    });
                 activity?.Stop();
                 activity?.SetStatus(ActivityStatusCode.Error);
                 activity?.SetTag("http.response.status_code", "200");
 
-            _current++;
-            _count--;
+                _current++;
+                _count--;
             }
         }
 
@@ -653,7 +656,7 @@ namespace MigrationTools.Processors
                 CommonTools.WorkItemLink.Enrich(this, sourceWorkItem, targetWorkItem);
                 //AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
                 int fixedLinkCount = CommonTools.GitRepository.Enrich(this, sourceWorkItem, targetWorkItem);
-               // AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
+                // AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
             else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case")
             {
@@ -691,6 +694,7 @@ namespace MigrationTools.Processors
 
                 foreach (var revision in revisionsToMigrate)
                 {
+                    workItemMetrics.RevisionsProcessedCount.Add(1);
                     var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
                     TraceWriteLine(LogEventLevel.Information, " Processing Revision [{RevisionNumber}]",
