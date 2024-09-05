@@ -357,7 +357,7 @@ namespace MigrationTools.Processors
                 }
                 else
                 {
-                    throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Most likley this is due to a typo in the .json configuration under WorkItemTypeDefinition! ", destType));
+                    throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Either the work item specific is from the source, or its being specified in the {tool} defenition in your configuration file! ", destType, nameof(WorkItemTypeMappingTool)));
                 }
                 activity?.Stop();
                 activity?.SetStatus(ActivityStatusCode.Ok);
