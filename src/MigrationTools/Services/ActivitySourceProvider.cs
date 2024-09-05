@@ -136,6 +136,8 @@ namespace MigrationTools.Services
 
                 services.AddOptions();
 
+                services.AddSingleton<WorkItemMetrics>();
+
                 // Configure OpenTelemetry
                 Assembly entryAssembly = Assembly.GetEntryAssembly();
                 string entryAssemblyName = entryAssembly?.GetName().Name;
@@ -160,7 +162,7 @@ namespace MigrationTools.Services
                     {
                         builder
                              .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(entryAssemblyName, serviceVersion: versionString))
-                             .AddMeter("MigrationTools.TestPlans", "MigrationTools.WorkItems")
+                             .AddMeter("MigrationTools.TestPlans", WorkItemMetrics.meterName)
                              .AddHttpClientInstrumentation()
                              .AddRuntimeInstrumentation()
                              .AddProcessInstrumentation()
@@ -203,7 +205,6 @@ namespace MigrationTools.Services
 
                 if (value != null)
                 {
-                    activity.SetTag($"options.{property.Name}", value.ToString());
                     activity.SetTag($"{options.GetType().Name}.{property.Name}", value.ToString());
                 }
             }
