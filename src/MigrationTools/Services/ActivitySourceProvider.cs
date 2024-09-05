@@ -160,6 +160,7 @@ namespace MigrationTools.Services
                     {
                         builder
                              .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(entryAssemblyName, serviceVersion: versionString))
+                             .AddMeter("MigrationTools.TestPlans", "MigrationTools.WorkItems")
                              .AddHttpClientInstrumentation()
                              .AddRuntimeInstrumentation()
                              .AddProcessInstrumentation()

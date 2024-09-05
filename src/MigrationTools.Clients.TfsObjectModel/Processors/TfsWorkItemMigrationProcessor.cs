@@ -85,7 +85,7 @@ namespace MigrationTools.Processors
             workItemLog.Write(level, workItemLogTemplate + message);
         }
 
-        private static readonly Meter WorkItemMeter = new Meter("MigrationTools.WorkItemProcessor");
+        private static readonly Meter WorkItemMeter = new Meter("MigrationTools.WorkItems");
         private static readonly Counter<long> WorkItemsProcessedCounter = WorkItemMeter.CreateCounter<long>("work_items_processed_total");
         private static readonly Histogram<double> WorkItemProcessingDurationHistogram = WorkItemMeter.CreateHistogram<double>("work_item_processing_duration");
 

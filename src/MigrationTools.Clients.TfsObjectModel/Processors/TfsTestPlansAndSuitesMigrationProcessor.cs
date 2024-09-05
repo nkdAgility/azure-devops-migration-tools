@@ -52,7 +52,7 @@ namespace MigrationTools.Processors
         private int _totalTestCases = 0;
 
 
-        private static readonly Meter _meter = new Meter("MigrationTools.TestPlansAndSuitesMigrationProcessor", "1.0.0");
+        private static readonly Meter _meter = new Meter("MigrationTools.TestPlans");
         private static readonly Counter<int> _testPlansCounter = _meter.CreateCounter<int>("test_plans_count");
         private static readonly Counter<int> _testSuitesCounter = _meter.CreateCounter<int>("test_suites_count");
         private static readonly Counter<int> _testCasesCounter = _meter.CreateCounter<int>("test_cases_count");
