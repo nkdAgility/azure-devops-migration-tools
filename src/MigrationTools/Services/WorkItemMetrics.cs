@@ -17,7 +17,7 @@ namespace MigrationTools.Services
 
         public Histogram<double> RevisionsPerWorkItem { get; private set; }
 
-        public WorkItemMetrics(IMeterFactory meterFactory, IConfiguration configuration)
+        public WorkItemMetrics(IMeterFactory meterFactory)
         {
             WorkItemMeter = meterFactory.Create(meterName);
             WorkItemsProcessedCount = WorkItemMeter.CreateCounter<long>("work_items_processed_total");

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics.Metrics;
+using Microsoft.Extensions.DependencyInjection;
 using MigrationTools.Clients;
 using MigrationTools.Clients.Shadows;
 using MigrationTools.Services;
@@ -32,6 +33,11 @@ namespace MigrationTools.Shadows
             context.AddSingleton<ITelemetryLogger, TelemetryLoggerFake>();
             context.AddSingleton<IMigrationToolVersion, FakeMigrationToolVersion>();
             context.AddSingleton<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactoryFake>();
+
+
+            // Meters
+            context.AddSingleton<IMeterFactory, MeterFactoryFake>();
+            context.AddSingleton<WorkItemMetrics>();
         }
     }
 }
