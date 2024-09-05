@@ -63,7 +63,8 @@ namespace MigrationTools
 
             }
            var result = elmahIoClient.Messages.CreateAndNotify(new Guid("24086b6d-4f58-47f4-8ac7-68d8bc05ca9e"), createMessage);
-            Console.WriteLine($"Error logged to Elmah.io");
+           Console.WriteLine($"Error logged to Elmah.io! ");
+           Console.WriteLine($"!! Check for latest version - We fix issues constantly - If not, please create a discussion on https://github.com/nkdAgility/azure-devops-migration-tools/discussions so we can get this fixed !!");
         }
 
         public void TrackException(Exception ex, IEnumerable<KeyValuePair<string, string>> properties = null)
