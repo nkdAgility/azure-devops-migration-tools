@@ -59,7 +59,7 @@ namespace MigrationTools.Tools
         private string _sourceProjectName;
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService4 _targetCommonStructureService;
-        
+
         private string _targetProjectName;
         private KeyValuePair<string, string>? _lastResortRemapRule;
 
@@ -77,7 +77,7 @@ namespace MigrationTools.Tools
             _targetProjectName = settings.TargetProjectName;
         }
 
-        public void ValidateAllNodesExistOrAreMapped(TfsProcessor processor, List<WorkItemData> sourceWorkItems, string sourceProject,string targetProject)
+        public void ValidateAllNodesExistOrAreMapped(TfsProcessor processor, List<WorkItemData> sourceWorkItems, string sourceProject, string targetProject)
         {
             ContextLog.Information("Validating::Check that all Area & Iteration paths from Source have a valid mapping on Target");
             if (!Options.Enabled && targetProject != sourceProject)
@@ -108,22 +108,24 @@ namespace MigrationTools.Tools
             var lastResortRule = GetLastResortRemappingRule();
 
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers", mappers);
-            foreach (var mapper in mappers)
+            if (mappers != null)
             {
-                Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}", mapper.Key);
-                if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
+                foreach (var mapper in mappers)
                 {
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Key);
-                    string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Key, replacement);
-                    return replacement;
-                }
-                else
-                {
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::NoMatch", mapper.Key);
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}", mapper.Key);
+                    if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
+                    {
+                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Key);
+                        string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
+                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Key, replacement);
+                        return replacement;
+                    }
+                    else
+                    {
+                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::NoMatch", mapper.Key);
+                    }
                 }
             }
-
             if (!Regex.IsMatch(sourceNodePath, lastResortRule.Key, RegexOptions.IgnoreCase))
             {
                 Log.LogWarning("NodeStructureEnricher.NodePathNotAnchoredException({sourceNodePath}, {nodeStructureType})", sourceNodePath, nodeStructureType.ToString());
@@ -153,7 +155,7 @@ namespace MigrationTools.Tools
 
         private NodeInfo GetOrCreateNode(string nodePath, DateTime? startDate, DateTime? finishDate)
         {
-             Log.LogDebug("TfsNodeStructureTool:GetOrCreateNode({nodePath}, {startDate}, {finishDate})", nodePath, startDate, finishDate);
+            Log.LogDebug("TfsNodeStructureTool:GetOrCreateNode({nodePath}, {startDate}, {finishDate})", nodePath, startDate, finishDate);
             if (_pathToKnownNodeMap.TryGetValue(nodePath, out var info))
             {
                 Log.LogInformation(" Node {0} already migrated, nothing to do", nodePath);
@@ -261,13 +263,13 @@ namespace MigrationTools.Tools
                 case TfsNodeStructureType.Area:
                     return Options.Areas != null ? Options.Areas.Mappings : new Dictionary<string, string>();
                 case TfsNodeStructureType.Iteration:
-                    return Options.Iterations != null ?  Options.Iterations.Mappings : new Dictionary<string, string>();
+                    return Options.Iterations != null ? Options.Iterations.Mappings : new Dictionary<string, string>();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(nodeStructureType), nodeStructureType, null);
             }
         }
 
-        public  void ProcessorExecutionBegin(TfsProcessor processor)
+        public void ProcessorExecutionBegin(TfsProcessor processor)
         {
             if (Options.Enabled)
             {
@@ -278,13 +280,14 @@ namespace MigrationTools.Tools
                     MigrateAllNodeStructures();
                 }
                 RefreshForProcessorType(processor);
-            } else
+            }
+            else
             {
                 Log.LogWarning("TfsNodeStructureTool: TfsNodeStructureTool is disabled! This may cause work item migration errors! ");
             }
         }
 
-        protected  void EntryForProcessorType(TfsProcessor processor)
+        protected void EntryForProcessorType(TfsProcessor processor)
         {
             if (processor is null)
             {
@@ -309,10 +312,10 @@ namespace MigrationTools.Tools
             }
         }
 
-        protected  void RefreshForProcessorType(TfsProcessor processor)
+        protected void RefreshForProcessorType(TfsProcessor processor)
         {
- 
-                ((TfsWorkItemMigrationClient)processor.Target.WorkItems).Store?.RefreshCache(true);
+
+            ((TfsWorkItemMigrationClient)processor.Target.WorkItems).Store?.RefreshCache(true);
         }
 
         private void CreateNodes(XmlNodeList nodeList, string treeType, TfsNodeStructureType nodeStructureType)
@@ -493,7 +496,7 @@ namespace MigrationTools.Tools
                 if (DotNet.Globbing.Glob.Parse(filter).IsMatch(userFriendlyPath))
                 {
                     if (!_matchedPath.Contains(userFriendlyPath))
-                    { 
+                    {
                         _matchedPath.Add(userFriendlyPath);
                         return true;
                     }
@@ -534,7 +537,7 @@ namespace MigrationTools.Tools
         public List<NodeStructureItem> CheckForMissingPaths(TfsProcessor processor, List<WorkItemData> workItems, TfsNodeStructureType nodeType)
         {
             EntryForProcessorType(processor);
-             Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths");
+            Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths");
             _targetCommonStructureService.ClearProjectInfoCache();
 
             string fieldName = GetFieldNameFromTfsNodeStructureToolType(nodeType);
@@ -545,24 +548,24 @@ namespace MigrationTools.Tools
                 .Distinct()
                 .ToList();
 
-             Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths::{nodeType}Nodes::{count}", nodeType.ToString(), nodePaths.Count);
+            Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths::{nodeType}Nodes::{count}", nodeType.ToString(), nodePaths.Count);
 
             List<NodeStructureItem> missingPaths = new List<NodeStructureItem>();
 
             foreach (var missingItem in nodePaths)
             {
-                 Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:Checking::{sourceSystemPath}", missingItem.sourceSystemPath);
-                 Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:Checking::{@missingItem}", missingItem);
+                Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:Checking::{sourceSystemPath}", missingItem.sourceSystemPath);
+                Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:Checking::{@missingItem}", missingItem);
                 bool keepProcessing = true;
                 try
                 {
                     missingItem.targetPath = GetNewNodeName(missingItem.sourcePath, nodeType);
-                     Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:GetNewNodeName::{@missingItem}", missingItem);
+                    Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:GetNewNodeName::{@missingItem}", missingItem);
                 }
                 catch (NodePathNotAnchoredException ex)
                 {
-                     Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{sourceSystemPath}", missingItem.sourceSystemPath);
-                     Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);
+                    Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{sourceSystemPath}", missingItem.sourceSystemPath);
+                    Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);
                     missingItem.anchored = false;
                     List<int> workItemsNotAncored = workItems.SelectMany(x => x.Revisions.Values)
                         .Where(x => x.Fields[fieldName].Value.ToString().Contains(missingItem.sourcePath))
@@ -580,13 +583,13 @@ namespace MigrationTools.Tools
                     PopulateIterationDatesFronSource(missingItem);
                     try
                     {
-                         Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::{targetSystemPath}", missingItem.targetSystemPath);
+                        Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::{targetSystemPath}", missingItem.targetSystemPath);
                         NodeInfo c = _targetCommonStructureService.GetNodeFromPath(missingItem.targetSystemPath);
-                         Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::FOUND::{@missingItem}::FOUND", missingItem);
+                        Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::FOUND::{@missingItem}::FOUND", missingItem);
                     }
                     catch
                     {
-                         Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::NOTFOUND:{targetSystemPath}", missingItem.targetSystemPath);
+                        Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::NOTFOUND:{targetSystemPath}", missingItem.targetSystemPath);
                         if (Options.ShouldCreateMissingRevisionPaths && ShouldCreateNode(missingItem.targetSystemPath, nodeType))
                         {
 
@@ -595,7 +598,7 @@ namespace MigrationTools.Tools
                         else
                         {
                             missingPaths.Add(missingItem);
-                             Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
+                            Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
                         }
                     }
                 }
@@ -611,7 +614,7 @@ namespace MigrationTools.Tools
         {
             if (missingItem.nodeType == "Iteration")
             {
-                 Log.LogDebug("TfsNodeStructureTool:PopulateIterationDatesFronSource:{sourceSystemPath}", missingItem.sourceSystemPath);
+                Log.LogDebug("TfsNodeStructureTool:PopulateIterationDatesFronSource:{sourceSystemPath}", missingItem.sourceSystemPath);
                 try
                 {
                     var sourceNode = _sourceCommonStructureService.GetNodeFromPath(missingItem.sourceSystemPath);
@@ -621,7 +624,7 @@ namespace MigrationTools.Tools
                 }
                 catch (Exception)
                 {
-                     Log.LogTrace("TfsNodeStructureTool:PopulateIterationDatesFronSource:{@missingItem}", missingItem);
+                    Log.LogTrace("TfsNodeStructureTool:PopulateIterationDatesFronSource:{@missingItem}", missingItem);
                     missingItem.startDate = null;
                     missingItem.finishDate = null;
                     missingItem.sourcePathExists = false;
