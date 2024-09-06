@@ -1,0 +1,31 @@
+name: Function Build & Release (Azure DevOps Migration Tools)
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  push:
+    branches: ["main"]
+    tags-ignore: ["v*-*"]
+  pull_request:
+      branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      ForceRelease:
+        description: 'Force a release! Use when changes hapen out of sync and `src` and `docs` folder changes are not detected.'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }} 
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+
+   # Setup & Configuration

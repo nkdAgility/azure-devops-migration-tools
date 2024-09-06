@@ -117,6 +117,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Documentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Shadows", "src\MigrationTools.Shadows\MigrationTools.Shadows.csproj", "{FA314A24-7616-498C-83F1-84D64365D00F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTools.Telemetery", "src\MigrationTools.Telemetery\MigrationTools.Telemetery.csproj", "{5B9D24D8-8F47-4EB8-847A-9D5634CBC010}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,10 @@ Global
 		{FA314A24-7616-498C-83F1-84D64365D00F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA314A24-7616-498C-83F1-84D64365D00F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA314A24-7616-498C-83F1-84D64365D00F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B9D24D8-8F47-4EB8-847A-9D5634CBC010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B9D24D8-8F47-4EB8-847A-9D5634CBC010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B9D24D8-8F47-4EB8-847A-9D5634CBC010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B9D24D8-8F47-4EB8-847A-9D5634CBC010}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -210,6 +216,7 @@ Global
 		{BADF6B5C-1987-4F2D-8316-41D78CD25366} = {83F36820-E9BC-4F48-8202-5EAF9530405E}
 		{217A2F5E-C6C7-4B1A-9E22-C7A1D00E9BED} = {83F36820-E9BC-4F48-8202-5EAF9530405E}
 		{FA314A24-7616-498C-83F1-84D64365D00F} = {BADF6B5C-1987-4F2D-8316-41D78CD25366}
+		{5B9D24D8-8F47-4EB8-847A-9D5634CBC010} = {83F36820-E9BC-4F48-8202-5EAF9530405E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {62EE0B27-C55A-46EE-8D17-1691DE9BBD50}

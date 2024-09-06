@@ -32,7 +32,7 @@ This is going to be a crash course and I really recommend watching [What can go 
 You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process will likley look somethig like:
 
 ```JSON
-{% include sampleConfig/configuration.json %}
+{% include sampleConfig/configuration-getstarted.json %}
 ```
 
 The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfsworkitemmigrationprocessor.md) processor will perform the following operations:
