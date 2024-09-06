@@ -22,8 +22,8 @@ namespace MigrationTools.Services
     public class ActivitySourceProvider
     {
         public static readonly string ActivitySourceName = "MigrationTools";
-        //private static string OpenTelemetryConnectionString = "InstrumentationKey=823d0de3-69c9-42ee-b902-de7675f681bc;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=4dd8f684-2f91-48ac-974f-dc898b686786";
-        private static string MigrationToolAIConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/;ApplicationId=9146fe72-5c18-48d7-a0f2-8fb891ef1277";
+        private static string OpenTelemetryConnectionString = "InstrumentationKey=823d0de3-69c9-42ee-b902-de7675f681bc;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=4dd8f684-2f91-48ac-974f-dc898b686786";
+        //private static string MigrationToolAIConnectionString = "InstrumentationKey=2d666f84-b3fb-4dcf-9aad-65de038d2772;IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/;ApplicationId=9146fe72-5c18-48d7-a0f2-8fb891ef1277";
 
 
             public static ActivitySource ActivitySource { get; private set; }
@@ -33,7 +33,7 @@ namespace MigrationTools.Services
 
         public static string GetConnectionString()
         {
-            return MigrationToolAIConnectionString;
+            return OpenTelemetryConnectionString;
         }
 
 
