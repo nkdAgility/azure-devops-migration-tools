@@ -89,6 +89,9 @@ The documentation for the preview is on [Preview](https://nkdagility.com/docs/az
 | Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
 | Average Work item Migration Time  | **22s** | Work Item (includes all revisions, links, and attachments for the work item) |
 
+![All Work Items Migrated with new version](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D)
+
+
 This tool uses OpenTelemetery to collect metrics and logs, and Application Insights to store and analyse them. Exceptions are also sent to [Elmah.io](https://elmah.io) for analysis and improvement.
 
 ## Advanced tools
