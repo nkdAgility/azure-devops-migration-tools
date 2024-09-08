@@ -25,11 +25,62 @@ namespace MigrationTools.Telemetery
             _cache = cache;
         }
 
+        // Method to fetch total work items processed (counter, uses sum)
         [Function("GetShieldIoWorkItemMetrics_WorkItemTotals")]
         public async Task<IActionResult> GetShieldIoWorkItemMetrics_WorkItemTotals(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
-            _logger.LogInformation("Processing request for Application Insights data.");
+            string query = @"
+                customMetrics
+                | where name == 'work_items_processed_total'
+                | summarize Total = sum(value) by application_Version";
+
+            return await FetchAndReturnMetric(req, query, "Total Work Items", "sum");
+        }
+
+        // Method to fetch average work item processing duration (histogram, uses avg)
+        [Function("GetShieldIoWorkItemMetrics_WorkItemProcessingDuration")]
+        public async Task<IActionResult> GetShieldIoWorkItemMetrics_WorkItemProcessingDuration(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        {
+            string query = @"
+                customMetrics
+                | where name == 'work_item_processing_duration'
+                | summarize Average = avg(value) by application_Version";
+
+            return await FetchAndReturnMetric(req, query, "Work Item Processing Duration", "avg");
+        }
+
+        // Method to fetch average work item revisions (histogram, uses avg)
+        [Function("GetShieldIoWorkItemMetrics_WorkItemRevisions")]
+        public async Task<IActionResult> GetShieldIoWorkItemMetrics_WorkItemRevisions(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        {
+            string query = @"
+                customMetrics
+                | where name == 'work_item_revisions'
+                | summarize Average = avg(value) by application_Version";
+
+            return await FetchAndReturnMetric(req, query, "Work Item Revisions", "avg");
+        }
+
+        // Method to fetch total work item revisions (counter, uses sum)
+        [Function("GetShieldIoWorkItemMetrics_WorkItemRevisionsTotal")]
+        public async Task<IActionResult> GetShieldIoWorkItemMetrics_WorkItemRevisionsTotal(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        {
+            string query = @"
+                customMetrics
+                | where name == 'work_item_revisions_total'
+                | summarize Total = sum(value) by application_Version";
+
+            return await FetchAndReturnMetric(req, query, "Total Work Item Revisions", "sum");
+        }
+
+        // Generic method to fetch and return a metric from Application Insights
+        private async Task<IActionResult> FetchAndReturnMetric(HttpRequest req, string query, string metricLabel, string aggregationType)
+        {
+            _logger.LogInformation($"Processing request for Application Insights data for metric {metricLabel}.");
 
             string appId = Environment.GetEnvironmentVariable("APP_INSIGHTS_APP_ID");
             string apiKey = Environment.GetEnvironmentVariable("APP_INSIGHTS_API_KEY");
@@ -41,15 +92,10 @@ namespace MigrationTools.Telemetery
 
             string versionPrefix = req.Query["version"]; // Get the 'version' query parameter if provided
 
-            // Check if cached result exists
-            if (!_cache.TryGetValue("ai_work_items", out AppInsightsResponse cachedData))
+            string cacheKey = $"ai_{metricLabel}_{aggregationType}";
+            if (!_cache.TryGetValue(cacheKey, out AppInsightsResponse cachedData))
             {
                 _logger.LogInformation("Cache miss. Fetching data from Application Insights.");
-
-                string query = @"
-                customMetrics
-                | where name == 'work_items_processed_total'
-                | summarize Total = sum(value) by application_Version";
 
                 var payload = new
                 {
@@ -66,7 +112,7 @@ namespace MigrationTools.Telemetery
                     cachedData = JsonConvert.DeserializeObject<AppInsightsResponse>(result);
 
                     // Cache the result with a defined expiration
-                    _cache.Set("ai_work_items", cachedData, CacheDuration);
+                    _cache.Set(cacheKey, cachedData, CacheDuration);
                 }
                 else
                 {
@@ -78,20 +124,20 @@ namespace MigrationTools.Telemetery
                 _logger.LogInformation("Cache hit. Returning cached data.");
             }
 
-            // Check if the user requested a specific version prefix or if we should return the sum
-            double totalWorkItems = 0;
+            // Check if the user requested a specific version prefix or if we should return the aggregated value
+            double aggregatedMetricValue = 0;
             string formattedVersionLabel = "All Versions"; // Default label if no version is provided
             if (!string.IsNullOrEmpty(versionPrefix))
             {
-                // Sum totals for all versions that start with the provided version prefix
-                totalWorkItems = GetWorkItemTotalForVersionPrefix(cachedData, versionPrefix);
-                if (totalWorkItems == -1)
+                // Sum/average totals for all versions that start with the provided version prefix
+                aggregatedMetricValue = GetWorkItemTotalForVersionPrefix(cachedData, versionPrefix);
+                if (aggregatedMetricValue == -1)
                 {
                     // No matching versions found, return "No Data" message
                     return new JsonResult(new
                     {
                         schemaVersion = 1,
-                        label = $"Total Work Items ({FormatVersionLabel(versionPrefix)})",
+                        label = $"{metricLabel} ({FormatVersionLabel(versionPrefix)})",
                         message = "No Data",
                         color = "orange"
                     });
@@ -102,27 +148,27 @@ namespace MigrationTools.Telemetery
             }
             else
             {
-                // Sum all work items for all versions
-                totalWorkItems = GetTotalWorkItems(cachedData);
-                if (totalWorkItems == 0)
+                // Aggregate all items for all versions
+                aggregatedMetricValue = GetTotalWorkItems(cachedData);
+                if (aggregatedMetricValue == 0)
                 {
                     // No data found at all, return "No Data"
                     return new JsonResult(new
                     {
                         schemaVersion = 1,
-                        label = "Total Work Items (All Versions)",
+                        label = $"{metricLabel} (All Versions)",
                         message = "No Data",
                         color = "orange"
                     });
                 }
             }
 
-            // Create the response for Shields.io with total work items
+            // Create the response for Shields.io with the aggregated metric value
             var shieldsIoResponse = new
             {
                 schemaVersion = 1,
-                label = $"Total Work Items ({formattedVersionLabel})",
-                message = totalWorkItems.ToString(),
+                label = $"{metricLabel} ({formattedVersionLabel})",
+                message = aggregatedMetricValue.ToString(),
                 color = "orange"
             };
 
@@ -135,7 +181,7 @@ namespace MigrationTools.Telemetery
             double total = 0;
             foreach (var row in appInsightsData.Tables[0].Rows)
             {
-                total += Convert.ToDouble(row[1]); // Sum the "Total" column
+                total += Convert.ToDouble(row[1]); // Sum the "Total" or "Average" column
             }
             return total;
         }
@@ -151,7 +197,7 @@ namespace MigrationTools.Telemetery
                 string version = row[0].ToString(); // "application_Version" column
                 if (version.StartsWith(versionPrefix))
                 {
-                    total += Convert.ToDouble(row[1]); // Sum the "Total" column for matching versions
+                    total += Convert.ToDouble(row[1]); // Sum/average the "Total" or "Average" column for matching versions
                     foundAnyMatchingVersion = true;
                 }
             }

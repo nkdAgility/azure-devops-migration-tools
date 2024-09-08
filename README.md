@@ -89,6 +89,15 @@ The documentation for the preview is on [Preview](https://nkdagility.com/docs/az
 | Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
 | Average Work item Migration Time  | **22s** | Work Item (includes all revisions, links, and attachments for the work item) |
 
+## New Metrics (experimental)
+
+| Metric | Category | Total | v16 |
+| ------------- | ------------- | ------------- | ------------- |
+| WorkItemMetrics | Work Items | !(https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D&label=%20) | !(!(https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D%26version%3D16.0&label=%20)
+) |
+|  | Revisions | !(https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D&label=%20) | !(!(https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D%26version%3D16.0&label=%20)
+) |
+
 ![All Work Items Migrated with new version](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D)
 
 
