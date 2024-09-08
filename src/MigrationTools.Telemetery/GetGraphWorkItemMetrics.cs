@@ -111,19 +111,33 @@ namespace MigrationTools.Telemetry
         // Method to generate the graph using OxyPlot
         private MemoryStream GenerateGraph(AppInsightsResponse data, string versionLabel)
         {
-            var plotModel = new PlotModel { Title = $"Work Items Processed ({versionLabel})" };
+            var plotModel = new PlotModel {
+                Title = $"Work Items Processed ({versionLabel})",
+                TitleColor = OxyColor.Parse("#2575fc"), // Updated title color as requested
+                DefaultColors = new List<OxyColor> { OxyColor.Parse("#2575fc") } // Updated default color as requested
+
+            };
 
             // Create X and Y axes
             plotModel.Axes.Add(new DateTimeAxis
             {
                 Position = AxisPosition.Bottom,
                 StringFormat = "MM-dd",
-                Title = "Date"
+                Title = "Date",
+                TitleColor = OxyColor.Parse("#2575fc"), // Updated title color as requested
+                AxislineColor = OxyColor.Parse("#2575fc"), // Updated axis line color as requested
+                TextColor = OxyColor.Parse("#2575fc"), // Updated text color as requested
+                TicklineColor = OxyColor.Parse("#2575fc") // Updated tick line color as requested
             });
             plotModel.Axes.Add(new LinearAxis
             {
                 Position = AxisPosition.Left,
-                Title = "Work Items Processed"
+                Title = "Work Items Processed",
+                TitleColor = OxyColor.Parse("#2575fc"), // Updated title color as requested
+                AxislineColor = OxyColor.Parse("#2575fc"), // Updated axis line color as requested
+                TextColor = OxyColor.Parse("#2575fc"), // Updated text color as requested
+                TicklineColor = OxyColor.Parse("#2575fc") // Updated tick line color as requested
+
             });
 
             // Create a line series to plot the work item data
@@ -131,8 +145,7 @@ namespace MigrationTools.Telemetry
             {
                 MarkerType = MarkerType.Circle,
                 MarkerSize = 4,
-                MarkerStroke = OxyColors.Purple,
-                Color = OxyColors.Orange
+                MarkerStroke = OxyColors.Purple                 
             };
 
             // Generate list of the last 30 days and pad missing days with zero
