@@ -357,7 +357,7 @@ namespace MigrationTools.Processors
                 }
                 else
                 {
-                    throw new Exception(string.Format("WARNING: Unable to find '{0}' in the target project. Either the work item specific is from the source, or its being specified in the {tool} defenition in your configuration file! ", destType, nameof(WorkItemTypeMappingTool)));
+                    throw new Exception($"WARNING: Unable to find '{destType}' in the target project. Either the work item specific is from the source, or its being specified in the {nameof(WorkItemTypeMappingTool)} definition in your configuration file! ");
                 }
                 activity?.Stop();
                 activity?.SetStatus(ActivityStatusCode.Ok);
