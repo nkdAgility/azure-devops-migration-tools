@@ -70,7 +70,24 @@ The documentation for the preview is on [Preview](https://nkdagility.com/docs/az
  * [Options migrating TFS to Azure DevOps from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
  * [Migrating Test artifacts and all other work item types using the Azure DevOps from Gordon Beeming](https://youtu.be/jU6E0k0eXXw)
 
-## Some Data from the last 30 days (as of 06/04/2023)
+
+ ## Metrics (v16+ experimental)
+
+These metrics come directly from Custo Metrics in Application Insights and are updated every 10 minutes. They are experimental and may not be accurate yet... once I get more data Ill tweek both the collection and rendering.
+
+| Metric          | Category   | Type       | All                                                                                                                     | v16                                                                                                                      | Notes             |
+|-----------------|------------|------------|-------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|-------------------|
+| WorkItemMetrics | Work Items | Count    | ![Work Items Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3Dgithub%26version%3D&label=%20)  | ![Work Items v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3Dgithub%26version%3D16.0&label=%20) | This counts the number of work items processed |
+| WorkItemMetrics | Work Items | Ave  | ![Work Items Avg](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3Dgithub%26version%3D&label=%20) | ![Work Items Avg v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3Dgithub%26version%3D16.0&label=%20) | the average amount of time a work item takes to process |
+| WorkItemMetrics | Revisions  | Count    | ![Revisions Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3Dgithub&label=%20)  | ![Revisions v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3Dgithub%26version%3D16.0&label=%20) | the total number of revisions processed |
+| WorkItemMetrics | Revisions  | Ave  | ![Revisions Avg](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisions%3Fcode%3Dgithub&label=%20)  | ![Revisions Avg v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisions%3Fcode%3Dgithub%26version%3D16.0&label=%20)  | the average number of revisions per work item |
+
+![Work Items in last 30 days](https://migrationtoolstelemetery.azurewebsites.net/api/GetGraphWorkItemMetrics_WorkItems?code=github)
+
+
+This tool uses OpenTelemetery to collect metrics and logs, and Application Insights to store and analyse them. Exceptions are also sent to [Elmah.io](https://elmah.io) for analysis and improvement.
+
+### Some Data from the last 30 days (v15- as of 06/04/2023)
 
 | Catagory  | Metric | Notes |
 | ------------- | ------------- | ------------- |
