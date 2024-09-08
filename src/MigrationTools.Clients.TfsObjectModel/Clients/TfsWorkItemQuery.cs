@@ -74,6 +74,7 @@ namespace MigrationTools.Clients
                     var workItemCollection = wiClient.Store.Query(Query);
                     if (workItemCollection.Count > 0)
                     {
+                        activity?.SetTag("migrationtools.client.tfsobjectmodel.GetWorkItemsFromQuery_Count", workItemCollection.Count);
                         Log.Information("{0} Work items received, verifying", workItemCollection.Count);
                         foreach (WorkItem item in workItemCollection)
                         {
