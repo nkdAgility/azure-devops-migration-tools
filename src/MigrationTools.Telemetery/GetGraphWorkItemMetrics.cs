@@ -131,7 +131,8 @@ namespace MigrationTools.Telemetry
             {
                 MarkerType = MarkerType.Circle,
                 MarkerSize = 4,
-                MarkerStroke = OxyColors.Black
+                MarkerStroke = OxyColors.Purple,
+                Color = OxyColors.Orange
             };
 
             // Generate list of the last 30 days and pad missing days with zero
