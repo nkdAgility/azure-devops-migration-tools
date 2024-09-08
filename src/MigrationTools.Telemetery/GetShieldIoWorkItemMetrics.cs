@@ -14,10 +14,17 @@ namespace MigrationTools.Telemetery
 {
     public class GetShieldIoWorkItemMetrics
     {
-        private static readonly HttpClient client = new HttpClient();
+        // Make HttpClient static to ensure it's only instantiated once
+        private static readonly HttpClient _client = new HttpClient();
         private readonly ILogger<GetShieldIoWorkItemMetrics> _logger;
         private readonly IMemoryCache _cache;
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10); // Cache duration
+
+        static GetShieldIoWorkItemMetrics()
+        {
+            // You can set other HttpClient defaults here if needed
+            _client.Timeout = TimeSpan.FromSeconds(30);  // Example of setting a timeout
+        }
 
         public GetShieldIoWorkItemMetrics(ILogger<GetShieldIoWorkItemMetrics> logger, IMemoryCache cache)
         {
@@ -44,12 +51,52 @@ namespace MigrationTools.Telemetery
             [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
             string query = @"
-                customMetrics
-                | where name == 'work_item_processing_duration'
-                | summarize Average = avg(value) by application_Version";
+        customMetrics
+        | where name == 'work_item_processing_duration'
+        | summarize Average = avg(value) by application_Version";
 
-            return await FetchAndReturnMetric(req, query, "Work Item Processing Duration", "avg");
+            // Fetch the raw result (in milliseconds)
+            var result = await FetchAndReturnMetric(req, query, "Work Item Processing Duration (milliseconds)", "avg");
+
+            // Check if the result is a BadRequest or NoData response, return it directly
+            if (result is BadRequestObjectResult)
+            {
+                return result;
+            }
+
+            if (result is JsonResult json)
+            {
+                var responseData = json.Value as dynamic;
+
+                // Check if the message field indicates "No Data"
+                if (responseData?.message == "No Data")
+                {
+                    return result;
+                }
+
+                // Convert the result from milliseconds to seconds
+                if (double.TryParse(responseData.message.ToString(), out double valueInMilliseconds))
+                {
+                    // Convert to seconds
+                    double valueInSeconds = valueInMilliseconds / 1000;
+
+                    // Create a new object with the updated message value (in seconds)
+                    var updatedResponse = new
+                    {
+                        schemaVersion = responseData.schemaVersion,
+                        label = responseData.label,
+                        message = valueInSeconds.ToString("F2"), // formatted to 2 decimal places
+                        color = responseData.color
+                    };
+
+                    // Return the updated JsonResult
+                    return new JsonResult(updatedResponse);
+                }
+            }
+
+            return result;
         }
+
 
         // Method to fetch average work item revisions (histogram, uses avg)
         [Function("GetShieldIoWorkItemMetrics_WorkItemRevisions")]
@@ -102,9 +149,12 @@ namespace MigrationTools.Telemetery
                     query = query
                 };
 
-                client.DefaultRequestHeaders.Add("x-api-key", apiKey);
+                // Always clear headers and set them before making a request
+                _client.DefaultRequestHeaders.Clear();
+                _client.DefaultRequestHeaders.Add("x-api-key", apiKey);
+
                 var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync($"https://api.applicationinsights.io/v1/apps/{appId}/query", content);
+                HttpResponseMessage response = await _client.PostAsync($"https://api.applicationinsights.io/v1/apps/{appId}/query", content);
 
                 if (response.IsSuccessStatusCode)
                 {

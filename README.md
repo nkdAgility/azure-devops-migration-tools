@@ -93,10 +93,11 @@ The documentation for the preview is on [Preview](https://nkdagility.com/docs/az
 
 | Metric | Category | Version | Counter | Histogram | Notes |
 | ------------- | ------------- | ------------- | ------------- |
-| WorkItemMetrics | Work Items | All | ![Work Items Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D&label=%20) | ![Work Items Ave](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D&label=%20) | 
-| WorkItemMetrics | Work Items | v16 | ![Work Items v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D%26version%3D16.0&label=%20) | ![Work Items v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D%26version%3D16.0&label=%20) |
-|  | Revisions | All | !(https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D&label=%20) | |
-|  | Revisions | v16 | !(!(https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D%26version%3D16.0&label=%20) | |
+| WorkItemMetrics | Work Items | All | ![Work Items Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3Dgithub%26version%3D&label=%20) | ![Work Items Ave](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3Dgithub%26version%3D&label=%20
+) | 
+| WorkItemMetrics | Work Items | v16 | ![Work Items v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3Dgithub%26version%3D16.0&label=%20) | ![Work Items v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3Dgithub%26version%3D16.0&label=%20) |
+|  | Revisions | All | ![Revisions Total]() | |
+|  | Revisions | v16 | ![Revisions v16]() | |
 
 ![All Work Items Migrated with new version](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3DN0Lfmkrz_Rzh1lrd5eol1IuDIUfOVnX0oFaT8k6m_uX8AzFu27y_og%3D%3D)
 
