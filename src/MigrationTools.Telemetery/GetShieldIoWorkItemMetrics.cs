@@ -51,9 +51,10 @@ namespace MigrationTools.Telemetery
             [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
             string query = @"
-        customMetrics
-        | where name == 'work_item_processing_duration'
-        | summarize Average = avg(value) by application_Version";
+                customMetrics
+                | where name == 'work_item_processing_duration'
+                | summarize AverageValue = round(sum(valueSum) / sum(valueCount), 0) by application_Version
+                ";
 
             // Fetch the raw result (in milliseconds)
             var result = await FetchAndReturnMetric(req, query, "Work Item Processing Duration (milliseconds)", "avg");
@@ -104,9 +105,9 @@ namespace MigrationTools.Telemetery
             [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
             string query = @"
-                customMetrics
+               customMetrics
                 | where name == 'work_item_revisions'
-                | summarize Average = avg(value) by application_Version";
+                | summarize AverageValue = round(sum(valueSum) / sum(valueCount), 0) by application_Version";
 
             return await FetchAndReturnMetric(req, query, "Work Item Revisions", "avg");
         }
