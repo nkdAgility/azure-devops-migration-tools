@@ -10,6 +10,11 @@ using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using MigrationTools.Services;
+using System.Linq;
+using System.Configuration.Assemblies;
+using System.Reflection;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
@@ -17,6 +22,26 @@ namespace VstsSyncMigrator.ConsoleApp
     {
         public static async Task Main(string[] args)
         {
+            string binDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string[] clientAssemblies = { "MigrationTools.Clients.TfsObjectModel.dll", "MigrationTools.Clients.FileSystem.dll", "MigrationTools.Clients.AzureDevops.Rest.dll" };
+            foreach (var assemblyName in clientAssemblies)
+            {
+                string assemblyPath = Path.Combine(binDirectory, assemblyName);
+                if (File.Exists(assemblyPath))
+                {
+                    Assembly.LoadFrom(assemblyPath);
+                }
+                else
+                {
+                    Console.WriteLine($"Assembly not found: {assemblyName}");
+                }
+            }
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(ass => (ass.FullName.StartsWith("MigrationTools") || ass.FullName.StartsWith("VstsSyncMigrator")));
+            foreach (var assembly in assemblies)
+            {
+               // Console.WriteLine(assembly.FullName);
+            }
+
             using (var CommandActivity = ActivitySourceProvider.GetActivitySource().StartActivity("MigrationToolsCli"))
             {
                 var hostBuilder = MigrationToolHost.CreateDefaultBuilder(args);

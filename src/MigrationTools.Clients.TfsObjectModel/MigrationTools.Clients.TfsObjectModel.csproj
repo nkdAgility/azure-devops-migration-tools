@@ -40,7 +40,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.9.0" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
-    <PackageReference Include="TfsUrlParser" Version="1.4.1" />
+    <PackageReference Include="TfsUrlParser" Version="1.5.0" />
   </ItemGroup>
 
   <ItemGroup>
