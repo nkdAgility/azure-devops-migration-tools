@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.Host.Commands;
 using MigrationTools.Host.Services;
 using MigrationTools.Options;
@@ -59,6 +60,15 @@ namespace MigrationTools.Host.Commands
                 var migrationEngine = _services.GetRequiredService<IMigrationEngine>();
                 migrationEngine.Run();
                 _exitCode = 0;
+            }
+            catch (OptionsValidationException ex)
+            {
+                CommandActivity.RecordException(ex);
+                _logger.LogCritical("The config contains some invalid options. Please check the list below and refer to https://nkdagility.com/learn/azure-devops-migration-tools/ for the specific configration options.");
+                _logger.LogCritical("------------");
+                _logger.LogCritical(ex.Message);
+                _logger.LogCritical("------------");
+                _exitCode = 1;
             }
             catch (Exception ex)
             {
