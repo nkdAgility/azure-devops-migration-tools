@@ -2,8 +2,7 @@
   "profiles": {
     "MigrationTools.Telemetery": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7008",
-      "launchBrowser": false
+      "commandLineArgs": "--port 7008 --csharp"
     }
   }
 }
