@@ -223,4 +223,23 @@ public class GetSvcWorkItemMetrics
         _logger.LogError($"Failed to fetch data from Application Insights: {response.StatusCode}");
         return -1;
     }
+
+    // Classes to represent the structure of the Application Insights response
+    public class AppInsightsResponse
+    {
+        public List<Table> Tables { get; set; }
+    }
+
+    public class Table
+    {
+        public string Name { get; set; }
+        public List<Column> Columns { get; set; }
+        public List<List<object>> Rows { get; set; }
+    }
+
+    public class Column
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+    }
 }
