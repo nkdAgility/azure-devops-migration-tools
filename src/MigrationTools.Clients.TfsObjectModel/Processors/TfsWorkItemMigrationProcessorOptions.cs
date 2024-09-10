@@ -113,6 +113,7 @@ namespace MigrationTools.Processors
 
         public ValidateOptionsResult Validate(string name, TfsWorkItemMigrationProcessorOptions options)
         {
+            ValidateOptionsResult result = new ValidateOptionsResult();
             // Check if WIQLQuery is provided
             if (string.IsNullOrWhiteSpace(options.WIQLQuery))
             {

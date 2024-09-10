@@ -66,7 +66,12 @@ namespace MigrationTools.Host.Commands
                 CommandActivity.RecordException(ex);
                 _logger.LogCritical("The config contains some invalid options. Please check the list below and refer to https://nkdagility.com/learn/azure-devops-migration-tools/ for the specific configration options.");
                 _logger.LogCritical("------------");
-                _logger.LogCritical(ex.Message);
+                _logger.LogCritical("OptionName: {OptionsName}", ex.OptionsName);
+                _logger.LogCritical("The following options are invalid:");
+                foreach (var failure in ex.Failures)
+                {
+                    _logger.LogCritical(failure);
+                }                
                 _logger.LogCritical("------------");
                 _exitCode = 1;
             }
