@@ -60,7 +60,6 @@ namespace MigrationTools.Processors
     /// <processingtarget>Pipelines</processingtarget>
     public partial class ProcessDefinitionProcessor : Processor
     {
-        private ProcessDefinitionProcessorOptions _Options;
         private ProcessorModel SourceModel;
         private ProcessorModel TargetModel;
         private Dictionary<string, WorkItemField> SourceFields = new Dictionary<string, WorkItemField>();
@@ -97,7 +96,7 @@ namespace MigrationTools.Processors
         private void EnsureConfigured()
         {
             Log.LogInformation("Processor::EnsureConfigured");
-            if (_Options == null)
+            if (Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
@@ -110,7 +109,7 @@ namespace MigrationTools.Processors
                 throw new Exception("The Target endpoint configured must be of type AzureDevOpsEndpoint");
             }
 
-            if (_Options.Processes.Count == 0) _Options.Processes.Add("*", new List<string>() { "*" });
+            if (Options.Processes.Count == 0) Options.Processes.Add("*", new List<string>() { "*" });
 
             if (Source.Options.Name == Target.Options.Name)
             {
@@ -134,7 +133,7 @@ namespace MigrationTools.Processors
 
                 Log.LogInformation("Synchronizing organization level fields.");
                 // We've got all the target and sources data.. let's start syncronizing
-                await SourceFields.Values.ParallelForEachAsync(Math.Max(1, _Options.MaxDegreeOfParallelism), async (sourceField) =>
+                await SourceFields.Values.ParallelForEachAsync(Math.Max(1, Options.MaxDegreeOfParallelism), async (sourceField) =>
                 {
                     if (sourceField.ReferenceName.StartsWith("System.") || sourceField.ReferenceName.StartsWith("Microsoft."))
                     {
@@ -147,7 +146,7 @@ namespace MigrationTools.Processors
                     }
                 });
 
-                await SourceModel.ProcessDefinitions.Values.ParallelForEachAsync(Math.Max(1,_Options.MaxDegreeOfParallelism), SyncProcess);
+                await SourceModel.ProcessDefinitions.Values.ParallelForEachAsync(Math.Max(1,Options.MaxDegreeOfParallelism), SyncProcess);
             }
             catch (Exception ex)
             {
@@ -488,12 +487,12 @@ namespace MigrationTools.Processors
 
 
             var procs = await endpoint.GetApiDefinitionsAsync<ProcessDefinition>();
-            foreach (var processFilter in _Options.Processes.Keys)
+            foreach (var processFilter in Options.Processes.Keys)
             {
                 string mappedProcName = processFilter;
-                if (model == TargetModel && _Options.ProcessMaps.ContainsKey(processFilter))
+                if (model == TargetModel && Options.ProcessMaps.ContainsKey(processFilter))
                 {
-                    mappedProcName = _Options.ProcessMaps[processFilter];
+                    mappedProcName = Options.ProcessMaps[processFilter];
                 }
 
                 var proc = procs.FirstOrDefault(p => processFilter == "*"
@@ -521,7 +520,7 @@ namespace MigrationTools.Processors
                     #region Build Work Item Types data ...
 
                     var procWits = (await endpoint.GetApiDefinitionsAsync<WorkItemType>(new string[] { proc.Id }, singleDefinitionQueryString: "$expand=All"));
-                    procWits = procWits.Where(x => _Options.Processes[processFilter].Any(a => a == "*"
+                    procWits = procWits.Where(x => Options.Processes[processFilter].Any(a => a == "*"
                             || x.Name.Equals(a, StringComparison.OrdinalIgnoreCase)));
                     if (procWits != null && procWits.Count() > 0)
                     {
