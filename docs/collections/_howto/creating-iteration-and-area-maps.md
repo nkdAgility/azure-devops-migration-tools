@@ -1,5 +1,6 @@
 ---
 title: "How-To: Creating area and iteration maps"
+layout: page
 toc: true
 discussionId: 
 ---

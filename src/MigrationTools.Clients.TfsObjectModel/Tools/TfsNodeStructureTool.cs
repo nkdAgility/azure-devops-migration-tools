@@ -456,7 +456,7 @@ namespace MigrationTools.Tools
             }
             catch (Exception ex)
             {
-                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to different language versions. Validate that '{0}' is the correct name in your version. ", localizedTreeTypeName), ex);
+                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to TFS having a different installed langauge version than was expected.. Validate that '{0}' is the correct name in your version. This would be something like 'Fläche' or 'Aire'. If you open the area tree in Visual Studio, or web access, you should see the name your langauage uses for 'Area' or 'Iteration. Do not try to add a specific area or iteration path to this field. Check the defaults on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/ for an example fro English.", localizedTreeTypeName), ex);
                 Log.LogError(ex2, "Unable to load Common Structure for Target.");
                 Telemetry.TrackException(ex2, null);
                 throw ex2;

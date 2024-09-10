@@ -27,15 +27,16 @@ namespace MigrationTools
             context.AddSingleton<TfsWorkItemEmbededLinkTool>().AddMigrationToolsOptions<TfsWorkItemEmbededLinkToolOptions>(configuration);
             context.AddSingleton<TfsEmbededImagesTool>().AddMigrationToolsOptions<TfsEmbededImagesToolOptions>(configuration);
             context.AddSingleton<TfsGitRepositoryTool>().AddMigrationToolsOptions<TfsGitRepositoryToolOptions>(configuration);
-            context.AddSingleton<TfsNodeStructureTool>().AddMigrationToolsOptions<TfsNodeStructureToolOptions>(configuration);
+            context.AddSingleton<TfsNodeStructureTool>().AddMigrationToolsOptions<TfsNodeStructureToolOptions, TfsNodeStructureToolOptionsValidator>(configuration);
             context.AddSingleton<TfsRevisionManagerTool>().AddMigrationToolsOptions<TfsRevisionManagerToolOptions>(configuration);
             context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
         }
 
-        [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
-        public static void AddMigrationToolServicesForClientLegacyCore(this IServiceCollection context)
+        public static void AddMigrationToolServicesForClientTfs_Processors(this IServiceCollection context)
         {
             context.AddSingleton<TfsWorkItemMigrationProcessor>();
+            context.AddSingleton<IValidateOptions<TfsWorkItemMigrationProcessorOptions>, TfsWorkItemMigrationProcessorOptionsValidator>();
+
             context.AddSingleton<TfsTestConfigurationsMigrationProcessor>();
             context.AddSingleton<TfsTestPlansAndSuitesMigrationProcessor>();
             context.AddSingleton<TfsTestVariablesMigrationProcessor>();

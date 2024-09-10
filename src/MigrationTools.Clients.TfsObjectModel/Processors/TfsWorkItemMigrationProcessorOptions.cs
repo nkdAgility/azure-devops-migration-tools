@@ -4,11 +4,13 @@ using MigrationTools.Processors;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Options;
+using System.Text.RegularExpressions;
 
 namespace MigrationTools.Processors
 {
 
-    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions,  IWorkItemProcessorConfig
+    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
 
 
@@ -32,7 +34,7 @@ namespace MigrationTools.Processors
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
-        /// <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
+        /// <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>
         [Required]
         public string WIQLQuery { get; set; }
 
@@ -99,5 +101,58 @@ namespace MigrationTools.Processors
         /// </summary>
         public bool SkipRevisionWithInvalidAreaPath { get; set; }
 
+    }
+
+    public class TfsWorkItemMigrationProcessorOptionsValidator : IValidateOptions<TfsWorkItemMigrationProcessorOptions>
+    {
+
+        public TfsWorkItemMigrationProcessorOptionsValidator()
+        {
+            
+        }
+
+        public ValidateOptionsResult Validate(string name, TfsWorkItemMigrationProcessorOptions options)
+        {
+            ValidateOptionsResult result = new ValidateOptionsResult();
+            // Check if WIQLQuery is provided
+            if (string.IsNullOrWhiteSpace(options.WIQLQuery))
+            {
+                return ValidateOptionsResult.Fail("The WIQLQuery must be provided.");
+            }
+
+            // Validate the presence of required elements in the WIQL query
+            if (!ContainsTeamProjectCondition(options.WIQLQuery))
+            {
+                return ValidateOptionsResult.Fail("The WIQLQuery must contain the condition '[System.TeamProject] = @TeamProject'.");
+            }
+
+            if (!UsesWorkItemsTable(options.WIQLQuery))
+            {
+                return ValidateOptionsResult.Fail("The WIQLQuery must use 'WorkItems' after the 'FROM' clause and not 'WorkItemLinks'.");
+            }
+
+            return ValidateOptionsResult.Success;
+        }
+
+        // Check if the WIQL query contains the '[System.TeamProject] = @TeamProject' condition
+        private bool ContainsTeamProjectCondition(string query)
+        {
+            // Regex to match '[System.TeamProject] = @TeamProject'
+            string teamProjectPattern = @"\[System\.TeamProject\]\s*=\s*@TeamProject";
+
+            return Regex.IsMatch(query, teamProjectPattern, RegexOptions.IgnoreCase);
+        }
+
+        // Check if the WIQL query is using 'WorkItems' and not 'WorkItemLinks'
+        private bool UsesWorkItemsTable(string query)
+        {
+            // Regex to ensure that 'FROM WorkItems' exists and 'WorkItemLinks' does not follow the FROM clause
+            string fromWorkItemsPattern = @"FROM\s+WorkItems\b";
+            string fromWorkItemLinksPattern = @"FROM\s+WorkItemLinks\b";
+
+            // Return true if "WorkItems" is used and "WorkItemLinks" is not
+            return Regex.IsMatch(query, fromWorkItemsPattern, RegexOptions.IgnoreCase) &&
+                   !Regex.IsMatch(query, fromWorkItemLinksPattern, RegexOptions.IgnoreCase);
+        }
     }
 }

@@ -102,7 +102,7 @@ namespace MigrationTools.Telemetry
                 FileDownloadName = "workitems_graph.png"
             };
             req.HttpContext.Response.Headers.Add("Cache-Control", "public, max-age=14400");
-            req.HttpContext.Response.Headers.Add("Expires", DateTime.UtcNow.AddHours(4).ToString("R"));
+            req.HttpContext.Response.Headers.Add("Expires", DateTime.UtcNow.AddHours(1).ToString("R"));
 
             // Return the graph image as an HTTP response
             return responseHeaders;

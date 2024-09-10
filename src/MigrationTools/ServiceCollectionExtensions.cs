@@ -24,7 +24,14 @@ namespace MigrationTools
         public static OptionsBuilder<TOptions> AddMigrationToolsOptions<TOptions>(this IServiceCollection services, IConfiguration configuration) where TOptions : class
         {
             IOptions options = (IOptions)Activator.CreateInstance<TOptions>();
-            return services.AddOptions<TOptions>().Bind(configuration.GetSection(options.ConfigurationMetadata.PathToInstance));
+            return services.AddOptions<TOptions>().Bind(configuration.GetSection(options.ConfigurationMetadata.PathToInstance)).ValidateOnStart();
+        }
+
+        public static OptionsBuilder<TOptions> AddMigrationToolsOptions<TOptions, TOptionsValidator>(this IServiceCollection services, IConfiguration configuration) where TOptions : class, IOptions where TOptionsValidator : class, IValidateOptions<TOptions>, new()
+        {
+            IOptions options = (IOptions)Activator.CreateInstance<TOptions>();
+            services.AddSingleton<IValidateOptions<TOptions>, TOptionsValidator>();
+           return services.AddOptions<TOptions>().Bind(configuration.GetSection(options.ConfigurationMetadata.PathToInstance));
         }
 
         public static void AddMigrationToolServices(this IServiceCollection context, IConfiguration configuration, string configFile = "configuration.json")
