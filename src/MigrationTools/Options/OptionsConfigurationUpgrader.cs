@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,6 +25,7 @@ using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Services;
 using Newtonsoft.Json.Linq;
+using static System.Collections.Specialized.BitVector32;
 
 namespace MigrationTools.Options
 {
@@ -153,11 +155,46 @@ namespace MigrationTools.Options
                 _logger.LogDebug("Upgrading {group} item {old} to {new}", path, optionTypeString, newOptionTypeString);
                 var option = GetOptionWithDefaults(configuration, newOptionTypeString);
                 childSection.Bind(option);
+                switch (optionTypeString)
+                {
+                    case "TfsNodeStructureOptions":
+                        MapTfsNodeStructureOptions(childSection, option);
+                        _logger.LogWarning("Empty type string found in {path}", path);
+                        break;
+                    default:
+                        break;
+                }
+
+
                 options.Add(option);
             }
 
             return options;
         }
+
+        private void MapTfsNodeStructureOptions(IConfigurationSection section, dynamic option)
+        {
+            // Map AreaMaps from the old structure to the new Areas.Mappings
+            var areaMaps = section.GetSection("AreaMaps").GetChildren();
+            foreach (var areaMap in areaMaps)
+            {
+                var key = areaMap.Key;
+                var value = areaMap.Value;
+                option.Areas.Mappings.Add(key, value);
+            }
+
+            // Map IterationMaps from the old structure to the new Iterations.Mappings
+            var iterationMaps = section.GetSection("IterationMaps").GetChildren();
+            foreach (var iterationMap in iterationMaps)
+            {
+                var key = iterationMap.Key;
+                var value = iterationMap.Value;
+                option.Iterations.Mappings.Add(key, value);
+            }
+            // Now map the intermediate structure back into the original `option` object
+            _logger.LogDebug("Mapped TfsNodeStructureOptions to TfsNodeStructureTool structure and updated the options object.");
+        }
+
 
         private List<IOptions> ParseV1FieldMaps(IConfiguration configuration)
         {
