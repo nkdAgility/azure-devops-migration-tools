@@ -24,6 +24,7 @@ namespace MigrationTools.Services
             ProcessingDuration = WorkItemMeter.CreateHistogram<double>("work_item_processing_duration");
             RevisionsPerWorkItem = WorkItemMeter.CreateHistogram<double>("work_item_revisions");
             RevisionsProcessedCount = WorkItemMeter.CreateCounter<long>("work_item_revisions_total");
+       
         }
     }
 }

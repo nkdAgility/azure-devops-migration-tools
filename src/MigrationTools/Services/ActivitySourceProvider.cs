@@ -61,6 +61,8 @@ namespace MigrationTools.Services
                     }
                 }
             });
+
+
         }
 
         public static string GetActivityPath(Activity activity)
@@ -128,7 +130,7 @@ namespace MigrationTools.Services
 
     public static class ActivitySourceProviderExtensions
     {
-        public static IHostBuilder UseOpenTelemitery(this IHostBuilder builder, string versionString)
+        public static IHostBuilder UseOpenTelemeter(this IHostBuilder builder, string versionString)
         {
             builder.ConfigureServices((context, services) =>
             {
@@ -136,6 +138,7 @@ namespace MigrationTools.Services
                 services.AddOptions();
 
                 services.AddSingleton<WorkItemMetrics>();
+                services.AddSingleton<ProcessorMetrics>();
 
                 // Configure OpenTelemetry
                 Assembly entryAssembly = Assembly.GetEntryAssembly();
@@ -161,7 +164,7 @@ namespace MigrationTools.Services
                     {
                         builder
                              .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(entryAssemblyName, serviceVersion: versionString))
-                             .AddMeter("MigrationTools.TestPlans", WorkItemMetrics.meterName)
+                             .AddMeter("MigrationTools.TestPlans", WorkItemMetrics.meterName, ProcessorMetrics.meterName)
                              .AddHttpClientInstrumentation()
                              .AddRuntimeInstrumentation()
                              .AddProcessInstrumentation()
