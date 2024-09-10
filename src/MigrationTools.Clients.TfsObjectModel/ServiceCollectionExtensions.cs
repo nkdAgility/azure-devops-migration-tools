@@ -32,10 +32,11 @@ namespace MigrationTools
             context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
         }
 
-        [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]
-        public static void AddMigrationToolServicesForClientLegacyCore(this IServiceCollection context)
+        public static void AddMigrationToolServicesForClientTfs_Processors(this IServiceCollection context)
         {
             context.AddSingleton<TfsWorkItemMigrationProcessor>();
+            context.AddSingleton<IValidateOptions<TfsWorkItemMigrationProcessorOptions>, TfsWorkItemMigrationProcessorOptionsValidator>();
+
             context.AddSingleton<TfsTestConfigurationsMigrationProcessor>();
             context.AddSingleton<TfsTestPlansAndSuitesMigrationProcessor>();
             context.AddSingleton<TfsTestVariablesMigrationProcessor>();

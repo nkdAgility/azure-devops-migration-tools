@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace MigrationTools.Processors
 {
 
-    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions,  IWorkItemProcessorConfig
+    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
 
 
@@ -105,6 +105,12 @@ namespace MigrationTools.Processors
 
     public class TfsWorkItemMigrationProcessorOptionsValidator : IValidateOptions<TfsWorkItemMigrationProcessorOptions>
     {
+
+        public TfsWorkItemMigrationProcessorOptionsValidator()
+        {
+            
+        }
+
         public ValidateOptionsResult Validate(string name, TfsWorkItemMigrationProcessorOptions options)
         {
             // Check if WIQLQuery is provided
@@ -148,3 +154,4 @@ namespace MigrationTools.Processors
                    !Regex.IsMatch(query, fromWorkItemLinksPattern, RegexOptions.IgnoreCase);
         }
     }
+}

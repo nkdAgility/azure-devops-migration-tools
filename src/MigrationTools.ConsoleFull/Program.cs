@@ -61,7 +61,7 @@ namespace VstsSyncMigrator.ConsoleApp
 
                         // v1 Architecture (Legacy)
                         services.AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel();
-                        services.AddMigrationToolServicesForClientLegacyCore();
+                        services.AddMigrationToolServicesForClientTfs_Processors();
                     });
                 await hostBuilder.RunConsoleAsync();
             }

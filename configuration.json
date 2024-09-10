@@ -1,6 +1,6 @@
 {
   "Serilog": {
-    "MinimumLevel": "Information"
+    "MinimumLevel": "Debug"
   },
   "MigrationTools": {
     "Version": "16.0",
