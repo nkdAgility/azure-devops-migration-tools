@@ -12,13 +12,13 @@ namespace MigrationTools.Services
         private readonly Meter WorkItemMeter;
 
         public Histogram<double> Duration { get; private set; }
-        public object QueueSize { get; private set; }
+        public UpDownCounter<int> QueueSize { get; private set; }
 
         public ProcessorMetrics(IMeterFactory meterFactory)
         {
             WorkItemMeter = meterFactory.Create(meterName);
             Duration = WorkItemMeter.CreateHistogram<double>("processor_duration");
-            QueueSize = WorkItemMeter.CreateUpDownCounter<long>("processor_queue_size");
+            QueueSize = WorkItemMeter.CreateUpDownCounter<int>("processor_queue_size");
         }
     }
 }

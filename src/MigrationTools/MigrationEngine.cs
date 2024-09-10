@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,7 @@ namespace MigrationTools
         private IEndpoint _source;
         private IEndpoint _target;
         private ITelemetryLogger _telemetryLogger;
-        private static readonly Meter _meter = new("MigrationEngine");
+        private ProcessorMetrics processorMetrics;
 
         public MigrationEngine(
             IServiceProvider services,
@@ -29,6 +30,7 @@ namespace MigrationTools
             _services = services;
             Processors = processors;
             _telemetryLogger = telemetry;
+            processorMetrics = services.GetRequiredService<ProcessorMetrics>();
         }
 
 
@@ -72,19 +74,20 @@ namespace MigrationTools
                 _logger.LogInformation("The Max log levels above show where to go look for extra info. e.g. Even if you set the log level to Verbose you will only see that info in the Log File, however everything up to Debug will be in the Console.");
                 ProcessingStatus ps = ProcessingStatus.Running;
                 _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-                var histogram = _meter.CreateHistogram<float>("ProcessorDuration", unit: "ms");
+               
                 foreach (IOldProcessor process in Processors.Processors)
-                {
+                {                   
                     using (var activityForProcessor = ActivitySourceProvider.ActivitySource.StartActivity($"Processor[{process.GetType().Name}]", ActivityKind.Internal))
                     {
+                        activityForProcessor.AddTag("ProcessorName", process.Name);
+                        activityForProcessor.AddTag("Status", process.Status.ToString());
+                        processorMetrics.QueueSize.Add(1);
                         _logger.LogInformation("Processor: {ProcessorName}", process.Name);
                         Stopwatch processorTimer = Stopwatch.StartNew();
                         process.Execute();
                         processorTimer.Stop();
-                        var tags = new TagList();
-                        tags.Add("Processor", process.Name);
-                        tags.Add("Status", process.Status.ToString());
-                        histogram.Record(processorTimer.ElapsedMilliseconds, tags);
+                       
+                        processorMetrics.Duration.Record(processorTimer.ElapsedMilliseconds, new KeyValuePair<string, object?>("processor", nameof(process)));
                         if (process.Status == ProcessingStatus.Failed)
                         {
                             activity.SetStatus(ActivityStatusCode.Error);
@@ -93,6 +96,7 @@ namespace MigrationTools
                             break;
                         }
                     }
+                    processorMetrics.QueueSize.Add(-1);
                 }
                 activity?.Stop();
                 return ps;
