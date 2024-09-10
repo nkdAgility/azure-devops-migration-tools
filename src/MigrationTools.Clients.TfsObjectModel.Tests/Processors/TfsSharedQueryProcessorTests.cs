@@ -10,15 +10,15 @@ namespace MigrationTools.Processors.Tests
     [TestClass()]
     public class TfsSharedQueryProcessorTests : TfsProcessorTests
     {
-        [TestMethod(), TestCategory("L0")]
-        public void TfsSharedQueryProcessorTest()
+        [TestMethod("TfsSharedQueryProcessorTests_Incantate"), TestCategory("L0")]
+        public void Incantate()
         {
             var x = GetTfsSharedQueryProcessor();
             Assert.IsNotNull(x);
         }
 
-        [TestMethod(), TestCategory("L0")]
-        public void TfsSharedQueryProcessorConfigureTest()
+        [TestMethod("TfsSharedQueryProcessorTests_BasicConfigure"), TestCategory("L0")]
+        public void BasicConfigure()
         {
             var y = new TfsSharedQueryProcessorOptions
             {
@@ -33,8 +33,8 @@ namespace MigrationTools.Processors.Tests
             Assert.AreEqual("fortyTwo", x.Options.RefName);
         }
 
-        [TestMethod(), TestCategory("L0")]
-        public void TfsSharedQueryProcessorRunTest()
+        [TestMethod("TfsSharedQueryProcessorTests_BasicRun"), TestCategory("L0")]
+        public void BasicRun()
         {
             var y = new TfsSharedQueryProcessorOptions
             {
