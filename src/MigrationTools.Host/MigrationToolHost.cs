@@ -92,7 +92,7 @@ namespace MigrationTools.Host
                 builder.AddCommandLine(args);
             });
 
-            hostBuilder.UseOpenTelemitery(mtv.GetRunningVersion().versionString);
+            hostBuilder.UseOpenTelemeter(mtv.GetRunningVersion().versionString);
 
             hostBuilder.ConfigureServices((context, services) =>
             {
