@@ -20,6 +20,11 @@ namespace MigrationTools
             {
                 var endpointName = endpointConfig.Key;
                 var endpointType = endpointConfig.GetValue<string>("EndpointType");
+                if (string.IsNullOrEmpty(endpointType))
+                {
+                    Log.Warning("Endpoint '{EndpointName}' does not have a type configured. Skipping.", endpointName);
+                    continue;
+                }
                 AddEndPointSingleton(services, configuration, endpointConfig, endpointName, endpointType);
             }
         }

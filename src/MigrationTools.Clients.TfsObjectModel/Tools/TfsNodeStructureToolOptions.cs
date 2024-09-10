@@ -18,13 +18,21 @@ namespace MigrationTools.Tools
         /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
         /// </summary>
         /// <default>{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })</default>
-        public NodeOptions Areas { get; set; }
+        public NodeOptions Areas { get; set; } = new NodeOptions
+        {
+            Filters = new List<string>(),
+            Mappings = new Dictionary<string, string>()
+        };
 
         /// <summary>
         /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
         /// </summary>
         /// <default>{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })</default>
-        public NodeOptions Iterations { get; set; }
+        public NodeOptions Iterations { get; set; } = new NodeOptions
+        {
+            Filters = new List<string>(),
+            Mappings = new Dictionary<string, string>()
+        };
 
         /// <summary>
         /// When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.

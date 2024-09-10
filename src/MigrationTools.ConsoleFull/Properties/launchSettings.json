@@ -25,7 +25,7 @@
     },
     "Upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade -c \"C:\\Users\\MartinHinshelwoodNKD\\source\\repos\\azure-devops-migration-tools\\docs\\_includes\\sampleConfig\\configuration-full.json\" --debugTrace"
+      "commandLineArgs": "upgrade -c \"C:\\Users\\MartinHinshelwoodNKD\\source\\Danlewis3.json\" --debugTrace"
     },
     "Execute Classic": {
       "commandName": "Project",
