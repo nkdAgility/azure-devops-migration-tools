@@ -7,6 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "Processors": [
           {
             "ProcessorType": "AzureDevOpsPipelineProcessor",
@@ -30,6 +31,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "Processors": [
           {
             "ProcessorType": "AzureDevOpsPipelineProcessor",

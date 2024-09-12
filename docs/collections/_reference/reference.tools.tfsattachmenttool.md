@@ -7,6 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsAttachmentTool": {
             "Enabled": "True",
@@ -23,6 +24,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsAttachmentTool": {
             "Enabled": "True",

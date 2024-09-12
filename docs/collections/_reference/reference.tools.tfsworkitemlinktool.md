@@ -7,6 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemLinkTool": {
             "Enabled": "True",
@@ -22,6 +23,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemLinkTool": {
             "Enabled": "True",

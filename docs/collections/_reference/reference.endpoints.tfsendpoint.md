@@ -7,6 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "Endpoints": {
           "#KEY#": {
             "TfsEndpoint": {
@@ -39,6 +40,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "Endpoints": {
           "#KEY#": {
             "TfsEndpoint": {
