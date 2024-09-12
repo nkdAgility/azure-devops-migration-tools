@@ -7,6 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsNodeStructureTool": {
             "Areas": {
@@ -30,6 +31,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsNodeStructureTool": {
             "Areas": {

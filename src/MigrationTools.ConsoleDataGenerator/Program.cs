@@ -20,6 +20,7 @@ using MigrationTools.Tools.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Endpoints.Infrastructure;
+using Elmah.Io.Client;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program
@@ -33,23 +34,34 @@ class Program
 
     static void Main(string[] args)
     {
-       
+
+        AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
+        {
+            Console.WriteLine("Loaded assembly: " + args.LoadedAssembly.FullName);
+        };
+
+
         string dir = AppDomain.CurrentDomain.BaseDirectory;
+        Console.WriteLine(dir);
         AppDomain currentDomain = AppDomain.CurrentDomain;
         currentDomain.Load("MigrationTools");
         currentDomain.Load("MigrationTools.Clients.TfsObjectModel");
         currentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
         currentDomain.Load("MigrationTools.Clients.FileSystem");
+        //currentDomain.Load("Microsoft.Extensions.Options");
+
+        Assembly assembly = Assembly.LoadFrom(System.IO.Path.Combine(dir, "Microsoft.Extensions.Options.dll"));
+
 
         Console.WriteLine("Assemblies");
-        List<Type> allMigrationTypes = currentDomain.GetMigrationToolsTypes().ToList();
+        
         Console.WriteLine("-----------");
-        foreach (var item in currentDomain.GetAssemblies().Where(x => x.FullName.StartsWith("MigrationTools")))
+        foreach (var item in currentDomain.GetAssemblies())
         {
             Console.WriteLine(item.FullName);
         }
         Console.WriteLine("-----------");
-
+        List<Type> allMigrationTypes = currentDomain.GetMigrationToolsTypes().ToList();
 
         List<ClassData> classDataList = new List<ClassData>();
 

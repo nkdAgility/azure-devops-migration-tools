@@ -166,6 +166,13 @@ namespace MigrationTools.ConsoleDataGenerator
                     {
                         currentObject[key] = new JObject();
                     }
+
+                    // Add the additional property to the first section (top level in the path)
+                    if (i == 0 && option != null)
+                    {
+                        ((JObject)currentObject[key]).Add("Version", "16.0");
+                    }
+
                     currentObject = (JObject)currentObject[key];
                 }
                 else

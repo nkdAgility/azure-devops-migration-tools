@@ -6,6 +6,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "Processors": [
           {
             "ProcessorType": "TfsWorkItemMigrationProcessor",
@@ -35,6 +36,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "Processors": [
           {
             "ProcessorType": "TfsWorkItemMigrationProcessor",
@@ -152,7 +154,7 @@ options:
 - parameterName: WIQLQuery
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-  defaultValue: SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [[System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc
+  defaultValue: SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
   description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'

@@ -7,6 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
             "Enabled": "False",
@@ -21,6 +22,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
             "Enabled": "True",

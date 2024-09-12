@@ -7,6 +7,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsTeamSettingsTool": {
             "Enabled": "True",
@@ -24,6 +25,7 @@ configurationSamples:
   code: >-
     {
       "MigrationTools": {
+        "Version": "16.0",
         "CommonTools": {
           "TfsTeamSettingsTool": {
             "Enabled": "True",

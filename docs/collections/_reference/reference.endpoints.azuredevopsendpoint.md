@@ -8,7 +8,23 @@ configurationSamples:
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: sample
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Endpoints": {
+          "#KEY#": {
+            "AzureDevOpsEndpoint": {
+              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+              "AuthenticationMode": "AccessToken",
+              "EndpointType": "AzureDevOpsEndpoint",
+              "Organisation": "https://dev.azure.com/xxx/",
+              "Project": "myProject"
+            }
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: classic
   description: 
@@ -16,9 +32,9 @@ configurationSamples:
     {
       "$type": "AzureDevOpsEndpointOptions",
       "AuthenticationMode": "AccessToken",
-      "AccessToken": null,
-      "Organisation": null,
-      "Project": null,
+      "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+      "Organisation": "https://dev.azure.com/xxx/",
+      "Project": "myProject",
       "ReflectedWorkItemIdField": null,
       "EndpointEnrichers": null
     }
