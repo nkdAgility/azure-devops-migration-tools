@@ -15,8 +15,8 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 ## Prerequisits
 
-1. [Install](installation.md) the tools using your prefered method.
-1. Check that you have the required [Permissions](permissions.md) to run the tools.
+1. [Install](/setup/installation.md) the tools using your prefered method.
+1. Check that you have the required [Permissions](/setup/permissions.md) to run the tools.
 1. Get to grips with the [Configuration](./Reference/) to understand how to configure the tool. (you can skup this for now and come back to it later)
 
 ## Getting Started

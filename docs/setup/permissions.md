@@ -9,36 +9,48 @@ redirect_from:
   - /permissions/
 ---
 
-The permissions are courently governed by the needs of the [TFS Client Object Model](https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/dotnet-client-libraries?view=azure-devops) from Microsoft. Microsoft [Announced the deprecation of the WIT and Test Client OM](https://devblogs.microsoft.com/devops/announcing-the-deprecation-of-the-wit-and-test-client-om-at-jan-1-2020-2/) in 2020, however this is still the only way to interact with versions of TFS from 2010 to 2018 with any consistantcy. We are working on moving our tools to the REST API, but this is a large task and will take some time.
+The current permissions are governed by the requirements of the [TFS Client Object Model](https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/dotnet-client-libraries?view=azure-devops) from Microsoft. While Microsoft [announced the deprecation of the WIT and Test Client OM](https://devblogs.microsoft.com/devops/announcing-the-deprecation-of-the-wit-and-test-client-om-at-jan-1-2020-2/) in 2020, it remains the only consistent method for interacting with versions of TFS from 2010 to 2018. We are in the process of migrating our tools to the REST API, but this is a large effort and will take some time to complete.
 
-## Minimum Permission Requirements
+The Azure DevOps Migration Tools use a flag to bypass the Work Item rules engine, allowing data to be written into TFS/VSTS in ways that might not comply with the usual rules. For example, you can directly transition an item into the `Closed` state without starting at `New`. This is highly beneficial for migrations but requires specific pre-requisites.
 
-At this time the documented minimum required permissions for running the tools are:
+_Note: According to the Azure DevOps product team, the Object Model API only works with full-scoped PATs, meaning it is incompatible with PATs that have limited scopes._
 
-- Account in both the source and target projects with "Project Collection Administrator" rights
-- PAT with "full access" for both the Source and the Target
+## Source Permissions
 
-Note: I have been informed by the Azure DevOps product team information that ObjectModel API only works with full scoped PATs, so it won't work with any PAT that has specific scopes. 
+The current minimum required permissions for running the tools are:
 
-### However! Unsupported Permission Options
+- Membership in the "Project Collection Administrator" group – This will override any 'denied' permissions, ensuring a smooth migration.
+- A PAT (Personal Access Token) with "full access."
 
-We have seen that the tools may work with less permissions however the following has not been full tested and is not currently supported:
+_Note: Although we do not write data to the source system, we still require a PAT with full access._
 
-- Project and Team (Read, write, & manage)
-- Work Items (Read, Write & Manage)
-- Identity (Read & Manage)
+## Target Permissions
+
+The current minimum required permissions for running the tools are:
+
+- Membership in the "Project Collection Administrator" group – This overrides any 'denied' permissions and allows the tools to bypass the Work Item rules engine.
+- Membership in the "Project Collection Automation" group – This grants the "Make requests on behalf of others" permission.
+- A PAT with "full access."
+
+### Unsupported Permissions for Scoped PATs
+
+In some cases, the tools may function with fewer permissions, but the following configurations have not been fully tested and are not officially supported:
+
+- Project and Team (Read, Write, and Manage)
+- Work Items (Read, Write, and Manage)
+- Identity (Read and Manage)
 - Security (Manage)
 
-If you do try this out then please let us know how you get on!
+If you try these settings, please share your results with us!
 
-## TFS, VSTS, & Azure DevOps Server Configuration (On-Premises Only)
+### Granting "Make requests on behalf of others" in Older TFS Versions
 
-There are some additional requirements that you will need to meet in order to use the tool against your TFS or VSTS server. The Azure DevOps Migration Tools use a flag to Bypass the Work Item rules engine and write data into TFS\VSTS that may not comply with the rules. For example you can write data directly into the `Closed` state without starting at `New`. This is very useful for migrations but requires some pre-requisites.
+To set the "Changed by" field to a user other than the one running the migration, you must grant the user the "Make requests on behalf of others" permission. This permission is not included by default for "Project Collection Administrator" users. In older versions of TFS, it can only be assigned by adding the user to the "Project Collection Service Accounts" group.
 
-## Bypass Rules
+You can use the following command to do this:
 
-For on-premises instances you need to be part of the `Project Collection Service Accounts` group. You can do this by calling the following command:
+```cmd
+tfssecurity /g+ "Project Collection Service Accounts" n:domainusername ALLOW /server:http://myserver:8080/tfs
+```
 
-`tfssecurity /g+ "Project Collection Service Accounts" n:domainusername ALLOW /server:http://myserver:8080/tfs`
-
-This is not required for Azure DevOps Service targets, but you do need to be a Collection Admin on the Target.
+This step is not required for Azure DevOps Service targets, as `tfssecurity` is not available in that environment.
