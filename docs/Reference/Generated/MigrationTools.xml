@@ -258,32 +258,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"main"
+            => @"topic/niggles-v16-docs"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"bdf61e81"
+            => @"f77063d0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"bdf61e816203f90e6adc8c8a479d8c55a349bae3"
+            => @"f77063d036704350c54dbeef542fb2c527425a2d"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-10T17:11:58+01:00"
+            => @"2024-09-13T15:03:25+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.2"
+            => @"v16.0.2-4-gf77063d0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -318,7 +318,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"2"
+            => @"6"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

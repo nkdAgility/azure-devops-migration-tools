@@ -40,7 +40,7 @@ namespace MigrationTools
                 {
                     // Create the options instance and bind the configuration
                     IEndpointOptions endpointOptionsInstance = (IEndpointOptions)Activator.CreateInstance(endpointOptionsType);
-
+                    endpointOptionsInstance.Name = endpointName;
                     // Get and bind the defaults
                     var endpointsDefaultsSection = configuration.GetSection(endpointOptionsInstance.ConfigurationMetadata.PathToDefault);
                     endpointsDefaultsSection.Bind(endpointOptionsInstance);
