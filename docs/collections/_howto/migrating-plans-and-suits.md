@@ -26,58 +26,55 @@ The important bits:
 
 ```JSON
 {
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
+  "Serilog": {
+    "MinimumLevel": "Information"
   },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        },
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "Enabled": false,
+        "UpdateCreatedDate": false,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Case', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+      }
+    ],
+    "CommonTools": {
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldToFieldMap",
+            "sourceField": "Custom.ReflectedWorkItemId",
+            "targetField": "Microsoft.VSTS.Build.IntegrationBuild",
+            "defaultValue": "",
+            "ApplyTo": ["*"]
+          }
+        ]
+      }
     }
-  },
-  "FieldMaps": [
- {
-      "$type": "FieldtoFieldMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "Custom.ReflectedWorkItemId",
-      "targetField": "Microsoft.VSTS.Build.IntegrationBuild",
-      "defaultValue": ""
-    }
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Case', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-    }
-  ],
-  "Version": "15.0",
-  "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+  }
 }
 ```
 
@@ -93,55 +90,40 @@ The important bits:
 
 ```JSON
 {
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
+  "Serilog": {
+    "MinimumLevel": "Information"
   },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Microsoft.VSTS.Build.IntegrationBuild",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
- {
-      "$type": "FieldtoFieldMapConfig",
-      "WorkItemTypeName": "Test Cases",
-      "sourceField": "Microsoft.VSTS.Build.IntegrationBuild",
-      "targetField": "Custom.ReflectedWorkItemId",
-      "defaultValue": ""
-    }
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "WorkItemMigrationConfig",
-      "Enabled": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-    }
-  ],
-  "Version": "15.0",
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        },
+        "ReflectedWorkItemIdField": "Microsoft.VSTS.Build.IntegrationBuild"
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "Enabled": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Test Case','Shared Steps','Shared Parameter') ORDER BY [System.ChangedDate] desc"
+      }
+    ]
+  }
 }
 ```
 
@@ -155,51 +137,44 @@ The important bits:
 
 ```JSON
 {
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
+  "Serilog": {
+    "MinimumLevel": "Information"
   },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "TestVariablesMigrationConfig",
-      "Enabled": true
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        },
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      }
     },
-    {
-      "$type": "TestConfigurationsMigrationConfig",
-      "Enabled": true
-    },
-  ],
-  "Version": "15.0",
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+    "Processors": [
+      {
+        "ProcessorType": "TfsTestVariablesMigrationProcessor",
+        "Enabled": true,
+        "Processor": "TestVariablesMigrationContext"
+      },
+      {
+        "ProcessorType": "TfsTestConfigurationsMigrationProcessor",
+        "Enabled": true
+      }
+    ]
+  }
 }
 ```
 
@@ -215,52 +190,44 @@ The important bits:
 
 ```JSON
 {
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
+  "Serilog": {
+    "MinimumLevel": "Information"
   },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "TestPlansAndSuitesMigrationConfig",
-      "Enabled": true,
-      "OnlyElementsWithTag": null,
-      "TestPlanQueryBit": null,
-      "RemoveAllLinks": false,
-      "MigrationDelay": 0,
-      "RemoveInvalidTestSuiteLinks": false,
-      "FilterCompleted": false
-    }
-  ],
-  "Version": "15.0",
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationSource1",
+       "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-preview/",
+        "Project": "migrationTest5",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "Authentication": {
+          "AuthenticationMode": "AccessToken",
+          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+        }
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsTestPlansAndSuitesMigrationProcessor",
+        "Enabled": true,
+        "OnlyElementsWithTag": "",
+        "TestPlanQuery": null,
+        "RemoveAllLinks": false,
+        "MigrationDelay": 0,
+        "RemoveInvalidTestSuiteLinks": false,
+        "FilterCompleted": false
+      }
+    ]
+  }
 }
 ```
