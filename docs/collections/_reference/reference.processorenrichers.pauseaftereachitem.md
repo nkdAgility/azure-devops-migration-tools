@@ -20,7 +20,7 @@ configurationSamples:
       "RefName": null
     }
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
-description: missng XML code comments
+description: missing XML code comments
 className: PauseAfterEachItem
 typeName: ProcessorEnrichers
 architecture: 
@@ -31,14 +31,14 @@ options:
   defaultValue: true
 - parameterName: OptionFor
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: RefName
   type: String
   description: For internal use
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs
 optionsClassFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
 

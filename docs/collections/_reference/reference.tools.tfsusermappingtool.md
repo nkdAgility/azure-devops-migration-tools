@@ -79,17 +79,17 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: IdentityFieldsToCheck
   type: List
   description: This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: UserMappingFile
   type: String
   description: This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingTool.cs
 optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingToolOptions.cs
 

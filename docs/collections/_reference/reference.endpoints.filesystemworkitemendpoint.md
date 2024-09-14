@@ -19,21 +19,21 @@ configurationSamples:
       "EndpointEnrichers": null
     }
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
-description: missng XML code comments
+description: missing XML code comments
 className: FileSystemWorkItemEndpoint
 typeName: Endpoints
 architecture: 
 options:
 - parameterName: EndpointEnrichers
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: FileStore
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpoint.cs
 optionsClassFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpointOptions.cs
 

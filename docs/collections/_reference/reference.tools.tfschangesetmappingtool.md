@@ -41,21 +41,21 @@ configurationSamples:
       "ChangeSetMappingFile": null
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
-description: missng XML code comments
+description: missing XML code comments
 className: TfsChangeSetMappingTool
 typeName: Tools
 architecture: 
 options:
 - parameterName: ChangeSetMappingFile
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingTool.cs
 optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingToolOptions.cs
 

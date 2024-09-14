@@ -20,7 +20,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
         public string GetTypeData(Type item, string element = "summary")
         {
-            string query = "missng XML code comments";
+            string query = "missing XML code comments";
             try
             {
                 // Query the data and write out a subset of contacts
@@ -39,7 +39,7 @@ namespace MigrationTools.ConsoleDataGenerator
             }
             else
             {
-                query = "missng XML code comments";
+                query = "missing XML code comments";
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
             }
             return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
@@ -64,7 +64,7 @@ namespace MigrationTools.ConsoleDataGenerator
             else
             {
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
-                query = "missng XML code comments";
+                query = "missing XML code comments";
             }
             return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
         }
@@ -89,7 +89,7 @@ namespace MigrationTools.ConsoleDataGenerator
             else
             {
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
-                defaultvalue = "missng XML code comments";
+                defaultvalue = "missing XML code comments";
             }
 
             return defaultvalue.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();

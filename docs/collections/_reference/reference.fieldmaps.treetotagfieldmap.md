@@ -39,25 +39,25 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
-description: missng XML code comments
+description: missing XML code comments
 className: TreeToTagFieldMap
 typeName: FieldMaps
 architecture: 
 options:
 - parameterName: ApplyTo
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: timeTravel
   type: Int32
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: toSkip
   type: Int32
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMap.cs
 optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMapOptions.cs
 

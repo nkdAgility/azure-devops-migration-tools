@@ -38,7 +38,7 @@ configurationSamples:
       "Enabled": true
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
-description: missng XML code comments
+description: missing XML code comments
 className: TfsWorkItemEmbededLinkTool
 typeName: Tools
 architecture: 
@@ -46,9 +46,9 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkTool.cs
 optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkToolOptions.cs
 

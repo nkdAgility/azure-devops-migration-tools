@@ -52,7 +52,7 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: MaxRevisions
   type: Int32
   description: Sets the maximum number of revisions that will be migrated. "First + Last N = Max". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.
@@ -61,8 +61,8 @@ options:
   type: Boolean
   description: You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.
   defaultValue: true
-status: missng XML code comments
-processingTarget: missng XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerTool.cs
 optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerToolOptions.cs
 

@@ -64,7 +64,7 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: MigrateTeamCapacities
   type: Boolean
   description: 'Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.'
@@ -76,13 +76,13 @@ options:
 - parameterName: Teams
   type: List
   description: List of Teams to process. If this is `null` then all teams will be processed.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: UpdateTeamSettings
   type: Boolean
   description: Reset the target team settings to match the source if the team exists
   defaultValue: false
-status: missng XML code comments
-processingTarget: missng XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsTool.cs
 optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsToolOptions.cs
 

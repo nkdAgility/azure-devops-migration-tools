@@ -63,25 +63,25 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
-description: missng XML code comments
+description: missing XML code comments
 className: FieldToTagFieldMap
 typeName: FieldMaps
 architecture: 
 options:
 - parameterName: ApplyTo
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: formatExpression
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: sourceField
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldToTagFieldMap.cs
 optionsClassFile: ''
 
