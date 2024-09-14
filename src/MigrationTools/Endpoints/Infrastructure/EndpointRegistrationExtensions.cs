@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Exceptions;
 using MigrationTools.Options;
 using Serilog;
 
@@ -54,9 +55,10 @@ namespace MigrationTools
                     {
                         var validator = Activator.CreateInstance(validatorType);
                         var validationResult = InvokeValidator(validator, endpointOptionsInstance);
-                        if (!validationResult.IsValid)
+                        if (validationResult.Failed)
                         {
-                            throw new InvalidOperationException($"Validation failed for endpoint '{endpointName}': {validationResult.Message}");
+                            //throw new OptionsValidationException(endpointName, endpointOptionsType, validationResult.Failures);
+                            throw new ConfigurationValidationException(endpointConfig, endpointOptionsInstance, validationResult);
                         }
                     }
 
@@ -118,20 +120,13 @@ namespace MigrationTools
         }
 
 
-        private static (bool IsValid, string Message) InvokeValidator(object validator, IEndpointOptions optionsInstance)
+        private static ValidateOptionsResult InvokeValidator(object validator, IEndpointOptions optionsInstance)
         {
             var validateMethod = validator.GetType().GetMethod("Validate");
             var validationResult = validateMethod?.Invoke(validator, new object[] { null, optionsInstance });
 
-            if (validationResult is Microsoft.Extensions.Options.ValidateOptionsResult result)
-            {
-                if (result.Failed)
-                {
-                    return (false, result.FailureMessage);
-                }
-            }
+                return (ValidateOptionsResult)validationResult;
 
-            return (true, string.Empty);
         }
 
 

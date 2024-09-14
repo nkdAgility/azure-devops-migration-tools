@@ -81,7 +81,7 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: Manipulators
   type: List
   description: List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
@@ -90,8 +90,8 @@ options:
   type: Int32
   description: Max number of chars in a string. Applied last, and set to 1000000 by default.
   defaultValue: 1000000
-status: missng XML code comments
-processingTarget: missng XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools/Tools/StringManipulatorTool.cs
 optionsClassFile: /src/MigrationTools/Tools/StringManipulatorToolOptions.cs
 

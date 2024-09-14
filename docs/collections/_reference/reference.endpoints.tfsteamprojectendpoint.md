@@ -92,41 +92,41 @@ configurationSamples:
       "EndpointEnrichers": null
     }
   sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
-description: missng XML code comments
+description: missing XML code comments
 className: TfsTeamProjectEndpoint
 typeName: Endpoints
 architecture: 
 options:
 - parameterName: AllowCrossProjectLinking
   type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: Authentication
   type: TfsAuthenticationOptions
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: Collection
   type: Uri
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: EndpointEnrichers
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: LanguageMaps
   type: TfsLanguageMapOptions
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: Project
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: ReflectedWorkItemIdField
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsTeamProjectEndpoint.cs
 optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsTeamProjectEndPointOptions.cs
 

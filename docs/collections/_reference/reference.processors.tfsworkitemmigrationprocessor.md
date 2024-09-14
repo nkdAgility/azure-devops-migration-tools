@@ -99,11 +99,11 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: Enrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
   description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
@@ -127,23 +127,23 @@ options:
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: SkipRevisionWithInvalidAreaPath
   type: Boolean
   description: When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: SkipRevisionWithInvalidIterationPath
   type: Boolean
   description: This will skip a revision if the source iteration has not been migrated i.e. it was deleted
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: UpdateCreatedBy
   type: Boolean
   description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"

@@ -36,15 +36,15 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: Enrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: FilterCompleted
   type: Boolean
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: MigrationDelay
   type: Int32
   description: ??Not sure what this does. Check code.
@@ -56,7 +56,7 @@ options:
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: RemoveAllLinks
   type: Boolean
   description: ??Not sure what this does. Check code.
@@ -67,12 +67,12 @@ options:
   defaultValue: false
 - parameterName: SourceName
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missng XML code comments
-  defaultValue: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: TestPlanQuery
   type: String
   description: Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.

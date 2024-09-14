@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Enrichers;
+using MigrationTools.Exceptions;
 using MigrationTools.Options;
 using Serilog;
 
@@ -71,13 +72,13 @@ namespace MigrationTools.Processors.Infrastructure
 
 
                     // Validate the processor options
-                    ValidateProcessorOptions(processorType, processorOption);
+                    ValidateProcessorOptions(processorType, processorOption, processorSection);
                     // Add the processor to the list of processors
                     options.Processors.Add(processorOption);
                 }
             }
 
-            private void ValidateProcessorOptions(Type processorType, IProcessorOptions processorOptions)
+            private void ValidateProcessorOptions(Type processorType, IProcessorOptions processorOptions, IConfigurationSection processorSection)
             {
                 // Find a validator for the processor options type
                 var validatorType = typeof(IValidateOptions<>).MakeGenericType(processorType);
@@ -100,7 +101,8 @@ namespace MigrationTools.Processors.Infrastructure
                     {
                         var failuresProperty = result.GetType().GetProperty("Failures");
                         var failures = (IEnumerable<string>)failuresProperty.GetValue(result);
-                        throw new OptionsValidationException(processorType.Name, processorType, failures.ToArray());
+                        throw new ConfigurationValidationException(processorSection, processorOptions,(ValidateOptionsResult) result);
+                        //throw new OptionsValidationException(processorType.Name, processorType, failures.ToArray());
                     }
                 }
                 else

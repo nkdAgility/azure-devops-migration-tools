@@ -198,7 +198,7 @@ configurationSamples:
       "FieldMaps": []
     }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions
-description: missng XML code comments
+description: missing XML code comments
 className: FieldMappingTool
 typeName: Tools
 architecture: 
@@ -206,13 +206,13 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: FieldMaps
   type: List
-  description: missng XML code comments
-  defaultValue: missng XML code comments
-status: missng XML code comments
-processingTarget: missng XML code comments
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools/Tools/FieldMappingTool.cs
 optionsClassFile: /src/MigrationTools/Tools/FieldMappingToolOptions.cs
 

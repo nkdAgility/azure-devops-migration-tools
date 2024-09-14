@@ -44,7 +44,7 @@ configurationSamples:
       "SaveAfterEachLinkIsAdded": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
-description: missng XML code comments
+description: missing XML code comments
 className: TfsWorkItemLinkTool
 typeName: Tools
 architecture: 
@@ -52,17 +52,17 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: FilterIfLinkCountMatches
   type: Boolean
   description: Skip validating links if the number of links in the source and the target matches!
-  defaultValue: missng XML code comments
+  defaultValue: missing XML code comments
 - parameterName: SaveAfterEachLinkIsAdded
   type: Boolean
   description: Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
   defaultValue: false
-status: missng XML code comments
-processingTarget: missng XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
 classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
 optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkToolOptions.cs
 
