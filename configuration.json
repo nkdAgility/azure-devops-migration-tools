@@ -5,7 +5,7 @@
   "MigrationTools": {
     "Version": "16.0",
     "Endpoints": {
-      "Source": {
+      "Source2": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
@@ -25,7 +25,7 @@
           "IterationPath": "Iteration"
         }
       },
-      "Target": {
+      "Target2": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationTest5",
@@ -147,6 +147,8 @@
         "PauseAfterEachWorkItem": false,
         "AttachRevisionHistory": false,
         "GenerateMigrationComment": true,
+        "SourceName": "Source2",
+        "TargetName": "Target2",
         "WorkItemIDs": [ 12 ],
         "MaxGracefulFailures": 0,
         "SkipRevisionWithInvalidIterationPath": false,

@@ -9,6 +9,7 @@ using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
 using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Enrichers;
+using MigrationTools.Exceptions;
 using MigrationTools.Services;
 using MigrationTools.Tools;
 
@@ -63,21 +64,13 @@ namespace MigrationTools.Processors.Infrastructure
             {
                 throw new ArgumentException("Endpoint name cannot be null or empty", nameof(name));
             }
-            try
-            {
                 // Assuming GetRequiredKeyedService throws an exception if the service is not found
-                IEndpoint endpoint = Services.GetKeyedService<IEndpoint>(name);
+                IEndpoint endpoint = Services.GetRequiredKeyedService<IEndpoint>(name);
                 if (endpoint == null)
                 {
                     Log.LogCritical("Processor::GetEndpoint: The endpoint '{EndpointName}' could not be found.", name);
                 }
                 return endpoint;
-            }
-            catch (Exception ex)
-            {
-                // Catch any other exceptions that might occur and wrap them in a more specific exception if needed
-                throw new InvalidOperationException($"An error occurred while retrieving the endpoint '{name}'.", ex);
-            }
         }
 
         public void Execute()
@@ -107,6 +100,20 @@ namespace MigrationTools.Processors.Infrastructure
 
 
                     Log.LogInformation(" Migration Processor Complete {MigrationContextname} ", Name);
+                }
+                catch (OptionsValidationException ex)
+                {
+                    Status = ProcessingStatus.Failed;
+                    ProcessorActivity.SetStatus(ActivityStatusCode.Error);
+                    Telemetry.TrackException(ex, ProcessorActivity.Tags);
+                    Log.LogCritical(ex, "Validation of your configuration failed:");
+                }
+                catch (ConfigurationValidationException ex)
+                {
+                    Status = ProcessingStatus.Failed;
+                    ProcessorActivity.SetStatus(ActivityStatusCode.Error);
+                    Telemetry.TrackException(ex, ProcessorActivity.Tags);
+                    Log.LogCritical(ex, "Validation of your configuration failed:");
                 }
                 catch (Exception ex)
                 {
