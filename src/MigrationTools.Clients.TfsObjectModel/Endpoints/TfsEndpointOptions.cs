@@ -56,7 +56,7 @@ namespace MigrationTools.Endpoints
             // Validate ReflectedWorkItemIdField - Must not be null or empty
             if (string.IsNullOrWhiteSpace(options.ReflectedWorkItemIdField))
             {
-                errors.Add("The ReflectedWorkItemIdField property must not be null or empty.");
+                errors.Add("The ReflectedWorkItemIdField property must not be null or empty. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/setup/reflectedworkitemid/");
             }
 
             // Validate LanguageMaps - Must exist

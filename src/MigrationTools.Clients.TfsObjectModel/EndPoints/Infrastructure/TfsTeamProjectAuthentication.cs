@@ -31,7 +31,7 @@ namespace MigrationTools.Endpoints.Infrastructure
                 case AuthenticationMode.AccessToken:
                     if (string.IsNullOrWhiteSpace(options.AccessToken))
                     {
-                        errors.Add("The AccessToken must not be null or empty when AuthenticationMode is set to 'AccessToken'.");
+                        errors.Add("The AccessToken must not be null or empty when AuthenticationMode is set to 'AccessToken'. You must provide a PAT to use 'AccessToken' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environment variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/");
                     }
                     break;
 
