@@ -11,7 +11,7 @@ using System.DirectoryServices.AccountManagement;
 namespace MigrationTools.Processors
 {
 
-    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
+    public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig, IValidateOptions<TfsWorkItemMigrationProcessorOptions>
     {
 
 
@@ -102,24 +102,20 @@ namespace MigrationTools.Processors
         /// </summary>
         public bool SkipRevisionWithInvalidAreaPath { get; set; }
 
-    }
-
-    public class TfsWorkItemMigrationProcessorOptionsValidator : IValidateOptions<TfsWorkItemMigrationProcessorOptions>
-    {
-
-        public TfsWorkItemMigrationProcessorOptionsValidator()
-        {
-            
-        }
-
         public ValidateOptionsResult Validate(string name, TfsWorkItemMigrationProcessorOptions options)
         {
             var errors = new List<string>();
+            ValidateOptionsResult baseResult = base.Validate(name, options);
+            if (baseResult != ValidateOptionsResult.Success)
+            {
+                errors.AddRange(baseResult.Failures);
+            }
             // Check if WIQLQuery is provided
             if (string.IsNullOrWhiteSpace(options.WIQLQuery))
             {
                 errors.Add($"The WIQLQuery on {name} must be provided.");
-            } else
+            }
+            else
             {
                 // Validate the presence of required elements in the WIQL query
                 if (!ContainsTeamProjectCondition(options.WIQLQuery))
@@ -132,15 +128,6 @@ namespace MigrationTools.Processors
                     errors.Add("The WIQLQuery on {name} must use 'WorkItems' after the 'FROM' clause and not 'WorkItemLinks'.");
                 }
             }
-            if (string.IsNullOrWhiteSpace(options.SourceName))
-            {
-                errors.Add("The `SourceName` field on {name} must contain a value that matches one of the Endpoint names.");
-            }
-            if (string.IsNullOrWhiteSpace(options.TargetName))
-            {
-                errors.Add("The `TargetName` field on {name} must contain a value that matches one of the Endpoint names.");
-            }
-
             if (errors.Count > 0)
             {
                 return ValidateOptionsResult.Fail(errors);
@@ -149,7 +136,6 @@ namespace MigrationTools.Processors
             return ValidateOptionsResult.Success;
         }
 
-        // Check if the WIQL query contains the '[System.TeamProject] = @TeamProject' condition
         private bool ContainsTeamProjectCondition(string query)
         {
             // Regex to match '[System.TeamProject] = @TeamProject'
@@ -170,4 +156,6 @@ namespace MigrationTools.Processors
                    !Regex.IsMatch(query, fromWorkItemLinksPattern, RegexOptions.IgnoreCase);
         }
     }
+
+ 
 }

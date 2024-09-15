@@ -65,10 +65,10 @@ namespace MigrationTools.Processors.Infrastructure
                 throw new ArgumentException("Endpoint name cannot be null or empty", nameof(name));
             }
                 // Assuming GetRequiredKeyedService throws an exception if the service is not found
-                IEndpoint endpoint = Services.GetRequiredKeyedService<IEndpoint>(name);
+                IEndpoint endpoint = Services.GetKeyedService<IEndpoint>(name);
                 if (endpoint == null)
                 {
-                    Log.LogCritical("Processor::GetEndpoint: The endpoint '{EndpointName}' could not be found.", name);
+                throw new ConfigurationValidationException( Options, ValidateOptionsResult.Fail($"The Endpoint '{name}' specified for `{this.GetType().Name}` was not found."));
                 }
                 return endpoint;
         }

@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Processors.Infrastructure
 {
-    public abstract class ProcessorOptions : IProcessorOptions
+    public abstract class ProcessorOptions : IProcessorOptions, IValidateOptions<ProcessorOptions>
     {
         [JsonIgnore]
         public string OptionFor => $"{GetType().Name.Replace("Options", "")}";
@@ -53,6 +53,26 @@ namespace MigrationTools.Processors.Infrastructure
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
         {
             return true;
+        }
+
+        public ValidateOptionsResult Validate(string name, ProcessorOptions options)
+        {
+            var errors = new List<string>();
+            if (string.IsNullOrWhiteSpace(options.SourceName))
+            {
+                errors.Add("The `SourceName` field on {name} must contain a value that matches one of the Endpoint names.");
+            }
+            if (string.IsNullOrWhiteSpace(options.TargetName))
+            {
+                errors.Add("The `TargetName` field on {name} must contain a value that matches one of the Endpoint names.");
+            }
+
+            if (errors.Count > 0)
+            {
+                return ValidateOptionsResult.Fail(errors);
+            }
+
+            return ValidateOptionsResult.Success;
         }
     }
 }
