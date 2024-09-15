@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MigrationTools.Processors.Tests
@@ -25,7 +26,10 @@ namespace MigrationTools.Processors.Tests
             var validator = new TfsWorkItemMigrationProcessorOptionsValidator();
             var x = new TfsWorkItemMigrationProcessorOptions();
             x.WIQLQuery = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject";
-            Assert.IsTrue(validator.Validate(null, x).Succeeded);
+            x.SourceName = "source";
+            x.TargetName = "target";
+            ValidateOptionsResult result = validator.Validate(null, x);
+            Assert.IsTrue(result.Succeeded);
         }
 
     }

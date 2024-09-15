@@ -6,7 +6,7 @@
     "Version": "16.0",
     "Endpoints": {
       "Source": {
-        "EndpointType": "TfsTeamProjectEndpoint",
+        "EndpointType": "AzureDevOpsEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationSource1",
         "AllowCrossProjectLinking": false,
@@ -26,7 +26,7 @@
         }
       },
       "Target": {
-        "EndpointType": "TfsTeamProjectEndpoint",
+        "EndpointType": "AzureDevOpsEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
         "Project": "migrationTest5",
         "TfsVersion": "AzureDevOps",
