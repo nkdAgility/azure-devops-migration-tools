@@ -258,32 +258,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"main"
+            => @"topic/validation-refactor"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"927c6118"
+            => @"a249caf1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"927c6118f5ad3f11bded4a786e665b57e5aa1ed7"
+            => @"a249caf19931b605c708dd66691cb9ec44a7ccc0"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-14T07:20:22+01:00"
+            => @"2024-09-15T23:18:28+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.3-Preview.3"
+            => @"v16.0.3-Preview.3-1-ga249caf1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -318,7 +318,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"3"
+            => @"4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">

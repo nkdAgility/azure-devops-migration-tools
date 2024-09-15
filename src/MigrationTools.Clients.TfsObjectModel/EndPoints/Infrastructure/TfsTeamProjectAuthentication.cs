@@ -39,6 +39,13 @@ namespace MigrationTools.Endpoints.Infrastructure
                     if (options.NetworkCredentials == null)
                     {
                         errors.Add("The NetworkCredentials must be provided when AuthenticationMode is set to 'Windows'.");
+                    } else
+                    {
+                        ValidateOptionsResult result = options.NetworkCredentials.Validate(name, options.NetworkCredentials);
+                        if (!result.Succeeded)
+                        {
+                            errors.AddRange(result.Failures);
+                        }
                     }
                     break;
                 case AuthenticationMode.Prompt:
