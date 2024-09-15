@@ -112,7 +112,6 @@ namespace MigrationTools.Processors.Infrastructure
                 {
                     Status = ProcessingStatus.Failed;
                     ProcessorActivity.SetStatus(ActivityStatusCode.Error);
-                    Telemetry.TrackException(ex, ProcessorActivity.Tags);
                     Log.LogCritical(ex, "Validation of your configuration failed:");
                 }
                 catch (Exception ex)

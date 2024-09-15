@@ -58,7 +58,7 @@ namespace MigrationTools.Tests
             {
                 Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
                 Project = project,
-                Authentication = new TfsAuthenticationOptions()
+                Authentication = new Endpoints.Infrastructure.TfsAuthenticationOptions()
                 {
                     AuthenticationMode = AuthenticationMode.AccessToken,
                     AccessToken = TestingConstants.AccessToken,
@@ -82,7 +82,7 @@ namespace MigrationTools.Tests
             {
                 Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
                 Project = project,
-                Authentication = new TfsAuthenticationOptions()
+                Authentication = new Endpoints.Infrastructure.TfsAuthenticationOptions()
                 {
                     AuthenticationMode = AuthenticationMode.AccessToken,
                     AccessToken = TestingConstants.AccessToken,

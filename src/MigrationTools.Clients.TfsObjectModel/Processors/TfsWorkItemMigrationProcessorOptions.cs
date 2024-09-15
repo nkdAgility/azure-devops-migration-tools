@@ -6,6 +6,7 @@ using MigrationTools.Processors.Infrastructure;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
+using System.DirectoryServices.AccountManagement;
 
 namespace MigrationTools.Processors
 {
@@ -113,22 +114,36 @@ namespace MigrationTools.Processors
 
         public ValidateOptionsResult Validate(string name, TfsWorkItemMigrationProcessorOptions options)
         {
-            ValidateOptionsResult result = new ValidateOptionsResult();
+            var errors = new List<string>();
             // Check if WIQLQuery is provided
             if (string.IsNullOrWhiteSpace(options.WIQLQuery))
             {
-                return ValidateOptionsResult.Fail("The WIQLQuery must be provided.");
+                errors.Add($"The WIQLQuery on {name} must be provided.");
+            } else
+            {
+                // Validate the presence of required elements in the WIQL query
+                if (!ContainsTeamProjectCondition(options.WIQLQuery))
+                {
+                    errors.Add("The WIQLQuery on {name} must contain the condition '[System.TeamProject] = @TeamProject'.");
+                }
+
+                if (!UsesWorkItemsTable(options.WIQLQuery))
+                {
+                    errors.Add("The WIQLQuery on {name} must use 'WorkItems' after the 'FROM' clause and not 'WorkItemLinks'.");
+                }
+            }
+            if (string.IsNullOrWhiteSpace(options.SourceName))
+            {
+                errors.Add("The `SourceName` field on {name} must contain a value that matches one of the Endpoint names.");
+            }
+            if (string.IsNullOrWhiteSpace(options.TargetName))
+            {
+                errors.Add("The `TargetName` field on {name} must contain a value that matches one of the Endpoint names.");
             }
 
-            // Validate the presence of required elements in the WIQL query
-            if (!ContainsTeamProjectCondition(options.WIQLQuery))
+            if (errors.Count > 0)
             {
-                return ValidateOptionsResult.Fail("The WIQLQuery must contain the condition '[System.TeamProject] = @TeamProject'.");
-            }
-
-            if (!UsesWorkItemsTable(options.WIQLQuery))
-            {
-                return ValidateOptionsResult.Fail("The WIQLQuery must use 'WorkItems' after the 'FROM' clause and not 'WorkItemLinks'.");
+                return ValidateOptionsResult.Fail(errors);
             }
 
             return ValidateOptionsResult.Success;
