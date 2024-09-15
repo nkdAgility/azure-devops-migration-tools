@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.Extensions.Options;
 using MigrationTools.Endpoints.Infrastructure;
 using Newtonsoft.Json;
@@ -55,13 +56,21 @@ namespace MigrationTools.Endpoints
             // Validate ReflectedWorkItemIdField - Must not be null or empty
             if (string.IsNullOrWhiteSpace(options.ReflectedWorkItemIdField))
             {
-                errors.Add("The ReflectedWorkItemIdField property must not be null or empty.");
+                errors.Add("The ReflectedWorkItemIdField property must not be null or empty. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/setup/reflectedworkitemid/");
             }
 
             // Validate LanguageMaps - Must exist
             if (options.LanguageMaps == null)
             {
                 errors.Add("The LanguageMaps property must exist.");
+            }
+            else
+            {
+               ValidateOptionsResult lmr= options.LanguageMaps.Validate(name, options.LanguageMaps);
+                if (lmr != ValidateOptionsResult.Success)
+                {
+                    errors.AddRange(lmr.Failures);
+                }
             }
 
             // Validate Authentication - Must exist
@@ -71,34 +80,17 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-                // Validate Authentication properties based on AuthenticationMode
-                switch (options.Authentication.AuthenticationMode)
+                ValidateOptionsResult lmr = options.Authentication.Validate(name, options.Authentication);
+                if (lmr != ValidateOptionsResult.Success)
                 {
-                    case AuthenticationMode.AccessToken:
-                        if (string.IsNullOrWhiteSpace(options.Authentication.AccessToken))
-                        {
-                            errors.Add("The AccessToken must not be null or empty when AuthenticationMode is set to 'AccessToken'.");
-                        }
-                        break;
-
-                    case AuthenticationMode.Windows:
-                        if (options.Authentication.NetworkCredentials == null)
-                        {
-                            errors.Add("The NetworkCredentials must be provided when AuthenticationMode is set to 'Windows'.");
-                        }
-                        break;
-                    case AuthenticationMode.Prompt:
-                        break;
-                    default:
-                        errors.Add($"The AuthenticationMode '{options.Authentication.AuthenticationMode}' is not supported.");
-                        break;
+                    errors.AddRange(lmr.Failures);
                 }
             }
 
             // Return failure if there are errors, otherwise success
-            if (errors.Count > 0)
+            if (errors.Any())
             {
-                return ValidateOptionsResult.Fail(string.Join(Environment.NewLine, errors));
+                return ValidateOptionsResult.Fail(errors);
             }
 
             return ValidateOptionsResult.Success;

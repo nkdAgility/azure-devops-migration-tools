@@ -54,7 +54,7 @@ namespace MigrationTools
                     if (validatorType != null)
                     {
                         var validator = Activator.CreateInstance(validatorType);
-                        var validationResult = InvokeValidator(validator, endpointOptionsInstance);
+                        var validationResult = InvokeValidator(validator, endpointOptionsInstance, endpointName);
                         if (validationResult.Failed)
                         {
                             //throw new OptionsValidationException(endpointName, endpointOptionsType, validationResult.Failures);
@@ -120,10 +120,10 @@ namespace MigrationTools
         }
 
 
-        private static ValidateOptionsResult InvokeValidator(object validator, IEndpointOptions optionsInstance)
+        private static ValidateOptionsResult InvokeValidator(object validator, IEndpointOptions optionsInstance, string name)
         {
             var validateMethod = validator.GetType().GetMethod("Validate");
-            var validationResult = validateMethod?.Invoke(validator, new object[] { null, optionsInstance });
+            var validationResult = validateMethod?.Invoke(validator, new object[] { name, optionsInstance });
 
                 return (ValidateOptionsResult)validationResult;
 

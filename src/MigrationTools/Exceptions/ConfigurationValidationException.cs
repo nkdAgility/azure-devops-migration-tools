@@ -10,20 +10,27 @@ namespace MigrationTools.Exceptions
 {
     public class ConfigurationValidationException : Exception
     {
-        public IConfigurationSection ConfigrationSection { get; }
+        public string ConfigrationSectionPath { get; }
         public IOptions OptionsInstance { get; }
         public ValidateOptionsResult ValidationResult { get; }
 
         public ConfigurationValidationException(IConfigurationSection configrationSection, IOptions optionsInstance, ValidateOptionsResult validationResult)
         {
-            ConfigrationSection = configrationSection;
+            ConfigrationSectionPath = configrationSection.Path;
+            OptionsInstance = optionsInstance;
+            ValidationResult = validationResult;
+        }
+
+        public ConfigurationValidationException(IOptions optionsInstance, ValidateOptionsResult validationResult)
+        {
+            ConfigrationSectionPath = optionsInstance.ConfigurationMetadata.PathToInstance;
             OptionsInstance = optionsInstance;
             ValidationResult = validationResult;
         }
 
         public override string ToString()
         {
-            return $"The configuration entry at '{ConfigrationSection.Path}' did not pass validation!\n Please check the following failures:\n -{string.Join("\n-", ValidationResult.Failures)}";
+            return $"The configuration entry at '{ConfigrationSectionPath}' did not pass validation!\n Please check the following failures:\n -{string.Join("\n-", ValidationResult.Failures)}";
         }
 
     }

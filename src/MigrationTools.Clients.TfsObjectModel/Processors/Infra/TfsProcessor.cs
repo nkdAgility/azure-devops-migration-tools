@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools;
 using MigrationTools.Clients;
 using MigrationTools.Enrichers;
+using MigrationTools.Exceptions;
 using MigrationTools.Tools;
 
 namespace MigrationTools.Processors.Infrastructure
@@ -19,9 +20,31 @@ namespace MigrationTools.Processors.Infrastructure
   
         }
 
-        new public TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
+        new public TfsTeamProjectEndpoint Source
+        {
+            get
+            {
+                var endpoint = base.Source as TfsTeamProjectEndpoint;
+                if (endpoint == null)
+                {
+                    throw new ConfigurationValidationException(Options, ValidateOptionsResult.Fail($"The Endpoint '{Options.SourceName}' specified for `{this.GetType().Name}` is of the wrong type! {nameof(TfsTeamProjectEndpoint)} was expected."));
+                }
+                return endpoint;
+            }
+        }
 
-        new public TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+        new public TfsTeamProjectEndpoint Target
+        {
+            get
+            {
+                var endpoint = base.Target as TfsTeamProjectEndpoint;
+                if (endpoint == null)
+                {
+                    throw new ConfigurationValidationException(Options, ValidateOptionsResult.Fail($"The Endpoint '{Options.TargetName}' specified for `{this.GetType().Name}` is of the wrong type! {nameof(TfsTeamProjectEndpoint)} was expected."));
+                }
+                return endpoint;
+            }
+        }
 
         new public TfsCommonTools CommonTools => (TfsCommonTools)base.CommonTools;
 
