@@ -103,8 +103,12 @@ namespace MigrationTools.Tools
         public string GetNewNodeName(string sourceNodePath, TfsNodeStructureType nodeStructureType)
         {
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName({sourceNodePath}, {nodeStructureType})", sourceNodePath, nodeStructureType.ToString());
-
-            var mappers = GetMaps(nodeStructureType);
+            if (!Options.Enabled)
+            {
+                Log.LogWarning("nodeStructureEnricher is disabled! You may get migration errors!");
+                return sourceNodePath;
+            }
+                var mappers = GetMaps(nodeStructureType);
             var lastResortRule = GetLastResortRemappingRule();
 
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers", mappers);
