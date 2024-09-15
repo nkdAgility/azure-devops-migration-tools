@@ -35,7 +35,7 @@ namespace MigrationTools
         public static void AddMigrationToolServicesForClientTfs_Processors(this IServiceCollection context)
         {
             context.AddSingleton<TfsWorkItemMigrationProcessor>();
-            context.AddTransient<IValidateOptions<TfsWorkItemMigrationProcessorOptions>, TfsWorkItemMigrationProcessorOptions>();
+            context.AddTransient<IValidateOptions<TfsWorkItemMigrationProcessorOptions>, TfsWorkItemMigrationProcessorOptionsValidator>();
 
             context.AddSingleton<TfsTestConfigurationsMigrationProcessor>();
             context.AddSingleton<TfsTestPlansAndSuitesMigrationProcessor>();
