@@ -43,7 +43,7 @@ namespace MigrationTools
 
             
 
-            context.AddConfiguredEndpoints(configuration);
+            context.AddConfiguredEndpoints(configuration); //keep this one
             //Containers
             context.AddTransient<ProcessorEnricherContainer>();
             context.AddTransient<EndpointEnricherContainer>();

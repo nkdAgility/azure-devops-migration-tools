@@ -13,8 +13,6 @@ namespace MigrationTools
     {
         public static void AddMigrationToolServicesForClientAzureDevopsRest(this IServiceCollection context, IConfiguration configuration)
         {
-            context.AddConfiguredEndpoints(configuration);
-
             //TfsPipelines
             context.AddTransient<AzureDevOpsPipelineProcessor>();
             context.AddTransient<ProcessDefinitionProcessor>();

@@ -14,8 +14,14 @@ namespace MigrationTools
 {
     public static class EndpointRegistrationExtensions
     {
+        private static bool configured = false;
+
         public static void AddConfiguredEndpoints(this IServiceCollection services, IConfiguration configuration)
         {
+            if (configured)
+            {
+                return;
+            }
             var endpointsSection = configuration.GetSection("MigrationTools:Endpoints");
             foreach (var endpointConfig in endpointsSection.GetChildren())
             {
@@ -23,7 +29,7 @@ namespace MigrationTools
                 var endpointType = endpointConfig.GetValue<string>("EndpointType");
                 if (string.IsNullOrEmpty(endpointType))
                 {
-                    Log.Warning("Endpoint '{EndpointName}' does not have a type configured. Skipping.", endpointName);
+                    Console.WriteLine("Endpoint '{EndpointName}' does not have a type configured. Skipping.", endpointName);
                     continue;
                 }
                 AddEndPointSingleton(services, configuration, endpointConfig, endpointName, endpointType);

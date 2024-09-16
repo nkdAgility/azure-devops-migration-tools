@@ -59,7 +59,6 @@ namespace MigrationTools
             context.AddTransient<TfsTeamSettingsProcessor>();
             context.AddTransient<TfsSharedQueryProcessor>();
 
-            context.AddConfiguredEndpoints(configuration);
 
             context.AddMigrationToolServicesForClientTfs_Tools(configuration);
 
