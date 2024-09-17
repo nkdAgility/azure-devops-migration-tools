@@ -258,32 +258,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"main"
+            => @"topic/limit-endpoint-creation"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"76c49c7b"
+            => @"8d4a8c06"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"76c49c7bd212b11211a22924e6ad4e36339739b8"
+            => @"8d4a8c06a31d595ee06b524c197ad5728f41673d"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-16T00:57:48+01:00"
+            => @"2024-09-16T14:51:48+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"1"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.4-Preview.2"
+            => @"v16.0.4-Preview.2-1-g8d4a8c06"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
@@ -318,7 +318,7 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"4"
+            => @"5"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
