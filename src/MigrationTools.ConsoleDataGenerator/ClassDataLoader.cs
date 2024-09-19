@@ -150,6 +150,14 @@ namespace MigrationTools.ConsoleDataGenerator
         static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section, IOptions option = null)
         {
             var pathSegments = option == null ? section.Path.Split(':') : option.ConfigurationMetadata.PathToInstance.Split(':');
+
+            // If IsKeyed is true, we skip the lowest path segment
+            if (option != null && option.ConfigurationMetadata.IsKeyed && pathSegments.Length > 1)
+            {
+                pathSegments = pathSegments.Take(pathSegments.Length - 1).ToArray();
+            }
+
+
             JObject root = new JObject();
             JObject currentObject = root;
 
@@ -198,7 +206,15 @@ namespace MigrationTools.ConsoleDataGenerator
                     else
                     {
                         // Handle as a regular object
-                        currentObject[key] = sectionObject;
+                        JObject itemObject = sectionObject as JObject ?? new JObject();
+
+                        // Add ObjectName and OptionFor if IsKeyed is true
+                        if (option != null && option.ConfigurationMetadata.IsKeyed)
+                        {
+                            itemObject.AddFirst(new JProperty(option.ConfigurationMetadata.ObjectName, option.ConfigurationMetadata.OptionFor));
+                        }
+
+                        currentObject[key] = itemObject;
                     }
                 }
             }
