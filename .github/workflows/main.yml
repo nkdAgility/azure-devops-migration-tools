@@ -371,6 +371,17 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site/**/*
+      - name: Build with Jekyll 2
+        # Outputs to the './_site' directory by default
+        run: bundle exec jekyll build --destination ./_site2/
+        env:
+          JEKYLL_ENV: production
+      # - name: Build Jekyll
+      #   uses: jerryjvl/jekyll-build-action@v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Site2
+          path: ./_site2/**/*
  
 
   # GitHubRelease
