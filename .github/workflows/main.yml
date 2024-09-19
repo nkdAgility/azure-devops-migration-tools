@@ -578,13 +578,18 @@ jobs:
           app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
           private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
 
+      - name: Download a single artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Site2
+          path: ./_site2
       - name: Build and Deploy
         uses: Azure/static-web-apps-deploy@v1
         id: azureDeploy
         with:
           repo_token: ${{ steps.app-token.outputs.token }}
           action: 'upload'
-          app_location: ./_site
+          app_location: ./_site2
           skip_app_build: true
           skip_api_build: true
           output_location: ''
