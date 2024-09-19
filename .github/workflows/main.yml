@@ -373,7 +373,7 @@ jobs:
           path: ./_site/**/*
       - name: Build with Jekyll 2
         # Outputs to the './_site' directory by default
-        run: bundle exec jekyll build --destination ./_site2/
+        run: bundle exec jekyll build --destination ./_site2/  --baseurl "/"
         env:
           JEKYLL_ENV: production
       # - name: Build Jekyll
