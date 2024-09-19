@@ -10,26 +10,24 @@ configurationSamples:
         "Version": "16.0",
         "Endpoints": {
           "#KEY#": {
-            "TfsTeamProjectEndpoint": {
-              "AllowCrossProjectLinking": "False",
-              "Authentication": {
-                "AccessToken": "",
-                "AuthenticationMode": "AccessToken",
-                "NetworkCredentials": {
-                  "Domain": "",
-                  "Password": "",
-                  "UserName": ""
-                }
-              },
+            "EndpointType": "TfsTeamProjectEndpoint",
+            "AllowCrossProjectLinking": "False",
+            "Authentication": {
+              "AccessToken": "",
               "AuthenticationMode": "AccessToken",
-              "Collection": "",
-              "EndpointType": "TfsTeamProjectEndpoint",
-              "LanguageMaps": {
-                "AreaPath": "Area",
-                "IterationPath": "Iteration"
-              },
-              "Project": ""
-            }
+              "NetworkCredentials": {
+                "Domain": "",
+                "Password": "",
+                "UserName": ""
+              }
+            },
+            "AuthenticationMode": "AccessToken",
+            "Collection": "",
+            "LanguageMaps": {
+              "AreaPath": "Area",
+              "IterationPath": "Iteration"
+            },
+            "Project": ""
           }
         }
       }
@@ -43,25 +41,23 @@ configurationSamples:
         "Version": "16.0",
         "Endpoints": {
           "#KEY#": {
-            "TfsTeamProjectEndpoint": {
-              "AllowCrossProjectLinking": "False",
-              "Authentication": {
-                "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
-                "AuthenticationMode": "AccessToken",
-                "NetworkCredentials": {
-                  "Domain": "",
-                  "Password": "",
-                  "UserName": ""
-                }
-              },
-              "Collection": "https://dev.azure.com/nkdagility-preview/",
-              "EndpointType": "TfsTeamProjectEndpoint",
-              "LanguageMaps": {
-                "AreaPath": "Area",
-                "IterationPath": "Iteration"
-              },
-              "Project": "migrationSource1"
-            }
+            "EndpointType": "TfsTeamProjectEndpoint",
+            "AllowCrossProjectLinking": "False",
+            "Authentication": {
+              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+              "AuthenticationMode": "AccessToken",
+              "NetworkCredentials": {
+                "Domain": "",
+                "Password": "",
+                "UserName": ""
+              }
+            },
+            "Collection": "https://dev.azure.com/nkdagility-preview/",
+            "LanguageMaps": {
+              "AreaPath": "Area",
+              "IterationPath": "Iteration"
+            },
+            "Project": "migrationSource1"
           }
         }
       }
