@@ -52,7 +52,7 @@ jobs:
       nkdAgility_DocsBaseURL: ${{ steps.nkdagility.outputs.docs_baseURL }}
       nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
-      
+      nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -116,6 +116,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                     $docs_deploy_folder = "./azure-devops-migration-tools/"
                     $docs_baseURL = "/learn/azure-devops-migration-tools"
+                    $AzureSitesEnvironment = ""
                     $RunRelease = 'true'
                 }    
                 "Preview" {
@@ -123,6 +124,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
                     $docs_baseURL = "/learn/azure-devops-migration-tools/preview"
+                    $AzureSitesEnvironment = "preview";
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
@@ -130,6 +132,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
                     $docs_deploy_folder = "./azure-devops-migration-tools/canary/$branchSafeName"
                     $docs_baseURL = "/learn/azure-devops-migration-tools/canary/$branchSafeName"
+                    $AzureSitesEnvironment = "$branchSafeName"
                     $RunRelease = 'false'
                 }
             }
@@ -141,6 +144,8 @@ jobs:
             echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
             Write-Output "docs_baseURL=$docs_baseURL"
             echo "docs_baseURL=$docs_baseURL" >> $env:GITHUB_OUTPUT
+            Write-Output "We are running for the $AzureSitesEnvironment AzureSitesEnvironment!"
+            echo "AzureSitesEnvironment=$AzureSitesEnvironment" >> $env:GITHUB_OUTPUT
             Write-Output "RunRelease=$RunRelease"
             echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
@@ -201,6 +206,7 @@ jobs:
                  - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
                  - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
                  - nkdAgility_DocsBaseURL: ${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}
+                 - nkdAgility_AzureSitesEnvironment: ${{needs.Setup.outputs.nkdAgility_AzureSitesEnvironment}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
                  - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
                ### GitVersion
@@ -554,3 +560,33 @@ jobs:
               ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
           # If true, any existing files in the remote upload directories are deleted.
           delete: false
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+          private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+
+      - name: Build and Deploy
+        uses: Azure/static-web-apps-deploy@v1
+        id: azureDeploy
+        with:
+          repo_token: ${{ steps.app-token.outputs.token }}
+          action: 'upload'
+          app_location: ./_site
+          skip_app_build: true
+          skip_api_build: true
+          output_location: ''
+          deployment_environment: ${{ (needs.Setup.outputs.nkdAgility_AzureSitesEnvironment) }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+
+      - name: 'Show Summery'
+        if: always()
+        shell: pwsh
+        id: nkdagility-summery
+        run: |
+          $markdown = @"
+              ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
+             Docs deployed to [${{steps.azureDeploy.outputs.static_web_app_url}}](${{steps.azureDeploy.outputs.static_web_app_url}})
+          "@
+          echo $markdown >> $Env:GITHUB_STEP_SUMMARY
