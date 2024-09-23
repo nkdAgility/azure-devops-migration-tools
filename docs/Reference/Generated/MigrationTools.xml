@@ -258,22 +258,22 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"main"
+            => @"topic/output-log-location"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"76c49c7b"
+            => @"718c3190"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"76c49c7bd212b11211a22924e6ad4e36339739b8"
+            => @"718c31903c2750f5170ac91a202c51682b4ebb13"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-16T00:57:48+01:00"
+            => @"2024-09-19T09:18:52+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
@@ -283,12 +283,12 @@
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.4-Preview.2"
+            => @"v16.0.4-Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v16.0.4-Preview.2"
+            => @"v16.0.4-Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -323,12 +323,12 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.2"
+            => @"Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.2"
+            => @"-Preview.3"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

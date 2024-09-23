@@ -53,7 +53,7 @@ namespace MigrationTools.Host
             var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
-            string logsPath = CreateLogsPath();
+            string logsPath = LogLocationService.GetLogPath();
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
@@ -66,8 +66,8 @@ namespace MigrationTools.Host
                     .Enrich.WithProperty("versionString", mtv.GetRunningVersion().versionString)
                     .Enrich.FromLogContext()
                     .Enrich.WithProcessId()
-                    .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: outputTemplate)
-                    .WriteTo.File(new Serilog.Formatting.Json.JsonFormatter(), Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true)
+                    .WriteTo.File(Path.Combine(logsPath, $"migration.log"), LogEventLevel.Verbose, shared: true,outputTemplate: outputTemplate, rollOnFileSizeLimit: true, rollingInterval: RollingInterval.Hour)
+                    .WriteTo.File(new Serilog.Formatting.Json.JsonFormatter(), Path.Combine(logsPath, $"migration-errors.log"), LogEventLevel.Error, shared: true, rollOnFileSizeLimit: true, rollingInterval: RollingInterval.Day)
                     .WriteTo.Logger(lc => lc
                             .Filter.ByExcluding(Matching.FromSource("Microsoft.Hosting.Lifetime"))
                             .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
@@ -139,21 +139,6 @@ namespace MigrationTools.Host
             } );
 
             return hostBuilder;
-        }
-
-        static string logDate = DateTime.Now.ToString("yyyyMMddHHmmss");
-
-        private static string CreateLogsPath()
-        {
-            string exportPath;
-            string assPath = Assembly.GetEntryAssembly().Location;
-            exportPath = Path.Combine(Path.GetDirectoryName(assPath), "logs", logDate);
-            if (!Directory.Exists(exportPath))
-            {
-                Directory.CreateDirectory(exportPath);
-            }
-
-            return exportPath;
         }
 
     }
