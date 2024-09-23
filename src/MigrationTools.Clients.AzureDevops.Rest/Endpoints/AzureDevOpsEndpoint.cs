@@ -42,7 +42,7 @@ namespace MigrationTools.Endpoints
             {
                 baseUrl.Path += "/";
             }
-            return CreateHttpClientWithHeaders(baseUrl.Uri.AbsoluteUri.ToString(), "api-version=6.0");
+            return CreateHttpClientWithHeaders(baseUrl.Uri.AbsoluteUri.ToString(), "api-version=5.0");
         }
 
         /// <summary>
