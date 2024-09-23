@@ -42,9 +42,14 @@ namespace MigrationTools.Endpoints
             {
                 errors.Add("The Collection property must not be null.");
             }
-            else if (!Uri.IsWellFormedUriString(options.Collection.ToString(), UriKind.Absolute))
+            else
             {
-                errors.Add("The Collection property must be a valid URL.");
+                Uri output;
+                if (!Uri.TryCreate(options.Collection.ToString(), UriKind.Absolute, out output))
+                {
+                    errors.Add("The Collection property must be a valid URL.");
+                }
+
             }
 
             // Validate Project - Must not be null or empty
@@ -66,7 +71,7 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-               ValidateOptionsResult lmr= options.LanguageMaps.Validate(name, options.LanguageMaps);
+                ValidateOptionsResult lmr = options.LanguageMaps.Validate(name, options.LanguageMaps);
                 if (lmr != ValidateOptionsResult.Success)
                 {
                     errors.AddRange(lmr.Failures);
