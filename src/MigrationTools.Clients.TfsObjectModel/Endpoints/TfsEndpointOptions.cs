@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Encodings.Web;
 using Microsoft.Extensions.Options;
 using MigrationTools.Endpoints.Infrastructure;
 using Newtonsoft.Json;
@@ -44,8 +45,8 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-                Uri output;
-                if (!Uri.TryCreate(options.Collection.ToString(), UriKind.Absolute, out output))
+                Uri output; 
+                if (!Uri.TryCreate(Uri.UnescapeDataString(options.Collection.ToString()), UriKind.Absolute, out output))
                 {
                     errors.Add("The Collection property must be a valid URL.");
                 }
