@@ -3,6 +3,7 @@ optionsClassName: TfsWorkItemLinkToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -19,6 +20,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -35,6 +37,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

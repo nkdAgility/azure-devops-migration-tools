@@ -3,6 +3,7 @@ optionsClassName: TfsUserMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsUserMappingToolOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -26,6 +27,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -49,6 +51,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

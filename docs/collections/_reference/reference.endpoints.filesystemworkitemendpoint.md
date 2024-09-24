@@ -3,14 +3,17 @@ optionsClassName: FileSystemWorkItemEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

@@ -3,14 +3,17 @@ optionsClassName: TfsTeamSettingsProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

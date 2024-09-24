@@ -3,6 +3,7 @@ optionsClassName: AzureDevOpsPipelineProcessorOptions
 optionsClassFullName: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -27,6 +28,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -51,6 +53,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

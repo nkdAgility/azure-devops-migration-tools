@@ -3,14 +3,17 @@ optionsClassName: TfsValidateRequiredFieldToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

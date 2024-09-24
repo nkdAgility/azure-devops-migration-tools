@@ -3,6 +3,7 @@ optionsClassName: MultiValueConditionalMapOptions
 optionsClassFullName: MigrationTools.Tools.MultiValueConditionalMapOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -24,6 +25,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -53,6 +55,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

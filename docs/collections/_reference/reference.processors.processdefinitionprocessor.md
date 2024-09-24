@@ -3,14 +3,17 @@ optionsClassName: ProcessDefinitionProcessorOptions
 optionsClassFullName: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

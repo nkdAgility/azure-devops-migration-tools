@@ -3,14 +3,17 @@ optionsClassName: PauseAfterEachItemOptions
 optionsClassFullName: MigrationTools.Enrichers.PauseAfterEachItemOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Enrichers.PauseAfterEachItemOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

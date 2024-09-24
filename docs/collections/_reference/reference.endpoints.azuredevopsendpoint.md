@@ -3,10 +3,12 @@ optionsClassName: AzureDevOpsEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -26,6 +28,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {
