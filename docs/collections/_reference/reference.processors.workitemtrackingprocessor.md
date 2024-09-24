@@ -19,10 +19,8 @@ configurationSamples:
       "ReplayRevisions": false,
       "CollapseRevisions": false,
       "WorkItemCreateRetryLimit": 0,
-      "Enrichers": null,
       "SourceName": null,
-      "TargetName": null,
-      "RefName": null
+      "TargetName": null
     }
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
 description: This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
@@ -37,14 +35,6 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missing XML code comments
-- parameterName: Enrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missing XML code comments
-- parameterName: RefName
-  type: String
-  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
   defaultValue: missing XML code comments
 - parameterName: ReplayRevisions
   type: Boolean

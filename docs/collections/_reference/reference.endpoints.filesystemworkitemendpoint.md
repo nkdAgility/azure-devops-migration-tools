@@ -15,8 +15,7 @@ configurationSamples:
   code: >-
     {
       "$type": "FileSystemWorkItemEndpointOptions",
-      "FileStore": null,
-      "EndpointEnrichers": null
+      "FileStore": null
     }
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 description: missing XML code comments
@@ -24,10 +23,6 @@ className: FileSystemWorkItemEndpoint
 typeName: Endpoints
 architecture: 
 options:
-- parameterName: EndpointEnrichers
-  type: List
-  description: missing XML code comments
-  defaultValue: missing XML code comments
 - parameterName: FileStore
   type: String
   description: missing XML code comments

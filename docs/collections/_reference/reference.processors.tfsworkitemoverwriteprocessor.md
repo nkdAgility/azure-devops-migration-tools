@@ -21,10 +21,8 @@ configurationSamples:
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "WorkItemCreateRetryLimit": 0,
-      "Enrichers": null,
       "SourceName": null,
-      "TargetName": null,
-      "RefName": null
+      "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteProcessorOptions
 description: Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
@@ -36,10 +34,6 @@ options:
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
-- parameterName: Enrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
-  defaultValue: missing XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
   description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
@@ -48,10 +42,6 @@ options:
   type: Boolean
   description: Pause after each work item is migrated
   defaultValue: false
-- parameterName: RefName
-  type: String
-  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
-  defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
   description: missing XML code comments

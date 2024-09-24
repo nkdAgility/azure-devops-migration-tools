@@ -22,10 +22,8 @@ configurationSamples:
       "MigrationDelay": 0,
       "RemoveInvalidTestSuiteLinks": false,
       "FilterCompleted": false,
-      "Enrichers": null,
       "SourceName": null,
-      "TargetName": null,
-      "RefName": null
+      "TargetName": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
@@ -36,10 +34,6 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missing XML code comments
-- parameterName: Enrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
 - parameterName: FilterCompleted
   type: Boolean
@@ -53,10 +47,6 @@ options:
   type: String
   description: The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
   defaultValue: '`String.Empty`'
-- parameterName: RefName
-  type: String
-  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
-  defaultValue: missing XML code comments
 - parameterName: RemoveAllLinks
   type: Boolean
   description: ??Not sure what this does. Check code.

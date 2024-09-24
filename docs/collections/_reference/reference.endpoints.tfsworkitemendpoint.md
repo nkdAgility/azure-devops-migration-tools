@@ -20,9 +20,10 @@ configurationSamples:
       "Query": null,
       "Authentication": null,
       "ReflectedWorkItemIdField": null,
-      "AllowCrossProjectLinking": false,
-      "LanguageMaps": null,
-      "EndpointEnrichers": null
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
     }
   sampleFor: MigrationTools.Endpoints.TfsWorkItemEndpointOptions
 description: missing XML code comments
@@ -30,20 +31,12 @@ className: TfsWorkItemEndpoint
 typeName: Endpoints
 architecture: 
 options:
-- parameterName: AllowCrossProjectLinking
-  type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
 - parameterName: Authentication
   type: TfsAuthenticationOptions
   description: missing XML code comments
   defaultValue: missing XML code comments
 - parameterName: Collection
   type: Uri
-  description: missing XML code comments
-  defaultValue: missing XML code comments
-- parameterName: EndpointEnrichers
-  type: List
   description: missing XML code comments
   defaultValue: missing XML code comments
 - parameterName: LanguageMaps

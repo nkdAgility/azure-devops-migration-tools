@@ -18,7 +18,8 @@ configurationSamples:
             "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
             "AuthenticationMode": "AccessToken",
             "Organisation": "https://dev.azure.com/xxx/",
-            "Project": "myProject"
+            "Project": "myProject",
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
           }
         }
       }
@@ -33,8 +34,7 @@ configurationSamples:
       "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
       "Organisation": "https://dev.azure.com/xxx/",
       "Project": "myProject",
-      "ReflectedWorkItemIdField": null,
-      "EndpointEnrichers": null
+      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 description: missing XML code comments
@@ -48,10 +48,6 @@ options:
   defaultValue: missing XML code comments
 - parameterName: AuthenticationMode
   type: AuthenticationMode
-  description: missing XML code comments
-  defaultValue: missing XML code comments
-- parameterName: EndpointEnrichers
-  type: List
   description: missing XML code comments
   defaultValue: missing XML code comments
 - parameterName: Organisation
