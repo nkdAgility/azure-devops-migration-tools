@@ -34,14 +34,18 @@ namespace MigrationTools.Processors.Infrastructure
         /// <summary>
         /// List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
         /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<IProcessorEnricherOptions> Enrichers { get; set; }
 
+        [Required]
         public string SourceName { get; set; }
+        [Required]
         public string TargetName { get; set; }
 
         /// <summary>
         /// `Refname` will be used in the future to allow for using named Options without the need to copy all of the options.
         /// </summary>
+        [JsonIgnore]
         public string RefName { get; set; }
 
         public IProcessorOptions GetSample()

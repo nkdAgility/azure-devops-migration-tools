@@ -26,10 +26,13 @@ namespace MigrationTools.Endpoints
         [JsonProperty(Order = -1)]
         [Required]
         public string ReflectedWorkItemIdField { get; set; }
-        public bool AllowCrossProjectLinking { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool AllowCrossProjectLinking { get; set; } = false;
 
         [Required]
-        public TfsLanguageMapOptions LanguageMaps { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public TfsLanguageMapOptions LanguageMaps { get; set; } = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" }; 
     }
 
     public class TfsEndpointOptionsValidator : IValidateOptions<TfsEndpointOptions>
