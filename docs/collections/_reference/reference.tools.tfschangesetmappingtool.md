@@ -3,6 +3,7 @@ optionsClassName: TfsChangeSetMappingToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -18,6 +19,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -33,6 +35,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

@@ -3,6 +3,7 @@ optionsClassName: TreeToTagFieldMapOptions
 optionsClassFullName: MigrationTools.Tools.TreeToTagFieldMapOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -24,10 +25,12 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

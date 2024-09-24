@@ -17,6 +17,7 @@ namespace MigrationTools.Endpoints.Infrastructure
         [JsonConverter(typeof(StringEnumConverter))]
         public AuthenticationMode AuthenticationMode { get; set; }
 
+        [JsonProperty( NullValueHandling = NullValueHandling.Ignore)]
         public NetworkCredentials NetworkCredentials { get; set; }
 
         [JsonConverter(typeof(DefaultOnlyConverter<string>), "** removed as a secret ***")]

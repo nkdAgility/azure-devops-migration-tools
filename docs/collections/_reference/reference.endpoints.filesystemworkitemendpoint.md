@@ -3,20 +3,22 @@ optionsClassName: FileSystemWorkItemEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {
       "$type": "FileSystemWorkItemEndpointOptions",
-      "FileStore": null,
-      "EndpointEnrichers": null
+      "FileStore": null
     }
   sampleFor: MigrationTools.Endpoints.FileSystemWorkItemEndpointOptions
 description: missing XML code comments
@@ -24,10 +26,6 @@ className: FileSystemWorkItemEndpoint
 typeName: Endpoints
 architecture: 
 options:
-- parameterName: EndpointEnrichers
-  type: List
-  description: missing XML code comments
-  defaultValue: missing XML code comments
 - parameterName: FileStore
   type: String
   description: missing XML code comments

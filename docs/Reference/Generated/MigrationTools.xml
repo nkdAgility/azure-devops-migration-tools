@@ -258,37 +258,37 @@
         </member>
         <member name="F:ThisAssembly.Git.Branch">
             <summary>
-            => @"topic/output-log-location"
+            => @"main"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"718c3190"
+            => @"cf9e4445"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"718c31903c2750f5170ac91a202c51682b4ebb13"
+            => @"cf9e4445856c9cb732b3bcc438d2d3fc23b3fa23"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-19T09:18:52+01:00"
+            => @"2024-09-23T16:40:10+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.4-Preview.3"
+            => @"v16.0.4-Preview.4-4-gcf9e4445"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v16.0.4-Preview.3"
+            => @"v16.0.4-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -318,17 +318,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"4"
+            => @"8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.3"
+            => @"Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.3"
+            => @"-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

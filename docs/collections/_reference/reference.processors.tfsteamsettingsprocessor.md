@@ -3,14 +3,17 @@ optionsClassName: TfsTeamSettingsProcessorOptions
 optionsClassFullName: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {
@@ -21,10 +24,8 @@ configurationSamples:
       "PrefixProjectToNodes": false,
       "MigrateTeamCapacities": false,
       "Teams": null,
-      "Enrichers": null,
       "SourceName": null,
-      "TargetName": null,
-      "RefName": null
+      "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsTeamSettingsProcessorOptions
 description: Native TFS Processor, does not work with any other Endpoints.
@@ -35,10 +36,6 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missing XML code comments
-- parameterName: Enrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
 - parameterName: MigrateTeamCapacities
   type: Boolean
@@ -52,10 +49,6 @@ options:
   type: Boolean
   description: Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.
   defaultValue: false
-- parameterName: RefName
-  type: String
-  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
-  defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
   description: missing XML code comments

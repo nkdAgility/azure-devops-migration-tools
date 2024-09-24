@@ -24,7 +24,10 @@ namespace MigrationTools.Endpoints.Infrastructure
 
         [JsonIgnore]
         public string Name { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<IEndpointEnricherOptions> EndpointEnrichers { get; set; }
+
         [JsonIgnore]
         public bool Enabled { get; set; }
 
