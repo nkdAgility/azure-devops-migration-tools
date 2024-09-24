@@ -3,6 +3,7 @@ optionsClassName: TfsTeamProjectEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -27,13 +28,15 @@ configurationSamples:
               "AreaPath": "Area",
               "IterationPath": "Iteration"
             },
-            "Project": ""
+            "Project": "",
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
           }
         }
       }
     }
   sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -53,17 +56,15 @@ configurationSamples:
               }
             },
             "Collection": "https://dev.azure.com/nkdagility-preview/",
-            "LanguageMaps": {
-              "AreaPath": "Area",
-              "IterationPath": "Iteration"
-            },
-            "Project": "migrationSource1"
+            "Project": "migrationSource1",
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
           }
         }
       }
     }
   sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {
@@ -79,13 +80,11 @@ configurationSamples:
         },
         "AccessToken": "** removed as a secret ***"
       },
-      "ReflectedWorkItemIdField": null,
-      "AllowCrossProjectLinking": false,
+      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
       "LanguageMaps": {
         "AreaPath": "Area",
         "IterationPath": "Iteration"
-      },
-      "EndpointEnrichers": null
+      }
     }
   sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
 description: missing XML code comments
@@ -93,20 +92,12 @@ className: TfsTeamProjectEndpoint
 typeName: Endpoints
 architecture: 
 options:
-- parameterName: AllowCrossProjectLinking
-  type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
 - parameterName: Authentication
   type: TfsAuthenticationOptions
   description: missing XML code comments
   defaultValue: missing XML code comments
 - parameterName: Collection
   type: Uri
-  description: missing XML code comments
-  defaultValue: missing XML code comments
-- parameterName: EndpointEnrichers
-  type: List
   description: missing XML code comments
   defaultValue: missing XML code comments
 - parameterName: LanguageMaps

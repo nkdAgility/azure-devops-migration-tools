@@ -93,10 +93,10 @@ namespace MigrationTools.ConsoleDataGenerator
                     {
                         mainOrDefaultSection.Bind(instanceOfOption);
                         var json = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection, instanceOfOption);
-                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = json.Trim() });
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", Order = 2, SampleFor = data.OptionsClassFullName, Code = json.Trim() });
                     } else
                     {
-                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", SampleFor = data.OptionsClassFullName, Code = "There are no defaults! Check the sample for options!" });
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", Order = 2, SampleFor = data.OptionsClassFullName, Code = "There are no defaults! Check the sample for options!" });
                     }
                 }
                 if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToSample))
@@ -107,14 +107,14 @@ namespace MigrationTools.ConsoleDataGenerator
                     if (sampleSection.Exists())
                     {
                         var json = ConvertSectionWithPathToJson(configuration, sampleSection, instanceOfOption);
-                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = json.Trim() });
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", Order = 1, SampleFor = data.OptionsClassFullName, Code = json.Trim() });
                     }
                     else
                     {
-                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", SampleFor = data.OptionsClassFullName, Code = "There is no sample, but you can check the classic below for a general feel." });
+                        data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "sample", Order = 1, SampleFor = data.OptionsClassFullName, Code = "There is no sample, but you can check the classic below for a general feel." });
                     }
                 }
-                data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "classic", SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
+                data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "classic", Order = 3, SampleFor = data.OptionsClassFullName, Code = saveData.SeraliseDataToJson(instanceOfOption).Trim() });
                 if (instanceOfOption != null)
                 {
                     JObject joptions = (JObject)JToken.FromObject(instanceOfOption);

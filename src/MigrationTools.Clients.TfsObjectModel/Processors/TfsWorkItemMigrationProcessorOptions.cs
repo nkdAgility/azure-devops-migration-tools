@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 using System.DirectoryServices.AccountManagement;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
@@ -21,7 +22,8 @@ namespace MigrationTools.Processors
         /// not the internal create date)
         /// </summary>
         /// <default>true</default>
-        public bool UpdateCreatedDate { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool UpdateCreatedDate { get; set; } = true;
 
         /// <summary>
         /// If this is enabled the creation process on the target project will create the items with the original creation date.
@@ -29,7 +31,8 @@ namespace MigrationTools.Processors
         /// not the internal create date)
         /// </summary>
         /// <default>true</default>
-        public bool UpdateCreatedBy { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool UpdateCreatedBy { get; set; } = true;
 
 
         /// <summary>
@@ -44,15 +47,17 @@ namespace MigrationTools.Processors
         /// fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;
         /// TFS should use integrated authentication.
         /// </summary>
-        /// <default>?</default>
-        public bool FixHtmlAttachmentLinks { get; set; }
+        /// <default>true</default>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool FixHtmlAttachmentLinks { get; set; } = true;
 
         /// <summary>
         /// **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
         /// This allows for periodic network glitches not to end the process.
         /// </summary>
         /// <default>5</default>
-        public int WorkItemCreateRetryLimit { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public int WorkItemCreateRetryLimit { get; set; } = 5;
 
         /// <summary>
         /// This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
@@ -65,24 +70,28 @@ namespace MigrationTools.Processors
         /// Pause after each work item is migrated
         /// </summary>
         /// <default>false</default>
-        public bool PauseAfterEachWorkItem { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool PauseAfterEachWorkItem { get; set; } = false;
 
         /// <summary>
         /// This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
         /// </summary>
-        /// <default>?</default>
-        public bool AttachRevisionHistory { get; set; }
+        /// <default>false</default>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool AttachRevisionHistory { get; set; } = false;
 
         /// <summary>
         /// If enabled, adds a comment recording the migration
         /// </summary>
-        /// <default>false</default>
-        public bool GenerateMigrationComment { get; set; }
+        /// <default>true</default>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool GenerateMigrationComment { get; set; } = true;
 
         /// <summary>
         /// A list of work items to import
         /// </summary>
         /// <default>[]</default>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IList<int> WorkItemIDs { get; set; }
 
         /// <summary>
@@ -90,17 +99,20 @@ namespace MigrationTools.Processors
         /// continue until the number of failed items reaches the configured value, after which the migration fails.
         /// </summary>
         /// <default>0</default>
-        public int MaxGracefulFailures { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public int MaxGracefulFailures { get; set; } = 0;
 
         /// <summary>
         /// This will skip a revision if the source iteration has not been migrated i.e. it was deleted
         /// </summary>
-        public bool SkipRevisionWithInvalidIterationPath { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool SkipRevisionWithInvalidIterationPath { get; set; } = false;
 
         /// <summary>
         /// When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
         /// </summary>
-        public bool SkipRevisionWithInvalidAreaPath { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool SkipRevisionWithInvalidAreaPath { get; set; } = false;
 
         
     }

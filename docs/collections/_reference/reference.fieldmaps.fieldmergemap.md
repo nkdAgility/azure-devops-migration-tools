@@ -3,6 +3,7 @@ optionsClassName: FieldMergeMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldMergeMapOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -24,6 +25,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -51,6 +53,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

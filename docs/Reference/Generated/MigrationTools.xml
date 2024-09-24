@@ -263,32 +263,32 @@
         </member>
         <member name="F:ThisAssembly.Git.Commit">
             <summary>
-            => @"76c49c7b"
+            => @"cf9e4445"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Sha">
             <summary>
-            => @"76c49c7bd212b11211a22924e6ad4e36339739b8"
+            => @"cf9e4445856c9cb732b3bcc438d2d3fc23b3fa23"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.CommitDate">
             <summary>
-            => @"2024-09-16T00:57:48+01:00"
+            => @"2024-09-23T16:40:10+01:00"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Commits">
             <summary>
-            => @"0"
+            => @"4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.Tag">
             <summary>
-            => @"v16.0.4-Preview.2"
+            => @"v16.0.4-Preview.4-4-gcf9e4445"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseTag">
             <summary>
-            => @"v16.0.4-Preview.2"
+            => @"v16.0.4-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.BaseVersion.Major">
@@ -318,17 +318,17 @@
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Patch">
             <summary>
-            => @"4"
+            => @"8"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
             <summary>
-            => @"Preview.2"
+            => @"Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.DashLabel">
             <summary>
-            => @"-Preview.2"
+            => @"-Preview.4"
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Source">

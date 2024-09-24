@@ -3,6 +3,7 @@ optionsClassName: TfsNodeStructureToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsNodeStructureToolOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -27,6 +28,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -64,6 +66,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

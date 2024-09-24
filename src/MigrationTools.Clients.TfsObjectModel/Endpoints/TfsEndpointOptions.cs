@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Encodings.Web;
 using Microsoft.Extensions.Options;
 using MigrationTools.Endpoints.Infrastructure;
 using Newtonsoft.Json;
@@ -25,10 +26,13 @@ namespace MigrationTools.Endpoints
         [JsonProperty(Order = -1)]
         [Required]
         public string ReflectedWorkItemIdField { get; set; }
-        public bool AllowCrossProjectLinking { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool AllowCrossProjectLinking { get; set; } = false;
 
         [Required]
-        public TfsLanguageMapOptions LanguageMaps { get; set; }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public TfsLanguageMapOptions LanguageMaps { get; set; } = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" }; 
     }
 
     public class TfsEndpointOptionsValidator : IValidateOptions<TfsEndpointOptions>
@@ -42,9 +46,14 @@ namespace MigrationTools.Endpoints
             {
                 errors.Add("The Collection property must not be null.");
             }
-            else if (!Uri.IsWellFormedUriString(options.Collection.ToString(), UriKind.Absolute))
+            else
             {
-                errors.Add("The Collection property must be a valid URL.");
+                Uri output; 
+                if (!Uri.TryCreate(Uri.UnescapeDataString(options.Collection.ToString()), UriKind.Absolute, out output))
+                {
+                    errors.Add("The Collection property must be a valid URL.");
+                }
+
             }
 
             // Validate Project - Must not be null or empty
@@ -66,7 +75,7 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-               ValidateOptionsResult lmr= options.LanguageMaps.Validate(name, options.LanguageMaps);
+                ValidateOptionsResult lmr = options.LanguageMaps.Validate(name, options.LanguageMaps);
                 if (lmr != ValidateOptionsResult.Success)
                 {
                     errors.AddRange(lmr.Failures);

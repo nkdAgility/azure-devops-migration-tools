@@ -3,6 +3,7 @@ optionsClassName: TfsEmbededImagesToolOptions
 optionsClassFullName: MigrationTools.Tools.TfsEmbededImagesToolOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -17,6 +18,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -31,6 +33,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

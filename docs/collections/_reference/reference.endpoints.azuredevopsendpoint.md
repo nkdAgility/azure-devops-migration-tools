@@ -3,10 +3,12 @@ optionsClassName: AzureDevOpsEndpointOptions
 optionsClassFullName: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -18,13 +20,15 @@ configurationSamples:
             "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
             "AuthenticationMode": "AccessToken",
             "Organisation": "https://dev.azure.com/xxx/",
-            "Project": "myProject"
+            "Project": "myProject",
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
           }
         }
       }
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {
@@ -33,8 +37,7 @@ configurationSamples:
       "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
       "Organisation": "https://dev.azure.com/xxx/",
       "Project": "myProject",
-      "ReflectedWorkItemIdField": null,
-      "EndpointEnrichers": null
+      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 description: missing XML code comments
@@ -48,10 +51,6 @@ options:
   defaultValue: missing XML code comments
 - parameterName: AuthenticationMode
   type: AuthenticationMode
-  description: missing XML code comments
-  defaultValue: missing XML code comments
-- parameterName: EndpointEnrichers
-  type: List
   description: missing XML code comments
   defaultValue: missing XML code comments
 - parameterName: Organisation
