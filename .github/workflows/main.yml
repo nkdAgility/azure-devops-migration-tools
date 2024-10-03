@@ -55,7 +55,7 @@ jobs:
       nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Install GitVersion
@@ -255,19 +255,19 @@ jobs:
       GitVersion_MajorMinorPatch: ${{ needs.Setup.outputs.GitVersion_MajorMinorPatch }}
     steps:
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@latest
         with:
           java-version: 17
           distribution: 'zulu'
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: cschleiden/replace-tokens@v1
+        uses: actions/checkout@latest
+      - uses: cschleiden/replace-tokens@latest
         with:
           files: '["**/StaticVariables.cs"]'
           tokenPrefix: "${"
           tokenSuffix: "}"
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@latest
         with:
           dotnet-version: |
               8.x
@@ -340,7 +340,7 @@ jobs:
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Ruby
         uses: ruby/setup-ruby@8575951200e472d5f2d95c625da0c7bec8217c42 # v1.161.0
         with:
@@ -475,7 +475,7 @@ jobs:
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring == 'Release' ) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
       - name: "Find files"
         shell: pwsh
@@ -528,7 +528,7 @@ jobs:
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
       - name: "Find files"
         shell: pwsh
@@ -558,7 +558,7 @@ jobs:
         run: |
             Get-Item -Path .\         
       - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
-        uses: Dylan700/sftp-upload-action@v1.1.4
+        uses: Dylan700/sftp-upload-action@latest
         with:
           server: nakedalmweb.sftp.wpengine.com
           username: nakedalmweb-learn
