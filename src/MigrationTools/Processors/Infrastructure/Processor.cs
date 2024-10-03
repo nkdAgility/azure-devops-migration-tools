@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,13 +65,13 @@ namespace MigrationTools.Processors.Infrastructure
             {
                 throw new ArgumentException("Endpoint name cannot be null or empty", nameof(name));
             }
-                // Assuming GetRequiredKeyedService throws an exception if the service is not found
-                IEndpoint endpoint = Services.GetKeyedService<IEndpoint>(name);
-                if (endpoint == null)
-                {
-                throw new ConfigurationValidationException( Options, ValidateOptionsResult.Fail($"The Endpoint '{name}' specified for `{this.GetType().Name}` was not found."));
-                }
-                return endpoint;
+            // Assuming GetRequiredKeyedService throws an exception if the service is not found
+            IEndpoint endpoint = Services.GetKeyedService<IEndpoint>(name);
+            if (endpoint == null)
+            {
+                throw new ConfigurationValidationException(Options, ValidateOptionsResult.Fail($"The Endpoint '{name}' specified for `{this.GetType().Name}` was not found."));
+            }
+            return endpoint;
         }
 
         public void Execute()
@@ -113,12 +114,28 @@ namespace MigrationTools.Processors.Infrastructure
                     ProcessorActivity.SetStatus(ActivityStatusCode.Error);
                     Log.LogCritical(ex, "Validation of your configuration failed:");
                 }
+                catch (MigrationToolsException ex)
+                {
+                    Status = ProcessingStatus.Failed;
+                    ProcessorActivity.SetStatus(ActivityStatusCode.Error);
+                    switch (ex.ErrorSource)
+                    {
+                        case MigrationToolsException.ExceptionSource.Configuration:
+                            Log.LogCritical(ex, "An error occurred in the Migration Tools causing it to stop! This is likley due to a configuration issue and is not being logged remotely. You can always ask on https://github.com/nkdAgility/azure-devops-migration-tools/discussions ");
+                            break;
+                        case MigrationToolsException.ExceptionSource.Internal:
+                        default:
+                            Log.LogCritical(ex, "An error occurred in the Migration Tools causing it to stop!");
+                            Telemetry.TrackException(ex, ProcessorActivity.Tags);
+                            break;
+                    }
+                }
                 catch (Exception ex)
                 {
                     Status = ProcessingStatus.Failed;
                     ProcessorActivity.SetStatus(ActivityStatusCode.Error);
-                    Telemetry.TrackException(ex, ProcessorActivity.Tags);
                     Log.LogCritical(ex, "Error while running {MigrationContextname}", Name);
+                    Telemetry.TrackException(ex, ProcessorActivity.Tags);
                 }
                 finally
                 {

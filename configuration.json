@@ -28,7 +28,7 @@
       "Target": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "migrationTest5",
+        "Project": "migrationTest55",
         "TfsVersion": "AzureDevOps",
         "Authentication": {
           "AuthenticationMode": "AccessToken",
