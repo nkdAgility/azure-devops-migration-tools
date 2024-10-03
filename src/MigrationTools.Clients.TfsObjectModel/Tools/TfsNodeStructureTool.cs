@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
-using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Work.WebApi;
 using MigrationTools.Clients;
@@ -56,14 +55,13 @@ namespace MigrationTools.Tools
         private TfsLanguageMapOptions _sourceLanguageMaps;
         private TfsLanguageMapOptions _targetLanguageMaps;
 
-        private Microsoft.TeamFoundation.Server.ProjectInfo _sourceProjectInfo;
+        private ProjectInfo _sourceProjectInfo;
 
         private string _sourceProjectName;
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService4 _targetCommonStructureService;
 
         private string _targetProjectName;
-        private Microsoft.TeamFoundation.Server.ProjectInfo _targetProjectInfo;
         private KeyValuePair<string, string>? _lastResortRemapRule;
 
         public WorkItemMetrics workItemMetrics { get; private set; }
@@ -111,7 +109,7 @@ namespace MigrationTools.Tools
                 Log.LogWarning("nodeStructureEnricher is disabled! You may get migration errors!");
                 return sourceNodePath;
             }
-                var mappers = GetMaps(nodeStructureType);
+            var mappers = GetMaps(nodeStructureType);
             var lastResortRule = GetLastResortRemappingRule();
 
             Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers", mappers);
@@ -315,15 +313,6 @@ namespace MigrationTools.Tools
                     _targetCommonStructureService = processor.Target.GetService<ICommonStructureService4>();
                     _targetLanguageMaps = processor.Target.Options.LanguageMaps;
                     _targetProjectName = processor.Target.Options.Project;
-                    try
-                    {
-                        _targetProjectInfo = _targetCommonStructureService.GetProjectFromName(_targetProjectName);
-                    }
-                    catch (ProjectException ex)
-                    {
-                        throw new MigrationToolsException(ex, MigrationToolsException.ExceptionSource.Configuration);
-                    }
-                    
                 }
             }
         }
@@ -415,8 +404,6 @@ namespace MigrationTools.Tools
         private void MigrateAllNodeStructures()
         {
             Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures(@{areaMaps}, @{iterationMaps})", Options.Areas, Options.Iterations);
-
-
             //////////////////////////////////////////////////
             ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _targetLanguageMaps.AreaPath, _targetProjectName, TfsNodeStructureType.Area);
             //////////////////////////////////////////////////
@@ -438,9 +425,8 @@ namespace MigrationTools.Tools
 
                 case TfsNodeStructureType.Iteration:
                     return languageMap.IterationPath.IsNullOrEmpty() ? "Iteration" : languageMap.IterationPath;
-
                 default:
-                    throw new InvalidOperationException("Not a valid NodeStructureType ");
+                    throw new InvalidOperationException("Not a valid NodeStructureType ").AsMigrationToolsException(MigrationToolsException.ExceptionSource.Internal);
             }
         }
 
@@ -464,7 +450,7 @@ namespace MigrationTools.Tools
             {
                 Exception ex = new Exception(string.Format("Unable to load Common Structure for Source. This is usually due to different language versions. Validate that '{0}' is the correct name in your version. ", treeTypeSource));
                 Log.LogError(ex, "Unable to load Common Structure for Source.");
-                throw ex;
+                throw ex.AsMigrationToolsException(MigrationToolsException.ExceptionSource.Configuration);
             }
             XmlElement sourceTree = _sourceCommonStructureService.GetNodesXml(new string[] { sourceNode.Uri }, true);
             NodeInfo structureParent;
@@ -475,9 +461,7 @@ namespace MigrationTools.Tools
             catch (Exception ex)
             {
                 Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to TFS having a different installed langauge version than was expected.. Validate that '{0}' is the correct name in your version. This would be something like 'Fläche' or 'Aire'. If you open the area tree in Visual Studio, or web access, you should see the name your langauage uses for 'Area' or 'Iteration. Do not try to add a specific area or iteration path to this field. Check the defaults on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/ for an example fro English.", localizedTreeTypeName), ex);
-                Log.LogError(ex2, "Unable to load Common Structure for Target.");
-                Telemetry.TrackException(ex2, null);
-                throw ex2;
+                throw ex2.AsMigrationToolsException(MigrationToolsException.ExceptionSource.Configuration);
             }
 
             _pathToKnownNodeMap[structureParent.Path] = structureParent;
@@ -751,7 +735,7 @@ namespace MigrationTools.Tools
                         structureType = TfsNodeStructureType.Iteration;
                         break;
                     default:
-                        throw new InvalidOperationException($"Field type {fieldType} is not supported for query remapping.");
+                        throw new InvalidOperationException($"Field type {fieldType} is not supported for query remapping.").AsMigrationToolsException(MigrationToolsException.ExceptionSource.Internal);
                 }
 
                 var remappedPath = GetNewNodeName(value, structureType);
