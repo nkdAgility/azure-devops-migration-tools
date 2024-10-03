@@ -86,7 +86,12 @@ namespace MigrationTools.Tools
 
         private Dictionary<string, string> GetMappingFileData()
         {
-            if (_UserMappings == null && System.IO.File.Exists(Options.UserMappingFile))
+            if (!System.IO.File.Exists(Options.UserMappingFile))
+            {
+                Log.LogError("TfsUserMappingTool::GetMappingFileData:: The UserMappingFile '{UserMappingFile}' cant be found! Provide a valid file or disable TfsUserMappingTool!", Options.UserMappingFile);
+                _UserMappings = new Dictionary<string, string>();
+            }
+            if (_UserMappings == null)
             {
                 var fileData = System.IO.File.ReadAllText(Options.UserMappingFile);
                 try
@@ -101,14 +106,7 @@ namespace MigrationTools.Tools
                 }
 
             }
-            else
-            {
-                Log.LogError($"TfsUserMappingTool::GetMappingFileData::No User Mapping file Provided! Provide file or disable TfsUserMappingTool");
-                _UserMappings = new Dictionary<string, string>();
-            }
-
             return _UserMappings;
-
         }
 
         private List<IdentityItemData> GetUsersListFromServer(IGroupSecurityService gss)
