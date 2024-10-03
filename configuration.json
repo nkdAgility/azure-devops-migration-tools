@@ -132,6 +132,18 @@
         "UpdateTeamSettings": true,
         "MigrateTeamCapacities": true,
         "Teams": [ "Team 1", "Team 2" ]
+      },
+      "TfsUserMappingTool": {
+        "Enabled": true,
+        "UserMappingFile": "C:\\temp\\userExport.json",
+        "IdentityFieldsToCheck": [
+          "System.AssignedTo",
+          "System.ChangedBy",
+          "System.CreatedBy",
+          "Microsoft.VSTS.Common.ActivatedBy",
+          "Microsoft.VSTS.Common.ResolvedBy",
+          "Microsoft.VSTS.Common.ClosedBy"
+        ]
       }
     },
     "Processors": [
