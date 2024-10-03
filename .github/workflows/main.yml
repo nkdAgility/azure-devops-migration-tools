@@ -255,19 +255,19 @@ jobs:
       GitVersion_MajorMinorPatch: ${{ needs.Setup.outputs.GitVersion_MajorMinorPatch }}
     steps:
       - name: Set up JDK 17
-        uses: actions/setup-java@latest
+        uses: actions/setup-java@v2
         with:
           java-version: 17
           distribution: 'zulu'
       - name: Checkout
-        uses: actions/checkout@latest
-      - uses: cschleiden/replace-tokens@latest
+        uses: actions/checkout@v4
+      - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/StaticVariables.cs"]'
           tokenPrefix: "${"
           tokenSuffix: "}"
       - name: Setup .NET
-        uses: actions/setup-dotnet@latest
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
               8.x
