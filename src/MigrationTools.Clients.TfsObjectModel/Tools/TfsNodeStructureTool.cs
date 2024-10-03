@@ -8,12 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
+using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.Work.WebApi;
 using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
+using MigrationTools.Exceptions;
 using MigrationTools.FieldMaps;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
@@ -54,13 +56,14 @@ namespace MigrationTools.Tools
         private TfsLanguageMapOptions _sourceLanguageMaps;
         private TfsLanguageMapOptions _targetLanguageMaps;
 
-        private ProjectInfo _sourceProjectInfo;
+        private Microsoft.TeamFoundation.Server.ProjectInfo _sourceProjectInfo;
 
         private string _sourceProjectName;
         private NodeInfo[] _sourceRootNodes;
         private ICommonStructureService4 _targetCommonStructureService;
 
         private string _targetProjectName;
+        private Microsoft.TeamFoundation.Server.ProjectInfo _targetProjectInfo;
         private KeyValuePair<string, string>? _lastResortRemapRule;
 
         public WorkItemMetrics workItemMetrics { get; private set; }
@@ -312,6 +315,15 @@ namespace MigrationTools.Tools
                     _targetCommonStructureService = processor.Target.GetService<ICommonStructureService4>();
                     _targetLanguageMaps = processor.Target.Options.LanguageMaps;
                     _targetProjectName = processor.Target.Options.Project;
+                    try
+                    {
+                        _targetProjectInfo = _targetCommonStructureService.GetProjectFromName(_targetProjectName);
+                    }
+                    catch (ProjectException ex)
+                    {
+                        throw new MigrationToolsException(ex, MigrationToolsException.ExceptionSource.Configuration);
+                    }
+                    
                 }
             }
         }
@@ -403,6 +415,8 @@ namespace MigrationTools.Tools
         private void MigrateAllNodeStructures()
         {
             Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures(@{areaMaps}, @{iterationMaps})", Options.Areas, Options.Iterations);
+
+
             //////////////////////////////////////////////////
             ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _targetLanguageMaps.AreaPath, _targetProjectName, TfsNodeStructureType.Area);
             //////////////////////////////////////////////////
