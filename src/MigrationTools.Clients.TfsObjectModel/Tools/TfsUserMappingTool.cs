@@ -76,7 +76,9 @@ namespace MigrationTools.Tools
                 var mapps = GetMappingFileData();
                 if (mapps != null && mapps.ContainsKey(field.Value.ToString()))
                 {
+                    var original = field.Value;
                     field.Value = mapps[field.Value.ToString()];
+                    Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField::Map:[original|{original}][new|{field.Value}]");
                 }
 
             }
