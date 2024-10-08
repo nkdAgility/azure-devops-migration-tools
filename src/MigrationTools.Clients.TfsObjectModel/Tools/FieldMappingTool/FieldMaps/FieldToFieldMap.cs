@@ -1,37 +1,41 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Infrastructure;
 
-namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
+namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel;
+
+#nullable enable
+
+public class FieldToFieldMap : FieldMapBase
 {
-    public class FieldToFieldMap : FieldMapBase
+    public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
+    private FieldToFieldMapOptions Config => (FieldToFieldMapOptions)_Config;
+
+    public FieldToFieldMap(ILogger<FieldToFieldMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
     {
-        public FieldToFieldMap(ILogger<FieldToFieldMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
+    }
+
+    public override void Configure(IFieldMapOptions config)
+    {
+        base.Configure(config);
+    }
+
+    internal override void InternalExecute(WorkItem source, WorkItem target)
+    {
+        if (!source.Fields.Contains(Config.sourceField) || !target.Fields.Contains(Config.targetField))
         {
+            return;
         }
 
-        public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
-        private FieldToFieldMapOptions Config { get { return (FieldToFieldMapOptions)_Config; } }
-
-        public override void Configure(IFieldMapOptions config)
+        var value = Convert.ToString(source.Fields[Config.sourceField]?.Value);
+        if (string.IsNullOrEmpty(value) && Config.defaultValue is not null)
         {
-            base.Configure(config);
+            value = Config.defaultValue;
         }
 
-        internal override void InternalExecute(WorkItem source, WorkItem target)
-        {
-            if (source.Fields.Contains(Config.sourceField) && target.Fields.Contains(Config.targetField))
-            {
-                var value = source.Fields[Config.sourceField].Value;
-                if ((value as string is null || value as string == "") && Config.defaultValue != null)
-                {
-                    value = Config.defaultValue;
-                }
-                target.Fields[Config.targetField].Value = value;
-                Log.LogDebug("FieldToFieldMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceField, target.Id, Config.targetField);
-            }
-        }
+        target.Fields[Config.targetField].Value = value;
+        Log.LogDebug("FieldToFieldMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceField, target.Id, Config.targetField);
     }
 }
