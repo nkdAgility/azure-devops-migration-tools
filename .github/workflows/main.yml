@@ -8,7 +8,7 @@ on:
   push:
     branches: ["main"]
     tags-ignore: ["v*-*"]
-  pull_request_target:
+  pull_request:
       branches: ["main"]
   workflow_dispatch:
     inputs:
@@ -19,7 +19,7 @@ on:
         type: boolean
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }} 
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.pull_request.head.repo.fork }} 
   cancel-in-progress: true
 
 defaults:
@@ -31,6 +31,7 @@ jobs:
    # Setup & Configuration
   Setup:
     name: "Setup & Configuration "
+    if: ${{ !(github.event.pull_request.head.repo.fork && github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-latest
     outputs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
@@ -58,6 +59,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v1.1.1
       with:
