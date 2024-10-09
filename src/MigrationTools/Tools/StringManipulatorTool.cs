@@ -34,9 +34,11 @@ namespace MigrationTools.Tools
             }
             if (fieldItem.FieldType == "String" && fieldItem.Value != null)
             {
-                if (HasManipulators())
+                if (!HasManipulators())
                 {
-                    foreach (var manipulator in Options.Manipulators)
+                    AddDefaultManipulator();
+                }
+                foreach (var manipulator in Options.Manipulators)
                     {
                         if (manipulator.Enabled)
                         {
@@ -49,13 +51,22 @@ namespace MigrationTools.Tools
                             Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled::{Description}", GetType().Name, manipulator.Description);
                         }
                     }
-                }
+                
                 if (HasStringTooLong(fieldItem))
                 {
                     fieldItem.Value = fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, Options.MaxStringLength));
                 }
             }
 
+        }
+
+        private void AddDefaultManipulator()
+        {
+            if (Options.Manipulators == null)
+            {
+                Options.Manipulators = new List<RegexStringManipulator>();
+            }
+            Options.Manipulators.Add(new RegexStringManipulator() { Enabled = true, Description = "Default: Removes invalid chars!", Pattern = "[^( -~)\n\r\t]+", Replacement = "" });
         }
 
         private bool HasStringTooLong(FieldItem fieldItem)
