@@ -265,6 +265,7 @@ jobs:
     steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v2
+        if: ${{ !(github.event.pull_request.head.repo.fork) }}
         with:
           java-version: 17
           distribution: 'zulu'
@@ -285,8 +286,12 @@ jobs:
         run: |
             Get-Item -Path .\ 
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
-      - run: dotnet tool install --global dotnet-sonarscanner
-      - run: dotnet sonarscanner begin 
+      - name: sonar install
+        if: ${{ !(github.event.pull_request.head.repo.fork) }}
+        run: dotnet tool install --global dotnet-sonarscanner
+      - name: sonar begin
+        if: ${{ !(github.event.pull_request.head.repo.fork) }}
+        run: dotnet sonarscanner begin 
               /o:"nkdagility" 
               /k:"vsts-sync-migrator:master" 
               /d:sonar.host.url="https://sonarcloud.io" 
@@ -309,7 +314,9 @@ jobs:
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
-      - run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - name: sonar end
+        if: ${{ !(github.event.pull_request.head.repo.fork) }}
+        run: dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: "Package Executable Files"
         id: packageExecutable
         shell: pwsh
