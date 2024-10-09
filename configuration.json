@@ -28,7 +28,7 @@
       "Target": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "migrationTest5",
+        "Project": "migrationTest55",
         "TfsVersion": "AzureDevOps",
         "Authentication": {
           "AuthenticationMode": "AccessToken",
@@ -132,6 +132,18 @@
         "UpdateTeamSettings": true,
         "MigrateTeamCapacities": true,
         "Teams": [ "Team 1", "Team 2" ]
+      },
+      "TfsUserMappingTool": {
+        "Enabled": true,
+        "UserMappingFile": "C:\\temp\\userExport.json",
+        "IdentityFieldsToCheck": [
+          "System.AssignedTo",
+          "System.ChangedBy",
+          "System.CreatedBy",
+          "Microsoft.VSTS.Common.ActivatedBy",
+          "Microsoft.VSTS.Common.ResolvedBy",
+          "Microsoft.VSTS.Common.ClosedBy"
+        ]
       }
     },
     "Processors": [

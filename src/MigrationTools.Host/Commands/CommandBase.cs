@@ -105,6 +105,7 @@ namespace MigrationTools.Host.Commands
                     Lifetime.StopApplication();
                     CommandActivity?.Stop();
                     _logger.LogInformation("Command {CommandName} completed in {Elapsed}", this.GetType().Name, CommandActivity?.Duration);
+                    _logger.LogInformation("Check the logs for errors: {LogPath}", LogLocationService.GetLogPath());
                 }
 
             }
@@ -196,6 +197,7 @@ namespace MigrationTools.Host.Commands
             _logger.LogInformation("Running with settings: {@settings}", settings);
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
             _logger.LogInformation("Version (Assembly): {Version}", _MigrationToolVersion.GetRunningVersion().versionString);
+            _logger.LogInformation("Logpath: {LogPath}", LogLocationService.GetLogPath());
         }
 
 

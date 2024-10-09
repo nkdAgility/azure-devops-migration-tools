@@ -78,6 +78,11 @@ namespace MigrationTools.Tools
             {
                 throw new ArgumentNullException(nameof(targetWorkItem));
             }
+            if (!Options.Enabled)
+            {
+                Log.LogWarning("TfsGitRepositoryEnricher is not enabled! We will not fix any git commit links in Work items and they will be ignored.");
+                return 0;
+            }
 
             Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
             var changeSetMappings = Services.GetService<TfsChangeSetMappingTool>();

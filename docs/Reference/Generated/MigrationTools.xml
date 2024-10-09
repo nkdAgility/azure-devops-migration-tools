@@ -322,7 +322,6 @@
             </summary>
         </member>
         <member name="F:ThisAssembly.Git.SemVer.Label">
-            <summary>
             => @"Preview.2"
             </summary>
         </member>

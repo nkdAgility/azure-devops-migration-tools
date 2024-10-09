@@ -8,7 +8,8 @@ on:
   push:
     branches: ["main"]
     tags-ignore: ["v*-*"]
-  pull_request:
+  pull_request_target:
+      types: [opened, synchronize, labeled]
       branches: ["main"]
   workflow_dispatch:
     inputs:
@@ -31,6 +32,11 @@ jobs:
    # Setup & Configuration
   Setup:
     name: "Setup & Configuration "
+    if: ${{ (github.event_name == 'push') || 
+           (github.event_name == 'workflow_dispatch') || 
+           (github.event_name == 'pull_request_target' && 
+            (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe-to-build')))
+         }}
     runs-on: ubuntu-latest
     outputs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
@@ -52,11 +58,24 @@ jobs:
       nkdAgility_DocsBaseURL: ${{ steps.nkdagility.outputs.docs_baseURL }}
       nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
-      
+      nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - uses: actions/create-github-app-token@v1
+      id: app-token
       with:
+        app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+        private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+    - name: Remove "safe" label from PR
+      if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+      uses: actions-ecosystem/action-remove-labels@v1
+      with:
+        token: ${{ steps.app-token.outputs.token }}
+        labels: safe-to-build
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
         fetch-depth: 0
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v1.1.1
@@ -68,11 +87,7 @@ jobs:
       uses: gittools/actions/gitversion/execute@v1.1.1
       with:
         useConfigFile: true
-    - uses: actions/create-github-app-token@v1
-      id: app-token
-      with:
-        app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
-        private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+    
     - uses: dorny/paths-filter@v3
       id: filter
       with:
@@ -84,6 +99,7 @@ jobs:
           automation:
             - 'build/**'
             - '.github/workflows/**'
+
     - name: "Build NKDAgility Outputs"
       shell: pwsh
       id: nkdagility
@@ -116,6 +132,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                     $docs_deploy_folder = "./azure-devops-migration-tools/"
                     $docs_baseURL = "/learn/azure-devops-migration-tools"
+                    $AzureSitesEnvironment = ""
                     $RunRelease = 'true'
                 }    
                 "Preview" {
@@ -123,6 +140,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
                     $docs_baseURL = "/learn/azure-devops-migration-tools/preview"
+                    $AzureSitesEnvironment = "preview";
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
@@ -130,6 +148,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
                     $docs_deploy_folder = "./azure-devops-migration-tools/canary/$branchSafeName"
                     $docs_baseURL = "/learn/azure-devops-migration-tools/canary/$branchSafeName"
+                    $AzureSitesEnvironment = "$branchSafeName"
                     $RunRelease = 'false'
                 }
             }
@@ -141,6 +160,8 @@ jobs:
             echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
             Write-Output "docs_baseURL=$docs_baseURL"
             echo "docs_baseURL=$docs_baseURL" >> $env:GITHUB_OUTPUT
+            Write-Output "We are running for the $AzureSitesEnvironment AzureSitesEnvironment!"
+            echo "AzureSitesEnvironment=$AzureSitesEnvironment" >> $env:GITHUB_OUTPUT
             Write-Output "RunRelease=$RunRelease"
             echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
@@ -201,6 +222,7 @@ jobs:
                  - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
                  - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
                  - nkdAgility_DocsBaseURL: ${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}
+                 - nkdAgility_AzureSitesEnvironment: ${{needs.Setup.outputs.nkdAgility_AzureSitesEnvironment}}
                  - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
                  - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
                ### GitVersion
@@ -249,19 +271,22 @@ jobs:
       GitVersion_MajorMinorPatch: ${{ needs.Setup.outputs.GitVersion_MajorMinorPatch }}
     steps:
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v2
         with:
           java-version: 17
           distribution: 'zulu'
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/StaticVariables.cs"]'
           tokenPrefix: "${"
           tokenSuffix: "}"
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
               8.x
@@ -334,7 +359,10 @@ jobs:
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+            repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
+            ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
       - name: Setup Ruby
         uses: ruby/setup-ruby@8575951200e472d5f2d95c625da0c7bec8217c42 # v1.161.0
         with:
@@ -365,6 +393,17 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Site
           path: ./_site/**/*
+      - name: Build with Jekyll 2
+        # Outputs to the './_site' directory by default
+        run: bundle exec jekyll build --destination ./_site2/  --baseurl ""
+        env:
+          JEKYLL_ENV: production
+      # - name: Build Jekyll
+      #   uses: jerryjvl/jekyll-build-action@v1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Site2
+          path: ./_site2/**/*
  
 
   # GitHubRelease
@@ -458,7 +497,7 @@ jobs:
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring == 'Release' ) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
       - name: "Find files"
         shell: pwsh
@@ -511,7 +550,7 @@ jobs:
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
       - name: "Find files"
         shell: pwsh
@@ -541,7 +580,7 @@ jobs:
         run: |
             Get-Item -Path .\         
       - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
-        uses: Dylan700/sftp-upload-action@v1.1.4
+        uses: Dylan700/sftp-upload-action@latest
         with:
           server: nakedalmweb.sftp.wpengine.com
           username: nakedalmweb-learn
@@ -554,3 +593,38 @@ jobs:
               ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
           # If true, any existing files in the remote upload directories are deleted.
           delete: false
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+          private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+
+      - name: Download a single artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Site2
+          path: ./_site2
+      - name: Build and Deploy
+        uses: Azure/static-web-apps-deploy@v1
+        id: azureDeploy
+        with:
+          repo_token: ${{ steps.app-token.outputs.token }}
+          action: 'upload'
+          app_location: ./_site2
+          skip_app_build: true
+          skip_api_build: true
+          output_location: ''
+          deployment_environment: ${{ (needs.Setup.outputs.nkdAgility_AzureSitesEnvironment) }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+
+      - name: 'Show Summery'
+        if: always()
+        shell: pwsh
+        id: nkdagility-summery
+        run: |
+          $markdown = @"
+              ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
+             Docs deployed to [${{steps.azureDeploy.outputs.static_web_app_url}}](${{steps.azureDeploy.outputs.static_web_app_url}})
+          "@
+          echo $markdown >> $Env:GITHUB_STEP_SUMMARY

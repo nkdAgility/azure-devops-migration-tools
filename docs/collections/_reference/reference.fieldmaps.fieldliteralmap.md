@@ -3,6 +3,7 @@ optionsClassName: FieldLiteralMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldLiteralMapOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -24,6 +25,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -47,6 +49,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.FieldLiteralMapOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

@@ -3,14 +3,17 @@ optionsClassName: TfsTestPlansAndSuitesMigrationProcessorOptions
 optionsClassFullName: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 - name: sample
+  order: 1
   description: 
   code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {
@@ -22,10 +25,8 @@ configurationSamples:
       "MigrationDelay": 0,
       "RemoveInvalidTestSuiteLinks": false,
       "FilterCompleted": false,
-      "Enrichers": null,
       "SourceName": null,
-      "TargetName": null,
-      "RefName": null
+      "TargetName": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
 description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
@@ -36,10 +37,6 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missing XML code comments
-- parameterName: Enrichers
-  type: List
-  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
 - parameterName: FilterCompleted
   type: Boolean
@@ -53,10 +50,6 @@ options:
   type: String
   description: The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
   defaultValue: '`String.Empty`'
-- parameterName: RefName
-  type: String
-  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
-  defaultValue: missing XML code comments
 - parameterName: RemoveAllLinks
   type: Boolean
   description: ??Not sure what this does. Check code.
@@ -94,8 +87,56 @@ categories:
 topics:
 - topic: notes
   path: /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-notes.md
-  exists: false
-  markdown: ''
+  exists: true
+  markdown: >2-
+
+    ## Additional Samples & Info
+
+
+    To run a full plans and suits you should run the three processors in this order below.  `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
+
+
+    ```json
+
+    "Processors": [
+        {
+          "$type": "TestVariablesMigrationConfig",
+          "Enabled": false
+        },
+        {
+          "$type": "TestConfigurationsMigrationConfig",
+          "Enabled": true
+        },
+        {
+          "$type": "TestPlansAndSuitesMigrationConfig",
+          "Enabled": true,
+          "PrefixProjectToNodes": false,
+          "OnlyElementsWithTag": null,
+          "TestPlanQueryBit": null,
+          "RemoveAllLinks": false,
+          "MigrationDelay": 0,
+          "UseCommonNodeStructureEnricherConfig": false,
+          "NodeBasePaths": [],
+          "AreaMaps": null,
+          "IterationMaps": null,
+          "RemoveInvalidTestSuiteLinks": false,
+          "FilterCompleted": false
+        }
+    ]
+
+    ```
+
+    ## Known working TestPlanQueryBit filter fields names
+
+
+    `AreaPath`, `PlanName` and `PlanState`
+
+
+    ```json
+
+    "TestPlanQueryBit": "PlanName = 'ABC'"
+
+    ```
 - topic: introduction
   path: /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-introduction.md
   exists: false

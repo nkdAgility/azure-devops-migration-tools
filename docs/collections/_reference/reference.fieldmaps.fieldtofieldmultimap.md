@@ -3,6 +3,7 @@ optionsClassName: FieldToFieldMultiMapOptions
 optionsClassFullName: MigrationTools.Tools.FieldToFieldMultiMapOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -24,6 +25,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -50,6 +52,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

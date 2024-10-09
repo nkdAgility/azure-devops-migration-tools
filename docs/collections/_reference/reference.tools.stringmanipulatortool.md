@@ -3,6 +3,7 @@ optionsClassName: StringManipulatorToolOptions
 optionsClassFullName: MigrationTools.Tools.StringManipulatorToolOptions
 configurationSamples:
 - name: defaults
+  order: 2
   description: 
   code: >-
     {
@@ -27,6 +28,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 - name: sample
+  order: 1
   description: 
   code: >-
     {
@@ -51,6 +53,7 @@ configurationSamples:
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 - name: classic
+  order: 3
   description: 
   code: >-
     {

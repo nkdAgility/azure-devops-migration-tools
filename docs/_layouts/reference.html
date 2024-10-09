@@ -42,18 +42,27 @@ layout: default
     </div>
 
     <h2>Examples</h2>
-    {% assign configurationSamples = page.configurationSamples %}
+    {% assign configurationSamples = page.configurationSamples | sort: "order" %}
     {% for sample in configurationSamples %}
     <h3>{{sample.name}}</h3>
-    {% if sample.name == "Classic" %}
-    <p>We have moved to a new config format, but are still tying to get this here to generate :)! The sample below is generated and is still valid for the settings, but you will need to map it to the main format.</p>
+    {% if sample.name == "classic" %}
+    <p>We have moved to a new config format, and you will need to update your old configs. This entry is a strate seralisation of the object and is here for legacy, and may provide value for debugging issues. </p>
+    {% endif %}
+    {% if sample.name == "defaults" %}
+    <p>These are the default values for this configuration. If you do not set it in your config the default always applies. You can overide by adding a diferent value in your config.</p>
+    {% endif %}
+    {% if sample.name == "sample" %}
+    <p>This is an example of what your config might look like once configured.</p>
     {% endif %}
     {% highlight json linenos %}
     {{sample.code}}
     {% endhighlight %}
     {% endfor %}
     {% assign mdInfo = page.topics | where: "topic", "notes" | last %}
-    <p>{{ mdInfo.markdown | markdownify }}</p>
+    {% capture processedContent %}
+    {{ mdInfo.markdown }}
+    {% endcapture %}
+    <p>{{ processedContent | markdownify }}</p>
 
     {{ content | inject_anchors }}
 
