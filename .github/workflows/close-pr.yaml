@@ -7,6 +7,7 @@ on:
 jobs:
   pr_cleanup:
     runs-on: ubuntu-latest
+    if: ${{ !(github.event.pull_request.head.repo.fork) }}
     steps:
       - uses: actions/create-github-app-token@v1
         id: app-token
