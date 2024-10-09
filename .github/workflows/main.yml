@@ -167,7 +167,7 @@ jobs:
             Write-Output "-------------------------------------------"
             Write-Output "Get-ReleaseDescription"
             Write-Output "-------------------------------------------"
-            if ($env:GITHUB_EVENT_NAME -eq "pull_request" -or $eventName -eq "pull_request_target")
+            if ($env:GITHUB_EVENT_NAME -ne "pull_request" -and $eventName -ne "pull_request_target")
             {
                 Write-Output "Running Get-ReleaseDescription.ps1"
                 . .\build\include\Get-ReleaseDescription.ps1
