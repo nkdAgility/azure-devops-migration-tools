@@ -66,7 +66,7 @@ jobs:
         app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
         private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
     - name: Remove "safe" label from PR
-      if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+      if: ${{ github.event.pull_request.head.repo.full_name != github.repository && contains(github.event.pull_request.labels.*.name, 'safe-to-build' }}
       uses: actions-ecosystem/action-remove-labels@v1
       with:
         token: ${{ steps.app-token.outputs.token }}
@@ -87,6 +87,7 @@ jobs:
       uses: gittools/actions/gitversion/execute@v1.1.1
       with:
         useConfigFile: true
+        verbosity: verbose  # Set verbosity level to verbose or debug
     
     - uses: dorny/paths-filter@v3
       id: filter
@@ -243,9 +244,11 @@ jobs:
                  - github.event.pull_request.head.repo.full_name: ${{github.event.pull_request.head.repo.full_name}}
                  - github.ref: ${{github.ref}}
                  - github.event.pull_request.head.ref: ${{github.event.pull_request.head.ref}}
+                 - github.event.pull_request.head.repo.fork: ${{github.event.pull_request.head.repo.fork}}
   
             "@
             echo $markdown >> $Env:GITHUB_STEP_SUMMARY
+
     - name: "Show Release Description"
       if: always()
       shell: pwsh
@@ -264,7 +267,7 @@ jobs:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
-    if: false # ${{ success() }}
+    if: ${{ !(github.event.pull_request.head.repo.fork && github.ref == 'refs/heads/main') }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
@@ -360,7 +363,7 @@ jobs:
   BuildDocs:
     name: "Build Documentation output"
     runs-on: ubuntu-latest
-    if: false # ${{ success() }}
+    if: ${{ !(github.event.pull_request.head.repo.fork && github.ref == 'refs/heads/main') }}
     needs: [Setup]
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
