@@ -555,7 +555,7 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [Setup, BuildDocs]
-    if: ${{ success() }}
+    if: ${{ !(github.event.pull_request.head.repo.fork) }}
     steps:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
