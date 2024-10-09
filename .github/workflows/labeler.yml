@@ -1,22 +1,22 @@
-name: "Pull Request Labeler"
-on:
-- pull_request_target
+# name: "Pull Request Labeler"
+# on:
+# - pull_request_target
 
-jobs:
-  labeler:
-    permissions:
-      contents: read
-      pull-requests: write
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - uses: actions/create-github-app-token@v1
-      id: app-token
-      with:
-        app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
-        private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
-    - uses: actions/labeler@v5
-      with:
-        sync-labels: true
-        repo-token: ${{ steps.app-token.outputs.token }}
+# jobs:
+#   labeler:
+#     permissions:
+#       contents: read
+#       pull-requests: write
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Checkout
+#       uses: actions/checkout@v4
+#     - uses: actions/create-github-app-token@v1
+#       id: app-token
+#       with:
+#         app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+#         private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+#     - uses: actions/labeler@v5
+#       with:
+#         sync-labels: true
+#         repo-token: ${{ steps.app-token.outputs.token }}
