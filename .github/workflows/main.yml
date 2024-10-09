@@ -160,20 +160,28 @@ jobs:
             Write-Output "-------------------------------------------"
             Write-Output "Get-ReleaseDescription"
             Write-Output "-------------------------------------------"
-            Write-Output "Running Get-ReleaseDescription.ps1"
-            . .\build\include\Get-ReleaseDescription.ps1
-            $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
-            if ($description -eq $null) {
-                $description = "No release description found";
-                echo "release_description_state=false" >> $env:GITHUB_OUTPUT
-            } else {
-                echo "release_description_state=true" >> $env:GITHUB_OUTPUT
+            if ($env:GITHUB_EVENT_NAME -eq "pull_request" -or $eventName -eq "pull_request_target")
+            {
+                Write-Output "Running Get-ReleaseDescription.ps1"
+                . .\build\include\Get-ReleaseDescription.ps1
+                $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
+                if ($description -eq $null) {
+                    $description = "No release description found";
+                    echo "release_description_state=false" >> $env:GITHUB_OUTPUT
+                } else {
+                    echo "release_description_state=true" >> $env:GITHUB_OUTPUT
 
+                }
+                $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
+                echo "release_description<<$EOF" >> $env:GITHUB_OUTPUT
+                echo $description >> $env:GITHUB_OUTPUT
+                echo "$EOF" >> $env:GITHUB_OUTPUT
+            } else {
+                $description = "Skipping for PR!"
+                echo "release_description=$description  >> $env:GITHUB_OUTPUT
+                Write-Output $description
             }
-            $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
-            echo "release_description<<$EOF" >> $env:GITHUB_OUTPUT
-            echo $description >> $env:GITHUB_OUTPUT
-            echo "$EOF" >> $env:GITHUB_OUTPUT
+            
             Write-Output "-------------------------------------------"
             Write-Output "::endgroup::"
 
