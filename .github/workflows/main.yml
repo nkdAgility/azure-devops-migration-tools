@@ -178,13 +178,12 @@ jobs:
                 echo "$EOF" >> $env:GITHUB_OUTPUT
             } else {
                 $description = "Skipping for PR!"
-                echo "release_description=$description  >> $env:GITHUB_OUTPUT
+                echo "release_description=$description"  >> $env:GITHUB_OUTPUT
                 Write-Output $description
             }
             
             Write-Output "-------------------------------------------"
             Write-Output "::endgroup::"
-
     - uses: actions/upload-artifact@v4
       with:
         name: AzureDevOpsMigrationTools-Scripts
