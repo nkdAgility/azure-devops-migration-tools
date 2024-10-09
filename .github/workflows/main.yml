@@ -456,7 +456,13 @@ jobs:
             Version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
             Ring: (${{ needs.Setup.outputs.nkdAgility_Ring }})
 
-            ${{ needs.Setup.outputs.nkdAgility_ReleaseDescription }}
+            ---
+            Funding for us doing work on this tool is generally through 1) customer funding, or 2) donated free time. 
+
+            [Sponcer a Feature](https://github.com/sponsors/nkdAgility) | [Hire us directly](https://nkdagility.com/capabilities/azure-devops-migration-services/)
+            ---
+
+            ${{ needs.Setup.outputs.nkdAgility_ReleaseDescription }}            
 
             ## Get the tools
 
