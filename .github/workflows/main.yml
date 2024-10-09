@@ -8,7 +8,8 @@ on:
   push:
     branches: ["main"]
     tags-ignore: ["v*-*"]
-  pull_request:
+  pull_request_target:
+      types: [opened, synchronize, labeled]
       branches: ["main"]
   workflow_dispatch:
     inputs:
@@ -31,6 +32,11 @@ jobs:
    # Setup & Configuration
   Setup:
     name: "Setup & Configuration "
+    if: ${{ (github.event_name == 'push') || 
+           (github.event_name == 'workflow_dispatch') || 
+           (github.event_name == 'pull_request_target' && 
+            (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe-to-build')))
+         }}
     runs-on: ubuntu-latest
     outputs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
@@ -54,9 +60,22 @@ jobs:
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
       nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
     steps:
+    - uses: actions/create-github-app-token@v1
+      id: app-token
+      with:
+        app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
+        private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+    - name: Remove "safe" label from PR
+      if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+      uses: actions-ecosystem/action-remove-labels@v1
+      with:
+        token: ${{ steps.app-token.outputs.token }}
+        labels: safe-to-build
     - name: Checkout
       uses: actions/checkout@v4
       with:
+        repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
         fetch-depth: 0
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v1.1.1
@@ -68,11 +87,7 @@ jobs:
       uses: gittools/actions/gitversion/execute@v1.1.1
       with:
         useConfigFile: true
-    - uses: actions/create-github-app-token@v1
-      id: app-token
-      with:
-        app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
-        private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
+    
     - uses: dorny/paths-filter@v3
       id: filter
       with:
@@ -84,6 +99,7 @@ jobs:
           automation:
             - 'build/**'
             - '.github/workflows/**'
+
     - name: "Build NKDAgility Outputs"
       shell: pwsh
       id: nkdagility
@@ -261,6 +277,9 @@ jobs:
           distribution: 'zulu'
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/StaticVariables.cs"]'
@@ -341,6 +360,9 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
       - uses: actions/checkout@v4
+        with:
+            repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
+            ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
       - name: Setup Ruby
         uses: ruby/setup-ruby@8575951200e472d5f2d95c625da0c7bec8217c42 # v1.161.0
         with:
