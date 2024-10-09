@@ -31,11 +31,6 @@ jobs:
    # Setup & Configuration
   Setup:
     name: "Setup & Configuration "
-    if: ${{ (github.event_name == 'push') || 
-           (github.event_name == 'workflow_dispatch') || 
-           (github.event_name == 'pull_request_target' && 
-            (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe')))
-         }}
     runs-on: ubuntu-latest
     outputs:
       GitVersion_BranchName: ${{ steps.gitversion.outputs.GitVersion_BranchName }}
