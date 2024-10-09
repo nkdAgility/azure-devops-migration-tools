@@ -9,7 +9,6 @@ on:
     branches: ["main"]
     tags-ignore: ["v*-*"]
   pull_request_target:
-      types: [opened, synchronize, labeled]
       branches: ["main"]
   workflow_dispatch:
     inputs:
@@ -35,7 +34,7 @@ jobs:
     if: ${{ (github.event_name == 'push') || 
            (github.event_name == 'workflow_dispatch') || 
            (github.event_name == 'pull_request_target' && 
-            (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe-to-build')))
+            (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe')))
          }}
     runs-on: ubuntu-latest
     outputs:
@@ -60,22 +59,9 @@ jobs:
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
       nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
     steps:
-    - uses: actions/create-github-app-token@v1
-      id: app-token
-      with:
-        app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
-        private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
-    - name: Remove "safe" label from PR
-      if: ${{ github.event.pull_request.head.repo.full_name != github.repository && contains(github.event.pull_request.labels.*.name, 'safe-to-build' }}
-      uses: actions-ecosystem/action-remove-labels@v1
-      with:
-        token: ${{ steps.app-token.outputs.token }}
-        labels: safe-to-build
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
-        ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
         fetch-depth: 0
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v1.1.1
@@ -87,8 +73,6 @@ jobs:
       uses: gittools/actions/gitversion/execute@v1.1.1
       with:
         useConfigFile: true
-        verbosity: verbose  # Set verbosity level to verbose or debug
-    
     - uses: dorny/paths-filter@v3
       id: filter
       with:
@@ -100,12 +84,9 @@ jobs:
           automation:
             - 'build/**'
             - '.github/workflows/**'
-
     - name: "Build NKDAgility Outputs"
       shell: pwsh
       id: nkdagility
-      env:
-         GH_TOKEN: ${{ steps.app-token.outputs.token }}
       run: |
             # Get Branch Name
             Write-Output "::group::Get Branch Name"
@@ -237,18 +218,8 @@ jobs:
                  - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
                  - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
                  - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
-               ### Github Bits
-                 - repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
-                 - ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
-                 - github.repository: ${{github.repository}}
-                 - github.event.pull_request.head.repo.full_name: ${{github.event.pull_request.head.repo.full_name}}
-                 - github.ref: ${{github.ref}}
-                 - github.event.pull_request.head.ref: ${{github.event.pull_request.head.ref}}
-                 - github.event.pull_request.head.repo.fork: ${{github.event.pull_request.head.repo.fork}}
-  
             "@
             echo $markdown >> $Env:GITHUB_STEP_SUMMARY
-
     - name: "Show Release Description"
       if: always()
       shell: pwsh
@@ -267,7 +238,7 @@ jobs:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
-    if: ${{ !(github.event.pull_request.head.repo.fork && github.ref == 'refs/heads/main') }}
+    if: ${{ success() }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
@@ -288,9 +259,6 @@ jobs:
           distribution: 'zulu'
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/StaticVariables.cs"]'
@@ -363,7 +331,7 @@ jobs:
   BuildDocs:
     name: "Build Documentation output"
     runs-on: ubuntu-latest
-    if: ${{ !(github.event.pull_request.head.repo.fork && github.ref == 'refs/heads/main') }}
+    if: ${{ success() }}
     needs: [Setup]
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
@@ -371,9 +339,6 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
       - uses: actions/checkout@v4
-        with:
-            repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
-            ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
       - name: Setup Ruby
         uses: ruby/setup-ruby@8575951200e472d5f2d95c625da0c7bec8217c42 # v1.161.0
         with:
