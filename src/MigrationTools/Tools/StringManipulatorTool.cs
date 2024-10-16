@@ -20,7 +20,7 @@ namespace MigrationTools.Tools
     {
 
         public StringManipulatorTool(IOptions<StringManipulatorToolOptions> options, IServiceProvider services, ILogger<StringManipulatorTool> logger, ITelemetryLogger telemetryLogger)
-           : base(options,services, logger, telemetryLogger)
+           : base(options, services, logger, telemetryLogger)
         {
         }
 
@@ -39,19 +39,21 @@ namespace MigrationTools.Tools
                     AddDefaultManipulator();
                 }
                 foreach (var manipulator in Options.Manipulators)
+                {
+                    if (manipulator.Enabled)
                     {
-                        if (manipulator.Enabled)
-                        {
-                            Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description} with {pattern}", GetType().Name, manipulator.Description, manipulator.Pattern);
-                            fieldItem.Value = Regex.Replace((string)fieldItem.Value, manipulator.Pattern, manipulator.Replacement);
-
-                        }
-                        else
-                        {
-                            Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled::{Description}", GetType().Name, manipulator.Description);
-                        }
+                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description} with {pattern}", GetType().Name, manipulator.Description, manipulator.Pattern);
+                        var originalValue = fieldItem.Value;
+                        fieldItem.Value = Regex.Replace((string)fieldItem.Value, manipulator.Pattern, manipulator.Replacement);
+                        Log.LogTrace("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description}::Original::{@OriginalValue}", GetType().Name, manipulator.Description, originalValue);
+                        Log.LogTrace("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description}::New::{@fieldItemValue}", GetType().Name, manipulator.Description, fieldItem.Value);
                     }
-                
+                    else
+                    {
+                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled::{Description}", GetType().Name, manipulator.Description);
+                    }
+                }
+
                 if (HasStringTooLong(fieldItem))
                 {
                     fieldItem.Value = fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, Options.MaxStringLength));
