@@ -144,22 +144,22 @@ namespace MigrationTools.Services
                 Assembly entryAssembly = Assembly.GetEntryAssembly();
                 string entryAssemblyName = entryAssembly?.GetName().Name;
                 services.AddOpenTelemetry()
-                    .WithTracing(builder =>
-                    {
-                        builder
-                            .SetSampler(new AlwaysOnSampler())
-                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(entryAssemblyName, serviceVersion: versionString))
-                            .AddSource(ActivitySourceProvider.ActivitySourceName) // Register your custom ActivitySource
-                            //.AddConsoleExporter() // Export traces to console
-                            .AddProcessor(new ActivitySourceProvider.ActivityFilteringProcessor())
-                            .AddHttpClientInstrumentation()
-                            .SetErrorStatusOnException()
-                            .AddAzureMonitorTraceExporter(options =>
-                            {
-                                options.ConnectionString = ActivitySourceProvider.GetConnectionString();
+                    //.WithTracing(builder =>
+                    //{
+                    //    builder
+                    //        .SetSampler(new AlwaysOnSampler())
+                    //        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(entryAssemblyName, serviceVersion: versionString))
+                    //        .AddSource(ActivitySourceProvider.ActivitySourceName) // Register your custom ActivitySource
+                    //        //.AddConsoleExporter() // Export traces to console
+                    //        .AddProcessor(new ActivitySourceProvider.ActivityFilteringProcessor())
+                    //        .AddHttpClientInstrumentation()
+                    //        .SetErrorStatusOnException()
+                    //        .AddAzureMonitorTraceExporter(options =>
+                    //        {
+                    //            options.ConnectionString = ActivitySourceProvider.GetConnectionString();
 
-                            });
-                    })
+                    //        });
+                    //})
                     .WithMetrics(builder =>
                     {
                         builder
@@ -175,17 +175,17 @@ namespace MigrationTools.Services
                                  options.ConnectionString = ActivitySourceProvider.GetConnectionString();
                              });
                     });
-                services.AddLogging(loggingBuilder =>
-                {
-                    loggingBuilder.AddOpenTelemetry(options =>
-                    {
-                        //options.AddConsoleExporter();
-                        options.AddAzureMonitorLogExporter(config =>
-                        {
-                            config.ConnectionString = ActivitySourceProvider.GetConnectionString();
-                        });
-                    });
-                });
+                //services.AddLogging(loggingBuilder =>
+                //{
+                //    loggingBuilder.AddOpenTelemetry(options =>
+                //    {
+                //        //options.AddConsoleExporter();
+                //        options.AddAzureMonitorLogExporter(config =>
+                //        {
+                //            config.ConnectionString = ActivitySourceProvider.GetConnectionString();
+                //        });
+                //    });
+                //});
                 services.AddSingleton(sp => ActivitySourceProvider.GetActivitySource());
             });
 
