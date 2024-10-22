@@ -419,12 +419,12 @@ namespace MigrationTools.Processors
             }
 
             newWorkItem.Title = oldWorkItem.Title;
-            if (newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
+            if (newWorkItem.Fields.Contains("Microsoft.VSTS.Common.ClosedDate") && newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
             {
                 newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
             }
             newWorkItem.State = oldWorkItem.State;
-            if (newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
+            if (newWorkItem.Fields.Contains("Microsoft.VSTS.Common.ClosedDate") && newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
             {
                 newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
             }
