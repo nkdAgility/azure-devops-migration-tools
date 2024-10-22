@@ -117,18 +117,18 @@ namespace MigrationTools.Host
             {
                 config.AddCommand<Commands.ExecuteMigrationCommand>("execute")
                             .WithDescription("Executes the enables processors specified in the configuration file.")
-                            .WithExample("execute -config \"configuration.json\"")
-                            .WithExample("execute -config \"configuration.json\" --skipVersionCheck ");
+                            .WithExample("execute --config \"configuration.json\"")
+                            .WithExample("execute --config \"configuration.json\" --skipVersionCheck ");
                 config.AddCommand<Commands.InitMigrationCommand>("init")
                             .WithDescription($"Creates an default configuration file or applies templates! Available templates are `{string.Join("`, `", Enum.GetNames(typeof(OptionsConfigurationTemplate)))}`. With `Reference` loading all options with their defaults.")
-                            .WithExample("init -template Basic");
+                            .WithExample("init --template Basic");
                 config.AddCommand<Commands.UpgradeConfigCommand>("upgrade")
                            .WithDescription("Attempts to upgrade your config from the old version to the new one. For each option we will load the defaults, then apply your config. This will only bring across valid settings. This is 'best effort' and you will need to check all the values as we have changed a lot! Also note that it will automatically load any defaults in Environment variables which may require you to remove secrets from the output file.")
-                           .WithExample("upgrade -config \"configuration.json\"");
+                           .WithExample("upgrade --config \"configuration.json\"");
 
                 config.AddCommand<Commands.ConfigurationBuilderCommand>("builder")
                            .WithDescription("Creates or edits a configuration file")
-                          .WithExample("builder -config \"configuration.json\"").IsHidden();
+                          .WithExample("builder --config \"configuration.json\"").IsHidden();
 
                 extraCommands?.Invoke(config);
                 config.PropagateExceptions();
