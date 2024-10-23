@@ -117,7 +117,7 @@ public class GetSvcWorkItemMetrics
     {
         return $@"
         <svg width=""400"" height=""100"" xmlns=""http://www.w3.org/2000/svg"">
-          <text x=""10"" y=""50"" font-size=""40"" font-family=""Arial"" fill=""black"">
+          <text x=""10"" y=""50"" font-size=""16"" font-family=""Arial"" fill=""black"">
             <tspan id=""count"">{startValue}</tspan>
             <animate attributeName=""text"" from=""{startValue}"" to=""{endValue}"" dur=""{durationInSeconds}s"" keySplines=""0.4 0 0.6 1"" repeatCount=""indefinite"" fill=""freeze"" />
           </text>
