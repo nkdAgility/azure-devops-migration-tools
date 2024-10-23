@@ -74,31 +74,17 @@ For the most part we support moving data between ((Azure DevOps Server | Team Fo
 
 The documentation for the preview is on [Preview](https://nkdagility.com/docs/azure-devops-migration-tools/preview/)]
 
-## Some Data from the last 30 days (as of 05/03/2024)
-
-| Category  | Metric | Notes |
-| ------------- | ------------- | ------------- |
-| Work Items | **1m** | A single Work Item may have many revisions that we need to migrate |
-| Work Item Revisions | **23m** | A single Work Item may have many revisions that we need to migrate |
-| RelatedLinkCount | **11m** | Each work item may have many links or none. |
-| Git Commit Links  | **1.3m** |  |
-| Attachments | **1.2m**  | Total number of attachments migrated |
-| Test Suits | 52k | total suits migrated | 
-| Test Cases Mapped | **1.4m** | Total test cases mapped into Suits |
-| Migration Run Ave  | **14 minutes** | Includes dry-runs as well.  |
-| Migration Run Total   |  **19bn Seconds** | Thats **316m hours** or **13m days** of run time in the last 30 days. |
-| Average Work item Migration Time  | **22s** | Work Item (includes all revisions, links, and attachments for the work item) |
-
-## New Metrics (experimental)
+## Metrics
 
 These metrics come directly from Custo Metrics in Application Insights and are updated every 10 minutes. They are experimental and may not be accurate.
 
-| Metric          | Category   | Type       | All (last 30 days)                                                                                                                     | v16 (05/09/2024)                                                                                                                      | Notes             |
-|-----------------|------------|------------|-------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------|-------------------|
-| WorkItemMetrics | WorkItems | Count    | ![Work Items Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3Dgithub%26version%3D&label=%20)  | ![Work Items v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3Dgithub%26version%3D16.0&label=%20) | This counts the number of work items processed |
-|  | | Ave  | ![Work Items Avg](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3Dgithub%26version%3D&label=%20) | ![Work Items Avg v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3Dgithub%26version%3D16.0&label=%20) | the average amount of time a work item takes to process |
-|  | Revisions  | Count    | ![Revisions Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3Dgithub&label=%20)  | ![Revisions v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3Dgithub%26version%3D16.0&label=%20) | the total number of revisions procesed |
-|  |   | Ave  | ![Revisions Avg](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisions%3Fcode%3Dgithub&label=%20)  | ![Revisions Avg v16](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisions%3Fcode%3Dgithub%26version%3D16.0&label=%20)  | the avaerge number of revisions per work item |
+
+| Metric          | Category   | Type       | All (last 30 days)                                                                                                                     | Notes             |
+|-----------------|------------|------------|-------------------------------------------------------------------------------------------------------------------------|-------------------|
+| WorkItemMetrics | WorkItems  | Count      | ![Work Items Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemTotals%3Fcode%3Dgithub%26version%3D&label=%20)  | This counts the number of work items processed |
+|                 |            | Ave        | ![Work Items Avg](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemProcessingDuration%3Fcode%3Dgithub%26version%3D&label=%20) | The average amount of time a work item takes to process |
+|                 | Revisions  | Count      | ![Revisions Total](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisionsTotal%3Fcode%3Dgithub&label=%20)  | The total number of revisions processed |
+|                 |            | Ave        | ![Revisions Avg](https://img.shields.io/endpoint?url=https%3A%2F%2Fmigrationtoolstelemetery.azurewebsites.net%2Fapi%2FGetShieldIoWorkItemMetrics_WorkItemRevisions%3Fcode%3Dgithub&label=%20)  | The average number of revisions per work item |
 
 ![Work Items in last 30 days](https://migrationtoolstelemetery.azurewebsites.net/api/GetGraphWorkItemMetrics_WorkItems?code=github)
 
