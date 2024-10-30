@@ -435,7 +435,7 @@ jobs:
         shell: pwsh
         run: |
              if ($Env:nkdAgility_Ring -eq 'Release') {
-                echo "discussion_category_name=Anouncement" >> $env:GITHUB_OUTPUT    
+                echo "discussion_category_name=Releases" >> $env:GITHUB_OUTPUT    
              }             
       - name: Release
         uses: softprops/action-gh-release@v2
