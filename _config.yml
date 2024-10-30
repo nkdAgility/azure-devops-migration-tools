@@ -5,6 +5,7 @@ parent_url: https://nkdagility.com
 
 website: https://nkdagility.com
 baseurl: /learn/azure-devops-migration-tools
+cannonicalBase: https://nkdagility.com/learn/azure-devops-migration-tools
 url: "https://nkdagility.com"
 githuburl: https://github.com/nkdAgility/azure-devops-migration-tools
 source: ./docs

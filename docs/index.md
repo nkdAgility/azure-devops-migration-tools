@@ -52,9 +52,9 @@ For the most part we support moving data between `((Azure DevOps Server | Team F
 
 ## Quick Links
 
-- [Installation](installation.md)
-- [Permissions](permissions.md)
-- [Getting Started](getting-started.md)
+- [Installation](/setup/installation.md)
+- [Permissions](/setup/permissions.md)
+- [Getting Started](/getting-started/)
 - [Configuration Reference](./Reference/)
 - [FAQ](faq.md)
 - [Support](support.md)
