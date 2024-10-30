@@ -83,6 +83,7 @@ jobs:
         filters: |
           src:
             - 'src/**'
+            - '!src/MigrationTools.Telemetery/**' 
           docs:
             - 'docs/**'
           automation:
