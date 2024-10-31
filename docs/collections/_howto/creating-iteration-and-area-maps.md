@@ -5,262 +5,67 @@ toc: true
 discussionId: 
 ---
 
-Migrating Plans and Suits is quite convoluted since Shared Steps, which we need to map, can't have a custom field.
 
-1. Migrate Basic Work Items
-2. Migrate `Test Cases` with their `Shared Steps` and `Shared Parameter`
-3. Migrate `Test Variables` & `Test Configurations`
-4. Rebuild `Test Plans` & `Test Suits`
+As per the [documentation](/Reference/Tools/TfsNodeStructureTool/), you need to add Iteration Maps and Area Maps that adapt the old locations to new ones that are valid in the Target.
 
-_WARNING: The configs below are for illustration and were correct as of the version number in the `Version` field._
+Before your migration starts, it will validate that all of the Areas and Iterations from the **Source** work items revisions exist on the **Target**. Any that do not exist will be flagged in the logs, and if you have `"StopMigrationOnMissingAreaIterationNodes": true,` set, the migration will stop just after it outputs a list of the missing nodes.
 
-## 1. Migrate Basic Work Items
+Our algorithm that converts the Source nodes to Target nodes processes the [mappings](/Reference/Tools/TfsNodeStructureTool/) at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message, as they are already altered to be valid.
 
-This will migrate all of the work items, while also populating `IntegrationBuild`. Ensure that you have a Field Map that will copy `ReflectedWorkItemId` to `Microsoft.VSTS.Build.IntegrationBuild`. 
+> We recently updated the logging for this part of the system to more easily debug both your mappings and to see what the system is doing with the nodes and their current state. You can set `"LogLevel": "Debug"` to see the details.
 
-The important bits:
+To add a mapping, you can follow [the documentation](/Reference/Tools/TfsNodeStructureTool/) with this being the simplest way:
 
-- Target ReflectedWorkItemIdField is your main Custom field.
-- Field map copies the `ReflectedWorkItemId` to `Microsoft.VSTS.Build.IntegrationBuild`
-- Exclude all test based work items from the query
-
-```JSON
-{
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "PersonalAccessTokenVariableName": "",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
- {
-      "$type": "FieldtoFieldMapConfig",
-      "WorkItemTypeName": "*",
-      "sourceField": "Custom.ReflectedWorkItemId",
-      "targetField": "Microsoft.VSTS.Build.IntegrationBuild",
-      "defaultValue": ""
-    }
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "WorkItemMigrationConfig",
-      "Enabled": false,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Case', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-    }
-  ],
-  "Version": "15.0",
-  "workaroundForQuerySOAPBugEnabled": false,
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+```json
+"IterationMaps": {
+  "WorkItemMovedFromProjectName\\\\Iteration 1": "TargetProject\\Sprint 1"
+},
+"AreaMaps": {
+   "WorkItemMovedFromProjectName\\\\Team 2": "TargetProject\\ProductA\\Team 2"
 }
 ```
 
-## 2. Migrate `Test Cases` with their `Shared Steps` and `Shared Parameter`
+Or you can use regular expressions to match the missing area or iteration paths:
 
-This will migrate Test Cases while fixing the links to the Shared bits that can't be customised. This will use the `Microsoft.VSTS.Build.IntegrationBuild` to wire everything up as needed. It will also copy the `Microsoft.VSTS.Build.IntegrationBuild` to  `ReflectedWorkItemId` for Test Cases so that we can also use them with work items.
-
-The important bits:
-
-- Target ReflectedWorkItemIdField is a common field that is available on the non-customisable work items
-- Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only
-- The query includes only the Test items that we can migrate as work items (No Suits or Plans)
-
-```JSON
-{
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Microsoft.VSTS.Build.IntegrationBuild",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
- {
-      "$type": "FieldtoFieldMapConfig",
-      "WorkItemTypeName": "Test Cases",
-      "sourceField": "Microsoft.VSTS.Build.IntegrationBuild",
-      "targetField": "Custom.ReflectedWorkItemId",
-      "defaultValue": ""
-    }
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "WorkItemMigrationConfig",
-      "Enabled": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-    }
-  ],
-  "Version": "15.0",
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+```json
+"IterationMaps": {
+  "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
+  "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
+  "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2"
+},
+"AreaMaps": {
+  "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
+  "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\"
 }
 ```
 
-## 3. Migrate `Test Variables` & `Test Configurations`
+If you want to use the matches in the replacement, you can use the following:
 
-These are pre-requisites for rebuilding the Plans and Suits.
-
-The important bits:
-
-- Processors for `Test Variables` & `Test Configurations`
-
-```JSON
-{
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "TestVariablesMigrationConfig",
-      "Enabled": true
-    },
-    {
-      "$type": "TestConfigurationsMigrationConfig",
-      "Enabled": true
-    },
-  ],
-  "Version": "15.0",
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
+```json
+"IterationMaps": {
+  "^\\\\oldproject1(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\Q1$2"
 }
 ```
 
-## 4. Rebuild `Test Plans` & `Test Suits`
+If the old iteration path was `\oldproject1\Custom Reporting\Sprint 13`, this would result in a match for each Iteration node after the project node. You would then be able to reference any of the nodes using "$" and the number of the match.
 
-This will rebuild the Plans and Suits and wire up all of the Test Cases. 
+Regular expressions are much more difficult to build and debug, so it is a good idea to use a [regular expression tester](https://regex101.com/) to check that you are matching the right things and to build them in ChatGPT.
 
-_note: Runs are not migrated._
+*NOTE: You need `\\` to escape a `\` in the pattern, and `\\` to escape a `\` in JSON. Therefore, on the left of the match, you need 4 `\` to represent the `\\` for the pattern and only 2 `\` in the match.*
 
-The important bits:
+## Some pretty cool mappings
 
-- Processors for `TestPlansAndSuitesMigrationConfig`
+```json
+"^OldProjectName([\\\\]?.*)$": "NewProjectName$1"
+```
 
-```JSON
-{
-  "ChangeSetMappingFile": null,
-  "Source": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationSource1",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "Target": {
-    "$type": "TfsTeamProjectConfig",
-    "Collection": "https://dev.azure.com/nkdagility-preview/",
-    "Project": "migrationTest5",
-    "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-    "AllowCrossProjectLinking": false,
-    "AuthenticationMode": "Prompt",
-    "PersonalAccessToken": "XXXXXXXXXXXXXX",
-    "LanguageMaps": {
-      "AreaPath": "Area",
-      "IterationPath": "Iteration"
-    }
-  },
-  "FieldMaps": [
-],
-  "GitRepoMapping": null,
-  "LogLevel": "Debug",
-  "CommonEnrichersConfig": []
-  "Processors": [
-    {
-      "$type": "TestPlansAndSuitesMigrationConfig",
-      "Enabled": true,
-      "OnlyElementsWithTag": null,
-      "TestPlanQueryBit": null,
-      "RemoveAllLinks": false,
-      "MigrationDelay": 0,
-      "RemoveInvalidTestSuiteLinks": false,
-      "FilterCompleted": false
-    }
-  ],
-  "Version": "15.0",
-  "WorkItemTypeDefinition": {
-    "sourceWorkItemTypeName": "targetWorkItemTypeName"
-  },
-}
+or
+
+```json
+"^OldProjectName([\\\\]?.*)$": "NewProjectName"
+```
+
+The first one maps all `OldProjectName` area or iterations to a similar new node. If you have `CreateMissingNodes` enabled, it will create that. The second will just map all `OldProjectName` to the new project name root.
+
+![image](https://github.com/nkdAgility/azure-devops-migration-tools/assets/5205575/2cf50929-7ea9-4a71-beab-dd8ff3b5b2a8)
 ```
