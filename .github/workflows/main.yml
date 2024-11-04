@@ -50,6 +50,7 @@ jobs:
       nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
       nkdAgility_DocsDeployFolder: ${{ steps.nkdagility.outputs.docs_deploy_folder }}
       nkdAgility_DocsBaseURL: ${{ steps.nkdagility.outputs.docs_baseURL }}
+      nkdAgility_DocsBaseURL_AFD: ${{ steps.nkdagility.outputs.docs_baseURL_AFD }}
       nkdAgility_DocsVersionFolder: ${{ steps.nkdagility.outputs.docs_version_folder }}
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
       nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
@@ -111,6 +112,7 @@ jobs:
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
             $docs_deploy_folder = "./azure-devops-migration-tools/";
             $docs_baseURL = "/learn/azure-devops-migration-tools"
+            $docs_baseURL_AFD = "/learn/azure-devops-migration-tools"
             $RunCodeRelease = 'false'
             $RunDocsRelease = 'false'
             switch ($Env:GitVersion_PreReleaseLabel) {
@@ -119,6 +121,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                     $docs_deploy_folder = "./azure-devops-migration-tools/"
                     $docs_baseURL = "/learn/azure-devops-migration-tools"
+                    $docs_baseURL_AFD = "/learn/azure-devops-migration-tools"
                     $AzureSitesEnvironment = ""
                     $RunRelease = 'true'
                 }    
@@ -127,6 +130,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
                     $docs_baseURL = "/learn/azure-devops-migration-tools/preview"
+                    $docs_baseURL_AFD = ""
                     $AzureSitesEnvironment = "preview";
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
@@ -135,6 +139,7 @@ jobs:
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
                     $docs_deploy_folder = "./azure-devops-migration-tools/canary/$branchSafeName"
                     $docs_baseURL = "/learn/azure-devops-migration-tools/canary/$branchSafeName"
+                    $docs_baseURL_AFD = ""
                     $AzureSitesEnvironment = "canary-${{ github.event.pull_request.number }}"
                     $RunRelease = 'false'
                 }
@@ -147,6 +152,9 @@ jobs:
             echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
             Write-Output "docs_baseURL=$docs_baseURL"
             echo "docs_baseURL=$docs_baseURL" >> $env:GITHUB_OUTPUT
+            Write-Output "docs_baseURL_AFD=$docs_baseURL_AFD"
+            echo "docs_baseURL_AFD=$docs_baseURL_AFD" >> $env:GITHUB_OUTPUT
+
             Write-Output "We are running for the $AzureSitesEnvironment AzureSitesEnvironment!"
             echo "AzureSitesEnvironment=$AzureSitesEnvironment" >> $env:GITHUB_OUTPUT
             Write-Output "RunRelease=$RunRelease"
@@ -390,7 +398,7 @@ jobs:
           path: ./_site/**/*
       - name: Build with Jekyll 2
         # Outputs to the './_site' directory by default
-        run: bundle exec jekyll build --destination ./_site2/  --baseurl ""
+        run: bundle exec jekyll build --destination ./_site2/  --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL_AFD}}"
         env:
           JEKYLL_ENV: production
       # - name: Build Jekyll
