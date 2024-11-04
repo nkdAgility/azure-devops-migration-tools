@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.Endpoints.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Serilog;
 using TfsUrlParser;
 
 namespace MigrationTools.Endpoints
@@ -99,9 +100,10 @@ namespace MigrationTools.Endpoints
             // Return failure if there are errors, otherwise success
             if (errors.Any())
             {
+                Log.Debug("TfsEndpointOptionsValidator::Validate::Fail");
                 return ValidateOptionsResult.Fail(errors);
             }
-
+            Log.Debug("TfsEndpointOptionsValidator::Validate::Success");
             return ValidateOptionsResult.Success;
         }
     }

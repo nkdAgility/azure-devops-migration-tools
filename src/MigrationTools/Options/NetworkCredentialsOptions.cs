@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using MigrationTools.Options.Infrastructure;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace MigrationTools.Options
 {
@@ -39,8 +40,10 @@ namespace MigrationTools.Options
             }
             if (errors.Any())
             {
+                Log.Debug("NetworkCredentials::Validate::Fail");
                 return ValidateOptionsResult.Fail(errors);
             }
+            Log.Debug("NetworkCredentials::Validate::Success");
             return ValidateOptionsResult.Success;
         }
     }

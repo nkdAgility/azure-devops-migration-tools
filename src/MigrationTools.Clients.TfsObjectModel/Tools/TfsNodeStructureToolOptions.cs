@@ -8,6 +8,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json.Schema;
 using DotNet.Globbing;
+using Serilog;
 
 namespace MigrationTools.Tools
 {
@@ -77,9 +78,10 @@ namespace MigrationTools.Tools
             var iterationsValidation = ValidateNodeOptions(options.Iterations, "Iterations");
             if (iterationsValidation != ValidateOptionsResult.Success)
             {
+                Log.Debug("TfsNodeStructureToolOptionsValidator::Validate::Fail");
                 return iterationsValidation;
             }
-
+            Log.Debug("TfsNodeStructureToolOptionsValidator::Validate::Success");
             return ValidateOptionsResult.Success;
         }
 
