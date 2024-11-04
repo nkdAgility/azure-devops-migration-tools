@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace MigrationTools.Endpoints
 {
@@ -23,8 +24,10 @@ namespace MigrationTools.Endpoints
             }
             if (errors.Any())
             {
+                Log.Debug("TfsLanguageMapOptions::Validate::Fail");
                 ValidateOptionsResult.Fail(errors);
             }
+            Log.Debug("TfsLanguageMapOptions::Validate::Success");
             return ValidateOptionsResult.Success;
         }
     }

@@ -8,6 +8,7 @@ using MigrationTools.Options;
 using MigrationTools.Options.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Serilog;
 
 
 namespace MigrationTools.Endpoints.Infrastructure
@@ -57,8 +58,10 @@ namespace MigrationTools.Endpoints.Infrastructure
             }
             if (errors.Any())
             {
+                Log.Debug("TfsAuthenticationOptions::Validate::Fail");
                 return ValidateOptionsResult.Fail(errors);
             }
+            Log.Debug("TfsAuthenticationOptions::Validate::Success");
             return ValidateOptionsResult.Success;
         }
     }
