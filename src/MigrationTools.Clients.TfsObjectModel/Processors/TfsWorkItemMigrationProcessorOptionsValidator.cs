@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace MigrationTools.Processors
 {
@@ -12,6 +13,7 @@ namespace MigrationTools.Processors
     {
         public ValidateOptionsResult Validate(string name, TfsWorkItemMigrationProcessorOptions options)
         {
+            
             var errors = new List<string>();
             ValidateOptionsResult baseResult = options.Validate(name, options);
             if (baseResult != ValidateOptionsResult.Success)
@@ -38,9 +40,10 @@ namespace MigrationTools.Processors
             }
             if (errors.Count > 0)
             {
+                Log.Debug("TfsWorkItemMigrationProcessorOptionsValidator::Validate::Fail");
                 return ValidateOptionsResult.Fail(errors);
             }
-
+            Log.Debug("TfsWorkItemMigrationProcessorOptionsValidator::Validate::Success");
             return ValidateOptionsResult.Success;
         }
 
