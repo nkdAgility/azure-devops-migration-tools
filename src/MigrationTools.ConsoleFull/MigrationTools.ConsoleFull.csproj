@@ -31,7 +31,7 @@
     <Content Include="..\..\configuration-classic2.json" Link="configuration-classic2.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\configuration.json" Link="configuration.json">
+    <Content Include="..\..\configuration-default.json" Link="configuration-default.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

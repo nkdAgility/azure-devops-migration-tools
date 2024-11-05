@@ -12,15 +12,7 @@ configurationSamples:
         "CommonTools": {
           "StringManipulatorTool": {
             "Enabled": "True",
-            "Manipulators": [
-              {
-                "$type": "RegexStringManipulator",
-                "Description": "Remove invalid characters from the end of the string",
-                "Enabled": "True",
-                "Pattern": "[^( -~)\n\r\t]+",
-                "Replacement": ""
-              }
-            ],
+            "Manipulators": null,
             "MaxStringLength": "1000000"
           }
         }
@@ -61,12 +53,6 @@ configurationSamples:
       "Enabled": true,
       "MaxStringLength": 1000000,
       "Manipulators": [
-        {
-          "Enabled": true,
-          "Pattern": "[^( -~)\n\r\t]+",
-          "Replacement": "",
-          "Description": "Remove invalid characters from the end of the string"
-        },
         {
           "Enabled": true,
           "Pattern": "[^( -~)\n\r\t]+",
