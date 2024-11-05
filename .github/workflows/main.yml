@@ -319,7 +319,6 @@ jobs:
               Write-Output "Found WITDataStore64"
             }
             $foundFiles
-      - run: dotnet tool install --global dotnet-sonarscanner
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
@@ -353,13 +352,17 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Packages
           path: ./staging/**
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Generated
+          path: ./docs/Reference/Generated/**
 
   # Build Docs
   BuildDocs:
     name: "Build Documentation output"
     runs-on: ubuntu-latest
     if: ${{ success() }}
-    needs: [Setup]
+    needs: [Setup, build]
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
