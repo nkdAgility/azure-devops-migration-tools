@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\configuration.json" Link="configuration.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="..\..\configuration-default.json" Link="configuration-default.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
