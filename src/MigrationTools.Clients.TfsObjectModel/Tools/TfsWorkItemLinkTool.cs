@@ -16,8 +16,6 @@ namespace MigrationTools.Tools
 {
     public class TfsWorkItemLinkTool : Tool<TfsWorkItemLinkToolOptions>
     {
-        private IMigrationEngine Engine;
-
         public TfsWorkItemLinkTool(IOptions<TfsWorkItemLinkToolOptions> options, IServiceProvider services, ILogger<TfsWorkItemLinkTool> logger, ITelemetryLogger telemetryLogger)
             : base(options, services, logger, telemetryLogger)
         {
