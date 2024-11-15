@@ -24,10 +24,12 @@ insert_final_newline = true
 [*.csproj]
 tab_width = 2
 indent_size = 2
+indent_style = space
 
 [*.props]
 tab_width = 2
 indent_size = 2
+indent_style = space
 
 [*.cs]
 indent_style = space
