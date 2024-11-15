@@ -22,7 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
     <ProjectReference Include="..\MigrationTools.Shadows\MigrationTools.Shadows.csproj" />
-    <ProjectReference Include="..\MigrationTools.TestExtensions\MigrationTools.TestExtensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

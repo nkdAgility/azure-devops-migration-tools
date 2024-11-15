@@ -1,13 +1,71 @@
+# Remove the line below if you want to inherit .editorconfig settings from higher directories
+root = true
+
 [*]
 end_of_line = crlf
+
+[*.md]
+trim_trailing_whitespace = false
 
 [*.xml]
 indent_style = space
 
+[*.yml]
+indent_style = space
+tab_width = 2
+trim_trailing_whitespace = true
+
+[*.json]
+tab_width = 4
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+
+[*.csproj]
+tab_width = 2
+indent_size = 2
+
+[*.props]
+tab_width = 2
+indent_size = 2
+
 [*.cs]
-dotnet_sort_system_directives_first = true
 indent_style = space
 indent_size = 4
-insert_final_newline = false
+insert_final_newline = true
 trim_trailing_whitespace = true
+dotnet_sort_system_directives_first = true
 charset = utf-8-bom
+csharp_using_directive_placement = outside_namespace:suggestion
+
+#### C# Code Analyzers ####
+
+# CS0612: Type or member is obsolete
+dotnet_diagnostic.CS0612.severity = silent
+
+# CS0618: Type or member is obsolete
+dotnet_diagnostic.CS0618.severity = silent
+
+# CS8600: Converting null literal or possible null value to non-nullable type.
+dotnet_diagnostic.CS8600.severity = silent
+
+# CS8601: Possible null reference assignment.
+dotnet_diagnostic.CS8601.severity = silent
+
+# CS8602: Dereference of a possibly null reference.
+dotnet_diagnostic.CS8602.severity = silent
+
+# CS8603: Possible null reference return.
+dotnet_diagnostic.CS8603.severity = silent
+
+# CS8604: Possible null reference argument.
+dotnet_diagnostic.CS8604.severity = silent
+
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+dotnet_diagnostic.CS8618.severity = silent
+
+# CS8625: Cannot convert null literal to non-nullable reference type.
+dotnet_diagnostic.CS8625.severity = silent
+
+# CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+dotnet_diagnostic.CS8632.severity = silent
