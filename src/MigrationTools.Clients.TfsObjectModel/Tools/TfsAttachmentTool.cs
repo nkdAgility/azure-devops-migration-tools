@@ -95,7 +95,7 @@ namespace MigrationTools.Tools
                     Directory.Delete(_exportWiPath, true);
                     _exportWiPath = null;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Log.LogWarning(" ERROR: Unable to delete folder {0}! Should be cleaned up at the end.", _exportWiPath);
                 }

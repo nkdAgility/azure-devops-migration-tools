@@ -57,7 +57,7 @@ namespace MigrationTools.Tools
                     targetRepos = targetRepoService.QueryRepositories(_processor.Target.Options.Project);
                     allTargetRepos = targetRepoService.QueryRepositories("");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     sourceRepoService = null;
                 }
