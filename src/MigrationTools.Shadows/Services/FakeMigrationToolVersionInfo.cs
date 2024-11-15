@@ -9,7 +9,7 @@ using MigrationTools.Services;
 
 namespace MigrationTools.Services.Shadows
 {
-    public class FakeMigrationToolVersionInfo : MigrationToolVersionInfo
+    public class FakeMigrationToolVersionInfo : IMigrationToolVersionInfo
     {
         public FakeMigrationToolVersionInfo()
         {
@@ -23,5 +23,9 @@ namespace MigrationTools.Services.Shadows
             FileVersion = fileVersion;
             GitTag = gitTag;
         }
+
+        public string ProductVersion { get; set; }
+        public string FileVersion { get; set; }
+        public string GitTag { get; set; }
     }
 }
