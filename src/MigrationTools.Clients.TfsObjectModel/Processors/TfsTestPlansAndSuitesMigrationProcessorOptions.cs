@@ -43,12 +43,6 @@ namespace MigrationTools._EngineV1.Configuration.Processing
 
         public bool FilterCompleted { get; set; }
 
-        /// <inheritdoc />
-        public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)
-        {
-            return true;
-        }
-
         public TfsTestPlansAndSuitesMigrationProcessorOptions()
         {
             MigrationDelay = 0;
