@@ -5,6 +5,8 @@ pageType: index
 toc: true
 pageStatus: published
 discussionId: 
+redirect_from: 
+ - /preview/version-control/
 ---
 
 While we do not migrate source control for you, we do have tools to maintain the links between work items and source code. 

@@ -7,6 +7,7 @@ pageStatus: published
 discussionId: 
 redirect_from:
   - /installation/
+  - /preview/installation/
 ---
 
 Install the Azure DevOps Migration Tools on Windows.

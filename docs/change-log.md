@@ -6,7 +6,10 @@ pageType: index
 toc: true
 pageStatus: published
 discussionId: 
-redirect_from: /change-log.html
+redirect_from: 
+ - /change-log.html
+ - /preview/change-log/
+
 ---
 
 ## Change Log

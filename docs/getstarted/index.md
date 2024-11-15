@@ -7,6 +7,7 @@ pageStatus: published
 discussionId: 
 redirect_from:
   - /getting-started/
+  - /preview/getting-started/
 ---
 
 If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.

@@ -5,6 +5,8 @@ pageType: index
 toc: true
 pageStatus: published
 discussionId: 
+redirect_from: 
+ - /preview/setup/
 ---
 
 To use these tools you will need to install them and configure your target environment (TFS or Azure DevOps). The following pages will guide you through the process:
