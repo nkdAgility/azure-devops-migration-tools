@@ -101,8 +101,8 @@ namespace MigrationTools.Telemetry
             {
                 FileDownloadName = "workitems_graph.png"
             };
-            req.HttpContext.Response.Headers.Add("Cache-Control", "public, max-age=14400");
-            req.HttpContext.Response.Headers.Add("Expires", DateTime.UtcNow.AddHours(1).ToString("R"));
+            req.HttpContext.Response.Headers.CacheControl = "public, max-age=14400";
+            req.HttpContext.Response.Headers.Expires = DateTime.UtcNow.AddHours(1).ToString("R");
 
             // Return the graph image as an HTTP response
             return responseHeaders;
@@ -111,7 +111,8 @@ namespace MigrationTools.Telemetry
         // Method to generate the graph using OxyPlot
         private MemoryStream GenerateGraph(AppInsightsResponse data, string versionLabel)
         {
-            var plotModel = new PlotModel {
+            var plotModel = new PlotModel
+            {
                 Title = $"Work Items Processed ({versionLabel})",
                 TitleColor = OxyColor.Parse("#2575fc"), // Updated title color as requested
                 DefaultColors = new List<OxyColor> { OxyColor.Parse("#2575fc") } // Updated default color as requested
@@ -145,7 +146,7 @@ namespace MigrationTools.Telemetry
             {
                 MarkerType = MarkerType.Circle,
                 MarkerSize = 4,
-                MarkerStroke = OxyColors.Purple                 
+                MarkerStroke = OxyColors.Purple
             };
 
             // Generate list of the last 30 days and pad missing days with zero
