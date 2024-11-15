@@ -20,6 +20,7 @@ namespace MigrationTools.Endpoints
             _innerList = new List<WorkItemData>();
         }
 
+        [Obsolete("Dont know what this is for")]
         public override int Count => GetWorkItems().Count();
 
         public void EnsureStore()

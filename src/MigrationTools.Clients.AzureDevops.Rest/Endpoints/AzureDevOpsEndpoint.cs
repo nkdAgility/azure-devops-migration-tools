@@ -22,6 +22,7 @@ namespace MigrationTools.Endpoints
 {
     public class AzureDevOpsEndpoint : Endpoint<AzureDevOpsEndpointOptions>
     {
+        [Obsolete("Dont know what this is for")]
         public override int Count => 0;
 
         public AzureDevOpsEndpoint(IOptions<AzureDevOpsEndpointOptions> optipons, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
