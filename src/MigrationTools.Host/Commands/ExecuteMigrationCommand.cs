@@ -45,18 +45,18 @@ namespace MigrationTools.Host.Commands
             _appLifetime = appLifetime;
         }
 
-        internal override async Task<int> ExecuteInternalAsync(CommandContext context, ExecuteMigrationCommandSettings settings)
+        internal override Task<int> ExecuteInternalAsync(CommandContext context, ExecuteMigrationCommandSettings settings)
         {
             int _exitCode;
             try
             {
-                    // KILL if the config is not valid
-                    if (!VersionOptions.ConfigureOptions.IsConfigValid(Configuration))
-                    {
-                        CommandActivity.AddEvent(new ActivityEvent("ConfigIsNotValid"));
-                        BoilerplateCli.ConfigIsNotValidMessage(Configuration, Log.Logger);
-                        return -1;
-                    }
+                // KILL if the config is not valid
+                if (!VersionOptions.ConfigureOptions.IsConfigValid(Configuration))
+                {
+                    CommandActivity.AddEvent(new ActivityEvent("ConfigIsNotValid"));
+                    BoilerplateCli.ConfigIsNotValidMessage(Configuration, Log.Logger);
+                    return Task.FromResult(-1);
+                }
                 var migrationEngine = _services.GetRequiredService<IMigrationEngine>();
                 migrationEngine.Run();
                 _exitCode = 0;
@@ -71,7 +71,7 @@ namespace MigrationTools.Host.Commands
                 foreach (var failure in ex.Failures)
                 {
                     _logger.LogCritical(failure);
-                }                
+                }
                 _logger.LogCritical("------------");
                 _exitCode = 1;
             }
@@ -88,7 +88,7 @@ namespace MigrationTools.Host.Commands
                 // Stop the application once the work is done
                 _appLifetime.StopApplication();
             }
-            return _exitCode;
+            return Task.FromResult(_exitCode);
         }
     }
 }

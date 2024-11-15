@@ -111,10 +111,9 @@ namespace MigrationTools.Host.Commands
             }
         }
 
-        internal virtual async Task<int> ExecuteInternalAsync(CommandContext context, TSettings settings)
+        internal virtual Task<int> ExecuteInternalAsync(CommandContext context, TSettings settings)
         {
-            // no-op
-            return 0;
+            return Task.FromResult( 0);
         }
 
         public void RunStartupLogic(TSettings settings)

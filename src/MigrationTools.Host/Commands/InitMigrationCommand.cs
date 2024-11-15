@@ -32,7 +32,7 @@ namespace MigrationTools.Host.Commands
             _logger = logger;
         }
 
-        internal override async Task<int> ExecuteInternalAsync(CommandContext context, InitMigrationCommandSettings settings)
+        internal override Task<int> ExecuteInternalAsync(CommandContext context, InitMigrationCommandSettings settings)
         {
             int _exitCode;
             try
@@ -81,7 +81,7 @@ namespace MigrationTools.Host.Commands
                 // Stop the application once the work is done
                 Lifetime.StopApplication();
             }
-            return _exitCode;
+            return Task.FromResult(_exitCode);
         }
     }
 }
