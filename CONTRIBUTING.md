@@ -1,75 +1,86 @@
-## Contributing Issues
+## Contributor License Agreement (CLA)
 
-### Before Submitting an Issue
-First, please do a search in [open issues](https://github.com/nkdAgility/azure-devops-migration-tools/issues) to see if the issue or feature request has already been filed. Use this [query](https://github.com/nkdAgility/azure-devops-migration-tools/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+) to search for the most popular feature requests.
+Before making a contribution, all contributors must agree to the following Contributor License Agreement (CLA). By submitting a pull request or any contribution, you acknowledge and agree to the following:
 
-If you find your issue already exists, make relevant comments and add your [reaction](https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments). Use a reaction in place of a "+1" comment.
+1. **Grant of License**:  
+   You grant us, Naked Agility Limited ("Us" or "We"), a perpetual, worldwide, non-exclusive, royalty-free, irrevocable license to use, modify, publish, and distribute your contributions under the terms of the GNU Affero General Public License (AGPL). This ensures that contributions remain aligned with the project's licensing terms.
 
-👍 - upvote
+2. **Your Rights**:  
+   You retain the copyright to your contributions and are free to use them as you see fit, independent of this agreement, provided such use does not conflict with the AGPL.
 
-👎 - downvote
+3. **Warranties**:  
+   You represent that:
+   - You are the original author of the contributions.
+   - Your contributions are not subject to any conflicting agreements or third-party rights.
+   - Your contributions comply with the project's **Contributing Guidelines**.
 
-The entire codebase for the Azure DevOps Migration Tools project is stored in this repository.
+4. **Obligation to Share**:  
+   You agree that any modifications to the software made as part of your use of this project will be shared back with the community by submitting changes to the original repository.
 
-If your issue is a question then please ask the question on [Stack Overflow](https://stackoverflow.com/questions/tagged/azure-devops-migration-tools) using the tag `azure-devops-migration-tools`.
+By submitting a contribution to the project, you agree to this CLA. If you do not agree, please refrain from contributing.
 
-If you cannot find an existing issue that describes your bug or feature, submit an issue using the guidelines below.
+---
 
-## Writing Good Bug Reports and Feature Requests
+## Contributing Guidelines
 
-File a single issue per problem and feature request.
+### Asking Questions or Starting Discussions
 
-* Do not enumerate multiple bugs or feature requests in the same issue.
-* Do not add your issue as a comment to an existing issue unless it's for the identical input. Many issues look similar, but have different causes.
+- **Use GitHub Discussions**:  
+  If you have questions, ideas, or suggestions, please use the [GitHub Discussions tab](https://github.com/nkdAgility/azure-devops-migration-tools/discussions). This helps centralise knowledge and allows the community to collaborate effectively.  
+  - Browse existing discussions to see if your question or idea has already been addressed.  
+  - Add comments or reactions (e.g., 👍, 👎) to relevant discussions.
 
-The more information you can provide, the more likely someone will be successful reproducing the issue and finding a fix. 
+- **Use the Comment/Discussion Boxes on Documentation Pages**:  
+  If your topic relates to an existing feature, check the relevant [documentation page](https://nkdagility.com/) for details. Most pages include comment or discussion boxes at the bottom.  
+  - Using these boxes for discussions tied to specific features helps keep the conversation contextual and accessible for others with similar questions.
 
-Please include the following with each issue. 
+---
 
-* Version of Azure DevOps Migration Tools
-* Version of the source and target ADO/VSTS/TFS instances 
+### Submitting Issues
 
-* Reproducible steps (1... 2... 3...) and what you expected versus what you actually got.
-* The Session ID from your migration run that had a problem (this lets us look up telemetry).
+#### When to Submit an Issue
+Issues should only be created for confirmed **bugs** or **feature requests**. Before creating an issue:
+- **Search for Existing Issues**:  
+  Check [open issues](https://github.com/nkdAgility/azure-devops-migration-tools/issues) to avoid duplicates. Use this [query](https://github.com/nkdAgility/azure-devops-migration-tools/issues?q=is%3Aopen+is%3Aissue+sort%3Areactions-%2B1-desc+) to find popular feature requests.  
+  If your issue already exists:
+  - Add comments with additional details or context.
+  - Use reactions (e.g., 👍, 👎) to express your interest.
 
-> **Note:** Session ID is in your Log file for that run.
+#### Writing Good Bug Reports and Feature Requests
+- Submit **one issue per problem or feature**.
+- Avoid combining multiple bugs or requests in a single issue.
+- Include as much detail as possible to help others reproduce the issue:
+  - Version of Azure DevOps Migration Tools
+  - Source and target instance versions
+  - Step-by-step reproduction instructions
+  - The **Session ID** from your migration run (found in the log file).
 
-Please remember to do the following:
+---
 
-* Search the issue repository to see if there exists a duplicate. 
+### Submitting Pull Requests
 
-Don't feel bad if we can't reproduce the issue and ask for more information!
+#### Bug Fixes
+- **Focus on Simplicity**: Keep changes minimal and targeted to the bug being fixed.
+- **Update GitVersion.yaml**: Ensure version numbers do not collide.
 
-## Contributing Fixes
+#### Feature Enhancements
+- Features should add or improve functionality. Clearly describe the feature and its use case in the pull request.
 
-Azure DevOps Migration Tools accepts both bug fixes and feature enhancements as Pull Requests. When contributing please try to minimise the number of files that you touch, and do not arbitrarily change large amounts of the files without justification. This will help keep the fix or feature as simple and easy as possible to review and incorporate. If you are a long term contributor you may request access to the git repository that houses the core code and provide direct contributions there.
+#### General Housekeeping
+Pull requests should:
+1. Be based on the **master** branch.
+2. Avoid merge commits (use a linear commit history).
+3. Include adequate tests:
+   - Tests should fail without your changes.
+   - Cover edge cases and various scenarios.
+   - Maintain 100% code coverage.
+4. Adhere to the coding guidelines.
+5. Include clear, descriptive commit messages.
 
-# Instructions for Contributing Code
-
-All fixed require to update GitVersion.yaml so that we don't have colliding version numbers.
-
-## Contributing bug fixes
-
-Bugs are things that cause exceptions and failures. Please keep fixes simple and minimal so that we can incorporate them quickly.
-
-## Contributing features
-
-Features (things that add new or improved functionality to Azure DevOps Migration Tools) may be accepted.
-
-## Housekeeping
-
-Your pull request should: 
-
-* Include a description of what your change intends to do
-* Be a child commit of a reasonably recent commit in the **master** branch 
-    * Requests need not be a single commit, but should be a linear sequence of commits (i.e. no merge commits in your PR)
-* It is desirable, but not necessary, for the tests to pass at each commit
-* Have clear commit messages 
-    * e.g. "Refactor feature", "Fix issue", "Add tests for issue"
-* Include adequate tests 
-    * At least one test should fail in the absence of your non-test code changes. If your PR does not match this criteria, please specify why
-    * Tests should include reasonable permutations of the target fix/change
-    * Include baseline changes with your change
-    * All changed code must have 100% code coverage
-* Follow the code conventions described in _Coding Guidelines_ (link lost)
-* To avoid line ending issues, set `autocrlf = input` and `whitespace = cr-at-eol` in your git configuration
+#### Coding and Git Configuration
+- Follow the project's coding conventions (see [Coding Guidelines](#)).  
+- Set your Git configuration to avoid line-ending issues:
+  ```bash
+  git config --global core.autocrlf input
+  git config --global core.whitespace cr-at-eol
+  ```
