@@ -589,7 +589,7 @@ namespace MigrationTools.Processors
         }
         private async Task LoadLayout(ProcessorModel model, WorkItemTypeModel wit, AzureDevOpsEndpoint endpoint, string processId)
         {
-            wit.Layout = (await endpoint.GetApiDefinitionAsync<WorkItemLayout>(new string[] { processId, wit.WorkItemType.ReferenceName }, queryForDetails: false));
+            wit.Layout = (await endpoint.GetApiDefinitionAsync<WorkItemLayout>(new string[] { processId, wit.WorkItemType.ReferenceName }));
             foreach (var page in wit.Layout.Pages)
             {
                 var pageKey = $"{wit.WorkItemType.Name}::{page.Label}";

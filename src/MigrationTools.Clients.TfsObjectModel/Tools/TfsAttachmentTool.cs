@@ -64,11 +64,11 @@ namespace MigrationTools.Tools
                 {
                     string filepath = null;
                     Directory.CreateDirectory(Path.Combine(_exportWiPath, wia.Id.ToString()));
-                    filepath = ExportAttachment(source.ToWorkItem(), wia, _exportWiPath);
+                    filepath = ExportAttachment(wia, _exportWiPath);
                     Log.LogDebug("AttachmentMigrationEnricher: Exported {Filename} to disk", Path.GetFileName(filepath));
                     if (filepath != null)
                     {
-                        ImportAttachment(target.ToWorkItem(), wia, filepath, save);
+                        ImportAttachment(target.ToWorkItem(), wia, filepath);
                         Log.LogDebug("AttachmentMigrationEnricher: Imported {Filename} from disk", Path.GetFileName(filepath));
                     }
                 }
@@ -102,7 +102,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        private string ExportAttachment(WorkItem wi, Attachment wia, string exportpath)
+        private string ExportAttachment(Attachment wia, string exportpath)
         {
             string fname = GetSafeFilename(wia.Name);
             Log.LogDebug(fname);
@@ -131,7 +131,7 @@ namespace MigrationTools.Tools
             return fpath;
         }
 
-        private void ImportAttachment(WorkItem targetWorkItem, Attachment wia, string filepath, bool save = true)
+        private void ImportAttachment(WorkItem targetWorkItem, Attachment wia, string filepath)
         {
             var filename = Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);

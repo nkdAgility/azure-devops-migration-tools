@@ -632,7 +632,7 @@ namespace MigrationTools.Processors
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             var rootTargetDefinitions = SortDefinitionsByVersion(targetDefinitions).First();
-            await Target.UpdateTaskGroupsAsync(targetDefinitions, rootTargetDefinitions, updatedSourceDefinitions);
+            await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, updatedSourceDefinitions);
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions.Where(d => d.Name != null), mappings));
