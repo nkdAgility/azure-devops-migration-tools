@@ -183,7 +183,7 @@ namespace MigrationTools.Host.Commands
             }
             else
             {
-                /// not online or you have specified not to
+                // not online or you have specified not to
                 Log.Warning("You are either not online or have chosen `skipVersionCheck`. We will not check for a newer version of the tools.", _detectVersionService.PackageId);
             }
         }

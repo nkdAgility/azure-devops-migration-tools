@@ -150,8 +150,9 @@ namespace MigrationTools.Processors
         /// <summary>
         /// Filter incompatible TaskGroups
         /// </summary>
-        /// <param name="filteredTaskGroups"></param>
+        /// <param name="sourceDefinitions"></param>
         /// <param name="availableTasks"></param>
+        /// <param name="taskGroupMapping"></param>
         /// <returns>List of filtered Definitions</returns>
         private IEnumerable<BuildDefinition> FilterOutIncompatibleBuildDefinitions(IEnumerable<BuildDefinition> sourceDefinitions, IEnumerable<TaskDefinition> availableTasks, IEnumerable<Mapping> taskGroupMapping)
         {

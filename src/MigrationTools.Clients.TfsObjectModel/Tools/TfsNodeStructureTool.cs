@@ -480,6 +480,7 @@ namespace MigrationTools.Tools
         /// Checks node-to-be-created with allowed BasePath's
         /// </summary>
         /// <param name="userFriendlyPath">The user-friendly path of the source node</param>
+        /// <param name="nodeStructureType"></param>
         /// <returns>true/false</returns>
         private bool ShouldCreateNode(string userFriendlyPath, TfsNodeStructureType nodeStructureType)
         {
