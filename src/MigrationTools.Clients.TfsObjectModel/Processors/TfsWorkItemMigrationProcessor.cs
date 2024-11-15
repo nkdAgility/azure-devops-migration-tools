@@ -52,7 +52,6 @@ namespace MigrationTools.Processors
 
         private static int _count = 0;
         private static int _current = 0;
-        private static long _elapsedms = 0;
         private static int _totalWorkItem = 0;
         private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
         private List<string> _ignore;
@@ -159,7 +158,6 @@ namespace MigrationTools.Processors
 
                 _current = 1;
                 _count = sourceWorkItems.Count;
-                _elapsedms = 0;
                 _totalWorkItem = sourceWorkItems.Count;
                 ProcessorActivity.SetTag("source_workitems_to_process", sourceWorkItems.Count);
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)

@@ -22,7 +22,6 @@ namespace MigrationTools.Tools
     {
 
         private bool _save = true;
-        private bool _filter = true;
         private GitRepositoryService sourceRepoService;
         private IList<GitRepository> sourceRepos;
         private IList<GitRepository> allSourceRepos;
