@@ -257,112 +257,23 @@ namespace MigrationTools.Processors
             return string.Empty;
         }
 
-        private void MigrateCapacities(WorkHttpClient sourceHttpClient, WorkHttpClient targetHttpClient, TeamFoundationTeam sourceTeam, TeamFoundationTeam targetTeam, Dictionary<string, string> iterationMap)
+        private void MigrateCapacities(
+            WorkHttpClient sourceHttpClient,
+            WorkHttpClient targetHttpClient,
+            TeamFoundationTeam sourceTeam,
+            TeamFoundationTeam targetTeam,
+            Dictionary<string, string> iterationMap)
         {
-            if (!Options.MigrateTeamCapacities) return;
-
-            Log.LogInformation("Migrating team capacities..");
-            try
+            if (!Options.MigrateTeamCapacities)
             {
-                var sourceTeamContext = new TeamContext(Source.TfsProject.Guid, sourceTeam.Identity.TeamFoundationId);
-                var sourceIterations = sourceHttpClient.GetTeamIterationsAsync(sourceTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
-
-                var targetTeamContext = new TeamContext(Target.TfsProject.Guid, targetTeam.Identity.TeamFoundationId);
-                var targetIterations = targetHttpClient.GetTeamIterationsAsync(targetTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
-
-                foreach (var sourceIteration in sourceIterations)
-                {
-                    try
-                    {
-                        var targetIterationPath = iterationMap[sourceIteration.Path];
-                        var targetIteration = targetIterations.FirstOrDefault(i => i.Path == targetIterationPath);
-                        if (targetIteration == null) continue;
-
-                        var targetCapacities = new List<TeamMemberCapacityIdentityRef>();
-                        var sourceCapacities = sourceHttpClient.GetCapacitiesWithIdentityRefAsync(sourceTeamContext, sourceIteration.Id).ConfigureAwait(false).GetAwaiter().GetResult();
-                        foreach (var sourceCapacity in sourceCapacities)
-                        {
-                            var sourceDisplayName = sourceCapacity.TeamMember.DisplayName;
-                            var index = sourceDisplayName.IndexOf("<");
-                            if (index > 0)
-                            {
-                                sourceDisplayName = sourceDisplayName.Substring(0, index).Trim();
-                            }
-
-                            // Match:
-                            //   "Doe, John" to "Doe, John"
-                            //   "John Doe" to "John Doe"
-                            var targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-                            if (targetTeamFoundatationIdentity == null)
-                            {
-                                if (sourceDisplayName.Contains(", "))
-                                {
-                                    // Match:
-                                    //   "Doe, John" to "John Doe"
-                                    var splitName = sourceDisplayName.Split(',');
-                                    sourceDisplayName = $"{splitName[1].Trim()} {splitName[0].Trim()}";
-                                    targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-                                }
-                                else
-                                {
-                                    if (sourceDisplayName.Contains(' '))
-                                    {
-                                        // Match:
-                                        //   "John Doe" to "Doe, John"
-                                        var splitName = sourceDisplayName.Split(' ');
-                                        sourceDisplayName = $"{splitName[1].Trim()}, {splitName[0].Trim()}";
-                                        targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-                                    }
-                                }
-
-                                // last attempt to match on unique name
-                                // Match: "John Michael Bolden" to Bolden, "John Michael" on "john.m.bolden@example.com" unique name
-                                if (targetTeamFoundatationIdentity == null)
-                                {
-                                    var sourceUniqueName = sourceCapacity.TeamMember.UniqueName;
-                                    targetTeamFoundatationIdentity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.UniqueName == sourceUniqueName);
-                                }
-                            }
-
-                            if (targetTeamFoundatationIdentity != null)
-                            {
-                                targetCapacities.Add(new TeamMemberCapacityIdentityRef
-                                {
-                                    Activities = sourceCapacity.Activities,
-                                    DaysOff = sourceCapacity.DaysOff,
-                                    TeamMember = new IdentityRef
-                                    {
-                                        Id = targetTeamFoundatationIdentity.TeamFoundationId.ToString()
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                Log.LogWarning("[SKIP] Team Member {member} was not found on target when replacing capacities on iteration {iteration}.", sourceCapacity.TeamMember.DisplayName, targetIteration.Path);
-                            }
-                        }
-
-                        if (targetCapacities.Count > 0)
-                        {
-                            targetHttpClient.ReplaceCapacitiesWithIdentityRefAsync(targetCapacities, targetTeamContext, targetIteration.Id).ConfigureAwait(false).GetAwaiter().GetResult();
-                            Log.LogDebug("Team {team} capacities for iteration {iteration} migrated.", targetTeam.Name, targetIteration.Path);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Telemetry.TrackException(ex, null);
-                        Log.LogWarning(ex, "[SKIP] Problem migrating team capacities for iteration {iteration}.", sourceIteration.Path);
-                    }
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Telemetry.TrackException(ex, null);
-                Log.LogWarning(ex, "[SKIP] Problem migrating team capacities.");
+                return;
             }
 
-            Log.LogInformation("Team capacities migration done..");
+            TfsTeamSettingsCore.MigrateCapacities(
+                sourceHttpClient, Source.TfsProject.Guid, sourceTeam,
+                targetHttpClient, Target.TfsProject.Guid, targetTeam,
+                iterationMap, _targetTeamFoundationIdentitiesLazyCache,
+                Telemetry, Log, exceptionLogLevel: LogLevel.Warning);
         }
     }
 }
