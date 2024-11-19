@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.VisualStudio.Services.Commerce;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
@@ -28,7 +21,6 @@ namespace MigrationTools.Tools
         public TfsUserMappingTool(IOptions<TfsUserMappingToolOptions> options, IServiceProvider services, ILogger<TfsUserMappingTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
         }
-
 
         private List<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
@@ -52,22 +44,6 @@ namespace MigrationTools.Tools
             return foundUsers;
         }
 
-
-
-        private void MapUserIdentityField(FieldItem field)
-        {
-            if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
-            {
-                Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField [ReferenceName|{field.ReferenceName}]");
-                var mapps = GetMappingFileData();
-                if (mapps != null && mapps.ContainsKey(field.Value.ToString()))
-                {
-                    field.Value = mapps[field.Value.ToString()];
-                }
-
-            }
-        }
-
         public void MapUserIdentityField(Field field)
         {
             if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
@@ -80,7 +56,6 @@ namespace MigrationTools.Tools
                     field.Value = mapps[field.Value.ToString()];
                     Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField::Map:[original|{original}][new|{field.Value}]");
                 }
-
             }
         }
 
@@ -99,14 +74,13 @@ namespace MigrationTools.Tools
                 try
                 {
                     var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
-                    _UserMappings = fileMaps.ToDictionary(x => x.Source.FriendlyName, x => x.target?.FriendlyName);
+                    _UserMappings = fileMaps.ToDictionary(x => x.Source.FriendlyName, x => x.Target?.FriendlyName);
                 }
                 catch (Exception)
                 {
                     _UserMappings = new Dictionary<string, string>();
                     Log.LogError($"TfsUserMappingTool::GetMappingFileData [UserMappingFile|{Options.UserMappingFile}] <-- invalid - No mapping are applied!");
                 }
-
             }
             return _UserMappings;
         }
@@ -133,18 +107,15 @@ namespace MigrationTools.Tools
                     {
                         Log.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] ReadIdentity returned null for {@bits}", user, bits);
                     }
-
                 }
                 catch (Exception ex)
                 {
                     Telemetry.TrackException(ex, null);
                     Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Failed With {Exception}", user, ex.Message);
                 }
-
             }
             return foundUsers;
         }
-
 
         public List<IdentityMapData> GetUsersInSourceMappedToTarget(TfsProcessor processor)
         {
@@ -155,22 +126,19 @@ namespace MigrationTools.Tools
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTarget [SourceUsersCount|{sourceUsers.Count}]");
                 var targetUsers = GetUsersListFromServer(processor.Target.GetService<IGroupSecurityService>());
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTarget [targetUsersCount|{targetUsers.Count}]");
-                return sourceUsers.Select(sUser => new IdentityMapData { Source = sUser, target = targetUsers.SingleOrDefault(tUser => tUser.FriendlyName == sUser.FriendlyName) }).ToList();
+                return sourceUsers.Select(sUser => new IdentityMapData { Source = sUser, Target = targetUsers.SingleOrDefault(tUser => tUser.FriendlyName == sUser.FriendlyName) }).ToList();
             }
             else
             {
                 Log.LogWarning("TfsUserMappingTool is disabled in settings. You may have users in the source that are not mapped to the target. ");
                 return null;
             }
-
         }
-
 
         public List<IdentityMapData> GetUsersInSourceMappedToTargetForWorkItems(TfsProcessor processor, List<WorkItemData> sourceWorkItems)
         {
             if (Options.Enabled)
             {
-
                 Dictionary<string, string> result = new Dictionary<string, string>();
                 List<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
@@ -188,7 +156,6 @@ namespace MigrationTools.Tools
 
     public class CaseInsensativeStringComparer : IEqualityComparer<string>
     {
-
         public bool Equals(string x, string y)
         {
             return x?.IndexOf(y, StringComparison.OrdinalIgnoreCase) >= 0;

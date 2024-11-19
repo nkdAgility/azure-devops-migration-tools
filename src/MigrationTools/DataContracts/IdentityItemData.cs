@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MigrationTools.DataContracts
+﻿namespace MigrationTools.DataContracts
 {
     public class IdentityItemData
     {
@@ -13,6 +9,6 @@ namespace MigrationTools.DataContracts
     public class IdentityMapData
     {
         public IdentityItemData Source { get; set; }
-        public IdentityItemData target { get; set; }
+        public IdentityItemData Target { get; set; }
     }
 }
