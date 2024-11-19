@@ -6,7 +6,9 @@ pageType: index
 toc: true
 pageStatus: published
 discussionId: 
-redirect_from: /faq.html
+redirect_from: 
+ - /faq.html
+ - /preview/faq/
 ---
 
 ## What is this tool for?
