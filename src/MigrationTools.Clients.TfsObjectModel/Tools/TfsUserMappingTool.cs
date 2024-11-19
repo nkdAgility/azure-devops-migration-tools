@@ -22,9 +22,9 @@ namespace MigrationTools.Tools
         {
         }
 
-        private List<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
+        private HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
-            List<string> foundUsers = new List<string>();
+            HashSet<string> foundUsers = new(StringComparer.CurrentCultureIgnoreCase);
             foreach (var wItem in workitems)
             {
                 foreach (var rItem in wItem.Revisions.Values)
@@ -148,7 +148,7 @@ namespace MigrationTools.Tools
             if (Options.Enabled)
             {
                 Dictionary<string, string> result = new Dictionary<string, string>();
-                List<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
+                HashSet<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
                 List<IdentityMapData> mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.Count}]");
