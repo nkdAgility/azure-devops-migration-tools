@@ -54,15 +54,14 @@ For the most part we support moving data between `((Azure DevOps Server | Team F
 
 - [Installation](/setup/installation.md)
 - [Permissions](/setup/permissions.md)
-- [Getting Started](/getting-started/)
+- [Getting Started](/getting-started/index.md)
 - [Configuration Reference](./Reference/)
 - [FAQ](faq.md)
 - [Support](support.md)
-- [How To Migrate Things](./HowTo/index.md)
 - [Community Support](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
 - [Commercial Support](https://nkdagility.com/capabilities/azure-devops-migration-services/)
 
-The documentation for the preview is on [Preview](https://nkdagility.com/docs/azure-devops-migration-tools/preview/)]
+The documentation for the preview is on [Preview](https://preview.nkdagility.com/docs/azure-devops-migration-tools/)]
 
 #### External Walkthroughs and Reviews
 
