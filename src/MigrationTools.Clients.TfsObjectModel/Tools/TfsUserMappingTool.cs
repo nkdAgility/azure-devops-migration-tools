@@ -22,6 +22,8 @@ namespace MigrationTools.Tools
         {
         }
 
+        private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
+
         private HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
             HashSet<string> foundUsers = new(StringComparer.CurrentCultureIgnoreCase);
@@ -31,7 +33,7 @@ namespace MigrationTools.Tools
                 {
                     foreach (var fItem in rItem.Fields.Values)
                     {
-                        if (identityFieldsToCheck.Contains(fItem.ReferenceName, new CaseInsensativeStringComparer()))
+                        if (identityFieldsToCheck.Contains(fItem.ReferenceName, _workItemNameComparer))
                         {
                             if (!foundUsers.Contains(fItem.Value) && !string.IsNullOrEmpty((string)fItem.Value))
                             {
@@ -162,7 +164,7 @@ namespace MigrationTools.Tools
         }
     }
 
-    public class CaseInsensativeStringComparer : IEqualityComparer<string>
+    internal class CaseInsensitiveStringComparer : IEqualityComparer<string>
     {
         public bool Equals(string x, string y)
         {
