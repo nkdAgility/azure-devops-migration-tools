@@ -40,6 +40,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
+    <PackageReference Include="Riok.Mapperly" />
     <PackageReference Include="TfsUrlParser" />
   </ItemGroup>
 

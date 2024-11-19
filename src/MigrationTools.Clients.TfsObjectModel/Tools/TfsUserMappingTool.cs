@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
+using Riok.Mapperly.Abstractions;
 
 namespace MigrationTools.Tools
 {
@@ -23,6 +24,7 @@ namespace MigrationTools.Tools
         }
 
         private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
+        private readonly TfsUserMappingToolMapper _mapper = new();
 
         private HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
@@ -76,7 +78,7 @@ namespace MigrationTools.Tools
                 try
                 {
                     var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
-                    _UserMappings = fileMaps.ToDictionary(x => x.Source.FriendlyName, x => x.Target?.FriendlyName);
+                    _UserMappings = fileMaps.ToDictionary(x => x.Source.DisplayName, x => x.Target?.DisplayName);
                 }
                 catch (Exception)
                 {
@@ -106,11 +108,7 @@ namespace MigrationTools.Tools
                     else if ((identity.Type == IdentityType.WindowsUser) || (identity.Type == IdentityType.UnknownIdentityType))
                     {
                         // UnknownIdentityType is set for users in Azure Entra ID.
-                        foundUsers.Add(new IdentityItemData()
-                        {
-                            FriendlyName = identity.DisplayName,
-                            AccountName = identity.AccountName
-                        });
+                        foundUsers.Add(_mapper.IdentityToIdentityItemData(identity));
                     }
                     else
                     {
@@ -154,7 +152,7 @@ namespace MigrationTools.Tools
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
                 List<IdentityMapData> mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.Count}]");
-                return mappedUsers.Where(x => workItemUsers.Contains(x.Source.FriendlyName)).ToList();
+                return mappedUsers.Where(x => workItemUsers.Contains(x.Source.DisplayName)).ToList();
             }
             else
             {
@@ -175,5 +173,13 @@ namespace MigrationTools.Tools
         {
             return obj.GetHashCode();
         }
+    }
+
+    [Mapper]
+    internal partial class TfsUserMappingToolMapper
+    {
+#pragma warning disable RMG020 // Source member is not mapped to any target member
+        public partial IdentityItemData IdentityToIdentityItemData(Identity identity);
+#pragma warning restore RMG020 // Source member is not mapped to any target member
     }
 }
