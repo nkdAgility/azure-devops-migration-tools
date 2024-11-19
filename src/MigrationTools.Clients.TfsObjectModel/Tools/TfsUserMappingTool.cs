@@ -87,33 +87,41 @@ namespace MigrationTools.Tools
 
         private List<IdentityItemData> GetUsersListFromServer(IGroupSecurityService gss)
         {
-            Identity SIDS = gss.ReadIdentity(SearchFactor.AccountName, "Project Collection Valid Users", QueryMembership.Expanded);
-            var people = SIDS.Members.ToList().Where(x => x.Contains("\\")).Select(x => x);
+            Identity allIdentities = gss.ReadIdentity(SearchFactor.AccountName, "Project Collection Valid Users", QueryMembership.Expanded);
+            Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer Found {count} identities (users and groups) in server.", allIdentities.Members.Length);
 
             List<IdentityItemData> foundUsers = new List<IdentityItemData>();
-            Log.LogTrace("TfsUserMappingTool::GetUsersListFromServer:foundUsers\\ {@foundUsers}", foundUsers);
-            foreach (string user in people)
+            foreach (string sid in allIdentities.Members)
             {
-                Log.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Atempting to load user", user);
+                Log.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Atempting to load user", sid);
                 try
                 {
-                    var bits = user.Split('\\');
-                    Identity sids = gss.ReadIdentity(SearchFactor.AccountName, bits[1], QueryMembership.Expanded);
-                    if (sids != null)
+                    Identity identity = gss.ReadIdentity(SearchFactor.Sid, sid, QueryMembership.Expanded);
+                    if (identity is null)
                     {
-                        foundUsers.Add(new IdentityItemData() { FriendlyName = sids.DisplayName, AccountName = sids.AccountName });
+                        Log.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] ReadIdentity returned null", sid);
+                    }
+                    else if ((identity.Type == IdentityType.WindowsUser) || (identity.Type == IdentityType.UnknownIdentityType))
+                    {
+                        // UnknownIdentityType is set for users in Azure Entra ID.
+                        foundUsers.Add(new IdentityItemData()
+                        {
+                            FriendlyName = identity.DisplayName,
+                            AccountName = identity.AccountName
+                        });
                     }
                     else
                     {
-                        Log.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] ReadIdentity returned null for {@bits}", user, bits);
+                        Log.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Not applicable identity type {identityType}", sid, identity.Type);
                     }
                 }
                 catch (Exception ex)
                 {
                     Telemetry.TrackException(ex, null);
-                    Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Failed With {Exception}", user, ex.Message);
+                    Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Failed With {Exception}", sid, ex.Message);
                 }
             }
+            Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} user identities are applicable for mapping", foundUsers.Count);
             return foundUsers;
         }
 
@@ -122,10 +130,10 @@ namespace MigrationTools.Tools
             Log.LogDebug("TfsUserMappingTool::GetUsersInSourceMappedToTarget");
             if (Options.Enabled)
             {
+                Log.LogInformation($"TfsUserMappingTool::GetUsersInSourceMappedToTarget Loading identities from source server");
                 var sourceUsers = GetUsersListFromServer(processor.Source.GetService<IGroupSecurityService>());
-                Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTarget [SourceUsersCount|{sourceUsers.Count}]");
+                Log.LogInformation($"TfsUserMappingTool::GetUsersInSourceMappedToTarget Loading identities from target server");
                 var targetUsers = GetUsersListFromServer(processor.Target.GetService<IGroupSecurityService>());
-                Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTarget [targetUsersCount|{targetUsers.Count}]");
                 return sourceUsers.Select(sUser => new IdentityMapData { Source = sUser, Target = targetUsers.SingleOrDefault(tUser => tUser.FriendlyName == sUser.FriendlyName) }).ToList();
             }
             else
