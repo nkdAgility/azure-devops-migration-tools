@@ -165,7 +165,7 @@ namespace MigrationTools.ConsoleDataGenerator
             for (int i = 0; i < pathSegments.Length; i++)
             {
                 string key = pathSegments[i];
-                IConfigurationSection currentSection = configuration.GetSection(string.Join(':', pathSegments, 0, i + 1));
+                IConfigurationSection currentSection = configuration.GetSection(string.Join(":", pathSegments, 0, i + 1));
 
                 if (i < pathSegments.Length - 1)
                 {
