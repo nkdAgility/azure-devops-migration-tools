@@ -54,7 +54,7 @@ For the most part we support moving data between `((Azure DevOps Server | Team F
 
 - [Installation](/setup/installation.md)
 - [Permissions](/setup/permissions.md)
-- [Getting Started](/getting-started/index.md)
+- [Getting Started](/getstarted/)
 - [Configuration Reference](./Reference/)
 - [FAQ](faq.md)
 - [Support](support.md)
