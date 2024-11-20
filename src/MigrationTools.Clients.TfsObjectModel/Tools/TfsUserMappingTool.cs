@@ -134,12 +134,40 @@ namespace MigrationTools.Tools
                 var sourceUsers = GetUsersListFromServer(processor.Source.GetService<IGroupSecurityService>());
                 Log.LogInformation($"TfsUserMappingTool::GetUsersInSourceMappedToTarget Loading identities from target server");
                 var targetUsers = GetUsersListFromServer(processor.Target.GetService<IGroupSecurityService>());
-                return sourceUsers.Select(sUser => new IdentityMapData { Source = sUser, Target = targetUsers.SingleOrDefault(tUser => tUser.FriendlyName == sUser.FriendlyName) }).ToList();
+
+                if (Options.MatchUsersByEmail)
+                {
+                    Log.LogInformation("TfsUserMappingTool::GetUsersInSourceMappedToTarget "
+                        + "Matching users between source and target by email is enabled. In no match by email is found, "
+                        + "matching by display name will be used.");
+                }
+
+                List<IdentityMapData> identityMap = [];
+                foreach (var sourceUser in sourceUsers)
+                {
+                    IdentityItemData targetUser = null;
+                    if (Options.MatchUsersByEmail && !string.IsNullOrEmpty(sourceUser.MailAddress))
+                    {
+                        var candidates = targetUsers
+                            .Where(tu => tu.MailAddress.Equals(sourceUser.MailAddress, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                        if (candidates.Count == 1)
+                        {
+                            // If there are more than one user with the same email address, we can't be sure which one is
+                            // the correct one, so mapping will match either by display name, or will be skipped and
+                            // exported for manual mapping.
+                            targetUser = candidates[0];
+                        }
+                    }
+                    targetUser ??= targetUsers.SingleOrDefault(x => x.DisplayName == sourceUser.DisplayName);
+                    identityMap.Add(new IdentityMapData { Source = sourceUser, Target = targetUser });
+                }
+                return identityMap;
             }
             else
             {
                 Log.LogWarning("TfsUserMappingTool is disabled in settings. You may have users in the source that are not mapped to the target. ");
-                return null;
+                return [];
             }
         }
 

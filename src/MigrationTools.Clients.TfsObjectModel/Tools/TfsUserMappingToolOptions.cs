@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.TeamFoundation.Build.Client;
-using MigrationTools.Enrichers;
+﻿using System.Collections.Generic;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -10,7 +7,7 @@ namespace MigrationTools.Tools
     {
 
         /// <summary>
-        /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
+        /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.
         /// </summary>
         public List<string> IdentityFieldsToCheck { get; set; }
 
@@ -19,11 +16,17 @@ namespace MigrationTools.Tools
         /// </summary>
         public string UserMappingFile { get; set; }
 
+        /// <summary>
+        /// By default, users in source are mapped to target users by their display name. If this is set to true, then the
+        /// users will be mapped by their email address first. If no match is found, then the display name will be used.
+        /// </summary>
+        public bool MatchUsersByEmail { get; set; }
     }
 
     public interface ITfsUserMappingToolOptions
     {
         List<string> IdentityFieldsToCheck { get; set; }
         string UserMappingFile { get; set; }
+        bool MatchUsersByEmail { get; set; }
     }
 }
