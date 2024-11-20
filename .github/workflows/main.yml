@@ -388,17 +388,6 @@ jobs:
       - uses: igsekor/pyspelling-any@v1.0.4
         id: spellcheck
         name: Spellcheck
-      # - name: Build with Jekyll
-      #   # Outputs to the './_site' directory by default
-      #   run: bundle exec jekyll build --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}"
-      #   env:
-      #     JEKYLL_ENV: production
-      # - name: Build Jekyll
-      #   uses: jerryjvl/jekyll-build-action@v1
-      - uses: actions/upload-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Site
-          path: ./_site/**/*
       - name: Build with Jekyll 2
         # Outputs to the './_site' directory by default
         run: bundle exec jekyll build --destination ./_site2/  --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL_AFD}}"
@@ -585,38 +574,18 @@ jobs:
       - name: Download a single artifact
         uses: actions/download-artifact@v4
         with:
-          name: AzureDevOpsMigrationTools-Site
-          path: ./_site
+          name: AzureDevOpsMigrationTools-Site2
+          path: ./_site2
       - name: "Find  files"
         shell: pwsh
         run: |
             Get-Item -Path .\         
-      # - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
-      #   uses: Dylan700/sftp-upload-action@latest
-      #   with:
-      #     server: nakedalmweb.sftp.wpengine.com
-      #     username: nakedalmweb-learn
-      #     password: ${{ secrets.NKDAGILITY_LEARN_SFTP }}
-      #     port: 2222
-      #     # If true, outputs the results of the upload, without actually uploading.
-      #     #dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
-      #     # A list of folders to upload in the format of `folder/ => upload_folder/`
-      #     uploads: | 
-      #         ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
-      #     # If true, any existing files in the remote upload directories are deleted.
-      #     delete: false
-
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
           app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
           private-key: ${{ secrets.NKDAGILITY_BOT_CLIENTSECRET }}
 
-      - name: Download a single artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: AzureDevOpsMigrationTools-Site2
-          path: ./_site2
       - name: Build and Deploy
         uses: Azure/static-web-apps-deploy@v1
         id: azureDeploy
