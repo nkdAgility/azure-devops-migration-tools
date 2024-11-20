@@ -128,9 +128,9 @@ jobs:
                 "Preview" {
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
-                    $docs_deploy_folder = "./azure-devops-migration-tools/preview/";
-                    $docs_baseURL = "/learn/azure-devops-migration-tools/preview"
-                    $docs_baseURL_AFD = ""
+                    $docs_deploy_folder = "./azure-devops-migration-tools/";
+                    $docs_baseURL = "/learn/azure-devops-migration-tools"
+                    $docs_baseURL_AFD = "/learn/azure-devops-migration-tools"
                     $AzureSitesEnvironment = "preview";
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
@@ -388,11 +388,11 @@ jobs:
       - uses: igsekor/pyspelling-any@v1.0.4
         id: spellcheck
         name: Spellcheck
-      - name: Build with Jekyll
-        # Outputs to the './_site' directory by default
-        run: bundle exec jekyll build --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}"
-        env:
-          JEKYLL_ENV: production
+      # - name: Build with Jekyll
+      #   # Outputs to the './_site' directory by default
+      #   run: bundle exec jekyll build --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}"
+      #   env:
+      #     JEKYLL_ENV: production
       # - name: Build Jekyll
       #   uses: jerryjvl/jekyll-build-action@v1
       - uses: actions/upload-artifact@v4
@@ -591,20 +591,20 @@ jobs:
         shell: pwsh
         run: |
             Get-Item -Path .\         
-      - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
-        uses: Dylan700/sftp-upload-action@latest
-        with:
-          server: nakedalmweb.sftp.wpengine.com
-          username: nakedalmweb-learn
-          password: ${{ secrets.NKDAGILITY_LEARN_SFTP }}
-          port: 2222
-          # If true, outputs the results of the upload, without actually uploading.
-          #dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
-          # A list of folders to upload in the format of `folder/ => upload_folder/`
-          uploads: | 
-              ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
-          # If true, any existing files in the remote upload directories are deleted.
-          delete: false
+      # - name: SFTP Upload ${{ (needs.Setup.outputs.nkdAgility_Ring) }}
+      #   uses: Dylan700/sftp-upload-action@latest
+      #   with:
+      #     server: nakedalmweb.sftp.wpengine.com
+      #     username: nakedalmweb-learn
+      #     password: ${{ secrets.NKDAGILITY_LEARN_SFTP }}
+      #     port: 2222
+      #     # If true, outputs the results of the upload, without actually uploading.
+      #     #dry-run: ${{ (needs.Setup.outputs.nkdAgility_Ring) == 'Canary' }}
+      #     # A list of folders to upload in the format of `folder/ => upload_folder/`
+      #     uploads: | 
+      #         ./_site/ => ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
+      #     # If true, any existing files in the remote upload directories are deleted.
+      #     delete: false
 
       - uses: actions/create-github-app-token@v1
         id: app-token
