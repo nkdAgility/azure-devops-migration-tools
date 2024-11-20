@@ -34,13 +34,10 @@ using System.Net.NetworkInformation;
 namespace MigrationTools.Host
 {
 
-    
+
 
     public static class MigrationToolHost
     {
-        static int logs = 1;
-        private static bool LoggerHasBeenBuilt = false;
-
         public static IEnumerable<T> GetAll<T>(this IServiceProvider provider)
         {
             var site = typeof(ServiceProvider).GetProperty("CallSiteFactory", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(provider);
@@ -57,7 +54,7 @@ namespace MigrationTools.Host
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
 
-            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}"; // 
+            var outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] [{versionString}] {Message:lj} {NewLine}{Exception}"; //
 
             hostBuilder.UseSerilog((hostingContext, services, loggerConfiguration) =>
             {
@@ -73,8 +70,6 @@ namespace MigrationTools.Host
                             .Filter.ByExcluding(Matching.FromSource("Microsoft.Extensions.Hosting.Internal.Host"))
                             .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: outputTemplate))
                     ;
-                    
-                LoggerHasBeenBuilt = true;
             });
 
             hostBuilder.ConfigureLogging((context, logBuilder) =>

@@ -113,7 +113,7 @@ namespace MigrationTools.ConsoleDataGenerator
             return true; // This converter applies to all types, but we'll decide whether to include $type inside WriteJson
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             JObject jo = JObject.FromObject(value);
 
@@ -126,7 +126,7 @@ namespace MigrationTools.ConsoleDataGenerator
             jo.WriteTo(writer);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             // Deserialize normally
             return serializer.Deserialize(reader, objectType);

@@ -22,6 +22,7 @@ namespace MigrationTools.Endpoints
 {
     public class AzureDevOpsEndpoint : Endpoint<AzureDevOpsEndpointOptions>
     {
+        [Obsolete("Dont know what this is for")]
         public override int Count => 0;
 
         public AzureDevOpsEndpoint(IOptions<AzureDevOpsEndpointOptions> optipons, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
@@ -208,10 +209,8 @@ namespace MigrationTools.Endpoints
         /// <typeparam name="DefinitionType"></typeparam>
         /// <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
         /// <param name="queryString">additional query string parameters passed to the underlying api call</param>
-        /// <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
-        /// <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
         /// <returns></returns>
-        public async Task<DefinitionType> GetApiDefinitionAsync<DefinitionType>(string[] routeParameters = null, string queryString = "", string singleDefinitionQueryString = "", bool queryForDetails = true)
+        public async Task<DefinitionType> GetApiDefinitionAsync<DefinitionType>(string[] routeParameters = null, string queryString = "")
             where DefinitionType : RestApiDefinition, new()
         {
             var apiPathAttribute = typeof(DefinitionType).GetCustomAttributes(typeof(ApiPathAttribute), false).OfType<ApiPathAttribute>().FirstOrDefault();
@@ -235,11 +234,10 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Make HTTP Request to add Revision / Version of Task Group
         /// </summary>
-        /// <param name="targetDefinitions"></param>
         /// <param name="rootDefinitions"></param>
         /// <param name="updatedDefinitions"></param>
         /// <returns>List of Mappings</returns>
-        public async Task<List<Mapping>> UpdateTaskGroupsAsync(IEnumerable<TaskGroup> targetDefinitions, IEnumerable<TaskGroup> rootDefinitions, IEnumerable<TaskGroup> updatedDefinitions)
+        public async Task<List<Mapping>> UpdateTaskGroupsAsync(IEnumerable<TaskGroup> rootDefinitions, IEnumerable<TaskGroup> updatedDefinitions)
         {
             var migratedDefinitions = new List<Mapping>();
             foreach (var definitionToBeMigrated in updatedDefinitions)

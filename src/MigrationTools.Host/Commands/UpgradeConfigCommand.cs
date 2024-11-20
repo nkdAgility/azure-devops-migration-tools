@@ -37,14 +37,12 @@ namespace MigrationTools.Host.Commands
 
         private readonly ILogger _logger;
 
-       
-
         public UpgradeConfigCommand(IHostApplicationLifetime appLifetime, IServiceProvider services, IDetectOnlineService detectOnlineService, IDetectVersionService2 detectVersionService, ILogger<CommandBase<UpgradeConfigCommandSettings>> logger, ITelemetryLogger telemetryLogger, IMigrationToolVersion migrationToolVersion, IConfiguration configuration, ActivitySource activitySource) : base(appLifetime, services, detectOnlineService, detectVersionService, logger, telemetryLogger, migrationToolVersion, configuration, activitySource)
         {
             _logger = logger;
         }
 
-        internal override async Task<int> ExecuteInternalAsync(CommandContext context, UpgradeConfigCommandSettings settings)
+        internal override Task<int> ExecuteInternalAsync(CommandContext context, UpgradeConfigCommandSettings settings)
         {
             CommandActivity.SetTagsFromObject(settings);
             int _exitCode = 0;
@@ -63,7 +61,7 @@ namespace MigrationTools.Host.Commands
             File.WriteAllText(configFile, json);
             _logger.LogInformation("New {configFile} file has been created", configFile);
             Console.WriteLine(json);
-            return _exitCode;
+            return Task.FromResult(_exitCode);
         }
 
 

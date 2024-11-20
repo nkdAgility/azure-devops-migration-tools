@@ -111,10 +111,9 @@ namespace MigrationTools.Host.Commands
             }
         }
 
-        internal virtual async Task<int> ExecuteInternalAsync(CommandContext context, TSettings settings)
+        internal virtual Task<int> ExecuteInternalAsync(CommandContext context, TSettings settings)
         {
-            // no-op
-            return 0;
+            return Task.FromResult( 0);
         }
 
         public void RunStartupLogic(TSettings settings)
@@ -183,7 +182,7 @@ namespace MigrationTools.Host.Commands
             }
             else
             {
-                /// not online or you have specified not to
+                // not online or you have specified not to
                 Log.Warning("You are either not online or have chosen `skipVersionCheck`. We will not check for a newer version of the tools.", _detectVersionService.PackageId);
             }
         }

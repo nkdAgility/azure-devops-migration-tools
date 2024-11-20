@@ -52,7 +52,6 @@ namespace MigrationTools.Processors
 
         private static int _count = 0;
         private static int _current = 0;
-        private static long _elapsedms = 0;
         private static int _totalWorkItem = 0;
         private static string workItemLogTemplate = "[{sourceWorkItemTypeName,20}][Complete:{currentWorkItem,6}/{totalWorkItems}][sid:{sourceWorkItemId,6}|Rev:{sourceRevisionInt,3}][tid:{targetWorkItemId,6} | ";
         private List<string> _ignore;
@@ -159,12 +158,11 @@ namespace MigrationTools.Processors
 
                 _current = 1;
                 _count = sourceWorkItems.Count;
-                _elapsedms = 0;
                 _totalWorkItem = sourceWorkItems.Count;
                 ProcessorActivity.SetTag("source_workitems_to_process", sourceWorkItems.Count);
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
-                    
+
                     var stopwatch = Stopwatch.StartNew();
                     var sourceWorkItem = TfsExtensions.ToWorkItem(sourceWorkItemData);
                     workItemLog = contextLog.ForContext("SourceWorkItemId", sourceWorkItem.Id);
@@ -259,7 +257,7 @@ namespace MigrationTools.Processors
         //    } else
         //    {
         //        contextLog.Error("nodeStructureEnricher is disabled! Please enable it in the config.");
-        //    }            
+        //    }
         //}
 
         private void ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(List<WorkItemData> sourceWorkItems)
@@ -432,7 +430,7 @@ namespace MigrationTools.Processors
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                CommonTools.UserMapping.MapUserIdentityField(this, f);
+                CommonTools.UserMapping.MapUserIdentityField(f);
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
@@ -551,7 +549,7 @@ namespace MigrationTools.Processors
                             if (revisionsToMigrate.Count == 0)
                             {
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                                ProcessWorkItemLinks(Source.WorkItems, Target.WorkItems, sourceWorkItem, targetWorkItem);
+                                ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
@@ -648,7 +646,7 @@ namespace MigrationTools.Processors
             }
         }
 
-        private void ProcessWorkItemLinks(IWorkItemMigrationClient sourceStore, IWorkItemMigrationClient targetStore, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        private void ProcessWorkItemLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
@@ -834,7 +832,7 @@ namespace MigrationTools.Processors
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     if (!string.IsNullOrEmpty(targetWorkItem.Id))
                     {
-                        ProcessWorkItemLinks(Source.WorkItems, Target.WorkItems, sourceWorkItem, targetWorkItem);
+                        ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
                         // The TFS client seems to plainly ignore the ChangedBy field when saving a link, so we need to put this back in place
                         targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                     }

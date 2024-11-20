@@ -22,7 +22,6 @@ namespace MigrationTools.Tools
     {
 
         private bool _save = true;
-        private bool _filter = true;
         private GitRepositoryService sourceRepoService;
         private IList<GitRepository> sourceRepos;
         private IList<GitRepository> allSourceRepos;
@@ -57,7 +56,7 @@ namespace MigrationTools.Tools
                     targetRepos = targetRepoService.QueryRepositories(_processor.Target.Options.Project);
                     allTargetRepos = targetRepoService.QueryRepositories("");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     sourceRepoService = null;
                 }

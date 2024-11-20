@@ -150,8 +150,9 @@ namespace MigrationTools.Processors
         /// <summary>
         /// Filter incompatible TaskGroups
         /// </summary>
-        /// <param name="filteredTaskGroups"></param>
+        /// <param name="sourceDefinitions"></param>
         /// <param name="availableTasks"></param>
+        /// <param name="taskGroupMapping"></param>
         /// <returns>List of filtered Definitions</returns>
         private IEnumerable<BuildDefinition> FilterOutIncompatibleBuildDefinitions(IEnumerable<BuildDefinition> sourceDefinitions, IEnumerable<TaskDefinition> availableTasks, IEnumerable<Mapping> taskGroupMapping)
         {
@@ -631,7 +632,7 @@ namespace MigrationTools.Processors
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             var rootTargetDefinitions = SortDefinitionsByVersion(targetDefinitions).First();
-            await Target.UpdateTaskGroupsAsync(targetDefinitions, rootTargetDefinitions, updatedSourceDefinitions);
+            await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, updatedSourceDefinitions);
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions.Where(d => d.Name != null), mappings));

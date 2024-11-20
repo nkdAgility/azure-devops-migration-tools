@@ -56,10 +56,8 @@ namespace MigrationTools.Endpoints
             get { return TfsProject.Uri; }
         }
 
+        [Obsolete("Dont know what this is for")]
         public override int Count => 0;
-
-
-
 
         private TfsTeamProjectCollection GetTfsCollection()
         {

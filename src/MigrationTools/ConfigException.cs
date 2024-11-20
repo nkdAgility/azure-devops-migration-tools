@@ -17,9 +17,5 @@ namespace MigrationTools
         public ConfigException(string message, Exception innerException) : base(message, innerException)
         {
         }
-
-        protected ConfigException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }
