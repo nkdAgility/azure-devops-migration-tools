@@ -17,6 +17,7 @@ namespace MigrationTools.Processors
             MigrateServiceConnections = true;
             BuildPipelines = null;
             ReleasePipelines = null;
+            RepositoryNameMaps = {};
             SourceName = "sourceName";
             TargetName = "targetName";
         }
