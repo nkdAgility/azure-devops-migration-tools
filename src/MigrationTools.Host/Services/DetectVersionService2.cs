@@ -19,8 +19,6 @@ namespace MigrationTools.Host.Services
         private WinGetPackageManager _packageManager;
         private WinGetPackage _package = null;
         private bool _packageChecked = false;
-        private bool _ServiceInitialised = false;
-        private Guid UniqueID = Guid.NewGuid();
 
         private WinGetPackage Package
         {

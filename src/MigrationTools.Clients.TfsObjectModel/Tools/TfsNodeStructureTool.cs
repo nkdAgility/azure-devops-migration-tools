@@ -44,7 +44,7 @@ namespace MigrationTools.Tools
     }
 
     /// <summary>
-    /// The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied. 
+    /// The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
     /// </summary>
     public class TfsNodeStructureTool : Tool<TfsNodeStructureToolOptions>
     {
@@ -194,7 +194,7 @@ namespace MigrationTools.Tools
                         {
                             parentNode = _targetCommonStructureService.GetNodeFromPath(currentAncestorPath);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Log.LogDebug("  Not Found:", currentAncestorPath);
                             parentNode = null;
@@ -480,6 +480,7 @@ namespace MigrationTools.Tools
         /// Checks node-to-be-created with allowed BasePath's
         /// </summary>
         /// <param name="userFriendlyPath">The user-friendly path of the source node</param>
+        /// <param name="nodeStructureType"></param>
         /// <returns>true/false</returns>
         private bool ShouldCreateNode(string userFriendlyPath, TfsNodeStructureType nodeStructureType)
         {
@@ -564,7 +565,7 @@ namespace MigrationTools.Tools
                     missingItem.targetPath = GetNewNodeName(missingItem.sourcePath, nodeType);
                     Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:GetNewNodeName::{@missingItem}", missingItem);
                 }
-                catch (NodePathNotAnchoredException ex)
+                catch (NodePathNotAnchoredException)
                 {
                     Log.LogDebug("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{sourceSystemPath}", missingItem.sourceSystemPath);
                     Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);

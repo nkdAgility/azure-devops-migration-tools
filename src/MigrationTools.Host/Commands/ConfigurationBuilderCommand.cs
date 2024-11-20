@@ -39,7 +39,7 @@ namespace MigrationTools.Host.Commands
         Layout layout = new Layout("Root");
 
 
-        public override async Task<int> ExecuteAsync(CommandContext context, ConfigurationBuilderCommandSettings settings)
+        public override Task<int> ExecuteAsync(CommandContext context, ConfigurationBuilderCommandSettings settings)
         {
             int _exitCode;
 
@@ -57,10 +57,6 @@ namespace MigrationTools.Host.Commands
                 OptionsConfigurationUpgrader optionsUpgrader = _services.GetRequiredService<OptionsConfigurationUpgrader>();
                 optionsUpgrader.UpgradeConfiguration(optionsBuilder, configFile);
                 _logger.LogInformation("Configuration loaded & Upgraded to latest...");
-
-
-          
-
 
                 var configurationEditorOptions = new[]
                 {
@@ -116,7 +112,7 @@ namespace MigrationTools.Host.Commands
                 // Stop the application once the work is done
                 _appLifetime.StopApplication();
             }
-            return _exitCode;
+            return Task.FromResult(_exitCode);
         }
 
         private void DisplayCurrentOptions(OptionsConfigurationBuilder optionsBuilder)
@@ -171,7 +167,7 @@ namespace MigrationTools.Host.Commands
 
         private void SelectTemplateToApply(OptionsConfigurationBuilder optionsBuilder, string configFile)
         {
-            
+
             bool shouldExit = false;
             while (!shouldExit)
             {

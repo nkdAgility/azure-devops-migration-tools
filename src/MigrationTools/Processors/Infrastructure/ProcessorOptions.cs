@@ -51,7 +51,6 @@ namespace MigrationTools.Processors.Infrastructure
         public IProcessorOptions GetSample()
         {
             throw new NotImplementedException();
-            return null; 
         }
 
         public bool IsProcessorCompatible(IReadOnlyList<IProcessorConfig> otherProcessors)

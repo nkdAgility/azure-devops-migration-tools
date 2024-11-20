@@ -20,6 +20,7 @@ namespace MigrationTools.Endpoints.Shadows
         {
         }
 
+        [Obsolete("Dont know what this is for")]
         public override int Count => 0;
     }
 

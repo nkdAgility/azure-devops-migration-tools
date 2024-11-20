@@ -39,11 +39,10 @@ namespace MigrationTools.Clients
 
             _workItemClient = ActivatorUtilities.CreateInstance<TfsWorkItemMigrationClient>(Services, this, options);
             //networkCredentials IOptions<NetworkCredentialsOptions> networkCredentials,
-         
         }
 
+        [Obsolete("Dont know what this is for")]
         public override int Count => 0;
-
 
         public IWorkItemMigrationClient WorkItems
         {

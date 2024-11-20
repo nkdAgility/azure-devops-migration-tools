@@ -68,7 +68,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        public void MapUserIdentityField(TfsProcessor processor, Field field)
+        public void MapUserIdentityField(Field field)
         {
             if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
             {

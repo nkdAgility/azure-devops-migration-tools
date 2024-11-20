@@ -58,7 +58,7 @@ namespace MigrationTools.Endpoints
                 var dictionary = items.ToDictionary(item => item.Number);
                 return new SortedDictionary<int, RevisionItem>(dictionary);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 Log.Warning("For some Reason there are multiple Revisions on {WorkItemId} with the same System.Rev. We will create a renumbered list...", items[0].WorkItemId);
                 var currentNumber = -1;

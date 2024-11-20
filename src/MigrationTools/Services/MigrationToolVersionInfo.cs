@@ -33,7 +33,7 @@ namespace MigrationTools.Services
             {
                 // Do nothing
             }
-            
+
         }
     }
 
@@ -84,11 +84,11 @@ namespace MigrationTools.Services
                 }
                 return (version, matches[0].Groups[1].Value, textVersion);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return (new Version(0, 0, 0, 0), "ex", "0.0.0-ex");
             }
-           
+
         }
     }
 

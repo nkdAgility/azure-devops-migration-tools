@@ -10,7 +10,8 @@ namespace MigrationTools.Processors
 
         public string WIQLQuery { get; set; }
 
-        /// `OnlyListUsersInWorkItems` 
+        /// <summary>
+        /// `OnlyListUsersInWorkItems`
         /// </summary>
         /// <default>true</default>
         public bool OnlyListUsersInWorkItems { get; set; } = true;

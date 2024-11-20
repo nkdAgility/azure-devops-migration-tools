@@ -8,6 +8,5 @@ namespace MigrationTools.Tools.Infrastructure
 {
     public interface IToolOptions : IOptions
     {
-        bool Enabled { get; set; }
     }
 }
