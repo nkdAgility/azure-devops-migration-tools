@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -121,11 +121,12 @@ namespace MigrationTools.Tools
                     Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer::[user:{user}] Failed With {Exception}", sid, ex.Message);
                 }
             }
+            foundUsers.Sort((x, y) => x.AccountName.CompareTo(y.AccountName));
             Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} user identities are applicable for mapping", foundUsers.Count);
             return foundUsers;
         }
 
-        public List<IdentityMapData> GetUsersInSourceMappedToTarget(TfsProcessor processor)
+        public IdentityMapResult GetUsersInSourceMappedToTarget(TfsProcessor processor)
         {
             Log.LogDebug("TfsUserMappingTool::GetUsersInSourceMappedToTarget");
             if (Options.Enabled)
@@ -162,25 +163,31 @@ namespace MigrationTools.Tools
                     targetUser ??= targetUsers.SingleOrDefault(x => x.DisplayName == sourceUser.DisplayName);
                     identityMap.Add(new IdentityMapData { Source = sourceUser, Target = targetUser });
                 }
-                return identityMap;
+                return new()
+                {
+                    IdentityMap = identityMap,
+                    SourceUsers = sourceUsers,
+                    TargetUsers = targetUsers
+                };
             }
             else
             {
                 Log.LogWarning("TfsUserMappingTool is disabled in settings. You may have users in the source that are not mapped to the target. ");
-                return [];
+                return new();
             }
         }
 
-        public List<IdentityMapData> GetUsersInSourceMappedToTargetForWorkItems(TfsProcessor processor, List<WorkItemData> sourceWorkItems)
+        public IdentityMapResult GetUsersInSourceMappedToTargetForWorkItems(TfsProcessor processor, List<WorkItemData> sourceWorkItems)
         {
             if (Options.Enabled)
             {
                 Dictionary<string, string> result = new Dictionary<string, string>();
                 HashSet<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
-                List<IdentityMapData> mappedUsers = GetUsersInSourceMappedToTarget(processor);
-                Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.Count}]");
-                return mappedUsers.Where(x => workItemUsers.Contains(x.Source.DisplayName)).ToList();
+                IdentityMapResult mappedUsers = GetUsersInSourceMappedToTarget(processor);
+                Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.IdentityMap.Count}]");
+                mappedUsers.IdentityMap = mappedUsers.IdentityMap.Where(x => workItemUsers.Contains(x.Source.DisplayName)).ToList();
+                return mappedUsers;
             }
             else
             {

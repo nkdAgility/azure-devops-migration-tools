@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,30 +43,26 @@ namespace MigrationTools.Processors
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            if (string.IsNullOrEmpty(CommonTools.UserMapping.Options.UserMappingFile))
-            {
-                Log.LogError("UserMappingFile is not set");
-                throw new ArgumentNullException("UserMappingFile must be set on the TfsUserMappingToolOptions in CommonEnrichersConfig.");
-            }
+            CheckOptions();
 
-            List<IdentityMapData> usersToMap = new List<IdentityMapData>();
+            IdentityMapResult data;
             if (Options.OnlyListUsersInWorkItems)
             {
                 Log.LogInformation("OnlyListUsersInWorkItems is true, only users in work items will be listed");
                 List<WorkItemData> sourceWorkItems = Source.WorkItems.GetWorkItems(Options.WIQLQuery);
                 Log.LogInformation("Processed {0} work items from Source", sourceWorkItems.Count);
 
-                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
-                Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
+                data = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
+                Log.LogInformation("Found {usersToMap} total mapped", data.IdentityMap.Count);
             }
             else
             {
                 Log.LogInformation("OnlyListUsersInWorkItems is false, all users will be listed");
-                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTarget(this);
-                Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
+                data = CommonTools.UserMapping.GetUsersInSourceMappedToTarget(this);
+                Log.LogInformation("Found {usersToMap} total mapped", data.IdentityMap.Count);
             }
 
-            usersToMap = usersToMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName).ToList();
+            List<IdentityMapData> usersToMap = data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName).ToList();
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
             Dictionary<string, string> usermappings = [];
             foreach (IdentityMapData userMapping in usersToMap)
@@ -74,11 +71,40 @@ namespace MigrationTools.Processors
                 // it would throw with duplicate key. This way we just overwrite the value – last item in source wins.
                 usermappings[userMapping.Source.DisplayName] = userMapping.Target?.DisplayName;
             }
-            System.IO.File.WriteAllText(CommonTools.UserMapping.Options.UserMappingFile, JsonConvert.SerializeObject(usermappings, Formatting.Indented));
-            Log.LogInformation("Writen to: {LocalExportJsonFile}", CommonTools.UserMapping.Options.UserMappingFile);
+            File.WriteAllText(CommonTools.UserMapping.Options.UserMappingFile, JsonConvert.SerializeObject(usermappings, Formatting.Indented));
+            Log.LogInformation("User mappings writen to: {LocalExportJsonFile}", CommonTools.UserMapping.Options.UserMappingFile);
+            if (Options.ExportAllUsers)
+            {
+                ExportAllUsers(data);
+            }
 
             stopwatch.Stop();
             Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed);
+        }
+
+        private void ExportAllUsers(IdentityMapResult data)
+        {
+            var allUsers = new
+            {
+                data.SourceUsers,
+                data.TargetUsers
+            };
+            File.WriteAllText(Options.UserExportFile, JsonConvert.SerializeObject(allUsers, Formatting.Indented));
+            Log.LogInformation("All user writen to: {exportFile}", Options.UserExportFile);
+        }
+
+        private void CheckOptions()
+        {
+            if (string.IsNullOrEmpty(CommonTools.UserMapping.Options.UserMappingFile))
+            {
+                Log.LogError("UserMappingFile is not set");
+                throw new ArgumentNullException("UserMappingFile must be set on the TfsUserMappingToolOptions in CommonTools.");
+            }
+            if (Options.ExportAllUsers && string.IsNullOrEmpty(Options.UserExportFile))
+            {
+                Log.LogError($"Flag ExportAllUsers is set but export file UserExportFile is not set.");
+                throw new ArgumentNullException("UserExportFile must be set on the TfsExportUsersForMappingProcessorOptions in Processors.");
+            }
         }
     }
 }

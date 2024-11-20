@@ -227,15 +227,15 @@ namespace MigrationTools.Processors
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         {
-
             contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
-            List<IdentityMapData> usersToMap = new List<IdentityMapData>();
-            usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
-            if (usersToMap != null && usersToMap?.Count > 0)
+            IdentityMapResult usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
+            if (usersToMap.IdentityMap != null && usersToMap.IdentityMap.Count > 0)
             {
-                Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist in the target. This will not cause any errors, but may result in disconnected users that could have been mapped. Use the ExportUsersForMapping processor to create a list of mappable users. Then Import using ", usersToMap.Count);
+                Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist "
+                    + "in the target. This will not cause any errors, but may result in disconnected users that could have "
+                    + "been mapped. Use the ExportUsersForMapping processor to create a list of mappable users.",
+                    usersToMap.IdentityMap.Count);
             }
-
         }
 
         //private void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems)
