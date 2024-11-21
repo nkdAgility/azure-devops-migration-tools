@@ -2,8 +2,11 @@
 {
     public class IdentityItemData
     {
-        public string FriendlyName { get; set; }
+        public string Sid { get; set; }
+        public string DisplayName { get; set; }
+        public string Domain { get; set; }
         public string AccountName { get; set; }
+        public string MailAddress { get; set; }
     }
 
     public class IdentityMapData

@@ -8,6 +8,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
+using Riok.Mapperly.Abstractions;
 
 namespace MigrationTools.Tools
 {
@@ -22,16 +23,19 @@ namespace MigrationTools.Tools
         {
         }
 
-        private List<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
+        private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
+        private readonly TfsUserMappingToolMapper _mapper = new();
+
+        private HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
-            List<string> foundUsers = new List<string>();
+            HashSet<string> foundUsers = new(StringComparer.CurrentCultureIgnoreCase);
             foreach (var wItem in workitems)
             {
                 foreach (var rItem in wItem.Revisions.Values)
                 {
                     foreach (var fItem in rItem.Fields.Values)
                     {
-                        if (identityFieldsToCheck.Contains(fItem.ReferenceName, new CaseInsensativeStringComparer()))
+                        if (identityFieldsToCheck.Contains(fItem.ReferenceName, _workItemNameComparer))
                         {
                             if (!foundUsers.Contains(fItem.Value) && !string.IsNullOrEmpty((string)fItem.Value))
                             {
@@ -74,7 +78,7 @@ namespace MigrationTools.Tools
                 try
                 {
                     var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
-                    _UserMappings = fileMaps.ToDictionary(x => x.Source.FriendlyName, x => x.Target?.FriendlyName);
+                    _UserMappings = fileMaps.ToDictionary(x => x.Source.DisplayName, x => x.Target?.DisplayName);
                 }
                 catch (Exception)
                 {
@@ -104,11 +108,7 @@ namespace MigrationTools.Tools
                     else if ((identity.Type == IdentityType.WindowsUser) || (identity.Type == IdentityType.UnknownIdentityType))
                     {
                         // UnknownIdentityType is set for users in Azure Entra ID.
-                        foundUsers.Add(new IdentityItemData()
-                        {
-                            FriendlyName = identity.DisplayName,
-                            AccountName = identity.AccountName
-                        });
+                        foundUsers.Add(_mapper.IdentityToIdentityItemData(identity));
                     }
                     else
                     {
@@ -134,12 +134,40 @@ namespace MigrationTools.Tools
                 var sourceUsers = GetUsersListFromServer(processor.Source.GetService<IGroupSecurityService>());
                 Log.LogInformation($"TfsUserMappingTool::GetUsersInSourceMappedToTarget Loading identities from target server");
                 var targetUsers = GetUsersListFromServer(processor.Target.GetService<IGroupSecurityService>());
-                return sourceUsers.Select(sUser => new IdentityMapData { Source = sUser, Target = targetUsers.SingleOrDefault(tUser => tUser.FriendlyName == sUser.FriendlyName) }).ToList();
+
+                if (Options.MatchUsersByEmail)
+                {
+                    Log.LogInformation("TfsUserMappingTool::GetUsersInSourceMappedToTarget "
+                        + "Matching users between source and target by email is enabled. In no match by email is found, "
+                        + "matching by display name will be used.");
+                }
+
+                List<IdentityMapData> identityMap = [];
+                foreach (var sourceUser in sourceUsers)
+                {
+                    IdentityItemData targetUser = null;
+                    if (Options.MatchUsersByEmail && !string.IsNullOrEmpty(sourceUser.MailAddress))
+                    {
+                        var candidates = targetUsers
+                            .Where(tu => tu.MailAddress.Equals(sourceUser.MailAddress, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                        if (candidates.Count == 1)
+                        {
+                            // If there are more than one user with the same email address, we can't be sure which one is
+                            // the correct one, so mapping will match either by display name, or will be skipped and
+                            // exported for manual mapping.
+                            targetUser = candidates[0];
+                        }
+                    }
+                    targetUser ??= targetUsers.SingleOrDefault(x => x.DisplayName == sourceUser.DisplayName);
+                    identityMap.Add(new IdentityMapData { Source = sourceUser, Target = targetUser });
+                }
+                return identityMap;
             }
             else
             {
                 Log.LogWarning("TfsUserMappingTool is disabled in settings. You may have users in the source that are not mapped to the target. ");
-                return null;
+                return [];
             }
         }
 
@@ -148,11 +176,11 @@ namespace MigrationTools.Tools
             if (Options.Enabled)
             {
                 Dictionary<string, string> result = new Dictionary<string, string>();
-                List<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
+                HashSet<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
                 List<IdentityMapData> mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.Count}]");
-                return mappedUsers.Where(x => workItemUsers.Contains(x.Source.FriendlyName)).ToList();
+                return mappedUsers.Where(x => workItemUsers.Contains(x.Source.DisplayName)).ToList();
             }
             else
             {
@@ -162,7 +190,7 @@ namespace MigrationTools.Tools
         }
     }
 
-    public class CaseInsensativeStringComparer : IEqualityComparer<string>
+    internal class CaseInsensitiveStringComparer : IEqualityComparer<string>
     {
         public bool Equals(string x, string y)
         {
@@ -173,5 +201,13 @@ namespace MigrationTools.Tools
         {
             return obj.GetHashCode();
         }
+    }
+
+    [Mapper]
+    internal partial class TfsUserMappingToolMapper
+    {
+#pragma warning disable RMG020 // Source member is not mapped to any target member
+        public partial IdentityItemData IdentityToIdentityItemData(Identity identity);
+#pragma warning restore RMG020 // Source member is not mapped to any target member
     }
 }

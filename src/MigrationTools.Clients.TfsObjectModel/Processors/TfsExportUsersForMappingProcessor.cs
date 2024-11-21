@@ -65,14 +65,14 @@ namespace MigrationTools.Processors
                 Log.LogInformation("Found {usersToMap} total mapped", usersToMap.Count);
             }
 
-            usersToMap = usersToMap.Where(x => x.Source.FriendlyName != x.Target?.FriendlyName).ToList();
+            usersToMap = usersToMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName).ToList();
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
             Dictionary<string, string> usermappings = [];
             foreach (IdentityMapData userMapping in usersToMap)
             {
-                // We cannot use ToDictionary(), because there can be multiple users with the same friendly name and so
+                // We cannot use ToDictionary(), because there can be multiple users with the same display name and so
                 // it would throw with duplicate key. This way we just overwrite the value – last item in source wins.
-                usermappings[userMapping.Source.FriendlyName] = userMapping.Target?.FriendlyName;
+                usermappings[userMapping.Source.DisplayName] = userMapping.Target?.DisplayName;
             }
             System.IO.File.WriteAllText(CommonTools.UserMapping.Options.UserMappingFile, JsonConvert.SerializeObject(usermappings, Formatting.Indented));
             Log.LogInformation("Writen to: {LocalExportJsonFile}", CommonTools.UserMapping.Options.UserMappingFile);
