@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -19,8 +19,14 @@ namespace MigrationTools.Tools
     {
         new public TfsUserMappingToolOptions Options => (TfsUserMappingToolOptions)base.Options;
 
-        public TfsUserMappingTool(IOptions<TfsUserMappingToolOptions> options, IServiceProvider services, ILogger<TfsUserMappingTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
+        public TfsUserMappingTool(
+            IOptions<TfsUserMappingToolOptions> options,
+            IServiceProvider services,
+            ILogger<TfsUserMappingTool> logger,
+            ITelemetryLogger telemetryLogger)
+            : base(options, services, logger, telemetryLogger)
         {
+            UserMappings = new Lazy<Dictionary<string, string>>(GetMappingFileData);
         }
 
         private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
@@ -53,40 +59,35 @@ namespace MigrationTools.Tools
             if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
             {
                 Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField [ReferenceName|{field.ReferenceName}]");
-                var mapps = GetMappingFileData();
-                if (mapps != null && mapps.ContainsKey(field.Value.ToString()))
+                if (UserMappings.Value.ContainsKey(field.Value.ToString()))
                 {
                     var original = field.Value;
-                    field.Value = mapps[field.Value.ToString()];
+                    field.Value = UserMappings.Value[field.Value.ToString()];
                     Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField::Map:[original|{original}][new|{field.Value}]");
                 }
             }
         }
 
-        private Dictionary<string, string> _UserMappings = null;
+        public Lazy<Dictionary<string, string>> UserMappings { get; }
 
         private Dictionary<string, string> GetMappingFileData()
         {
             if (!System.IO.File.Exists(Options.UserMappingFile))
             {
                 Log.LogError("TfsUserMappingTool::GetMappingFileData:: The UserMappingFile '{UserMappingFile}' cant be found! Provide a valid file or disable TfsUserMappingTool!", Options.UserMappingFile);
-                _UserMappings = new Dictionary<string, string>();
+                return [];
             }
-            if (_UserMappings == null)
+            var fileData = System.IO.File.ReadAllText(Options.UserMappingFile);
+            try
             {
-                var fileData = System.IO.File.ReadAllText(Options.UserMappingFile);
-                try
-                {
-                    var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
-                    _UserMappings = fileMaps.ToDictionary(x => x.Source.DisplayName, x => x.Target?.DisplayName);
-                }
-                catch (Exception)
-                {
-                    _UserMappings = new Dictionary<string, string>();
-                    Log.LogError($"TfsUserMappingTool::GetMappingFileData [UserMappingFile|{Options.UserMappingFile}] <-- invalid - No mapping are applied!");
-                }
+                var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
+                return fileMaps.ToDictionary(x => x.Source.DisplayName, x => x.Target?.DisplayName);
             }
-            return _UserMappings;
+            catch (Exception)
+            {
+                Log.LogError($"TfsUserMappingTool::GetMappingFileData [UserMappingFile|{Options.UserMappingFile}] <-- invalid - No mapping are applied!");
+            }
+            return [];
         }
 
         private List<IdentityItemData> GetUsersListFromServer(IGroupSecurityService gss)
