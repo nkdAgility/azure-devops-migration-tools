@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
+using Newtonsoft.Json;
 using Riok.Mapperly.Abstractions;
 
 namespace MigrationTools.Tools
@@ -31,6 +33,27 @@ namespace MigrationTools.Tools
 
         private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
         private readonly TfsUserMappingToolMapper _mapper = new();
+
+        public static void SerializeUserMap(string fileName, Dictionary<string, string> userMap, ILogger logger)
+        {
+            File.WriteAllText(fileName, JsonConvert.SerializeObject(userMap, Formatting.Indented));
+            logger.LogInformation("User mappings writen to: {fileName}", fileName);
+        }
+
+        public static Dictionary<string, string> DeserializeUserMap(string fileName, ILogger logger)
+        {
+            try
+            {
+                string fileData = File.ReadAllText(fileName);
+                var mapping = JsonConvert.DeserializeObject<Dictionary<string, string>>(fileData);
+                return new Dictionary<string, string>(mapping, StringComparer.CurrentCultureIgnoreCase);
+            }
+            catch (Exception)
+            {
+                logger.LogError($"TfsUserMappingTool::DeserializeUserMap User mapping could not be deserialized from file '{fileName}'.", fileName);
+            }
+            return [];
+        }
 
         private HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
@@ -72,22 +95,12 @@ namespace MigrationTools.Tools
 
         private Dictionary<string, string> GetMappingFileData()
         {
-            if (!System.IO.File.Exists(Options.UserMappingFile))
+            if (!File.Exists(Options.UserMappingFile))
             {
                 Log.LogError("TfsUserMappingTool::GetMappingFileData:: The UserMappingFile '{UserMappingFile}' cant be found! Provide a valid file or disable TfsUserMappingTool!", Options.UserMappingFile);
                 return [];
             }
-            var fileData = System.IO.File.ReadAllText(Options.UserMappingFile);
-            try
-            {
-                var fileMaps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
-                return fileMaps.ToDictionary(x => x.Source.DisplayName, x => x.Target?.DisplayName);
-            }
-            catch (Exception)
-            {
-                Log.LogError($"TfsUserMappingTool::GetMappingFileData [UserMappingFile|{Options.UserMappingFile}] <-- invalid - No mapping are applied!");
-            }
-            return [];
+            return DeserializeUserMap(Options.UserMappingFile, Log);
         }
 
         private List<IdentityItemData> GetUsersListFromServer(IGroupSecurityService gss)
