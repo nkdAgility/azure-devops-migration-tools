@@ -64,15 +64,14 @@ namespace MigrationTools.Processors
 
             List<IdentityMapData> usersToMap = data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName).ToList();
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
-            Dictionary<string, string> usermappings = [];
+            Dictionary<string, string> usermappings = new(StringComparer.CurrentCultureIgnoreCase);
             foreach (IdentityMapData userMapping in usersToMap)
             {
                 // We cannot use ToDictionary(), because there can be multiple users with the same display name and so
                 // it would throw with duplicate key. This way we just overwrite the value – last item in source wins.
                 usermappings[userMapping.Source.DisplayName] = userMapping.Target?.DisplayName;
             }
-            File.WriteAllText(CommonTools.UserMapping.Options.UserMappingFile, JsonConvert.SerializeObject(usermappings, Formatting.Indented));
-            Log.LogInformation("User mappings writen to: {LocalExportJsonFile}", CommonTools.UserMapping.Options.UserMappingFile);
+            TfsUserMappingTool.SerializeUserMap(CommonTools.UserMapping.Options.UserMappingFile, usermappings, Log);
             if (Options.ExportAllUsers)
             {
                 ExportAllUsers(data);
