@@ -1,4 +1,6 @@
-﻿namespace MigrationTools.DataContracts
+﻿using System.Collections.Generic;
+
+namespace MigrationTools.DataContracts
 {
     public class IdentityItemData
     {
@@ -13,5 +15,12 @@
     {
         public IdentityItemData Source { get; set; }
         public IdentityItemData Target { get; set; }
+    }
+
+    public class IdentityMapResult
+    {
+        public List<IdentityMapData> IdentityMap { get; set; } = [];
+        public List<IdentityItemData> SourceUsers { get; set; } = [];
+        public List<IdentityItemData> TargetUsers { get; set; } = [];
     }
 }
