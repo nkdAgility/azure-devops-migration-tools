@@ -272,8 +272,8 @@ namespace MigrationTools.Processors
             TfsTeamSettingsCore.MigrateCapacities(
                 sourceHttpClient, Source.TfsProject.Guid, sourceTeam,
                 targetHttpClient, Target.TfsProject.Guid, targetTeam,
-                iterationMap, _targetTeamFoundationIdentitiesLazyCache,
-                Telemetry, Log, exceptionLogLevel: LogLevel.Warning);
+                iterationMap, _targetTeamFoundationIdentitiesLazyCache, Options.UseUserMapping,
+                Telemetry, Log, exceptionLogLevel: LogLevel.Warning, Services);
         }
     }
 }

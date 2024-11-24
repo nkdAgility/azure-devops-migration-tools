@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -231,8 +231,8 @@ namespace MigrationTools.Tools
             TfsTeamSettingsCore.MigrateCapacities(
                 _processor.Source.GetClient<WorkHttpClient>(), _processor.Source.WorkItems.Project.Guid, sourceTeam,
                 _processor.Target.GetClient<WorkHttpClient>(), _processor.Target.WorkItems.Project.Guid, targetTeam,
-                iterationMap, _targetTeamFoundationIdentitiesLazyCache,
-                Telemetry, Log, exceptionLogLevel: LogLevel.Error);
+                iterationMap, _targetTeamFoundationIdentitiesLazyCache, Options.UseUserMapping,
+                Telemetry, Log, exceptionLogLevel: LogLevel.Error, Services);
         }
     }
 }

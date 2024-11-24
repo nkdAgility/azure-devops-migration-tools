@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.TeamFoundation.Build.Client;
-using MigrationTools.Enrichers;
+﻿using System.Collections.Generic;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
     public class TfsTeamSettingsToolOptions : ToolOptions, ITfsTeamSettingsToolOptions
     {
-
         /// <summary>
         /// Migrate original team settings after their creation on target team project
         /// </summary>
@@ -28,15 +24,20 @@ namespace MigrationTools.Tools
         public bool MigrateTeamCapacities { get; set; }
 
         /// <summary>
+        /// Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities.
+        /// By default, users in source are matched in target users by current display name. When this is set to `true`,
+        /// users are matched also by mapped name from user mapping file.
+        /// </summary>
+        public bool UseUserMapping { get; set; }
+
+        /// <summary>
         /// List of Teams to process. If this is `null` then all teams will be processed.
         /// </summary>
         public List<string> Teams { get; set; }
-
     }
 
     public interface ITfsTeamSettingsToolOptions
     {
-
         public bool MigrateTeamSettings { get; set; }
 
         public bool UpdateTeamSettings { get; set; }
@@ -44,5 +45,7 @@ namespace MigrationTools.Tools
         public bool MigrateTeamCapacities { get; set; }
 
         public List<string> Teams { get; set; }
+
+        public bool UseUserMapping { get; set; }
     }
 }

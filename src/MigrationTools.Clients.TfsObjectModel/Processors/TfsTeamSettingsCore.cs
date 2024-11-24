@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Core.WebApi.Types;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Work.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -21,9 +23,11 @@ namespace MigrationTools.Processors
             TeamFoundationTeam targetTeam,
             Dictionary<string, string> iterationMap,
             Lazy<List<TeamFoundationIdentity>> identityCache,
+            bool useUserMapping,
             ITelemetryLogger telemetry,
             ILogger log,
-            LogLevel exceptionLogLevel)
+            LogLevel exceptionLogLevel,
+            IServiceProvider services)
         {
             log.LogInformation("Migrating team capacities..");
 
@@ -48,7 +52,7 @@ namespace MigrationTools.Processors
                         List<TeamMemberCapacityIdentityRef> sourceCapacities = GetSourceCapacities(
                             sourceHttpClient, sourceTeamContext, sourceIteration);
                         List<TeamMemberCapacityIdentityRef> targetCapacities = GetTargetCapacities(
-                            sourceCapacities, targetIteration.Path, identityCache, log);
+                            sourceCapacities, targetIteration.Path, useUserMapping, identityCache, log, services);
 
                         if (targetCapacities.Count > 0)
                         {
@@ -83,13 +87,22 @@ namespace MigrationTools.Processors
         private static List<TeamMemberCapacityIdentityRef> GetTargetCapacities(
             List<TeamMemberCapacityIdentityRef> sourceCapacities,
             string targetIteration,
+            bool useUserMapping,
             Lazy<List<TeamFoundationIdentity>> identityCache,
-            ILogger log)
+            ILogger log,
+            IServiceProvider services)
         {
-            var targetCapacities = new List<TeamMemberCapacityIdentityRef>();
+            List<TeamMemberCapacityIdentityRef> targetCapacities = [];
+            Dictionary<string, string> userMapping = null;
+            if (useUserMapping)
+            {
+                TfsCommonTools commonTools = services.GetRequiredService<TfsCommonTools>();
+                userMapping = commonTools.UserMapping.UserMappings.Value;
+            }
+
             foreach (var sourceCapacity in sourceCapacities)
             {
-                if (TryMatchIdentity(sourceCapacity, identityCache, out TeamFoundationIdentity targetIdentity))
+                if (TryMatchIdentity(sourceCapacity, identityCache, userMapping, out TeamFoundationIdentity targetIdentity))
                 {
                     targetCapacities.Add(new TeamMemberCapacityIdentityRef
                     {
@@ -127,51 +140,66 @@ namespace MigrationTools.Processors
         private static bool TryMatchIdentity(
             TeamMemberCapacityIdentityRef sourceCapacity,
             Lazy<List<TeamFoundationIdentity>> identityCache,
+            Dictionary<string, string> userMapping,
             out TeamFoundationIdentity targetIdentity)
         {
-            var sourceDisplayName = sourceCapacity.TeamMember.DisplayName;
-            var index = sourceDisplayName.IndexOf("<");
+            var sourceName = sourceCapacity.TeamMember.DisplayName;
+            var index = sourceName.IndexOf("<");
             if (index > 0)
             {
-                sourceDisplayName = sourceDisplayName.Substring(0, index).Trim();
+                sourceName = sourceName.Substring(0, index).Trim();
             }
 
-            // Match:
-            //   "Doe, John" to "Doe, John"
-            //   "John Doe" to "John Doe"
-            targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-            if (targetIdentity == null)
+            targetIdentity = MatchIdentity(sourceName, identityCache);
+            if ((targetIdentity is null) && (userMapping is not null))
             {
-                if (sourceDisplayName.Contains(", "))
+                if (userMapping.TryGetValue(sourceName, out var mappedName) && !string.IsNullOrEmpty(mappedName))
                 {
-                    // Match:
-                    //   "Doe, John" to "John Doe"
-                    var splitName = sourceDisplayName.Split(',');
-                    sourceDisplayName = $"{splitName[1].Trim()} {splitName[0].Trim()}";
-                    targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+                    targetIdentity = MatchIdentity(mappedName, identityCache);
                 }
-                else
-                {
-                    if (sourceDisplayName.Contains(' '))
-                    {
-                        // Match:
-                        //   "John Doe" to "Doe, John"
-                        var splitName = sourceDisplayName.Split(' ');
-                        sourceDisplayName = $"{splitName[1].Trim()}, {splitName[0].Trim()}";
-                        targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-                    }
-                }
+            }
 
-                // last attempt to match on unique name
-                // Match: "John Michael Bolden" to Bolden, "John Michael" on "john.m.bolden@example.com" unique name
-                if (targetIdentity == null)
-                {
-                    var sourceUniqueName = sourceCapacity.TeamMember.UniqueName;
-                    targetIdentity = identityCache.Value.FirstOrDefault(i => i.UniqueName == sourceUniqueName);
-                }
+            // last attempt to match on unique name
+            // Match: "John Michael Bolden" to Bolden, "John Michael" on "john.m.bolden@example.com" unique name
+            if (targetIdentity is null)
+            {
+                var sourceUniqueName = sourceCapacity.TeamMember.UniqueName;
+                targetIdentity = identityCache.Value.FirstOrDefault(i => i.UniqueName == sourceUniqueName);
             }
 
             return targetIdentity is not null;
+        }
+
+        private static TeamFoundationIdentity MatchIdentity(string sourceName, Lazy<List<TeamFoundationIdentity>> identityCache)
+        {
+            // Match:
+            //   "Doe, John" to "Doe, John"
+            //   "John Doe" to "John Doe"
+            TeamFoundationIdentity targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceName);
+            if (targetIdentity == null)
+            {
+                if (sourceName.Contains(", "))
+                {
+                    // Match:
+                    //   "Doe, John" to "John Doe"
+                    var splitName = sourceName.Split(',');
+                    sourceName = $"{splitName[1].Trim()} {splitName[0].Trim()}";
+                    targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceName);
+                }
+                else
+                {
+                    if (sourceName.Contains(' '))
+                    {
+                        // Match:
+                        //   "John Doe" to "Doe, John"
+                        var splitName = sourceName.Split(' ');
+                        sourceName = $"{splitName[1].Trim()}, {splitName[0].Trim()}";
+                        targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceName);
+                    }
+                }
+            }
+
+            return targetIdentity;
         }
     }
 }
