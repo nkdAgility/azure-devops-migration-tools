@@ -30,10 +30,12 @@ namespace MigrationTools.Processors
             try
             {
                 var sourceTeamContext = new TeamContext(sourceProjectId, sourceTeam.Identity.TeamFoundationId);
-                var sourceIterations = sourceHttpClient.GetTeamIterationsAsync(sourceTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
+                var sourceIterations = sourceHttpClient.GetTeamIterationsAsync(sourceTeamContext)
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
 
                 var targetTeamContext = new TeamContext(targetProjectId, targetTeam.Identity.TeamFoundationId);
-                var targetIterations = targetHttpClient.GetTeamIterationsAsync(targetTeamContext).ConfigureAwait(false).GetAwaiter().GetResult();
+                var targetIterations = targetHttpClient.GetTeamIterationsAsync(targetTeamContext)
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
 
                 foreach (var sourceIteration in sourceIterations)
                 {
@@ -43,74 +45,14 @@ namespace MigrationTools.Processors
                         var targetIteration = targetIterations.FirstOrDefault(i => i.Path == targetIterationPath);
                         if (targetIteration == null) continue;
 
-                        var targetCapacities = new List<TeamMemberCapacityIdentityRef>();
-                        var sourceCapacities = sourceHttpClient.GetCapacitiesWithIdentityRefAsync(sourceTeamContext, sourceIteration.Id).ConfigureAwait(false).GetAwaiter().GetResult();
-                        foreach (var sourceCapacity in sourceCapacities)
-                        {
-                            var sourceDisplayName = sourceCapacity.TeamMember.DisplayName;
-                            var index = sourceDisplayName.IndexOf("<");
-                            if (index > 0)
-                            {
-                                sourceDisplayName = sourceDisplayName.Substring(0, index).Trim();
-                            }
-
-                            // Match:
-                            //   "Doe, John" to "Doe, John"
-                            //   "John Doe" to "John Doe"
-                            var targetTeamFoundatationIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-                            if (targetTeamFoundatationIdentity == null)
-                            {
-                                if (sourceDisplayName.Contains(", "))
-                                {
-                                    // Match:
-                                    //   "Doe, John" to "John Doe"
-                                    var splitName = sourceDisplayName.Split(',');
-                                    sourceDisplayName = $"{splitName[1].Trim()} {splitName[0].Trim()}";
-                                    targetTeamFoundatationIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-                                }
-                                else
-                                {
-                                    if (sourceDisplayName.Contains(' '))
-                                    {
-                                        // Match:
-                                        //   "John Doe" to "Doe, John"
-                                        var splitName = sourceDisplayName.Split(' ');
-                                        sourceDisplayName = $"{splitName[1].Trim()}, {splitName[0].Trim()}";
-                                        targetTeamFoundatationIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
-                                    }
-                                }
-
-                                // last attempt to match on unique name
-                                // Match: "John Michael Bolden" to Bolden, "John Michael" on "john.m.bolden@example.com" unique name
-                                if (targetTeamFoundatationIdentity == null)
-                                {
-                                    var sourceUniqueName = sourceCapacity.TeamMember.UniqueName;
-                                    targetTeamFoundatationIdentity = identityCache.Value.FirstOrDefault(i => i.UniqueName == sourceUniqueName);
-                                }
-                            }
-
-                            if (targetTeamFoundatationIdentity != null)
-                            {
-                                targetCapacities.Add(new TeamMemberCapacityIdentityRef
-                                {
-                                    Activities = sourceCapacity.Activities,
-                                    DaysOff = sourceCapacity.DaysOff,
-                                    TeamMember = new IdentityRef
-                                    {
-                                        Id = targetTeamFoundatationIdentity.TeamFoundationId.ToString()
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                log.LogWarning("[SKIP] Team Member {member} was not found on target when replacing capacities on iteration {iteration}.", sourceCapacity.TeamMember.DisplayName, targetIteration.Path);
-                            }
-                        }
+                        List<TeamMemberCapacityIdentityRef> sourceCapacities = GetSourceCapacities(
+                            sourceHttpClient, sourceTeamContext, sourceIteration);
+                        List<TeamMemberCapacityIdentityRef> targetCapacities = GetTargetCapacities(
+                            sourceCapacities, targetIteration.Path, identityCache, log);
 
                         if (targetCapacities.Count > 0)
                         {
-                            targetHttpClient.ReplaceCapacitiesWithIdentityRefAsync(targetCapacities, targetTeamContext, targetIteration.Id).ConfigureAwait(false).GetAwaiter().GetResult();
-                            log.LogDebug("Team {team} capacities for iteration {iteration} migrated.", targetTeam.Name, targetIteration.Path);
+                            ReplaceTargetCapacities(targetHttpClient, targetTeamContext, targetTeam, targetIteration, targetCapacities, log);
                         }
                     }
                     catch (Exception ex)
@@ -128,5 +70,109 @@ namespace MigrationTools.Processors
 
             log.LogInformation("Team capacities migration done..");
         }
+
+        private static List<TeamMemberCapacityIdentityRef> GetSourceCapacities(
+            WorkHttpClient sourceHttpClient,
+            TeamContext sourceTeamContext,
+            TeamSettingsIteration sourceIteration)
+        {
+            return sourceHttpClient.GetCapacitiesWithIdentityRefAsync(sourceTeamContext, sourceIteration.Id)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        private static List<TeamMemberCapacityIdentityRef> GetTargetCapacities(
+            List<TeamMemberCapacityIdentityRef> sourceCapacities,
+            string targetIteration,
+            Lazy<List<TeamFoundationIdentity>> identityCache,
+            ILogger log)
+        {
+            var targetCapacities = new List<TeamMemberCapacityIdentityRef>();
+            foreach (var sourceCapacity in sourceCapacities)
+            {
+                if (TryMatchIdentity(sourceCapacity, identityCache, out TeamFoundationIdentity targetIdentity))
+                {
+                    targetCapacities.Add(new TeamMemberCapacityIdentityRef
+                    {
+                        Activities = sourceCapacity.Activities,
+                        DaysOff = sourceCapacity.DaysOff,
+                        TeamMember = new IdentityRef
+                        {
+                            Id = targetIdentity.TeamFoundationId.ToString()
+                        }
+                    });
+                }
+                else
+                {
+                    log.LogWarning("[SKIP] Team Member {member} was not found on target when replacing capacities "
+                        + "on iteration {iteration}.", sourceCapacity.TeamMember.DisplayName, targetIteration);
+                }
+            }
+
+            return targetCapacities;
+        }
+
+        private static void ReplaceTargetCapacities(
+            WorkHttpClient targetHttpClient,
+            TeamContext targetTeamContext,
+            TeamFoundationTeam targetTeam,
+            TeamSettingsIteration targetIteration,
+            List<TeamMemberCapacityIdentityRef> targetCapacities,
+            ILogger log)
+        {
+            targetHttpClient.ReplaceCapacitiesWithIdentityRefAsync(targetCapacities, targetTeamContext, targetIteration.Id)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
+            log.LogDebug("Team {team} capacities for iteration {iteration} migrated.", targetTeam.Name, targetIteration.Path);
+        }
+
+        private static bool TryMatchIdentity(
+            TeamMemberCapacityIdentityRef sourceCapacity,
+            Lazy<List<TeamFoundationIdentity>> identityCache,
+            out TeamFoundationIdentity targetIdentity)
+        {
+            var sourceDisplayName = sourceCapacity.TeamMember.DisplayName;
+            var index = sourceDisplayName.IndexOf("<");
+            if (index > 0)
+            {
+                sourceDisplayName = sourceDisplayName.Substring(0, index).Trim();
+            }
+
+            // Match:
+            //   "Doe, John" to "Doe, John"
+            //   "John Doe" to "John Doe"
+            targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+            if (targetIdentity == null)
+            {
+                if (sourceDisplayName.Contains(", "))
+                {
+                    // Match:
+                    //   "Doe, John" to "John Doe"
+                    var splitName = sourceDisplayName.Split(',');
+                    sourceDisplayName = $"{splitName[1].Trim()} {splitName[0].Trim()}";
+                    targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+                }
+                else
+                {
+                    if (sourceDisplayName.Contains(' '))
+                    {
+                        // Match:
+                        //   "John Doe" to "Doe, John"
+                        var splitName = sourceDisplayName.Split(' ');
+                        sourceDisplayName = $"{splitName[1].Trim()}, {splitName[0].Trim()}";
+                        targetIdentity = identityCache.Value.FirstOrDefault(i => i.DisplayName == sourceDisplayName);
+                    }
+                }
+
+                // last attempt to match on unique name
+                // Match: "John Michael Bolden" to Bolden, "John Michael" on "john.m.bolden@example.com" unique name
+                if (targetIdentity == null)
+                {
+                    var sourceUniqueName = sourceCapacity.TeamMember.UniqueName;
+                    targetIdentity = identityCache.Value.FirstOrDefault(i => i.UniqueName == sourceUniqueName);
+                }
+            }
+
+            return targetIdentity is not null;
+        }
     }
 }
+
