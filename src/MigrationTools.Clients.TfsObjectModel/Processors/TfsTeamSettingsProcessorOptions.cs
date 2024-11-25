@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
     public class TfsTeamSettingsProcessorOptions : ProcessorOptions
     {
-
         /// <summary>
         /// Migrate original team settings after their creation on target team project
         /// </summary>
@@ -36,5 +34,11 @@ namespace MigrationTools.Processors
         /// </summary>
         public List<string> Teams { get; set; }
 
+        /// <summary>
+        /// Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities.
+        /// By default, users in source are matched in target users by current display name. When this is set to `true`,
+        /// users are matched also by mapped name from user mapping file.
+        /// </summary>
+        public bool UseUserMapping { get; set; }
     }
 }
