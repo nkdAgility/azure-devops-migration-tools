@@ -269,7 +269,7 @@ namespace MigrationTools.Processors
                 return;
             }
 
-            TfsTeamSettingsCore.MigrateCapacities(
+            TfsTeamSettingsTool.MigrateCapacities(
                 sourceHttpClient, Source.TfsProject.Guid, sourceTeam,
                 targetHttpClient, Target.TfsProject.Guid, targetTeam,
                 iterationMap, _targetTeamFoundationIdentitiesLazyCache, Options.UseUserMapping,
