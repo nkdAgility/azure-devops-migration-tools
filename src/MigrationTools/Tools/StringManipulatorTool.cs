@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.Processors;
-using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -19,20 +14,27 @@ namespace MigrationTools.Tools
     public class StringManipulatorTool : Tool<StringManipulatorToolOptions>, IStringManipulatorTool
     {
 
-        public StringManipulatorTool(IOptions<StringManipulatorToolOptions> options, IServiceProvider services, ILogger<StringManipulatorTool> logger, ITelemetryLogger telemetryLogger)
-           : base(options, services, logger, telemetryLogger)
+        public StringManipulatorTool(
+            IOptions<StringManipulatorToolOptions> options,
+            IServiceProvider services,
+            ILogger<StringManipulatorTool> logger,
+            ITelemetryLogger telemetryLogger)
+            : base(options, services, logger, telemetryLogger)
         {
         }
 
-        public void ProcessorExecutionWithFieldItem(IProcessor processor, FieldItem fieldItem)
+        public string? ProcessString(string? value)
         {
-            Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem", GetType().Name);
+            const string logPrefix = nameof(StringManipulatorTool) + "::" + nameof(ProcessString);
+            Log.LogDebug(logPrefix);
+
+            string result = value;
             if (!Options.Enabled)
             {
-                Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled", GetType().Name);
-                return;
+                Log.LogDebug(logPrefix + "::Disabled");
+                return result;
             }
-            if (fieldItem.FieldType == "String" && fieldItem.Value != null)
+            if (value is not null)
             {
                 if (!HasManipulators())
                 {
@@ -42,45 +44,43 @@ namespace MigrationTools.Tools
                 {
                     if (manipulator.Enabled)
                     {
-                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description} with {pattern}", GetType().Name, manipulator.Description, manipulator.Pattern);
-                        var originalValue = fieldItem.Value;
-                        fieldItem.Value = Regex.Replace((string)fieldItem.Value, manipulator.Pattern, manipulator.Replacement);
-                        Log.LogTrace("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description}::Original::{@OriginalValue}", GetType().Name, manipulator.Description, originalValue);
-                        Log.LogTrace("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Running::{Description}::New::{@fieldItemValue}", GetType().Name, manipulator.Description, fieldItem.Value);
+                        Log.LogDebug(logPrefix + "::Running::{Description} with {pattern}", manipulator.Description, manipulator.Pattern);
+                        string oldValue = result;
+                        result = Regex.Replace(result, manipulator.Pattern, manipulator.Replacement);
+                        Log.LogTrace(logPrefix + "::Running::{Description}::Original::{@oldValue}", manipulator.Description, oldValue);
+                        Log.LogTrace(logPrefix + "::Running::{Description}::New::{@newValue}", manipulator.Description, result);
                     }
                     else
                     {
-                        Log.LogDebug("{WorkItemProcessorEnricher}::ProcessorExecutionWithFieldItem::Disabled::{Description}", GetType().Name, manipulator.Description);
+                        Log.LogDebug(logPrefix + "::Disabled::{Description}", manipulator.Description);
                     }
                 }
 
-                if (HasStringTooLong(fieldItem))
+                if (IsStringTooLong(result))
                 {
-                    fieldItem.Value = fieldItem.Value.ToString().Substring(0, Math.Min(fieldItem.Value.ToString().Length, Options.MaxStringLength));
+                    result = result.Substring(0, Options.MaxStringLength);
                 }
             }
-
+            return result;
         }
 
         private void AddDefaultManipulator()
         {
-            if (Options.Manipulators == null)
+            if (Options.Manipulators is null)
             {
                 Options.Manipulators = new List<RegexStringManipulator>();
             }
-            Options.Manipulators.Add(new RegexStringManipulator() { Enabled = true, Description = "Default: Removes invalid chars!", Pattern = "[^( -~)\n\r\t]+", Replacement = "" });
+            Options.Manipulators.Add(new RegexStringManipulator()
+            {
+                Enabled = true,
+                Description = "Default: Removes invalid chars!",
+                Pattern = "[^( -~)\n\r\t]+",
+                Replacement = ""
+            });
         }
 
-        private bool HasStringTooLong(FieldItem fieldItem)
-        {
-            return fieldItem.Value.ToString().Length > 0 && fieldItem.Value.ToString().Length > Options.MaxStringLength;
-        }
+        private bool IsStringTooLong(string value) => (value.Length > 0) && (value.Length > Options.MaxStringLength);
 
-        private bool HasManipulators()
-        {
-            return Options.Manipulators != null && Options.Manipulators.Count > 0;
-        }
+        private bool HasManipulators() => Options.Manipulators?.Count > 0;
     }
-
 }
-
