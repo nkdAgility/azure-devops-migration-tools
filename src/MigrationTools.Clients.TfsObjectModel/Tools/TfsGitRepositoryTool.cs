@@ -84,7 +84,7 @@ namespace MigrationTools.Tools
             }
 
             Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
-            var changeSetMappings = Services.GetService<TfsChangeSetMappingTool>();
+            var changeSetMappings = Services.GetRequiredService<TfsChangeSetMappingTool>();
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;

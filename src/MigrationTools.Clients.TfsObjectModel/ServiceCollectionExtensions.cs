@@ -30,6 +30,7 @@ namespace MigrationTools
             context.AddSingleton<TfsNodeStructureTool>().AddMigrationToolsOptions<TfsNodeStructureToolOptions, TfsNodeStructureToolOptionsValidator>(configuration);
             context.AddSingleton<TfsRevisionManagerTool>().AddMigrationToolsOptions<TfsRevisionManagerToolOptions>(configuration);
             context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
+            context.AddSingleton< TfsChangeSetMappingTool>().AddMigrationToolsOptions<TfsChangeSetMappingToolOptions>(configuration);
         }
 
         public static void AddMigrationToolServicesForClientTfs_Processors(this IServiceCollection context)
