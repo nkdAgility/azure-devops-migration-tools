@@ -2,12 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
-using MigrationTools.Endpoints;
-using MigrationTools.Processors;
-using MigrationTools.Tests;
-using Microsoft.Extensions.Options;
-using MigrationTools.Tools;
 using MigrationTools.Shadows;
+using MigrationTools.Tools;
 
 namespace MigrationTools.ProcessorEnrichers.Tests
 {
@@ -21,7 +17,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             var options = new StringManipulatorToolOptions();
             options.Enabled = true;
             options.MaxStringLength = 10;
-                options.Manipulators = new List<RegexStringManipulator>
+            options.Manipulators = new List<RegexStringManipulator>
                 {
                     new RegexStringManipulator
                     {
@@ -40,10 +36,10 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         [TestMethod(), TestCategory("L1")]
         public void StringManipulatorTool_RegexTest()
         {
-           var options = new StringManipulatorToolOptions();
+            var options = new StringManipulatorToolOptions();
             options.Enabled = true;
-                    options.MaxStringLength = 10;
-                    options.Manipulators = new List<RegexStringManipulator>
+            options.MaxStringLength = 10;
+            options.Manipulators = new List<RegexStringManipulator>
                 {
                     new RegexStringManipulator
                     {
@@ -56,18 +52,10 @@ namespace MigrationTools.ProcessorEnrichers.Tests
 
             var x = GetStringManipulatorTool(options);
 
-            var fieldItem = new FieldItem
-            {
-                FieldType = "String",
-                internalObject = null,
-                ReferenceName = "Custom.Test",
-                Name = "Test",
-                Value = "Test"
-            };
+            string value = "Test";
+            string? newValue = x.ProcessString(value);
 
-            x.ProcessorExecutionWithFieldItem(null, fieldItem);
-
-            Assert.AreEqual("Test 2", fieldItem.Value);
+            Assert.AreEqual("Test 2", newValue);
         }
 
         [TestMethod(), TestCategory("L1")]
@@ -75,21 +63,13 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         {
             var options = new StringManipulatorToolOptions();
             options.Enabled = true;
-                options.MaxStringLength = 10;
+            options.MaxStringLength = 10;
             var x = GetStringManipulatorTool(options);
 
-            var fieldItem = new FieldItem
-            {
-                FieldType = "String",
-                internalObject = null,
-                ReferenceName = "Custom.Test",
-                Name = "Test",
-                Value = "Test"
-            };
+            string value = "Test";
+            string? newValue = x.ProcessString(value);
 
-            x.ProcessorExecutionWithFieldItem(null, fieldItem);
-
-            Assert.AreEqual(4, fieldItem.Value.ToString().Length);
+            Assert.AreEqual(4, newValue.Length);
         }
 
         [TestMethod(), TestCategory("L1")]
@@ -100,24 +80,93 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             options.MaxStringLength = 10;
             var x = GetStringManipulatorTool(options);
 
-            var fieldItem = new FieldItem
-            {
-                FieldType = "String",
-                internalObject = null,
-                ReferenceName = "Custom.Test",
-                Name = "Test",
-                Value = "Test Test Test Test Test Test Test Test Test Test Test Test Test"
-            };
+            string value = "Test Test Test Test Test Test Test Test Test Test Test Test Test";
+            string? newValue = x.ProcessString(value);
 
-            x.ProcessorExecutionWithFieldItem(null, fieldItem);
-
-            Assert.AreEqual(10, fieldItem.Value.ToString().Length);
+            Assert.AreEqual(10, newValue.Length);
         }
 
-        private static StringManipulatorTool GetStringManipulatorTool()
+        [DataTestMethod(), TestCategory("L1")]
+        [DataRow(null, null)]
+        [DataRow("", "")]
+        [DataRow("lorem", "lorem")]
+        public void StringManipulatorTool_Disabled(string? value, string? expected)
         {
-            var options = new StringManipulatorToolOptions();           
-            return GetStringManipulatorTool(options);
+            var options = new StringManipulatorToolOptions();
+            options.Enabled = false;
+            options.MaxStringLength = 15;
+            options.Manipulators = new List<RegexStringManipulator>
+                {
+                    new RegexStringManipulator
+                    {
+                        Enabled = true,
+                        Pattern = "(^.*$)",
+                        Replacement = "$1 $1",
+                        Description = "Test"
+                    }
+                };
+            var x = GetStringManipulatorTool(options);
+
+            string? newValue = x.ProcessString(value);
+            Assert.AreEqual(expected, newValue);
+        }
+
+        [DataTestMethod(), TestCategory("L1")]
+        [DataRow(null, null)]
+        [DataRow("", " ")]
+        [DataRow("lorem", "lorem lorem")]
+        [DataRow("lorem ipsum", "lorem ipsum lor")]
+        public void StringManipulatorTool_Process(string? value, string? expected)
+        {
+            var options = new StringManipulatorToolOptions();
+            options.Enabled = true;
+            options.MaxStringLength = 15;
+            options.Manipulators = new List<RegexStringManipulator>
+                {
+                    new RegexStringManipulator
+                    {
+                        Enabled = true,
+                        Pattern = "(^.*$)",
+                        Replacement = "$1 $1",
+                        Description = "Test"
+                    }
+                };
+            var x = GetStringManipulatorTool(options);
+
+            string? newValue = x.ProcessString(value);
+            Assert.AreEqual(expected, newValue);
+        }
+
+        [DataTestMethod(), TestCategory("L1")]
+        [DataRow(null, null)]
+        [DataRow("", " 1 2")]
+        [DataRow("lorem", "lorem 1 2")]
+        public void StringManipulatorTool_MultipleManipulators(string? value, string? expected)
+        {
+            var options = new StringManipulatorToolOptions();
+            options.Enabled = true;
+            options.MaxStringLength = 15;
+            options.Manipulators = new List<RegexStringManipulator>
+                {
+                    new RegexStringManipulator
+                    {
+                        Enabled = true,
+                        Pattern = "(^.*$)",
+                        Replacement = "$1 1",
+                        Description = "Add 1"
+                    },
+                    new RegexStringManipulator
+                    {
+                        Enabled = true,
+                        Pattern = "(^.*$)",
+                        Replacement = "$1 2",
+                        Description = "Add 2"
+                    }
+                };
+            var x = GetStringManipulatorTool(options);
+
+            string? newValue = x.ProcessString(value);
+            Assert.AreEqual(expected, newValue);
         }
 
         private static StringManipulatorTool GetStringManipulatorTool(StringManipulatorToolOptions options)

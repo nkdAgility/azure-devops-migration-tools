@@ -449,8 +449,9 @@ namespace MigrationTools.Processors
                     switch (f.FieldDefinition.FieldType)
                     {
                         case FieldType.String:
-                            CommonTools.StringManipulator.ProcessorExecutionWithFieldItem(null, oldWorkItemData.Fields[f.ReferenceName]);
-                            newWorkItem.Fields[f.ReferenceName].Value = oldWorkItemData.Fields[f.ReferenceName].Value;
+                            string oldValue = oldWorkItem.Fields[f.ReferenceName].Value.ToString();
+                            string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
+                            newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
                         default:
                             newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
