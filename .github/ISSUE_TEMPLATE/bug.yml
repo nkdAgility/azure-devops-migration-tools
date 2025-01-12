@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report! If you have questions or want to discus how the tool works then please [open a discussion](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) instead of filing a bug report.
+        Thanks for taking the time to fill out this bug report! If you have questions or want to discuss how the tool works then please [open a discussion](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) instead of filing a bug report.
   - type: checkboxes
     attributes:
       label: Version
