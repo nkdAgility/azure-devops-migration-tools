@@ -4,7 +4,7 @@ layout: page
 pageType: index
 toc: true
 pageStatus: published
-discussionId: 
+discussionId:
 redirect_from:
   - /getting-started/
 ---
@@ -17,7 +17,7 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 1. [Install](/setup/installation.md) the tools using your prefered method.
 1. Check that you have the required [Permissions](/setup/permissions.md) to run the tools.
-1. Get to grips with the [Configuration](./Reference/) to understand how to configure the tool. (you can skup this for now and come back to it later)
+1. Get to grips with the [Configuration](./Reference/) to understand how to configure the tool. (you can skip this for now and come back to it later)
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ This is going to be a crash course and I really recommend watching [What can go 
 2. Run `devopsmigration init --options Basic` to create a default configuration
 3. Open `configuration.json` from the current directory
 
-You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process will likley look somethig like:
+You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process will likely look something like:
 
 ```JSON
 {% include sampleConfig/configuration-getstarted.json %}
@@ -37,9 +37,9 @@ You can now customize the configuration depending on what you need to do. Howeve
 
 The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfsworkitemmigrationprocessor.md) processor will perform the following operations:
 
-* Migrate iterations and sprints
-* Attachments
-* Links including source code. Optionally clone the repositories before starting the migration to have links maintained on the initial pass.
+- Migrate iterations and sprints
+- Attachments
+- Links including source code. Optionally clone the repositories before starting the migration to have links maintained on the initial pass.
 
 ## How to execute configuration.json with minimal adjustments
 
@@ -52,9 +52,9 @@ The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfswo
 2. Adjust the value of the `Project` attribute for Source and Target
 3. Set the `AuthenticationMode` (`Prompt` or `AccessToken`) for Source and Target
 
-    If you set Authentication mode to `AccessToken`, enter a valid PAT as value
-    for the `PersonalAccessToken` attribute, or set the
-    `PersonalAccessTokenVariableName` to the name of an environment variable containing your PAT.
+   If you set Authentication mode to `AccessToken`, enter a valid PAT as value
+   for the `PersonalAccessToken` attribute, or set the
+   `PersonalAccessTokenVariableName` to the name of an environment variable containing your PAT.
 
 4. Adjust the value of the `ReflectedWorkItemIdField` attribute (field name of the migration tracking field) for Source and Target
 
@@ -65,14 +65,15 @@ The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfswo
 7. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
-**Remember:** If you want a processor to run, its `Enabled` attribute must be set to `true`. 
+**Remember:** If you want a processor to run, its `Enabled` attribute must be set to `true`.
 
 Refer to the [Reference Guide](/docs/Reference/index.md) for more details.
 
 ## Other Configuration Options
+
 When running `devopsmigration init` you can also pass `--options` with one of the following:
 
-- *Full* - 
-- *WorkItemTracking* - 
-- *Fullv2* - 
-- *WorkItemTrackingv2* - 
+- _Full_ -
+- _WorkItemTracking_ -
+- _Fullv2_ -
+- _WorkItemTrackingv2_ -
