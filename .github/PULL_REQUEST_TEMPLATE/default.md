@@ -6,7 +6,7 @@ Fixes # (issue)
 
 ## Things to be aware of
 
-- **Logging uses serilog** - All Logging should be in the format `"My message that contains {item} and {item2}", item, itesm2`! Do not use `$"My message that contains {item} and {item2}"` to pass text into the log strings as this disables [Serilog](https://serilog.net/)'s ability to pass that data as telemetry to Application Insights and for log highlighting.
+- **Logging uses serilog** - All Logging should be in the format `"My message that contains {item} and {item2}", item, item2`! Do not use `$"My message that contains {item} and {item2}"` to pass text into the log strings as this disables [Serilog](https://serilog.net/)'s ability to pass that data as telemetry to Application Insights and for log highlighting.
 
 ## Type of change
 

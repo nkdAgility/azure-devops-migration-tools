@@ -1,22 +1,22 @@
 ---
-title: "How-to: Migrating Plans and Suits"
+title: "How-to: Migrating Plans and Suites"
 layout: page
 toc: true
-discussionId: 
+discussionId:
 ---
 
-Migrating Plans and Suits is quite convoluted since Shared Steps, which we need to map, can't have a custom field.
+Migrating Plans and Suites is quite convoluted since Shared Steps, which we need to map, can't have a custom field.
 
 1. Migrate Basic Work Items
 2. Migrate `Test Cases` with their `Shared Steps` and `Shared Parameter`
 3. Migrate `Test Variables` & `Test Configurations`
-4. Rebuild `Test Plans` & `Test Suits`
+4. Rebuild `Test Plans` & `Test Suites`
 
 _WARNING: The configs below are for illustration and were correct as of the version number in the `Version` field._
 
 ## 1. Migrate Basic Work Items
 
-This will migrate all of the work items, while also populating `IntegrationBuild`. Ensure that you have a Field Map that will copy `ReflectedWorkItemId` to `Microsoft.VSTS.Build.IntegrationBuild`. 
+This will migrate all of the work items, while also populating `IntegrationBuild`. Ensure that you have a Field Map that will copy `ReflectedWorkItemId` to `Microsoft.VSTS.Build.IntegrationBuild`.
 
 The important bits:
 
@@ -80,13 +80,13 @@ The important bits:
 
 ## 2. Migrate `Test Cases` with their `Shared Steps` and `Shared Parameter`
 
-This will migrate Test Cases while fixing the links to the Shared bits that can't be customised. This will use the `Microsoft.VSTS.Build.IntegrationBuild` to wire everything up as needed. It will also copy the `Microsoft.VSTS.Build.IntegrationBuild` to  `ReflectedWorkItemId` for Test Cases so that we can also use them with work items.
+This will migrate Test Cases while fixing the links to the Shared bits that can't be customised. This will use the `Microsoft.VSTS.Build.IntegrationBuild` to wire everything up as needed. It will also copy the `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases so that we can also use them with work items.
 
 The important bits:
 
 - Target ReflectedWorkItemIdField is a common field that is available on the non-customisable work items
 - Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only
-- The query includes only the Test items that we can migrate as work items (No Suits or Plans)
+- The query includes only the Test items that we can migrate as work items (No Suites or Plans)
 
 ```JSON
 {
@@ -129,7 +129,7 @@ The important bits:
 
 ## 3. Migrate `Test Variables` & `Test Configurations`
 
-These are pre-requisites for rebuilding the Plans and Suits.
+These are pre-requisites for rebuilding the Plans and Suites.
 
 The important bits:
 
@@ -178,9 +178,9 @@ The important bits:
 }
 ```
 
-## 4. Rebuild `Test Plans` & `Test Suits`
+## 4. Rebuild `Test Plans` & `Test Suites`
 
-This will rebuild the Plans and Suits and wire up all of the Test Cases. 
+This will rebuild the Plans and Suites and wire up all of the Test Cases.
 
 _note: Runs are not migrated._
 
