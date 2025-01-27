@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -158,6 +159,9 @@ namespace MigrationTools.Tools
 
                 return attachRef.Url;
             }
+            catch (Exception ex) {
+                throw ex;
+            }            
             finally
             {
                 if (File.Exists(fullImageFilePath))
@@ -239,9 +243,33 @@ namespace MigrationTools.Tools
 
                 _targetDummyWorkItem = type.NewWorkItem();
                 _targetDummyWorkItem.Title = TargetDummyWorkItemTitle;
+
+                var fails = _targetDummyWorkItem.Validate();
+                if (fails.Count > 0)
+                {
+                    Log.LogWarning("Dummy Work Item is not ready to save as it has some invalid fields. This may not result in an error. Enable LogLevel as 'Debug' in the config to see more.");
+                    Log.LogDebug("--------------------------------------------------------------------------------------------------------------------");
+                    Log.LogDebug("--------------------------------------------------------------------------------------------------------------------");
+                    foreach (Field f in fails)
+                    {
+                        Log.LogDebug("Invalid Field Object:\r\n{Field}", f.ToJson());
+                    }
+                    Log.LogDebug("--------------------------------------------------------------------------------------------------------------------");
+                    Log.LogDebug("--------------------------------------------------------------------------------------------------------------------");
+                }
+                Log.LogTrace("TfsEmbededImagesTool::GetDummyWorkItem::Save()");
+
+
                 _targetDummyWorkItem.Save();
-                Log.LogDebug("EmbededImagesRepairEnricher: Dummy workitem {id} created on the target collection.", _targetDummyWorkItem.Id);
-                //_targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
+
+                if (_targetDummyWorkItem.Id == 0)
+                {
+                    throw new Exception("The Dummy work Item cant be created due to a save failure. This is likley due to required fields on the Task or First work items type.");
+                } else
+                {
+                    Log.LogDebug("TfsEmbededImagesTool: Dummy workitem {id} created on the target collection.", _targetDummyWorkItem.Id);
+                    //_targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
+                }
             }
             _DummyWorkItemCount++;
             return _targetDummyWorkItem;
