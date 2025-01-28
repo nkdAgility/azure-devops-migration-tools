@@ -12,6 +12,11 @@ namespace MigrationTools.Tools
     public class TfsGitRepositoryToolOptions : ToolOptions
     {
         /// <summary>
+        /// When set to True the changedset links will be dropped during the migration
+        /// </summary>
+        public bool ShouldDropChangedSetLinks { get; set; }
+
+        /// <summary>
         /// List of work item mappings. 
         /// </summary>
         /// <default>{}</default>
