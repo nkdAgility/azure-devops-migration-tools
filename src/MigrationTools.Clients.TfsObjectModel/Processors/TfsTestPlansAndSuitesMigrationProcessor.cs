@@ -607,8 +607,16 @@ namespace MigrationTools.Processors
         private ITestPlan FindTestPlan(string planName, int sourcePlanId)
         {
             Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan");
-            ITestPlan testPlan = (from p in _targetTestStore.Project.TestPlans.Query("Select * From TestPlan") where p.Name == planName select p).SingleOrDefault();
- 
+            ITestPlan testPlan;
+            List<ITestPlan> testPlans = (from p in _targetTestStore.Project.TestPlans.Query("Select * From TestPlan") where p.Name == planName select p).ToList();
+            if (testPlans.Count > 1)
+            {
+                string result = string.Join(",", testPlans.Select(obj => obj.Id));
+                Log.LogWarning("We found multiple test Plans with the name '{TestPlanName}'. They have ID(s) of '{result}'! We only have name at this point as a unique identifier and duplicates will break the code. Ensure that all Test Plans have unique names.", planName, result);
+                throw new Exception(string.Format("Test plans {0} all have the same name!", result));
+            }
+            testPlan = testPlans[0];
+
             if (testPlan != null)
             {
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan:: FOUND Test Plan with {name}", planName);
