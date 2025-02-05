@@ -615,7 +615,7 @@ namespace MigrationTools.Processors
                 Log.LogWarning("We found multiple test Plans with the name '{TestPlanName}'. They have ID(s) of '{result}'! We only have name at this point as a unique identifier and duplicates will break the code. Ensure that all Test Plans have unique names.", planName, result);
                 throw new Exception(string.Format("Test plans {0} all have the same name!", result));
             }
-            testPlan = testPlans[0];
+            testPlan = testPlans.FirstOrDefault();
 
             if (testPlan != null)
             {
