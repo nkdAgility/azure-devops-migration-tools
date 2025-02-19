@@ -68,6 +68,7 @@ The documentation for the preview is on [Preview](https://preview.nkdagility.com
 - [TFS 2017 Migration To Azure DevOps with Azure DevOps Sync Migrator from Mohamed Radwan](http://mohamedradwan.com/2017/09/15/tfs-2017-migration-to-vsts-with-vsts-sync-migrator/)
 - [Options migrating TFS to Azure DevOps from Richard Fennell](https://blogs.blackmarble.co.uk/blogs/rfennell/post/2017/05/10/Options-migrating-TFS-to-VSTS)
 - [Migrating Test artifacts and all other work item types using the Azure DevOps from Gordon Beeming](https://youtu.be/jU6E0k0eXXw)
+- [Migrating Azure DevOps Projects - Part 2: Boards & Work Items from Jan-Åge Johnsen](https://www.linkedin.com/pulse/migrating-azure-devops-projects-part-2-boards-work-items-johnsen-igzvf)
 
 ## Metrics (v16+ experimental)
 
