@@ -895,6 +895,12 @@ namespace MigrationTools.Processors
             {
                 closedDateField = "Microsoft.VSTS.Common.ClosedDate";
             }
+            else if (!targetWorkItem.ToWorkItem().Fields.Contains("System.ClosedDate"))
+            {
+                Log.LogDebug("CheckClosedDateIsValid::ClosedDate field doesn't exist in targetWorkItem: {targetWorkItem} - nothing to validate.", targetWorkItem);
+                return;
+            }
+
             Log.LogDebug("CheckClosedDateIsValid::ClosedDate field is {closedDateField}", closedDateField);
             if (targetWorkItem.ToWorkItem().Fields[closedDateField].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
             {
@@ -921,7 +927,6 @@ namespace MigrationTools.Processors
                     Log.LogWarning("Target ClosedDate Field: ", "System.ClosedDate");
                 }
             }
-
         }
 
         private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
