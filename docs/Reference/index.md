@@ -15,11 +15,11 @@ The easyest way to get started with the configruation is to create both a refere
 
 ### Creating a Reference File
 
-If you run `devlopsmigration init --options Reference -c configuration-ref.json` the output should be a file with all posible options using the Sample data.
+If you run `devopsmigration init --options Reference -c configuration-ref.json` the output should be a file with all posible options using the Sample data.
 
 ### Creating a Minimal File
 
-To get a file that you can use its best to start with a minimal file. If you run `devlopsmigration init --options Basic --overwrite` thsi will create that minimal file.
+To get a file that you can use its best to start with a minimal file. If you run `devopsmigration init --options Basic --overwrite` thsi will create that minimal file.
 
 ### Other options
 
@@ -31,7 +31,7 @@ Right now we support:
 
 **Note:** Azure DevOps Migration Tools do not ship with internal default configuration and will not function without one.
 
-To create your config file just type `devlopsmigration init` in the directory that you unzipped the tools and a minimal `configuration.json` configuration
+To create your config file just type `devopsmigration init` in the directory that you unzipped the tools and a minimal `configuration.json` configuration
 file will be created. Modify this as you need.
 
 Note that the generated file show all the possible options, you configuration file will probably only need a subset of those shown.
