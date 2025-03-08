@@ -276,15 +276,20 @@ namespace MigrationTools.Tools
 
         public void ProcessorExecutionBegin(TfsProcessor processor)
         {
+            Log.LogDebug("TfsNodeStrictureTool: Enabled={enabled}", Options.Enabled);
             if (Options.Enabled)
             {
-                Log.LogInformation("Migrating all Nodes before the Processor run.");
                 EntryForProcessorType(processor);
+                Log.LogDebug("TfsNodeStrictureTool: ReplicateAllExistingNodes={ReplicateAllExistingNodes}", Options.ReplicateAllExistingNodes);
                 if (Options.ReplicateAllExistingNodes)
                 {
+                    Log.LogInformation("Migrating all Nodes before the Processor run.");
                     MigrateAllNodeStructures();
-                }
-                RefreshForProcessorType(processor);
+                    RefreshForProcessorType(processor);
+                } else
+                {
+                    Log.LogInformation("SKIP: Migrating all Nodes before the Processor run.");
+                }                   
             }
             else
             {
@@ -403,7 +408,7 @@ namespace MigrationTools.Tools
 
         private void MigrateAllNodeStructures()
         {
-            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures(@{areaMaps}, @{iterationMaps})", Options.Areas, Options.Iterations);
+            Log.LogDebug("NodeStructureEnricher.MigrateAllNodeStructures({@areaMaps}, {@iterationMaps})", Options.Areas, Options.Iterations);
             //////////////////////////////////////////////////
             ProcessCommonStructure(_sourceLanguageMaps.AreaPath, _targetLanguageMaps.AreaPath, _targetProjectName, TfsNodeStructureType.Area);
             //////////////////////////////////////////////////
