@@ -86,6 +86,12 @@ namespace MigrationTools.Processors
             var stopwatch = Stopwatch.StartNew();
             var starttime = DateTime.Now;
             var sourcePlans = _sourceTestStore.GetTestPlans();
+            // Using the config flag 'TestPlanIds', we will filter out all test plans except the required ones for migration
+            var testPlanIdsToMigrate = Options.TestPlanIds;
+            if (testPlanIdsToMigrate != null && testPlanIdsToMigrate.Length > 0)
+            {
+                sourcePlans = sourcePlans.Where(tp => testPlanIdsToMigrate.Contains(tp.Id)).ToList();
+            }
             List<ITestPlan> toProcess;
             if (filterByCompleted)
             {
