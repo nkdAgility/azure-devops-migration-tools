@@ -2,6 +2,7 @@
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using System;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
@@ -42,6 +43,12 @@ namespace MigrationTools._EngineV1.Configuration.Processing
         public bool RemoveInvalidTestSuiteLinks { get; set; }
 
         public bool FilterCompleted { get; set; }
+
+        /// <summary>
+        /// This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: "TestPlanIds": [123, 456, 789]  
+        /// Works optimally when "TestPlanQuery" is set to null.  
+        /// </summary>
+        public int[] TestPlanIds { get; set; } = Array.Empty<int>();
 
         public TfsTestPlansAndSuitesMigrationProcessorOptions()
         {
