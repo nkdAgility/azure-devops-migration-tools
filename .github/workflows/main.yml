@@ -422,7 +422,7 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Scripts
           path: ./build/
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@v2
         id: app-token
         with:
           app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
@@ -580,7 +580,7 @@ jobs:
         shell: pwsh
         run: |
             Get-Item -Path .\         
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@v2
         id: app-token
         with:
           app-id: ${{ secrets.NKDAGILITY_BOT_APP_ID }}
