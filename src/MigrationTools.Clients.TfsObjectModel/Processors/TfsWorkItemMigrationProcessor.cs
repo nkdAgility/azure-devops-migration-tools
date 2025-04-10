@@ -417,10 +417,6 @@ namespace MigrationTools.Processors
             }
 
             newWorkItem.Title = oldWorkItem.Title;
-            if (newWorkItem.Fields.Contains("Microsoft.VSTS.Common.ClosedDate") && newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].IsEditable)
-            {
-                newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
-            }
             newWorkItem.State = oldWorkItem.State;
             try
             {
@@ -905,7 +901,17 @@ namespace MigrationTools.Processors
             if (targetWorkItem.ToWorkItem().Fields[closedDateField].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
             {
                 Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
-                Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ", sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev, sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
+                if (sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
+                {
+                    Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ",
+                        sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev,
+                        sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
+                }
+                else
+                {
+                    Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}] is not Available ",
+                        sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev);
+                }
             }
             if (!sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
             {
