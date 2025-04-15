@@ -9,15 +9,29 @@ discussionId:
 
 ## Support
 
-1. [Question & Discussion](https://github.com/nkdAgility/azure-devops-migration-tools/discussions) - The first place to look for usage, configuration, and general help. 
-1. [Issues on Github](https://github.com/nkdAgility/azure-devops-migration-tools/issues) - If you have identified a bug and have logs then please raise an issue.
+This project is open source and supported primarily by the community. If you’re looking for help with using or troubleshooting the Azure DevOps Migration Tools, your first stop should be our community support forum.
 
-### Professional Support
+### Community Support
 
-You can get free support from the community above and on social media on a best effort basis if folks are available. If you are *looking for paid support* [naked Agility with Martin Hinshelwood & Co](https://nkdagility.com) has a number of experts, many of whom contribute to this project, that can help. Find out how [we can help you](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) with your migration and [book a free consultation](https://nkdagility.com/technical-consulting-and-coaching/azure-devops-migration-tools-consulting/) to discuss how we can make things easier.
+You can get free support from the community on a best-effort basis:
 
-We use these tools with our customers, and for fun, to do real world migrations on a daily basis and we can:
+- [Community Discussions](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
 
- - Consult with your internal folks who need help and guidance in running the tooling.
- - Make changes to the tool to support your needs; all additions are committed to the main repo.
- - Run the migration for you:- you would need to pay for the hours that we would spend baby-sitting the running migrations
+We encourage you to search previous discussions before opening a new thread. Community members, including contributors to the project, regularly help users with questions, troubleshooting, and advice on real-world migration scenarios.
+
+If you’ve solved a problem or discovered something useful, please consider sharing your experience in the discussions to help others in the community.
+
+### Commercial Support
+
+If you require dedicated assistance, naked Agility with Martin Hinshelwood & Co provides professional support and consulting services:
+
+- [Commercial Services Overview](https://nkdagility.com/capabilities/azure-devops-migration-services/)
+- [Consulting & Free Consultation](https://nkdagility.com/company/contact/)
+
+We use these tools in our daily work with customers and can help with:
+
+- Coaching your internal teams on setup, configuration, and execution
+- Extending the tools to meet specific needs (contributions are made upstream)
+- Running migrations on your behalf, with hourly billing for active work
+
+If you’re unsure what kind of support you need, [book a free consultation](https://nkdagility.com/company/contact/) to discuss how we can help.
