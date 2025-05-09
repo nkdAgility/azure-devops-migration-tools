@@ -50,17 +50,20 @@ namespace MigrationTools.Processors
 
             public int TotalCount => _totalCount;
             public int ProcessedCount => _processedCount;
-            public int RemainingCount => TotalCount - ProcessedCount;
             public TimeSpan TotalProcessedTime => _totalProcessedTime;
 
-            public void AddProcessedItem(TimeSpan processDuration)
+            public void AddProcessedItem(TimeSpan processDuration, bool addToTotal)
             {
+                if (addToTotal)
+                {
+                    _totalCount++;
+                }
                 _processedCount++;
                 _totalProcessedTime += processDuration;
             }
 
             public TimeSpan AverageTime => ProcessedCount > 0
-                ? TimeSpan.FromTicks(TotalProcessedTime.Ticks / ProcessedCount)
+                ? TimeSpan.FromSeconds(TotalProcessedTime.TotalSeconds / ProcessedCount)
                 : TotalProcessedTime;
 
             public TimeSpan RemainingTime => TimeSpan.FromTicks(AverageTime.Ticks * (TotalCount - ProcessedCount));
@@ -362,7 +365,6 @@ namespace MigrationTools.Processors
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
 
                 WorkItem newwit;
                 if (destProject.ToProject().WorkItemTypes.Contains(destType))
@@ -535,7 +537,6 @@ namespace MigrationTools.Processors
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 activity?.SetTag("SourceURL", Source.Options.Collection.ToString());
                 activity?.SetTag("SourceWorkItem", sourceWorkItem.Id);
                 activity?.SetTag("TargetURL", Target.Options.Collection.ToString());
@@ -639,14 +640,18 @@ namespace MigrationTools.Processors
                     Telemetry.TrackException(ex, activity.Tags);
                     throw ex;
                 }
-                progressTimer.AddProcessedItem(activity.Duration);
-                TraceWriteLine(LogEventLevel.Information,
-                    "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
-                    new Dictionary<string, object>() {
-                    {"average", progressTimer.AverageTime},
-                    {"remaining", progressTimer.RemainingTime}
-                    });
                 activity?.Stop();
+                progressTimer.AddProcessedItem(activity.Duration, retries > 0);
+                TraceWriteLine(LogEventLevel.Information,
+                    "Processed {processedItemsCount} items from {totalItemsCount} with average process time {average:%s}.{average:%fff} s (total processing time is {totalProcessedTime:h\\:mm\\:ss}). "
+                    + "Estimated time to completion is {remaining:%h} hours {remaining:%m} minutes {remaining:%s} seconds.",
+                    new Dictionary<string, object>() {
+                        { "processedItemsCount", progressTimer.ProcessedCount},
+                        { "totalItemsCount", progressTimer.TotalCount },
+                        { "totalProcessedTime", progressTimer.TotalProcessedTime },
+                        { "average", progressTimer.AverageTime },
+                        { "remaining", progressTimer.RemainingTime }
+                    });
                 activity?.SetStatus(ActivityStatusCode.Error);
                 activity?.SetTag("http.response.status_code", "200");
 
