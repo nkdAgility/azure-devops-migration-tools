@@ -37,6 +37,34 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Items</processingtarget>
     public class TfsWorkItemMigrationProcessor : TfsProcessor
     {
+        private class ProgressTimer
+        {
+            private int _totalCount;
+            private int _processedCount;
+            private TimeSpan _totalProcessedTime = TimeSpan.Zero;
+
+            public ProgressTimer(int totalCount)
+            {
+                _totalCount = totalCount;
+            }
+
+            public int TotalCount => _totalCount;
+            public int ProcessedCount => _processedCount;
+            public int RemainingCount => TotalCount - ProcessedCount;
+            public TimeSpan TotalProcessedTime => _totalProcessedTime;
+
+            public void AddProcessedItem(TimeSpan processDuration)
+            {
+                _processedCount++;
+                _totalProcessedTime += processDuration;
+            }
+
+            public TimeSpan AverageTime => ProcessedCount > 0
+                ? TimeSpan.FromTicks(TotalProcessedTime.Ticks / ProcessedCount)
+                : TotalProcessedTime;
+
+            public TimeSpan RemainingTime => TimeSpan.FromTicks(AverageTime.Ticks * (TotalCount - ProcessedCount));
+        }
 
         private static int _count = 0;
         private static int _current = 0;
@@ -147,6 +175,7 @@ namespace MigrationTools.Processors
                 _current = 1;
                 _count = sourceWorkItems.Count;
                 _totalWorkItem = sourceWorkItems.Count;
+                ProgressTimer progressTimer = new ProgressTimer(_totalWorkItem);
                 ProcessorActivity.SetTag("source_workitems_to_process", sourceWorkItems.Count);
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
@@ -163,7 +192,7 @@ namespace MigrationTools.Processors
                     {
                         try
                         {
-                            ProcessWorkItemAsync(sourceWorkItemData, Options.WorkItemCreateRetryLimit).Wait();
+                            ProcessWorkItemAsync(sourceWorkItemData, progressTimer, Options.WorkItemCreateRetryLimit).Wait();
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
@@ -209,7 +238,6 @@ namespace MigrationTools.Processors
                 {
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
-
             }
         }
 
@@ -500,7 +528,7 @@ namespace MigrationTools.Processors
             }
         }
 
-        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retries = 0)
+        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, ProgressTimer progressTimer, int retryLimit = 5, int retries = 0)
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("ProcessWorkItemAsync", ActivityKind.Client))
             {
@@ -595,7 +623,7 @@ namespace MigrationTools.Processors
                             {"Retrys", retries },
                             {"RetryLimit", retryLimit }
                             });
-                        await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retries);
+                        await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
                     }
                     else
                     {
@@ -611,13 +639,12 @@ namespace MigrationTools.Processors
                     Telemetry.TrackException(ex, activity.Tags);
                     throw ex;
                 }
-                var average = new TimeSpan(0, 0, 0, 0, (int)(activity.Duration.TotalMilliseconds / _current));
-                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
+                progressTimer.AddProcessedItem(activity.Duration);
                 TraceWriteLine(LogEventLevel.Information,
                     "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
                     new Dictionary<string, object>() {
-                    {"average", average},
-                    {"remaining", remaining}
+                    {"average", progressTimer.AverageTime},
+                    {"remaining", progressTimer.RemainingTime}
                     });
                 activity?.Stop();
                 activity?.SetStatus(ActivityStatusCode.Error);
