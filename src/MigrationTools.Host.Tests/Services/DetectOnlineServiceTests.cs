@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Services;
 using Serilog;
-using Serilog.Debugging;
 using Serilog.Events;
 
 namespace MigrationTools.Host.Services.Tests

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.TeamFoundation.Build.Client;
-using MigrationTools.Enrichers;
-using MigrationTools.Tools.Infrastructure;
-using MigrationTools.Tools.Infrastructure;
+﻿using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
     public class TfsAttachmentToolOptions : ToolOptions, ITfsAttachmentToolOptions
     {
-
         /// <summary>
         /// `AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.
         /// </summary>
@@ -22,13 +16,11 @@ namespace MigrationTools.Tools
         /// </summary>
         /// <default>480000000</default>
         public int MaxAttachmentSize { get; set; }
-
     }
 
     public interface ITfsAttachmentToolOptions
     {
         public string ExportBasePath { get; set; }
         public int MaxAttachmentSize { get; set; }
-
     }
 }

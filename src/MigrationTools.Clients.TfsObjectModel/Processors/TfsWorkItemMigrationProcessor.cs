@@ -1,43 +1,31 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
-using Microsoft.TeamFoundation.TestManagement;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using MigrationTools;
-using MigrationTools.Clients;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools._EngineV1.Containers;
 using MigrationTools._EngineV1.DataContracts;
-
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Services;
 using MigrationTools.Tools;
-using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
-using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Processors
 {
@@ -425,7 +413,7 @@ namespace MigrationTools.Processors
                     newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
                 }
             }
-            catch (FieldDefinitionNotExistException ex)
+            catch (FieldDefinitionNotExistException)
             {
                 // Eat exception coz the TFS API Sucks
             }

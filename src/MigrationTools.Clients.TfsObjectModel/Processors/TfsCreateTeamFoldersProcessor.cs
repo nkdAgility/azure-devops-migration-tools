@@ -4,16 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools;
 using MigrationTools.Clients;
-using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
-using MigrationTools.Processors.Infrastructure;
-using Microsoft.Extensions.Options;
-using MigrationTools.Enrichers;
 
 
 namespace MigrationTools.Processors

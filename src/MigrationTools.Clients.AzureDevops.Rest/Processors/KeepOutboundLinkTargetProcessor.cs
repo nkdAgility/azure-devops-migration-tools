@@ -7,21 +7,18 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts.WorkItems;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using MigrationTools.Processors;
-using Newtonsoft.Json;
 using MigrationTools.Processors.Infrastructure;
-using Microsoft.Extensions.Options;
 using MigrationTools.Tools;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {
     internal class KeepOutboundLinkTargetProcessor : Processor
     {
-        private KeepOutboundLinkTargetProcessorOptions _options;
-
         public KeepOutboundLinkTargetProcessor(IOptions<KeepOutboundLinkTargetProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
@@ -44,7 +41,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         private void EnsureConfigured()
         {
             Log.LogInformation("Processor::EnsureConfigured");
-            if (_options == null)
+            if (Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
@@ -61,7 +58,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         private async Task AddLinksToWorkItems()
         {
             var wiqlClient = Source.GetHttpClient("wit/wiql");
-            WiqlResponse workItems = await GetWorkItemsBasedOnWiql(wiqlClient, _options.WIQLQuery);
+            WiqlResponse workItems = await GetWorkItemsBasedOnWiql(wiqlClient, Options.WIQLQuery);
 
             var client = Source.GetHttpClient("wit/workitemsbatch");
 
@@ -99,7 +96,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                     foreach (var relation in workitem.Relations)
                     {
                         var relationValues = GetOrgAndProject(relation.Url);
-                        if (relationValues.project != _options.TargetLinksToKeepProject)
+                        if (relationValues.project != Options.TargetLinksToKeepProject)
                         {
                             continue;
                         }
@@ -137,7 +134,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                         continue;
                     }
 
-                    if (_options.DryRun)
+                    if (Options.DryRun)
                     {
                         continue;
                     }
@@ -159,7 +156,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                 }
             }
 
-            var fileInfo = new FileInfo(_options.CleanupFileName);
+            var fileInfo = new FileInfo(Options.CleanupFileName);
             if (fileInfo.Directory.Exists == false)
             {
                 fileInfo.Directory.Create();
@@ -168,7 +165,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             using StreamWriter file = new(fileInfo.FullName);
             foreach (var target in uniqueRelationTargets)
             {
-                file.WriteLine($"{_options.PrependCommand} {target}");
+                file.WriteLine($"{Options.PrependCommand} {target}");
             }
         }
 

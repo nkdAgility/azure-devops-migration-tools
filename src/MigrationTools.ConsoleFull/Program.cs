@@ -1,20 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.TeamFoundation.TestManagement.WebApi;
 using MigrationTools;
 using MigrationTools.Host;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using MigrationTools.Services;
-using System.Linq;
-using System.Configuration.Assemblies;
-using System.Reflection;
-using System.IO;
-using System.Runtime.InteropServices;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
