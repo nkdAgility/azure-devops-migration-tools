@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Endpoints;
@@ -65,7 +64,6 @@ namespace MigrationTools
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("MigrationEngine:Run", ActivityKind.Internal))
             {
                 activity?.SetTag("migrationtools.engine.processors", Processors.Count);
-                activity?.Start();
 
                 _logger.LogInformation("Logging has been configured and is set to: {LogLevel}. ", "unknown");
                 _logger.LogInformation("                              Max Logfile: {FileLogLevel}. ", "Verbose");
@@ -74,9 +72,9 @@ namespace MigrationTools
                 _logger.LogInformation("The Max log levels above show where to go look for extra info. e.g. Even if you set the log level to Verbose you will only see that info in the Log File, however everything up to Debug will be in the Console.");
                 ProcessingStatus ps = ProcessingStatus.Running;
                 _logger.LogInformation("Beginning run of {ProcessorCount} processors", Processors.Count.ToString());
-               
+
                 foreach (IOldProcessor process in Processors.Processors)
-                {                   
+                {
                     using (var activityForProcessor = ActivitySourceProvider.ActivitySource.StartActivity($"Processor[{process.GetType().Name}]", ActivityKind.Internal))
                     {
                         activityForProcessor.AddTag("ProcessorName", process.Name);
@@ -86,7 +84,7 @@ namespace MigrationTools
                         Stopwatch processorTimer = Stopwatch.StartNew();
                         process.Execute();
                         processorTimer.Stop();
-                       
+
                         processorMetrics.Duration.Record(processorTimer.ElapsedMilliseconds, new KeyValuePair<string, object?>("processor", nameof(process)));
                         if (process.Status == ProcessingStatus.Failed)
                         {
