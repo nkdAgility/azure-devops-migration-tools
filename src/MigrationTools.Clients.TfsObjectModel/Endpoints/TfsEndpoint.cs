@@ -68,7 +68,6 @@ namespace MigrationTools.Endpoints
                 activity?.SetTag("server.address", Options.Collection);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
 
                 if (_Collection is null)
                 {
@@ -129,7 +128,6 @@ namespace MigrationTools.Endpoints
                     activity?.SetTag("server.address", Options?.Collection);
                     activity?.SetTag("http.request.method", "GET");
                     activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                    activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                     try
                     {
                         _Store = new WorkItemStore(tfs, bypassRules);
@@ -168,8 +166,6 @@ namespace MigrationTools.Endpoints
                     activity?.SetTag("server.address", Options.Collection);
                     activity?.SetTag("http.request.method", "GET");
                     activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                    activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
-
 
                     if (TfsStore.Projects.Contains(Options.Project))
                     {

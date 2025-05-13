@@ -26,9 +26,8 @@ namespace MigrationTools.Host.Services
                 activity?.SetTag("url.full", "8.8.4.4");
                 activity?.SetTag("server.address", "8.8.4.4");
                 activity?.SetTag("http.request.method", "GET");
-                
+
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(1));
 
                 DateTime startTime = DateTime.Now;
                 Stopwatch mainTimer = Stopwatch.StartNew();

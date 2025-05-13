@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,13 +9,9 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.Client;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
-using MigrationTools.Endpoints.Infrastructure;
-using MigrationTools.Options;
 using MigrationTools.Services;
-using Serilog;
 
 namespace MigrationTools.Clients
 {
@@ -86,81 +81,80 @@ namespace MigrationTools.Clients
                 activity?.SetTag("server.address", Options.Collection);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
-            TfsTeamProjectCollection y = null;
-            try
-            {
-                Log.LogDebug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", Options.Authentication.AuthenticationMode.ToString());
-                switch (Options.Authentication.AuthenticationMode)
+                TfsTeamProjectCollection y = null;
+                try
                 {
-                    case AuthenticationMode.AccessToken:
-                        Log.LogInformation("Connecting with AccessToken ");
-                        if (string.IsNullOrEmpty(Options.Authentication.AccessToken))
-                        {
-                            Log.LogCritical("You must provide a PAT to use 'AccessToken' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/");
-                            Environment.Exit(-1);
-                        }
-                        var pat = Options.Authentication.AccessToken;
-                        _vssCredentials = new VssBasicCredential(string.Empty, pat);
-                        y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
-                        break;
-                    case AuthenticationMode.Windows:
-                        Log.LogInformation("Connecting with NetworkCredential ");
-                        if (Options.Authentication.NetworkCredentials == null)
-                        {
-                            Log.LogCritical("You must set NetworkCredential to use 'Windows' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/");
-                            Environment.Exit(-1);
-                        }
-                        var cred = new NetworkCredential(Options.Authentication.NetworkCredentials.UserName, Options.Authentication.NetworkCredentials.Password, Options.Authentication.NetworkCredentials.Domain);
-                        _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(cred));
-                        y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
-                        break;
-                    case AuthenticationMode.Prompt:
-                        Log.LogInformation("Prompting for credentials ");
-                        _vssCredentials = new VssClientCredentials();
-                        _vssCredentials.PromptType = CredentialPromptType.PromptIfNeeded;
-                        y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
-                        break;
+                    Log.LogDebug("TfsMigrationClient::GetDependantTfsCollection:AuthenticationMode({0})", Options.Authentication.AuthenticationMode.ToString());
+                    switch (Options.Authentication.AuthenticationMode)
+                    {
+                        case AuthenticationMode.AccessToken:
+                            Log.LogInformation("Connecting with AccessToken ");
+                            if (string.IsNullOrEmpty(Options.Authentication.AccessToken))
+                            {
+                                Log.LogCritical("You must provide a PAT to use 'AccessToken' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/");
+                                Environment.Exit(-1);
+                            }
+                            var pat = Options.Authentication.AccessToken;
+                            _vssCredentials = new VssBasicCredential(string.Empty, pat);
+                            y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
+                            break;
+                        case AuthenticationMode.Windows:
+                            Log.LogInformation("Connecting with NetworkCredential ");
+                            if (Options.Authentication.NetworkCredentials == null)
+                            {
+                                Log.LogCritical("You must set NetworkCredential to use 'Windows' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/");
+                                Environment.Exit(-1);
+                            }
+                            var cred = new NetworkCredential(Options.Authentication.NetworkCredentials.UserName, Options.Authentication.NetworkCredentials.Password, Options.Authentication.NetworkCredentials.Domain);
+                            _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(cred));
+                            y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
+                            break;
+                        case AuthenticationMode.Prompt:
+                            Log.LogInformation("Prompting for credentials ");
+                            _vssCredentials = new VssClientCredentials();
+                            _vssCredentials.PromptType = CredentialPromptType.PromptIfNeeded;
+                            y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
+                            break;
 
-                    default:
-                        Log.LogInformation("Setting _vssCredentials to Null ");
-                        y = new TfsTeamProjectCollection(Options.Collection);
-                        break;
-                }
-                Log.LogDebug("MigrationClient: Connecting to {CollectionUrl} ", Options.Collection);
-                Log.LogTrace("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
-                y.EnsureAuthenticated();
+                        default:
+                            Log.LogInformation("Setting _vssCredentials to Null ");
+                            y = new TfsTeamProjectCollection(Options.Collection);
+                            break;
+                    }
+                    Log.LogDebug("MigrationClient: Connecting to {CollectionUrl} ", Options.Collection);
+                    Log.LogTrace("MigrationClient: validating security for {@AuthorizedIdentity} ", y.AuthorizedIdentity);
+                    y.EnsureAuthenticated();
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Ok);
                     activity?.SetTag("http.response.status_code", "200");
                     Log.LogInformation("Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
-            }
-            catch (TeamFoundationServerUnauthorizedException ex)
-            {
+                }
+                catch (TeamFoundationServerUnauthorizedException ex)
+                {
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     activity?.SetTag("http.response.status_code", "401");
                     Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.Authentication.AuthenticationMode);
-                Environment.Exit(-1);
-            }
-            catch (Exception ex)
-            {
+                    Environment.Exit(-1);
+                }
+                catch (Exception ex)
+                {
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     activity?.SetTag("http.response.status_code", "500");
                     Telemetry.TrackException(ex, activity?.Tags);
-                Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, Options.Authentication.AuthenticationMode);
-                switch (Options.Authentication.AuthenticationMode)
-                {
-                    case AuthenticationMode.AccessToken:
-                        Log.LogError("The PAT MUST be 'full access' for it to work with the Object Model API.");
-                        break;
-                    default:
-                        break;
+                    Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, Options.Authentication.AuthenticationMode);
+                    switch (Options.Authentication.AuthenticationMode)
+                    {
+                        case AuthenticationMode.AccessToken:
+                            Log.LogError("The PAT MUST be 'full access' for it to work with the Object Model API.");
+                            break;
+                        default:
+                            break;
+                    }
+                    Environment.Exit(-1);
                 }
-                Environment.Exit(-1);
-            }
-            return y;
+                return y;
             }
         }
 

@@ -106,7 +106,6 @@ namespace MigrationTools.Clients
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("http.response.status_code", "500");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
 
                 Project y = null;
                 try
@@ -177,7 +176,6 @@ namespace MigrationTools.Clients
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("http.response.status_code", "500");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 if (id == 0)
                 {
                     throw new ArgumentOutOfRangeException("id", id, "id cant be empty.");
@@ -317,7 +315,6 @@ namespace MigrationTools.Clients
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
                 activity?.SetTag("migrationtools.WorkItemStoreFlags", _bypassRules.ToString());
                 activity?.SetTagsFromOptions(Options);
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 WorkItemStore store = null;
                 try
                 {
