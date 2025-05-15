@@ -18,11 +18,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     <PackageReference Include="NuGet.Protocol" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Process" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
     <PackageReference Include="Serilog" />
@@ -42,10 +39,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="CustomDiagnostics\" />
   </ItemGroup>
 
 </Project>

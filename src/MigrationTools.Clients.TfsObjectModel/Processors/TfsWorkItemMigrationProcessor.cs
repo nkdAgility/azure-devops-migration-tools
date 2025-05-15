@@ -1,43 +1,31 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
-using Microsoft.TeamFoundation.TestManagement;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using MigrationTools;
-using MigrationTools.Clients;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools._EngineV1.Containers;
 using MigrationTools._EngineV1.DataContracts;
-
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Services;
 using MigrationTools.Tools;
-using Newtonsoft.Json.Linq;
 using Serilog.Context;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
-using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Processors
 {
@@ -49,6 +37,37 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Items</processingtarget>
     public class TfsWorkItemMigrationProcessor : TfsProcessor
     {
+        private class ProgressTimer
+        {
+            private int _totalCount;
+            private int _processedCount;
+            private TimeSpan _totalProcessedTime = TimeSpan.Zero;
+
+            public ProgressTimer(int totalCount)
+            {
+                _totalCount = totalCount;
+            }
+
+            public int TotalCount => _totalCount;
+            public int ProcessedCount => _processedCount;
+            public TimeSpan TotalProcessedTime => _totalProcessedTime;
+
+            public void AddProcessedItem(TimeSpan processDuration, bool addToTotal)
+            {
+                if (addToTotal)
+                {
+                    _totalCount++;
+                }
+                _processedCount++;
+                _totalProcessedTime += processDuration;
+            }
+
+            public TimeSpan AverageTime => ProcessedCount > 0
+                ? TimeSpan.FromSeconds(TotalProcessedTime.TotalSeconds / ProcessedCount)
+                : TotalProcessedTime;
+
+            public TimeSpan RemainingTime => TimeSpan.FromTicks(AverageTime.Ticks * (TotalCount - ProcessedCount));
+        }
 
         private static int _count = 0;
         private static int _current = 0;
@@ -159,6 +178,7 @@ namespace MigrationTools.Processors
                 _current = 1;
                 _count = sourceWorkItems.Count;
                 _totalWorkItem = sourceWorkItems.Count;
+                ProgressTimer progressTimer = new ProgressTimer(_totalWorkItem);
                 ProcessorActivity.SetTag("source_workitems_to_process", sourceWorkItems.Count);
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
@@ -175,7 +195,7 @@ namespace MigrationTools.Processors
                     {
                         try
                         {
-                            ProcessWorkItemAsync(sourceWorkItemData, Options.WorkItemCreateRetryLimit).Wait();
+                            ProcessWorkItemAsync(sourceWorkItemData, progressTimer, Options.WorkItemCreateRetryLimit).Wait();
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
@@ -221,7 +241,6 @@ namespace MigrationTools.Processors
                 {
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
-
             }
         }
 
@@ -346,7 +365,6 @@ namespace MigrationTools.Processors
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
 
                 WorkItem newwit;
                 if (destProject.ToProject().WorkItemTypes.Contains(destType))
@@ -425,7 +443,7 @@ namespace MigrationTools.Processors
                     newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
                 }
             }
-            catch (FieldDefinitionNotExistException ex)
+            catch (FieldDefinitionNotExistException)
             {
                 // Eat exception coz the TFS API Sucks
             }
@@ -512,14 +530,13 @@ namespace MigrationTools.Processors
             }
         }
 
-        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retries = 0)
+        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, ProgressTimer progressTimer, int retryLimit = 5, int retries = 0)
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("ProcessWorkItemAsync", ActivityKind.Client))
             {
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 activity?.SetTag("SourceURL", Source.Options.Collection.ToString());
                 activity?.SetTag("SourceWorkItem", sourceWorkItem.Id);
                 activity?.SetTag("TargetURL", Target.Options.Collection.ToString());
@@ -607,7 +624,7 @@ namespace MigrationTools.Processors
                             {"Retrys", retries },
                             {"RetryLimit", retryLimit }
                             });
-                        await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retries);
+                        await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
                     }
                     else
                     {
@@ -623,15 +640,18 @@ namespace MigrationTools.Processors
                     Telemetry.TrackException(ex, activity.Tags);
                     throw ex;
                 }
-                var average = new TimeSpan(0, 0, 0, 0, (int)(activity.Duration.TotalMilliseconds / _current));
-                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
-                TraceWriteLine(LogEventLevel.Information,
-                    "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
-                    new Dictionary<string, object>() {
-                    {"average", average},
-                    {"remaining", remaining}
-                    });
                 activity?.Stop();
+                progressTimer.AddProcessedItem(activity.Duration, retries > 0);
+                TraceWriteLine(LogEventLevel.Information,
+                    "Processed {processedItemsCount} items from {totalItemsCount} with average process time {average:%s}.{average:%fff} s (total processing time is {totalProcessedTime:h\\:mm\\:ss}). "
+                    + "Estimated time to completion is {remaining:%h} hours {remaining:%m} minutes {remaining:%s} seconds.",
+                    new Dictionary<string, object>() {
+                        { "processedItemsCount", progressTimer.ProcessedCount},
+                        { "totalItemsCount", progressTimer.TotalCount },
+                        { "totalProcessedTime", progressTimer.TotalProcessedTime },
+                        { "average", progressTimer.AverageTime },
+                        { "remaining", progressTimer.RemainingTime }
+                    });
                 activity?.SetStatus(ActivityStatusCode.Error);
                 activity?.SetTag("http.response.status_code", "200");
 

@@ -1,13 +1,9 @@
-﻿using MigrationTools.Host.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Services;
+using MigrationTools.Services.Shadows;
 using Serilog;
 using Serilog.Events;
-using MigrationTools.Host.Tests;
-using MigrationTools.Tests;
-using MigrationTools.Services.Shadows;
 
 namespace MigrationTools.Host.Services.Tests
 {

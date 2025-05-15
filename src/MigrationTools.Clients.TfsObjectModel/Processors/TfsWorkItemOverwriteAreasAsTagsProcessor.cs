@@ -4,16 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MigrationTools;
-using MigrationTools.Clients;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools.DataContracts;
-
 using Microsoft.Extensions.Options;
-using MigrationTools.Tools;
-using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Clients;
+using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -24,11 +20,9 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Item</processingtarget>
     public class TfsWorkItemOverwriteAreasAsTagsProcessor : TfsProcessor
     {
-        private TfsWorkItemOverwriteAreasAsTagsProcessorOptions _config;
-
         public TfsWorkItemOverwriteAreasAsTagsProcessor(IOptions<TfsWorkItemOverwriteAreasAsTagsProcessorOptions> options, TfsCommonTools tfsStaticTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsStaticTools, processorEnrichers, services, telemetry, logger)
         {
-          
+
         }
 
         new TfsWorkItemOverwriteAreasAsTagsProcessorOptions Options => (TfsWorkItemOverwriteAreasAsTagsProcessorOptions)base.Options;
@@ -43,7 +37,7 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
 
             IWorkItemQueryBuilder wiqb = Services.GetRequiredService<IWorkItemQueryBuilder>();
-            wiqb.AddParameter("AreaPath", _config.AreaIterationPath);
+            wiqb.AddParameter("AreaPath", Options.AreaIterationPath);
             wiqb.Query = @"SELECT [System.Id], [System.Tags] FROM WorkItems WHERE  [System.TeamProject] = @TeamProject and [System.AreaPath] under @AreaPath";
             List<WorkItemData> workitems = Target.WorkItems.GetWorkItems(wiqb);
             Log.LogInformation("Update {0} work items?", workitems.Count);

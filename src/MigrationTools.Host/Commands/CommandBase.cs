@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MigrationTools.Host.Services;
-using MigrationTools.Options;
 using MigrationTools.Services;
-using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
 using Spectre.Console;
@@ -67,7 +60,6 @@ namespace MigrationTools.Host.Commands
             using (CommandActivity = ActivitySource.StartActivity(this.GetType().Name))
             {
                 CommandActivity.SetTagsFromObject(settings);
-                CommandActivity?.Start();
                 // Disable Telemetry
                 if (settings.DisableTelemetry)
                 {
@@ -201,6 +193,4 @@ namespace MigrationTools.Host.Commands
 
 
     }
-
-
 }

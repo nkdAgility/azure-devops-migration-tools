@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools.Enrichers;
-using MigrationTools.Options;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -25,11 +21,11 @@ namespace MigrationTools.Tools
 
             public void Configure(FieldMappingToolOptions options)
             {
-                 _configuration.GetSection(options.ConfigurationMetadata.PathToInstance).Bind(options);
-                 options.FieldMaps = _configuration.GetSection(options.ConfigurationMetadata.PathToInstance + ":FieldMaps")?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapOptions>("FieldMapType"));
-
+                IConfigurationSection cfg = _configuration.GetSection(options.ConfigurationMetadata.PathToInstance);
+                options.Enabled = cfg.GetValue(nameof(Enabled), defaultValue: false);
+                options.FieldMaps = _configuration.GetSection(options.ConfigurationMetadata.PathToInstance + ":FieldMaps")
+                    ?.ToMigrationToolsList(child => child.GetMigrationToolsOption<IFieldMapOptions>("FieldMapType"));
             }
         }
-
     }
 }

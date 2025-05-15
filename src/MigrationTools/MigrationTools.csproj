@@ -28,12 +28,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Infrastructure\**" />
-    <EmbeddedResource Remove="Infrastructure\**" />
-    <None Remove="Infrastructure\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\..\GlobalUsings.cs" Link="GlobalUsings.cs" />
   </ItemGroup>
 
@@ -52,7 +46,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Services.Client" />
     <PackageReference Include="Microsoft.VisualStudio.Services.ServiceEndpoints.WebApi" />
     <PackageReference Include="Newtonsoft.Json.Schema" />
-    <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Process" />
@@ -67,10 +60,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Host\" />
   </ItemGroup>
 
 </Project>

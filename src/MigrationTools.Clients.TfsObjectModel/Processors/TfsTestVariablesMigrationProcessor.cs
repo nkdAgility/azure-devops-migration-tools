@@ -2,21 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.TestManagement.Client;
-using MigrationTools;
-using MigrationTools._EngineV1.Configuration;
+using MigrationTools.Clients;
+using MigrationTools.Enrichers;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
-using MigrationTools.Processors.Infrastructure;
-using Microsoft.Extensions.Options;
-using MigrationTools.Enrichers;
-using MigrationTools.Clients;
 
 
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`. 
+    /// This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
 using MigrationTools.Services;
@@ -38,7 +37,6 @@ namespace MigrationTools.Clients
                 activity?.SetTag("server.address", MigrationClient.Options.Collection);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 foreach (var item in Parameters)
                 {
                     activity?.SetTag($"wiql.parameters.{item.Key}", item.Value);
@@ -66,7 +64,6 @@ namespace MigrationTools.Clients
                 activity?.SetTag("server.address", MigrationClient.Options.Collection);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 var results = new List<WorkItem>();
                 try
                 {
@@ -103,7 +100,6 @@ namespace MigrationTools.Clients
                 }
                 catch (Exception ex)
                 {
-
                     activity?.SetTag("http.response.status_code", "500");
                     Telemetry.TrackException(ex, activity.Tags);
                     Log.Error(ex, " Error running query");

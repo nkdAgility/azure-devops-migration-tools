@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
-using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Services;
-using OpenTelemetry.Metrics;
 using Serilog;
 
 namespace MigrationTools.Clients
@@ -110,12 +106,10 @@ namespace MigrationTools.Clients
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("http.response.status_code", "500");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
-                
+
                 Project y = null;
                 try
                 {
-                    activity?.Start();
                     y = (from Project x in Store.Projects where string.Equals(x.Name, Options.Project, StringComparison.OrdinalIgnoreCase) select x).SingleOrDefault(); // Use Single instead of SingleOrDefault to force an exception here
                     if (y == null)
                     {
@@ -182,7 +176,6 @@ namespace MigrationTools.Clients
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("http.response.status_code", "500");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 if (id == 0)
                 {
                     throw new ArgumentOutOfRangeException("id", id, "id cant be empty.");
@@ -190,7 +183,6 @@ namespace MigrationTools.Clients
                 WorkItem y = null;
                 try
                 {
-                    activity?.Start();
                     Log.Debug("TfsWorkItemMigrationClient::GetWorkItem({id})", id);
                     y = Store.GetWorkItem(id);
                     activity?.Stop();
@@ -254,7 +246,7 @@ namespace MigrationTools.Clients
             }
         }
 
- 
+
 
         public override WorkItemData PersistWorkItem(WorkItemData workItem)
         {
@@ -323,7 +315,6 @@ namespace MigrationTools.Clients
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
                 activity?.SetTag("migrationtools.WorkItemStoreFlags", _bypassRules.ToString());
                 activity?.SetTagsFromOptions(Options);
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 WorkItemStore store = null;
                 try
                 {

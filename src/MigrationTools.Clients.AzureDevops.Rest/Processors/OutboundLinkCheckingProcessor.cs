@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts.WorkItems;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
-using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools;
 
@@ -17,8 +16,6 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
 {
     internal class OutboundLinkCheckingProcessor : Processor
     {
-        private OutboundLinkCheckingProcessorOptions _options;
-
         public OutboundLinkCheckingProcessor(IOptions<OutboundLinkCheckingProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
         }
@@ -43,7 +40,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         private void EnsureConfigured()
         {
             Log.LogInformation("Processor::EnsureConfigured");
-            if (_options == null)
+            if (Options == null)
             {
                 throw new Exception("You must call Configure() first");
             }
@@ -62,7 +59,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
             var wiqlClient = Source.GetHttpClient("wit/wiql");
             var query = new WiqlRequest
             {
-                Query = _options.WIQLQuery
+                Query = Options.WIQLQuery
             };
 
             var wiqlResult = await wiqlClient.PostAsJsonAsync("", query);
@@ -130,12 +127,12 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                     }
                 }
             }
-            var fileInfo = new FileInfo(_options.ResultFileName);
+            var fileInfo = new FileInfo(Options.ResultFileName);
             if (fileInfo.Directory.Exists == false)
             {
                 fileInfo.Directory.Create();
             }
-            File.WriteAllLines(_options.ResultFileName, foundLinks);
+            File.WriteAllLines(Options.ResultFileName, foundLinks);
             Log.LogInformation("");
             Log.LogInformation("---------------------------");
 

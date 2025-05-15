@@ -2,14 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MigrationTools.DataContracts;
-using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Enrichers
 {
     public class PauseAfterEachItem : WorkItemProcessorEnricher
     {
-        private PauseAfterEachItemOptions _Options;
+        private PauseAfterEachItemOptions _Options = new PauseAfterEachItemOptions();
 
         public PauseAfterEachItemOptions Options
         {
