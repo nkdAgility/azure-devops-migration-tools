@@ -4,11 +4,8 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
@@ -56,7 +53,7 @@ namespace MigrationTools.Tools
                 }
                 catch (WorkItemTypeDeniedOrNotExistException ex)
                 {
-                    Log.LogWarning(ex, "ValidatingRequiredField: Unable to validate one of the work items as its returned by TFS but has been deleted");
+                    Log.LogWarning(ex, "ValidatingRequiredField: Unable to validate work item type {name} as its returned by the source but does not exist in the target", sourceWorkItemType.Name);
                 }
 
             }

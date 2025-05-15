@@ -37,37 +37,6 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Items</processingtarget>
     public class TfsWorkItemMigrationProcessor : TfsProcessor
     {
-        private class ProgressTimer
-        {
-            private int _totalCount;
-            private int _processedCount;
-            private TimeSpan _totalProcessedTime = TimeSpan.Zero;
-
-            public ProgressTimer(int totalCount)
-            {
-                _totalCount = totalCount;
-            }
-
-            public int TotalCount => _totalCount;
-            public int ProcessedCount => _processedCount;
-            public TimeSpan TotalProcessedTime => _totalProcessedTime;
-
-            public void AddProcessedItem(TimeSpan processDuration, bool addToTotal)
-            {
-                if (addToTotal)
-                {
-                    _totalCount++;
-                }
-                _processedCount++;
-                _totalProcessedTime += processDuration;
-            }
-
-            public TimeSpan AverageTime => ProcessedCount > 0
-                ? TimeSpan.FromSeconds(TotalProcessedTime.TotalSeconds / ProcessedCount)
-                : TotalProcessedTime;
-
-            public TimeSpan RemainingTime => TimeSpan.FromTicks(AverageTime.Ticks * (TotalCount - ProcessedCount));
-        }
 
         private static int _count = 0;
         private static int _current = 0;
@@ -143,8 +112,8 @@ namespace MigrationTools.Processors
                     sourceWorkItems.Count);
 
                 //////////////////////////////////////////////////
-                ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(sourceWorkItems);
                 ValiddateWorkItemTypesExistInTarget(sourceWorkItems);
+                ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(sourceWorkItems);
                 CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
@@ -178,7 +147,6 @@ namespace MigrationTools.Processors
                 _current = 1;
                 _count = sourceWorkItems.Count;
                 _totalWorkItem = sourceWorkItems.Count;
-                ProgressTimer progressTimer = new ProgressTimer(_totalWorkItem);
                 ProcessorActivity.SetTag("source_workitems_to_process", sourceWorkItems.Count);
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
@@ -195,7 +163,7 @@ namespace MigrationTools.Processors
                     {
                         try
                         {
-                            ProcessWorkItemAsync(sourceWorkItemData, progressTimer, Options.WorkItemCreateRetryLimit).Wait();
+                            ProcessWorkItemAsync(sourceWorkItemData, Options.WorkItemCreateRetryLimit).Wait();
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
@@ -241,6 +209,7 @@ namespace MigrationTools.Processors
                 {
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
+
             }
         }
 
@@ -297,43 +266,102 @@ namespace MigrationTools.Processors
         private void ValiddateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
         {
             contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
-            // get list of all work item types
-            List<String> sourceWorkItemTypes = sourceWorkItems.SelectMany(x => x.Revisions.Values)
-            //.Where(x => x.Fields[fieldName].Value.ToString().Contains("\\"))
-            .Select(x => x.Type)
-            .Distinct()
-            .ToList();
 
-            Log.LogDebug("Validating::WorkItemTypes::sourceWorkItemTypes: {count} WorkItemTypes in the full source history {sourceWorkItemTypesString}", sourceWorkItemTypes.Count(), string.Join(",", sourceWorkItemTypes));
+            var sourceWorkItemTypes = sourceWorkItems
+                .SelectMany(x => x.Revisions.Values)
+                .Select(x => x.Type)
+                .Distinct()
+                .ToList();
 
-            var targetWorkItemTypes = Target.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().Select(x => x.Name);
-            Log.LogDebug("Validating::WorkItemTypes::targetWorkItemTypes::{count} WorkItemTypes in Target process: {targetWorkItemTypesString}", targetWorkItemTypes.Count(), string.Join(",", targetWorkItemTypes));
+            Log.LogDebug("Validating::WorkItemTypes::sourceWorkItemTypes: {count} WorkItemTypes in the full source history: {sourceWorkItemTypesString}",
+                sourceWorkItemTypes.Count, string.Join(",", sourceWorkItemTypes));
 
-            var missingWorkItemTypes = sourceWorkItemTypes.Where(sourceWit => !targetWorkItemTypes.Contains(sourceWit)); // the real one
-            if (missingWorkItemTypes.Count() > 0)
+            var targetWorkItemTypes = Target.WorkItems.Project
+                .ToProject()
+                .WorkItemTypes
+                .Cast<WorkItemType>()
+                .Select(x => x.Name)
+                .Distinct()
+                .ToList();
+
+            Log.LogDebug("Validating::WorkItemTypes::targetWorkItemTypes: {count} WorkItemTypes in Target process: {targetWorkItemTypesString}",
+                targetWorkItemTypes.Count, string.Join(",", targetWorkItemTypes));
+
+            var missingWorkItemTypes = new List<string>();
+
+            foreach (var sourceWit in sourceWorkItemTypes)
             {
-                Log.LogWarning("Validating::WorkItemTypes::targetWorkItemTypes::There are {count} WorkItemTypes that are used in the history of the Source and that do not exist in the Target. These will all need mapped using `WorkItemTypeDefinition` in the config. ", missingWorkItemTypes.Count());
-
-                bool allTypesMapped = true;
-                foreach (var missingWorkItemType in missingWorkItemTypes)
+                if (!targetWorkItemTypes.Contains(sourceWit, StringComparer.OrdinalIgnoreCase))
                 {
-                    bool thisTypeMapped = true;
-                    if (!CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(missingWorkItemType))
-                    {
-                        thisTypeMapped = false;
-                    }
-                    Log.LogWarning("Validating::WorkItemTypes::targetWorkItemTypes::{missingWorkItemType}::Mapped? {thisTypeMapped}", missingWorkItemType, thisTypeMapped.ToString());
-                    allTypesMapped &= thisTypeMapped;
-                }
-                if (!allTypesMapped)
-                {
-                    var ex = new Exception(
-                       "Not all WorkItemTypes present in the Source are present in the Target or mapped! Filter them from the query, or map the to target types.");
-                    Log.LogError(ex, "Not all WorkItemTypes present in the Source are present in the Target or mapped using `WorkItemTypeDefinition` in the config.");
-                    Environment.Exit(-1);
+                    missingWorkItemTypes.Add(sourceWit);
                 }
             }
+
+            if (missingWorkItemTypes.Count > 0)
+            {
+                Log.LogWarning("There are {count} WorkItemTypes used in source history that do not exist in the target. These may need to be mapped.", missingWorkItemTypes.Count);
+
+                foreach (var sourceWit in missingWorkItemTypes)
+                {
+                    Log.LogWarning("Missing Source WIT: '{sourceWit}' (Unicode: {unicode})",
+                        sourceWit,
+                        string.Join(" ", sourceWit.Select(c => $"U+{(int)c:X4}")));
+
+                    // Try to suggest a match based on character similarity
+                    foreach (var targetWit in targetWorkItemTypes)
+                    {
+                        if (AreVisuallySimilar(sourceWit, targetWit))
+                        {
+                            Log.LogWarning("→ Suggested mapping: \"{0}\": \"{1}\"", sourceWit, targetWit);
+                        }
+                    }
+
+                    if (!CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(sourceWit))
+                    {
+                        Log.LogWarning("WorkItemType '{0}' is not mapped in your config. Add to WorkItemTypeDefinition if needed.", sourceWit);
+                    }
+                }
+
+                var ex = new Exception("Some Work Item Types in the source do not exist in the target. Either map or filter them.");
+                Log.LogError(ex, "Validation failed: unmapped or missing work item types.");
+                Environment.Exit(-1);
+            }
         }
+
+
+        private static bool AreVisuallySimilar(string a, string b)
+        {
+            if (a.Equals(b, StringComparison.OrdinalIgnoreCase)) return false; // Already matched normally
+
+            if (a.Length != b.Length) return false;
+
+            int similarCount = 0;
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                var aChar = a[i];
+                var bChar = b[i];
+
+                if (aChar == bChar)
+                {
+                    similarCount++;
+                    continue;
+                }
+
+                // Check known lookalike characters (expandable)
+                if ((aChar == '\u0399' && bChar == 'I') || (aChar == 'I' && bChar == '\u0399'))
+                {
+                    similarCount++;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return similarCount == a.Length;
+        }
+
 
         private void ValidatePatTokenRequirement()
         {
@@ -365,6 +393,7 @@ namespace MigrationTools.Processors
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
 
                 WorkItem newwit;
                 if (destProject.ToProject().WorkItemTypes.Contains(destType))
@@ -443,7 +472,7 @@ namespace MigrationTools.Processors
                     newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
                 }
             }
-            catch (FieldDefinitionNotExistException)
+            catch (FieldDefinitionNotExistException ex)
             {
                 // Eat exception coz the TFS API Sucks
             }
@@ -530,13 +559,14 @@ namespace MigrationTools.Processors
             }
         }
 
-        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, ProgressTimer progressTimer, int retryLimit = 5, int retries = 0)
+        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retries = 0)
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("ProcessWorkItemAsync", ActivityKind.Client))
             {
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
+                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 activity?.SetTag("SourceURL", Source.Options.Collection.ToString());
                 activity?.SetTag("SourceWorkItem", sourceWorkItem.Id);
                 activity?.SetTag("TargetURL", Target.Options.Collection.ToString());
@@ -624,7 +654,7 @@ namespace MigrationTools.Processors
                             {"Retrys", retries },
                             {"RetryLimit", retryLimit }
                             });
-                        await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
+                        await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retries);
                     }
                     else
                     {
@@ -640,18 +670,15 @@ namespace MigrationTools.Processors
                     Telemetry.TrackException(ex, activity.Tags);
                     throw ex;
                 }
-                activity?.Stop();
-                progressTimer.AddProcessedItem(activity.Duration, retries > 0);
+                var average = new TimeSpan(0, 0, 0, 0, (int)(activity.Duration.TotalMilliseconds / _current));
+                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
                 TraceWriteLine(LogEventLevel.Information,
-                    "Processed {processedItemsCount} items from {totalItemsCount} with average process time {average:%s}.{average:%fff} s (total processing time is {totalProcessedTime:h\\:mm\\:ss}). "
-                    + "Estimated time to completion is {remaining:%h} hours {remaining:%m} minutes {remaining:%s} seconds.",
+                    "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
                     new Dictionary<string, object>() {
-                        { "processedItemsCount", progressTimer.ProcessedCount},
-                        { "totalItemsCount", progressTimer.TotalCount },
-                        { "totalProcessedTime", progressTimer.TotalProcessedTime },
-                        { "average", progressTimer.AverageTime },
-                        { "remaining", progressTimer.RemainingTime }
+                    {"average", average},
+                    {"remaining", remaining}
                     });
+                activity?.Stop();
                 activity?.SetStatus(ActivityStatusCode.Error);
                 activity?.SetTag("http.response.status_code", "200");
 
