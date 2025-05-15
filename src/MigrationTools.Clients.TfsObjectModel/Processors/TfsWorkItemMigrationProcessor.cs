@@ -284,6 +284,8 @@ namespace MigrationTools.Processors
                 .Distinct()
                 .ToList();
 
+
+
             Log.LogDebug("Validating::WorkItemTypes::targetWorkItemTypes: {count} WorkItemTypes in Target process: {targetWorkItemTypesString}",
                 targetWorkItemTypes.Count, string.Join(",", targetWorkItemTypes));
 
@@ -291,9 +293,15 @@ namespace MigrationTools.Processors
 
             foreach (var sourceWit in sourceWorkItemTypes)
             {
-                if (!targetWorkItemTypes.Contains(sourceWit, StringComparer.OrdinalIgnoreCase))
+                var witToFind = sourceWit;
+                if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(sourceWit))
                 {
-                    missingWorkItemTypes.Add(sourceWit);
+                    witToFind = CommonTools.WorkItemTypeMapping.Mappings[sourceWit];
+                    Log.LogDebug("Validating::WorkItemTypes::sourceWit: `{sourceWit}` is mapped to `{witToFind}`", sourceWit, witToFind);
+                }
+                if (!targetWorkItemTypes.Contains(witToFind, StringComparer.OrdinalIgnoreCase))
+                {
+                    missingWorkItemTypes.Add(witToFind);
                 }
             }
 
