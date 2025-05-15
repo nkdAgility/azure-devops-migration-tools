@@ -9,7 +9,7 @@
     },
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c C:\\Users\\MartinHinshelwoodNKD\\source\\repos\\Customer-iTeam-Migration\\devopsmigration\\EMR.24.503.EK_ENDYSIS-2-TfsWorkItemMigrationProcessor1.json --disableTelemetry"
+      "commandLineArgs": "execute -c configuration.json --disableTelemetry"
     },
     "execute --help": {
       "commandName": "Project",
