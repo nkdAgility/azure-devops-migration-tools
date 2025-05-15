@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
-using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
@@ -28,8 +23,8 @@ namespace MigrationTools.Tools
         private const string RegexPatternForImageFileName = "(?<=FileName=)[^=]*";
         private const string TargetDummyWorkItemTitle = "***** DELETE THIS - Migration Tool Generated Dummy Work Item For TfsEmbededImagesTool *****";
 
-        private  Project _targetProject;
-        private  TfsTeamProjectEndpointOptions _targetConfig;
+        private Project _targetProject;
+        private TfsTeamProjectEndpointOptions _targetConfig;
 
         private readonly IDictionary<string, string> _cachedUploadedUrisBySourceValue;
 
@@ -50,7 +45,7 @@ namespace MigrationTools.Tools
             return 0;
         }
 
-        public  void ProcessorExecutionEnd(TfsProcessor processor)
+        public void ProcessorExecutionEnd(TfsProcessor processor)
         {
             _processor = processor;
             if (_targetDummyWorkItem != null)
@@ -159,9 +154,10 @@ namespace MigrationTools.Tools
 
                 return attachRef.Url;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw ex;
-            }            
+            }
             finally
             {
                 if (File.Exists(fullImageFilePath))
@@ -200,13 +196,13 @@ namespace MigrationTools.Tools
             });
 
             var dummyWi = GetDummyWorkItem(wi.Type);
-            var wii = httpClient.UpdateWorkItemAsync(payload, dummyWi.Id).GetAwaiter().GetResult();
+            var wii = httpClient.UpdateWorkItemAsync(payload, dummyWi.Id, bypassRules: true).GetAwaiter().GetResult();
             if (wii != null)
             {
                 payload[0].Operation = Microsoft.VisualStudio.Services.WebApi.Patch.Operation.Remove;
                 payload[0].Path = "/relations/" + (wii.Relations.Count - 1);
                 payload[0].Value = null;
-                wii = httpClient.UpdateWorkItemAsync(payload, dummyWi.Id).GetAwaiter().GetResult();
+                wii = httpClient.UpdateWorkItemAsync(payload, dummyWi.Id, bypassRules: true).GetAwaiter().GetResult();
             }
             else
             {
@@ -265,7 +261,8 @@ namespace MigrationTools.Tools
                 if (_targetDummyWorkItem.Id == 0)
                 {
                     throw new Exception("The Dummy work Item cant be created due to a save failure. This is likley due to required fields on the Task or First work items type.");
-                } else
+                }
+                else
                 {
                     Log.LogDebug("TfsEmbededImagesTool: Dummy workitem {id} created on the target collection.", _targetDummyWorkItem.Id);
                     //_targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
