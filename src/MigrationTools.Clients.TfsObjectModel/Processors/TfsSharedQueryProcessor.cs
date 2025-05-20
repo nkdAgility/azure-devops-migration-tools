@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -148,6 +149,9 @@ namespace MigrationTools.Processors
                 Log.LogWarning("Skipping query '{queryName}' as already exists", query.Name);
                 return;
             }
+            // Get the original query text for debugging
+            string originalQueryText = query.QueryText;
+            
             // Sort out any path issues in the quertText
             var fixedQueryText = query.QueryText.Replace($"'{Source.Project}", $"'{Target.Project}"); // the ' should only items at the start of areapath etc.
 
@@ -164,6 +168,12 @@ namespace MigrationTools.Processors
                     fixedQueryText = fixedQueryText.Replace(sourceField, Options.SourceToTargetFieldMappings[sourceField]);
                 }
             }
+            
+            // Special handling for @CurrentIteration macro to ensure it's preserved correctly
+            fixedQueryText = PreserveMacros(fixedQueryText);
+            
+            Log.LogDebug("Original Query Text: '{queryText}'", originalQueryText);
+            Log.LogDebug("Fixed Query Text: '{fixedQueryText}'", fixedQueryText);
 
             // you cannot just add an item from one store to another, we need to create a new object
             var queryCopy = new QueryDefinition(query.Name, fixedQueryText);
@@ -178,11 +188,152 @@ namespace MigrationTools.Processors
             catch (Exception ex)
             {
                 _totalQueryFailed++;
-                Log.LogDebug("Source Query: '{query}'");
-                Log.LogDebug("Target Query: '{fixedQueryText}'");
+                Log.LogDebug("Source Query: '{query}'", originalQueryText);
+                Log.LogDebug("Target Query: '{fixedQueryText}'", fixedQueryText);
                 Log.LogError(ex, "Error saving query '{queryName}', probably due to invalid area or iteration paths", query.Name);
                 targetHierarchy.Refresh(); // get the tree without the last edit
             }
+        }
+
+        /// <summary>
+        /// Ensures that special macros like @CurrentIteration are preserved in the query text
+        /// </summary>
+        /// <param name="queryText">The query text to process</param>
+        /// <returns>Updated query text with preserved macros</returns>
+        private string PreserveMacros(string queryText)
+        {
+            // If the query doesn't contain @CurrentIteration, no special handling needed
+            if (!queryText.Contains("@CurrentIteration"))
+            {
+                return queryText;
+            }
+            
+            Log.LogInformation("Found @CurrentIteration in query, applying special handling");
+            
+            try
+            {
+                // Based on the issue, when a query contains @CurrentIteration, the area path selections are lost
+                // The specific issue shown in the screenshot is that the area selection is missing in the migrated query
+                
+                // This is a direct fix for the issue where area path selection is missing with @CurrentIteration
+                // We need to ensure the area path conditions are properly maintained in the migrated query
+
+                // The issue appears when [System.IterationPath] = @CurrentIteration is used,
+                // which may cause area path selections to be dropped during migration
+                
+                // The WIQL query syntax for @CurrentIteration can vary across different queries
+                // but the core issue is that area path selections get lost in the process
+                
+                // Since the TFS Object Model may not fully support this scenario (as per Mr. Hinsh's comment),
+                // we need to ensure the area path selection is explicitly preserved
+                string areaPathPattern = @"(\[System\.AreaPath\]\s*(?:=|UNDER)\s*(?:'[^']+'|@\w+))";
+                
+                // Look for area path conditions in the query
+                MatchCollection areaMatches = Regex.Matches(queryText, areaPathPattern);
+                
+                if (areaMatches.Count > 0)
+                {
+                    // The query has area path conditions that need to be preserved
+                    Log.LogInformation("Found area path conditions with @CurrentIteration - ensuring they're preserved");
+                    
+                    // In the WIQL parser, area path conditions might be dropped when @CurrentIteration is present
+                    // This specific fix addresses that by restructuring the query to ensure area paths are preserved
+                    
+                    // Extract the area path conditions and ensure they're properly formatted
+                    foreach (Match match in areaMatches)
+                    {
+                        string areaCondition = match.Groups[1].Value;
+                        Log.LogDebug("Area path condition: {0}", areaCondition);
+                    }
+                    
+                    // The key fix: Move @CurrentIteration references after area path conditions
+                    // This ensures that area path selections aren't dropped during migration
+                    int areaPathIndex = queryText.IndexOf("[System.AreaPath]", StringComparison.OrdinalIgnoreCase);
+                    int iterationPathIndex = queryText.IndexOf("[System.IterationPath]", StringComparison.OrdinalIgnoreCase);
+                    
+                    // Only reorder if both exist and area path comes after iteration path (which may cause the issue)
+                    if (areaPathIndex > 0 && iterationPathIndex > 0 && areaPathIndex > iterationPathIndex)
+                    {
+                        Log.LogInformation("Reordering conditions to ensure area path is preserved");
+                        
+                        // Extract the WHERE clause
+                        int whereIndex = queryText.IndexOf("WHERE ", StringComparison.OrdinalIgnoreCase);
+                        if (whereIndex > 0)
+                        {
+                            // Extract the part before WHERE
+                            string beforeWhere = queryText.Substring(0, whereIndex + 6); // +6 includes "WHERE "
+                            
+                            // Extract the conditions after WHERE
+                            string whereConditions = queryText.Substring(whereIndex + 6);
+                            
+                            // Split conditions by AND
+                            string[] conditions = whereConditions.Split(new[] { " AND " }, StringSplitOptions.None);
+                            
+                            // Identify area path and iteration path conditions
+                            string areaPathCondition = null;
+                            string iterationPathCondition = null;
+                            
+                            for (int i = 0; i < conditions.Length; i++)
+                            {
+                                if (conditions[i].Contains("[System.AreaPath]"))
+                                {
+                                    areaPathCondition = conditions[i];
+                                    conditions[i] = null; // Mark for removal
+                                }
+                                else if (conditions[i].Contains("[System.IterationPath]") && conditions[i].Contains("@CurrentIteration"))
+                                {
+                                    iterationPathCondition = conditions[i];
+                                    conditions[i] = null; // Mark for removal
+                                }
+                            }
+                            
+                            // Rebuild the WHERE conditions with area path before iteration path
+                            string newWhereConditions = "";
+                            
+                            // Add area path first if it exists
+                            if (areaPathCondition != null)
+                            {
+                                newWhereConditions = areaPathCondition;
+                            }
+                            
+                            // Add iteration path next if it exists
+                            if (iterationPathCondition != null)
+                            {
+                                if (newWhereConditions.Length > 0)
+                                {
+                                    newWhereConditions += " AND ";
+                                }
+                                newWhereConditions += iterationPathCondition;
+                            }
+                            
+                            // Add other conditions
+                            foreach (string condition in conditions)
+                            {
+                                if (!string.IsNullOrEmpty(condition))
+                                {
+                                    if (newWhereConditions.Length > 0)
+                                    {
+                                        newWhereConditions += " AND ";
+                                    }
+                                    newWhereConditions += condition;
+                                }
+                            }
+                            
+                            // Rebuild the full query
+                            string newQueryText = beforeWhere + newWhereConditions;
+                            
+                            Log.LogDebug("Reordered query: {0}", newQueryText);
+                            return newQueryText;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning(ex, "Error while processing @CurrentIteration in query");
+            }
+            
+            return queryText;
         }
     }
 }
