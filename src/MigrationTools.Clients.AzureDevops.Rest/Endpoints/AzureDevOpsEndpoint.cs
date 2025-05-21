@@ -177,7 +177,8 @@ namespace MigrationTools.Endpoints
                     foreach (RestApiDefinition definition in definitions.Value)
                     {
                         // Nessecary because getting all Pipelines doesn't include all of their properties
-                        var response = await client2.GetAsync(client2.BaseAddress + "/" + definition.Id + "?" + singleDefinitionQueryString);
+                        var urlEncodedId = Uri.EscapeDataString(definition.Id);
+                        var response = await client2.GetAsync(client2.BaseAddress + "/" + urlEncodedId + "?" + singleDefinitionQueryString);
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
                             var fullDefinition = await response.Content.ReadAsAsync<DefinitionType>();
