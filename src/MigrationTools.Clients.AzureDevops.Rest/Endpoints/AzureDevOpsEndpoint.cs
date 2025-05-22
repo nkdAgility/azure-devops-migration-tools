@@ -178,7 +178,8 @@ namespace MigrationTools.Endpoints
                     {
                         // Nessecary because getting all Pipelines doesn't include all of their properties
                         var urlEncodedId = Uri.EscapeDataString(definition.Id);
-                        var response = await client2.GetAsync(client2.BaseAddress + "/" + urlEncodedId + "?" + singleDefinitionQueryString);
+                        var requestUri = new Uri(client2.BaseAddress, $"{urlEncodedId}?{singleDefinitionQueryString}");
+                        var response = await client2.GetAsync(requestUri);
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
                             var fullDefinition = await response.Content.ReadAsAsync<DefinitionType>();
