@@ -537,9 +537,9 @@ namespace MigrationTools.Processors
                     {
                         newWorkItem.Fields["Microsoft.VSTS.TCM.Steps"].Value = oldWorkItem.Fields["Microsoft.VSTS.TCM.Steps"].Value;
                     }
-                    catch (Exception e)
+                    catch (FieldDefinitionNotExistException ex)
                     {
-                        Log.LogWarning("Microsoft.VSTS.TCM.Steps does not exist on Source Work Item. This field will be skipped, but the all other fields on the revision will be populated.");
+                        Log.LogWarning($"Microsoft.VSTS.TCM.Steps does not exist on Source Work Item. This field will be skipped, but the all other fields on the revision will be populated. Exception details: {ex.Message}");
                     }
                     newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
                         oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
