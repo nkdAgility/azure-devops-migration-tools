@@ -533,7 +533,14 @@ namespace MigrationTools.Processors
             switch (destType)
             {
                 case "Test Case":
-                    newWorkItem.Fields["Microsoft.VSTS.TCM.Steps"].Value = oldWorkItem.Fields["Microsoft.VSTS.TCM.Steps"].Value;
+                    try
+                    {
+                        newWorkItem.Fields["Microsoft.VSTS.TCM.Steps"].Value = oldWorkItem.Fields["Microsoft.VSTS.TCM.Steps"].Value;
+                    }
+                    catch (Exception e)
+                    {
+                        Log.LogWarning("Microsoft.VSTS.TCM.Steps does not exist on Source Work Item. This field will be skipped, but the all other fields on the revision will be populated.");
+                    }
                     newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
                         oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
                     break;
