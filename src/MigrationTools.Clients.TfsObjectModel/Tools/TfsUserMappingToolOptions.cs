@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using MigrationTools.Tools.Infrastructure;
+using Newtonsoft.Json;
 
 namespace MigrationTools.Tools
 {
@@ -21,6 +22,12 @@ namespace MigrationTools.Tools
         /// users will be mapped by their email address first. If no match is found, then the display name will be used.
         /// </summary>
         public bool MatchUsersByEmail { get; set; }
+
+        /// <summary>
+        /// When set to true, this setting will skip a validation that all users exists or mapped
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool SkipValidateAllUsersExistOrAreMapped { get; set; } = false;
     }
 
     public interface ITfsUserMappingToolOptions
@@ -28,5 +35,6 @@ namespace MigrationTools.Tools
         List<string> IdentityFieldsToCheck { get; set; }
         string UserMappingFile { get; set; }
         bool MatchUsersByEmail { get; set; }
+        bool SkipValidateAllUsersExistOrAreMapped { get; set; }
     }
 }

@@ -113,8 +113,6 @@ namespace MigrationTools.Processors
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool SkipRevisionWithInvalidAreaPath { get; set; } = false;
-
-        
     }
 
  
