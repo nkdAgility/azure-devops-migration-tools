@@ -215,7 +215,7 @@ namespace MigrationTools.Processors
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         {
-            if (this.Options.SkipValidateAllUsersExistOrAreMapped)
+            if (CommonTools.UserMapping.Options.SkipValidateAllUsersExistOrAreMapped)
             {
                 contextLog.Information("Skipped: Validating::Check that all users in the source exist in the target or are mapped!");
                 return;

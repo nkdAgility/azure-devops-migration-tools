@@ -113,12 +113,6 @@ namespace MigrationTools.Processors
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool SkipRevisionWithInvalidAreaPath { get; set; } = false;
-
-        /// <summary>
-        /// When set to true, this setting will skip a validation that all users exists or mapped
-        /// </summary>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool SkipValidateAllUsersExistOrAreMapped { get; set; } = false;
     }
 
  
