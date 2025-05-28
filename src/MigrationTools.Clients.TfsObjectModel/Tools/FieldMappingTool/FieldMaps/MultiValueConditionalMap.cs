@@ -75,7 +75,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
             bool matches = true;
             foreach (string field in fieldAndValues.Keys)
             {
-                if ((string)workitem.Fields[field].Value != fieldAndValues[field])
+                if ((workitem.Fields[field].Value?.ToString() ?? string.Empty) != fieldAndValues[field])
                 {
                     matches = false;
                 }
