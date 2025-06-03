@@ -215,6 +215,12 @@ namespace MigrationTools.Processors
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         {
+            if (CommonTools.UserMapping.Options.SkipValidateAllUsersExistOrAreMapped)
+            {
+                contextLog.Information("Skipped: Validating::Check that all users in the source exist in the target or are mapped!");
+                return;
+            }
+
             contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
             IdentityMapResult usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
             if (usersToMap != null && usersToMap.IdentityMap != null && usersToMap.IdentityMap.Count > 0)
