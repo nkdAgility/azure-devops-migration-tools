@@ -37,6 +37,35 @@ namespace MigrationTools.Processors
     /// <processingtarget>Work Items</processingtarget>
     public class TfsWorkItemMigrationProcessor : TfsProcessor
     {
+        private class ProgressTimer
+        {
+            private TimeSpan _totalProcessedTime = TimeSpan.Zero;
+
+            public ProgressTimer(int totalCount)
+            {
+                TotalCount = totalCount;
+            }
+
+            public int TotalCount { get; private set; }
+            public int ProcessedCount { get; private set; }
+            public TimeSpan TotalProcessedTime => _totalProcessedTime;
+
+            public void AddProcessedItem(TimeSpan processDuration, bool addToTotal)
+            {
+                if (addToTotal)
+                {
+                    TotalCount++;
+                }
+                ProcessedCount++;
+                _totalProcessedTime += processDuration;
+            }
+
+            public TimeSpan AverageTime => ProcessedCount > 0
+                ? TimeSpan.FromSeconds(TotalProcessedTime.TotalSeconds / ProcessedCount)
+                : TotalProcessedTime;
+
+            public TimeSpan RemainingTime => TimeSpan.FromTicks(AverageTime.Ticks * (TotalCount - ProcessedCount));
+        }
 
         private static int _count = 0;
         private static int _current = 0;
@@ -147,6 +176,8 @@ namespace MigrationTools.Processors
                 _current = 1;
                 _count = sourceWorkItems.Count;
                 _totalWorkItem = sourceWorkItems.Count;
+                ProgressTimer progressTimer = new ProgressTimer(_totalWorkItem);
+
                 ProcessorActivity.SetTag("source_workitems_to_process", sourceWorkItems.Count);
                 foreach (WorkItemData sourceWorkItemData in sourceWorkItems)
                 {
@@ -163,7 +194,7 @@ namespace MigrationTools.Processors
                     {
                         try
                         {
-                            ProcessWorkItemAsync(sourceWorkItemData, Options.WorkItemCreateRetryLimit).Wait();
+                            ProcessWorkItemAsync(sourceWorkItemData, progressTimer, Options.WorkItemCreateRetryLimit).Wait();
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
@@ -407,7 +438,6 @@ namespace MigrationTools.Processors
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
 
                 WorkItem newwit;
                 if (destProject.ToProject().WorkItemTypes.Contains(destType))
@@ -580,14 +610,13 @@ namespace MigrationTools.Processors
             }
         }
 
-        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, int retryLimit = 5, int retries = 0)
+        private async Task ProcessWorkItemAsync(WorkItemData sourceWorkItem, ProgressTimer progressTimer, int retryLimit = 5, int retries = 0)
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("ProcessWorkItemAsync", ActivityKind.Client))
             {
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("http.request.method", "GET");
                 activity?.SetTag("migrationtools.client", "TfsObjectModel");
-                activity?.SetEndTime(activity.StartTimeUtc.AddSeconds(10));
                 activity?.SetTag("SourceURL", Source.Options.Collection.ToString());
                 activity?.SetTag("SourceWorkItem", sourceWorkItem.Id);
                 activity?.SetTag("TargetURL", Target.Options.Collection.ToString());
@@ -676,7 +705,7 @@ namespace MigrationTools.Processors
                             {"Retrys", retries },
                             {"RetryLimit", retryLimit }
                             });
-                        await ProcessWorkItemAsync(sourceWorkItem, retryLimit, retries);
+                        await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
                     }
                     else
                     {
@@ -692,15 +721,15 @@ namespace MigrationTools.Processors
                     Telemetry.TrackException(ex, activity.Tags);
                     throw ex;
                 }
-                var average = new TimeSpan(0, 0, 0, 0, (int)(activity.Duration.TotalMilliseconds / _current));
-                var remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * _count));
-                TraceWriteLine(LogEventLevel.Information,
-                    "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s}.{remaining:%fff} seconds estimated to completion",
-                    new Dictionary<string, object>() {
-                    {"average", average},
-                    {"remaining", remaining}
-                    });
                 activity?.Stop();
+                progressTimer.AddProcessedItem(activity.Duration, retries > 0);
+                TraceWriteLine(LogEventLevel.Information,
+                    "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s} seconds estimated to completion.",
+                    new Dictionary<string, object>() {
+                        { "average", progressTimer.AverageTime },
+                        { "remaining", progressTimer.RemainingTime }
+                    });
+
                 activity?.SetStatus(ActivityStatusCode.Error);
                 activity?.SetTag("http.response.status_code", "200");
 
