@@ -11,7 +11,9 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
 {
-
+    /// <summary>
+    /// Configuration options for the TfsWorkItemMigrationProcessor, which handles comprehensive work item migration including revisions, links, and attachments.
+    /// </summary>
     public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
 

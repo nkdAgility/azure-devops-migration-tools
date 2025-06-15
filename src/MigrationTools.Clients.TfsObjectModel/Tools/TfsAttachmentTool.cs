@@ -19,17 +19,34 @@ using Serilog;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Tool for processing and migrating work item attachments between Team Foundation Server instances, handling file downloads, uploads, and attachment metadata.
+    /// </summary>
     public class TfsAttachmentTool : Tool<TfsAttachmentToolOptions>
     {
         private string _exportWiPath;
         private WorkItemServer _workItemServer;
 
 
+        /// <summary>
+        /// Initializes a new instance of the TfsAttachmentTool class.
+        /// </summary>
+        /// <param name="options">Configuration options for the attachment tool</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="logger">Logger for the tool operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public TfsAttachmentTool(IOptions<TfsAttachmentToolOptions> options, IServiceProvider services, ILogger<TfsAttachmentTool> logger, ITelemetryLogger telemetryLogger) : base(options,services, logger, telemetryLogger)
         {
 
         }
 
+        /// <summary>
+        /// Processes and migrates attachments from a source work item to a target work item.
+        /// </summary>
+        /// <param name="processer">The TFS processor performing the migration</param>
+        /// <param name="source">The source work item containing attachments to migrate</param>
+        /// <param name="target">The target work item to receive the attachments</param>
+        /// <param name="save">Whether to save the target work item after processing attachments</param>
         public void ProcessAttachemnts(TfsProcessor processer, WorkItemData source, WorkItemData target, bool save = true)
         {
             SetupWorkItemServer(processer);

@@ -34,12 +34,24 @@ namespace MigrationTools.Tools
         private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
         private readonly TfsUserMappingToolMapper _mapper = new();
 
+        /// <summary>
+        /// Serializes a user mapping dictionary to a JSON file for use in user mapping operations.
+        /// </summary>
+        /// <param name="fileName">The file path where the user mapping will be saved</param>
+        /// <param name="userMap">The dictionary of user mappings to serialize</param>
+        /// <param name="logger">Logger for the operation</param>
         public static void SerializeUserMap(string fileName, Dictionary<string, string> userMap, ILogger logger)
         {
             File.WriteAllText(fileName, JsonConvert.SerializeObject(userMap, Formatting.Indented));
             logger.LogInformation("User mappings writen to: {fileName}", fileName);
         }
 
+        /// <summary>
+        /// Deserializes a user mapping dictionary from a JSON file for use in user mapping operations.
+        /// </summary>
+        /// <param name="fileName">The file path where the user mapping is stored</param>
+        /// <param name="logger">Logger for the operation</param>
+        /// <returns>A dictionary containing the user mappings, or an empty dictionary if the file doesn't exist</returns>
         public static Dictionary<string, string> DeserializeUserMap(string fileName, ILogger logger)
         {
             try
@@ -77,6 +89,10 @@ namespace MigrationTools.Tools
             return foundUsers;
         }
 
+        /// <summary>
+        /// Maps a user identity field value using the configured user mappings if the field is configured for mapping.
+        /// </summary>
+        /// <param name="field">The work item field containing a user identity to be mapped</param>
         public void MapUserIdentityField(Field field)
         {
             if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
