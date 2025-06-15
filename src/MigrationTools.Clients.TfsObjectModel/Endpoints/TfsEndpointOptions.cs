@@ -12,25 +12,47 @@ using TfsUrlParser;
 
 namespace MigrationTools.Endpoints
 {
+    /// <summary>
+    /// Configuration options for connecting to a Team Foundation Server (TFS) or Azure DevOps Server endpoint. Provides authentication and project access settings for on-premises TFS operations.
+    /// </summary>
     public class TfsEndpointOptions : EndpointOptions
     {
+        /// <summary>
+        /// URI of the TFS collection (e.g., "http://tfsserver:8080/tfs/DefaultCollection"). Must be a valid absolute URL pointing to the TFS collection.
+        /// </summary>
         [JsonProperty(Order = -3)]
         [Required]
         public Uri Collection { get; set; }
+        
+        /// <summary>
+        /// Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.
+        /// </summary>
         [JsonProperty(Order = -2)]
         [Required]
         public string Project { get; set; }
 
+        /// <summary>
+        /// Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.
+        /// </summary>
         [Required]
         public TfsAuthenticationOptions Authentication { get; set; }
 
+        /// <summary>
+        /// Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
+        /// </summary>
         [JsonProperty(Order = -1)]
         [Required]
         public string ReflectedWorkItemIdField { get; set; }
 
+        /// <summary>
+        /// When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.
+        /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool AllowCrossProjectLinking { get; set; } = false;
 
+        /// <summary>
+        /// Language mapping configuration for translating area and iteration path names between different language versions of TFS.
+        /// </summary>
         [Required]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public TfsLanguageMapOptions LanguageMaps { get; set; } = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" }; 

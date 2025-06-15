@@ -20,11 +20,22 @@ using Newtonsoft.Json.Serialization;
 
 namespace MigrationTools.Endpoints
 {
+    /// <summary>
+    /// Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.
+    /// </summary>
     public class AzureDevOpsEndpoint : Endpoint<AzureDevOpsEndpointOptions>
     {
         [Obsolete("Dont know what this is for")]
         public override int Count => 0;
 
+        /// <summary>
+        /// Initializes a new instance of the AzureDevOpsEndpoint class with the specified configuration and dependencies.
+        /// </summary>
+        /// <param name="optipons">Configuration options for the Azure DevOps endpoint connection</param>
+        /// <param name="endpointEnrichers">Container for endpoint enrichers that can modify endpoint behavior</param>
+        /// <param name="serviceProvider">Service provider for dependency injection</param>
+        /// <param name="telemetry">Telemetry logger for tracking operations</param>
+        /// <param name="logger">Logger instance for diagnostic messages</param>
         public AzureDevOpsEndpoint(IOptions<AzureDevOpsEndpointOptions> optipons, EndpointEnricherContainer endpointEnrichers, IServiceProvider serviceProvider, ITelemetryLogger telemetry, ILogger<AzureDevOpsEndpoint> logger)
             : base(optipons, endpointEnrichers, serviceProvider, telemetry, logger)
         {

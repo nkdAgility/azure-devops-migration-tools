@@ -5,6 +5,9 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Configuration options for the TFS Export Profile Picture from Active Directory Processor that exports user profile pictures from Active Directory for migration purposes.
+    /// </summary>
     public class TfsExportProfilePictureFromADProcessorOptions : ProcessorOptions
     {
 
