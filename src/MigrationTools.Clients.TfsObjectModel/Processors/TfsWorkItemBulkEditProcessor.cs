@@ -21,7 +21,15 @@ namespace MigrationTools.Processors
     /// <processingtarget>WorkItem</processingtarget>
     public class TfsWorkItemBulkEditProcessor : TfsProcessor
     {
-
+        /// <summary>
+        /// Initializes a new instance of the TfsWorkItemBulkEditProcessor class.
+        /// </summary>
+        /// <param name="options">Configuration options for the bulk edit processor</param>
+        /// <param name="tfsCommonTools">Common TFS tools for processor operations</param>
+        /// <param name="processorEnrichers">Container for processor enrichers</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="telemetry">Telemetry logger for tracking operations</param>
+        /// <param name="logger">Logger for the processor operations</param>
         public TfsWorkItemBulkEditProcessor(IOptions<TfsWorkItemBulkEditProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemBulkEditProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }
