@@ -16,11 +16,21 @@ using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Tool for applying field mapping transformations to work items during migration, supporting various field mapping strategies like direct mapping, regex transformations, and value lookups.
+    /// </summary>
     public class FieldMappingTool : Tool<FieldMappingToolOptions>, IFieldMappingTool
     {
 
         private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
 
+        /// <summary>
+        /// Initializes a new instance of the FieldMappingTool class.
+        /// </summary>
+        /// <param name="options">Configuration options for field mapping</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="logger">Logger for the tool operations</param>
+        /// <param name="telemetry">Telemetry logger for tracking operations</param>
         public FieldMappingTool(IOptions<FieldMappingToolOptions> options, IServiceProvider services, ILogger<ITool> logger, ITelemetryLogger telemetry) : base(options, services, logger, telemetry)
         {
             if (Options.FieldMaps != null)
