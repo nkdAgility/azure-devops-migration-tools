@@ -16,7 +16,7 @@ using MigrationTools.Enrichers;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
+    /// This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
     /// </summary>
     /// <processingtarget>WorkItem</processingtarget>
     public class TfsWorkItemBulkEditProcessor : TfsProcessor
