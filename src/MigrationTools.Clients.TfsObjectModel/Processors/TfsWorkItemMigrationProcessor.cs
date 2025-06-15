@@ -653,6 +653,7 @@ namespace MigrationTools.Processors
                                 ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
+                                CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
                             }
