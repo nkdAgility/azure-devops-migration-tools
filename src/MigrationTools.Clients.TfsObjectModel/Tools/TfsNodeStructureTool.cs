@@ -117,17 +117,17 @@ namespace MigrationTools.Tools
             {
                 foreach (var mapper in mappers)
                 {
-                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}", mapper.Key);
-                    if (Regex.IsMatch(sourceNodePath, mapper.Key, RegexOptions.IgnoreCase))
+                    Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}", mapper.Match);
+                    if (Regex.IsMatch(sourceNodePath, mapper.Match, RegexOptions.IgnoreCase))
                     {
-                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Key);
-                        string replacement = Regex.Replace(sourceNodePath, mapper.Key, mapper.Value);
-                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Key, replacement);
+                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Match);
+                        string replacement = Regex.Replace(sourceNodePath, mapper.Match, mapper.Replacement);
+                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Match, replacement);
                         return replacement;
                     }
                     else
                     {
-                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::NoMatch", mapper.Key);
+                        Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::NoMatch", mapper.Match);
                     }
                 }
             }
@@ -261,14 +261,14 @@ namespace MigrationTools.Tools
             return parentNode;
         }
 
-        private Dictionary<string, string> GetMaps(TfsNodeStructureType nodeStructureType)
+        private List<NodeMapping> GetMaps(TfsNodeStructureType nodeStructureType)
         {
             switch (nodeStructureType)
             {
                 case TfsNodeStructureType.Area:
-                    return Options.Areas != null ? Options.Areas.Mappings : new Dictionary<string, string>();
+                    return Options.Areas != null ? Options.Areas.Mappings : [];
                 case TfsNodeStructureType.Iteration:
-                    return Options.Iterations != null ? Options.Iterations.Mappings : new Dictionary<string, string>();
+                    return Options.Iterations != null ? Options.Iterations.Mappings : [];
                 default:
                     throw new ArgumentOutOfRangeException(nameof(nodeStructureType), nodeStructureType, null);
             }
@@ -289,7 +289,7 @@ namespace MigrationTools.Tools
                 } else
                 {
                     Log.LogInformation("SKIP: Migrating all Nodes before the Processor run.");
-                }                   
+                }
             }
             else
             {
@@ -694,9 +694,9 @@ namespace MigrationTools.Tools
             var mappers = GetMaps((TfsNodeStructureType)Enum.Parse(typeof(TfsNodeStructureType), missingItem.nodeType, true));
             foreach (var mapper in mappers)
             {
-                if (Regex.IsMatch(missingItem.sourcePath, mapper.Key, RegexOptions.IgnoreCase))
+                if (Regex.IsMatch(missingItem.sourcePath, mapper.Match, RegexOptions.IgnoreCase))
                 {
-                    return mapper.Key;
+                    return mapper.Match;
                 }
             }
             return null;

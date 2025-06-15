@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.TeamFoundation.TestManagement.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Tests;
-using System.Threading.Tasks;
 using MigrationTools.Shadows;
-using System;
 using MigrationTools.Tools;
 
 namespace MigrationTools.Tests.Tools
@@ -22,10 +19,9 @@ namespace MigrationTools.Tests.Tools
             options.Enabled = true;
             options.Areas = new NodeOptions()
             {
-                Mappings = new Dictionary<string, string>()
-                {
-                    { @"^SourceProject\\PUL", "TargetProject\\test\\PUL" }
-                }
+                Mappings = [
+                    new() { Match = @"^SourceProject\\PUL", Replacement = "TargetProject\\test\\PUL" }
+                ]
             };
             var nodeStructure = GetTfsNodeStructureTool(options);
 
@@ -82,17 +78,15 @@ namespace MigrationTools.Tests.Tools
             options.Enabled = true;
             options.Areas = new NodeOptions()
             {
-                Mappings = new Dictionary<string, string>()
-                {
-                    { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
-                }
+                Mappings = [
+                    new() { Match = "^SourceServer\\\\(.*)", Replacement = "TargetServer\\SourceServer\\$1" }
+                ]
             };
             options.Iterations = new NodeOptions()
             {
-                Mappings = new Dictionary<string, string>()
-                            {
-                                { "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1" }
-                            }
+                Mappings = [
+                    new() { Match = "^SourceServer\\\\(.*)", Replacement = "TargetServer\\SourceServer\\$1" }
+                ]
             };
             var nodeStructure = GetTfsNodeStructureTool(options);
 
@@ -124,18 +118,16 @@ namespace MigrationTools.Tests.Tools
             options.Enabled = true;
             options.Areas = new NodeOptions()
             {
-                Mappings = new Dictionary<string, string>()
-                {
-                    { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
-                }
+                Mappings = [
+                    new() { Match = "^Source Project\\\\(.*)", Replacement = "Target Project\\Source Project\\$1" }
+                ]
             };
 
             options.Iterations = new NodeOptions()
             {
-                Mappings = new Dictionary<string, string>()
-                {
-                    { "^Source Project\\\\(.*)" , "Target Project\\Source Project\\$1" }
-                }
+                Mappings = [
+                    new() { Match = "^Source Project\\\\(.*)", Replacement = "Target Project\\Source Project\\$1" }
+                ]
             };
             var settings = new TfsNodeStructureToolSettings() { SourceProjectName = "Source Project", TargetProjectName = "Target Project", FoundNodes = new Dictionary<string, bool>() };
             var nodeStructure = GetTfsNodeStructureTool(options, settings);
@@ -225,7 +217,7 @@ namespace MigrationTools.Tests.Tools
 
         private static TfsNodeStructureTool GetTfsNodeStructureTool()
         {
-            var options = new TfsNodeStructureToolOptions() { Enabled = true, Areas = new NodeOptions { Mappings = new Dictionary<string, string>() }, Iterations = new NodeOptions { Mappings = new Dictionary<string, string>() } };
+            var options = new TfsNodeStructureToolOptions() { Enabled = true, Areas = new NodeOptions(), Iterations = new NodeOptions() };
             var settings = new TfsNodeStructureToolSettings() { SourceProjectName = "SourceServer", TargetProjectName = "TargetServer", FoundNodes = new Dictionary<string, bool>() };
             return GetTfsNodeStructureTool(options, settings);
         }
