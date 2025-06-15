@@ -6,6 +6,9 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
+    /// <summary>
+    /// Configuration options for the TfsWorkItemBulkEditProcessor, which performs bulk editing operations on work items in place.
+    /// </summary>
     public class TfsWorkItemBulkEditProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
         public bool WhatIf { get; set; }
