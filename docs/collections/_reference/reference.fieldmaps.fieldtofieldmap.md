@@ -88,7 +88,7 @@ options:
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldToFieldMap.cs
-optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldtoFieldMapOptions.cs
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldToFieldMapOptions/
@@ -101,11 +101,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/FieldMaps/FieldToFieldMap-notes.md
+  path: ../../docs/Reference/FieldMaps/FieldToFieldMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/FieldMaps/FieldToFieldMap-introduction.md
+  path: ../../docs/Reference/FieldMaps/FieldToFieldMap-introduction.md
   exists: false
   markdown: ''
 

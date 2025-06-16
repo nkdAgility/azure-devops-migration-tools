@@ -83,8 +83,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldtoFieldMultiMap.cs
-optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldtoFieldMultiMapOptions.cs
+classFile: ''
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldToFieldMultiMapOptions/
@@ -97,11 +97,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/FieldMaps/FieldToFieldMultiMap-notes.md
+  path: ../../docs/Reference/FieldMaps/FieldToFieldMultiMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/FieldMaps/FieldToFieldMultiMap-introduction.md
+  path: ../../docs/Reference/FieldMaps/FieldToFieldMultiMap-introduction.md
   exists: false
   markdown: ''
 

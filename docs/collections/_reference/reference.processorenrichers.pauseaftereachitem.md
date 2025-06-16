@@ -42,7 +42,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs
+classFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
 optionsClassFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
 
 redirectFrom:
@@ -56,11 +56,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/ProcessorEnrichers/PauseAfterEachItem-notes.md
+  path: ../../docs/Reference/ProcessorEnrichers/PauseAfterEachItem-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/ProcessorEnrichers/PauseAfterEachItem-introduction.md
+  path: ../../docs/Reference/ProcessorEnrichers/PauseAfterEachItem-introduction.md
   exists: false
   markdown: ''
 
