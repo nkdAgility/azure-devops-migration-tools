@@ -1,32 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using MigrationTools._EngineV1.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using MigrationTools.Options;
-using Newtonsoft.Json.Linq;
-using MigrationTools;
-using System.Configuration;
 using Newtonsoft.Json;
-using MigrationTools.Tools.Infrastructure;
-using System.Security.AccessControl;
-using Microsoft.Extensions.Options;
-using MigrationTools.Processors;
+using Newtonsoft.Json.Linq;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
     public class ClassDataLoader
     {
         private DataSerialization saveData;
-        private static CodeDocumentation codeDocs = new CodeDocumentation("../../docs/Reference/Generated/");
-        private static CodeFileFinder codeFinder = new CodeFileFinder("../");
+        private readonly CodeDocumentation codeDocs;
+        private readonly CodeFileFinder codeFinder;
         private IConfiguration configuration;
-        public ClassDataLoader(DataSerialization saveData, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        public ClassDataLoader(string rootPath, DataSerialization saveData, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
-
+            codeDocs = new CodeDocumentation(Path.Combine(rootPath, "docs/Reference/Generated/"));
+            codeFinder = new CodeFileFinder(rootPath);
             this.saveData = saveData;
             this.configuration = configuration;
         }
@@ -61,7 +50,7 @@ namespace MigrationTools.ConsoleDataGenerator
         private ClassData CreateClassDataFromOptions<TOptionsInterface>(List<Type> allTypes, string dataTypeName, Type optionInFocus)
             where TOptionsInterface : IOptions
         {
-           var oConfig =  GetOptionsConfiguration(optionInFocus);
+            var oConfig = GetOptionsConfiguration(optionInFocus);
             var typeOftargetOfOption = allTypes.Where(t => t.Name == oConfig.OptionFor && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
             if (typeOftargetOfOption == null)
             {
@@ -94,7 +83,8 @@ namespace MigrationTools.ConsoleDataGenerator
                         mainOrDefaultSection.Bind(instanceOfOption);
                         var json = ConvertSectionWithPathToJson(configuration, mainOrDefaultSection, instanceOfOption);
                         data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", Order = 2, SampleFor = data.OptionsClassFullName, Code = json.Trim() });
-                    } else
+                    }
+                    else
                     {
                         data.ConfigurationSamples.Add(new ConfigurationSample() { Name = "defaults", Order = 2, SampleFor = data.OptionsClassFullName, Code = "There are no defaults! Check the sample for options!" });
                     }

@@ -21,7 +21,7 @@ configurationSamples:
       "Enabled": false
     }
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
-description: missing XML code comments
+description: Tool for validating that required fields exist in target work item types before migration, preventing migration failures due to missing required fields.
 className: TfsValidateRequiredFieldTool
 typeName: Tools
 architecture: 
@@ -32,8 +32,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsValidateRequiredFieldToolOptions/

@@ -59,8 +59,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsChangeSetMappingToolOptions/

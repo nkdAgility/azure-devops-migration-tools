@@ -59,7 +59,7 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
-description: missing XML code comments
+description: Clears a target field by setting its value to null, useful for removing data from specific fields during migration.
 className: FieldClearMap
 typeName: FieldMaps
 architecture: 
@@ -70,9 +70,9 @@ options:
   defaultValue: missing XML code comments
 - parameterName: targetField
   type: String
-  description: missing XML code comments
+  description: Gets or sets the name of the target field to be cleared/set to null during work item migration.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldClearMap.cs
-optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldClearMapOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldClearMap.cs
+optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldClearMapOptions.cs

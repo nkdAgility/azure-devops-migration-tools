@@ -31,11 +31,11 @@ architecture:
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: Processor
   type: String
-  description: missing XML code comments
+  description: Gets the processor identifier for test variables migration.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
@@ -47,8 +47,8 @@ options:
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsTestVariablesMigrationProcessorOptions/

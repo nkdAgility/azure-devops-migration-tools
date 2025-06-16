@@ -42,7 +42,7 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
-description: missing XML code comments
+description: Maps work item area path or iteration path hierarchies to tags, allowing tree structures to be represented as flat tag collections.
 className: TreeToTagFieldMap
 typeName: FieldMaps
 architecture: 
@@ -53,16 +53,16 @@ options:
   defaultValue: missing XML code comments
 - parameterName: timeTravel
   type: Int32
-  description: missing XML code comments
+  description: Gets or sets the number of months to travel back in time when looking up historical area path values. Use 0 for current values.
   defaultValue: missing XML code comments
 - parameterName: toSkip
   type: Int32
-  description: missing XML code comments
+  description: Gets or sets the number of levels to skip from the root when converting area path hierarchy to tags. For example, if set to 2, "ProjectName\Level1\Level2\Level3" would skip "ProjectName\Level1" and start from "Level2".
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMap.cs
-optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMapOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMap.cs
+optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMapOptions.cs
 
 redirectFrom:
 - /Reference/FieldMaps/TreeToTagFieldMapOptions/

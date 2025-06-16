@@ -48,7 +48,7 @@ configurationSamples:
       "MaxAttachmentSize": 480000000
     }
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
-description: missing XML code comments
+description: Tool for processing and migrating work item attachments between Team Foundation Server instances, handling file downloads, uploads, and attachment metadata.
 className: TfsAttachmentTool
 typeName: Tools
 architecture: 
@@ -67,5 +67,5 @@ options:
   defaultValue: 480000000
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentToolOptions.cs

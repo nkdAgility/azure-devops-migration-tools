@@ -117,5 +117,5 @@ options:
   defaultValue: 5
 status: ready
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessorOptions.cs

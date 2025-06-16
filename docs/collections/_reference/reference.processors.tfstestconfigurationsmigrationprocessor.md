@@ -42,8 +42,8 @@ options:
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsTestConfigurationsMigrationProcessorOptions/

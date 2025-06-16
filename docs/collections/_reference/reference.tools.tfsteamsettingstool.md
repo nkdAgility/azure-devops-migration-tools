@@ -53,13 +53,14 @@ configurationSamples:
       "MigrateTeamSettings": true,
       "UpdateTeamSettings": true,
       "MigrateTeamCapacities": true,
+      "UseUserMapping": false,
       "Teams": [
         "Team 1",
         "Team 2"
       ]
     }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
-description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+description: Tool for migrating team settings including team configurations, area paths, iterations, and team-specific settings from source to target Team Foundation Server or Azure DevOps.
 className: TfsTeamSettingsTool
 typeName: Tools
 architecture: 
@@ -84,10 +85,14 @@ options:
   type: Boolean
   description: Reset the target team settings to match the source if the team exists
   defaultValue: false
+- parameterName: UseUserMapping
+  type: Boolean
+  description: Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.
+  defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsTeamSettingsToolOptions/

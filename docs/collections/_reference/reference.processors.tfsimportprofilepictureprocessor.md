@@ -42,8 +42,8 @@ options:
   defaultValue: missing XML code comments
 status: alpha
 processingTarget: Profiles
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsImportProfilePictureProcessorOptions/

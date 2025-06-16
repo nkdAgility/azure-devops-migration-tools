@@ -65,7 +65,7 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
-description: missing XML code comments
+description: Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.
 className: RegexFieldMap
 typeName: FieldMaps
 architecture: 
@@ -76,21 +76,21 @@ options:
   defaultValue: missing XML code comments
 - parameterName: pattern
   type: String
-  description: missing XML code comments
+  description: Gets or sets the regular expression pattern to match against the source field value.
   defaultValue: missing XML code comments
 - parameterName: replacement
   type: String
-  description: missing XML code comments
+  description: Gets or sets the replacement pattern that defines how matched groups should be used to construct the target value.
   defaultValue: missing XML code comments
 - parameterName: sourceField
   type: String
-  description: missing XML code comments
+  description: Gets or sets the name of the source field to read data from and apply regex pattern matching.
   defaultValue: missing XML code comments
 - parameterName: targetField
   type: String
-  description: missing XML code comments
+  description: Gets or sets the name of the target field to write the regex-transformed data to.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/RegexFieldMap.cs
-optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/RegexFieldMapOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/RegexFieldMap.cs
+optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/RegexFieldMapOptions.cs

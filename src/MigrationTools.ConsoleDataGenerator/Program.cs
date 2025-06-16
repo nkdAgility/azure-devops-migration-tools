@@ -1,36 +1,20 @@
 ﻿using System.Reflection;
-using System.Runtime.Loader;
-using System.Security.Policy;
-using Microsoft.TeamFoundation.Build.WebApi;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools.EndpointEnrichers;
-using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
-using MigrationTools.Helpers;
-using MigrationTools.Tests;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
-using MigrationTools.Options;
-using System.Text;
-using MigrationTools.ConsoleDataGenerator.ReferenceData;
-using Microsoft.VisualStudio.Services.Common;
-using MigrationTools.Tools.Infrastructure;
 using Microsoft.Extensions.Configuration;
-using MigrationTools.Processors.Infrastructure;
+using MigrationTools.ConsoleDataGenerator.ReferenceData;
+using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints.Infrastructure;
-using Elmah.Io.Client;
+using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.ConsoleDataGenerator;
 class Program
 {
     private static IConfiguration configuration = GetConfiguration();
-    private static DataSerialization saveData = new DataSerialization("../../docs/_data/");
-    private static CodeDocumentation codeDocs = new CodeDocumentation("../../docs/Reference/Generated/");
-    private static ClassDataLoader cdLoader = new ClassDataLoader(saveData, configuration);
+    private static DataSerialization saveData = new DataSerialization("../../../../../");
+    private static ClassDataLoader cdLoader = new ClassDataLoader("../../../../../", saveData, configuration);
     private static MarkdownLoader mdLoader = new MarkdownLoader();
-    
+
 
     static void Main(string[] args)
     {
@@ -54,7 +38,7 @@ class Program
 
 
         Console.WriteLine("Assemblies");
-        
+
         Console.WriteLine("-----------");
         foreach (var item in currentDomain.GetAssemblies())
         {
@@ -119,7 +103,7 @@ class Program
         return data;
     }
 
- private static IConfiguration GetConfiguration()
+    private static IConfiguration GetConfiguration()
     {
         // Create a new ConfigurationBuilder
         var configurationBuilder = new ConfigurationBuilder();
@@ -128,7 +112,7 @@ class Program
         // Add configuration sources
         configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         // Build the configuration
-       return configurationBuilder.Build();
+        return configurationBuilder.Build();
     }
 
 

@@ -62,8 +62,8 @@ options:
   defaultValue: String.Empty
 status: alpha
 processingTarget: Profiles
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsExportProfilePictureFromADProcessorOptions/

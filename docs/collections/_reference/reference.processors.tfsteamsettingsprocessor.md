@@ -24,6 +24,7 @@ configurationSamples:
       "PrefixProjectToNodes": false,
       "MigrateTeamCapacities": false,
       "Teams": null,
+      "UseUserMapping": false,
       "SourceName": null,
       "TargetName": null
     }
@@ -65,10 +66,14 @@ options:
   type: Boolean
   description: Reset the target team settings to match the source if the team exists
   defaultValue: false
+- parameterName: UseUserMapping
+  type: Boolean
+  description: Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.
+  defaultValue: missing XML code comments
 status: Beta
 processingTarget: Teams
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsTeamSettingsProcessorOptions/
