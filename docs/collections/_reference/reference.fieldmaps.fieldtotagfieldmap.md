@@ -5,12 +5,52 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldToTagFieldMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldToTagFieldMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "sourceFields": [
+                  "System.Description",
+                  "Microsoft.VSTS.Common.AcceptanceCriteria"
+                ],
+                "targetField": "System.Description"
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 - name: classic
   order: 3
@@ -19,8 +59,11 @@ configurationSamples:
     {
       "$type": "FieldToTagFieldMapOptions",
       "sourceField": null,
-      "formatExpression": null,
-      "ApplyTo": []
+      "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+      "ApplyTo": [
+        "*",
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldToTagFieldMapOptions
 description: missing XML code comments

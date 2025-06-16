@@ -5,7 +5,24 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldSkipMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 - name: sample
   order: 1
@@ -19,7 +36,9 @@ configurationSamples:
     {
       "$type": "FieldSkipMapOptions",
       "targetField": null,
-      "ApplyTo": []
+      "ApplyTo": [
+        "*"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 description: Skips field mapping for a specific target field, effectively leaving the field unchanged during migration.

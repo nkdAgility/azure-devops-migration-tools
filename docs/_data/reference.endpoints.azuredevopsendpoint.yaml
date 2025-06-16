@@ -9,7 +9,22 @@ configurationSamples:
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Endpoints": {
+          "#KEY#": {
+            "EndpointType": "AzureDevOpsEndpoint",
+            "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+            "AuthenticationMode": "AccessToken",
+            "Organisation": "https://dev.azure.com/xxx/",
+            "Project": "myProject",
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 - name: classic
   order: 3
@@ -18,10 +33,10 @@ configurationSamples:
     {
       "$type": "AzureDevOpsEndpointOptions",
       "AuthenticationMode": "AccessToken",
-      "AccessToken": null,
-      "Organisation": null,
-      "Project": null,
-      "ReflectedWorkItemIdField": null
+      "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+      "Organisation": "https://dev.azure.com/xxx/",
+      "Project": "myProject",
+      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
 description: Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.

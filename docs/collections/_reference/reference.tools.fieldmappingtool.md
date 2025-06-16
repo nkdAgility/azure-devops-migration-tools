@@ -5,12 +5,217 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "Enabled": "False",
+            "FieldMapDefaults": {
+              "ApplyTo": [
+                "*"
+              ]
+            },
+            "FieldMaps": null
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "Enabled": "True",
+            "FieldMaps": [
+              {
+                "ApplyTo": [
+                  "Bug",
+                  "Task"
+                ],
+                "expression": "[effort] * [rate]",
+                "FieldMapType": "FieldCalculationMap",
+                "parameters": {
+                  "effort": "Custom.EstimatedHours",
+                  "rate": "Custom.HourlyRate"
+                },
+                "targetField": "Custom.EstimatedCost"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "FieldMapType": "FieldMergeMap",
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "New",
+                "FieldMapType": "FieldValueMap",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "Active": "InProgress",
+                  "Closed": "Done",
+                  "Resolved": "InProgress"
+                }
+              },
+              {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "42",
+                "FieldMapType": "FieldToFieldMap",
+                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+                "targetField": "Microsoft.VSTS.Common.StackRank"
+              }
+            ],
+            "FieldMapSamples": {
+              "FieldCalculationMap": {
+                "ApplyTo": [
+                  "Bug",
+                  "Task"
+                ],
+                "expression": "[effort] * [rate]",
+                "FieldMapType": "FieldCalculationMap",
+                "parameters": {
+                  "effort": "Custom.EstimatedHours",
+                  "rate": "Custom.HourlyRate"
+                },
+                "targetField": "Custom.EstimatedCost"
+              },
+              "FieldClearMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.FieldC"
+              },
+              "FieldLiteralMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.SomeField",
+                "value": "New field value"
+              },
+              "FieldMergeMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              },
+              "FieldToFieldMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "42",
+                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+                "targetField": "Microsoft.VSTS.Common.StackRank"
+              },
+              "FieldToFieldMultiMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType",
+                  "SomeOtherWorkItemType"
+                ],
+                "SourceToTargetMappings": {
+                  "SourceField1": "TargetField1",
+                  "SourceField2": "TargetField2"
+                }
+              },
+              "FieldToTagFieldMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} <br/><br/><h3>Acceptance Criteria</h3>{1}",
+                "sourceFields": [
+                  "System.Description",
+                  "Microsoft.VSTS.Common.AcceptanceCriteria"
+                ],
+                "targetField": "System.Description"
+              },
+              "FieldToTagMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "ScrumState:{0}",
+                "sourceField": "System.State"
+              },
+              "FieldValueMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "StateB",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "StateA": "StateB"
+                }
+              },
+              "FieldValueToTagMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0}",
+                "pattern": "Yes",
+                "sourceField": "Microsoft.VSTS.CMMI.Blocked"
+              },
+              "MultiValueConditionalMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "sourceFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                },
+                "targetFieldsAndValues": {
+                  "Field1": "Value1",
+                  "Field2": "Value2"
+                }
+              },
+              "RegexFieldMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "pattern": "PRODUCT \\d{4}.(\\d{1})",
+                "replacement": "$1",
+                "sourceField": "COMPANY.PRODUCT.Release",
+                "targetField": "COMPANY.DEVISION.MinorReleaseVersion"
+              },
+              "targetFieldsAndValues": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "targetField": "Custom.ReflectedWorkItemId"
+              },
+              "TreeToTagMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "timeTravel": "1",
+                "toSkip": "3"
+              }
+            }
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions
 - name: classic
   order: 3
@@ -18,7 +223,7 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldMappingToolOptions",
-      "Enabled": false,
+      "Enabled": true,
       "FieldMaps": []
     }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions

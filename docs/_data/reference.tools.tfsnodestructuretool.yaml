@@ -4,7 +4,27 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "Areas": {
+              "Filters": null,
+              "Mappings": null
+            },
+            "Enabled": "True",
+            "Iterations": {
+              "Filters": null,
+              "Mappings": null
+            },
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: sample
   order: 1
@@ -68,7 +88,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsNodeStructureToolOptions",
-      "Enabled": false,
+      "Enabled": true,
       "Areas": {
         "Filters": [
           "*\\Team 1,*\\Team 1\\**"
@@ -108,8 +128,8 @@ configurationSamples:
           }
         ]
       },
-      "ShouldCreateMissingRevisionPaths": false,
-      "ReplicateAllExistingNodes": false
+      "ShouldCreateMissingRevisionPaths": true,
+      "ReplicateAllExistingNodes": true
     }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 description: Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.

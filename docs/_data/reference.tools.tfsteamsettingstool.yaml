@@ -4,12 +4,43 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsTeamSettingsTool": {
+            "Enabled": "True",
+            "MigrateTeamCapacities": "True",
+            "MigrateTeamSettings": "True",
+            "Teams": null,
+            "UpdateTeamSettings": "True"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsTeamSettingsTool": {
+            "Enabled": "True",
+            "MigrateTeamCapacities": "True",
+            "MigrateTeamSettings": "True",
+            "Teams": [
+              "Team 1",
+              "Team 2"
+            ],
+            "UpdateTeamSettings": "True"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 - name: classic
   order: 3
@@ -17,12 +48,15 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamSettingsToolOptions",
-      "Enabled": false,
-      "MigrateTeamSettings": false,
-      "UpdateTeamSettings": false,
-      "MigrateTeamCapacities": false,
+      "Enabled": true,
+      "MigrateTeamSettings": true,
+      "UpdateTeamSettings": true,
+      "MigrateTeamCapacities": true,
       "UseUserMapping": false,
-      "Teams": null
+      "Teams": [
+        "Team 1",
+        "Team 2"
+      ]
     }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 description: Tool for migrating team settings including team configurations, area paths, iterations, and team-specific settings from source to target Team Foundation Server or Azure DevOps.

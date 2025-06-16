@@ -5,12 +5,50 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "RegexFieldMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "RegexFieldMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "pattern": "PRODUCT \\d{4}.(\\d{1})",
+                "replacement": "$1",
+                "sourceField": "COMPANY.PRODUCT.Release",
+                "targetField": "COMPANY.DEVISION.MinorReleaseVersion"
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 - name: classic
   order: 3
@@ -18,11 +56,14 @@ configurationSamples:
   code: >-
     {
       "$type": "RegexFieldMapOptions",
-      "sourceField": null,
-      "targetField": null,
-      "pattern": null,
-      "replacement": null,
-      "ApplyTo": []
+      "sourceField": "COMPANY.PRODUCT.Release",
+      "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+      "pattern": "PRODUCT \\d{4}.(\\d{1})",
+      "replacement": "$1",
+      "ApplyTo": [
+        "*",
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.RegexFieldMapOptions
 description: Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.

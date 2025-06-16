@@ -5,12 +5,36 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsWorkItemLinkTool": {
+            "Enabled": "True",
+            "FilterIfLinkCountMatches": "True",
+            "SaveAfterEachLinkIsAdded": "False"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsWorkItemLinkTool": {
+            "Enabled": "True",
+            "FilterIfLinkCountMatches": "True",
+            "SaveAfterEachLinkIsAdded": "False"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
 - name: classic
   order: 3
@@ -18,8 +42,8 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsWorkItemLinkToolOptions",
-      "Enabled": false,
-      "FilterIfLinkCountMatches": false,
+      "Enabled": true,
+      "FilterIfLinkCountMatches": true,
       "SaveAfterEachLinkIsAdded": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
