@@ -36,6 +36,19 @@ configurationSamples:
             "FieldMaps": [
               {
                 "ApplyTo": [
+                  "Bug",
+                  "Task"
+                ],
+                "expression": "[effort] * [rate]",
+                "FieldMapType": "FieldCalculationMap",
+                "parameters": {
+                  "effort": "Custom.EstimatedHours",
+                  "rate": "Custom.HourlyRate"
+                },
+                "targetField": "Custom.EstimatedCost"
+              },
+              {
+                "ApplyTo": [
                   "SomeWorkItemType"
                 ],
                 "FieldMapType": "FieldMergeMap",
@@ -71,6 +84,19 @@ configurationSamples:
               }
             ],
             "FieldMapSamples": {
+              "FieldCalculationMap": {
+                "ApplyTo": [
+                  "Bug",
+                  "Task"
+                ],
+                "expression": "[effort] * [rate]",
+                "FieldMapType": "FieldCalculationMap",
+                "parameters": {
+                  "effort": "Custom.EstimatedHours",
+                  "rate": "Custom.HourlyRate"
+                },
+                "targetField": "Custom.EstimatedCost"
+              },
               "FieldClearMap": {
                 "ApplyTo": [
                   "SomeWorkItemType"
