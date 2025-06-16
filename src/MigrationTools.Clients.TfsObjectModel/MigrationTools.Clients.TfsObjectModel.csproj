@@ -36,6 +36,7 @@
     <PackageReference Include="Microsoft.TeamFoundation.DistributedTask.Common.Contracts" />
     <PackageReference Include="Microsoft.TeamFoundation.DistributedTask.WebApi" />
     <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" />
+    <PackageReference Include="ncalc" />
     <PackageReference Include="Newtonsoft.Json.Schema" />
     <PackageReference Include="OpenTelemetry.Exporter.Console" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
