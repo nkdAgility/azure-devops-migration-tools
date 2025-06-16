@@ -8,8 +8,16 @@ using MigrationTools.Tools;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
+    /// <summary>
+    /// Maps field values based on a lookup table, allowing specific source values to be translated to different target values.
+    /// </summary>
     public class FieldValueMap : FieldMapBase
     {
+        /// <summary>
+        /// Initializes a new instance of the FieldValueMap class.
+        /// </summary>
+        /// <param name="logger">Logger for the field map operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public FieldValueMap(ILogger<FieldValueMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }

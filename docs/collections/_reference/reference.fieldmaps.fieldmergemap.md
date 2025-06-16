@@ -70,7 +70,7 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
-description: missing XML code comments
+description: Merges values from multiple source fields into a single target field using a specified format template.
 className: FieldMergeMap
 typeName: FieldMaps
 architecture: 
@@ -93,8 +93,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldMergeMap.cs
-optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldMergeMapOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldMergeMap.cs
+optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldMergeMapOptions.cs
 
 redirectFrom:
 - /Reference/FieldMaps/FieldMergeMapOptions/

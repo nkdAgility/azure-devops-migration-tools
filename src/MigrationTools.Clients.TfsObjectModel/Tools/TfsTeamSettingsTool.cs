@@ -29,7 +29,7 @@ using MigrationTools.Tools.Infrastructure;
 namespace MigrationTools.Tools
 {
     /// <summary>
-    /// The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
+    /// Tool for migrating team settings including team configurations, area paths, iterations, and team-specific settings from source to target Team Foundation Server or Azure DevOps.
     /// </summary>
     public class TfsTeamSettingsTool : Tool<TfsTeamSettingsToolOptions>
     {
@@ -40,17 +40,43 @@ namespace MigrationTools.Tools
 
         private TfsProcessor _processor;
 
+        /// <summary>
+        /// Gets or sets the source team service for accessing team information.
+        /// </summary>
         public TfsTeamService SourceTeamService { get; protected set; }
+        
+        /// <summary>
+        /// Gets or sets the source team settings configuration service for accessing team configuration.
+        /// </summary>
         public TeamSettingsConfigurationService SourceTeamSettings { get; protected set; }
+        
+        /// <summary>
+        /// Gets or sets the target team service for creating and configuring teams.
+        /// </summary>
         public TfsTeamService TargetTeamService { get; protected set; }
+        
+        /// <summary>
+        /// Gets or sets the target team settings configuration service for configuring team settings.
+        /// </summary>
         public TeamSettingsConfigurationService TargetTeamSettings { get; protected set; }
 
+        /// <summary>
+        /// Initializes a new instance of the TfsTeamSettingsTool class.
+        /// </summary>
+        /// <param name="options">Configuration options for the team settings tool</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="logger">Logger for the tool operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public TfsTeamSettingsTool(IOptions<TfsTeamSettingsToolOptions> options, IServiceProvider services, ILogger<TfsTeamSettingsTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
 
         }
 
 
+        /// <summary>
+        /// Executes before the processor begins, setting up team services and migrating team settings if enabled.
+        /// </summary>
+        /// <param name="processor">The TFS processor that will be executed</param>
         public void ProcessorExecutionBegin(TfsProcessor processor) // Could be a IProcessorEnricher
         {
             _processor = processor;

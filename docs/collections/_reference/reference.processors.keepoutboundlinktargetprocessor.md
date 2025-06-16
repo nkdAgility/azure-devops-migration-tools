@@ -21,7 +21,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "332b7ec5-b938-4c13-8ab4-06d6c70ea68a",
+      "TargetLinksToKeepProject": "8950f163-3d8d-48d4-b14a-b7b250903fe1",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
@@ -36,11 +36,11 @@ architecture:
 options:
 - parameterName: CleanupFileName
   type: String
-  description: missing XML code comments
+  description: File path where the cleanup script or batch file will be generated for removing unwanted outbound links.
   defaultValue: missing XML code comments
 - parameterName: DryRun
   type: Boolean
-  description: missing XML code comments
+  description: When true, performs a dry run without making actual changes, only generating the cleanup script for review.
   defaultValue: missing XML code comments
 - parameterName: Enabled
   type: Boolean
@@ -48,7 +48,7 @@ options:
   defaultValue: missing XML code comments
 - parameterName: PrependCommand
   type: String
-  description: missing XML code comments
+  description: Command to prepend to each line in the cleanup script, such as "start" for Windows batch files.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
@@ -56,11 +56,11 @@ options:
   defaultValue: missing XML code comments
 - parameterName: TargetLinksToKeepOrganization
   type: String
-  description: missing XML code comments
+  description: URL of the Azure DevOps organization whose links should be preserved during cleanup operations.
   defaultValue: missing XML code comments
 - parameterName: TargetLinksToKeepProject
   type: String
-  description: missing XML code comments
+  description: Project name or GUID within the target organization whose links should be preserved.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
@@ -68,12 +68,12 @@ options:
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
-  description: missing XML code comments
+  description: WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessorOptions.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/KeepOutboundLinkTargetProcessorOptions/

@@ -14,14 +14,32 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Tool for migrating work item links and relationships between work items, including shared steps and parameters for test cases.
+    /// </summary>
     public class TfsWorkItemLinkTool : Tool<TfsWorkItemLinkToolOptions>
     {
+        /// <summary>
+        /// Initializes a new instance of the TfsWorkItemLinkTool class.
+        /// </summary>
+        /// <param name="options">Configuration options for the work item link tool</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="logger">Logger for the tool operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public TfsWorkItemLinkTool(IOptions<TfsWorkItemLinkToolOptions> options, IServiceProvider services, ILogger<TfsWorkItemLinkTool> logger, ITelemetryLogger telemetryLogger)
             : base(options, services, logger, telemetryLogger)
         {
 
         }
 
+        /// <summary>
+        /// Enriches the target work item with links from the source work item, processing all link types and relationships.
+        /// </summary>
+        /// <param name="processor">The TFS processor performing the migration</param>
+        /// <param name="sourceWorkItemLinkStart">The source work item containing links to migrate</param>
+        /// <param name="targetWorkItemLinkStart">The target work item to receive the links</param>
+        /// <returns>The number of links processed</returns>
+        /// <exception cref="ArgumentNullException">Thrown when source or target work items are null</exception>
         public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (sourceWorkItemLinkStart is null)
@@ -98,6 +116,12 @@ namespace MigrationTools.Tools
             return 0;
         }
 
+        /// <summary>
+        /// Migrates shared steps for test case work items, updating step references in the target work item.
+        /// </summary>
+        /// <param name="processor">The TFS processor performing the migration</param>
+        /// <param name="wiSourceL">The source test case work item</param>
+        /// <param name="wiTargetL">The target test case work item</param>
         public void MigrateSharedSteps(TfsProcessor processor, WorkItemData wiSourceL, WorkItemData wiTargetL)
         {
             const string microsoftVstsTcmSteps = "Microsoft.VSTS.TCM.Steps";
@@ -132,6 +156,12 @@ namespace MigrationTools.Tools
             }
         }
 
+        /// <summary>
+        /// Migrates shared parameters for test case work items, updating parameter references in the target work item.
+        /// </summary>
+        /// <param name="processor">The TFS processor performing the migration</param>
+        /// <param name="wiSourceL">The source test case work item</param>
+        /// <param name="wiTargetL">The target test case work item</param>
         public void MigrateSharedParameters(TfsProcessor processor, WorkItemData wiSourceL, WorkItemData wiTargetL)
         {
             const string microsoftVstsTcmLocalDataSource = "Microsoft.VSTS.TCM.LocalDataSource";

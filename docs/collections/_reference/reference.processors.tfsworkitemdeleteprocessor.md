@@ -39,11 +39,11 @@ options:
   defaultValue: missing XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
-  description: missing XML code comments
+  description: Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.
   defaultValue: missing XML code comments
 - parameterName: PauseAfterEachWorkItem
   type: Boolean
-  description: missing XML code comments
+  description: Gets or sets a value indicating whether to pause after each work item is deleted for review or debugging purposes.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
@@ -55,20 +55,20 @@ options:
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Gets or sets the WIQL query used to select work items for deletion. Should return a list of work item IDs.
+  defaultValue: SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
-  description: missing XML code comments
+  description: Gets or sets the number of retry attempts for work item deletion operations when they fail due to transient errors.
   defaultValue: missing XML code comments
 - parameterName: WorkItemIDs
   type: IList
-  description: missing XML code comments
+  description: Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.
   defaultValue: missing XML code comments
 status: ready
 processingTarget: WorkItem
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemDeleteProcessorOptions/

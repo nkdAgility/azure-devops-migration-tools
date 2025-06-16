@@ -14,12 +14,22 @@ using static Microsoft.VisualStudio.Services.Graph.GraphResourceIds.Users;
 namespace MigrationTools.Tools
 {
     /// <summary>
-    /// Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+    /// Provides mapping functionality for transforming work item types from source to target systems during migration, allowing different work item type names to be used in the target.
     /// </summary>
     public class WorkItemTypeMappingTool : Tool<WorkItemTypeMappingToolOptions>, IWorkItemTypeMappingTool
     {
+        /// <summary>
+        /// Gets the dictionary of work item type mappings from source to target types.
+        /// </summary>
         public Dictionary<string, string> Mappings { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the WorkItemTypeMappingTool class.
+        /// </summary>
+        /// <param name="options">Configuration options for work item type mappings</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="logger">Logger for the tool operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public WorkItemTypeMappingTool(IOptions<WorkItemTypeMappingToolOptions> options, IServiceProvider services, ILogger<WorkItemTypeMappingTool> logger, ITelemetryLogger telemetryLogger)
            : base(options, services, logger, telemetryLogger)
         {

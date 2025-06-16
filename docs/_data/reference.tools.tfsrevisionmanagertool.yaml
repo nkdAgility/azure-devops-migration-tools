@@ -65,5 +65,5 @@ options:
   defaultValue: true
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerToolOptions.cs

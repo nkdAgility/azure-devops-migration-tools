@@ -12,17 +12,36 @@ using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Tool for validating that required fields exist in target work item types before migration, preventing migration failures due to missing required fields.
+    /// </summary>
     public class TfsValidateRequiredFieldTool : Tool<TfsValidateRequiredFieldToolOptions>
     {
-
+        /// <summary>
+        /// Initializes a new instance of the TfsValidateRequiredFieldTool class.
+        /// </summary>
+        /// <param name="options">Configuration options for the validation tool</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="logger">Logger for the tool operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public TfsValidateRequiredFieldTool(IOptions<TfsValidateRequiredFieldToolOptions> options, IServiceProvider services, ILogger<TfsValidateRequiredFieldTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
             Engine = services.GetRequiredService<IMigrationEngine>();
         }
 
 
+        /// <summary>
+        /// Gets the migration engine instance for accessing migration context.
+        /// </summary>
         public IMigrationEngine Engine { get; private set; }
 
+        /// <summary>
+        /// Validates that a required field exists in all target work item types that correspond to the source work items.
+        /// </summary>
+        /// <param name="processor">The TFS processor performing the migration</param>
+        /// <param name="fieldToFind">The name of the field to validate</param>
+        /// <param name="sourceWorkItems">The source work items to validate against</param>
+        /// <returns>True if all target work item types have the required field; otherwise, false</returns>
         public bool ValidatingRequiredField(TfsProcessor processor, string fieldToFind, List<WorkItemData> sourceWorkItems)
         {
             var workItemTypeMappingTool = Services.GetRequiredService<IWorkItemTypeMappingTool>();

@@ -35,7 +35,7 @@ options:
   defaultValue: missing XML code comments
 - parameterName: ResultFileName
   type: String
-  description: missing XML code comments
+  description: File name where the results of the outbound link checking process will be saved, typically containing details of broken or invalid links.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
@@ -47,9 +47,9 @@ options:
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
-  description: missing XML code comments
+  description: WIQL (Work Item Query Language) query used to select the work items whose outbound links should be checked for validity.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessorOptions.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessorOptions.cs

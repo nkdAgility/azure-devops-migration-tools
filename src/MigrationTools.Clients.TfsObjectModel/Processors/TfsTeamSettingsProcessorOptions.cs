@@ -3,6 +3,9 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Configuration options for the TfsTeamSettingsProcessor, which handles migration of team configurations, capacities, and team-specific settings.
+    /// </summary>
     public class TfsTeamSettingsProcessorOptions : ProcessorOptions
     {
         /// <summary>

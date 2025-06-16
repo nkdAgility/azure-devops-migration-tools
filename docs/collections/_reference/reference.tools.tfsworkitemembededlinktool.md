@@ -41,7 +41,7 @@ configurationSamples:
       "Enabled": true
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
-description: missing XML code comments
+description: Tool for processing embedded links within work item fields, such as links in HTML fields and converting work item references between source and target systems.
 className: TfsWorkItemEmbededLinkTool
 typeName: Tools
 architecture: 
@@ -52,8 +52,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsWorkItemEmbededLinkToolOptions/

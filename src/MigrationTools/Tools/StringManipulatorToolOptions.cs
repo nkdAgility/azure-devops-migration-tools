@@ -6,6 +6,9 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Configuration options for the StringManipulatorTool, defining string transformations and length limits for work item string fields.
+    /// </summary>
     public class StringManipulatorToolOptions : ToolOptions
     {
 
@@ -22,11 +25,29 @@ namespace MigrationTools.Tools
         public List<RegexStringManipulator> Manipulators { get; set; }
     }
 
+    /// <summary>
+    /// Represents a regular expression-based string manipulation rule for processing work item string fields.
+    /// </summary>
     public class RegexStringManipulator
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether this manipulator is enabled.
+        /// </summary>
         public bool Enabled { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the regular expression pattern to match.
+        /// </summary>
         public string Pattern { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the replacement string for matched patterns.
+        /// </summary>
         public string Replacement { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a description of what this manipulator does.
+        /// </summary>
         public string Description { get; set; }
     }
 }

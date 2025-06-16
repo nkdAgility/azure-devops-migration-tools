@@ -12,7 +12,9 @@ using Serilog;
 
 namespace MigrationTools.Tools
 {
-
+    /// <summary>
+    /// Configuration options for the TFS Node Structure Tool that migrates and transforms area and iteration path hierarchies between TFS/Azure DevOps projects.
+    /// </summary>
     public sealed class TfsNodeStructureToolOptions : ToolOptions, ITfsNodeStructureToolOptions
     {
         /// <summary>

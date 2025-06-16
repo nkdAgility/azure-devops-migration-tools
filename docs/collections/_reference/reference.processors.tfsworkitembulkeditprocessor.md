@@ -29,7 +29,7 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsWorkItemBulkEditProcessorOptions
-description: This processor allows you to make changes in place where we load from teh Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
+description: This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
 className: TfsWorkItemBulkEditProcessor
 typeName: Processors
 architecture: 
@@ -56,8 +56,8 @@ options:
   defaultValue: missing XML code comments
 - parameterName: WhatIf
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Gets or sets a value indicating whether to run in "what if" mode without making actual changes to work items.
+  defaultValue: false
 - parameterName: WIQLQuery
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
@@ -72,8 +72,8 @@ options:
   defaultValue: '[]'
 status: missing XML code comments
 processingTarget: WorkItem
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemBulkEditProcessorOptions/

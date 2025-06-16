@@ -17,8 +17,20 @@ using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Exports a list of teams from the source Team Foundation Server or Azure DevOps collection, useful for analysis and planning team migrations.
+    /// </summary>
     public class TfsExportTeamListProcessor : TfsProcessor
     {
+        /// <summary>
+        /// Initializes a new instance of the TfsExportTeamListProcessor class.
+        /// </summary>
+        /// <param name="options">Configuration options for the processor</param>
+        /// <param name="tfsCommonTools">Common TFS tools for processor operations</param>
+        /// <param name="processorEnrichers">Container for processor enrichers</param>
+        /// <param name="services">Service provider for dependency injection</param>
+        /// <param name="telemetry">Telemetry logger for tracking operations</param>
+        /// <param name="logger">Logger for the processor operations</param>
         public TfsExportTeamListProcessor(IOptions<TfsEmptyProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
         }

@@ -42,8 +42,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs
-optionsClassFile: /src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
+classFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs
+optionsClassFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
 
 redirectFrom:
 - /Reference/ProcessorEnrichers/PauseAfterEachItemOptions/

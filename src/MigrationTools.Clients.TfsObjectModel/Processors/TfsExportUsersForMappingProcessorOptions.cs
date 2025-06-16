@@ -2,9 +2,14 @@
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Configuration options for the TFS Export Users for Mapping Processor that extracts user information from work items to create user mapping files for migration scenarios.
+    /// </summary>
     public class TfsExportUsersForMappingProcessorOptions : ProcessorOptions
     {
-
+        /// <summary>
+        /// WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.
+        /// </summary>
         public string WIQLQuery { get; set; }
 
         /// <summary>

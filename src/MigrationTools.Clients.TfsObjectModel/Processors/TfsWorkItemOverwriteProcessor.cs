@@ -20,7 +20,7 @@ using MigrationTools.Enrichers;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
+    /// Reapply field mappings after a migration. Does not migrate Work Items, only reapplies changes to field mappings.
     /// </summary>
     /// <status>preview</status>
     /// <processingtarget>Work Items</processingtarget>

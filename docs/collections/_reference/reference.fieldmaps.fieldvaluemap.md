@@ -70,7 +70,7 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
-description: missing XML code comments
+description: Maps field values based on a lookup table, allowing specific source values to be translated to different target values.
 className: FieldValueMap
 typeName: FieldMaps
 architecture: 
@@ -81,24 +81,24 @@ options:
   defaultValue: missing XML code comments
 - parameterName: defaultValue
   type: String
-  description: missing XML code comments
+  description: Gets or sets the default value to use when no mapping is found for the source field value.
   defaultValue: missing XML code comments
 - parameterName: sourceField
   type: String
-  description: missing XML code comments
+  description: Gets or sets the name of the source field to read values from during migration.
   defaultValue: missing XML code comments
 - parameterName: targetField
   type: String
-  description: missing XML code comments
+  description: Gets or sets the name of the target field to write mapped values to during migration.
   defaultValue: missing XML code comments
 - parameterName: valueMapping
   type: Dictionary
-  description: missing XML code comments
+  description: Gets or sets the dictionary that maps source field values to target field values. Key is the source value, value is the target value.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldValueMap.cs
-optionsClassFile: /src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldValueMapOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldValueMap.cs
+optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldValueMapOptions.cs
 
 redirectFrom:
 - /Reference/FieldMaps/FieldValueMapOptions/

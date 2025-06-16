@@ -28,12 +28,12 @@ architecture:
 options:
 - parameterName: FileStore
   type: String
-  description: missing XML code comments
+  description: Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpoint.cs
-optionsClassFile: /src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpointOptions.cs
+classFile: src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpoint.cs
+optionsClassFile: src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpointOptions.cs
 
 redirectFrom:
 - /Reference/Endpoints/FileSystemWorkItemEndpointOptions/

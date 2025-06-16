@@ -16,7 +16,7 @@ using MigrationTools.Tools;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Creates folders in Sared Queries for each Team
+    /// Creates folders in Shared Queries for each Team
     /// </summary>
     /// <status>alpha</status>
     /// <processingtarget>Shared Queries</processingtarget>

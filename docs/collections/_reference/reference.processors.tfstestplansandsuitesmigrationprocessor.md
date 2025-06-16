@@ -25,6 +25,7 @@ configurationSamples:
       "MigrationDelay": 0,
       "RemoveInvalidTestSuiteLinks": false,
       "FilterCompleted": false,
+      "TestPlanIds": [],
       "SourceName": null,
       "TargetName": null
     }
@@ -66,14 +67,18 @@ options:
   type: String
   description: missing XML code comments
   defaultValue: missing XML code comments
+- parameterName: TestPlanIds
+  type: Int32[]
+  description: 'This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: "TestPlanIds": [123, 456, 789]   Works optimally when "TestPlanQuery" is set to null.'
+  defaultValue: missing XML code comments
 - parameterName: TestPlanQuery
   type: String
   description: Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
   defaultValue: '`String.Empty`'
 status: Beta
 processingTarget: Suites & Plans
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPlansAndSuitesMigrationProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPlansAndSuitesMigrationProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPlansAndSuitesMigrationProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPlansAndSuitesMigrationProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsTestPlansAndSuitesMigrationProcessorOptions/
@@ -88,12 +93,11 @@ topics:
 - topic: notes
   path: /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-notes.md
   exists: true
-  markdown: >2-
-
+  markdown: >+
     ## Additional Samples & Info
 
 
-    To run a full plans and suits you should run the three processors in this order below.  `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
+    To run a full plans and suites you should run the three processors in this order below. `TestVariablesMigrationConfig` and `TestConfigurationsMigrationConfig` only need run once.
 
 
     ```json
@@ -125,6 +129,7 @@ topics:
     ]
 
     ```
+
 
     ## Known working TestPlanQueryBit filter fields names
 

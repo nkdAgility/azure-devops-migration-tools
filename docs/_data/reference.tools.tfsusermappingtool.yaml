@@ -70,7 +70,8 @@ configurationSamples:
         "Microsoft.VSTS.Common.ResolvedBy",
         "Microsoft.VSTS.Common.ClosedBy"
       ],
-      "UserMappingFile": "C:\\temp\\userExport.json"
+      "UserMappingFile": "C:\\temp\\userExport.json",
+      "MatchUsersByEmail": false
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
@@ -84,7 +85,11 @@ options:
   defaultValue: missing XML code comments
 - parameterName: IdentityFieldsToCheck
   type: List
-  description: This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you wan to map.
+  description: This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.
+  defaultValue: missing XML code comments
+- parameterName: MatchUsersByEmail
+  type: Boolean
+  description: By default, users in source are mapped to target users by their display name. If this is set to true, then the users will be mapped by their email address first. If no match is found, then the display name will be used.
   defaultValue: missing XML code comments
 - parameterName: UserMappingFile
   type: String
@@ -92,5 +97,5 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingToolOptions.cs

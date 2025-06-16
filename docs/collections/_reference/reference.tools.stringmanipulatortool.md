@@ -81,8 +81,8 @@ options:
   defaultValue: 1000000
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools/Tools/StringManipulatorTool.cs
-optionsClassFile: /src/MigrationTools/Tools/StringManipulatorToolOptions.cs
+classFile: src/MigrationTools/Tools/StringManipulatorTool.cs
+optionsClassFile: src/MigrationTools/Tools/StringManipulatorToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/StringManipulatorToolOptions/

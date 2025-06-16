@@ -52,8 +52,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsEmbededImagesToolOptions/
