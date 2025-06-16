@@ -60,8 +60,25 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsWorkItemEndpoint.cs
-optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsWorkItemEndpointOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsWorkItemEndpoint.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsWorkItemEndpointOptions.cs
+notes:
+  exists: true
+  path: docs/Reference/Endpoints/TfsWorkItemEndpoint-notes.md
+  markdown: >+
+    The Work Item endpoint is super awesome.
+
+
+    |Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description |
+
+    |:-:|:-:|:-:|:-:|:-:|
+
+    AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
+
+    AzureDevops.Rest | Azure DevOps REST | ?
+
+    FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
+
 
 redirectFrom:
 - /Reference/Endpoints/TfsWorkItemEndpointOptions/
@@ -74,7 +91,7 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Endpoints/TfsWorkItemEndpoint-notes.md
+  path: docs/Reference/Endpoints/TfsWorkItemEndpoint-notes.md
   exists: true
   markdown: >+
     The Work Item endpoint is super awesome.
@@ -91,7 +108,7 @@ topics:
     FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
 
 - topic: introduction
-  path: ../../docs/Reference/Endpoints/TfsWorkItemEndpoint-introduction.md
+  path: docs/Reference/Endpoints/TfsWorkItemEndpoint-introduction.md
   exists: false
   markdown: ''
 

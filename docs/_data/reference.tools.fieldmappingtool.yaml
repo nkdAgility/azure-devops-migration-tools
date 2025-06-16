@@ -241,5 +241,9 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
+classFile: src/MigrationTools/Tools/FieldMappingTool.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/FieldMappingTool-notes.md
+  markdown: ''

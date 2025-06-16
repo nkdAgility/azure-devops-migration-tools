@@ -81,7 +81,7 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
-  description: missing XML code comments
+  description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
 - parameterName: sourceFieldsAndValues
   type: Dictionary
@@ -95,6 +95,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/MultiValueConditionalMap.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/MultiValueConditionalMapOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/FieldMaps/MultiValueConditionalMap-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/MultiValueConditionalMapOptions/
@@ -107,11 +111,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/FieldMaps/MultiValueConditionalMap-notes.md
+  path: docs/Reference/FieldMaps/MultiValueConditionalMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/FieldMaps/MultiValueConditionalMap-introduction.md
+  path: docs/Reference/FieldMaps/MultiValueConditionalMap-introduction.md
   exists: false
   markdown: ''
 

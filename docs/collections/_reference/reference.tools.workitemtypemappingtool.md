@@ -66,8 +66,12 @@ options:
   defaultValue: '{}'
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Tools/WorkItemTypeMappingToolOptions.cs
+classFile: src/MigrationTools/Tools/WorkItemTypeMappingTool.cs
 optionsClassFile: src/MigrationTools/Tools/WorkItemTypeMappingToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/WorkItemTypeMappingTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/WorkItemTypeMappingToolOptions/
@@ -80,11 +84,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Tools/WorkItemTypeMappingTool-notes.md
+  path: docs/Reference/Tools/WorkItemTypeMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Tools/WorkItemTypeMappingTool-introduction.md
+  path: docs/Reference/Tools/WorkItemTypeMappingTool-introduction.md
   exists: false
   markdown: ''
 

@@ -53,3 +53,7 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsEmbededImagesToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsEmbededImagesTool-notes.md
+  markdown: ''

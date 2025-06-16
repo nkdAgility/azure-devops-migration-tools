@@ -39,16 +39,20 @@ options:
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Work Item
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteAreasAsTagsProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessorOptions/
@@ -61,11 +65,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-notes.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-introduction.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-introduction.md
   exists: false
   markdown: ''
 

@@ -68,6 +68,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsWorkItemLinkToolOptions/
@@ -80,11 +84,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Tools/TfsWorkItemLinkTool-introduction.md
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-introduction.md
   exists: false
   markdown: ''
 

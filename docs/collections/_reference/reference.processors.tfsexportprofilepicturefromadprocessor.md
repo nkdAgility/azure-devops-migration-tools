@@ -50,11 +50,11 @@ options:
   defaultValue: String.Empty
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: Username
   type: String
@@ -62,8 +62,12 @@ options:
   defaultValue: String.Empty
 status: alpha
 processingTarget: Profiles
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsExportProfilePictureFromADProcessorOptions/
@@ -76,11 +80,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-notes.md
+  path: docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-introduction.md
+  path: docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-introduction.md
   exists: false
   markdown: ''
 

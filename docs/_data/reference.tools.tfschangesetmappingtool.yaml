@@ -60,3 +60,7 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsChangeSetMappingTool-notes.md
+  markdown: ''

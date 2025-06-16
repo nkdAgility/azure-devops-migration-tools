@@ -67,3 +67,7 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsRevisionManagerToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsRevisionManagerTool-notes.md
+  markdown: ''

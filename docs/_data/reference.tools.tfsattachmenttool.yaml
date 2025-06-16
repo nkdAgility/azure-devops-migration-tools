@@ -67,5 +67,9 @@ options:
   defaultValue: 480000000
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsAttachmentTool-notes.md
+  markdown: ''

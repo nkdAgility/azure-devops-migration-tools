@@ -48,11 +48,11 @@ options:
   defaultValue: false
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WhatIf
   type: Boolean
@@ -74,6 +74,10 @@ status: missing XML code comments
 processingTarget: WorkItem
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsWorkItemBulkEditProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemBulkEditProcessorOptions/
@@ -86,11 +90,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/TfsWorkItemBulkEditProcessor-notes.md
+  path: docs/Reference/Processors/TfsWorkItemBulkEditProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/TfsWorkItemBulkEditProcessor-introduction.md
+  path: docs/Reference/Processors/TfsWorkItemBulkEditProcessor-introduction.md
   exists: false
   markdown: ''
 

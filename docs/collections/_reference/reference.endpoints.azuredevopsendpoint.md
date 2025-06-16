@@ -67,8 +67,12 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpointOptions.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpoint.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpointOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Endpoints/AzureDevOpsEndpoint-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Endpoints/AzureDevOpsEndpointOptions/
@@ -81,11 +85,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Endpoints/AzureDevOpsEndpoint-notes.md
+  path: docs/Reference/Endpoints/AzureDevOpsEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Endpoints/AzureDevOpsEndpoint-introduction.md
+  path: docs/Reference/Endpoints/AzureDevOpsEndpoint-introduction.md
   exists: false
   markdown: ''
 

@@ -40,11 +40,11 @@ options:
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
@@ -52,8 +52,12 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessorOptions.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/OutboundLinkCheckingProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/OutboundLinkCheckingProcessorOptions/
@@ -66,11 +70,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/OutboundLinkCheckingProcessor-notes.md
+  path: docs/Reference/Processors/OutboundLinkCheckingProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/OutboundLinkCheckingProcessor-introduction.md
+  path: docs/Reference/Processors/OutboundLinkCheckingProcessor-introduction.md
   exists: false
   markdown: ''
 

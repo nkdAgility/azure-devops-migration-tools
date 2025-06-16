@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Xml.Linq;
 using MigrationTools.Options;
+using System.Reflection;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -52,11 +53,18 @@ namespace MigrationTools.ConsoleDataGenerator
 
         public string GetPropertyData(Type targetType, JObject joptions, JProperty jproperty, string element)
         {
-            var optionsType = targetType.GetProperty(jproperty.Name).DeclaringType;
-            // Query the data and write out a subset of contacts
-            var query = (from c in GetXDocument(optionsType).Root.Descendants("member")
-                         where c.Attribute("name").Value == $"P:{optionsType.FullName}.{jproperty.Name}"
-                         select c.Element(element)?.Value).SingleOrDefault();
+            var propertyInfo = targetType.GetProperty(jproperty.Name);
+            var optionsType = propertyInfo.DeclaringType;
+            
+            // First try to get documentation from the declaring type
+            var query = GetPropertyDocumentationFromType(optionsType, jproperty.Name, element);
+            
+            // If not found, traverse inheritance hierarchy and interfaces
+            if (query == null)
+            {
+                query = GetPropertyDocumentationFromInheritanceChain(propertyInfo, jproperty.Name, element);
+            }
+            
             if (query != null)
             {
                 Console.WriteLine($"- - {element} Loaded: {jproperty.Name}");
@@ -71,11 +79,18 @@ namespace MigrationTools.ConsoleDataGenerator
 
         public string GetPropertyDefault(IOptions options, JObject joptions, JProperty jproperty)
         {
-            var optionsType = options.GetType().GetProperty(jproperty.Name).DeclaringType;
-            // Query the data and write out a subset of contacts
-            var properyXml = (from c in GetXDocument(optionsType).Root.Descendants("member")
-                              where c.Attribute("name").Value == $"P:{optionsType.FullName}.{jproperty.Name}"
-                              select c).SingleOrDefault();
+            var propertyInfo = options.GetType().GetProperty(jproperty.Name);
+            var optionsType = propertyInfo.DeclaringType;
+            
+            // First try to get default from the declaring type
+            var properyXml = GetPropertyXmlFromType(optionsType, jproperty.Name);
+            
+            // If not found, traverse inheritance hierarchy and interfaces
+            if (properyXml == null)
+            {
+                properyXml = GetPropertyXmlFromInheritanceChain(propertyInfo, jproperty.Name);
+            }
+            
             string defaultvalue = null;
             if (properyXml != null)
             {
@@ -104,6 +119,124 @@ namespace MigrationTools.ConsoleDataGenerator
         {
             string xmlDataPath = Path.Combine(documentationPath, string.Format($"{item.Assembly.GetName().Name}.xml"));
             return XDocument.Load(xmlDataPath);
+        }
+
+        /// <summary>
+        /// Gets property documentation from a specific type's XML documentation
+        /// </summary>
+        private string GetPropertyDocumentationFromType(Type type, string propertyName, string element)
+        {
+            try
+            {
+                var query = (from c in GetXDocument(type).Root.Descendants("member")
+                             where c.Attribute("name").Value == $"P:{type.FullName}.{propertyName}"
+                             select c.Element(element)?.Value).SingleOrDefault();
+                return query;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets property XML element from a specific type's XML documentation
+        /// </summary>
+        private XElement GetPropertyXmlFromType(Type type, string propertyName)
+        {
+            try
+            {
+                var properyXml = (from c in GetXDocument(type).Root.Descendants("member")
+                                  where c.Attribute("name").Value == $"P:{type.FullName}.{propertyName}"
+                                  select c).SingleOrDefault();
+                return properyXml;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Traverses inheritance hierarchy and interfaces to find property documentation
+        /// </summary>
+        private string GetPropertyDocumentationFromInheritanceChain(System.Reflection.PropertyInfo propertyInfo, string propertyName, string element)
+        {
+            var declaringType = propertyInfo.DeclaringType;
+            
+            // Check interfaces first
+            foreach (var interfaceType in declaringType.GetInterfaces())
+            {
+                // Check if this interface defines the property
+                var interfaceProperty = interfaceType.GetProperty(propertyName);
+                if (interfaceProperty != null)
+                {
+                    var documentation = GetPropertyDocumentationFromType(interfaceType, propertyName, element);
+                    if (documentation != null)
+                    {
+                        return documentation;
+                    }
+                }
+            }
+            
+            // Check base classes
+            var baseType = declaringType.BaseType;
+            while (baseType != null && baseType != typeof(object))
+            {
+                var baseProperty = baseType.GetProperty(propertyName);
+                if (baseProperty != null)
+                {
+                    var documentation = GetPropertyDocumentationFromType(baseType, propertyName, element);
+                    if (documentation != null)
+                    {
+                        return documentation;
+                    }
+                }
+                baseType = baseType.BaseType;
+            }
+            
+            return null;
+        }
+
+        /// <summary>
+        /// Traverses inheritance hierarchy and interfaces to find property XML element
+        /// </summary>
+        private XElement GetPropertyXmlFromInheritanceChain(System.Reflection.PropertyInfo propertyInfo, string propertyName)
+        {
+            var declaringType = propertyInfo.DeclaringType;
+            
+            // Check interfaces first
+            foreach (var interfaceType in declaringType.GetInterfaces())
+            {
+                // Check if this interface defines the property
+                var interfaceProperty = interfaceType.GetProperty(propertyName);
+                if (interfaceProperty != null)
+                {
+                    var xmlElement = GetPropertyXmlFromType(interfaceType, propertyName);
+                    if (xmlElement != null)
+                    {
+                        return xmlElement;
+                    }
+                }
+            }
+            
+            // Check base classes
+            var baseType = declaringType.BaseType;
+            while (baseType != null && baseType != typeof(object))
+            {
+                var baseProperty = baseType.GetProperty(propertyName);
+                if (baseProperty != null)
+                {
+                    var xmlElement = GetPropertyXmlFromType(baseType, propertyName);
+                    if (xmlElement != null)
+                    {
+                        return xmlElement;
+                    }
+                }
+                baseType = baseType.BaseType;
+            }
+            
+            return null;
         }
 
     }

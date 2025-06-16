@@ -67,3 +67,7 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
+  markdown: ''

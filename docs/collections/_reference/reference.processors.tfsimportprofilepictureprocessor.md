@@ -34,16 +34,20 @@ options:
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 status: alpha
 processingTarget: Profiles
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsImportProfilePictureProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsImportProfilePictureProcessorOptions/
@@ -56,11 +60,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/TfsImportProfilePictureProcessor-notes.md
+  path: docs/Reference/Processors/TfsImportProfilePictureProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/TfsImportProfilePictureProcessor-introduction.md
+  path: docs/Reference/Processors/TfsImportProfilePictureProcessor-introduction.md
   exists: false
   markdown: ''
 

@@ -45,7 +45,7 @@ options:
   defaultValue: Shared Queries
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: SourceToTargetFieldMappings
   type: Dictionary
@@ -53,12 +53,16 @@ options:
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Queries
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsSharedQueryProcessorOptions/
@@ -71,11 +75,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
+  path: docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/TfsSharedQueryProcessor-introduction.md
+  path: docs/Reference/Processors/TfsSharedQueryProcessor-introduction.md
   exists: false
   markdown: ''
 

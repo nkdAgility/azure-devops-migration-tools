@@ -83,6 +83,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools/Tools/StringManipulatorTool.cs
 optionsClassFile: src/MigrationTools/Tools/StringManipulatorToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/StringManipulatorTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/StringManipulatorToolOptions/
@@ -95,11 +99,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Tools/StringManipulatorTool-notes.md
+  path: docs/Reference/Tools/StringManipulatorTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Tools/StringManipulatorTool-introduction.md
+  path: docs/Reference/Tools/StringManipulatorTool-introduction.md
   exists: false
   markdown: ''
 

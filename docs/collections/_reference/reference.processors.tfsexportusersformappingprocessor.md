@@ -46,11 +46,11 @@ options:
   defaultValue: true
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: UserExportFile
   type: String
@@ -62,8 +62,12 @@ options:
   defaultValue: missing XML code comments
 status: ready
 processingTarget: Work Items
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsExportUsersForMappingProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsExportUsersForMappingProcessorOptions/
@@ -76,11 +80,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/TfsExportUsersForMappingProcessor-notes.md
+  path: docs/Reference/Processors/TfsExportUsersForMappingProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/TfsExportUsersForMappingProcessor-introduction.md
+  path: docs/Reference/Processors/TfsExportUsersForMappingProcessor-introduction.md
   exists: false
   markdown: ''
 

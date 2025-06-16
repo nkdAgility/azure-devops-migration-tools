@@ -34,6 +34,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpoint.cs
 optionsClassFile: src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpointOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Endpoints/FileSystemWorkItemEndpointOptions/
@@ -46,11 +50,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Endpoints/FileSystemWorkItemEndpoint-notes.md
+  path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Endpoints/FileSystemWorkItemEndpoint-introduction.md
+  path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-introduction.md
   exists: false
   markdown: ''
 

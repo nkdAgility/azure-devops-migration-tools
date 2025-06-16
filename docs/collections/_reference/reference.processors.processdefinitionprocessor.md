@@ -50,11 +50,11 @@ options:
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: UpdateProcessDetails
   type: Boolean
@@ -64,6 +64,50 @@ status: Beta
 processingTarget: Pipelines
 classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessorOptions.cs
+notes:
+  exists: true
+  path: docs/Reference/Processors/ProcessDefinitionProcessor-notes.md
+  markdown: >2+
+
+    ## Example 
+
+
+
+    ```JSON
+       {
+    ...
+        "Processors": [
+            {
+                "$type": "ProcessDefinitionProcessorOptions",
+                "Enabled": true,
+                "Processes": {
+                    "Custom Agile Process": [
+                        "Bug"
+                    ]
+                },
+                "ProcessMaps": {
+                    "Custom Agile Process": "Other Agile Process"
+                },
+                "SourceName": "Source",
+                "TargetName": "Target",
+                "UpdateProcessDetails": true
+            }
+        ]
+    ...
+
+    }
+
+    ```
+
+
+    ## Example Full
+
+
+    ```
+
+    {% include sampleConfig/ProcessDefinitionProcessor-Full.json %}
+
+    ```
 
 redirectFrom:
 - /Reference/Processors/ProcessDefinitionProcessorOptions/
@@ -76,9 +120,9 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/ProcessDefinitionProcessor-notes.md
+  path: docs/Reference/Processors/ProcessDefinitionProcessor-notes.md
   exists: true
-  markdown: >2
+  markdown: >2+
 
     ## Example 
 
@@ -120,7 +164,7 @@ topics:
 
     ```
 - topic: introduction
-  path: ../../docs/Reference/Processors/ProcessDefinitionProcessor-introduction.md
+  path: docs/Reference/Processors/ProcessDefinitionProcessor-introduction.md
   exists: true
   markdown: >2-
 

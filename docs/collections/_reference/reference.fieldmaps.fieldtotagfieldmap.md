@@ -73,7 +73,7 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
-  description: missing XML code comments
+  description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
 - parameterName: formatExpression
   type: String
@@ -87,6 +87,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldToTagFieldMap.cs
 optionsClassFile: ''
+notes:
+  exists: false
+  path: docs/Reference/FieldMaps/FieldToTagFieldMap-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldToTagFieldMapOptions/
@@ -99,11 +103,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/FieldMaps/FieldToTagFieldMap-notes.md
+  path: docs/Reference/FieldMaps/FieldToTagFieldMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/FieldMaps/FieldToTagFieldMap-introduction.md
+  path: docs/Reference/FieldMaps/FieldToTagFieldMap-introduction.md
   exists: false
   markdown: ''
 

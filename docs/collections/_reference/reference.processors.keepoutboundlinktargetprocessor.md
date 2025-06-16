@@ -21,7 +21,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "361b5603-dcfd-4b87-a6ba-158b4a7adb95",
+      "TargetLinksToKeepProject": "762fc0db-3055-447a-85e2-edf507a65294",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
@@ -52,7 +52,7 @@ options:
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetLinksToKeepOrganization
   type: String
@@ -64,7 +64,7 @@ options:
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
@@ -72,8 +72,12 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessorOptions.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/KeepOutboundLinkTargetProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/KeepOutboundLinkTargetProcessorOptions/
@@ -86,11 +90,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/KeepOutboundLinkTargetProcessor-notes.md
+  path: docs/Reference/Processors/KeepOutboundLinkTargetProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/KeepOutboundLinkTargetProcessor-introduction.md
+  path: docs/Reference/Processors/KeepOutboundLinkTargetProcessor-introduction.md
   exists: false
   markdown: ''
 

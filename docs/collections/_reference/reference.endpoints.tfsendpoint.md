@@ -118,8 +118,12 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsEndpointOptions.cs
-optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsEndpointOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsEndpoint.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsEndpointOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Endpoints/TfsEndpoint-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Endpoints/TfsEndpointOptions/
@@ -132,11 +136,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Endpoints/TfsEndpoint-notes.md
+  path: docs/Reference/Endpoints/TfsEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Endpoints/TfsEndpoint-introduction.md
+  path: docs/Reference/Endpoints/TfsEndpoint-introduction.md
   exists: false
   markdown: ''
 

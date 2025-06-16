@@ -98,8 +98,12 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsUserMappingTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsUserMappingToolOptions/
@@ -112,11 +116,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Tools/TfsUserMappingTool-notes.md
+  path: docs/Reference/Tools/TfsUserMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Tools/TfsUserMappingTool-introduction.md
+  path: docs/Reference/Tools/TfsUserMappingTool-introduction.md
   exists: false
   markdown: ''
 

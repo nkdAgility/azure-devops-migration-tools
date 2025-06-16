@@ -47,11 +47,11 @@ options:
   defaultValue: false
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
@@ -69,6 +69,10 @@ status: preview
 processingTarget: Work Items
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemOverwriteProcessorOptions/
@@ -81,11 +85,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: ../../docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: ../../docs/Reference/Processors/TfsWorkItemOverwriteProcessor-introduction.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-introduction.md
   exists: false
   markdown: ''
 
