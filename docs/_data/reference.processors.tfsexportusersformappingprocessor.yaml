@@ -61,5 +61,5 @@ options:
   defaultValue: missing XML code comments
 status: ready
 processingTarget: Work Items
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessor.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs

@@ -66,5 +66,5 @@ options:
   defaultValue: missing XML code comments
 status: ready
 processingTarget: WorkItem
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessor.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessorOptions.cs
