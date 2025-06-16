@@ -2,6 +2,9 @@
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Configuration options for the TFS Attachment Tool that handles the migration of work item attachments between TFS/Azure DevOps systems.
+    /// </summary>
     public class TfsAttachmentToolOptions : ToolOptions, ITfsAttachmentToolOptions
     {
         /// <summary>

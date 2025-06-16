@@ -10,6 +10,9 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item</processingtarget>
     public class FieldClearMapOptions : FieldMapOptions
     {
+        /// <summary>
+        /// Gets or sets the name of the target field to be cleared/set to null during work item migration.
+        /// </summary>
         public string targetField { get; set; }
 
         public void SetExampleConfigDefaults()

@@ -21,8 +21,8 @@ namespace MigrationTools.ConsoleDataGenerator
     public class ClassDataLoader
     {
         private DataSerialization saveData;
-        private static CodeDocumentation codeDocs = new CodeDocumentation("../../../../../docs/Reference/Generated/");
-        private static CodeFileFinder codeFinder = new CodeFileFinder("../../../../../src/");
+        private static CodeDocumentation codeDocs = new CodeDocumentation("../../docs/Reference/Generated/");
+        private static CodeFileFinder codeFinder = new CodeFileFinder("../");
         private IConfiguration configuration;
         public ClassDataLoader(DataSerialization saveData, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {

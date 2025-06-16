@@ -2,8 +2,14 @@
 
 namespace MigrationTools.Endpoints
 {
+    /// <summary>
+    /// Configuration options for the TFS/Azure DevOps Work Item Endpoint that defines connection settings and query options for accessing work items in Team Foundation Server or Azure DevOps Server.
+    /// </summary>
     public class TfsWorkItemEndpointOptions : TfsEndpointOptions
     {
+        /// <summary>
+        /// Gets or sets the query options that define which work items to retrieve from the source endpoint, including WIQL queries and parameters.
+        /// </summary>
         public QueryOptions Query { get; set; }
 
         //public override void SetDefaults()

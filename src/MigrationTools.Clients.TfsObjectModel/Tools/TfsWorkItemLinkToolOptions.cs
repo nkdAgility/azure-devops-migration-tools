@@ -6,6 +6,9 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Configuration options for the TFS Work Item Link Tool that manages the migration and processing of work item links between items.
+    /// </summary>
     public class TfsWorkItemLinkToolOptions : ToolOptions, ITfsWorkItemLinkToolOptions
     {
 

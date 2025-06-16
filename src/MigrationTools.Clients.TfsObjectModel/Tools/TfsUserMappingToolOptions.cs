@@ -4,6 +4,9 @@ using Newtonsoft.Json;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Configuration options for the TFS User Mapping Tool that handles the mapping of user identities between source and target systems during work item migration.
+    /// </summary>
     public class TfsUserMappingToolOptions : ToolOptions, ITfsUserMappingToolOptions
     {
 

@@ -46,7 +46,7 @@ namespace MigrationTools.Processors
         public bool MigrateTaskGroups { get; set; }
 
         /// <summary>
-        /// Migrate Valiable Groups
+        /// Migrate Variable Groups
         /// </summary>
         /// <default>true</default>
         public bool MigrateVariableGroups { get; set; }

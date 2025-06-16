@@ -26,7 +26,7 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                var fileInfo = new FileInfo(files[0]);
 
-                return files[0].Replace("../../../../..", "").Replace("\\", "/");
+                return files[0].Replace("../../", "").Replace("\\", "/");
             }
             return "";
         }

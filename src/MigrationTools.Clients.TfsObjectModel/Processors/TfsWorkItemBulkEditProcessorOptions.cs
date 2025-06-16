@@ -11,6 +11,10 @@ namespace MigrationTools._EngineV1.Configuration.Processing
     /// </summary>
     public class TfsWorkItemBulkEditProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether to run in "what if" mode without making actual changes to work items.
+        /// </summary>
+        /// <default>false</default>
         public bool WhatIf { get; set; }
 
 
