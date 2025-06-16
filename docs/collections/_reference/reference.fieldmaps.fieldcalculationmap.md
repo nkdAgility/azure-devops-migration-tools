@@ -1,0 +1,91 @@
+---
+optionsClassName: FieldCalculationMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldCalculationMapOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldCalculationMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
+- name: sample
+  order: 1
+  description: 
+  code: There is no sample, but you can check the classic below for a general feel.
+  sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "FieldCalculationMapOptions",
+      "expression": null,
+      "parameters": {},
+      "targetField": null,
+      "ApplyTo": [
+        "*"
+      ]
+    }
+  sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
+description: Performs mathematical calculations on numeric fields using NCalc expressions during migration.
+className: FieldCalculationMap
+typeName: FieldMaps
+architecture: 
+options:
+- parameterName: ApplyTo
+  type: List
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: expression
+  type: String
+  description: Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., "[x]*2").
+  defaultValue: null
+- parameterName: parameters
+  type: Dictionary
+  description: Gets or sets a dictionary mapping variable names used in the expression to source field reference names.
+  defaultValue: '{}'
+- parameterName: targetField
+  type: String
+  description: Gets or sets the target field reference name where the calculated result will be stored.
+  defaultValue: null
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldCalculationMap.cs
+optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldCalculationMapOptions.cs
+
+redirectFrom:
+- /Reference/FieldMaps/FieldCalculationMapOptions/
+layout: reference
+toc: true
+permalink: /Reference/FieldMaps/FieldCalculationMap/
+title: FieldCalculationMap
+categories:
+- FieldMaps
+- 
+topics:
+- topic: notes
+  path: /docs/Reference/FieldMaps/FieldCalculationMap-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: /docs/Reference/FieldMaps/FieldCalculationMap-introduction.md
+  exists: false
+  markdown: ''
+
+---
