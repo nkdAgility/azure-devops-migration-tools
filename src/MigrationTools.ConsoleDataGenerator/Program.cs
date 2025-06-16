@@ -11,8 +11,9 @@ namespace MigrationTools.ConsoleDataGenerator;
 class Program
 {
     private static IConfiguration configuration = GetConfiguration();
-    private static DataSerialization saveData = new DataSerialization("../../");
-    private static ClassDataLoader cdLoader = new ClassDataLoader("../../", saveData, configuration);
+    private static string rootPath = GetRepositoryRoot();
+    private static DataSerialization saveData = new DataSerialization(rootPath);
+    private static ClassDataLoader cdLoader = new ClassDataLoader(rootPath, saveData, configuration);
     private static MarkdownLoader mdLoader = new MarkdownLoader();
 
 
@@ -109,10 +110,40 @@ class Program
         var configurationBuilder = new ConfigurationBuilder();
         // Set the base path for the configuration (optional)
         configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-        // Add configuration sources
-        configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        // Add configuration sources - try current directory first, then repository root
+        configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        configurationBuilder.AddJsonFile("../../appsettings.json", optional: true, reloadOnChange: true);
         // Build the configuration
         return configurationBuilder.Build();
+    }
+
+    private static string GetRepositoryRoot()
+    {
+        // Start from current directory and walk up to find the repository root
+        string currentDir = Directory.GetCurrentDirectory();
+        
+        while (currentDir != null)
+        {
+            // Look for indicators of repository root (like .git, src folder, or MigrationTools.sln)
+            if (Directory.Exists(Path.Combine(currentDir, ".git")) ||
+                File.Exists(Path.Combine(currentDir, "MigrationTools.sln")))
+            {
+                return currentDir;
+            }
+            
+            string parentDir = Directory.GetParent(currentDir)?.FullName;
+            if (parentDir == currentDir) // Reached root of filesystem
+                break;
+            currentDir = parentDir;
+        }
+        
+        // Fallback: try the original relative paths
+        if (Directory.Exists("../../src"))
+            return "../../";
+        else if (Directory.Exists("../../../../../src"))
+            return "../../../../../";
+        
+        throw new DirectoryNotFoundException("Could not locate repository root directory. Please run from project directory or bin directory.");
     }
 
 

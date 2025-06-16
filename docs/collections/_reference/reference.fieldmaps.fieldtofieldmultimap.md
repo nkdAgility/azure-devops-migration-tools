@@ -5,51 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldToFieldMultiMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldToFieldMultiMap",
-                "ApplyTo": [
-                  "SomeWorkItemType",
-                  "SomeOtherWorkItemType"
-                ],
-                "SourceToTargetMappings": {
-                  "SourceField1": "TargetField1",
-                  "SourceField2": "TargetField2"
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 - name: classic
   order: 3
@@ -57,15 +18,8 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMultiMapOptions",
-      "SourceToTargetMappings": {
-        "SourceField1": "TargetField1",
-        "SourceField2": "TargetField2"
-      },
-      "ApplyTo": [
-        "*",
-        "SomeWorkItemType",
-        "SomeOtherWorkItemType"
-      ]
+      "SourceToTargetMappings": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMultiMapOptions
 description: missing XML code comments

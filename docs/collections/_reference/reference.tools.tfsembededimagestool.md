@@ -5,32 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsEmbededImagesTool": {
-            "Enabled": "True"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsEmbededImagesTool": {
-            "Enabled": "True"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
 - name: classic
   order: 3
@@ -38,7 +18,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsEmbededImagesToolOptions",
-      "Enabled": true
+      "Enabled": false
     }
   sampleFor: MigrationTools.Tools.TfsEmbededImagesToolOptions
 description: missing XML code comments

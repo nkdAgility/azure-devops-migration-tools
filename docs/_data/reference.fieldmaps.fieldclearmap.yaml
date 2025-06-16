@@ -4,47 +4,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldClearMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldClearMap",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "targetField": "Custom.FieldC"
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
 - name: classic
   order: 3
@@ -52,11 +17,8 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldClearMapOptions",
-      "targetField": "Custom.FieldC",
-      "ApplyTo": [
-        "*",
-        "SomeWorkItemType"
-      ]
+      "targetField": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
 description: Clears a target field by setting its value to null, useful for removing data from specific fields during migration.

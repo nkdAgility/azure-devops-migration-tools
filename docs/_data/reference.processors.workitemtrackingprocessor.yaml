@@ -56,5 +56,5 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
+classFile: src/MigrationTools/Processors/WorkItemTrackingProcessor.cs
 optionsClassFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs

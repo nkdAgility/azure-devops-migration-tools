@@ -5,49 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldToFieldMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldToFieldMap",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "defaultValue": "42",
-                "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-                "targetField": "Microsoft.VSTS.Common.StackRank"
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 - name: classic
   order: 3
@@ -55,13 +18,10 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMapOptions",
-      "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-      "targetField": "Microsoft.VSTS.Common.StackRank",
-      "defaultValue": "42",
-      "ApplyTo": [
-        "*",
-        "SomeWorkItemType"
-      ]
+      "sourceField": null,
+      "targetField": null,
+      "defaultValue": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldToFieldMapOptions
 description: Maps the value from a source field to a target field directly, with optional default value substitution for empty or null values.

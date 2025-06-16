@@ -5,63 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "Endpoints": {
-          "#KEY#": {
-            "EndpointType": "TfsTeamProjectEndpoint",
-            "AllowCrossProjectLinking": "False",
-            "Authentication": {
-              "AccessToken": "",
-              "AuthenticationMode": "AccessToken",
-              "NetworkCredentials": {
-                "Domain": "",
-                "Password": "",
-                "UserName": ""
-              }
-            },
-            "AuthenticationMode": "AccessToken",
-            "Collection": "",
-            "LanguageMaps": {
-              "AreaPath": "Area",
-              "IterationPath": "Iteration"
-            },
-            "Project": "",
-            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "Endpoints": {
-          "#KEY#": {
-            "EndpointType": "TfsTeamProjectEndpoint",
-            "AllowCrossProjectLinking": "False",
-            "Authentication": {
-              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
-              "AuthenticationMode": "AccessToken",
-              "NetworkCredentials": {
-                "Domain": "",
-                "Password": "",
-                "UserName": ""
-              }
-            },
-            "Collection": "https://dev.azure.com/nkdagility-preview/",
-            "Project": "migrationSource1",
-            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
 - name: classic
   order: 3
@@ -69,18 +18,10 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamProjectEndpointOptions",
-      "Collection": "https://dev.azure.com/nkdagility-preview/",
-      "Project": "migrationSource1",
-      "Authentication": {
-        "AuthenticationMode": "AccessToken",
-        "NetworkCredentials": {
-          "Domain": "",
-          "UserName": "",
-          "Password": "** removed as a secret ***"
-        },
-        "AccessToken": "** removed as a secret ***"
-      },
-      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+      "Collection": null,
+      "Project": null,
+      "Authentication": null,
+      "ReflectedWorkItemIdField": null,
       "LanguageMaps": {
         "AreaPath": "Area",
         "IterationPath": "Iteration"
