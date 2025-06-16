@@ -63,7 +63,6 @@ The Azure DevOps Migration Tools is a comprehensive solution for migrating work 
 
 **Key Features:**
 - Full TFS Object Model support
-- Both v1 (legacy) and v2 (modern) architectures
 - Dynamic assembly loading for client assemblies
 - Comprehensive migration capabilities
 - Activity tracking and telemetry
@@ -84,7 +83,7 @@ string[] clientAssemblies = {
 - TFS/Azure DevOps connectivity
 - Various configuration files (`configuration-classic.json`, etc.)
 
-**Copilot Agent Notes:** This is the full-featured version supporting both legacy TFS Object Model and modern patterns. When working with this application, consider both legacy v1 architecture patterns and modern v2 patterns. TFS Object Model code requires Windows and specific TFS assemblies.
+**Copilot Agent Notes:** This is the full-featured version supporting both TFS Object Model and REST API patterns. When working with this application, TFS Object Model code requires Windows and specific TFS assemblies, while REST API code is cross-platform.
 
 ---
 
@@ -203,22 +202,27 @@ Discovers and documents:
 
 ## Architecture Patterns
 
-### V1 (Legacy) Architecture
-- Based on older TFS Object Model patterns
-- Direct service registration with legacy interfaces
-- Primarily used in MigrationTools.ConsoleFull
+### TFS Object Model vs REST API
 
-### V2 (Modern) Architecture  
-- REST API-based with modern .NET patterns
+The migration tools support two primary approaches for connecting to Azure DevOps and TFS:
+
+**TFS Object Model Approach:**
+- Based on legacy TFS Object Model patterns
+- Requires Windows environment and specific TFS assemblies
+- Available primarily in MigrationTools.ConsoleFull
+- Provides deep integration with TFS/Azure DevOps
+
+**REST API Approach:**
+- Uses modern REST API clients
+- Cross-platform compatibility
+- Available in both console applications but primary in ConsoleCore
 - Configuration-driven endpoint and processor registration
-- Used in both console applications but primary in ConsoleCore
 
 ### Configuration Templates
 Available templates for `init` command:
 - `Basic` - Simple migration setup
-- `Full` - Complete feature set
 - `WorkItemTracking` - Work item migration focus
-- `Fullv2` - Modern v2 architecture
-- `WorkItemTrackingv2` - Modern work item migration
+- `PipelineProcessor` - Pipeline migration setup
+- `Reference` - Complete feature set with all options
 
-**Copilot Agent Notes:** When suggesting code modifications, consider which architecture version is being used. V2 patterns are preferred for new development, while V1 patterns may be necessary for legacy TFS compatibility.
+**Copilot Agent Notes:** When suggesting code modifications, consider whether TFS Object Model or REST API patterns are more appropriate. REST API patterns are preferred for new development and cross-platform scenarios, while TFS Object Model may be necessary for specific legacy TFS compatibility requirements.
