@@ -5,12 +5,52 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Processors": [
+          {
+            "ProcessorType": "AzureDevOpsPipelineProcessor",
+            "BuildPipelines": "",
+            "Enabled": "False",
+            "MigrateBuildPipelines": "True",
+            "MigrateReleasePipelines": "True",
+            "MigrateServiceConnections": "True",
+            "MigrateTaskGroups": "True",
+            "MigrateVariableGroups": "True",
+            "ReleasePipelines": "",
+            "SourceName": "sourceName",
+            "TargetName": "targetName"
+          }
+        ]
+      }
+    }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Processors": [
+          {
+            "ProcessorType": "AzureDevOpsPipelineProcessor",
+            "BuildPipelines": "",
+            "Enabled": "False",
+            "MigrateBuildPipelines": "True",
+            "MigrateReleasePipelines": "True",
+            "MigrateServiceConnections": "True",
+            "MigrateTaskGroups": "True",
+            "MigrateVariableGroups": "True",
+            "ReleasePipelines": "",
+            "SourceName": "sourceName",
+            "TargetName": "targetName"
+          }
+        ]
+      }
+    }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
 - name: classic
   order: 3

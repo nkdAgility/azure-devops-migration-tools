@@ -5,12 +5,38 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsAttachmentTool": {
+            "Enabled": "True",
+            "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+            "MaxAttachmentSize": "480000000",
+            "RefName": "TfsAttachmentTool"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsAttachmentTool": {
+            "Enabled": "True",
+            "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+            "MaxAttachmentSize": "480000000",
+            "RefName": "TfsAttachmentTool"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 - name: classic
   order: 3
@@ -18,9 +44,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsAttachmentToolOptions",
-      "Enabled": false,
-      "ExportBasePath": null,
-      "MaxAttachmentSize": 0
+      "Enabled": true,
+      "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
+      "MaxAttachmentSize": 480000000
     }
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 description: Tool for processing and migrating work item attachments between Team Foundation Server instances, handling file downloads, uploads, and attachment metadata.

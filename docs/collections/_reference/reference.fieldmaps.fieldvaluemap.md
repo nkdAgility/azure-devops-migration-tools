@@ -5,12 +5,52 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValueMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValueMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "StateB",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "StateA": "StateB"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: classic
   order: 3
@@ -18,11 +58,16 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldValueMapOptions",
-      "sourceField": null,
-      "targetField": null,
-      "defaultValue": null,
-      "valueMapping": null,
-      "ApplyTo": []
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "StateB",
+      "valueMapping": {
+        "StateA": "StateB"
+      },
+      "ApplyTo": [
+        "*",
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 description: Maps field values based on a lookup table, allowing specific source values to be translated to different target values.

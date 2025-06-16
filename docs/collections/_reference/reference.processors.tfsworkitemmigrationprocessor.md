@@ -5,12 +5,53 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Processors": [
+          {
+            "ProcessorType": "TfsWorkItemMigrationProcessor",
+            "AttachRevisionHistory": "False",
+            "Enabled": "False",
+            "FilterWorkItemsThatAlreadyExistInTarget": "False",
+            "FixHtmlAttachmentLinks": "True",
+            "GenerateMigrationComment": "True",
+            "MaxGracefulFailures": "0",
+            "PauseAfterEachWorkItem": "False",
+            "SkipRevisionWithInvalidAreaPath": "False",
+            "SkipRevisionWithInvalidIterationPath": "False",
+            "SourceName": "Source",
+            "TargetName": "Target",
+            "UpdateCreatedBy": "True",
+            "UpdateCreatedDate": "True",
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+            "WorkItemCreateRetryLimit": "5",
+            "WorkItemIDs": null
+          }
+        ]
+      }
+    }
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Processors": [
+          {
+            "ProcessorType": "TfsWorkItemMigrationProcessor",
+            "Enabled": "False",
+            "FilterWorkItemsThatAlreadyExistInTarget": "False",
+            "SourceName": "Source",
+            "TargetName": "Target",
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+          }
+        ]
+      }
+    }
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: classic
   order: 3
@@ -21,13 +62,13 @@ configurationSamples:
       "Enabled": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQuery": null,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
       "FixHtmlAttachmentLinks": true,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "GenerateMigrationComment": true,
-      "SourceName": null,
-      "TargetName": null
+      "SourceName": "Source",
+      "TargetName": "Target"
     }
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
@@ -82,7 +123,7 @@ optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkIt
 notes:
   exists: true
   path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
-  markdown: >
+  markdown: >+
     ## <a name="WIQLQuery"></a>WIQL Query
 
 
@@ -192,7 +233,7 @@ topics:
 - topic: notes
   path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
   exists: true
-  markdown: >
+  markdown: >+
     ## <a name="WIQLQuery"></a>WIQL Query
 
 
@@ -291,7 +332,7 @@ topics:
 - topic: introduction
   path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-introduction.md
   exists: true
-  markdown: >
+  markdown: >+
     The `WorkItemMigrationContext` processor is used for migrating work items from one Azure DevOps instance to another. This encompasses a variety of activities:
 
 
