@@ -9,7 +9,58 @@ configurationSamples:
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "Areas": {
+              "Filters": [
+                "*\\Team 1,*\\Team 1\\**"
+              ],
+              "Mappings": [
+                {
+                  "Match": "^migrationSource1([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                }
+              ]
+            },
+            "Enabled": "True",
+            "Iterations": {
+              "Filters": [
+                "*\\Sprint*",
+                "*\\Sprint*\\**"
+              ],
+              "Mappings": [
+                {
+                  "Match": "^migrationSource1([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                }
+              ]
+            },
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: classic
   order: 3
@@ -19,12 +70,43 @@ configurationSamples:
       "$type": "TfsNodeStructureToolOptions",
       "Enabled": false,
       "Areas": {
-        "Filters": [],
-        "Mappings": []
+        "Filters": [
+          "*\\Team 1,*\\Team 1\\**"
+        ],
+        "Mappings": [
+          {
+            "Match": "^migrationSource1([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^Skypoint Cloud([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          }
+        ]
       },
       "Iterations": {
-        "Filters": [],
-        "Mappings": []
+        "Filters": [
+          "*\\Sprint*",
+          "*\\Sprint*\\**"
+        ],
+        "Mappings": [
+          {
+            "Match": "^migrationSource1([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^Skypoint Cloud([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          }
+        ]
       },
       "ShouldCreateMissingRevisionPaths": false,
       "ReplicateAllExistingNodes": false
@@ -37,7 +119,7 @@ architecture:
 options:
 - parameterName: Areas
   type: NodeOptions
-  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }'
   defaultValue: '{"Filters": [], "Mappings": []}'
 - parameterName: Enabled
   type: Boolean
@@ -45,7 +127,7 @@ options:
   defaultValue: missing XML code comments
 - parameterName: Iterations
   type: NodeOptions
-  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
+  description: 'Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }'
   defaultValue: '{"Filters": [], "Mappings": []}'
 - parameterName: ReplicateAllExistingNodes
   type: Boolean
