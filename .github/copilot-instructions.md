@@ -226,3 +226,58 @@ Available templates for `init` command:
 - `Reference` - Complete feature set with all options
 
 **Copilot Agent Notes:** When suggesting code modifications, consider whether TFS Object Model or REST API patterns are more appropriate. REST API patterns are preferred for new development and cross-platform scenarios, while TFS Object Model may be necessary for specific legacy TFS compatibility requirements.
+
+## Documentation Synchronization Requirements
+
+### Critical: Keep Documentation in Sync with Code Changes
+
+When modifying any option classes or configuration-related classes, the documentation must be updated to reflect the current code state:
+
+**Classes Requiring Documentation Updates:**
+- `IProcessorOptions` implementations (processors configuration)
+- `IToolOptions` implementations (tools configuration)  
+- `IFieldMapOptions` implementations (field mapping configuration)
+- `IProcessorEnricherOptions` implementations (processor enrichers configuration)
+- `IEndpointOptions` implementations (endpoint configuration)
+- `IEndpointEnricherOptions` implementations (endpoint enrichers configuration)
+
+**Required Steps When Editing These Classes:**
+
+1. **Update XML Documentation Comments:** Ensure all public properties have accurate `<summary>` and `<default>` XML documentation comments that reflect current behavior and default values.
+
+2. **Regenerate Documentation:** Run the `MigrationTools.ConsoleDataGenerator` to regenerate YAML data files and Markdown documentation:
+   ```bash
+   cd src/MigrationTools.ConsoleDataGenerator
+   dotnet run
+   ```
+
+3. **Verify Configuration Samples:** Check that generated YAML files in `/docs/_data/` contain configuration samples that match the actual class properties:
+   - Property names must match exactly
+   - Default values must be current
+   - All required properties must be present
+   - Deprecated properties should be removed
+
+4. **Validate Documentation Pages:** Ensure that any code samples in `/docs/Reference/` markdown files reflect the current class structure and property names.
+
+5. **Cross-Reference Class Data:** Verify that the documentation accurately represents what is actually in the code by comparing:
+   - Property types and names in the class vs. documentation
+   - Default values in code vs. samples  
+   - Required vs. optional properties
+   - XML comments vs. generated descriptions
+
+**Documentation Generation Process:**
+The `ConsoleDataGenerator` uses reflection to discover types and generates:
+- YAML data files in `/docs/_data/` (e.g., `reference.processors.*.yaml`)
+- Markdown documentation in `/docs/Reference/Generated/`
+- Configuration samples that include all properties with their current default values
+
+**Validation Checklist:**
+- [ ] XML documentation comments updated for all modified properties
+- [ ] ConsoleDataGenerator executed successfully
+- [ ] Generated YAML samples match actual class properties
+- [ ] Property types and default values are accurate in documentation
+- [ ] No orphaned or outdated property references in samples
+- [ ] Markdown documentation reflects current class capabilities
+
+**Why This Matters:**
+Users rely on the generated documentation and configuration samples to understand how to configure the migration tools. Outdated documentation leads to configuration errors and user frustration. The reflection-based documentation generation ensures accuracy, but only when the source code contains current and complete XML documentation comments.
