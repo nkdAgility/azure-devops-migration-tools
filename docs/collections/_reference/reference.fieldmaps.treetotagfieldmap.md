@@ -75,11 +75,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/FieldMaps/TreeToTagFieldMap-notes.md
+  path: ../../docs/Reference/FieldMaps/TreeToTagFieldMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/FieldMaps/TreeToTagFieldMap-introduction.md
+  path: ../../docs/Reference/FieldMaps/TreeToTagFieldMap-introduction.md
   exists: false
   markdown: ''
 

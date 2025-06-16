@@ -57,7 +57,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Processors/WorkItemTrackingProcessor.cs
+classFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
 optionsClassFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
 
 redirectFrom:
@@ -71,9 +71,9 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/WorkItemTrackingProcessor-notes.md
+  path: ../../docs/Reference/Processors/WorkItemTrackingProcessor-notes.md
   exists: true
-  markdown: >2+
+  markdown: >2
 
     ### Supported Endpoints
 
@@ -194,7 +194,7 @@ topics:
         }
     ```
 - topic: introduction
-  path: /docs/Reference/Processors/WorkItemTrackingProcessor-introduction.md
+  path: ../../docs/Reference/Processors/WorkItemTrackingProcessor-introduction.md
   exists: false
   markdown: ''
 

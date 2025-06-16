@@ -52,7 +52,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkTool.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkToolOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkToolOptions.cs
 
 redirectFrom:
@@ -66,11 +66,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Tools/TfsWorkItemEmbededLinkTool-notes.md
+  path: ../../docs/Reference/Tools/TfsWorkItemEmbededLinkTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Tools/TfsWorkItemEmbededLinkTool-introduction.md
+  path: ../../docs/Reference/Tools/TfsWorkItemEmbededLinkTool-introduction.md
   exists: false
   markdown: ''
 
