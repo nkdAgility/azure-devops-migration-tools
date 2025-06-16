@@ -68,7 +68,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryToolOptions.cs
 
 redirectFrom:
@@ -82,11 +82,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Tools/TfsGitRepositoryTool-notes.md
+  path: docs/Reference/Tools/TfsGitRepositoryTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Tools/TfsGitRepositoryTool-introduction.md
+  path: docs/Reference/Tools/TfsGitRepositoryTool-introduction.md
   exists: false
   markdown: ''
 

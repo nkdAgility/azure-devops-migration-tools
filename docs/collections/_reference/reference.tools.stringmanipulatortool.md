@@ -95,11 +95,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Tools/StringManipulatorTool-notes.md
+  path: docs/Reference/Tools/StringManipulatorTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Tools/StringManipulatorTool-introduction.md
+  path: docs/Reference/Tools/StringManipulatorTool-introduction.md
   exists: false
   markdown: ''
 

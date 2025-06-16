@@ -107,11 +107,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/FieldMaps/RegexFieldMap-notes.md
+  path: docs/Reference/FieldMaps/RegexFieldMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/FieldMaps/RegexFieldMap-introduction.md
+  path: docs/Reference/FieldMaps/RegexFieldMap-introduction.md
   exists: false
   markdown: ''
 

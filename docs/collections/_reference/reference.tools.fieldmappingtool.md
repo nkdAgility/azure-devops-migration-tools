@@ -216,7 +216,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
+classFile: src/MigrationTools/Tools/FieldMappingTool.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
 
 redirectFrom:
@@ -230,11 +230,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Tools/FieldMappingTool-notes.md
+  path: docs/Reference/Tools/FieldMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Tools/FieldMappingTool-introduction.md
+  path: docs/Reference/Tools/FieldMappingTool-introduction.md
   exists: false
   markdown: ''
 

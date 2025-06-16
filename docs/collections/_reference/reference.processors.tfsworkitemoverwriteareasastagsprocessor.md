@@ -61,11 +61,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-notes.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-introduction.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-introduction.md
   exists: false
   markdown: ''
 

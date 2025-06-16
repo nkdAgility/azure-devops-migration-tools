@@ -71,5 +71,5 @@ options:
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Teams
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs

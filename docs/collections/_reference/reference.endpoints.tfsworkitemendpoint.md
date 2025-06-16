@@ -74,11 +74,24 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Endpoints/TfsWorkItemEndpoint-notes.md
-  exists: false
-  markdown: ''
+  path: docs/Reference/Endpoints/TfsWorkItemEndpoint-notes.md
+  exists: true
+  markdown: >+
+    The Work Item endpoint is super awesome.
+
+
+    |Client  | WriteTo/ReadFrom | Endpoint | Data Target | Description |
+
+    |:-:|:-:|:-:|:-:|:-:|
+
+    AzureDevops.ObjectModel | Tfs Object Model | `TfsWorkItemEndPoint` | WorkItems | TBA
+
+    AzureDevops.Rest | Azure DevOps REST | ?
+
+    FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
+
 - topic: introduction
-  path: /docs/Reference/Endpoints/TfsWorkItemEndpoint-introduction.md
+  path: docs/Reference/Endpoints/TfsWorkItemEndpoint-introduction.md
   exists: false
   markdown: ''
 

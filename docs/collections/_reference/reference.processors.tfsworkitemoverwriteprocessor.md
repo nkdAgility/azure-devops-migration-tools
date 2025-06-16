@@ -81,11 +81,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsWorkItemOverwriteProcessor-introduction.md
+  path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-introduction.md
   exists: false
   markdown: ''
 

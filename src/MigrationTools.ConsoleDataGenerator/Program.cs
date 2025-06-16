@@ -11,8 +11,8 @@ namespace MigrationTools.ConsoleDataGenerator;
 class Program
 {
     private static IConfiguration configuration = GetConfiguration();
-    private static DataSerialization saveData = new DataSerialization("../../../../../");
-    private static ClassDataLoader cdLoader = new ClassDataLoader("../../../../../", saveData, configuration);
+    private static DataSerialization saveData = new DataSerialization("../../");
+    private static ClassDataLoader cdLoader = new ClassDataLoader("../../", saveData, configuration);
     private static MarkdownLoader mdLoader = new MarkdownLoader();
 
 

@@ -61,11 +61,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsTestVariablesMigrationProcessor-notes.md
+  path: docs/Reference/Processors/TfsTestVariablesMigrationProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsTestVariablesMigrationProcessor-introduction.md
+  path: docs/Reference/Processors/TfsTestVariablesMigrationProcessor-introduction.md
   exists: false
   markdown: ''
 

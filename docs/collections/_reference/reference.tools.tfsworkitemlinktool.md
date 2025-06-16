@@ -80,11 +80,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Tools/TfsWorkItemLinkTool-introduction.md
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-introduction.md
   exists: false
   markdown: ''
 

@@ -55,7 +55,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsTeamSettingsEndpointOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsTeamSettingsEndpoint.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsTeamSettingsEndpointOptions.cs
 
 redirectFrom:
@@ -69,11 +69,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Endpoints/TfsTeamSettingsEndpoint-notes.md
+  path: docs/Reference/Endpoints/TfsTeamSettingsEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Endpoints/TfsTeamSettingsEndpoint-introduction.md
+  path: docs/Reference/Endpoints/TfsTeamSettingsEndpoint-introduction.md
   exists: false
   markdown: ''
 

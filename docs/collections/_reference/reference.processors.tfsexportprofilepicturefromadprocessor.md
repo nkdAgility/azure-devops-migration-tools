@@ -62,7 +62,7 @@ options:
   defaultValue: String.Empty
 status: alpha
 processingTarget: Profiles
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
 
 redirectFrom:
@@ -76,11 +76,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-notes.md
+  path: docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-introduction.md
+  path: docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-introduction.md
   exists: false
   markdown: ''
 

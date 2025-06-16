@@ -95,11 +95,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/FieldMaps/FieldLiteralMap-notes.md
+  path: docs/Reference/FieldMaps/FieldLiteralMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/FieldMaps/FieldLiteralMap-introduction.md
+  path: docs/Reference/FieldMaps/FieldLiteralMap-introduction.md
   exists: false
   markdown: ''
 

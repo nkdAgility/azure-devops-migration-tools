@@ -46,11 +46,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Endpoints/FileSystemWorkItemEndpoint-notes.md
+  path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Endpoints/FileSystemWorkItemEndpoint-introduction.md
+  path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-introduction.md
   exists: false
   markdown: ''
 

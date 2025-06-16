@@ -72,7 +72,7 @@ options:
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Teams
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
 
 redirectFrom:
@@ -86,11 +86,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsTeamSettingsProcessor-notes.md
+  path: docs/Reference/Processors/TfsTeamSettingsProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsTeamSettingsProcessor-introduction.md
+  path: docs/Reference/Processors/TfsTeamSettingsProcessor-introduction.md
   exists: false
   markdown: ''
 
