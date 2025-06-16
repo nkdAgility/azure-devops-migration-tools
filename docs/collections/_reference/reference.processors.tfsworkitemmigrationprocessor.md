@@ -118,7 +118,7 @@ options:
   defaultValue: 5
 status: ready
 processingTarget: Work Items
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessorOptions.cs
 
 redirectFrom:
@@ -132,9 +132,9 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
+  path: ../../docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
   exists: true
-  markdown: >+
+  markdown: >
     ## <a name="WIQLQuery"></a>WIQL Query
 
 
@@ -201,7 +201,7 @@ topics:
     Using the above sample structure, if you wanted to map the source project `Team 1` to target project `Team A` etc. you could add the field map as follows
 
 
-    A complete list of [FieldMaps](../Reference/FieldMaps/index.md) are available.
+    A complete list of [FieldMaps](../FieldMaps/index.md) are available.
 
 
     ```
@@ -231,9 +231,9 @@ topics:
 
     - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
 - topic: introduction
-  path: /docs/Reference/Processors/TfsWorkItemMigrationProcessor-introduction.md
+  path: ../../docs/Reference/Processors/TfsWorkItemMigrationProcessor-introduction.md
   exists: true
-  markdown: >+
+  markdown: >
     The `WorkItemMigrationContext` processor is used for migrating work items from one Azure DevOps instance to another. This encompasses a variety of activities:
 
 

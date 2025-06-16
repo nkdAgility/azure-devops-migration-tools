@@ -138,9 +138,9 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Tools/TfsNodeStructureTool-notes.md
+  path: ../../docs/Reference/Tools/TfsNodeStructureTool-notes.md
   exists: true
-  markdown: >+
+  markdown: >
     ## Iteration Maps and Area Maps
 
 
@@ -524,7 +524,7 @@ topics:
 
     You can also use negation when doing this.
 - topic: introduction
-  path: /docs/Reference/Tools/TfsNodeStructureTool-introduction.md
+  path: ../../docs/Reference/Tools/TfsNodeStructureTool-introduction.md
   exists: true
   markdown: ''
 

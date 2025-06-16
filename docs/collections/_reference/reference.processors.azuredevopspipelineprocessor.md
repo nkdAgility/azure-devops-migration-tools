@@ -122,7 +122,7 @@ options:
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Pipelines
-classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessor.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessorOptions.cs
 
 redirectFrom:
@@ -136,7 +136,7 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/AzureDevOpsPipelineProcessor-notes.md
+  path: ../../docs/Reference/Processors/AzureDevOpsPipelineProcessor-notes.md
   exists: true
   markdown: >2-
 
@@ -211,7 +211,7 @@ topics:
 
     When the application is creating service connections make sure you have proper permissions on Azure Active Directory and you can grant Contributor role to the subscription that was chosen.
 - topic: introduction
-  path: /docs/Reference/Processors/AzureDevOpsPipelineProcessor-introduction.md
+  path: ../../docs/Reference/Processors/AzureDevOpsPipelineProcessor-introduction.md
   exists: true
   markdown: >2-
 

@@ -91,9 +91,9 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-notes.md
+  path: ../../docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-notes.md
   exists: true
-  markdown: >+
+  markdown: >
     ## Additional Samples & Info
 
 
@@ -143,7 +143,7 @@ topics:
 
     ```
 - topic: introduction
-  path: /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-introduction.md
+  path: ../../docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-introduction.md
   exists: false
   markdown: ''
 

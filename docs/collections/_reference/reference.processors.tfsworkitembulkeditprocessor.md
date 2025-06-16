@@ -86,11 +86,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsWorkItemBulkEditProcessor-notes.md
+  path: ../../docs/Reference/Processors/TfsWorkItemBulkEditProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsWorkItemBulkEditProcessor-introduction.md
+  path: ../../docs/Reference/Processors/TfsWorkItemBulkEditProcessor-introduction.md
   exists: false
   markdown: ''
 

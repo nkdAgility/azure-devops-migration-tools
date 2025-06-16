@@ -57,7 +57,7 @@ options:
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Queries
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessor.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
 
 redirectFrom:
@@ -71,11 +71,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
+  path: ../../docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsSharedQueryProcessor-introduction.md
+  path: ../../docs/Reference/Processors/TfsSharedQueryProcessor-introduction.md
   exists: false
   markdown: ''
 

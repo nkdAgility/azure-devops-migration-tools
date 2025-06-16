@@ -11,7 +11,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
     public class MarkdownLoader
     {
-        private string markdownPath = "../../../../../docs/Reference/";
+        private string markdownPath = "../../docs/Reference/";
 
         public MarkdownLoader()
         {
