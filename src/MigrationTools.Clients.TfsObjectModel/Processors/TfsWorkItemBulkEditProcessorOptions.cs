@@ -6,8 +6,15 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
+    /// <summary>
+    /// Configuration options for the TfsWorkItemBulkEditProcessor, which performs bulk editing operations on work items in place.
+    /// </summary>
     public class TfsWorkItemBulkEditProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether to run in "what if" mode without making actual changes to work items.
+        /// </summary>
+        /// <default>false</default>
         public bool WhatIf { get; set; }
 
 

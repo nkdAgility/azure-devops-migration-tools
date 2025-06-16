@@ -17,6 +17,9 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// Tool for processing embedded links within work item fields, such as links in HTML fields and converting work item references between source and target systems.
+    /// </summary>
     public class TfsWorkItemEmbededLinkTool : Tool<TfsWorkItemEmbededLinkToolOptions>
     {
         private const string LogTypeName = nameof(TfsWorkItemEmbededLinkTool);

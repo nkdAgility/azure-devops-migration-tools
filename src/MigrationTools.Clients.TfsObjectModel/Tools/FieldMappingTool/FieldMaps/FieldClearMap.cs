@@ -6,8 +6,16 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
+    /// <summary>
+    /// Clears a target field by setting its value to null, useful for removing data from specific fields during migration.
+    /// </summary>
     public class FieldClearMap : FieldMapBase
     {
+        /// <summary>
+        /// Initializes a new instance of the FieldClearMap class.
+        /// </summary>
+        /// <param name="logger">Logger for the field map operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public FieldClearMap(ILogger<FieldSkipMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }

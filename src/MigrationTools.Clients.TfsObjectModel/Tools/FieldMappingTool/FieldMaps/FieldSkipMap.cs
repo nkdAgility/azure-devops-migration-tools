@@ -6,8 +6,16 @@ using MigrationTools.Tools;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
+    /// <summary>
+    /// Skips field mapping for a specific target field, effectively leaving the field unchanged during migration.
+    /// </summary>
     public class FieldSkipMap : FieldMapBase
     {
+        /// <summary>
+        /// Initializes a new instance of the FieldSkipMap class.
+        /// </summary>
+        /// <param name="logger">Logger for the field map operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public FieldSkipMap(ILogger<FieldSkipMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }

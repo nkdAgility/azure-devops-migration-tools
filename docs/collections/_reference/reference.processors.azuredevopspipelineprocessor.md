@@ -66,7 +66,7 @@ configurationSamples:
       "MigrateServiceConnections": true,
       "BuildPipelines": null,
       "ReleasePipelines": null,
-      "RepositoryNameMaps": null,
+      "RepositoryNameMaps": {},
       "SourceName": "sourceName",
       "TargetName": "targetName"
     }
@@ -102,7 +102,7 @@ options:
   defaultValue: true
 - parameterName: MigrateVariableGroups
   type: Boolean
-  description: Migrate Valiable Groups
+  description: Migrate Variable Groups
   defaultValue: true
 - parameterName: ReleasePipelines
   type: List
@@ -122,8 +122,8 @@ options:
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Pipelines
-classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessorOptions.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/AzureDevOpsPipelineProcessorOptions/

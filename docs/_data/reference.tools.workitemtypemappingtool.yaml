@@ -50,7 +50,7 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
-description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
+description: Provides mapping functionality for transforming work item types from source to target systems during migration, allowing different work item type names to be used in the target.
 className: WorkItemTypeMappingTool
 typeName: Tools
 architecture: 
@@ -65,5 +65,5 @@ options:
   defaultValue: '{}'
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools/Tools/WorkItemTypeMappingTool.cs
-optionsClassFile: /src/MigrationTools/Tools/WorkItemTypeMappingToolOptions.cs
+classFile: src/MigrationTools/Tools/WorkItemTypeMappingTool.cs
+optionsClassFile: src/MigrationTools/Tools/WorkItemTypeMappingToolOptions.cs

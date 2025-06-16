@@ -9,8 +9,16 @@ using MigrationTools.Tools;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
+    /// <summary>
+    /// Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.
+    /// </summary>
     public class RegexFieldMap : FieldMapBase
     {
+        /// <summary>
+        /// Initializes a new instance of the RegexFieldMap class.
+        /// </summary>
+        /// <param name="logger">Logger for the field map operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public RegexFieldMap(ILogger<RegexFieldMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
@@ -18,6 +26,10 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
         private RegexFieldMapOptions Config { get { return (RegexFieldMapOptions)_Config; } }
 
+        /// <summary>
+        /// Configures the field map with the specified options.
+        /// </summary>
+        /// <param name="config">The field map configuration options</param>
         public override void Configure(IFieldMapOptions config)
         {
             base.Configure(config);

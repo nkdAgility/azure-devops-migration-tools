@@ -44,7 +44,7 @@ namespace MigrationTools.Tools
     }
 
     /// <summary>
-    /// The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
+    /// Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.
     /// </summary>
     public class TfsNodeStructureTool : Tool<TfsNodeStructureToolOptions>
     {

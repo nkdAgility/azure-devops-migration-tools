@@ -5,8 +5,14 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Configuration options for the Azure DevOps Pipeline Processor that migrates build pipelines, release pipelines, task groups, variable groups, and service connections between Azure DevOps organizations.
+    /// </summary>
     public class AzureDevOpsPipelineProcessorOptions : ProcessorOptions
     {
+        /// <summary>
+        /// Initializes a new instance of the AzureDevOpsPipelineProcessorOptions class with default settings.
+        /// </summary>
         public AzureDevOpsPipelineProcessorOptions()
         {
             Enabled = false;
@@ -40,7 +46,7 @@ namespace MigrationTools.Processors
         public bool MigrateTaskGroups { get; set; }
 
         /// <summary>
-        /// Migrate Valiable Groups
+        /// Migrate Variable Groups
         /// </summary>
         /// <default>true</default>
         public bool MigrateVariableGroups { get; set; }

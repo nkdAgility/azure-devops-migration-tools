@@ -33,7 +33,7 @@ architecture:
 options:
 - parameterName: CollapseRevisions
   type: Boolean
-  description: missing XML code comments
+  description: Gets or sets a value indicating whether to collapse revisions into a single work item.
   defaultValue: missing XML code comments
 - parameterName: Enabled
   type: Boolean
@@ -41,7 +41,7 @@ options:
   defaultValue: missing XML code comments
 - parameterName: ReplayRevisions
   type: Boolean
-  description: missing XML code comments
+  description: Gets or sets a value indicating whether to replay all revisions during migration.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
@@ -53,12 +53,12 @@ options:
   defaultValue: missing XML code comments
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
-  description: missing XML code comments
+  description: Gets or sets the number of times to retry work item creation if it fails.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools/Processors/WorkItemTrackingProcessor.cs
-optionsClassFile: /src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
+classFile: src/MigrationTools/Processors/WorkItemTrackingProcessor.cs
+optionsClassFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/WorkItemTrackingProcessorOptions/

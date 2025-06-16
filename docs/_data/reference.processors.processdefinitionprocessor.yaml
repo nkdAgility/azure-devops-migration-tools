@@ -37,15 +37,15 @@ options:
   defaultValue: missing XML code comments
 - parameterName: MaxDegreeOfParallelism
   type: Int32
-  description: missing XML code comments
+  description: Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.
   defaultValue: missing XML code comments
 - parameterName: Processes
   type: Dictionary
-  description: missing XML code comments
+  description: Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.
   defaultValue: missing XML code comments
 - parameterName: ProcessMaps
   type: Dictionary
-  description: missing XML code comments
+  description: Dictionary mapping source process names to target process names for process template transformations during migration.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
@@ -57,9 +57,9 @@ options:
   defaultValue: missing XML code comments
 - parameterName: UpdateProcessDetails
   type: Boolean
-  description: missing XML code comments
+  description: Indicates whether to update existing process details in the target organization or only create new processes.
   defaultValue: missing XML code comments
 status: Beta
 processingTarget: Pipelines
-classFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessorOptions.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessorOptions.cs

@@ -97,7 +97,7 @@ configurationSamples:
       "ReplicateAllExistingNodes": true
     }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
-description: The TfsNodeStructureToolEnricher is used to create missing nodes in the target project. To configure it add a `TfsNodeStructureToolOptions` section to `CommonEnrichersConfig` in the config file. Otherwise defaults will be applied.
+description: Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.
 className: TfsNodeStructureTool
 typeName: Tools
 architecture: 
@@ -124,8 +124,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsNodeStructureToolOptions/
@@ -140,10 +140,7 @@ topics:
 - topic: notes
   path: /docs/Reference/Tools/TfsNodeStructureTool-notes.md
   exists: true
-  markdown: >2+
-
-
-
+  markdown: >+
     ## Iteration Maps and Area Maps
 
 
@@ -185,7 +182,7 @@ topics:
     The syntax is a dictionary of regular expressions and the replacement text.
 
 
-    *Warning*: These follow the
+    _Warning_: These follow the
 
     [.net regular expression language](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference).
 
@@ -196,7 +193,7 @@ topics:
     use back-references in the replacement string.
 
 
-    *Warning*: Special characters in the acceptation of regular expressions _and_
+    _Warning_: Special characters in the acceptation of regular expressions _and_
 
     json both need to be escaped. For a key, this means, for example, that a
 
@@ -213,7 +210,7 @@ topics:
     (`\\`) due to the special meaning in json.
 
 
-    *Advice*: To avoid unexpected results, always match terminating backslashes in
+    _Advice_: To avoid unexpected results, always match terminating backslashes in
 
     the search pattern and replacement string: if a search pattern ends with a
 
@@ -222,7 +219,6 @@ topics:
     pattern does not include a terminating backslash, then none should be included
 
     in the replacement string.
-
 
 
     ### Configuration
@@ -291,7 +287,6 @@ topics:
       `TargetProject\NewArea\ValidArea\` but `OriginalProject\DescopeThis` would not
       be modified by this rule.
 
-
     ### PrefixProjectToNodes
 
 
@@ -341,6 +336,7 @@ topics:
 
     ```
 
+
     Or you can use regular expressions to match the missing area or iteration paths:
 
 
@@ -371,26 +367,26 @@ topics:
 
     ```
 
-    If the olf iteration path was `\oldproject1\Custom Reporting\Sprint 13`, then this would result in a match for each Iteration node after the project node. You would then be able to reference any of the nodes using "$" and then the number of the match.
 
+    If the old iteration path was `\oldproject1\Custom Reporting\Sprint 13`, then this would result in a match for each Iteration node after the project node. You would then be able to reference any of the nodes using "$" and then the number of the match.
 
 
     Regular expressions are much more difficult to build and debug so it is a good idea to use a [regular expression tester](https://regex101.com/) to check that you are matching the right things and to build them in ChatGTP.
 
 
-    _NOTE: You need `\\` to escape a `\` the pattern, and `\\` to escape a `\` in JSON. Therefor on the left of the match you need 4 `\` to represent the `\\` for the pattern and only 2 `\` in the match_ 
+    _NOTE: You need `\\` to escape a `\` the pattern, and `\\` to escape a `\` in JSON. Therefor on the left of the match you need 4 `\` to represent the `\\` for the pattern and only 2 `\` in the match_
 
 
     ![image](https://github.com/nkdAgility/azure-devops-migration-tools/assets/5205575/2cf50929-7ea9-4a71-beab-dd8ff3b5b2a8)
 
 
-    ### Example with PrefixProjectToNodes 
+    ### Example with PrefixProjectToNodes
 
 
     This will prepend a bucket to the area and iteration paths. This is useful when you want to keep the original paths but also want to be able to identify them as being from the original project.
 
 
-    ```json
+    ````json
 
 
     ```json
@@ -403,7 +399,7 @@ topics:
       "^OriginalProject(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\BucketForIncommingInterations\$2",
     }
 
-    ```
+    ````
 
 
     ### Example with AreaMaps and IterationMaps
@@ -432,59 +428,60 @@ topics:
 
     ## <a name="Filters"></a>Filters
 
+
     The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
 
 
     - AreaPath
-       - SourceProj
-       - SourceProj\Team 1
-       - SourceProj\Team 2
-       - SourceProj\Team 2\Sub-Area 1
-       - SourceProj\Team 2\Sub-Area 2
-       - SourceProj\Team 3
+      - SourceProj
+      - SourceProj\Team 1
+      - SourceProj\Team 2
+      - SourceProj\Team 2\Sub-Area 1
+      - SourceProj\Team 2\Sub-Area 2
+      - SourceProj\Team 3
     - IterationPath
-       - SourceProj
-       - SourceProj\Sprint 1
-       - SourceProj\Sprint 2
-       - SourceProj\Sprint 2\Sub-Iteration
-       - SourceProj\Sprint 3
+      - SourceProj
+      - SourceProj\Sprint 1
+      - SourceProj\Sprint 2
+      - SourceProj\Sprint 2\Sub-Iteration
+      - SourceProj\Sprint 3
 
     Depending upon what node structures you wish to migrate you would need the following settings. Exclusions are also possible by prefixing a path with an exclamation mark `!`. Example are
 
 
-    | | |
+    |              |                                                                                                                                                                                                                                                                                                                                                  |
 
-    |-|-|
+    | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 
-    | Intention    | Migrate all areas and iterations and all Work Items
+    | Intention    | Migrate all areas and iterations and all Work Items                                                                                                                                                                                                                                                                                              |
 
-    | Filters | `[]`
+    | Filters      | `[]`                                                                                                                                                                                                                                                                                                                                             |
 
-    | Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths. <br/> This will be affected by the `AreaMaps` and `IterationMaps` settings.
+    | Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths. <br/> This will be affected by the `AreaMaps` and `IterationMaps` settings.                                                                                                          |
 
-    ||
+    |              |
 
-    | Intention    | Only migrate area path `Team 2` and it associated Work Items, but all iteration paths
+    | Intention    | Only migrate area path `Team 2` and it associated Work Items, but all iteration paths                                                                                                                                                                                                                                                            |
 
-    | NodeBasePath | `["*\\Team 2", "*\\Sprint*"]`
+    | NodeBasePath | `["*\\Team 2", "*\\Sprint*"]`                                                                                                                                                                                                                                                                                                                    |
 
-    | Comment      | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQuery` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source
+    | Comment      | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQuery` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source |
 
-    ||
+    |              |
 
-    | Intention    | Move the `Team 2` area, including its `Sub-Area`, and any others at the same level
+    | Intention    | Move the `Team 2` area, including its `Sub-Area`, and any others at the same level                                                                                                                                                                                                                                                               |
 
-    | NodeBasePath | `["*\\Team 2", "Team 2\\*"]`
+    | NodeBasePath | `["*\\Team 2", "Team 2\\*"]`                                                                                                                                                                                                                                                                                                                     |
 
-    | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migratin will fail
+    | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migration will fail                                                                                                             |
 
-    ||
+    |              |
 
-    | Intention    | Move the `Team 2` area, but not its `Sub-Area`
+    | Intention    | Move the `Team 2` area, but not its `Sub-Area`                                                                                                                                                                                                                                                                                                   |
 
-    | NodeBasePath | `["*\\Team 2", "!Team 2\\SubArea"]`
+    | NodeBasePath | `["*\\Team 2", "!Team 2\\SubArea"]`                                                                                                                                                                                                                                                                                                              |
 
-    | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migratin will fail
+    | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migration will fail                                                                                                             |
 
 
     # Patterns
@@ -492,34 +489,32 @@ topics:
 
     The following patterns are supported:
 
-    > 
 
-    | Wildcard  | Description | Example | Matches | Does not match |
+    > | Wildcard | Description                                                           | Example      | Matches                                                  | Does not match                        |
 
-    | --------  | ----------- | ------- | ------- | -------------- |
+    > | -------- | --------------------------------------------------------------------- | ------------ | -------------------------------------------------------- | ------------------------------------- |
 
-    | \* |  matches any number of any characters including none	| Law\*| Law, Laws, or Lawyer	|
+    > | \*       | matches any number of any characters including none                   | Law\*        | Law, Laws, or Lawyer                                     |
 
-    | ?	| matches any single character	| ?at	| Cat, cat, Bat or bat	| at |
+    > | ?        | matches any single character                                          | ?at          | Cat, cat, Bat or bat                                     | at                                    |
 
-    | [abc] |	matches one character given in the bracket |	[CB]at |	Cat or Bat	| cat or bat |
+    > | [abc]    | matches one character given in the bracket                            | [CB]at       | Cat or Bat                                               | cat or bat                            |
 
-    | [a-z] |	matches one character from the range given in the bracket	| Letter[0-9]	| Letter0, Letter1, Letter2 up to Letter9	| Letters, Letter or Letter10 |
+    > | [a-z]    | matches one character from the range given in the bracket             | Letter[0-9]  | Letter0, Letter1, Letter2 up to Letter9                  | Letters, Letter or Letter10           |
 
-    | [!abc] | matches one character that is not given in the bracket | [!C]at | Bat, bat, or cat | Cat |
+    > | [!abc]   | matches one character that is not given in the bracket                | [!C]at       | Bat, bat, or cat                                         | Cat                                   |
 
-    | [!a-z] | matches one character that is not from the range given in the bracket | Letter[!3-5] | Letter1, Letter2, Letter6 up to Letter9 and Letterx etc. | Letter3, Letter4, Letter5 or Letterxx |
+    > | [!a-z]   | matches one character that is not from the range given in the bracket | Letter[!3-5] | Letter1, Letter2, Letter6 up to Letter9 and Letterx etc. | Letter3, Letter4, Letter5 or Letterxx |
 
 
     In addition, Glob also supports:
 
 
-    | Wildcard  | Description | Example | Matches | Does not match |
+    | Wildcard | Description                                                                                        | Example       | Matches                                            | Does not match |
 
-    | --------  | ----------- | ------- | ------- | -------------- |
+    | -------- | -------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------------------- | -------------- |
 
-    | `**` |  matches any number of path / directory segments. When used must be the only contents of a segment. | /\*\*/some.\* | /foo/bar/bah/some.txt, /some.txt, or /foo/some.txt	|
-
+    | `**`     | matches any number of path / directory segments. When used must be the only contents of a segment. | /\*\*/some.\* | /foo/bar/bah/some.txt, /some.txt, or /foo/some.txt |
 
 
     # Escaping special characters

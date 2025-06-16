@@ -28,7 +28,7 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsWorkItemOverwriteProcessorOptions
-description: Reapply field mappings after a migration. Does not migtate Work Items, only reapplied changes to filed mappings.
+description: Reapply field mappings after a migration. Does not migrate Work Items, only reapplies changes to field mappings.
 className: TfsWorkItemOverwriteProcessor
 typeName: Processors
 architecture: 
@@ -67,8 +67,8 @@ options:
   defaultValue: '[]'
 status: preview
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteProcessorOptions.cs
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemOverwriteProcessorOptions/

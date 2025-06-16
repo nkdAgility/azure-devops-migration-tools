@@ -20,6 +20,8 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": null,
       "OnlyListUsersInWorkItems": true,
+      "ExportAllUsers": false,
+      "UserExportFile": null,
       "SourceName": null,
       "TargetName": null
     }
@@ -33,10 +35,14 @@ options:
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+- parameterName: ExportAllUsers
+  type: Boolean
+  description: Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .
+  defaultValue: missing XML code comments
 - parameterName: OnlyListUsersInWorkItems
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: '`OnlyListUsersInWorkItems`'
+  defaultValue: true
 - parameterName: SourceName
   type: String
   description: missing XML code comments
@@ -45,11 +51,15 @@ options:
   type: String
   description: missing XML code comments
   defaultValue: missing XML code comments
+- parameterName: UserExportFile
+  type: String
+  description: Path to export file where all source and target servers' users will be exported. Users are exported only if  is set to .
+  defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
-  description: missing XML code comments
+  description: WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.
   defaultValue: missing XML code comments
 status: ready
 processingTarget: Work Items
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessor.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs

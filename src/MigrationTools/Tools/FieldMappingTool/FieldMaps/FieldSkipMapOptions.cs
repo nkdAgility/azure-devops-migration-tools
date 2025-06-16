@@ -10,6 +10,9 @@ namespace MigrationTools.Tools
     /// <processingtarget>Work Item</processingtarget>
     public class FieldSkipMapOptions : FieldMapOptions
     {
+        /// <summary>
+        /// Gets or sets the name of the target field that should be skipped during migration, resetting it to its original value.
+        /// </summary>
         public string targetField { get; set; }
 
 

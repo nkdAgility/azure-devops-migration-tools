@@ -8,18 +8,41 @@ using Serilog;
 
 namespace MigrationTools.Options
 {
+    /// <summary>
+    /// Configuration options for network credentials used when connecting to source and target systems. This class is marked as obsolete and should not be used in new implementations.
+    /// </summary>
     [Obsolete]
     public class NetworkCredentialsOptions
     {
+        /// <summary>
+        /// Gets or sets the network credentials for connecting to the source system.
+        /// </summary>
         public NetworkCredentials Source { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the network credentials for connecting to the target system.
+        /// </summary>
         public NetworkCredentials Target { get; set; }
     }
 
+    /// <summary>
+    /// Represents network authentication credentials including domain, username, and password for connecting to TFS or other network-based systems.
+    /// </summary>
     public class NetworkCredentials : IValidateOptions<NetworkCredentials>
     {
+        /// <summary>
+        /// Gets or sets the domain name for Windows authentication (e.g., "CONTOSO" or "contoso.com").
+        /// </summary>
         public string Domain { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the username for authentication. Should not include the domain prefix.
+        /// </summary>
         public string UserName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the password for authentication. This value is masked in JSON serialization for security.
+        /// </summary>
         [JsonConverter(typeof(DefaultOnlyConverter<string>), "** removed as a secret ***")]
         public string Password { get; set; }
 

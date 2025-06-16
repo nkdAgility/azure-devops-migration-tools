@@ -47,7 +47,7 @@ configurationSamples:
       "SaveAfterEachLinkIsAdded": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemLinkToolOptions
-description: missing XML code comments
+description: Tool for migrating work item links and relationships between work items, including shared steps and parameters for test cases.
 className: TfsWorkItemLinkTool
 typeName: Tools
 architecture: 
@@ -66,8 +66,8 @@ options:
   defaultValue: false
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
-optionsClassFile: /src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkToolOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkToolOptions.cs
 
 redirectFrom:
 - /Reference/Tools/TfsWorkItemLinkToolOptions/

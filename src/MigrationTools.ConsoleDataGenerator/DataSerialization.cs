@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MigrationTools.Helpers;
-using Newtonsoft.Json;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
-using MigrationTools.ConsoleDataGenerator.ReferenceData;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using MigrationTools.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
     public class DataSerialization
     {
 
-        private static string dataPath = "../../../../../docs/_data/";
-        private static string referencePath = "../../../../../docs/collections/_reference";
+        private readonly string dataPath;
+        private readonly string referencePath;
 
-        public DataSerialization(string saveDataTo) {
-            dataPath = saveDataTo;
+        public DataSerialization(string rootPath)
+        {
+            dataPath = Path.Combine(rootPath, "docs/_data");
+            referencePath = Path.Combine(rootPath, "docs/collections/_reference");
         }
 
         public string SeraliseData(DataItem data, string apiVersion, string dataTypeName)
@@ -33,7 +28,7 @@ namespace MigrationTools.ConsoleDataGenerator
             yaml = "---" + '\n';
             yaml = yaml + SeraliseDataToYaml(data.classData) + '\n' + SeraliseDataToYaml(data.jekyllData);
             yaml = yaml + '\n' + "---";
-             filePath = Path.Combine(referencePath, filename.ToLower());
+            filePath = Path.Combine(referencePath, filename.ToLower());
             File.WriteAllText($"{filePath}.md", yaml);
             return yaml;
         }

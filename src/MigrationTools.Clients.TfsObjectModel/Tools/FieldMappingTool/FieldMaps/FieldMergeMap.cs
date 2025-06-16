@@ -9,15 +9,30 @@ using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
+    /// <summary>
+    /// Merges values from multiple source fields into a single target field using a specified format template.
+    /// </summary>
     public class FieldMergeMap : FieldMapBase
     {
+        /// <summary>
+        /// Initializes a new instance of the FieldMergeMap class.
+        /// </summary>
+        /// <param name="logger">Logger for the field map operations</param>
+        /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
         public FieldMergeMap(ILogger<FieldMergeMap> logger, ITelemetryLogger telemetryLogger) : base(logger, telemetryLogger)
         {
         }
 
+        /// <summary>
+        /// Gets the display name for this field mapping, showing the source fields and target field.
+        /// </summary>
         public override string MappingDisplayName => buildMappingDisplayName();
         private FieldMergeMapOptions Config { get { return (FieldMergeMapOptions)_Config; } }
 
+        /// <summary>
+        /// Configures the field map with the specified options.
+        /// </summary>
+        /// <param name="config">The field map configuration options</param>
         public override void Configure(IFieldMapOptions config)
         {
             base.Configure(config);

@@ -6,6 +6,9 @@ using System;
 
 namespace MigrationTools._EngineV1.Configuration.Processing
 {
+    /// <summary>
+    /// Configuration options for the TFS Test Plans and Suites Migration Processor that migrates test plans, test suites, and their associated test cases between TFS/Azure DevOps projects.
+    /// </summary>
     public class TfsTestPlansAndSuitesMigrationProcessorOptions : ProcessorOptions
     {
         /// <summary>
