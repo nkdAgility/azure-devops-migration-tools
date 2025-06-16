@@ -71,7 +71,7 @@ architecture:
 options:
 - parameterName: ApplyTo
   type: List
-  description: missing XML code comments
+  description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
 - parameterName: defaultValue
   type: String
@@ -88,7 +88,7 @@ options:
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldToFieldMap.cs
-optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldtoFieldMapOptions.cs
+optionsClassFile: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldToFieldMapOptions/

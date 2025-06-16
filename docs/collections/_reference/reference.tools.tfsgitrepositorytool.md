@@ -68,7 +68,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryToolOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryToolOptions.cs
 
 redirectFrom:

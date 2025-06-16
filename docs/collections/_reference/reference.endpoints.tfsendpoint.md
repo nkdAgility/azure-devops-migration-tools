@@ -118,8 +118,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsEndpoint.cs
-optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsEndpointOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsEndpointOptions.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsEndpointOptions.cs
 
 redirectFrom:
 - /Reference/Endpoints/TfsEndpointOptions/

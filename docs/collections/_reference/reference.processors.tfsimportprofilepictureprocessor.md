@@ -34,15 +34,15 @@ options:
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 status: alpha
 processingTarget: Profiles
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessor.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
 
 redirectFrom:

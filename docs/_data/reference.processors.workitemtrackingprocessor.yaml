@@ -44,11 +44,11 @@ options:
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
@@ -56,5 +56,5 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Processors/WorkItemTrackingProcessor.cs
+classFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs
 optionsClassFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions.cs

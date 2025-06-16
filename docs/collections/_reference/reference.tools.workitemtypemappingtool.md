@@ -66,7 +66,7 @@ options:
   defaultValue: '{}'
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Tools/WorkItemTypeMappingTool.cs
+classFile: src/MigrationTools/Tools/WorkItemTypeMappingToolOptions.cs
 optionsClassFile: src/MigrationTools/Tools/WorkItemTypeMappingToolOptions.cs
 
 redirectFrom:

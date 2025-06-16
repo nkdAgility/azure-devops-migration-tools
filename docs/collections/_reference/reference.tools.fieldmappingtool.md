@@ -216,7 +216,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Tools/FieldMappingTool.cs
+classFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
 
 redirectFrom:
