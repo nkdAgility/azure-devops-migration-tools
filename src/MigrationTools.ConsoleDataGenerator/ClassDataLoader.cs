@@ -188,8 +188,12 @@ namespace MigrationTools.ConsoleDataGenerator
                         if (currentObject[key] is JArray array)
                         {
                             JObject itemObject = sectionObject as JObject ?? new JObject();
-                            // Add ObjectName and OptionFor to the object
-                            itemObject.AddFirst(new JProperty(option.ConfigurationMetadata.ObjectName, option.ConfigurationMetadata.OptionFor));
+                            if (!itemObject.ContainsKey(option.ConfigurationMetadata.ObjectName))
+                            {
+                                // Add ObjectName and OptionFor to the object
+                                itemObject.AddFirst(new JProperty(option.ConfigurationMetadata.ObjectName, option.ConfigurationMetadata.OptionFor));
+                            }
+
                             array.Add(itemObject);
                         }
                     }

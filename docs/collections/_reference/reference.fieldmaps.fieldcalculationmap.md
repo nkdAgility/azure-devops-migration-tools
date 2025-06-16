@@ -27,7 +27,31 @@ configurationSamples:
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "ApplyTo": [
+                  "Bug",
+                  "Task"
+                ],
+                "expression": "[effort] * [rate]",
+                "FieldMapType": "FieldCalculationMap",
+                "parameters": {
+                  "effort": "Custom.EstimatedHours",
+                  "rate": "Custom.HourlyRate"
+                },
+                "targetField": "Custom.EstimatedCost"
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
 - name: classic
   order: 3
@@ -35,11 +59,16 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldCalculationMapOptions",
-      "expression": null,
-      "parameters": {},
-      "targetField": null,
+      "expression": "[effort] * [rate]",
+      "parameters": {
+        "effort": "Custom.EstimatedHours",
+        "rate": "Custom.HourlyRate"
+      },
+      "targetField": "Custom.EstimatedCost",
       "ApplyTo": [
-        "*"
+        "*",
+        "Bug",
+        "Task"
       ]
     }
   sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
