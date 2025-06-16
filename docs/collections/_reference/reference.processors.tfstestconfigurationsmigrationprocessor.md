@@ -56,11 +56,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsTestConfigurationsMigrationProcessor-notes.md
+  path: ../../docs/Reference/Processors/TfsTestConfigurationsMigrationProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsTestConfigurationsMigrationProcessor-introduction.md
+  path: ../../docs/Reference/Processors/TfsTestConfigurationsMigrationProcessor-introduction.md
   exists: false
   markdown: ''
 

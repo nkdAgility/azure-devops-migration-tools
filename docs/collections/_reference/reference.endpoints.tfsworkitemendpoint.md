@@ -60,8 +60,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsWorkItemEndpoint.cs
-optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsWorkItemEndpointOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsWorkItemEndpoint.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsWorkItemEndpointOptions.cs
 
 redirectFrom:
 - /Reference/Endpoints/TfsWorkItemEndpointOptions/
@@ -74,7 +74,7 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Endpoints/TfsWorkItemEndpoint-notes.md
+  path: ../../docs/Reference/Endpoints/TfsWorkItemEndpoint-notes.md
   exists: true
   markdown: >+
     The Work Item endpoint is super awesome.
@@ -91,7 +91,7 @@ topics:
     FileSystem | Local Files | `FileSystemWorkItemEndpoint` | WorkItems | TBA
 
 - topic: introduction
-  path: /docs/Reference/Endpoints/TfsWorkItemEndpoint-introduction.md
+  path: ../../docs/Reference/Endpoints/TfsWorkItemEndpoint-introduction.md
   exists: false
   markdown: ''
 

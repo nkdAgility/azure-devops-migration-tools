@@ -76,9 +76,9 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/ProcessDefinitionProcessor-notes.md
+  path: ../../docs/Reference/Processors/ProcessDefinitionProcessor-notes.md
   exists: true
-  markdown: >2+
+  markdown: >2
 
     ## Example 
 
@@ -120,7 +120,7 @@ topics:
 
     ```
 - topic: introduction
-  path: /docs/Reference/Processors/ProcessDefinitionProcessor-introduction.md
+  path: ../../docs/Reference/Processors/ProcessDefinitionProcessor-introduction.md
   exists: true
   markdown: >2-
 

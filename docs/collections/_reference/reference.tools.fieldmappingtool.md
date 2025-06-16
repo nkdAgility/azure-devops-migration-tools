@@ -36,6 +36,19 @@ configurationSamples:
             "FieldMaps": [
               {
                 "ApplyTo": [
+                  "Bug",
+                  "Task"
+                ],
+                "expression": "[effort] * [rate]",
+                "FieldMapType": "FieldCalculationMap",
+                "parameters": {
+                  "effort": "Custom.EstimatedHours",
+                  "rate": "Custom.HourlyRate"
+                },
+                "targetField": "Custom.EstimatedCost"
+              },
+              {
+                "ApplyTo": [
                   "SomeWorkItemType"
                 ],
                 "FieldMapType": "FieldMergeMap",
@@ -71,6 +84,19 @@ configurationSamples:
               }
             ],
             "FieldMapSamples": {
+              "FieldCalculationMap": {
+                "ApplyTo": [
+                  "Bug",
+                  "Task"
+                ],
+                "expression": "[effort] * [rate]",
+                "FieldMapType": "FieldCalculationMap",
+                "parameters": {
+                  "effort": "Custom.EstimatedHours",
+                  "rate": "Custom.HourlyRate"
+                },
+                "targetField": "Custom.EstimatedCost"
+              },
               "FieldClearMap": {
                 "ApplyTo": [
                   "SomeWorkItemType"
@@ -216,7 +242,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools/Tools/FieldMappingTool.cs
+classFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingToolOptions.cs
 
 redirectFrom:
@@ -230,11 +256,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Tools/FieldMappingTool-notes.md
+  path: ../../docs/Reference/Tools/FieldMappingTool-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Tools/FieldMappingTool-introduction.md
+  path: ../../docs/Reference/Tools/FieldMappingTool-introduction.md
   exists: false
   markdown: ''
 

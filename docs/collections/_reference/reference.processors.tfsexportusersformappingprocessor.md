@@ -62,7 +62,7 @@ options:
   defaultValue: missing XML code comments
 status: ready
 processingTarget: Work Items
-classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessor.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
 
 redirectFrom:
@@ -76,11 +76,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/TfsExportUsersForMappingProcessor-notes.md
+  path: ../../docs/Reference/Processors/TfsExportUsersForMappingProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/TfsExportUsersForMappingProcessor-introduction.md
+  path: ../../docs/Reference/Processors/TfsExportUsersForMappingProcessor-introduction.md
   exists: false
   markdown: ''
 

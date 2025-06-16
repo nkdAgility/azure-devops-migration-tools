@@ -21,7 +21,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "8950f163-3d8d-48d4-b14a-b7b250903fe1",
+      "TargetLinksToKeepProject": "df1a9cb1-115a-43f2-8034-d50128fee331",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
@@ -72,7 +72,7 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessor.cs
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessorOptions.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessorOptions.cs
 
 redirectFrom:
@@ -86,11 +86,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/Processors/KeepOutboundLinkTargetProcessor-notes.md
+  path: ../../docs/Reference/Processors/KeepOutboundLinkTargetProcessor-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/Processors/KeepOutboundLinkTargetProcessor-introduction.md
+  path: ../../docs/Reference/Processors/KeepOutboundLinkTargetProcessor-introduction.md
   exists: false
   markdown: ''
 

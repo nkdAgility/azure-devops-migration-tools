@@ -111,11 +111,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/FieldMaps/FieldValueMap-notes.md
+  path: ../../docs/Reference/FieldMaps/FieldValueMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/FieldMaps/FieldValueMap-introduction.md
+  path: ../../docs/Reference/FieldMaps/FieldValueMap-introduction.md
   exists: false
   markdown: ''
 
