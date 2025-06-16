@@ -88,6 +88,7 @@ namespace MigrationTools.Options
                         optionsBuilder.AddOption(ParseV1FieldMaps(configuration));
                         optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "Processors", "$type"));
                         optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "CommonEnrichersConfig", "$type"));
+                        optionsBuilder.AddOption(ParseSectionCollectionWithTypePropertyNameToList(configuration, "CommonTools", "$type"));
                         if (!IsSectionNullOrEmpty(configuration.GetSection("Source")) || !IsSectionNullOrEmpty(configuration.GetSection("Target")))
                         {
                             optionsBuilder.AddOption(ParseSectionWithTypePropertyNameToOptions(configuration, "Source", "$type"), "Source");
@@ -154,19 +155,23 @@ namespace MigrationTools.Options
                 var newOptionTypeString = ParseOptionsType(optionTypeString);
                 _logger.LogDebug("Upgrading {group} item {old} to {new}", path, optionTypeString, newOptionTypeString);
                 var option = GetOptionWithDefaults(configuration, newOptionTypeString);
-                childSection.Bind(option);
-                switch (optionTypeString)
+                if (option != null)
                 {
-                    case "TfsNodeStructureOptions":
-                        MapTfsNodeStructureOptions(childSection, option);
-                        _logger.LogWarning("Empty type string found in {path}", path);
-                        break;
-                    default:
-                        break;
+                    childSection.Bind(option);
+                    switch (optionTypeString)
+                    {
+                        case "TfsNodeStructureOptions":
+                            MapTfsNodeStructureOptions(childSection, option);
+                            break;
+                        default:
+                            break;
+                    }
+                    options.Add(option);
                 }
-
-
-                options.Add(option);
+                else
+                {
+                    _logger.LogWarning("Could not create option for type {newOptionTypeString} (original: {optionTypeString})", newOptionTypeString, optionTypeString);
+                }
             }
 
             return options;
@@ -174,25 +179,94 @@ namespace MigrationTools.Options
 
         private void MapTfsNodeStructureOptions(IConfigurationSection section, dynamic option)
         {
-            // Map AreaMaps from the old structure to the new Areas.Mappings
+            // Handle conversion from old dictionary format to new array format for Areas.Mappings
+            var areasMappingsSection = section.GetSection("Areas:Mappings");
+            if (areasMappingsSection.Exists() && areasMappingsSection.GetChildren().Any())
+            {
+                // Check if this is a dictionary format (children have Key/Value pairs rather than indexed)
+                var firstChild = areasMappingsSection.GetChildren().FirstOrDefault();
+                if (firstChild != null && !int.TryParse(firstChild.Key, out _))
+                {
+                    // This is dictionary format, convert to NodeMapping objects
+                    option.Areas.Mappings.Clear();
+                    foreach (var mapping in areasMappingsSection.GetChildren())
+                    {
+                        // Create NodeMapping using reflection or dynamic approach
+                        dynamic nodeMapping = CreateNodeMapping(mapping.Key, mapping.Value);
+                        option.Areas.Mappings.Add(nodeMapping);
+                    }
+                    _logger.LogDebug("Converted Areas.Mappings from dictionary format to array format for TfsNodeStructureTool");
+                }
+            }
+
+            // Handle conversion from old dictionary format to new array format for Iterations.Mappings
+            var iterationsMappingsSection = section.GetSection("Iterations:Mappings");
+            if (iterationsMappingsSection.Exists() && iterationsMappingsSection.GetChildren().Any())
+            {
+                // Check if this is a dictionary format (children have Key/Value pairs rather than indexed)
+                var firstChild = iterationsMappingsSection.GetChildren().FirstOrDefault();
+                if (firstChild != null && !int.TryParse(firstChild.Key, out _))
+                {
+                    // This is dictionary format, convert to NodeMapping objects
+                    option.Iterations.Mappings.Clear();
+                    foreach (var mapping in iterationsMappingsSection.GetChildren())
+                    {
+                        // Create NodeMapping using reflection or dynamic approach
+                        dynamic nodeMapping = CreateNodeMapping(mapping.Key, mapping.Value);
+                        option.Iterations.Mappings.Add(nodeMapping);
+                    }
+                    _logger.LogDebug("Converted Iterations.Mappings from dictionary format to array format for TfsNodeStructureTool");
+                }
+            }
+
+            // Legacy support: Map AreaMaps from the old structure to the new Areas.Mappings (if present)
             var areaMaps = section.GetSection("AreaMaps").GetChildren();
             foreach (var areaMap in areaMaps)
             {
                 var key = areaMap.Key;
                 var value = areaMap.Value;
-                option.Areas.Mappings.Add(key, value);
+                dynamic nodeMapping = CreateNodeMapping(key, value);
+                option.Areas.Mappings.Add(nodeMapping);
             }
 
-            // Map IterationMaps from the old structure to the new Iterations.Mappings
+            // Legacy support: Map IterationMaps from the old structure to the new Iterations.Mappings (if present)
             var iterationMaps = section.GetSection("IterationMaps").GetChildren();
             foreach (var iterationMap in iterationMaps)
             {
                 var key = iterationMap.Key;
                 var value = iterationMap.Value;
-                option.Iterations.Mappings.Add(key, value);
+                dynamic nodeMapping = CreateNodeMapping(key, value);
+                option.Iterations.Mappings.Add(nodeMapping);
             }
-            // Now map the intermediate structure back into the original `option` object
+
             _logger.LogDebug("Mapped TfsNodeStructureOptions to TfsNodeStructureTool structure and updated the options object.");
+        }
+
+        private object CreateNodeMapping(string match, string replacement)
+        {
+            // Try to find the NodeMapping type from loaded assemblies
+            var nodeMappingType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .FirstOrDefault(t => t.Name == "NodeMapping" && t.Namespace == "MigrationTools.Tools");
+
+            if (nodeMappingType != null)
+            {
+                var nodeMapping = Activator.CreateInstance(nodeMappingType);
+                var matchProperty = nodeMappingType.GetProperty("Match");
+                var replacementProperty = nodeMappingType.GetProperty("Replacement");
+
+                if (matchProperty != null && replacementProperty != null)
+                {
+                    matchProperty.SetValue(nodeMapping, match);
+                    replacementProperty.SetValue(nodeMapping, replacement);
+                }
+
+                return nodeMapping;
+            }
+
+            // Fallback: create a simple object with the properties
+            _logger.LogWarning("Could not find NodeMapping type, creating fallback object");
+            return new { Match = match, Replacement = replacement };
         }
 
 
@@ -247,12 +321,23 @@ namespace MigrationTools.Options
         {
             _logger.LogInformation("Upgrading {old} to {new}", "ChangeSetMappingFile", "TfsChangeSetMappingTool");
             var changeSetMappingOptions = configuration.GetValue<string>("ChangeSetMappingFile");
+            
+            // Skip if no ChangeSetMappingFile is configured
+            if (string.IsNullOrEmpty(changeSetMappingOptions))
+            {
+                _logger.LogDebug("No ChangeSetMappingFile found, skipping TfsChangeSetMappingTool creation");
+                return null;
+            }
+            
             var properties = new Dictionary<string, object>
                         {
                             { "ChangeSetMappingFile", changeSetMappingOptions }
                         };
             var option = (IOptions)OptionsBinder.BindToOptions("TfsChangeSetMappingToolOptions", properties, classNameChangeLog);
-            option.Enabled = true;
+            if (option != null)
+            {
+                option.Enabled = true;
+            }
             return option;
         }
 
@@ -260,12 +345,23 @@ namespace MigrationTools.Options
         {
             _logger.LogInformation("Upgrading {old} to {new}", "GitRepoMapping", "TfsGitRepoMappingTool");
             var data = configuration.GetValue<Dictionary<string, string>>("GitRepoMapping");
+            
+            // Skip if no GitRepoMapping is configured
+            if (data == null || data.Count == 0)
+            {
+                _logger.LogDebug("No GitRepoMapping found, skipping TfsGitRepoMappingTool creation");
+                return null;
+            }
+            
             var properties = new Dictionary<string, object>
                         {
                             { "Mappings", data }
                         };
             var option = (IOptions)OptionsBinder.BindToOptions("TfsGitRepositoryToolOptions", properties, classNameChangeLog);
-            option.Enabled = true;
+            if (option != null)
+            {
+                option.Enabled = true;
+            }
             return option;
         }
 
