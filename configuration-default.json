@@ -106,17 +106,29 @@
         "Enabled": true,
         "Areas": {
           "Filters": [ " *\\Team 1,*\\Team 1\\**" ],
-          "Mappings": {
-            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
-            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
-          }
+          "Mappings": [
+            {
+              "Match": "^Skypoint Cloud([\\\\]?.*)$",
+              "Replacement": "MigrationTest5$1"
+            },
+            {
+              "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+              "Replacement": "MigrationTest5$1"
+            }
+          ]
         },
         "Iterations": {
           "Filters": [],
-          "Mappings": {
-            "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1",
-            "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1"
-          }
+          "Mappings": [
+            {
+              "Match": "^Skypoint Cloud([\\\\]?.*)$",
+              "Replacement": "MigrationTest5$1"
+            },
+            {
+              "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+              "Replacement": "MigrationTest5$1"
+            }
+          ]
         },
         "ShouldCreateMissingRevisionPaths": true,
         "ReplicateAllExistingNodes": true

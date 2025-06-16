@@ -14,13 +14,13 @@ namespace MigrationTools.Tools
     public sealed class TfsNodeStructureToolOptions : ToolOptions, ITfsNodeStructureToolOptions
     {
         /// <summary>
-        /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
+        /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }
         /// </summary>
         /// <default>{"Filters": [], "Mappings": []}</default>
         public NodeOptions Areas { get; set; } = new NodeOptions();
 
         /// <summary>
-        /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
+        /// Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }
         /// </summary>
         /// <default>{"Filters": [], "Mappings": []}</default>
         public NodeOptions Iterations { get; set; } = new NodeOptions();

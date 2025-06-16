@@ -109,11 +109,11 @@ categories:
 - 
 topics:
 - topic: notes
-  path: /docs/Reference/FieldMaps/FieldCalculationMap-notes.md
+  path: ../../docs/Reference/FieldMaps/FieldCalculationMap-notes.md
   exists: false
   markdown: ''
 - topic: introduction
-  path: /docs/Reference/FieldMaps/FieldCalculationMap-introduction.md
+  path: ../../docs/Reference/FieldMaps/FieldCalculationMap-introduction.md
   exists: false
   markdown: ''
 

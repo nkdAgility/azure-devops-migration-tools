@@ -40,11 +40,20 @@ configurationSamples:
               "Filters": [
                 "*\\Team 1,*\\Team 1\\**"
               ],
-              "Mappings": {
-                "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
-                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
-                "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
-              }
+              "Mappings": [
+                {
+                  "Match": "^migrationSource1([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                }
+              ]
             },
             "Enabled": "True",
             "Iterations": {
@@ -52,11 +61,20 @@ configurationSamples:
                 "*\\Sprint*",
                 "*\\Sprint*\\**"
               ],
-              "Mappings": {
-                "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
-                "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
-                "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
-              }
+              "Mappings": [
+                {
+                  "Match": "^migrationSource1([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                },
+                {
+                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+                  "Replacement": "MigrationTest5$1"
+                }
+              ]
             },
             "ReplicateAllExistingNodes": "True",
             "ShouldCreateMissingRevisionPaths": "True"
@@ -76,22 +94,40 @@ configurationSamples:
         "Filters": [
           "*\\Team 1,*\\Team 1\\**"
         ],
-        "Mappings": {
-          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
-          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
-          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
-        }
+        "Mappings": [
+          {
+            "Match": "^migrationSource1([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^Skypoint Cloud([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          }
+        ]
       },
       "Iterations": {
         "Filters": [
           "*\\Sprint*",
           "*\\Sprint*\\**"
         ],
-        "Mappings": {
-          "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$": "MigrationTest5$1",
-          "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1",
-          "^Skypoint Cloud([\\\\]?.*)$": "MigrationTest5$1"
-        }
+        "Mappings": [
+          {
+            "Match": "^migrationSource1([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^Skypoint Cloud([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          },
+          {
+            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
+            "Replacement": "MigrationTest5$1"
+          }
+        ]
       },
       "ShouldCreateMissingRevisionPaths": true,
       "ReplicateAllExistingNodes": true
@@ -104,16 +140,16 @@ architecture:
 options:
 - parameterName: Areas
   type: NodeOptions
-  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
-  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
+  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }'
+  defaultValue: '{"Filters": [], "Mappings": []}'
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: Iterations
   type: NodeOptions
-  description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }'
-  defaultValue: '{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })'
+  description: 'Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }'
+  defaultValue: '{"Filters": [], "Mappings": []}'
 - parameterName: ReplicateAllExistingNodes
   type: Boolean
   description: missing XML code comments
