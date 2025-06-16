@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
-using Microsoft.TeamFoundation.Build.Client;
-using MigrationTools.Enrichers;
-using MigrationTools.Tools.Infrastructure;
-using Newtonsoft.Json.Schema;
 using DotNet.Globbing;
+using Microsoft.Extensions.Options;
+using MigrationTools.Tools.Infrastructure;
 using Serilog;
 
 namespace MigrationTools.Tools
@@ -20,22 +16,14 @@ namespace MigrationTools.Tools
         /// <summary>
         /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
         /// </summary>
-        /// <default>{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })</default>
-        public NodeOptions Areas { get; set; } = new NodeOptions
-        {
-            Filters = new List<string>(),
-            Mappings = new Dictionary<string, string>()
-        };
+        /// <default>{"Filters": [], "Mappings": []}</default>
+        public NodeOptions Areas { get; set; } = new NodeOptions();
 
         /// <summary>
         /// Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": { "^oldProjectName([\\\\]?.*)$": "targetProjectA$1", } }
         /// </summary>
-        /// <default>{"Filters": [], "Mappings": { "^migrationSource1([\\\\]?.*)$": "MigrationTest5$1" })</default>
-        public NodeOptions Iterations { get; set; } = new NodeOptions
-        {
-            Filters = new List<string>(),
-            Mappings = new Dictionary<string, string>()
-        };
+        /// <default>{"Filters": [], "Mappings": []}</default>
+        public NodeOptions Iterations { get; set; } = new NodeOptions();
 
         /// <summary>
         /// When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
@@ -47,16 +35,29 @@ namespace MigrationTools.Tools
     public class NodeOptions
     {
         /// <summary>
-        /// Using the Glob format you can specify a list of nodes that you want to match. This can be used to filter the main migration of current nodes. note: This does not negate the nees for all nodes in the history of a work item in scope for the migration MUST exist for the system to run, and this will be validated before the migration. e.g. add "migrationSource1\\Team 1,migrationSource1\\Team 1\\**" to match both the Team 1 node and all child nodes. 
+        /// Using the Glob format you can specify a list of nodes that you want to match. This can be used to filter the main migration of current nodes. note: This does not negate the nees for all nodes in the history of a work item in scope for the migration MUST exist for the system to run, and this will be validated before the migration. e.g. add "migrationSource1\\Team 1,migrationSource1\\Team 1\\**" to match both the Team 1 node and all child nodes.
         /// </summary>
-        /// <default>["/"]</default>
-        public List<string> Filters { get; set; }
+        /// <default>[]</default>
+        public List<string> Filters { get; set; } = [];
         /// <summary>
         /// Remapping rules for nodes, implemented with regular expressions. The rules apply with a higher priority than the `PrefixProjectToNodes`,
         /// that is, if no rule matches the path and the `PrefixProjectToNodes` option is enabled, then the old `PrefixProjectToNodes` behavior is applied.
         /// </summary>
-        /// <default>{}</default>
-        public Dictionary<string, string> Mappings { get; set; }
+        /// <default>[]</default>
+        public List<NodeMapping> Mappings { get; set; } = [];
+    }
+
+    public class NodeMapping
+    {
+        /// <summary>
+        /// The regular expression to match the node path.
+        /// </summary>
+        public string Match { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The replacement format for the matched node path.
+        /// </summary>
+        public string Replacement { get; set; } = string.Empty;
     }
 
     public interface ITfsNodeStructureToolOptions
@@ -99,20 +100,20 @@ namespace MigrationTools.Tools
                         return ValidateOptionsResult.Fail($"{propertyName}.Filters contains an invalid glob pattern: {filter}");
                     }
                 }
-            }           
+            }
             // Validate Mappings (Regex for keys, Format for values)
             if (nodeOptions.Mappings != null)
             {
                 foreach (var mapping in nodeOptions.Mappings)
                 {
-                    if (!IsValidRegex(mapping.Key))
+                    if (!IsValidRegex(mapping.Match))
                     {
-                        return ValidateOptionsResult.Fail($"{propertyName}.Mappings contains an invalid regex pattern: {mapping.Key}");
+                        return ValidateOptionsResult.Fail($"{propertyName}.Mappings contains an invalid regex pattern: {mapping.Match}");
                     }
 
-                    if (!IsValidRegexReplacementFormat(mapping.Value, mapping.Key))
+                    if (!IsValidRegexReplacementFormat(mapping.Replacement, mapping.Match))
                     {
-                        return ValidateOptionsResult.Fail($"{propertyName}.Mappings contains an invalid format string: {mapping.Value}");
+                        return ValidateOptionsResult.Fail($"{propertyName}.Mappings contains an invalid format string: {mapping.Replacement}");
                     }
                 }
             }
@@ -122,16 +123,15 @@ namespace MigrationTools.Tools
         // Example glob validation (modify according to your glob syntax requirements)
         private bool IsValidGlobPattern(string pattern)
         {
-                try
-                {
-                    // This will parse the pattern, and if invalid, will throw an exception
-                    Glob.Parse(pattern);
-                }
-                catch (Exception)
-                {
-                    return false; // If any pattern is invalid, return false
-                }
-           
+            try
+            {
+                // This will parse the pattern, and if invalid, will throw an exception
+                Glob.Parse(pattern);
+            }
+            catch (Exception)
+            {
+                return false; // If any pattern is invalid, return false
+            }
 
             return true; // All patterns are valid
         }
