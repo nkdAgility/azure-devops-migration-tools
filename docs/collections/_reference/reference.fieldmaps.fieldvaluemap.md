@@ -5,52 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldValueMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldValueMap",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "defaultValue": "StateB",
-                "sourceField": "System.State",
-                "targetField": "System.State",
-                "valueMapping": {
-                  "StateA": "StateB"
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 - name: classic
   order: 3
@@ -58,16 +18,11 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldValueMapOptions",
-      "sourceField": "System.State",
-      "targetField": "System.State",
-      "defaultValue": "StateB",
-      "valueMapping": {
-        "StateA": "StateB"
-      },
-      "ApplyTo": [
-        "*",
-        "SomeWorkItemType"
-      ]
+      "sourceField": null,
+      "targetField": null,
+      "defaultValue": null,
+      "valueMapping": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldValueMapOptions
 description: Maps field values based on a lookup table, allowing specific source values to be translated to different target values.
@@ -99,6 +54,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldValueMap.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldValueMapOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/FieldMaps/FieldValueMap-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldValueMapOptions/

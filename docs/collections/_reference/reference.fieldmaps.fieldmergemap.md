@@ -5,52 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldMergeMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldMergeMap",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "formatExpression": "{0} \n {1}",
-                "sourceFields": [
-                  "Custom.FieldA",
-                  "Custom.FieldB"
-                ],
-                "targetField": "Custom.FieldC"
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: classic
   order: 3
@@ -58,16 +18,10 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldMergeMapOptions",
-      "sourceFields": [
-        "Custom.FieldA",
-        "Custom.FieldB"
-      ],
-      "targetField": "Custom.FieldC",
-      "formatExpression": "{0} \n {1}",
-      "ApplyTo": [
-        "*",
-        "SomeWorkItemType"
-      ]
+      "sourceFields": null,
+      "targetField": null,
+      "formatExpression": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 description: Merges values from multiple source fields into a single target field using a specified format template.
@@ -95,6 +49,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldMergeMap.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldMergeMapOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/FieldMaps/FieldMergeMap-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldMergeMapOptions/

@@ -43,3 +43,7 @@ status: Beta
 processingTarget: Suites & Plans
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsTestConfigurationsMigrationProcessor-notes.md
+  markdown: ''

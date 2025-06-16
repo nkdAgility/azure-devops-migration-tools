@@ -44,6 +44,10 @@ status: alpha
 processingTarget: Profiles
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsImportProfilePictureProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsImportProfilePictureProcessorOptions/

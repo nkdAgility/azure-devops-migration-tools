@@ -5,53 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldCalculationMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "ApplyTo": [
-                  "Bug",
-                  "Task"
-                ],
-                "expression": "[effort] * [rate]",
-                "FieldMapType": "FieldCalculationMap",
-                "parameters": {
-                  "effort": "Custom.EstimatedHours",
-                  "rate": "Custom.HourlyRate"
-                },
-                "targetField": "Custom.EstimatedCost"
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
 - name: classic
   order: 3
@@ -59,17 +18,10 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldCalculationMapOptions",
-      "expression": "[effort] * [rate]",
-      "parameters": {
-        "effort": "Custom.EstimatedHours",
-        "rate": "Custom.HourlyRate"
-      },
-      "targetField": "Custom.EstimatedCost",
-      "ApplyTo": [
-        "*",
-        "Bug",
-        "Task"
-      ]
+      "expression": null,
+      "parameters": {},
+      "targetField": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
 description: Performs mathematical calculations on numeric fields using NCalc expressions during migration.
@@ -97,6 +49,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldCalculationMap.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldCalculationMapOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/FieldMaps/FieldCalculationMap-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldCalculationMapOptions/

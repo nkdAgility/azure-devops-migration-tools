@@ -74,6 +74,10 @@ status: missing XML code comments
 processingTarget: WorkItem
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsWorkItemBulkEditProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemBulkEditProcessorOptions/

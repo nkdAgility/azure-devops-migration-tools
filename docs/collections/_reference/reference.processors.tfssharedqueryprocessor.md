@@ -59,6 +59,10 @@ status: Beta
 processingTarget: Queries
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsSharedQueryProcessorOptions/

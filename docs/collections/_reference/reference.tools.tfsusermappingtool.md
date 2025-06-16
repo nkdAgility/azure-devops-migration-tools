@@ -5,50 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsUserMappingTool": {
-            "Enabled": "False",
-            "IdentityFieldsToCheck": [
-              "System.AssignedTo",
-              "System.ChangedBy",
-              "System.CreatedBy",
-              "Microsoft.VSTS.Common.ActivatedBy",
-              "Microsoft.VSTS.Common.ResolvedBy",
-              "Microsoft.VSTS.Common.ClosedBy"
-            ],
-            "UserMappingFile": "C:\\temp\\userExport.json"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsUserMappingTool": {
-            "Enabled": "True",
-            "IdentityFieldsToCheck": [
-              "System.AssignedTo",
-              "System.ChangedBy",
-              "System.CreatedBy",
-              "Microsoft.VSTS.Common.ActivatedBy",
-              "Microsoft.VSTS.Common.ResolvedBy",
-              "Microsoft.VSTS.Common.ClosedBy"
-            ],
-            "UserMappingFile": "C:\\temp\\userExport.json"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 - name: classic
   order: 3
@@ -56,22 +18,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsUserMappingToolOptions",
-      "Enabled": true,
-      "IdentityFieldsToCheck": [
-        "System.AssignedTo",
-        "System.ChangedBy",
-        "System.CreatedBy",
-        "Microsoft.VSTS.Common.ActivatedBy",
-        "Microsoft.VSTS.Common.ResolvedBy",
-        "Microsoft.VSTS.Common.ClosedBy",
-        "System.AssignedTo",
-        "System.ChangedBy",
-        "System.CreatedBy",
-        "Microsoft.VSTS.Common.ActivatedBy",
-        "Microsoft.VSTS.Common.ResolvedBy",
-        "Microsoft.VSTS.Common.ClosedBy"
-      ],
-      "UserMappingFile": "C:\\temp\\userExport.json",
+      "Enabled": false,
+      "IdentityFieldsToCheck": null,
+      "UserMappingFile": null,
       "MatchUsersByEmail": false
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
@@ -100,6 +49,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsUserMappingTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsUserMappingToolOptions/

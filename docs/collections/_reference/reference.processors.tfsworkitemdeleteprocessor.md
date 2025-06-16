@@ -69,6 +69,10 @@ status: ready
 processingTarget: WorkItem
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsWorkItemDeleteProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemDeleteProcessorOptions/

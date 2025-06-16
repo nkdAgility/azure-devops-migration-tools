@@ -49,6 +49,7 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string ProcessingTarget { get; internal set; }
         public string ClassFile { get; internal set; }
         public string OptionsClassFile { get; internal set; }
+        public NotesInfo Notes { get; internal set; }
     }
 
     public class JekyllData
@@ -85,5 +86,12 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string Description { get; set; }
         public string Code { get; set; }
         public string SampleFor { get;  set; }
+    }
+
+    public class NotesInfo
+    {
+        public bool Exists { get; internal set; }
+        public string Path { get; internal set; }
+        public string Markdown { get; internal set; }
     }
 }

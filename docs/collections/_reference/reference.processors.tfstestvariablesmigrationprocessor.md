@@ -49,6 +49,10 @@ status: Beta
 processingTarget: Suites & Plans
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsTestVariablesMigrationProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsTestVariablesMigrationProcessorOptions/

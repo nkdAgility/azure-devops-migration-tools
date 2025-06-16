@@ -74,6 +74,10 @@ status: Beta
 processingTarget: Teams
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTeamSettingsProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsTeamSettingsProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsTeamSettingsProcessorOptions/

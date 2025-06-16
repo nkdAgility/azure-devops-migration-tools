@@ -49,6 +49,10 @@ status: Beta
 processingTarget: Work Item
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemOverwriteAreasAsTagsProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessorOptions/

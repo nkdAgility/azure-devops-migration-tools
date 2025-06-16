@@ -5,24 +5,7 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "FieldSkipMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 - name: sample
   order: 1
@@ -36,9 +19,7 @@ configurationSamples:
     {
       "$type": "FieldSkipMapOptions",
       "targetField": null,
-      "ApplyTo": [
-        "*"
-      ]
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
 description: Skips field mapping for a specific target field, effectively leaving the field unchanged during migration.
@@ -58,6 +39,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldSkipMap.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldSkipMapOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/FieldMaps/FieldSkipMap-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldSkipMapOptions/

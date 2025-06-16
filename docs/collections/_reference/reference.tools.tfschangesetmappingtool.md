@@ -5,34 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsChangeSetMappingTool": {
-            "Enabled": "False",
-            "File": ""
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsChangeSetMappingTool": {
-            "Enabled": "True",
-            "File": "c:\\changesetmappings.json"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 - name: classic
   order: 3
@@ -40,7 +18,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsChangeSetMappingToolOptions",
-      "Enabled": true,
+      "Enabled": false,
       "ChangeSetMappingFile": null
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
@@ -61,6 +39,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsChangeSetMappingToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsChangeSetMappingTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsChangeSetMappingToolOptions/

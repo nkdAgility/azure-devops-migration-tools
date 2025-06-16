@@ -4,53 +4,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "Processors": [
-          {
-            "ProcessorType": "TfsWorkItemMigrationProcessor",
-            "AttachRevisionHistory": "False",
-            "Enabled": "False",
-            "FilterWorkItemsThatAlreadyExistInTarget": "False",
-            "FixHtmlAttachmentLinks": "True",
-            "GenerateMigrationComment": "True",
-            "MaxGracefulFailures": "0",
-            "PauseAfterEachWorkItem": "False",
-            "SkipRevisionWithInvalidAreaPath": "False",
-            "SkipRevisionWithInvalidIterationPath": "False",
-            "SourceName": "Source",
-            "TargetName": "Target",
-            "UpdateCreatedBy": "True",
-            "UpdateCreatedDate": "True",
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-            "WorkItemCreateRetryLimit": "5",
-            "WorkItemIDs": null
-          }
-        ]
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "Processors": [
-          {
-            "ProcessorType": "TfsWorkItemMigrationProcessor",
-            "Enabled": "False",
-            "FilterWorkItemsThatAlreadyExistInTarget": "False",
-            "SourceName": "Source",
-            "TargetName": "Target",
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
-          }
-        ]
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 - name: classic
   order: 3
@@ -61,13 +20,13 @@ configurationSamples:
       "Enabled": false,
       "UpdateCreatedDate": true,
       "UpdateCreatedBy": true,
-      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+      "WIQLQuery": null,
       "FixHtmlAttachmentLinks": true,
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "GenerateMigrationComment": true,
-      "SourceName": "Source",
-      "TargetName": "Target"
+      "SourceName": null,
+      "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
 description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
@@ -119,3 +78,102 @@ status: ready
 processingTarget: Work Items
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessorOptions.cs
+notes:
+  exists: true
+  path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
+  markdown: >
+    ## <a name="WIQLQuery"></a>WIQL Query
+
+
+    The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax). We only support flat quereis that have `FROM WorkItems` in the query.
+
+
+    > Note: A useful Azure DevOps Extension to explore WIQL is the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor)
+
+
+    ### Examples
+
+
+    You can use the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor) to craft a query in Azure DevOps.
+
+
+    A simple example config:
+
+
+    ```
+
+    "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+
+    ```
+
+
+    Scope to Area Path (Team data):
+
+
+    ```
+
+    "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.AreaPath] UNDER 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+
+    ```
+
+
+    Limit to specific work items (for testing purposes)
+
+
+    ```
+
+    "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.Id] in (123,456,789) AND [System.TeamProject] = @TeamProject AND [System.AreaPath] UNDER 'project\Team 1\' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+
+    ```
+
+
+    ## <a name="NodeBasePath"></a>NodeBasePath Configuration
+
+
+    Moved to the TfsNodeStructure
+
+
+    # Iteration Maps and Area Maps
+
+
+    Moved to the TfsNodeStructure
+
+
+    ## More Complex Team Migrations
+
+
+    The above options allow you to bring over a sub-set of the WIs (using the `WIQLQueryBit`) and move their area or iteration path to a default location. However you may wish to do something more complex e.g. re-map the team structure. This can be done with addition of a `FieldMaps` block to configuration in addition to the `NodeBasePaths`.
+
+
+    Using the above sample structure, if you wanted to map the source project `Team 1` to target project `Team A` etc. you could add the field map as follows
+
+
+    A complete list of [FieldMaps](../FieldMaps/index.md) are available.
+
+
+    ```
+     "FieldMaps": [
+       {
+          "$type": "FieldValueMapConfig",
+          "WorkItemTypeName": "*",
+          "sourceField": "System.AreaPath",
+          "targetField": "System.AreaPath",
+          "defaultValue": "TargetProg",
+          "valueMapping": {
+            "SampleProj\\Team 1": "TargetProg\\Team A",
+            "SampleProj\\Team 2": "TargetProg\\Team B"
+            "SampleProj\\Team 3": "TargetProg\\Team C"
+          }
+        },
+      ],
+
+    ```
+
+
+    > Note: These mappings could also be achieved with other forms of Field mapper e.g. `RegexFieldMapConfig`, but the value mapper as an example is easy to understand
+
+
+    # Removed Properties
+
+
+    - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)

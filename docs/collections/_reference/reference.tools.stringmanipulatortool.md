@@ -5,44 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "StringManipulatorTool": {
-            "Enabled": "True",
-            "Manipulators": null,
-            "MaxStringLength": "1000000"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "StringManipulatorTool": {
-            "Enabled": "True",
-            "Manipulators": [
-              {
-                "$type": "RegexStringManipulator",
-                "Description": "Remove invalid characters from the end of the string",
-                "Enabled": "True",
-                "Pattern": "[^( -~)\n\r\t]+",
-                "Replacement": ""
-              }
-            ],
-            "MaxStringLength": "1000000"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 - name: classic
   order: 3
@@ -50,16 +18,9 @@ configurationSamples:
   code: >-
     {
       "$type": "StringManipulatorToolOptions",
-      "Enabled": true,
-      "MaxStringLength": 1000000,
-      "Manipulators": [
-        {
-          "Enabled": true,
-          "Pattern": "[^( -~)\n\r\t]+",
-          "Replacement": "",
-          "Description": "Remove invalid characters from the end of the string"
-        }
-      ]
+      "Enabled": false,
+      "MaxStringLength": 0,
+      "Manipulators": null
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
@@ -83,6 +44,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools/Tools/StringManipulatorTool.cs
 optionsClassFile: src/MigrationTools/Tools/StringManipulatorToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/StringManipulatorTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/StringManipulatorToolOptions/

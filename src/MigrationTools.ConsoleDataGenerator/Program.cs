@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using MigrationTools.EndpointEnrichers;
@@ -14,7 +15,7 @@ class Program
     private static string rootPath = GetRepositoryRoot();
     private static DataSerialization saveData = new DataSerialization(rootPath);
     private static ClassDataLoader cdLoader = new ClassDataLoader(rootPath, saveData, configuration);
-    private static MarkdownLoader mdLoader = new MarkdownLoader();
+    private static MarkdownLoader mdLoader = new MarkdownLoader(Path.Combine(rootPath, "docs/Reference/"));
 
 
     static void Main(string[] args)
@@ -65,11 +66,19 @@ class Program
         foreach (var classData in classDataList)
         {
             Console.Write($"Out: {classData.ClassName}");
+            
+            // Add notes information to the ClassData
+            var notesInfo = mdLoader.GetMarkdownForTopic(classData, "notes");
+            classData.Notes = new NotesInfo
+            {
+                Exists = notesInfo.Exists,
+                Path = notesInfo.Path,
+                Markdown = notesInfo.Markdown
+            };
+            
             saveData.WriteYamlDataToDataFolder(classData);
             Console.Write($" [Yaml]");
             JekyllData jekyllData = GetJekyllData(classData);
-
-
 
             saveData.WriteMarkdownDataToCollectionFolder(classData, jekyllData);
             Console.Write($" [Markdown]");

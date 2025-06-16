@@ -5,54 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "MultiValueConditionalMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "MultiValueConditionalMap",
-                "ApplyTo": [
-                  "SomeWorkItemType"
-                ],
-                "sourceFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                },
-                "targetFieldsAndValues": {
-                  "Field1": "Value1",
-                  "Field2": "Value2"
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 - name: classic
   order: 3
@@ -60,18 +18,9 @@ configurationSamples:
   code: >-
     {
       "$type": "MultiValueConditionalMapOptions",
-      "sourceFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      },
-      "targetFieldsAndValues": {
-        "Field1": "Value1",
-        "Field2": "Value2"
-      },
-      "ApplyTo": [
-        "*",
-        "SomeWorkItemType"
-      ]
+      "sourceFieldsAndValues": null,
+      "targetFieldsAndValues": null,
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.MultiValueConditionalMapOptions
 description: missing XML code comments
@@ -95,6 +44,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/MultiValueConditionalMap.cs
 optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/MultiValueConditionalMapOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/FieldMaps/MultiValueConditionalMap-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/MultiValueConditionalMapOptions/

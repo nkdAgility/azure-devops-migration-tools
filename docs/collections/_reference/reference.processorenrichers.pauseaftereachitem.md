@@ -44,6 +44,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs
 optionsClassFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItemOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/ProcessorEnrichers/PauseAfterEachItem-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/ProcessorEnrichers/PauseAfterEachItemOptions/

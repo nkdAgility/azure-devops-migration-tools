@@ -64,6 +64,10 @@ status: alpha
 processingTarget: Profiles
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportProfilePictureFromADProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsExportProfilePictureFromADProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsExportProfilePictureFromADProcessorOptions/

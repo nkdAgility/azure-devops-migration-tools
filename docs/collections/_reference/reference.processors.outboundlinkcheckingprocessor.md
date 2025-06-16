@@ -54,6 +54,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/OutboundLinkCheckingProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/OutboundLinkCheckingProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/OutboundLinkCheckingProcessorOptions/

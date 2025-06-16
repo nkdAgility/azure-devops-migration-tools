@@ -5,36 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsGitRepositoryTool": {
-            "Enabled": "True",
-            "Mappings": null
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsGitRepositoryTool": {
-            "Enabled": "True",
-            "Mappings": {
-              "RepoInSource": "RepoInTarget"
-            }
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 - name: classic
   order: 3
@@ -42,11 +18,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsGitRepositoryToolOptions",
-      "Enabled": true,
+      "Enabled": false,
       "ShouldDropChangedSetLinks": false,
-      "Mappings": {
-        "RepoInSource": "RepoInTarget"
-      }
+      "Mappings": {}
     }
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 description: missing XML code comments
@@ -70,6 +44,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsGitRepositoryTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsGitRepositoryToolOptions/

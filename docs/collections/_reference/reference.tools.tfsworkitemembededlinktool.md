@@ -5,32 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsWorkItemEmbededLinkTool": {
-            "Enabled": "True"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsWorkItemEmbededLinkTool": {
-            "Enabled": "True"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 - name: classic
   order: 3
@@ -38,7 +18,7 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsWorkItemEmbededLinkToolOptions",
-      "Enabled": true
+      "Enabled": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemEmbededLinkToolOptions
 description: Tool for processing embedded links within work item fields, such as links in HTML fields and converting work item references between source and target systems.
@@ -54,6 +34,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemEmbededLinkToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsWorkItemEmbededLinkTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsWorkItemEmbededLinkToolOptions/

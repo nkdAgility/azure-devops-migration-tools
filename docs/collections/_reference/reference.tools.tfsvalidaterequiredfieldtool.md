@@ -34,6 +34,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsValidateRequiredFieldTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsValidateRequiredFieldToolOptions/

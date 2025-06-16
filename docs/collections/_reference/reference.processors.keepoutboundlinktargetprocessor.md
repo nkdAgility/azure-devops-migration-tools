@@ -21,7 +21,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "228767a1-6da6-46fd-8dbb-798d5d9d396d",
+      "TargetLinksToKeepProject": "c0594aa9-a9fb-4434-b201-5abc0a4f943b",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
@@ -74,6 +74,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/KeepOutboundLinkTargetProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/KeepOutboundLinkTargetProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/KeepOutboundLinkTargetProcessorOptions/

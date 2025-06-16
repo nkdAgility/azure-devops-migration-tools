@@ -5,38 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsAttachmentTool": {
-            "Enabled": "True",
-            "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-            "MaxAttachmentSize": "480000000",
-            "RefName": "TfsAttachmentTool"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsAttachmentTool": {
-            "Enabled": "True",
-            "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-            "MaxAttachmentSize": "480000000",
-            "RefName": "TfsAttachmentTool"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 - name: classic
   order: 3
@@ -44,9 +18,9 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsAttachmentToolOptions",
-      "Enabled": true,
-      "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-      "MaxAttachmentSize": 480000000
+      "Enabled": false,
+      "ExportBasePath": null,
+      "MaxAttachmentSize": 0
     }
   sampleFor: MigrationTools.Tools.TfsAttachmentToolOptions
 description: Tool for processing and migrating work item attachments between Team Foundation Server instances, handling file downloads, uploads, and attachment metadata.
@@ -70,6 +44,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsAttachmentToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsAttachmentTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsAttachmentToolOptions/

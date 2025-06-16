@@ -64,6 +64,10 @@ status: ready
 processingTarget: Work Items
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsExportUsersForMappingProcessorOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Processors/TfsExportUsersForMappingProcessor-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsExportUsersForMappingProcessorOptions/

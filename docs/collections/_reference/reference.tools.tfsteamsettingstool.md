@@ -5,43 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsTeamSettingsTool": {
-            "Enabled": "True",
-            "MigrateTeamCapacities": "True",
-            "MigrateTeamSettings": "True",
-            "Teams": null,
-            "UpdateTeamSettings": "True"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsTeamSettingsTool": {
-            "Enabled": "True",
-            "MigrateTeamCapacities": "True",
-            "MigrateTeamSettings": "True",
-            "Teams": [
-              "Team 1",
-              "Team 2"
-            ],
-            "UpdateTeamSettings": "True"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 - name: classic
   order: 3
@@ -49,15 +18,12 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsTeamSettingsToolOptions",
-      "Enabled": true,
-      "MigrateTeamSettings": true,
-      "UpdateTeamSettings": true,
-      "MigrateTeamCapacities": true,
+      "Enabled": false,
+      "MigrateTeamSettings": false,
+      "UpdateTeamSettings": false,
+      "MigrateTeamCapacities": false,
       "UseUserMapping": false,
-      "Teams": [
-        "Team 1",
-        "Team 2"
-      ]
+      "Teams": null
     }
   sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
 description: Tool for migrating team settings including team configurations, area paths, iterations, and team-specific settings from source to target Team Foundation Server or Azure DevOps.
@@ -93,6 +59,10 @@ status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsTool.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsToolOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Tools/TfsTeamSettingsTool-notes.md
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsTeamSettingsToolOptions/
