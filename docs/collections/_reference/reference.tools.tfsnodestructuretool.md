@@ -5,83 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsNodeStructureTool": {
-            "Areas": {
-              "Filters": null,
-              "Mappings": null
-            },
-            "Enabled": "True",
-            "Iterations": {
-              "Filters": null,
-              "Mappings": null
-            },
-            "ReplicateAllExistingNodes": "True",
-            "ShouldCreateMissingRevisionPaths": "True"
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsNodeStructureTool": {
-            "Areas": {
-              "Filters": [
-                "*\\Team 1,*\\Team 1\\**"
-              ],
-              "Mappings": [
-                {
-                  "Match": "^migrationSource1([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                }
-              ]
-            },
-            "Enabled": "True",
-            "Iterations": {
-              "Filters": [
-                "*\\Sprint*",
-                "*\\Sprint*\\**"
-              ],
-              "Mappings": [
-                {
-                  "Match": "^migrationSource1([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                }
-              ]
-            },
-            "ReplicateAllExistingNodes": "True",
-            "ShouldCreateMissingRevisionPaths": "True"
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 - name: classic
   order: 3
@@ -89,48 +18,17 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsNodeStructureToolOptions",
-      "Enabled": true,
+      "Enabled": false,
       "Areas": {
-        "Filters": [
-          "*\\Team 1,*\\Team 1\\**"
-        ],
-        "Mappings": [
-          {
-            "Match": "^migrationSource1([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^Skypoint Cloud([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          }
-        ]
+        "Filters": [],
+        "Mappings": []
       },
       "Iterations": {
-        "Filters": [
-          "*\\Sprint*",
-          "*\\Sprint*\\**"
-        ],
-        "Mappings": [
-          {
-            "Match": "^migrationSource1([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^Skypoint Cloud([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          }
-        ]
+        "Filters": [],
+        "Mappings": []
       },
-      "ShouldCreateMissingRevisionPaths": true,
-      "ReplicateAllExistingNodes": true
+      "ShouldCreateMissingRevisionPaths": false,
+      "ReplicateAllExistingNodes": false
     }
   sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
 description: Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.
@@ -165,7 +63,7 @@ optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructu
 notes:
   exists: true
   path: docs/Reference/Tools/TfsNodeStructureTool-notes.md
-  markdown: >+
+  markdown: >
     ## Iteration Maps and Area Maps
 
 
@@ -562,7 +460,7 @@ topics:
 - topic: notes
   path: docs/Reference/Tools/TfsNodeStructureTool-notes.md
   exists: true
-  markdown: >+
+  markdown: >
     ## Iteration Maps and Area Maps
 
 
