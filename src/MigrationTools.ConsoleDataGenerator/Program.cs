@@ -61,7 +61,7 @@ class Program
 
 
         Console.WriteLine("-----------");
-        Console.WriteLine("Output");
+        Console.WriteLine("Output - Hugo Data-Driven Generation");
         Console.WriteLine("-----------");
         foreach (var classData in classDataList)
         {
@@ -84,6 +84,7 @@ class Program
                 introInfo
             };
             
+            // Write YAML data files (used by Hugo templates)
             saveData.WriteYamlDataToDataFolder(classData);
             Console.Write($" [Yaml]");
             
@@ -91,41 +92,13 @@ class Program
             saveData.WriteHugoContentFile(classData);
             Console.Write($" [Hugo]");
             
-            // TODO: Remove Jekyll markdown generation once Hugo migration is complete
-            // For now, keeping both approaches during transition
-            JekyllData jekyllData = GetJekyllData(classData);
-            saveData.WriteMarkdownDataToCollectionFolder(classData, jekyllData);
-            Console.Write($" [Jekyll]");
             Console.WriteLine();
         }
         Console.WriteLine("-----------");
 
     }
 
-    private static JekyllData GetJekyllData(ClassData classData)
-    {
-        JekyllData data = new JekyllData();
-        data.Permalink = $"/Reference/{classData.TypeName}/{classData.ClassName}/";
-        data.layout = "reference";
-        data.toc = true;
-        data.title = classData.ClassName;
-        data.categories.Add(classData.TypeName);
-        data.categories.Add(classData.Architecture);
-        data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "notes"));
-        data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "introduction"));
-        List<string> posibleOldUrls = new List<string>()
-        {
-            $"/Reference/{classData.TypeName}/{classData.OptionsClassName}/"
-        };
-        foreach (var possible in posibleOldUrls)
-        {
-            if (possible != data.Permalink)
-            {
-                data.Redirect_from.Add(possible);
-            }
-        }
-        return data;
-    }
+
 
     private static IConfiguration GetConfiguration()
     {

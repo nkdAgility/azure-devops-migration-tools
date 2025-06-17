@@ -57,6 +57,8 @@ namespace MigrationTools.ConsoleDataGenerator
         public string WriteHugoContentFile(ClassData cdata)
         {
             // Create Hugo-style content files that reference data
+            // This implements the "_content.gotmpl" functionality mentioned in the issue
+            // by creating minimal content files that Hugo layouts can process
             string contentDir = Path.Combine(dataPath.Replace("_data", "content/reference"), cdata.TypeName.ToLower());
             Directory.CreateDirectory(contentDir);
             

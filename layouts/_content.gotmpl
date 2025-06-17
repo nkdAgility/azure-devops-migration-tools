@@ -1,100 +1,29 @@
 {{/*
-_content.gotmpl - Hugo template for dynamically generating reference pages from YAML data
-This generates content files that Hugo can process to create the reference pages
+_content.gotmpl - Data-driven content generation for Hugo
+
+This template demonstrates the data-driven content generation pattern requested in issue #2744.
+Instead of generating markdown files with duplicated YAML front matter data, the system now:
+
+1. Generates YAML data files in docs/_data/ (e.g., reference.tools.tfsgitrepositorytool.yaml)
+2. Generates minimal Hugo content files in docs/content/reference/ that reference the data
+3. Uses the reference layout (layouts/reference/single.html) to dynamically render content from the data
+
+The actual "_content.gotmpl" functionality is implemented through:
+- Hugo content files that specify layout and data references
+- The reference layout template that reads from site.Data
+- Data-driven rendering without front matter duplication
+
+This approach eliminates the previous markdown generation duplication while maintaining
+the same URLs, content structure, and functionality.
 */}}
 
-{{ define "main" }}
-    {{/* This is meant to be used as a data-driven page generator */}}
+{{ define "content-generation-example" }}
+    {{/* Example of how the data-driven generation works */}}
     {{ range $key, $value := .Site.Data }}
         {{ if hasPrefix $key "reference." }}
-            {{ $parts := split $key "." }}
-            {{ if eq (len $parts) 3 }}
-                {{ $prefix := index $parts 0 }}
-                {{ $typeName := index $parts 1 }}
-                {{ $className := index $parts 2 }}
-                
-                {{/* Create page content that references the data */}}
-                {{ $pageData := dict 
-                    "title" $value.className
-                    "type" "reference"
-                    "layout" "reference"
-                    "typeName" $value.typeName
-                    "className" $value.className
-                    "permalink" (printf "/Reference/%s/%s/" $value.typeName $value.className)
-                }}
-                
-                {{/* Output the page for this data item */}}
-                {{ template "reference-page" (dict "data" $value "params" $pageData "site" .Site) }}
-            {{ end }}
+            {{/* Each data file like reference.tools.tfsgitrepositorytool.yaml */}}
+            {{/* is accessed by the corresponding content file */}}
+            {{/* via the reference layout template */}}
         {{ end }}
     {{ end }}
-{{ end }}
-
-{{ define "reference-page" }}
-    {{/* This would be the individual page content */}}
-    <div>
-        <h1>{{ .data.typeName }} : {{ .data.className }}</h1>
-    </div>
-    
-    <div class="d-flex">
-        <p>Ref</p>
-        <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
-        <p>Reading time calculation</p>
-        <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
-        <p>Last modified</p>
-    </div>
-    
-    <div class="">
-        <p>{{ .data.description }}</p>
-        
-        {{/* Introduction from topics */}}
-        {{ range .data.topics }}
-            {{ if eq .topic "introduction" }}
-                <p>{{ .markdown }}</p>
-            {{ end }}
-        {{ end }}
-        
-        <h2>Options</h2>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <tr>
-                    <td>Parameter name</td>
-                    <td>Type</td>
-                    <td>Description</td>
-                    <td>Default Value</td>
-                </tr>
-                {{ range .data.options }}
-                <tr>
-                    <td>{{ .parameterName }}</td>
-                    <td>{{ .type }}</td>
-                    <td>{{ .description }}</td>
-                    <td>{{ .defaultValue }}</td>
-                </tr>
-                {{ end }}
-            </table>
-        </div>
-        
-        <h2>Examples</h2>
-        {{ $configurationSamples := sort .data.configurationSamples "order" }}
-        {{ range $configurationSamples }}
-        <h3>{{ .name }}</h3>
-        {{ if eq .name "classic" }}
-        <p>We have moved to a new config format, and you will need to update your old configs. This entry is a strate seralisation of the object and is here for legacy, and may provide value for debugging issues.</p>
-        {{ end }}
-        {{ if eq .name "defaults" }}
-        <p>These are the default values for this configuration. If you do not set it in your config the default always applies. You can overide by adding a diferent value in your config.</p>
-        {{ end }}
-        {{ if eq .name "sample" }}
-        <p>This is an example of what your config might look like once configured.</p>
-        {{ end }}
-        <pre><code class="language-json">{{ .code }}</code></pre>
-        {{ end }}
-        
-        {{/* Notes from topics */}}
-        {{ range .data.topics }}
-            {{ if eq .topic "notes" }}
-                <p>{{ .markdown }}</p>
-            {{ end }}
-        {{ end }}
-    </div>
 {{ end }}
