@@ -5,24 +5,7 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "FieldMappingTool": {
-            "FieldMaps": [
-              {
-                "FieldMapType": "TreeToTagFieldMap",
-                "ApplyTo": [
-                  "*"
-                ]
-              }
-            ]
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 - name: sample
   order: 1
@@ -37,9 +20,7 @@ configurationSamples:
       "$type": "TreeToTagFieldMapOptions",
       "toSkip": 0,
       "timeTravel": 0,
-      "ApplyTo": [
-        "*"
-      ]
+      "ApplyTo": []
     }
   sampleFor: MigrationTools.Tools.TreeToTagFieldMapOptions
 description: Maps work item area path or iteration path hierarchies to tags, allowing tree structures to be represented as flat tag collections.

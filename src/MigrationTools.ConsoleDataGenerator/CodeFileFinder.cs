@@ -15,11 +15,21 @@
             string assemblyName = typeToFind.Assembly.GetName().Name;
             string codePathToSearch = Path.Combine(codePath, "src", assemblyName);
             
-            // First try to find an exact match
+            // First try to find an exact match (case-sensitive)
             List<string> exactMatches = Directory.GetFiles(codePathToSearch, $"{typeToFind.Name}.cs", SearchOption.AllDirectories).ToList();
             if (exactMatches.Count > 0)
             {
                 string relativePath = Path.GetRelativePath(codePath, exactMatches[0]).Replace("\\", "/");
+                return relativePath;
+            }
+            
+            // Try case-insensitive exact match
+            List<string> allCsFiles = Directory.GetFiles(codePathToSearch, "*.cs", SearchOption.AllDirectories).ToList();
+            var caseInsensitiveExactMatch = allCsFiles
+                .FirstOrDefault(f => string.Equals(Path.GetFileNameWithoutExtension(f), typeToFind.Name, StringComparison.OrdinalIgnoreCase));
+            if (caseInsensitiveExactMatch != null)
+            {
+                string relativePath = Path.GetRelativePath(codePath, caseInsensitiveExactMatch).Replace("\\", "/");
                 return relativePath;
             }
             

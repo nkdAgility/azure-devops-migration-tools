@@ -5,38 +5,12 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "WorkItemTypeMappingTool": {
-            "Enabled": "False",
-            "Mappings": {
-              "Source Work Item Type Name": "Target Work Item Type Name"
-            }
-          }
-        }
-      }
-    }
+  code: There are no defaults! Check the sample for options!
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "WorkItemTypeMappingTool": {
-            "Enabled": "True",
-            "Mappings": {
-              "User Story": "Product Backlog Item"
-            }
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 - name: classic
   order: 3
@@ -44,11 +18,8 @@ configurationSamples:
   code: >-
     {
       "$type": "WorkItemTypeMappingToolOptions",
-      "Enabled": true,
-      "Mappings": {
-        "Source Work Item Type Name": "Target Work Item Type Name",
-        "User Story": "Product Backlog Item"
-      }
+      "Enabled": false,
+      "Mappings": null
     }
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
 description: Provides mapping functionality for transforming work item types from source to target systems during migration, allowing different work item type names to be used in the target.
