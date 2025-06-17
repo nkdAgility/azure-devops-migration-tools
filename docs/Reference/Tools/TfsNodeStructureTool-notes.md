@@ -21,19 +21,19 @@ These remapping rules are applied with a higher priority than the
 path and the `PrefixProjectToNodes` option is enabled, then the old behavior is
 used.
 
-The syntax is a dictionary of regular expressions and the replacement text.
+The syntax uses structured mappings with Match and Replacement properties containing regular expressions and the replacement text.
 
 _Warning_: These follow the
 [.net regular expression language](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference).
-The key in the dictionary is a regular expression search pattern, while the
-value is a regular expression replacement pattern. It is therefore possible to
+The Match property contains a regular expression search pattern, while the
+Replacement property contains a regular expression replacement pattern. It is therefore possible to
 use back-references in the replacement string.
 
 _Warning_: Special characters in the acceptation of regular expressions _and_
-json both need to be escaped. For a key, this means, for example, that a
+json both need to be escaped. For the Match property, this means, for example, that a
 literal backslash must be escaped for the regular expression language `\\`
 _and_ each of these backslashes must then be escaped for the json encoding:
-`\\\\`. In the replacement string, a literal `$` must be escaped with an
+`\\\\`. In the Replacement property, a literal `$` must be escaped with an
 additional `$` if it is followed by a number (due to the special meaning in
 regular expression replacement strings), while a backslash must be escaped
 (`\\`) due to the special meaning in json.
@@ -228,7 +228,7 @@ If the old iteration path was `\oldproject1\Custom Reporting\Sprint 13`, then th
 
 Regular expressions are much more difficult to build and debug so it is a good idea to use a [regular expression tester](https://regex101.com/) to check that you are matching the right things and to build them in ChatGTP.
 
-_NOTE: You need `\\` to escape a `\` the pattern, and `\\` to escape a `\` in JSON. Therefor on the left of the match you need 4 `\` to represent the `\\` for the pattern and only 2 `\` in the match_
+_NOTE: You need `\\` to escape a `\` the pattern, and `\\` to escape a `\` in JSON. Therefore in the Match property you need 4 `\` to represent the `\\` for the pattern and only 2 `\` in the Replacement property_
 
 ![image](https://github.com/nkdAgility/azure-devops-migration-tools/assets/5205575/2cf50929-7ea9-4a71-beab-dd8ff3b5b2a8)
 
