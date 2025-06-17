@@ -58,6 +58,15 @@ notes:
   exists: false
   path: docs/Reference/FieldMaps/FieldValueMap-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/FieldMaps/FieldValueMap-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/FieldMaps/FieldValueMap-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldValueMapOptions/

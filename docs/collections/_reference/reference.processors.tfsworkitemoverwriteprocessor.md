@@ -73,6 +73,15 @@ notes:
   exists: false
   path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Processors/TfsWorkItemOverwriteProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsWorkItemOverwriteProcessorOptions/

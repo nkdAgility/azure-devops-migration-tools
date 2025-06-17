@@ -43,6 +43,15 @@ notes:
   exists: false
   path: docs/Reference/Tools/FieldMappingTool-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Tools/FieldMappingTool-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Tools/FieldMappingTool-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/FieldMappingToolOptions/

@@ -61,6 +61,15 @@ notes:
   exists: false
   path: docs/Reference/Endpoints/TfsEndpoint-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Endpoints/TfsEndpoint-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Endpoints/TfsEndpoint-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Endpoints/TfsEndpointOptions/

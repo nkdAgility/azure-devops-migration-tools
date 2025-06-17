@@ -53,6 +53,15 @@ notes:
   exists: false
   path: docs/Reference/Tools/TfsUserMappingTool-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Tools/TfsUserMappingTool-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Tools/TfsUserMappingTool-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsUserMappingToolOptions/

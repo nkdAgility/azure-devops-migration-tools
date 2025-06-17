@@ -58,6 +58,15 @@ notes:
   exists: false
   path: docs/Reference/Processors/OutboundLinkCheckingProcessor-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Processors/OutboundLinkCheckingProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Processors/OutboundLinkCheckingProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/OutboundLinkCheckingProcessorOptions/

@@ -38,6 +38,15 @@ notes:
   exists: false
   path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Endpoints/FileSystemWorkItemEndpoint-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Endpoints/FileSystemWorkItemEndpointOptions/

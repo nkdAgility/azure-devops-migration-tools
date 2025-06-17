@@ -48,6 +48,15 @@ notes:
   exists: false
   path: docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Tools/TfsWorkItemLinkTool-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsWorkItemLinkToolOptions/

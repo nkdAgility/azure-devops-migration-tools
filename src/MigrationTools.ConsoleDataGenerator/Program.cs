@@ -76,12 +76,26 @@ class Program
                 Markdown = notesInfo.Markdown
             };
             
+            // Add topics information for Hugo templates
+            var introInfo = mdLoader.GetMarkdownForTopic(classData, "introduction");
+            classData.Topics = new List<MarkdownInfo>
+            {
+                notesInfo,
+                introInfo
+            };
+            
             saveData.WriteYamlDataToDataFolder(classData);
             Console.Write($" [Yaml]");
+            
+            // Generate Hugo content files that reference the data
+            saveData.WriteHugoContentFile(classData);
+            Console.Write($" [Hugo]");
+            
+            // TODO: Remove Jekyll markdown generation once Hugo migration is complete
+            // For now, keeping both approaches during transition
             JekyllData jekyllData = GetJekyllData(classData);
-
             saveData.WriteMarkdownDataToCollectionFolder(classData, jekyllData);
-            Console.Write($" [Markdown]");
+            Console.Write($" [Jekyll]");
             Console.WriteLine();
         }
         Console.WriteLine("-----------");

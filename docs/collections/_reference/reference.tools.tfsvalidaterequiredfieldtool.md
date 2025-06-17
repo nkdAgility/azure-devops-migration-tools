@@ -38,6 +38,15 @@ notes:
   exists: false
   path: docs/Reference/Tools/TfsValidateRequiredFieldTool-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Tools/TfsValidateRequiredFieldTool-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Tools/TfsValidateRequiredFieldTool-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Tools/TfsValidateRequiredFieldToolOptions/

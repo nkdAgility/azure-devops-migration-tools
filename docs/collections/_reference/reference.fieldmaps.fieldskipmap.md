@@ -43,6 +43,15 @@ notes:
   exists: false
   path: docs/Reference/FieldMaps/FieldSkipMap-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/FieldMaps/FieldSkipMap-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/FieldMaps/FieldSkipMap-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/FieldMaps/FieldSkipMapOptions/

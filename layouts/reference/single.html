@@ -1,0 +1,94 @@
+{{ define "main" }}
+{{/* Hugo reference layout - equivalent to Jekyll's reference.html */}}
+
+{{ $dataKey := printf "reference.%s.%s" (.Params.typeName | lower) (.Params.className | lower) }}
+{{ $data := index .Site.Data $dataKey }}
+
+{{ if $data }}
+<div>
+    <h1>{{ $data.typeName }} : {{ $data.className }}</h1>
+</div>
+
+<div class="d-flex">
+    <p>Ref</p>
+    <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+    <p>{{ .ReadingTime }} min to read</p>
+    <span>&nbsp;<i class="fa-solid fa-pipe"></i>&nbsp;</span>
+    <p>{{ .Lastmod.Format "2006-01-02" }}</p>
+</div>
+
+<div class="">
+    {{/* Include article alert if partial exists */}}
+    {{ partial "article-alert.html" . }}
+
+    <p>{{ $data.description | markdownify }}</p>
+
+    {{/* Introduction from topics */}}
+    {{ range $data.topics }}
+        {{ if eq .topic "introduction" }}
+            <p>{{ .markdown | markdownify }}</p>
+        {{ end }}
+    {{ end }}
+
+    <h2>Options</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <tr>
+                <td>Parameter name</td>
+                <td>Type</td>
+                <td>Description</td>
+                <td>Default Value</td>
+            </tr>
+            {{ range $data.options }}
+            <tr>
+                <td>{{ .parameterName }}</td>
+                <td>{{ .type }}</td>
+                <td>{{ .description }}</td>
+                <td>{{ .defaultValue }}</td>
+            </tr>
+            {{ end }}
+        </table>
+    </div>
+
+    <h2>Examples</h2>
+    {{ $configurationSamples := sort $data.configurationSamples "order" }}
+    {{ range $configurationSamples }}
+    <h3>{{ .name }}</h3>
+    {{ if eq .name "classic" }}
+    <p>We have moved to a new config format, and you will need to update your old configs. This entry is a strate seralisation of the object and is here for legacy, and may provide value for debugging issues.</p>
+    {{ end }}
+    {{ if eq .name "defaults" }}
+    <p>These are the default values for this configuration. If you do not set it in your config the default always applies. You can overide by adding a diferent value in your config.</p>
+    {{ end }}
+    {{ if eq .name "sample" }}
+    <p>This is an example of what your config might look like once configured.</p>
+    {{ end }}
+    {{ highlight .code "json" "linenos=table" }}
+    {{ end }}
+    
+    {{/* Notes from topics */}}
+    {{ range $data.topics }}
+        {{ if eq .topic "notes" }}
+            <p>{{ .markdown | markdownify }}</p>
+        {{ end }}
+    {{ end }}
+
+    {{ .Content }}
+
+{{ else }}
+    <div class="alert alert-warning">
+        <h3>Data Not Found</h3>
+        <p>No data found for reference key: <code>{{ $dataKey }}</code></p>
+        <p>Available data keys:</p>
+        <ul>
+        {{ range $key, $value := .Site.Data }}
+            {{ if hasPrefix $key "reference." }}
+                <li><code>{{ $key }}</code></li>
+            {{ end }}
+        {{ end }}
+        </ul>
+    </div>
+{{ end }}
+
+</div>
+{{ end }}

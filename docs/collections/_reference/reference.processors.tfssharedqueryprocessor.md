@@ -63,6 +63,15 @@ notes:
   exists: false
   path: docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Processors/TfsSharedQueryProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Processors/TfsSharedQueryProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsSharedQueryProcessorOptions/

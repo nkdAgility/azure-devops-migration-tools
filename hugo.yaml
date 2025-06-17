@@ -1,0 +1,43 @@
+baseURL: 'https://nkdagility.com/learn/azure-devops-migration-tools'
+languageCode: 'en-us'
+title: 'Azure DevOps Migration Tools'
+description: 'Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, Tasks, Test Cases, and Plans & Suites from one Project to another in Azure DevOps / TFS both within the same Organisation, and between Organisations.'
+
+contentDir: 'docs/content'
+dataDir: 'docs/_data'
+layoutDir: 'layouts'
+staticDir: 'docs/assets'
+publishDir: '_site'
+
+# Preserve existing URL structure
+permalinks:
+  reference: '/Reference/:section/:title/'
+
+# Enable data-driven content
+outputs:
+  home:
+    - HTML
+  page:
+    - HTML
+
+params:
+  version: "16.0"
+  github_url: "https://github.com/nkdAgility/azure-devops-migration-tools"
+  canonical_base: "https://nkdagility.com/learn/azure-devops-migration-tools"
+
+# Content sections
+taxonomies:
+  category: categories
+  tag: tags
+
+# Enable GitInfo for last modified dates
+enableGitInfo: true
+
+# Markdown settings
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    style: github
+    lineNos: true

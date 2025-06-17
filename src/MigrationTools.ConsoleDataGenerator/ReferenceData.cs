@@ -34,6 +34,7 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         {
             Options = new List<OptionsItem>();
             ConfigurationSamples = new List<ConfigurationSample>();
+            Topics = new List<MarkdownInfo>();
         }
 
         public string? OptionsClassName { get; set; }
@@ -50,6 +51,7 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string ClassFile { get; internal set; }
         public string OptionsClassFile { get; internal set; }
         public NotesInfo Notes { get; internal set; }
+        public List<MarkdownInfo> Topics { get; internal set; }
     }
 
     public class JekyllData

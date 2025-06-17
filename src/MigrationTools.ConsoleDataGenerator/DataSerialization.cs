@@ -54,6 +54,33 @@ namespace MigrationTools.ConsoleDataGenerator
             return yaml;
         }
 
+        public string WriteHugoContentFile(ClassData cdata)
+        {
+            // Create Hugo-style content files that reference data
+            string contentDir = Path.Combine(dataPath.Replace("_data", "content/reference"), cdata.TypeName.ToLower());
+            Directory.CreateDirectory(contentDir);
+            
+            string filename = $"{cdata.ClassName.ToLower()}.md";
+            string filePath = Path.Combine(contentDir, filename);
+            
+            string content = $@"---
+title: ""{cdata.ClassName}""
+type: ""reference""
+layout: ""reference""
+typeName: ""{cdata.TypeName}""
+className: ""{cdata.ClassName}""
+url: ""/Reference/{cdata.TypeName}/{cdata.ClassName}/""
+aliases:
+  - ""/Reference/{cdata.TypeName}/{cdata.OptionsClassName}/""
+---
+
+{{{{/* This page is generated from data in _data/{cdata.TypeName.ToLower()}.{cdata.ClassName.ToLower()}.yaml */}}}}
+";
+            
+            File.WriteAllText(filePath, content);
+            return content;
+        }
+
 
         public string SeraliseData(ClassGroup data, string apiVersion, string dataTypeName)
         {

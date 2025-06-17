@@ -48,6 +48,15 @@ notes:
   exists: false
   path: docs/Reference/Processors/TfsImportProfilePictureProcessor-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Processors/TfsImportProfilePictureProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Processors/TfsImportProfilePictureProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsImportProfilePictureProcessorOptions/

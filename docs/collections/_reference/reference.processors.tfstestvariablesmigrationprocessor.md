@@ -53,6 +53,15 @@ notes:
   exists: false
   path: docs/Reference/Processors/TfsTestVariablesMigrationProcessor-notes.md
   markdown: ''
+topics:
+- topic: notes
+  path: docs/Reference/Processors/TfsTestVariablesMigrationProcessor-notes.md
+  exists: false
+  markdown: ''
+- topic: introduction
+  path: docs/Reference/Processors/TfsTestVariablesMigrationProcessor-introduction.md
+  exists: false
+  markdown: ''
 
 redirectFrom:
 - /Reference/Processors/TfsTestVariablesMigrationProcessorOptions/
