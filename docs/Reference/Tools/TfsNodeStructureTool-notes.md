@@ -5,11 +5,11 @@
 You have two options to solve this problem:
 
 1. You can manually create the mentioned work items. This is a good option if you have a small number of work items or a small number of missing nodes. This will not work if you have work items that were moved from one project to another. Those Nodes are impossible to create in the target project.
-2. You can use the `AreaMaps` and `IterationMaps` to remap the nodes to existing nodes in the target project. This is a good option if you have a large number of work items or a large number of missing nodes.
+2. You can use the `Areas.Mappings` and `Iterations.Mappings` to remap the nodes to existing nodes in the target project. This is a good option if you have a large number of work items or a large number of missing nodes.
 
 ### Overview
 
-These two configuration elements apply after the `NodeBasePaths` selector, i.e.
+These two configuration elements apply after the `Areas.Filters` and `Iterations.Filters` selectors, i.e.
 only on Areas and Iterations that have been selected for migration. They allow
 to change the area path, respectively the iteration path, of migrated work items.
 
@@ -47,18 +47,37 @@ in the replacement string.
 ### Configuration
 
 ```json
-"IterationMaps": {
-  "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
-  "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
-  "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",
+"Iterations": {
+  "Mappings": [
+    {
+      "Match": "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)(.*)$",
+      "Replacement": "TargetProject\\AnotherPath\\NewTeam$1"
+    },
+    {
+      "Match": "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)(.*)$",
+      "Replacement": "TargetProject\\AnotherPath\\Archives\\Sprints 2020$1"
+    },
+    {
+      "Match": "^OriginalProject\\\\Path2(.*)$",
+      "Replacement": "TargetProject\\YetAnotherPath\\Path2$1"
+    }
+  ]
 },
-"AreaMaps": {
-  "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
-  "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",
+"Areas": {
+  "Mappings": [
+    {
+      "Match": "^OriginalProject\\\\(DescopeThis|DescopeThat)(.*)$",
+      "Replacement": "TargetProject\\Archive\\Descoped\\$1$2"
+    },
+    {
+      "Match": "^OriginalProject\\\\(?!DescopeThis|DescopeThat)(.*)$",
+      "Replacement": "TargetProject\\NewArea\\$1"
+    }
+  ]
 }
 ```
 
-- `"^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",`
+- `"Match": "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)(.*)$", "Replacement": "TargetProject\\AnotherPath\\NewTeam$1"`
 
   In an iteration path, `OriginalProject\Path1` found at the beginning of the
   path, when followed by `\Sprint 2022`, will be replaced by
@@ -69,7 +88,7 @@ in the replacement string.
   `OriginalProject\Path1\Sprint 2020\Sprint 03` will _not_ be transformed by
   this rule.
 
-- `"^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",`
+- `"Match": "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)(.*)$", "Replacement": "TargetProject\\AnotherPath\\Archives\\Sprints 2020$1"`
 
   In an iteration path, `OriginalProject\Path1` found at the beginning of the
   path, when followed by `\Sprint 2020`, will be replaced by
@@ -80,12 +99,12 @@ in the replacement string.
   `OriginalProject\Path1\Sprint 2021\Sprint 03` will _not_ be transformed by
   this rule.
 
-- `"^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",`
+- `"Match": "^OriginalProject\\\\Path2(.*)$", "Replacement": "TargetProject\\YetAnotherPath\\Path2$1"`
 
   In an iteration path, `OriginalProject\Path2` will be replaced by
   `TargetProject\YetAnotherPath\Path2`.
 
-- `"^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",`
+- `"Match": "^OriginalProject\\\\(DescopeThis|DescopeThat)(.*)$", "Replacement": "TargetProject\\Archive\\Descoped\\$1$2"`
 
   In an area path, `OriginalProject\` found at the beginning of the path, when
   followed by either `DescopeThis` or `DescopeThat` will be replaced by `TargetProject\Archive\Descoped\`.
@@ -95,7 +114,7 @@ in the replacement string.
   `OriginalProject\DescopeThat\Product` will be transformed to
   `TargetProject\Archive\Descoped\DescopeThat\Product`.
 
-- `"^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",`
+- `"Match": "^OriginalProject\\\\(?!DescopeThis|DescopeThat)(.*)$", "Replacement": "TargetProject\\NewArea\\$1"`
 
   In an area path, `OriginalProject\` found at the beginning of the path will be
   replaced by `TargetProject\NewArea\` unless it is followed by `DescopeThis` or
@@ -107,14 +126,24 @@ in the replacement string.
 
 ### PrefixProjectToNodes
 
-The `PrefixProjectToNodes` was an option that was used to prepend the source project name to the target set of nodes. This was super valuable when the target Project already has nodes and you dont want to merge them all together. This is now replaced by the `AreaMaps` and `IterationMaps` options.
+The `PrefixProjectToNodes` was an option that was used to prepend the source project name to the target set of nodes. This was super valuable when the target Project already has nodes and you dont want to merge them all together. This is now replaced by the `Areas.Mappings` and `Iterations.Mappings` options.
 
 ```
-"IterationMaps": {
-  "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+"Iterations": {
+  "Mappings": [
+    {
+      "Match": "^SourceServer\\\\(.*)$",
+      "Replacement": "TargetServer\\SourceServer\\$1"
+    }
+  ]
 },
-"AreaMaps": {
-   "^SourceServer\\\\(.*)" , "TargetServer\\SourceServer\\$1",
+"Areas": {
+  "Mappings": [
+    {
+      "Match": "^SourceServer\\\\(.*)$",
+      "Replacement": "TargetServer\\SourceServer\\$1"
+    }
+  ]
 }
 ```
 
@@ -131,33 +160,67 @@ Our algorithm that converts the Source nodes to Target nodes processes the mappi
 To add a mapping, you can follow the documentation with this being the simplest way:
 
 ```
-"IterationMaps": {
-  "WorkItemMovedFromProjectName\\\\Iteration 1": "TargetProject\\Sprint 1",
+"Iterations": {
+  "Mappings": [
+    {
+      "Match": "WorkItemMovedFromProjectName\\\\Iteration 1",
+      "Replacement": "TargetProject\\Sprint 1"
+    }
+  ]
 },
-"AreaMaps": {
-   "WorkItemMovedFromProjectName\\\\Team 2": "TargetProject\\ProductA\\Team 2",
+"Areas": {
+  "Mappings": [
+    {
+      "Match": "WorkItemMovedFromProjectName\\\\Team 2",
+      "Replacement": "TargetProject\\ProductA\\Team 2"
+    }
+  ]
 }
 ```
 
 Or you can use regular expressions to match the missing area or iteration paths:
 
 ```
-"IterationMaps": {
-  "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)": "TargetProject\\AnotherPath\\NewTeam",
-  "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)": "TargetProject\\AnotherPath\\Archives\\Sprints 2020",
-  "^OriginalProject\\\\Path2": "TargetProject\\YetAnotherPath\\Path2",
+"Iterations": {
+  "Mappings": [
+    {
+      "Match": "^OriginalProject\\\\Path1(?=\\\\Sprint 2022)(.*)$",
+      "Replacement": "TargetProject\\AnotherPath\\NewTeam$1"
+    },
+    {
+      "Match": "^OriginalProject\\\\Path1(?=\\\\Sprint 2020)(.*)$",
+      "Replacement": "TargetProject\\AnotherPath\\Archives\\Sprints 2020$1"
+    },
+    {
+      "Match": "^OriginalProject\\\\Path2(.*)$",
+      "Replacement": "TargetProject\\YetAnotherPath\\Path2$1"
+    }
+  ]
 },
-"AreaMaps": {
-  "^OriginalProject\\\\(DescopeThis|DescopeThat)": "TargetProject\\Archive\\Descoped\\",
-  "^OriginalProject\\\\(?!DescopeThis|DescopeThat)": "TargetProject\\NewArea\\",
+"Areas": {
+  "Mappings": [
+    {
+      "Match": "^OriginalProject\\\\(DescopeThis|DescopeThat)(.*)$",
+      "Replacement": "TargetProject\\Archive\\Descoped\\$1$2"
+    },
+    {
+      "Match": "^OriginalProject\\\\(?!DescopeThis|DescopeThat)(.*)$",
+      "Replacement": "TargetProject\\NewArea\\$1"
+    }
+  ]
 }
 ```
 
 If you want to use the matches in the replacement you can use the following:
 
 ```
-"IterationMaps": {
-  "^\\\\oldproject1(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\Q1\$2",
+"Iterations": {
+  "Mappings": [
+    {
+      "Match": "^\\\\oldproject1(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$",
+      "Replacement": "TargetProject\\Q1\\$2"
+    }
+  ]
 }
 ```
 
@@ -173,40 +236,57 @@ _NOTE: You need `\\` to escape a `\` the pattern, and `\\` to escape a `\` in JS
 
 This will prepend a bucket to the area and iteration paths. This is useful when you want to keep the original paths but also want to be able to identify them as being from the original project.
 
-````json
+```json
+"Areas": {
+  "Mappings": [
+    {
+      "Match": "^OriginalProject(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$",
+      "Replacement": "TargetProject\\BucketForIncommingAreas\\$2"
+    }
+  ]
+},
+"Iterations": {
+  "Mappings": [
+    {
+      "Match": "^OriginalProject(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$",
+      "Replacement": "TargetProject\\BucketForIncommingInterations\\$2"
+    }
+  ]
+}
+```
+
+### Example with Areas and Iterations
 
 ```json
-"AreaMaps": {
-  "^OriginalProject(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\BucketForIncommingAreas\$2",
-},
-"IterationMaps": {
-  "^OriginalProject(?:\\\\([^\\\\]+))?\\\\([^\\\\]+)$": "TargetProject\\BucketForIncommingInterations\$2",
+{
+  "$type": "TfsNodeStructureToolOptions",
+  "Enabled": true,
+  "Areas": {
+    "Filters": [],
+    "Mappings": [
+      {
+        "Match": "^Skypoint Cloud$",
+        "Replacement": "MigrationTest5"
+      }
+    ]
+  },
+  "Iterations": {
+    "Filters": [],
+    "Mappings": [
+      {
+        "Match": "^Skypoint Cloud\\\\Sprint 1$",
+        "Replacement": "MigrationTest5\\Sprint 1"
+      }
+    ]
+  },
+  "ShouldCreateMissingRevisionPaths": true,
+  "ReplicateAllExistingNodes": true
 }
-````
-
-### Example with AreaMaps and IterationMaps
-
-```
-"CommonEnrichersConfig": [
-    {
-    "$type": "TfsNodeStructureOptions",
-    "PrefixProjectToNodes": false,
-    "NodeBasePaths": [],
-    "AreaMaps": {
-      "^Skypoint Cloud$" : "MigrationTest5"
-    },
-    "IterationMaps": {
-      "^Skypoint Cloud\\\\Sprint 1$" : "MigrationTest5\\Sprint 1"
-    },
-    "ShouldCreateMissingRevisionPaths": true,
-    "ReplicateAllExistingNodes":  true
-  }
-],
 ```
 
 ## <a name="Filters"></a>Filters
 
-The `NodeBasePaths` entry allows the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
+The `Areas.Filters` and `Iterations.Filters` entries allow the filtering of the nodes to be replicated on the target projects. To try to explain the correct usage let us assume that we have a source team project `SourceProj` with the following node structures
 
 - AreaPath
   - SourceProj
@@ -227,19 +307,19 @@ Depending upon what node structures you wish to migrate you would need the follo
 |              |                                                                                                                                                                                                                                                                                                                                                  |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Intention    | Migrate all areas and iterations and all Work Items                                                                                                                                                                                                                                                                                              |
-| Filters      | `[]`                                                                                                                                                                                                                                                                                                                                             |
-| Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths. <br/> This will be affected by the `AreaMaps` and `IterationMaps` settings.                                                                                                          |
+| Filters      | `"Areas": { "Filters": [] }, "Iterations": { "Filters": [] }`                                                                                                                                                                                                                                                                                   |
+| Comment      | The same AreaPath and Iteration Paths are created on the target as on the source. Hence, all migrated WI remain in their existing area and iteration paths. <br/> This will be affected by the `Areas.Mappings` and `Iterations.Mappings` settings.                                                                                          |
 |              |
 | Intention    | Only migrate area path `Team 2` and it associated Work Items, but all iteration paths                                                                                                                                                                                                                                                            |
-| NodeBasePath | `["*\\Team 2", "*\\Sprint*"]`                                                                                                                                                                                                                                                                                                                    |
+| Filters      | `"Areas": { "Filters": ["*\\Team 2"] }, "Iterations": { "Filters": ["*\\Sprint*"] }`                                                                                                                                                                                                                                                            |
 | Comment      | Only the area path ending `Team 2` will be migrated. <br>The `WIQLQuery` should be edited to limit the WI migrated to this area path e.g. add `AND [System.AreaPath] UNDER 'SampleProject\\Team 2'` . <br> The migrated WI will have an area path of `TargetProj\Team 2` but retain their iteration paths matching the sprint name on the source |
 |              |
 | Intention    | Move the `Team 2` area, including its `Sub-Area`, and any others at the same level                                                                                                                                                                                                                                                               |
-| NodeBasePath | `["*\\Team 2", "Team 2\\*"]`                                                                                                                                                                                                                                                                                                                     |
+| Filters      | `"Areas": { "Filters": ["*\\Team 2", "Team 2\\*"] }, "Iterations": { "Filters": [] }`                                                                                                                                                                                                                                                           |
 | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migration will fail                                                                                                             |
 |              |
 | Intention    | Move the `Team 2` area, but not its `Sub-Area`                                                                                                                                                                                                                                                                                                   |
-| NodeBasePath | `["*\\Team 2", "!Team 2\\SubArea"]`                                                                                                                                                                                                                                                                                                              |
+| Filters      | `"Areas": { "Filters": ["*\\Team 2", "!Team 2\\SubArea"] }, "Iterations": { "Filters": [] }`                                                                                                                                                                                                                                                    |
 | Comment      | The Work Items will have to be restricted to the right areas, e.g. with `AND [System.AreaPath] UNDER 'SampleProject\\Team 2' AND [System.AreaPath] NOT UNDER 'SampleProject\\Team 2\\Sub-Area'`, otherwise their migration will fail                                                                                                             |
 
 # Patterns
