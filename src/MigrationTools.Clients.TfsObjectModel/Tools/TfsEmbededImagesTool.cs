@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
@@ -15,7 +14,6 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
-using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
@@ -197,8 +195,7 @@ namespace MigrationTools.Tools
                 }
             });
 
-            var targetType = GetTargetWorkItemType(wi.Type);
-            var dummyWi = GetDummyWorkItem(targetType);
+            var dummyWi = GetDummyWorkItem();
             var wii = httpClient.UpdateWorkItemAsync(payload, dummyWi.Id, bypassRules: true).GetAwaiter().GetResult();
             if (wii != null)
             {
@@ -218,33 +215,6 @@ namespace MigrationTools.Tools
 
         private int _DummyWorkItemCount = 0;
         private TfsProcessor _processor;
-
-        private WorkItemType GetTargetWorkItemType(WorkItemType sourceType)
-        {
-            // Get the work item type mapping tool to check for mappings
-            var workItemTypeMappingTool = Services.GetRequiredService<IWorkItemTypeMappingTool>();
-            
-            var workItemTypeName = sourceType.Name;
-            
-            // Check if there's a mapping configured for this work item type
-            if (workItemTypeMappingTool.Mappings != null && workItemTypeMappingTool.Mappings.ContainsKey(workItemTypeName))
-            {
-                workItemTypeName = workItemTypeMappingTool.Mappings[workItemTypeName];
-                Log.LogDebug("TfsEmbededImagesTool: Mapped work item type '{SourceType}' to '{TargetType}'", sourceType.Name, workItemTypeName);
-            }
-            
-            // Try to get the target work item type from the target project
-            try
-            {
-                var targetType = _targetProject.WorkItemTypes[workItemTypeName];
-                return targetType;
-            }
-            catch (WorkItemTypeDeniedOrNotExistException ex)
-            {
-                Log.LogWarning(ex, "TfsEmbededImagesTool: Target work item type '{WorkItemTypeName}' does not exist in target project. Falling back to default type selection.", workItemTypeName);
-                return null; // Will fall back to default type selection in GetDummyWorkItem
-            }
-        }
 
         private WorkItem GetDummyWorkItem(WorkItemType type = null)
         {
