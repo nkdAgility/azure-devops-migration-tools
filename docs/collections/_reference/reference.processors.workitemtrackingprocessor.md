@@ -62,7 +62,7 @@ optionsClassFile: src/MigrationTools/Processors/WorkItemTrackingProcessorOptions
 notes:
   exists: true
   path: docs/Reference/Processors/WorkItemTrackingProcessor-notes.md
-  markdown: >2+
+  markdown: >2
 
     ### Supported Endpoints
 
@@ -196,7 +196,7 @@ topics:
 - topic: notes
   path: docs/Reference/Processors/WorkItemTrackingProcessor-notes.md
   exists: true
-  markdown: >2+
+  markdown: >2
 
     ### Supported Endpoints
 

@@ -123,7 +123,7 @@ optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkIt
 notes:
   exists: true
   path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
-  markdown: >+
+  markdown: >
     ## <a name="WIQLQuery"></a>WIQL Query
 
 
@@ -233,7 +233,7 @@ topics:
 - topic: notes
   path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
   exists: true
-  markdown: >+
+  markdown: >
     ## <a name="WIQLQuery"></a>WIQL Query
 
 
@@ -332,7 +332,7 @@ topics:
 - topic: introduction
   path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-introduction.md
   exists: true
-  markdown: >+
+  markdown: >
     The `WorkItemMigrationContext` processor is used for migrating work items from one Azure DevOps instance to another. This encompasses a variety of activities:
 
 
