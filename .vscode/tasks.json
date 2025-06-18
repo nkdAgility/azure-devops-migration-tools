@@ -50,7 +50,10 @@
                 "test",
                 "${workspaceFolder}/MigrationTools.sln",
                 "--logger",
-                "console;verbosity=normal"
+                "console;verbosity=normal",
+                "--filter",
+                "(TestCategory=L0|TestCategory=L1)"
+
             ],
             "group": "test",
             "presentation": {
