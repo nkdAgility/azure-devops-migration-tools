@@ -5,12 +5,52 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldMergeMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldMergeMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "formatExpression": "{0} \n {1}",
+                "sourceFields": [
+                  "Custom.FieldA",
+                  "Custom.FieldB"
+                ],
+                "targetField": "Custom.FieldC"
+              }
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 - name: classic
   order: 3
@@ -18,10 +58,16 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldMergeMapOptions",
-      "sourceFields": null,
-      "targetField": null,
-      "formatExpression": null,
-      "ApplyTo": []
+      "sourceFields": [
+        "Custom.FieldA",
+        "Custom.FieldB"
+      ],
+      "targetField": "Custom.FieldC",
+      "formatExpression": "{0} \n {1}",
+      "ApplyTo": [
+        "*",
+        "SomeWorkItemType"
+      ]
     }
   sampleFor: MigrationTools.Tools.FieldMergeMapOptions
 description: Merges values from multiple source fields into a single target field using a specified format template.

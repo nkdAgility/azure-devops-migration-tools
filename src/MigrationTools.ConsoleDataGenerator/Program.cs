@@ -117,11 +117,13 @@ class Program
     {
         // Create a new ConfigurationBuilder
         var configurationBuilder = new ConfigurationBuilder();
-        // Set the base path for the configuration (optional)
-        configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-        // Add configuration sources - try current directory first, then repository root
-        configurationBuilder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        configurationBuilder.AddJsonFile("../../appsettings.json", optional: true, reloadOnChange: true);
+        
+        // Calculate the absolute path to the repository root appsettings.json
+        var repoRoot = GetRepositoryRoot();
+        
+        configurationBuilder.SetBasePath(repoRoot);
+        configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        
         // Build the configuration
         return configurationBuilder.Build();
     }

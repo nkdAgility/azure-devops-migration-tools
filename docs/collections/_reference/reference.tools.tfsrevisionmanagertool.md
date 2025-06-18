@@ -5,12 +5,36 @@ configurationSamples:
 - name: defaults
   order: 2
   description: 
-  code: There are no defaults! Check the sample for options!
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsRevisionManagerTool": {
+            "Enabled": "True",
+            "MaxRevisions": "0",
+            "ReplayRevisions": "True"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsRevisionManagerTool": {
+            "Enabled": "True",
+            "MaxRevisions": "0",
+            "ReplayRevisions": "True"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions
 - name: classic
   order: 3
@@ -18,8 +42,8 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsRevisionManagerToolOptions",
-      "Enabled": false,
-      "ReplayRevisions": false,
+      "Enabled": true,
+      "ReplayRevisions": true,
       "MaxRevisions": 0
     }
   sampleFor: MigrationTools.Tools.TfsRevisionManagerToolOptions
