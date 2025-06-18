@@ -25,9 +25,41 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
-        },
+        },        
         {
             "label": "build full framework",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "build only",
+                "test only", "build docs"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "test only",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "test",
+                "${workspaceFolder}/MigrationTools.sln",
+                "--logger",
+                "console;verbosity=normal"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build only",
             "type": "process",
             "command": "dotnet",
             "args": [
@@ -36,9 +68,20 @@
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
-            "group": "build",
+            "group": "build",            
             "presentation": {
                 "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        },        
+        {
+            "label": "build docs",
+            "type": "shell",
+            "command": "${workspaceFolder}/GenerateDocs.ps1",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
             },
             "problemMatcher": "$msCompile"
         }
