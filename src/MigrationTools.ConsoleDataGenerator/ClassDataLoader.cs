@@ -76,7 +76,6 @@ namespace MigrationTools.ConsoleDataGenerator
                 if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToDefault))
                 {
                     IConfigurationSection mainOrDefaultSection;
-                    Console.WriteLine("Processing as ConfigurationSectionName");
                     mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToDefault);
                     if (mainOrDefaultSection.Exists())
                     {
@@ -91,7 +90,6 @@ namespace MigrationTools.ConsoleDataGenerator
                 }
                 if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToSample))
                 {
-                    Console.WriteLine("targetItem");
                     IConfigurationSection sampleSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToSample);
                     sampleSection.Bind(instanceOfOption);
                     if (sampleSection.Exists())
