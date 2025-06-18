@@ -37,42 +37,21 @@ configurationSamples:
         "CommonTools": {
           "TfsNodeStructureTool": {
             "Areas": {
-              "Filters": [
-                "*\\Team 1,*\\Team 1\\**"
-              ],
+              "Filters": null,
               "Mappings": [
                 {
-                  "Match": "^migrationSource1([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
+                  "Match": "^Skypoint Cloud$",
+                  "Replacement": "MigrationTest5"
                 }
               ]
             },
             "Enabled": "True",
             "Iterations": {
-              "Filters": [
-                "*\\Sprint*",
-                "*\\Sprint*\\**"
-              ],
+              "Filters": null,
               "Mappings": [
                 {
-                  "Match": "^migrationSource1([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^Skypoint Cloud([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
-                },
-                {
-                  "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-                  "Replacement": "MigrationTest5$1"
+                  "Match": "^Skypoint Cloud\\\\Sprint 1$",
+                  "Replacement": "MigrationTest5\\Sprint 1"
                 }
               ]
             },
@@ -91,41 +70,20 @@ configurationSamples:
       "$type": "TfsNodeStructureToolOptions",
       "Enabled": true,
       "Areas": {
-        "Filters": [
-          "*\\Team 1,*\\Team 1\\**"
-        ],
+        "Filters": [],
         "Mappings": [
           {
-            "Match": "^migrationSource1([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^Skypoint Cloud([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
+            "Match": "^Skypoint Cloud$",
+            "Replacement": "MigrationTest5"
           }
         ]
       },
       "Iterations": {
-        "Filters": [
-          "*\\Sprint*",
-          "*\\Sprint*\\**"
-        ],
+        "Filters": [],
         "Mappings": [
           {
-            "Match": "^migrationSource1([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^Skypoint Cloud([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
-          },
-          {
-            "Match": "^7473924d-c47f-4089-8f5c-077c728b576e([\\\\]?.*)$",
-            "Replacement": "MigrationTest5$1"
+            "Match": "^Skypoint Cloud\\\\Sprint 1$",
+            "Replacement": "MigrationTest5\\Sprint 1"
           }
         ]
       },
@@ -165,7 +123,7 @@ optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructu
 notes:
   exists: true
   path: docs/Reference/Tools/TfsNodeStructureTool-notes.md
-  markdown: >+
+  markdown: >
     ## Iteration Maps and Area Maps
 
 
@@ -641,7 +599,7 @@ topics:
 - topic: notes
   path: docs/Reference/Tools/TfsNodeStructureTool-notes.md
   exists: true
-  markdown: >+
+  markdown: >
     ## Iteration Maps and Area Maps
 
 
