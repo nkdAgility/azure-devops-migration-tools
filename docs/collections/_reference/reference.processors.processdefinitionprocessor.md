@@ -67,7 +67,7 @@ optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/Process
 notes:
   exists: true
   path: docs/Reference/Processors/ProcessDefinitionProcessor-notes.md
-  markdown: >2
+  markdown: >2+
 
     ## Example 
 
@@ -122,7 +122,7 @@ topics:
 - topic: notes
   path: docs/Reference/Processors/ProcessDefinitionProcessor-notes.md
   exists: true
-  markdown: >2
+  markdown: >2+
 
     ## Example 
 

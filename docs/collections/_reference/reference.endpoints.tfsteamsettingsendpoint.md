@@ -55,8 +55,8 @@ options:
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
-classFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsTeamSettingsEndpoint.cs
-optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Endpoints/TfsTeamSettingsEndpointOptions.cs
+classFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsTeamSettingsEndpoint.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsTeamSettingsEndpointOptions.cs
 notes:
   exists: false
   path: docs/Reference/Endpoints/TfsTeamSettingsEndpoint-notes.md

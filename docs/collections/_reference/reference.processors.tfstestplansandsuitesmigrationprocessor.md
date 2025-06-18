@@ -82,7 +82,7 @@ optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPl
 notes:
   exists: true
   path: docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-notes.md
-  markdown: >
+  markdown: >+
     ## Additional Samples & Info
 
 
@@ -145,7 +145,7 @@ topics:
 - topic: notes
   path: docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor-notes.md
   exists: true
-  markdown: >
+  markdown: >+
     ## Additional Samples & Info
 
 

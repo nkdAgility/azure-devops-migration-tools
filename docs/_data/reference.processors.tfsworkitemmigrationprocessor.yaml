@@ -122,7 +122,7 @@ optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkIt
 notes:
   exists: true
   path: docs/Reference/Processors/TfsWorkItemMigrationProcessor-notes.md
-  markdown: >
+  markdown: >+
     ## <a name="WIQLQuery"></a>WIQL Query
 
 

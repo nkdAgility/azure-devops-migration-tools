@@ -165,7 +165,7 @@ optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructu
 notes:
   exists: true
   path: docs/Reference/Tools/TfsNodeStructureTool-notes.md
-  markdown: >
+  markdown: >+
     ## Iteration Maps and Area Maps
 
 
@@ -641,7 +641,7 @@ topics:
 - topic: notes
   path: docs/Reference/Tools/TfsNodeStructureTool-notes.md
   exists: true
-  markdown: >
+  markdown: >+
     ## Iteration Maps and Area Maps
 
 

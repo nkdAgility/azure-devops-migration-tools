@@ -200,6 +200,59 @@ Discovers and documents:
 
 **Copilot Agent Notes:** The MigrationToolHost provides the foundation for all console applications. When adding new CLI commands or services, follow the established patterns using Spectre.Console and the dependency injection container. Configuration follows the standard .NET configuration hierarchy.
 
+---
+
+## Utility Scripts
+
+### GenerateDocs.ps1
+
+**Path:** `GenerateDocs.ps1` (repository root)
+
+**Purpose:** PowerShell wrapper script that provides a convenient way to build and run the `MigrationTools.ConsoleDataGenerator` from the repository root. This script automates the documentation generation process with proper error handling and user feedback.
+
+**Usage:**
+```powershell
+# Basic usage
+.\GenerateDocs.ps1
+
+# Use Release configuration
+.\GenerateDocs.ps1 -Configuration Release
+
+# Enable verbose output
+.\GenerateDocs.ps1 -Verbose
+
+# Combine options
+.\GenerateDocs.ps1 -Configuration Release -Verbose
+```
+
+**Key Features:**
+- Builds the `MigrationTools.ConsoleDataGenerator` project automatically
+- Runs the documentation generator with proper error handling
+- Provides colored output with progress feedback
+- Shows summary statistics of generated files
+- Supports Debug/Release configurations
+- Uses PowerShell's built-in `-Verbose` parameter for detailed output
+
+**Generated Output:**
+- YAML data files in `docs/_data/` for Jekyll site integration
+- Markdown documentation in `docs/Reference/Generated/`
+- Progress feedback showing file counts and generation status
+
+**Environment Requirements:**
+- PowerShell 5.0+ or PowerShell Core
+- .NET 8.0 SDK (for building the generator project)
+- Write permissions to documentation directories
+
+**Error Handling:**
+- Validates project existence before execution
+- Checks build success before running generator
+- Provides clear error messages with exit codes
+- Returns to original directory on completion or failure
+
+**Copilot Agent Notes:** This script should be used instead of manually navigating to the ConsoleDataGenerator directory. When documentation updates are needed, recommend using this script for consistency. The script follows PowerShell best practices with proper parameter validation, error handling, and user feedback.
+
+---
+
 ## Architecture Patterns
 
 ### TFS Object Model vs REST API
