@@ -466,8 +466,11 @@ namespace MigrationTools.Tools
 
             _pathToKnownNodeMap[structureParent.Path] = structureParent;
 
-            XmlElement mainNode = sourceTree.ChildNodes.OfType<XmlElement>().First();
-            CreateNewRootNode(mainNode, nodeStructureType);
+            if (Options.MigrateRootNodes)
+            {
+                XmlElement mainNode = sourceTree.ChildNodes.OfType<XmlElement>().First();
+                CreateNewRootNode(mainNode, nodeStructureType);
+            }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
                 // The XPath would look like this: /Nodes/Node[Name=Area]/Children/...
