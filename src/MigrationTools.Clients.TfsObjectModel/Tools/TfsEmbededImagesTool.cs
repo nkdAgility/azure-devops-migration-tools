@@ -195,7 +195,7 @@ namespace MigrationTools.Tools
                 }
             });
 
-            var dummyWi = GetDummyWorkItem(wi.Type);
+            var dummyWi = GetDummyWorkItem();
             var wii = httpClient.UpdateWorkItemAsync(payload, dummyWi.Id, bypassRules: true).GetAwaiter().GetResult();
             if (wii != null)
             {
