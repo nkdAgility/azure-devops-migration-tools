@@ -12,7 +12,7 @@ redirect_from:
 Install the Azure DevOps Migration Tools on Windows.
 
 These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.
-For a more detailed getting started guide please see the [documentation](https://nkdagility.com/learn/azure-devops-migration-tools/getting-started/).
+For a more detailed getting started guide please see the [documentation](/getting-started/).
 
 ## Option 1: Winget
 

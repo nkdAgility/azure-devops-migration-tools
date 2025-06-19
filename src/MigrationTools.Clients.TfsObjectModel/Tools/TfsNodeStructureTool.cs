@@ -460,7 +460,7 @@ namespace MigrationTools.Tools
             }
             catch (Exception ex)
             {
-                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to TFS having a different installed langauge version than was expected.. Validate that '{0}' is the correct name in your version. This would be something like 'Fläche' or 'Aire'. If you open the area tree in Visual Studio, or web access, you should see the name your langauage uses for 'Area' or 'Iteration. Do not try to add a specific area or iteration path to this field. Check the defaults on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Endpoints/TfsTeamProjectEndpoint/ for an example fro English.", localizedTreeTypeName), ex);
+                Exception ex2 = new Exception(string.Format("Unable to load Common Structure for Target.This is usually due to TFS having a different installed langauge version than was expected.. Validate that '{0}' is the correct name in your version. This would be something like 'Fläche' or 'Aire'. If you open the area tree in Visual Studio, or web access, you should see the name your langauage uses for 'Area' or 'Iteration. Do not try to add a specific area or iteration path to this field. Check the defaults on https://devopsmigration.io/Reference/Endpoints/TfsTeamProjectEndpoint/ for an example fro English.", localizedTreeTypeName), ex);
                 throw ex2.AsMigrationToolsException(MigrationToolsException.ExceptionSource.Configuration);
             }
 
@@ -678,7 +678,7 @@ namespace MigrationTools.Tools
             {
                 Log.LogWarning("!! There are MISSING Area or Iteration Paths");
                 Log.LogWarning("NOTE: It is NOT possible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item with the project name swapped. The work item will not be created if the path does not exist. The only way to resolve this is to follow the instructions:");
-                Log.LogWarning("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target! These MUST be added or mapped before we can continue using the instructions on https://nkdagility.com/learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool/#iteration-maps-and-area-maps", missingItems.Count);
+                Log.LogWarning("!! There are {missingAreaPaths} Nodes (Area or Iteration) found in the history of the Source that are missing from the Target! These MUST be added or mapped before we can continue using the instructions on https://devopsmigration.io/Reference/Tools/TfsNodeStructureTool/#iteration-maps-and-area-maps", missingItems.Count);
                 foreach (NodeStructureItem missingItem in missingItems)
                 {
                     string mapper = GetMappingForMissingItem(missingItem);

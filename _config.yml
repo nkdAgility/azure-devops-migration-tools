@@ -3,10 +3,10 @@ description: Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, 
 parent_title: The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services.
 parent_url: https://nkdagility.com
 
-website: https://nkdagility.com
-baseurl: /learn/azure-devops-migration-tools
-cannonicalBase: https://nkdagility.com/learn/azure-devops-migration-tools
-url: "https://nkdagility.com"
+website: https://devopsmigration.io
+baseurl: /
+cannonicalBase: https://devopsmigration.io
+url: https://devopsmigration.io
 githuburl: https://github.com/nkdAgility/azure-devops-migration-tools
 source: ./docs
 destination: ./_site

@@ -31,7 +31,7 @@ By submitting a contribution to the project, you agree to this CLA. If you do no
   - Add comments or reactions (e.g., 👍, 👎) to relevant discussions.
 
 - **Use the Comment/Discussion Boxes on Documentation Pages**:  
-  If your topic relates to an existing feature, check the relevant [documentation page](https://nkdagility.com/) for details. Most pages include comment or discussion boxes at the bottom.  
+  If your topic relates to an existing feature, check the relevant [documentation page](https://devopsmigration.io/) for details. Most pages include comment or discussion boxes at the bottom.  
   - Using these boxes for discussions tied to specific features helps keep the conversation contextual and accessible for others with similar questions.
 
 ---
