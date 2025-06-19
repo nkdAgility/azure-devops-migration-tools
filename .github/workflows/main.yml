@@ -19,7 +19,7 @@ on:
         type: boolean
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.pull_request.head.repo.fork }} 
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.pull_request.head.repo.fork }}
   cancel-in-progress: true
 
 defaults:
@@ -84,7 +84,7 @@ jobs:
         filters: |
           src:
             - 'src/**'
-            - '!src/MigrationTools.Telemetery/**' 
+            - '!src/MigrationTools.Telemetery/**'
           docs:
             - 'docs/**'
           automation:
@@ -120,17 +120,17 @@ jobs:
                     $Ring = "Release";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                     $docs_deploy_folder = "./azure-devops-migration-tools/"
-                    $docs_baseURL = "/learn/azure-devops-migration-tools"
-                    $docs_baseURL_AFD = "/learn/azure-devops-migration-tools"
+                    $docs_baseURL = ""
+                    $docs_baseURL_AFD = ""
                     $AzureSitesEnvironment = ""
                     $RunRelease = 'true'
-                }    
+                }
                 "Preview" {
                     $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $docs_deploy_folder = "./azure-devops-migration-tools/";
-                    $docs_baseURL = "/learn/azure-devops-migration-tools"
-                    $docs_baseURL_AFD = "/learn/azure-devops-migration-tools"
+                    $docs_baseURL = ""
+                    $docs_baseURL_AFD = ""
                     $AzureSitesEnvironment = "preview";
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
@@ -138,7 +138,7 @@ jobs:
                     $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
                     $docs_deploy_folder = "./azure-devops-migration-tools/canary/$branchSafeName"
-                    $docs_baseURL = "/learn/azure-devops-migration-tools/canary/$branchSafeName"
+                    $docs_baseURL = "/"
                     $docs_baseURL_AFD = ""
                     $AzureSitesEnvironment = "canary-${{ github.event.pull_request.number }}"
                     $RunRelease = 'false'
@@ -146,7 +146,7 @@ jobs:
             }
             Write-Output "We are running for the $Ring Ring!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
-            Write-Output "We are focused on Winget ID $WingetApplicationId!"            
+            Write-Output "We are focused on Winget ID $WingetApplicationId!"
             echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
             Write-Output "docs_deploy_folder=$docs_deploy_folder"
             echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
@@ -197,7 +197,7 @@ jobs:
                 echo "release_description=$description"  >> $env:GITHUB_OUTPUT
                 Write-Output $description
             }
-            
+
             Write-Output "-------------------------------------------"
             Write-Output "::endgroup::"
     - uses: actions/upload-artifact@v4
@@ -251,7 +251,7 @@ jobs:
                ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
             "@
             echo $markdown >> $Env:GITHUB_STEP_SUMMARY
-    
+
   # Build, Test, Sonar Cloud Analysis, & Package
 
   build:
@@ -264,7 +264,7 @@ jobs:
       buildPlatform: 'Any CPU'
       buildConfiguration: 'Release'
       nkdAgility_Ring: ${{ needs.Setup.outputs.nkdAgility_Ring }}
-      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}      
+      GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
@@ -293,17 +293,17 @@ jobs:
       - name: "Find solution files"
         shell: pwsh
         run: |
-            Get-Item -Path .\ 
+            Get-Item -Path .\
             Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - name: sonar install
         if: ${{ !(github.event.pull_request.head.repo.fork) }}
         run: dotnet tool install --global dotnet-sonarscanner
       - name: sonar begin
         if: ${{ !(github.event.pull_request.head.repo.fork) }}
-        run: dotnet sonarscanner begin 
-              /o:"nkdagility" 
-              /k:"vsts-sync-migrator:master" 
-              /d:sonar.host.url="https://sonarcloud.io" 
+        run: dotnet sonarscanner begin
+              /o:"nkdagility"
+              /k:"vsts-sync-migrator:master"
+              /d:sonar.host.url="https://sonarcloud.io"
               /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_SemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }} /p:GitVersionTag=${{ env.GitVersion_PreReleaseLabel }}
         name: Build MigrationTools.sln
@@ -342,7 +342,7 @@ jobs:
         shell: pwsh
         if: ${{ steps.Build.outcome == 'success' }}
         run: |
-            .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging" 
+            .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging"
       - name: "List Package Files"
         shell: pwsh
         if: ${{ steps.Build.outcome == 'success' }}
@@ -380,7 +380,7 @@ jobs:
           files: '["**/*.html"]'
           tokenPrefix: "#{"
           tokenSuffix: "}#"
-        env: 
+        env:
           GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
           GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
           GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
@@ -399,7 +399,7 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Site2
           path: ./_site2/**/*
- 
+
 
   # GitHubRelease
   GitHubRelease:
@@ -436,8 +436,8 @@ jobs:
         shell: pwsh
         run: |
              if ($Env:nkdAgility_Ring -eq 'Release') {
-                echo "discussion_category_name=Releases" >> $env:GITHUB_OUTPUT    
-             }             
+                echo "discussion_category_name=Releases" >> $env:GITHUB_OUTPUT
+             }
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -453,17 +453,17 @@ jobs:
           discussion_category_name: ${{ steps.release-options.outputs.discussion_category_name }}
           draft: ${{ needs.Setup.outputs.nkdAgility_Ring == 'Canary' }}
           body: |
-            ## Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }} 
+            ## Azure DevOps Migration Tools v${{ needs.Setup.outputs.GitVersion_SemVer }}
             Version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
             Ring: (${{ needs.Setup.outputs.nkdAgility_Ring }})
 
             ---
-            Funding for us doing work on this tool is generally through 1) customer funding, or 2) donated free time. 
+            Funding for us doing work on this tool is generally through 1) customer funding, or 2) donated free time.
 
             [Sponcer a Feature](https://github.com/sponsors/nkdAgility) | [Hire us directly](https://nkdagility.com/capabilities/azure-devops-migration-services/)
             ---
 
-            ${{ needs.Setup.outputs.nkdAgility_ReleaseDescription }}            
+            ${{ needs.Setup.outputs.nkdAgility_ReleaseDescription }}
 
             ## Get the tools
 
@@ -472,7 +472,7 @@ jobs:
             - Install with Chocolatey with `choco install vsts-sync-migrator --version ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}`. There is a delay for aprovals on the chocolatey store, so you may need to wait a few hours before this is available.
 
           append_body: true
-  
+
 # ElmahDeployment
   ElmahDeployemnt:
     name: "Create Elmah.io Deployment"
@@ -517,7 +517,7 @@ jobs:
               Write-Output $"Running with {$vsixFile}"
             }
             .\build\releaseExtension.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
-  
+
 
   # Release to Chocolatey
   ChocolateyRelease:
@@ -579,7 +579,7 @@ jobs:
       - name: "Find  files"
         shell: pwsh
         run: |
-            Get-Item -Path .\         
+            Get-Item -Path .\
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
