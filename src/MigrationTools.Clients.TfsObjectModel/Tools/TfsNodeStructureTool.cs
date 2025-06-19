@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,21 +8,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
 using Microsoft.TeamFoundation.Server;
-using Microsoft.TeamFoundation.Work.WebApi;
 using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 using MigrationTools.FieldMaps;
-using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json;
-using Serilog.Context;
-using Serilog.Events;
-using static Microsoft.TeamFoundation.WorkItemTracking.Client.Node;
 using ILogger = Serilog.ILogger;
 
 
@@ -199,7 +192,6 @@ namespace MigrationTools.Tools
                             Log.LogDebug("  Not Found:", currentAncestorPath);
                             parentNode = null;
                         }
-
                     }
                 }
                 else
@@ -286,7 +278,8 @@ namespace MigrationTools.Tools
                     Log.LogInformation("Migrating all Nodes before the Processor run.");
                     MigrateAllNodeStructures();
                     RefreshForProcessorType(processor);
-                } else
+                }
+                else
                 {
                     Log.LogInformation("SKIP: Migrating all Nodes before the Processor run.");
                 }
@@ -397,13 +390,15 @@ namespace MigrationTools.Tools
         private static string GetUserFriendlyPath(string systemNodePath)
         {
             // Shape of the path is \SourceProject\StructureType\Rest\Of\The\Path, user-friendly shape skips StructureType and initial \
-            var match = Regex.Match(systemNodePath, @"^\\(?<sourceProject>[^\\]+)\\[^\\]+\\(?<restOfThePath>.*)$");
+            var match = Regex.Match(systemNodePath, @"^\\(?<sourceProject>[^\\]+)\\[^\\]+(\\(?<restOfThePath>.*))?$");
             if (!match.Success)
             {
                 throw new InvalidOperationException($"This path is not a valid area or iteration path: {systemNodePath}");
             }
+            string sourceProject = match.Groups["sourceProject"].Value;
+            string restOfThePath = match.Groups["restOfThePath"].Success ? match.Groups["restOfThePath"].Value : string.Empty;
 
-            return $"{match.Groups["sourceProject"].Value}\\{match.Groups["restOfThePath"].Value}";
+            return restOfThePath == string.Empty ? sourceProject : $"{sourceProject}\\{restOfThePath}";
         }
 
         private void MigrateAllNodeStructures()
@@ -471,11 +466,30 @@ namespace MigrationTools.Tools
 
             _pathToKnownNodeMap[structureParent.Path] = structureParent;
 
+            if (Options.MigrateRootNodes)
+            {
+                XmlElement mainNode = sourceTree.ChildNodes.OfType<XmlElement>().First();
+                CreateNewRootNode(mainNode, nodeStructureType);
+            }
             if (sourceTree.ChildNodes[0].HasChildNodes)
             {
                 // The XPath would look like this: /Nodes/Node[Name=Area]/Children/...
                 // The Path attributes however look like that for the children of the Area node: /SourceProject/Area/SourceArea
                 CreateNodes(sourceTree.ChildNodes[0].ChildNodes[0].ChildNodes, localizedTreeTypeName, nodeStructureType);
+            }
+        }
+
+        private void CreateNewRootNode(XmlElement node, TfsNodeStructureType nodeStructureType)
+        {
+            string userFriendlyPath = GetUserFriendlyPath(node.Attributes["Path"].Value);
+            string newUserPath = GetNewNodeName(userFriendlyPath, nodeStructureType);
+            string newSystemPath = GetSystemPath(newUserPath, nodeStructureType, _targetLanguageMaps);
+            if (!Regex.IsMatch(newSystemPath, @"\\" + nodeStructureType + @"\\?$"))
+            {
+                // Do not do anything if there is no node name after structure type for the new (target) node.
+                // For example, if the path is just "\Project\Area" or "\Project\Iteration".
+                // This will happen if there are no mappings for nodes.
+                GetOrCreateNode(newSystemPath, null, null);
             }
         }
 

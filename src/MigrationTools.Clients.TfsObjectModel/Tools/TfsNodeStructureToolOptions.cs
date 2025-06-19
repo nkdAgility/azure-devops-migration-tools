@@ -30,6 +30,15 @@ namespace MigrationTools.Tools
         /// </summary>
         public bool ShouldCreateMissingRevisionPaths { get; set; }
         public bool ReplicateAllExistingNodes { get; set; }
+
+        /// <summary>
+        /// By default, only child nodes in node structures are migrated. Turning this on migrates even the root node
+        /// (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate
+        /// default area in source to some sub-area in target project. You have to set proper mapping for this to work.
+        /// If after mapping the target node is still just root node (so it is not migrated under some child node),
+        /// nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.
+        /// </summary>
+        public bool MigrateRootNodes { get; set; } = false;
     }
 
     public class NodeOptions
