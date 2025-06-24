@@ -360,7 +360,7 @@ jobs:
   # Build Docs
   BuildDocs:
     name: "Build Documentation output"
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     if: ${{ success() }}
     needs: [Setup]
     env:
@@ -383,7 +383,7 @@ jobs:
         uses: peaceiris/actions-hugo@v3
         with:
           extended: true
-          hugo-version: '0.139.0'
+          hugo-version: '0.147.9'
       - name: Build
         run: |
           $environment = "${{ needs.Setup.outputs.nkdAgility_Ring }}".ToLower()
