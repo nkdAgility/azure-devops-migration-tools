@@ -1,0 +1,17 @@
+{{- $dest := .Destination | safeURL -}}
+{{- $isExternal := strings.HasPrefix $dest "http" -}}
+{{- $isPreview := strings.HasPrefix $dest "https://agreeable-island-0c966e810-preview.centralus.6.azurestaticapps.net" -}}
+
+{{- if $isPreview }}
+  <a href="{{ $dest }}" class="preview-link" target="_blank" rel="nofollow noopener noreferrer">
+    {{ .Text }}
+    <small><i class="fa-regular fa-flux-capacitor ms-1" style="transform: scale(0.9)" title="Preview link"></i></small>
+  </a>
+{{- else if $isExternal }}
+  <a href="{{ $dest }}" class="external-link" target="_blank" rel="noopener noreferrer">
+    {{ .Text }}
+    <small><i class="fa-regular fa-arrow-up-right-from-square ms-1" style="transform: scale(0.6)"></i></small>
+  </a>
+{{- else }}
+  <a href="{{ $dest }}">{{ .Text }}</a>
+{{- end }}

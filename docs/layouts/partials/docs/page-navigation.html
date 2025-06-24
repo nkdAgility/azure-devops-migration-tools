@@ -1,0 +1,121 @@
+{{/* Page navigation for docs - previous/next links */}}
+{{ $docsSection := .Site.GetPage "/docs" }}
+{{ if $docsSection }}
+  {{/* Get all docs pages in order */}}
+  {{ $allPages := slice }}
+  {{ range $docsSection.Pages.ByWeight.ByTitle }}
+    {{ $allPages = $allPages | append . }}
+    {{ range .Pages.ByWeight.ByTitle }}
+      {{ $allPages = $allPages | append . }}
+      {{ range .Pages.ByWeight.ByTitle }}
+        {{ $allPages = $allPages | append . }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{/* Find current page index */}}
+  {{ $currentIndex := -1 }}
+  {{ range $index, $page := $allPages }}
+    {{ if eq $page.RelPermalink $.RelPermalink }}
+      {{ $currentIndex = $index }}
+    {{ end }}
+  {{ end }}
+
+  {{ if ge $currentIndex 0 }}
+    {{ $prevPage := "" }}
+    {{ $nextPage := "" }}
+
+    {{ if gt $currentIndex 0 }}
+      {{ $prevPage = index $allPages (sub $currentIndex 1) }}
+    {{ end }}
+
+    {{ if lt $currentIndex (sub (len $allPages) 1) }}
+      {{ $nextPage = index $allPages (add $currentIndex 1) }}
+    {{ end }}
+
+    {{ if or $prevPage $nextPage }}
+      <div class="docs-page-nav d-flex justify-content-between align-items-center">
+        <div class="docs-nav-prev">
+          {{ if $prevPage }}
+            <a href="{{ $prevPage.RelPermalink }}" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>
+              <div class="d-flex flex-column align-items-start">
+                <small class="text-muted">Previous</small>
+                <span>{{ $prevPage.Title }}</span>
+              </div>
+            </a>
+          {{ end }}
+        </div>
+
+        <div class="docs-nav-next">
+          {{ if $nextPage }}
+            <a href="{{ $nextPage.RelPermalink }}" class="btn btn-outline-primary">
+              <div class="d-flex flex-column align-items-end">
+                <small class="text-muted">Next</small>
+                <span>{{ $nextPage.Title }}</span>
+              </div>
+              <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+          {{ end }}
+        </div>
+      </div>
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+
+<style>
+  .docs-page-nav {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--bs-border-color);
+  }
+
+  .docs-page-nav .btn {
+    border: 1px solid var(--bs-border-color);
+    padding: 1rem;
+    text-align: left;
+    background: transparent;
+    color: var(--bs-body-color);
+    transition: all 0.15s ease-in-out;
+  }
+
+  .docs-page-nav .btn:hover {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+    text-decoration: none;
+  }
+
+  .docs-page-nav .btn small {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .docs-page-nav .btn span {
+    font-weight: 500;
+    display: block;
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .docs-page-nav {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .docs-nav-prev,
+    .docs-nav-next {
+      width: 100%;
+    }
+
+    .docs-page-nav .btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .docs-page-nav .docs-nav-next .btn div {
+      align-items: center !important;
+    }
+  }
+</style>

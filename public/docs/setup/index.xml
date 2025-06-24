@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Setting up the Azure DevOps Migration Tools on Azure DevOps Migration Tools</title>
+    <link>//localhost:1313/docs/setup/</link>
+    <description>Recent content in Setting up the Azure DevOps Migration Tools on Azure DevOps Migration Tools</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 24 Jun 2025 12:07:31 +0000</lastBuildDate>
+    <atom:link href="//localhost:1313/docs/setup/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Permissions</title>
+      <link>//localhost:1313/docs/setup/permissions/</link>
+      <pubDate>Tue, 24 Jun 2025 12:07:31 +0000</pubDate>
+      <guid>//localhost:1313/docs/setup/permissions/</guid>
+      <description>&lt;p&gt;The current permissions are governed by the requirements of the &#xD;&#xA;  &lt;a href=&#34;https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/dotnet-client-libraries?view=azure-devops&#34; class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener noreferrer&#34;&gt;&#xD;&#xA;    TFS Client Object Model&#xD;&#xA;    &lt;small&gt;&lt;i class=&#34;fa-regular fa-arrow-up-right-from-square ms-1&#34; style=&#34;transform: scale(0.6)&#34;&gt;&lt;/i&gt;&lt;/small&gt;&#xD;&#xA;  &lt;/a&gt;&#xD;&#xA; from Microsoft. While Microsoft &#xD;&#xA;  &lt;a href=&#34;https://devblogs.microsoft.com/devops/announcing-the-deprecation-of-the-wit-and-test-client-om-at-jan-1-2020-2/&#34; class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener noreferrer&#34;&gt;&#xD;&#xA;    announced the deprecation of the WIT and Test Client OM&#xD;&#xA;    &lt;small&gt;&lt;i class=&#34;fa-regular fa-arrow-up-right-from-square ms-1&#34; style=&#34;transform: scale(0.6)&#34;&gt;&lt;/i&gt;&lt;/small&gt;&#xD;&#xA;  &lt;/a&gt;&#xD;&#xA; in 2020, it remains the only consistent method for interacting with versions of TFS from 2010 to 2018. We are in the process of migrating our tools to the REST API, but this is a large effort and will take some time to complete.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>ReflectedWorkItemId</title>
+      <link>//localhost:1313/docs/setup/reflectedworkitemid/</link>
+      <pubDate>Tue, 24 Jun 2025 12:07:31 +0000</pubDate>
+      <guid>//localhost:1313/docs/setup/reflectedworkitemid/</guid>
+      <description>&lt;p&gt;The Azure DevOps migrations Tools has no internal state, and uses a field on the work item to track the migration of work items. This field is always referred to in the docs as &lt;code&gt;ReflectedWorkItemId&lt;/code&gt; and is used to track the work item in the target. It enables the ability to resume migrations as well as to be able to scope the work items based on a query and have multiple runs overlap.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Install Azure DevOps Migration Tools on Windows</title>
+      <link>//localhost:1313/docs/setup/installation/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/docs/setup/installation/</guid>
+      <description>&lt;p&gt;Install the Azure DevOps Migration Tools on Windows.&lt;/p&gt;&#xA;&lt;p&gt;These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.&#xA;For a more detailed getting started guide please see the &#xD;&#xA;  &lt;a href=&#34;//localhost:1313/getting-started/&#34;&gt;documentation&lt;/a&gt;&#xD;&#xA;.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

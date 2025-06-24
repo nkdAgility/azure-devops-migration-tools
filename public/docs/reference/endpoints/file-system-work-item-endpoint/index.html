@@ -1,0 +1,3849 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TSHSKGHDK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-TSHSKGHDK");
+    </script>
+    
+    <title>File System Work Item Endpoint | Azure DevOps Migration Tools</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="description" content="This document provides an overview of the File System Work Item Endpoint used in the Azure DevOps Migration Tools, including its configuration and usage.
+" />
+    <meta name="keywords" content="Azure DevOps, Migration Tools, DevOps, Migration" />
+    <link rel="canonical" href="https://devopsmigration.io/docs/reference/endpoints/file-system-work-item-endpoint/" />
+    <meta property="og:title" content="File System Work Item Endpoint" />
+    <meta name="giscus:backlink" content="https://devopsmigration.io/docs/reference/endpoints/file-system-work-item-endpoint/" />
+    <meta name="license" content="© 2025 Azure DevOps Migration Tools." />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3e6b2f4808.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/tools_module_styles.css" />
+
+    
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "File System Work Item Endpoint",
+  "headline": "File System Work Item Endpoint",
+  "description": "This document provides an overview of the File System Work Item Endpoint used in the Azure DevOps Migration Tools, including its configuration and usage.\n",
+  "url": "https://devopsmigration.io/docs/reference/endpoints/file-system-work-item-endpoint/",
+  "datePublished": "2025-06-24T12:07:31Z",
+  "dateModified": "2025-06-24T12:07:31Z",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Azure DevOps Migration Tools",
+    "url": "https://devopsmigration.io"
+  },
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "Azure DevOps Migration Tools",
+    "url": "https://devopsmigration.io"
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://devopsmigration.io"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "File System Work Item Endpoint",
+        "item": "https://devopsmigration.io/docs/reference/endpoints/file-system-work-item-endpoint/"
+      }]
+  },
+  "inLanguage": "en",
+  "potentialAction": {
+    "@type": "ReadAction",
+    "target": "https://devopsmigration.io/docs/reference/endpoints/file-system-work-item-endpoint/"
+  }
+}
+</script>
+
+  </head>
+
+  <body id="top" data-ndka-environment="development" data-ndka-version="#{GitVersion.SemVer}#">
+    
+
+    
+      <div class="container-fluid text-center p-2 bg-development">
+        
+        
+          Local | v0.0.0 | No Robots
+        
+        | <a href="#debugArea">Debug Info</a>
+      </div>
+    
+
+    
+      <header class="header">
+        <div class="container">
+          <nav class="navbar navbar-expand-lg navbar-light py-5">
+  <div class="container">
+    
+    <a class="navbar-brand fw-bold text-primary" href="//localhost:1313/" title="Azure DevOps Migration Tools">
+      <img id="brandLogo" data-theme-src-light="/images/logo-wide-transparent-light.png" data-theme-src-dark="/images/logo-wide-transparent-dark.png" src="/images/logo-wide-transparent-light.png" style="height:50px;" alt="Azure DevOps Migration Tools" />
+    </a>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      
+      <ul class="navbar-nav me-auto">
+        
+          <li class="nav-item">
+            
+              <a class="nav-link" href="/docs/">
+                docs
+              </a>
+            
+          </li>
+        
+          <li class="nav-item">
+            
+              <a class="nav-link" href="/support/">
+                Support
+              </a>
+            
+          </li>
+        
+          <li class="nav-item">
+            
+              <a class="nav-link" href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions" target="_blank" rel="noopener noreferrer">
+                Community
+                <i class="fas fa-external-link-alt ms-1" style="font-size: 0.75em;"></i>
+              </a>
+            
+          </li>
+        
+      </ul>
+
+      
+      <div class="d-flex align-items-center gap-3">
+        
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="themeToggle" title="Toggle theme">
+          <i class="fas fa-sun" id="themeIcon"></i>
+        </button>
+
+        
+        <form class="d-flex d-none" role="search">
+          <div class="input-group input-group-sm" style="width: 200px;">
+            <input class="form-control" type="search" placeholder="Search..." aria-label="Search" id="searchInput" />
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+
+        
+        <a href="/download" class="btn btn-primary btn-sm">
+          <i class="fas fa-download me-1"></i>
+          Download
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const body = document.body;
+    const navbar = document.querySelector(".navbar");
+
+    
+    function updateThemeImages(theme) {
+      
+      const themeImages = document.querySelectorAll("img[data-theme-src-light], img[data-theme-src-dark]");
+
+      themeImages.forEach((img) => {
+        const lightSrc = img.getAttribute("data-theme-src-light");
+        const darkSrc = img.getAttribute("data-theme-src-dark");
+
+        if (theme === "dark" && darkSrc) {
+          img.src = darkSrc;
+        } else if (lightSrc) {
+          img.src = lightSrc;
+        }
+      });
+    }
+
+    
+    const currentTheme = localStorage.getItem("theme") || "light";
+
+    
+    if (currentTheme === "dark") {
+      body.setAttribute("data-bs-theme", "dark");
+      navbar.classList.remove("navbar-light");
+      navbar.classList.add("navbar-dark", "bg-dark");
+      navbar.style.backgroundColor = "";
+      themeIcon.classList.remove("fa-sun");
+      themeIcon.classList.add("fa-moon");
+      updateThemeImages("dark");
+    } else {
+      
+      navbar.style.backgroundColor = "transparent";
+      updateThemeImages("light");
+    }
+
+    
+    themeToggle.addEventListener("click", function () {
+      const currentTheme = body.getAttribute("data-bs-theme");
+      if (currentTheme === "dark") {
+        
+        body.setAttribute("data-bs-theme", "light");
+        navbar.classList.remove("navbar-dark", "bg-dark");
+        navbar.classList.add("navbar-light");
+        navbar.style.backgroundColor = "transparent";
+        themeIcon.classList.remove("fa-moon");
+        themeIcon.classList.add("fa-sun");
+        localStorage.setItem("theme", "light");
+        updateThemeImages("light");
+      } else {
+        
+        body.setAttribute("data-bs-theme", "dark");
+        navbar.classList.remove("navbar-light");
+        navbar.classList.add("navbar-dark", "bg-dark");
+        navbar.style.backgroundColor = "";
+        themeIcon.classList.remove("fa-sun");
+        themeIcon.classList.add("fa-moon");
+        localStorage.setItem("theme", "dark");
+        updateThemeImages("dark");
+      }
+    });
+
+    
+    const searchForm = document.querySelector('form[role="search"]');
+    searchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const searchTerm = document.getElementById("searchInput").value;
+      if (searchTerm.trim()) {
+        
+        window.location.href = `/search/?q=${encodeURIComponent(searchTerm)}`;
+      }
+    });
+  });
+</script>
+
+        </div>
+        <div class="container">
+          
+        </div>
+      </header>
+    
+
+
+    <main>
+      <section class="content-main">
+        
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-12" style="max-width: 1800px;">
+        <div class="row">
+          
+          <div class="col-12 col-xl-3 docs-navbar-container d-none d-xl-block">
+            
+
+
+  <nav class="docs-sidebar" aria-label="Documentation navigation">
+    <div class="sidebar-header mb-3">
+      <h5 class="text-primary fw-bold">
+        <i class="fas fa-book me-2"></i>
+        Documentation
+      </h5>
+    </div>
+
+    <div class="sidebar-content">
+      
+      
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Getting Started
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tutorial: Get started with the Azure DevOps Migration Tools" href="/docs/get-started/getting-started/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Get Started
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Getting Started with Git and TFVC Version Control" href="/docs/get-started/version-control/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Version Control
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Setting Up
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Permissions" href="/docs/setup/permissions/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Permissions
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="ReflectedWorkItemId" href="/docs/setup/reflectedworkitemid/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                ReflectedWorkItemId
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Install Azure DevOps Migration Tools on Windows" href="/docs/setup/installation/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Installation
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                How-To Guides
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: Creating area and iteration maps" href="/docs/how-to/creating-iteration-and-area-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Creating area and iteration maps
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-to: Migrating Plans and Suites" href="/docs/how-to/migrating-plans-and-suites/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Migrating Plans and Suites
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: User Mappings" href="/docs/how-to/user-mappings/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                User Mappings
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Reference
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Endpoints" href="/docs/reference/endpoints/" class="nav-level-1" >
+              
+                <i class="fas fa-folder-open me-2"></i>
+              
+              
+                Endpoints
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Azure DevOps Endpoint" href="/docs/reference/endpoints/azure-devops-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Azure DevOps Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="File System Work Item Endpoint" href="/docs/reference/endpoints/file-system-work-item-endpoint/" class="nav-level-2active" aria-current="page">
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                File System Work Item Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Endpoint" href="/docs/reference/endpoints/tfs-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Project Endpoint" href="/docs/reference/endpoints/tfs-team-project-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Project Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Settings Endpoint" href="/docs/reference/endpoints/tfs-team-settings-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Settings Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Endpoint" href="/docs/reference/endpoints/tfs-work-item-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Field Maps" href="/docs/reference/field-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Field Maps
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processor Enrichers" href="/docs/reference/processor-enrichers/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processor Enrichers
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processors" href="/docs/reference/processors/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processors
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tools" href="/docs/reference/tools/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Tools
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+  </ul>
+
+
+    </div>
+  </nav>
+
+  <style>
+    .docs-sidebar {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bs-light);
+      border-radius: 0.375rem;
+      border: 1px solid var(--bs-border-color);
+    }
+
+    [data-bs-theme="dark"] .docs-sidebar {
+      background: var(--bs-dark);
+      border-color: var(--bs-border-color);
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 0.25rem;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.375rem 0.75rem;
+      color: var(--bs-body-color);
+      text-decoration: none;
+      border-radius: 0.25rem;
+      transition: all 0.15s ease-in-out;
+      font-size: 0.9rem;
+
+       
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: var(--bs-primary);
+      color: white;
+    }
+
+    .sidebar-nav a.active {
+      background-color: var(--bs-primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .sidebar-nav .nav-level-1 {
+      padding-left: 1rem;
+    }
+
+    .sidebar-nav .nav-level-2 {
+      padding-left: 2rem;
+    }
+
+    .sidebar-nav .nav-level-3 {
+      padding-left: 3rem;
+    }
+
+    .sidebar-section-title {
+      font-weight: 600;
+      color: var(--bs-primary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      margin: 1rem 0 0.5rem 0;
+      padding: 0 0.75rem;
+    }
+    .sidebar-section-title:first-child {
+      margin-top: 0;
+    }  
+    .docs-dropdown-menu {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border: 1px solid var(--bs-border-color);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+       
+      max-width: calc(100vw - 2rem);
+      width: 100%;
+    }
+
+    .docs-dropdown-menu .docs-sidebar {
+      background: transparent;
+      border: none;
+      padding: 0;
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .docs-dropdown-menu .sidebar-header {
+      display: none;
+    }
+
+     
+    @media (max-width: 575.98px) {
+      .docs-dropdown-menu {
+        max-width: calc(100vw - 1rem);
+        padding: 0.25rem;
+      }
+
+      .docs-dropdown-menu .sidebar-nav a {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+     
+    @media (max-width: 1199.98px) {
+      .docs-dropdown-menu {
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+
+
+          </div>
+          
+          <div class="col-12 d-xl-none mb-3">
+            <div class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="docsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-book me-2"></i>
+                Documentation Navigation
+              </button>
+              <div class="dropdown-menu docs-dropdown-menu" aria-labelledby="docsDropdown">
+                
+
+
+  <nav class="docs-sidebar" aria-label="Documentation navigation">
+    <div class="sidebar-header mb-3">
+      <h5 class="text-primary fw-bold">
+        <i class="fas fa-book me-2"></i>
+        Documentation
+      </h5>
+    </div>
+
+    <div class="sidebar-content">
+      
+      
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Getting Started
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tutorial: Get started with the Azure DevOps Migration Tools" href="/docs/get-started/getting-started/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Get Started
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Getting Started with Git and TFVC Version Control" href="/docs/get-started/version-control/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Version Control
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Setting Up
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Permissions" href="/docs/setup/permissions/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Permissions
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="ReflectedWorkItemId" href="/docs/setup/reflectedworkitemid/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                ReflectedWorkItemId
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Install Azure DevOps Migration Tools on Windows" href="/docs/setup/installation/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Installation
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                How-To Guides
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: Creating area and iteration maps" href="/docs/how-to/creating-iteration-and-area-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Creating area and iteration maps
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-to: Migrating Plans and Suites" href="/docs/how-to/migrating-plans-and-suites/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Migrating Plans and Suites
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: User Mappings" href="/docs/how-to/user-mappings/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                User Mappings
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Reference
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Endpoints" href="/docs/reference/endpoints/" class="nav-level-1" >
+              
+                <i class="fas fa-folder-open me-2"></i>
+              
+              
+                Endpoints
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Azure DevOps Endpoint" href="/docs/reference/endpoints/azure-devops-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Azure DevOps Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="File System Work Item Endpoint" href="/docs/reference/endpoints/file-system-work-item-endpoint/" class="nav-level-2active" aria-current="page">
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                File System Work Item Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Endpoint" href="/docs/reference/endpoints/tfs-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Project Endpoint" href="/docs/reference/endpoints/tfs-team-project-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Project Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Settings Endpoint" href="/docs/reference/endpoints/tfs-team-settings-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Settings Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Endpoint" href="/docs/reference/endpoints/tfs-work-item-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Field Maps" href="/docs/reference/field-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Field Maps
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processor Enrichers" href="/docs/reference/processor-enrichers/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processor Enrichers
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processors" href="/docs/reference/processors/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processors
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tools" href="/docs/reference/tools/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Tools
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+  </ul>
+
+
+    </div>
+  </nav>
+
+  <style>
+    .docs-sidebar {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bs-light);
+      border-radius: 0.375rem;
+      border: 1px solid var(--bs-border-color);
+    }
+
+    [data-bs-theme="dark"] .docs-sidebar {
+      background: var(--bs-dark);
+      border-color: var(--bs-border-color);
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 0.25rem;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.375rem 0.75rem;
+      color: var(--bs-body-color);
+      text-decoration: none;
+      border-radius: 0.25rem;
+      transition: all 0.15s ease-in-out;
+      font-size: 0.9rem;
+
+       
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: var(--bs-primary);
+      color: white;
+    }
+
+    .sidebar-nav a.active {
+      background-color: var(--bs-primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .sidebar-nav .nav-level-1 {
+      padding-left: 1rem;
+    }
+
+    .sidebar-nav .nav-level-2 {
+      padding-left: 2rem;
+    }
+
+    .sidebar-nav .nav-level-3 {
+      padding-left: 3rem;
+    }
+
+    .sidebar-section-title {
+      font-weight: 600;
+      color: var(--bs-primary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      margin: 1rem 0 0.5rem 0;
+      padding: 0 0.75rem;
+    }
+    .sidebar-section-title:first-child {
+      margin-top: 0;
+    }  
+    .docs-dropdown-menu {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border: 1px solid var(--bs-border-color);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+       
+      max-width: calc(100vw - 2rem);
+      width: 100%;
+    }
+
+    .docs-dropdown-menu .docs-sidebar {
+      background: transparent;
+      border: none;
+      padding: 0;
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .docs-dropdown-menu .sidebar-header {
+      display: none;
+    }
+
+     
+    @media (max-width: 575.98px) {
+      .docs-dropdown-menu {
+        max-width: calc(100vw - 1rem);
+        padding: 0.25rem;
+      }
+
+      .docs-dropdown-menu .sidebar-nav a {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+     
+    @media (max-width: 1199.98px) {
+      .docs-dropdown-menu {
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+
+
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="col-12 col-xl-6">
+            <div class="docs-content">
+              
+              
+
+
+
+
+
+  
+
+  
+    
+  
+
+  
+    
+  
+
+  
+    
+  
+
+
+
+
+  <nav aria-label="breadcrumb" class="docs-breadcrumb mb-4">
+    <ol class="breadcrumb">
+      
+        
+          
+          <li class="breadcrumb-item">
+            <a href="/docs/" class="text-decoration-none">
+              
+                <i class="fas fa-home me-1"></i>
+              
+              Documentation for the Azure DevOps Migration Tools
+            </a>
+          </li>
+        
+      
+        
+          
+          <li class="breadcrumb-item">
+            <a href="/docs/reference/" class="text-decoration-none">
+              
+              Reference for Azure DevOps Migration Tools
+            </a>
+          </li>
+        
+      
+        
+          
+          <li class="breadcrumb-item">
+            <a href="/docs/reference/endpoints/" class="text-decoration-none">
+              
+              Endpoints
+            </a>
+          </li>
+        
+      
+        
+          
+          <li class="breadcrumb-item active" aria-current="page">
+            File System Work Item Endpoint
+          </li>
+        
+      
+    </ol>
+  </nav>
+
+
+
+<style>
+  .docs-breadcrumb .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+  }
+
+  .docs-breadcrumb .breadcrumb-item a {
+    color: var(--bs-primary);
+  }
+
+  .docs-breadcrumb .breadcrumb-item a:hover {
+    text-decoration: underline !important;
+  }
+
+  .docs-breadcrumb .breadcrumb-item.active {
+    color: var(--bs-body-color);
+  }
+</style>
+
+
+              
+              <div class="docs-header mb-4">
+                <h1 class="docs-title">File System Work Item Endpoint</h1>
+                
+                  <p class="docs-description text-muted">This document provides an overview of the File System Work Item Endpoint used in the Azure DevOps Migration Tools, including its configuration and usage.</p>
+                
+
+                
+                
+                  <div class="docs-meta mt-3">
+                    <small class="text-muted">
+                      <i class="fas fa-clock me-1"></i>
+                      Last updated:
+                      June 24, 2025
+                      
+                        
+                        
+                        | <a href="https://github.com/nkdAgility/azure-devops-migration-tools/edit/main/docs/reference/endpoints/file-system-work-item-endpoint/index.md" target="_blank" class="text-decoration-none"> <i class="fas fa-edit me-1"></i>Edit this page </a>
+                      
+                      
+                        | <a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions/" target="_blank" class="text-decoration-none"> <i class="fas fa-comments me-1"></i>Discuss this page </a>
+                      
+                    </small>
+                  </div>
+                
+              </div>
+
+              
+              <div class="docs-body">
+                
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-description">
+    <p>missing XML code comments</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>FileStore</code></td>
+            <td><code>String</code></td>
+            <td>Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;FileSystemWorkItemEndpointOptions&#34;,
+  &#34;FileStore&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>FileSystemWorkItemEndpoint</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Missing XML Code Comments
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">missing XML code comments</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Endpoints</dd>
+      
+    </dl>
+  </div>
+
+
+
+              </div>
+
+              <div class="docs-commnets">
+                <script
+                  src="https://giscus.app/client.js"
+                  data-repo="nkdAgility/azure-devops-migration-tools"
+                  data-repo-id="MDEwOlJlcG9zaXRvcnk1NjMxOTA3MA=="
+                  data-category-id="DIC_kwDOA1tcXs4Cj0cn"
+                  
+                    data-mapping="og:title" data-strict="1"
+                  
+                  data-reactions-enabled="1"
+                  data-emit-metadata="0"
+                  data-input-position="bottom"
+                  data-theme="light_protanopia"
+                  data-lang="en"
+                  data-loading="lazy"
+                  crossorigin="anonymous"
+                  async></script>
+              </div>
+
+              
+              <div class="docs-navigation mt-5">
+                
+
+
+  
+  
+  
+    
+    
+      
+      
+    
+      
+      
+    
+  
+    
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+  
+    
+    
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+      
+      
+        
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+  
+    
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+  
+
+  
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+
+  
+    
+    
+
+    
+      
+    
+
+    
+      
+    
+
+    
+      <div class="docs-page-nav d-flex justify-content-between align-items-center">
+        <div class="docs-nav-prev">
+          
+            <a href="/docs/reference/endpoints/azure-devops-endpoint/" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>
+              <div class="d-flex flex-column align-items-start">
+                <small class="text-muted">Previous</small>
+                <span>Azure DevOps Endpoint</span>
+              </div>
+            </a>
+          
+        </div>
+
+        <div class="docs-nav-next">
+          
+            <a href="/docs/reference/endpoints/tfs-endpoint/" class="btn btn-outline-primary">
+              <div class="d-flex flex-column align-items-end">
+                <small class="text-muted">Next</small>
+                <span>Tfs Endpoint</span>
+              </div>
+              <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+          
+        </div>
+      </div>
+    
+  
+
+
+
+<style>
+  .docs-page-nav {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--bs-border-color);
+  }
+
+  .docs-page-nav .btn {
+    border: 1px solid var(--bs-border-color);
+    padding: 1rem;
+    text-align: left;
+    background: transparent;
+    color: var(--bs-body-color);
+    transition: all 0.15s ease-in-out;
+  }
+
+  .docs-page-nav .btn:hover {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+    text-decoration: none;
+  }
+
+  .docs-page-nav .btn small {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .docs-page-nav .btn span {
+    font-weight: 500;
+    display: block;
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .docs-page-nav {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .docs-nav-prev,
+    .docs-nav-next {
+      width: 100%;
+    }
+
+    .docs-page-nav .btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .docs-page-nav .docs-nav-next .btn div {
+      align-items: center !important;
+    }
+  }
+</style>
+
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-12 col-xl-3 d-none d-xl-block">
+            <div>
+              <h5>In this article</h5>
+              <div class="docs-toc">
+                <nav>
+                  <ul>
+                    
+                    
+                      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#options">Options</a></li>
+    <li><a href="#samples">Samples</a>
+      <ul>
+        <li><a href="#sample">Sample</a></li>
+        <li><a href="#defaults">Defaults</a></li>
+        <li><a href="#classic">Classic</a></li>
+      </ul>
+    </li>
+    <li><a href="#metadata">Metadata</a></li>
+  </ul>
+</nav>
+                    
+                  </ul>
+                </nav>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Project Information</h6>
+              </div>
+              <div class="card-body">
+                
+                <div class="mb-4">
+                  <h6 class="text-muted mb-2"><i class="fas fa-store me-2"></i>Azure DevOps Marketplace</h6>
+                  <div class="text-center">
+                    <a href="https://marketplace.visualstudio.com/items?itemName=nkdagility.vsts-sync-migration" target="_blank" class="btn btn-outline-primary btn-sm">
+                      <img src="https://img.shields.io/visual-studio-marketplace/stars/nkdagility.vsts-sync-migration?logo=visualstudio" alt="Visual Studio Marketplace Stars" class="me-2" />
+                      View Extension
+                    </a>
+                  </div>
+                </div>
+
+                
+                <div class="mb-4">
+                  <h6 class="text-muted mb-2"><i class="fab fa-youtube me-2"></i>YouTube Channel</h6>
+                  <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="https://www.youtube.com/@nakedAgility" target="_blank" class="text-decoration-none">
+                      <img src="https://img.shields.io/youtube/channel/subscribers/UCkYqhFNmhCzkefHsHS652hw" alt="Youtube Subscribers" />
+                    </a>
+                    <a href="https://www.youtube.com/@nakedAgility" target="_blank" class="text-decoration-none">
+                      <img src="https://img.shields.io/youtube/channel/views/UCkYqhFNmhCzkefHsHS652hw" alt="Youtube Views" />
+                    </a>
+                  </div>
+                </div>
+
+                
+                <div class="mb-4 text-center">
+                  <h6 class="text-muted mb-2"><i class="fas fa-user me-2"></i>Maintainer</h6>
+                  <p class="mb-0 small">
+                    Created and maintained by
+                    <a href="https://www.linkedin.com/in/martinhinshelwood/" target="_blank" class="text-decoration-none fw-bold">Martin Hinshelwood</a>
+                    of
+                    <a href="https://nkdagility.com" target="_blank" class="text-decoration-none fw-bold">nkdagility.com</a>
+                  </p>
+                </div>
+
+                
+                <div>
+                  <h6 class="text-muted mb-3"><i class="fas fa-code-branch me-2"></i>Documentation Versions</h6>
+                  <div class="row g-2">
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded">
+                        <span class="small fw-medium">Production</span>
+                        <a href="https://devopsmigration.io/docs/reference/endpoints/file-system-work-item-endpoint/" target="_blank" class="text-decoration-none">
+                          <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools" alt="Azure DevOps Migration Tools Release Version" />
+                        </a>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded">
+                        <span class="small fw-medium">Preview</span>
+                        <a href="https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net/docs/reference/endpoints/file-system-work-item-endpoint/" target="_blank" class="text-decoration-none">
+                          <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases" alt="Azure DevOps Migration Tools Preview Version" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header bg-success text-white">
+                <h6 class="mb-0 no_toc"><i class="fas fa-life-ring me-2"></i>Getting Support</h6>
+              </div>
+              <div class="card-body">
+                
+                <div class="mb-4">
+                  <h6 class="text-muted mb-3"><i class="fas fa-users me-2"></i>Community Support</h6>
+                  <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0 me-3">
+                      <i class="fab fa-github text-muted" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                      <a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions" target="_blank" class="text-decoration-none fw-semibold"> Questions & Discussions </a>
+                      <p class="text-muted small mb-0 mt-1">The first place to look for usage, configuration, and general help.</p>
+                    </div>
+                  </div>
+                </div>
+
+                
+                <div>
+                  <h6 class="text-muted mb-3"><i class="fas fa-briefcase me-2"></i>Commercial Support</h6>
+                  <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0 me-3">
+                      <i class="fas fa-building text-muted" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                      <p class="mb-2">We provide training, ad-hoc support, and full service migrations through our professional services.</p>
+                      <a href="https://nkdagility.com/capabilities/azure-devops-migration-services/" title="Azure DevOps Migration Services with Naked Agility Ltd." target="_blank" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i>
+                        Azure DevOps Migration Services
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="d-lg-none">
+      <button class="btn btn-outline-primary btn-sm position-fixed" type="button" data-bs-toggle="offcanvas" data-bs-target="#docsSidebarMobile" style="top: 80px; left: 10px; z-index: 1020;">
+        <i class="fas fa-bars"></i>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="docsSidebarMobile">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Documentation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          
+
+
+  <nav class="docs-sidebar" aria-label="Documentation navigation">
+    <div class="sidebar-header mb-3">
+      <h5 class="text-primary fw-bold">
+        <i class="fas fa-book me-2"></i>
+        Documentation
+      </h5>
+    </div>
+
+    <div class="sidebar-content">
+      
+      
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Getting Started
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tutorial: Get started with the Azure DevOps Migration Tools" href="/docs/get-started/getting-started/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Get Started
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Getting Started with Git and TFVC Version Control" href="/docs/get-started/version-control/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Version Control
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Setting Up
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Permissions" href="/docs/setup/permissions/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Permissions
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="ReflectedWorkItemId" href="/docs/setup/reflectedworkitemid/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                ReflectedWorkItemId
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Install Azure DevOps Migration Tools on Windows" href="/docs/setup/installation/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Installation
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                How-To Guides
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: Creating area and iteration maps" href="/docs/how-to/creating-iteration-and-area-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Creating area and iteration maps
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-to: Migrating Plans and Suites" href="/docs/how-to/migrating-plans-and-suites/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Migrating Plans and Suites
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: User Mappings" href="/docs/how-to/user-mappings/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                User Mappings
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Reference
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Endpoints" href="/docs/reference/endpoints/" class="nav-level-1" >
+              
+                <i class="fas fa-folder-open me-2"></i>
+              
+              
+                Endpoints
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Azure DevOps Endpoint" href="/docs/reference/endpoints/azure-devops-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Azure DevOps Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="File System Work Item Endpoint" href="/docs/reference/endpoints/file-system-work-item-endpoint/" class="nav-level-2active" aria-current="page">
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                File System Work Item Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Endpoint" href="/docs/reference/endpoints/tfs-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Project Endpoint" href="/docs/reference/endpoints/tfs-team-project-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Project Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Settings Endpoint" href="/docs/reference/endpoints/tfs-team-settings-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Settings Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Endpoint" href="/docs/reference/endpoints/tfs-work-item-endpoint/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Endpoint
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Field Maps" href="/docs/reference/field-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Field Maps
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processor Enrichers" href="/docs/reference/processor-enrichers/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processor Enrichers
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processors" href="/docs/reference/processors/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processors
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tools" href="/docs/reference/tools/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Tools
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+  </ul>
+
+
+    </div>
+  </nav>
+
+  <style>
+    .docs-sidebar {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bs-light);
+      border-radius: 0.375rem;
+      border: 1px solid var(--bs-border-color);
+    }
+
+    [data-bs-theme="dark"] .docs-sidebar {
+      background: var(--bs-dark);
+      border-color: var(--bs-border-color);
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 0.25rem;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.375rem 0.75rem;
+      color: var(--bs-body-color);
+      text-decoration: none;
+      border-radius: 0.25rem;
+      transition: all 0.15s ease-in-out;
+      font-size: 0.9rem;
+
+       
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: var(--bs-primary);
+      color: white;
+    }
+
+    .sidebar-nav a.active {
+      background-color: var(--bs-primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .sidebar-nav .nav-level-1 {
+      padding-left: 1rem;
+    }
+
+    .sidebar-nav .nav-level-2 {
+      padding-left: 2rem;
+    }
+
+    .sidebar-nav .nav-level-3 {
+      padding-left: 3rem;
+    }
+
+    .sidebar-section-title {
+      font-weight: 600;
+      color: var(--bs-primary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      margin: 1rem 0 0.5rem 0;
+      padding: 0 0.75rem;
+    }
+    .sidebar-section-title:first-child {
+      margin-top: 0;
+    }  
+    .docs-dropdown-menu {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border: 1px solid var(--bs-border-color);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+       
+      max-width: calc(100vw - 2rem);
+      width: 100%;
+    }
+
+    .docs-dropdown-menu .docs-sidebar {
+      background: transparent;
+      border: none;
+      padding: 0;
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .docs-dropdown-menu .sidebar-header {
+      display: none;
+    }
+
+     
+    @media (max-width: 575.98px) {
+      .docs-dropdown-menu {
+        max-width: calc(100vw - 1rem);
+        padding: 0.25rem;
+      }
+
+      .docs-dropdown-menu .sidebar-nav a {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+     
+    @media (max-width: 1199.98px) {
+      .docs-dropdown-menu {
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+      </section>
+    </main>
+
+    
+      <footer class="footer bg-dark text-white p-4 mt-auto">
+        <div class="container text-center">v#{GitVersion.SemVer}# | © 2025 Azure DevOps Migration Tools. All rights reserved.</div>
+      </footer>
+    
+
+    
+      <div id="debugArea" class="container-fluid p-2 bg-secondary-subtle">
+        <div class="container my-2">
+          <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#debugSection" aria-expanded="false" aria-controls="debugSection">Show Debug Information</button>
+          <div class="collapse" id="debugSection">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Node</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Params</td>
+                  <td><pre>{
+  &#34;aliases&#34;: [
+    &#34;/docs/Reference/Endpoints/FileSystemWorkItemEndpoint&#34;,
+    &#34;/Reference/Endpoints/FileSystemWorkItemEndpoint&#34;,
+    &#34;/learn/azure-devops-migration-tools/Reference/Endpoints/FileSystemWorkItemEndpoint&#34;,
+    &#34;/learn/azure-devops-migration-tools/Reference/Endpoints/FileSystemWorkItemEndpoint/index.md&#34;
+  ],
+  &#34;datafile&#34;: &#34;data/reference.endpoints.filesystemworkitemendpoint.yaml&#34;,
+  &#34;date&#34;: &#34;2025-06-24T12:07:31Z&#34;,
+  &#34;description&#34;: &#34;This document provides an overview of the File System Work Item Endpoint used in the Azure DevOps Migration Tools, including its configuration and usage.\n&#34;,
+  &#34;draft&#34;: false,
+  &#34;iscjklanguage&#34;: false,
+  &#34;lastmod&#34;: &#34;2025-06-24T12:07:31Z&#34;,
+  &#34;publishdate&#34;: &#34;2025-06-24T12:07:31Z&#34;,
+  &#34;slug&#34;: &#34;file-system-work-item-endpoint&#34;,
+  &#34;title&#34;: &#34;File System Work Item Endpoint&#34;
+}</pre></td>
+                </tr>
+                <tr>
+                  <td>Template</td>
+                  <td>
+  docs/single.html</td>
+                </tr>
+                <tr>
+                  <td>Layout</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Kind</td>
+                  <td>page</td>
+                </tr>
+                <tr>
+                  <td>Type</td>
+                  <td>docs</td>
+                </tr>
+                <tr>
+                  <td>Section</td>
+                  <td>docs</td>
+                </tr>
+                <tr>
+                  <td>CurrentSection</td>
+                  <td>C:/Users/MartinHinshelwoodNKD/source/repos/azure-devops-migration-tools/docs/content/docs/reference/endpoints/_index.md</td>
+                </tr>
+                <tr>
+                  <td>Child Sections</td>
+                  <td>
+                    
+                      <p>No child sections.</p>
+                    
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pages</td>
+                  <td>
+                    
+                    
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    
+  </body>
+</html>

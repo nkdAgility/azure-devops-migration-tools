@@ -1,0 +1,8752 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TSHSKGHDK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-TSHSKGHDK");
+    </script>
+    
+    <title>Processors | Azure DevOps Migration Tools</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="description" content="Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, Work Items, Tasks, Test Cases, and Plans & Suits from one Project to another in Azure DevOps / TFS both within the same Organisation, and between Organisations." />
+    <meta name="keywords" content="Azure DevOps, Migration Tools, DevOps, Migration" />
+    <link rel="canonical" href="https://devopsmigration.io/docs/reference/processors/" />
+    <meta property="og:title" content="Processors" />
+    <meta name="giscus:backlink" content="https://devopsmigration.io/docs/reference/processors/" />
+    <meta name="license" content="© 2025 Azure DevOps Migration Tools." />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3e6b2f4808.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/css/tools_module_styles.css" />
+
+    
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Processors",
+  "headline": "Processors",
+  "description": "Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, Work Items, Tasks, Test Cases, and Plans \u0026 Suits from one Project to another in Azure DevOps \/ TFS both within the same Organisation, and between Organisations.",
+  "url": "https://devopsmigration.io/docs/reference/processors/",
+  "datePublished": "2025-06-24T12:07:31Z",
+  "dateModified": "2025-06-24T12:07:31Z",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Azure DevOps Migration Tools",
+    "url": "https://devopsmigration.io"
+  },
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "Azure DevOps Migration Tools",
+    "url": "https://devopsmigration.io"
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://devopsmigration.io"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Processors",
+        "item": "https://devopsmigration.io/docs/reference/processors/"
+      }]
+  },
+  "inLanguage": "en",
+  "potentialAction": {
+    "@type": "ReadAction",
+    "target": "https://devopsmigration.io/docs/reference/processors/"
+  }
+}
+</script>
+
+  </head>
+
+  <body id="top" data-ndka-environment="development" data-ndka-version="#{GitVersion.SemVer}#">
+    
+
+    
+      <div class="container-fluid text-center p-2 bg-development">
+        
+        
+          Local | v0.0.0 | No Robots
+        
+        | <a href="#debugArea">Debug Info</a>
+      </div>
+    
+
+    
+      <header class="header">
+        <div class="container">
+          <nav class="navbar navbar-expand-lg navbar-light py-5">
+  <div class="container">
+    
+    <a class="navbar-brand fw-bold text-primary" href="//localhost:1313/" title="Azure DevOps Migration Tools">
+      <img id="brandLogo" data-theme-src-light="/images/logo-wide-transparent-light.png" data-theme-src-dark="/images/logo-wide-transparent-dark.png" src="/images/logo-wide-transparent-light.png" style="height:50px;" alt="Azure DevOps Migration Tools" />
+    </a>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      
+      <ul class="navbar-nav me-auto">
+        
+          <li class="nav-item">
+            
+              <a class="nav-link" href="/docs/">
+                docs
+              </a>
+            
+          </li>
+        
+          <li class="nav-item">
+            
+              <a class="nav-link" href="/support/">
+                Support
+              </a>
+            
+          </li>
+        
+          <li class="nav-item">
+            
+              <a class="nav-link" href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions" target="_blank" rel="noopener noreferrer">
+                Community
+                <i class="fas fa-external-link-alt ms-1" style="font-size: 0.75em;"></i>
+              </a>
+            
+          </li>
+        
+      </ul>
+
+      
+      <div class="d-flex align-items-center gap-3">
+        
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="themeToggle" title="Toggle theme">
+          <i class="fas fa-sun" id="themeIcon"></i>
+        </button>
+
+        
+        <form class="d-flex d-none" role="search">
+          <div class="input-group input-group-sm" style="width: 200px;">
+            <input class="form-control" type="search" placeholder="Search..." aria-label="Search" id="searchInput" />
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+
+        
+        <a href="/download" class="btn btn-primary btn-sm">
+          <i class="fas fa-download me-1"></i>
+          Download
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const body = document.body;
+    const navbar = document.querySelector(".navbar");
+
+    
+    function updateThemeImages(theme) {
+      
+      const themeImages = document.querySelectorAll("img[data-theme-src-light], img[data-theme-src-dark]");
+
+      themeImages.forEach((img) => {
+        const lightSrc = img.getAttribute("data-theme-src-light");
+        const darkSrc = img.getAttribute("data-theme-src-dark");
+
+        if (theme === "dark" && darkSrc) {
+          img.src = darkSrc;
+        } else if (lightSrc) {
+          img.src = lightSrc;
+        }
+      });
+    }
+
+    
+    const currentTheme = localStorage.getItem("theme") || "light";
+
+    
+    if (currentTheme === "dark") {
+      body.setAttribute("data-bs-theme", "dark");
+      navbar.classList.remove("navbar-light");
+      navbar.classList.add("navbar-dark", "bg-dark");
+      navbar.style.backgroundColor = "";
+      themeIcon.classList.remove("fa-sun");
+      themeIcon.classList.add("fa-moon");
+      updateThemeImages("dark");
+    } else {
+      
+      navbar.style.backgroundColor = "transparent";
+      updateThemeImages("light");
+    }
+
+    
+    themeToggle.addEventListener("click", function () {
+      const currentTheme = body.getAttribute("data-bs-theme");
+      if (currentTheme === "dark") {
+        
+        body.setAttribute("data-bs-theme", "light");
+        navbar.classList.remove("navbar-dark", "bg-dark");
+        navbar.classList.add("navbar-light");
+        navbar.style.backgroundColor = "transparent";
+        themeIcon.classList.remove("fa-moon");
+        themeIcon.classList.add("fa-sun");
+        localStorage.setItem("theme", "light");
+        updateThemeImages("light");
+      } else {
+        
+        body.setAttribute("data-bs-theme", "dark");
+        navbar.classList.remove("navbar-light");
+        navbar.classList.add("navbar-dark", "bg-dark");
+        navbar.style.backgroundColor = "";
+        themeIcon.classList.remove("fa-sun");
+        themeIcon.classList.add("fa-moon");
+        localStorage.setItem("theme", "dark");
+        updateThemeImages("dark");
+      }
+    });
+
+    
+    const searchForm = document.querySelector('form[role="search"]');
+    searchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const searchTerm = document.getElementById("searchInput").value;
+      if (searchTerm.trim()) {
+        
+        window.location.href = `/search/?q=${encodeURIComponent(searchTerm)}`;
+      }
+    });
+  });
+</script>
+
+        </div>
+        <div class="container">
+          
+        </div>
+      </header>
+    
+
+
+    <main>
+      <section class="content-main">
+        
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-12" style="max-width: 1800px;">
+        <div class="row">
+          
+          <div class="col-12 col-xl-3 docs-navbar-container d-none d-xl-block">
+            
+
+
+  <nav class="docs-sidebar" aria-label="Documentation navigation">
+    <div class="sidebar-header mb-3">
+      <h5 class="text-primary fw-bold">
+        <i class="fas fa-book me-2"></i>
+        Documentation
+      </h5>
+    </div>
+
+    <div class="sidebar-content">
+      
+      
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Getting Started
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tutorial: Get started with the Azure DevOps Migration Tools" href="/docs/get-started/getting-started/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Get Started
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Getting Started with Git and TFVC Version Control" href="/docs/get-started/version-control/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Version Control
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Setting Up
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Permissions" href="/docs/setup/permissions/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Permissions
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="ReflectedWorkItemId" href="/docs/setup/reflectedworkitemid/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                ReflectedWorkItemId
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Install Azure DevOps Migration Tools on Windows" href="/docs/setup/installation/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Installation
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                How-To Guides
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: Creating area and iteration maps" href="/docs/how-to/creating-iteration-and-area-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Creating area and iteration maps
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-to: Migrating Plans and Suites" href="/docs/how-to/migrating-plans-and-suites/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Migrating Plans and Suites
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: User Mappings" href="/docs/how-to/user-mappings/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                User Mappings
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Reference
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Endpoints" href="/docs/reference/endpoints/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Endpoints
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Field Maps" href="/docs/reference/field-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Field Maps
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processor Enrichers" href="/docs/reference/processor-enrichers/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processor Enrichers
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processors" href="/docs/reference/processors/" class="nav-level-1active" aria-current="page">
+              
+                <i class="fas fa-folder-open me-2"></i>
+              
+              
+                Processors
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Azure Dev Ops Pipeline Processor" href="/docs/reference/processors/azure-devops-pipeline-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Azure Dev Ops Pipeline Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Keep Outbound Link Target Processor" href="/docs/reference/processors/keep-outbound-link-target-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Keep Outbound Link Target Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Outbound Link Checking Processor" href="/docs/reference/processors/outbound-link-checking-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Outbound Link Checking Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Process Definition Processor" href="/docs/reference/processors/process-definition-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Process Definition Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Export Profile Picture From A D Processor" href="/docs/reference/processors/tfs-export-profile-picture-from-a-d-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Export Profile Picture From A D Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Export Users For Mapping Processor" href="/docs/reference/processors/tfs-export-users-for-mapping-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Export Users For Mapping Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Import Profile Picture Processor" href="/docs/reference/processors/tfs-import-profile-picture-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Import Profile Picture Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Shared Query Processor" href="/docs/reference/processors/tfs-shared-query-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Shared Query Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Settings Processor" href="/docs/reference/processors/tfs-team-settings-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Settings Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Test Configurations Migration Processor" href="/docs/reference/processors/tfs-test-configurations-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Test Configurations Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Test Plans And Suites Migration Processor" href="/docs/reference/processors/tfs-test-plans-and-suites-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Test Plans And Suites Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Test Variables Migration Processor" href="/docs/reference/processors/tfs-test-variables-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Test Variables Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Bulk Edit Processor" href="/docs/reference/processors/tfs-work-item-bulk-edit-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Bulk Edit Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Delete Processor" href="/docs/reference/processors/tfs-work-item-delete-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Delete Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Migration Processor" href="/docs/reference/processors/tfs-work-item-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Overwrite Areas As Tags Processor" href="/docs/reference/processors/tfs-work-item-overwrite-areas-as-tags-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Overwrite Areas As Tags Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Overwrite Processor" href="/docs/reference/processors/tfs-work-item-overwrite-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Overwrite Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Work Item Tracking Processor" href="/docs/reference/processors/work-item-tracking-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Work Item Tracking Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tools" href="/docs/reference/tools/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Tools
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+  </ul>
+
+
+    </div>
+  </nav>
+
+  <style>
+    .docs-sidebar {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bs-light);
+      border-radius: 0.375rem;
+      border: 1px solid var(--bs-border-color);
+    }
+
+    [data-bs-theme="dark"] .docs-sidebar {
+      background: var(--bs-dark);
+      border-color: var(--bs-border-color);
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 0.25rem;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.375rem 0.75rem;
+      color: var(--bs-body-color);
+      text-decoration: none;
+      border-radius: 0.25rem;
+      transition: all 0.15s ease-in-out;
+      font-size: 0.9rem;
+
+       
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: var(--bs-primary);
+      color: white;
+    }
+
+    .sidebar-nav a.active {
+      background-color: var(--bs-primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .sidebar-nav .nav-level-1 {
+      padding-left: 1rem;
+    }
+
+    .sidebar-nav .nav-level-2 {
+      padding-left: 2rem;
+    }
+
+    .sidebar-nav .nav-level-3 {
+      padding-left: 3rem;
+    }
+
+    .sidebar-section-title {
+      font-weight: 600;
+      color: var(--bs-primary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      margin: 1rem 0 0.5rem 0;
+      padding: 0 0.75rem;
+    }
+    .sidebar-section-title:first-child {
+      margin-top: 0;
+    }  
+    .docs-dropdown-menu {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border: 1px solid var(--bs-border-color);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+       
+      max-width: calc(100vw - 2rem);
+      width: 100%;
+    }
+
+    .docs-dropdown-menu .docs-sidebar {
+      background: transparent;
+      border: none;
+      padding: 0;
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .docs-dropdown-menu .sidebar-header {
+      display: none;
+    }
+
+     
+    @media (max-width: 575.98px) {
+      .docs-dropdown-menu {
+        max-width: calc(100vw - 1rem);
+        padding: 0.25rem;
+      }
+
+      .docs-dropdown-menu .sidebar-nav a {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+     
+    @media (max-width: 1199.98px) {
+      .docs-dropdown-menu {
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+
+
+          </div>
+          
+          <div class="col-12 d-xl-none mb-3">
+            <div class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="docsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-book me-2"></i>
+                Documentation Navigation
+              </button>
+              <div class="dropdown-menu docs-dropdown-menu" aria-labelledby="docsDropdown">
+                
+
+
+  <nav class="docs-sidebar" aria-label="Documentation navigation">
+    <div class="sidebar-header mb-3">
+      <h5 class="text-primary fw-bold">
+        <i class="fas fa-book me-2"></i>
+        Documentation
+      </h5>
+    </div>
+
+    <div class="sidebar-content">
+      
+      
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Getting Started
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tutorial: Get started with the Azure DevOps Migration Tools" href="/docs/get-started/getting-started/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Get Started
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Getting Started with Git and TFVC Version Control" href="/docs/get-started/version-control/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Version Control
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Setting Up
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Permissions" href="/docs/setup/permissions/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Permissions
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="ReflectedWorkItemId" href="/docs/setup/reflectedworkitemid/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                ReflectedWorkItemId
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Install Azure DevOps Migration Tools on Windows" href="/docs/setup/installation/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Installation
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                How-To Guides
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: Creating area and iteration maps" href="/docs/how-to/creating-iteration-and-area-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Creating area and iteration maps
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-to: Migrating Plans and Suites" href="/docs/how-to/migrating-plans-and-suites/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Migrating Plans and Suites
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="How-To: User Mappings" href="/docs/how-to/user-mappings/" class="nav-level-1" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                User Mappings
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            <div class="sidebar-section-title">
+              
+                Reference
+              
+            </div>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Endpoints" href="/docs/reference/endpoints/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Endpoints
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Field Maps" href="/docs/reference/field-maps/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Field Maps
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processor Enrichers" href="/docs/reference/processor-enrichers/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Processor Enrichers
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Processors" href="/docs/reference/processors/" class="nav-level-1active" aria-current="page">
+              
+                <i class="fas fa-folder-open me-2"></i>
+              
+              
+                Processors
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+            
+
+
+
+
+
+  <ul class="sidebar-nav">
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Azure Dev Ops Pipeline Processor" href="/docs/reference/processors/azure-devops-pipeline-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Azure Dev Ops Pipeline Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Keep Outbound Link Target Processor" href="/docs/reference/processors/keep-outbound-link-target-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Keep Outbound Link Target Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Outbound Link Checking Processor" href="/docs/reference/processors/outbound-link-checking-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Outbound Link Checking Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Process Definition Processor" href="/docs/reference/processors/process-definition-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Process Definition Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Export Profile Picture From A D Processor" href="/docs/reference/processors/tfs-export-profile-picture-from-a-d-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Export Profile Picture From A D Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Export Users For Mapping Processor" href="/docs/reference/processors/tfs-export-users-for-mapping-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Export Users For Mapping Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Import Profile Picture Processor" href="/docs/reference/processors/tfs-import-profile-picture-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Import Profile Picture Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Shared Query Processor" href="/docs/reference/processors/tfs-shared-query-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Shared Query Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Team Settings Processor" href="/docs/reference/processors/tfs-team-settings-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Team Settings Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Test Configurations Migration Processor" href="/docs/reference/processors/tfs-test-configurations-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Test Configurations Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Test Plans And Suites Migration Processor" href="/docs/reference/processors/tfs-test-plans-and-suites-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Test Plans And Suites Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Test Variables Migration Processor" href="/docs/reference/processors/tfs-test-variables-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Test Variables Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Bulk Edit Processor" href="/docs/reference/processors/tfs-work-item-bulk-edit-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Bulk Edit Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Delete Processor" href="/docs/reference/processors/tfs-work-item-delete-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Delete Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Migration Processor" href="/docs/reference/processors/tfs-work-item-migration-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Migration Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Overwrite Areas As Tags Processor" href="/docs/reference/processors/tfs-work-item-overwrite-areas-as-tags-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Overwrite Areas As Tags Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tfs Work Item Overwrite Processor" href="/docs/reference/processors/tfs-work-item-overwrite-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Tfs Work Item Overwrite Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Work Item Tracking Processor" href="/docs/reference/processors/work-item-tracking-processor/" class="nav-level-2" >
+              
+                <i class="fas fa-file-alt me-2"></i>
+              
+              
+                Work Item Tracking Processor
+              
+            </a>
+          
+        
+
+        
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+      
+      
+      
+
+
+      <li>
+        
+        
+          
+          
+            
+            <a title="Tools" href="/docs/reference/tools/" class="nav-level-1" >
+              
+                <i class="fas fa-folder me-2"></i>
+              
+              
+                Tools
+              
+            </a>
+          
+        
+
+        
+        
+          
+          
+        
+      </li>
+    
+  </ul>
+
+
+          
+        
+      </li>
+    
+  </ul>
+
+
+    </div>
+  </nav>
+
+  <style>
+    .docs-sidebar {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 1rem;
+      background: var(--bs-light);
+      border-radius: 0.375rem;
+      border: 1px solid var(--bs-border-color);
+    }
+
+    [data-bs-theme="dark"] .docs-sidebar {
+      background: var(--bs-dark);
+      border-color: var(--bs-border-color);
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 0.25rem;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.375rem 0.75rem;
+      color: var(--bs-body-color);
+      text-decoration: none;
+      border-radius: 0.25rem;
+      transition: all 0.15s ease-in-out;
+      font-size: 0.9rem;
+
+       
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-nav a:hover {
+      background-color: var(--bs-primary);
+      color: white;
+    }
+
+    .sidebar-nav a.active {
+      background-color: var(--bs-primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    .sidebar-nav .nav-level-1 {
+      padding-left: 1rem;
+    }
+
+    .sidebar-nav .nav-level-2 {
+      padding-left: 2rem;
+    }
+
+    .sidebar-nav .nav-level-3 {
+      padding-left: 3rem;
+    }
+
+    .sidebar-section-title {
+      font-weight: 600;
+      color: var(--bs-primary);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      margin: 1rem 0 0.5rem 0;
+      padding: 0 0.75rem;
+    }
+    .sidebar-section-title:first-child {
+      margin-top: 0;
+    }  
+    .docs-dropdown-menu {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 0.5rem;
+      border: 1px solid var(--bs-border-color);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+       
+      max-width: calc(100vw - 2rem);
+      width: 100%;
+    }
+
+    .docs-dropdown-menu .docs-sidebar {
+      background: transparent;
+      border: none;
+      padding: 0;
+      position: static;
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .docs-dropdown-menu .sidebar-header {
+      display: none;
+    }
+
+     
+    @media (max-width: 575.98px) {
+      .docs-dropdown-menu {
+        max-width: calc(100vw - 1rem);
+        padding: 0.25rem;
+      }
+
+      .docs-dropdown-menu .sidebar-nav a {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+     
+    @media (max-width: 1199.98px) {
+      .docs-dropdown-menu {
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+
+
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-12 col-xl-9">
+            <div class="docs-content">
+              
+              <div class="docs-header mb-4">
+                <h1 class="docs-title">Processors</h1>
+                
+              </div>
+
+              
+              
+                <div class="docs-sections">
+                  <div class="row">
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/azure-devops-pipeline-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Azure Dev Ops Pipeline Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>BuildPipelines</code></td>
+            <td><code>List</code></td>
+            <td>List of Build Pipelines to process. If this is <code>null</code> then all Build Pipelines will be processed.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrateBuildPipelines</code></td>
+            <td><code>Boolean</code></td>
+            <td>Migrate Build Pipelines</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrateReleasePipelines</code></td>
+            <td><code>Boolean</code></td>
+            <td>Migrate Release Pipelines</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrateServiceConnections</code></td>
+            <td><code>Boolean</code></td>
+            <td>Migrate Service Connections <strong>secrets need to be entered manually</strong></td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrateTaskGroups</code></td>
+            <td><code>Boolean</code></td>
+            <td>Migrate Task Groups</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrateVariableGroups</code></td>
+            <td><code>Boolean</code></td>
+            <td>Migrate Variable Groups</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>ReleasePipelines</code></td>
+            <td><code>List</code></td>
+            <td>List of Release Pipelines to process. If this is <code>null</code> then all Release Pipelines will be processed.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>RepositoryNameMaps</code></td>
+            <td><code>Dictionary</code></td>
+            <td>Map of Source Repository to Target Repository Names</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;MigrationTools&#34;: {
+    &#34;Version&#34;: &#34;16.0&#34;,
+    &#34;Processors&#34;: [
+      {
+        &#34;ProcessorType&#34;: &#34;AzureDevOpsPipelineProcessor&#34;,
+        &#34;BuildPipelines&#34;: &#34;&#34;,
+        &#34;Enabled&#34;: &#34;False&#34;,
+        &#34;MigrateBuildPipelines&#34;: &#34;True&#34;,
+        &#34;MigrateReleasePipelines&#34;: &#34;True&#34;,
+        &#34;MigrateServiceConnections&#34;: &#34;True&#34;,
+        &#34;MigrateTaskGroups&#34;: &#34;True&#34;,
+        &#34;MigrateVariableGroups&#34;: &#34;True&#34;,
+        &#34;ReleasePipelines&#34;: &#34;&#34;,
+        &#34;SourceName&#34;: &#34;sourceName&#34;,
+        &#34;TargetName&#34;: &#34;targetName&#34;
+      }
+    ]
+  }
+}</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;MigrationTools&#34;: {
+    &#34;Version&#34;: &#34;16.0&#34;,
+    &#34;Processors&#34;: [
+      {
+        &#34;ProcessorType&#34;: &#34;AzureDevOpsPipelineProcessor&#34;,
+        &#34;BuildPipelines&#34;: &#34;&#34;,
+        &#34;Enabled&#34;: &#34;False&#34;,
+        &#34;MigrateBuildPipelines&#34;: &#34;True&#34;,
+        &#34;MigrateReleasePipelines&#34;: &#34;True&#34;,
+        &#34;MigrateServiceConnections&#34;: &#34;True&#34;,
+        &#34;MigrateTaskGroups&#34;: &#34;True&#34;,
+        &#34;MigrateVariableGroups&#34;: &#34;True&#34;,
+        &#34;ReleasePipelines&#34;: &#34;&#34;,
+        &#34;SourceName&#34;: &#34;sourceName&#34;,
+        &#34;TargetName&#34;: &#34;targetName&#34;
+      }
+    ]
+  }
+}</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;AzureDevOpsPipelineProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;MigrateBuildPipelines&#34;: true,
+  &#34;MigrateReleasePipelines&#34;: true,
+  &#34;MigrateTaskGroups&#34;: true,
+  &#34;MigrateVariableGroups&#34;: true,
+  &#34;MigrateServiceConnections&#34;: true,
+  &#34;BuildPipelines&#34;: null,
+  &#34;ReleasePipelines&#34;: null,
+  &#34;RepositoryNameMaps&#34;: {},
+  &#34;SourceName&#34;: &#34;sourceName&#34;,
+  &#34;TargetName&#34;: &#34;targetName&#34;
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>AzureDevOpsPipelineProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Beta
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Pipelines</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/keep-outbound-link-target-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Keep Outbound Link Target Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>missing XML code comments</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>CleanupFileName</code></td>
+            <td><code>String</code></td>
+            <td>File path where the cleanup script or batch file will be generated for removing unwanted outbound links.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>DryRun</code></td>
+            <td><code>Boolean</code></td>
+            <td>When true, performs a dry run without making actual changes, only generating the cleanup script for review.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>PrependCommand</code></td>
+            <td><code>String</code></td>
+            <td>Command to prepend to each line in the cleanup script, such as &ldquo;start&rdquo; for Windows batch files.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetLinksToKeepOrganization</code></td>
+            <td><code>String</code></td>
+            <td>URL of the Azure DevOps organization whose links should be preserved during cleanup operations.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetLinksToKeepProject</code></td>
+            <td><code>String</code></td>
+            <td>Project name or GUID within the target organization whose links should be preserved.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WIQLQuery</code></td>
+            <td><code>String</code></td>
+            <td>WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;KeepOutboundLinkTargetProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;WIQLQuery&#34;: &#34;Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains &#39;Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request&#39;&#34;,
+  &#34;TargetLinksToKeepOrganization&#34;: &#34;https://dev.azure.com/nkdagility&#34;,
+  &#34;TargetLinksToKeepProject&#34;: &#34;993d43f0-fa86-40df-9102-50118fb56357&#34;,
+  &#34;CleanupFileName&#34;: &#34;c:/temp/OutboundLinkTargets.bat&#34;,
+  &#34;PrependCommand&#34;: &#34;start&#34;,
+  &#34;DryRun&#34;: true,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>KeepOutboundLinkTargetProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Missing XML Code Comments
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">missing XML code comments</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/outbound-link-checking-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Outbound Link Checking Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>missing XML code comments</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>ResultFileName</code></td>
+            <td><code>String</code></td>
+            <td>File name where the results of the outbound link checking process will be saved, typically containing details of broken or invalid links.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WIQLQuery</code></td>
+            <td><code>String</code></td>
+            <td>WIQL (Work Item Query Language) query used to select the work items whose outbound links should be checked for validity.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;OutboundLinkCheckingProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;WIQLQuery&#34;: null,
+  &#34;ResultFileName&#34;: null,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>OutboundLinkCheckingProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Missing XML Code Comments
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">missing XML code comments</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/process-definition-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Process Definition Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>Process definition processor used to keep processes between two orgs in sync</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MaxDegreeOfParallelism</code></td>
+            <td><code>Int32</code></td>
+            <td>Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Processes</code></td>
+            <td><code>Dictionary</code></td>
+            <td>Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>ProcessMaps</code></td>
+            <td><code>Dictionary</code></td>
+            <td>Dictionary mapping source process names to target process names for process template transformations during migration.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>UpdateProcessDetails</code></td>
+            <td><code>Boolean</code></td>
+            <td>Indicates whether to update existing process details in the target organization or only create new processes.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;ProcessDefinitionProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;Processes&#34;: null,
+  &#34;ProcessMaps&#34;: null,
+  &#34;UpdateProcessDetails&#34;: false,
+  &#34;MaxDegreeOfParallelism&#34;: 0,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>ProcessDefinitionProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Beta
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Pipelines</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-export-profile-picture-from-a-d-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Export Profile Picture From A D Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>Downloads corporate images and updates TFS/Azure DevOps profiles</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Domain</code></td>
+            <td><code>String</code></td>
+            <td>The source domain where the pictures should be exported.</td>
+            <td>
+              
+                <code>String.Empty</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Password</code></td>
+            <td><code>String</code></td>
+            <td>The password of the user that is used to export the pictures.</td>
+            <td>
+              
+                <code>String.Empty</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>PictureEmpIDFormat</code></td>
+            <td><code>String</code></td>
+            <td>TODO: You wpuld need to customise this for your system. Clone repo and run in Debug</td>
+            <td>
+              
+                <code>String.Empty</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Username</code></td>
+            <td><code>String</code></td>
+            <td>The user name of the user that is used to export the pictures.</td>
+            <td>
+              
+                <code>String.Empty</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsExportProfilePictureFromADProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;Domain&#34;: null,
+  &#34;Username&#34;: null,
+  &#34;Password&#34;: null,
+  &#34;PictureEmpIDFormat&#34;: null,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsExportProfilePictureFromADProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-warning">
+            Alpha
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Profiles</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-export-users-for-mapping-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Export Users For Mapping Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use <code>ExportUsersForMappingConfig</code> to configure.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>ExportAllUsers</code></td>
+            <td><code>Boolean</code></td>
+            <td>Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>OnlyListUsersInWorkItems</code></td>
+            <td><code>Boolean</code></td>
+            <td><code>OnlyListUsersInWorkItems</code></td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>UserExportFile</code></td>
+            <td><code>String</code></td>
+            <td>Path to export file where all source and target servers&rsquo; users will be exported. Users are exported only if  is set to .</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WIQLQuery</code></td>
+            <td><code>String</code></td>
+            <td>WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsExportUsersForMappingProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;WIQLQuery&#34;: null,
+  &#34;OnlyListUsersInWorkItems&#34;: true,
+  &#34;ExportAllUsers&#34;: false,
+  &#34;UserExportFile&#34;: null,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsExportUsersForMappingProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Ready
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Work Items</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-import-profile-picture-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Import Profile Picture Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>Downloads corporate images and updates TFS/Azure DevOps profiles</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsImportProfilePictureProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsImportProfilePictureProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-warning">
+            Alpha
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Profiles</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-shared-query-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Shared Query Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>PrefixProjectToNodes</code></td>
+            <td><code>Boolean</code></td>
+            <td>Do we add the source project name into the folder path</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SharedFolderName</code></td>
+            <td><code>String</code></td>
+            <td>The name of the shared folder, made a parameter incase it every needs to be edited</td>
+            <td>
+              
+                <code>Shared Queries</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceToTargetFieldMappings</code></td>
+            <td><code>Dictionary</code></td>
+            <td>Mapping of the source to the target</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsSharedQueryProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;PrefixProjectToNodes&#34;: false,
+  &#34;SharedFolderName&#34;: &#34;Shared Queries&#34;,
+  &#34;SourceToTargetFieldMappings&#34;: null,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsSharedQueryProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Beta
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Queries</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-team-settings-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Team Settings Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>Native TFS Processor, does not work with any other Endpoints.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrateTeamCapacities</code></td>
+            <td><code>Boolean</code></td>
+            <td>Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrateTeamSettings</code></td>
+            <td><code>Boolean</code></td>
+            <td>Migrate original team settings after their creation on target team project</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>PrefixProjectToNodes</code></td>
+            <td><code>Boolean</code></td>
+            <td>Prefix your iterations and areas with the project name. If you have enabled this in <code>NodeStructuresMigrationConfig</code> you must do it here too.</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Teams</code></td>
+            <td><code>List</code></td>
+            <td>List of Teams to process. If this is <code>null</code> then all teams will be processed.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>UpdateTeamSettings</code></td>
+            <td><code>Boolean</code></td>
+            <td>Reset the target team settings to match the source if the team exists</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>UseUserMapping</code></td>
+            <td><code>Boolean</code></td>
+            <td>Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to <code>true</code>, users are matched also by mapped name from user mapping file.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsTeamSettingsProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;MigrateTeamSettings&#34;: false,
+  &#34;UpdateTeamSettings&#34;: false,
+  &#34;PrefixProjectToNodes&#34;: false,
+  &#34;MigrateTeamCapacities&#34;: false,
+  &#34;Teams&#34;: null,
+  &#34;UseUserMapping&#34;: false,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsTeamSettingsProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Beta
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Teams</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-test-configurations-migration-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Test Configurations Migration Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>This processor can migrate <code>test configuration</code>. This should be run before <code>LinkMigrationConfig</code>.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsTestConfigurationsMigrationProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsTestConfigurationsMigrationProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Beta
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Suites &amp; Plans</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-test-plans-and-suites-migration-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Test Plans And Suites Migration Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>FilterCompleted</code></td>
+            <td><code>Boolean</code></td>
+            <td>missing XML code comments</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>MigrationDelay</code></td>
+            <td><code>Int32</code></td>
+            <td>??Not sure what this does. Check code.</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>OnlyElementsWithTag</code></td>
+            <td><code>String</code></td>
+            <td>The tag name that is present on all elements that must be migrated. If this option isn&rsquo;t present this processor will migrate all.</td>
+            <td>
+              
+                <code>`String.Empty`</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>RemoveAllLinks</code></td>
+            <td><code>Boolean</code></td>
+            <td>??Not sure what this does. Check code.</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>RemoveInvalidTestSuiteLinks</code></td>
+            <td><code>Boolean</code></td>
+            <td>Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TestPlanIds</code></td>
+            <td><code>Int32[]</code></td>
+            <td>This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: &ldquo;TestPlanIds&rdquo;: [123, 456, 789]   Works optimally when &ldquo;TestPlanQuery&rdquo; is set to null.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TestPlanQuery</code></td>
+            <td><code>String</code></td>
+            <td>Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after <code>Select * From TestPlan Where</code> when selecting test plans. Among filtering options, <code>AreaPath</code>, <code>PlanName</code> and <code>PlanState</code> are known to work. There is unfortunately no documentation regarding the available fields.</td>
+            <td>
+              
+                <code>`String.Empty`</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsTestPlansAndSuitesMigrationProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;OnlyElementsWithTag&#34;: null,
+  &#34;TestPlanQuery&#34;: null,
+  &#34;RemoveAllLinks&#34;: false,
+  &#34;MigrationDelay&#34;: 0,
+  &#34;RemoveInvalidTestSuiteLinks&#34;: false,
+  &#34;FilterCompleted&#34;: false,
+  &#34;TestPlanIds&#34;: [],
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsTestPlansAndSuitesMigrationProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Beta
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Suites &amp; Plans</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-test-variables-migration-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Test Variables Migration Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>This processor can migrate test variables that are defined in the test plans / suites. This must run before <code>TestPlansAndSuitesMigrationConfig</code>.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Processor</code></td>
+            <td><code>String</code></td>
+            <td>Gets the processor identifier for test variables migration.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsTestVariablesMigrationProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;Processor&#34;: &#34;TestVariablesMigrationContext&#34;,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsTestVariablesMigrationProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Beta
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Suites &amp; Plans</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-work-item-bulk-edit-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Work Item Bulk Edit Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.</p></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-work-item-delete-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Work Item Delete Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>The <code>WorkItemDelete</code> processor allows you to delete any amount of work items that meet the query. <strong>DANGER:</strong> This is not a recoverable action and should be use with extream caution.</p></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-work-item-migration-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Work Item Migration Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use <code>WorkItemMigrationConfig</code> to configure.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>FilterWorkItemsThatAlreadyExistInTarget</code></td>
+            <td><code>Boolean</code></td>
+            <td>This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>FixHtmlAttachmentLinks</code></td>
+            <td><code>Boolean</code></td>
+            <td><strong>beta</strong> If enabled this will fix any image attachments URL&rsquo;s, work item mention URL&rsquo;s or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>GenerateMigrationComment</code></td>
+            <td><code>Boolean</code></td>
+            <td>If enabled, adds a comment recording the migration</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>UpdateCreatedBy</code></td>
+            <td><code>Boolean</code></td>
+            <td>If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it&rsquo;s change only the data column CreateDate, not the internal create date)</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>UpdateCreatedDate</code></td>
+            <td><code>Boolean</code></td>
+            <td>If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it&rsquo;s change only the data column CreateDate, not the internal create date)</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WIQLQuery</code></td>
+            <td><code>String</code></td>
+            <td>A work item query based on WIQL to select only important work items. To migrate all leave this empty. See 
+  <a href="#wiql-query-bits">WIQL Query Bits</a></td>
+            <td>
+              
+                <code>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN (&#39;Test Suite&#39;, &#39;Test Plan&#39;,&#39;Shared Steps&#39;,&#39;Shared Parameter&#39;,&#39;Feedback Request&#39;) ORDER BY [System.ChangedDate] desc</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WorkItemCreateRetryLimit</code></td>
+            <td><code>Int32</code></td>
+            <td><strong>beta</strong> If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.</td>
+            <td>
+              
+                <code>5</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;MigrationTools&#34;: {
+    &#34;Version&#34;: &#34;16.0&#34;,
+    &#34;Processors&#34;: [
+      {
+        &#34;ProcessorType&#34;: &#34;TfsWorkItemMigrationProcessor&#34;,
+        &#34;Enabled&#34;: &#34;False&#34;,
+        &#34;FilterWorkItemsThatAlreadyExistInTarget&#34;: &#34;False&#34;,
+        &#34;SourceName&#34;: &#34;Source&#34;,
+        &#34;TargetName&#34;: &#34;Target&#34;,
+        &#34;WIQLQuery&#34;: &#34;SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN (&#39;Test Suite&#39;, &#39;Test Plan&#39;,&#39;Shared Steps&#39;,&#39;Shared Parameter&#39;,&#39;Feedback Request&#39;) ORDER BY [System.ChangedDate] desc&#34;
+      }
+    ]
+  }
+}</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;MigrationTools&#34;: {
+    &#34;Version&#34;: &#34;16.0&#34;,
+    &#34;Processors&#34;: [
+      {
+        &#34;ProcessorType&#34;: &#34;TfsWorkItemMigrationProcessor&#34;,
+        &#34;AttachRevisionHistory&#34;: &#34;False&#34;,
+        &#34;Enabled&#34;: &#34;False&#34;,
+        &#34;FilterWorkItemsThatAlreadyExistInTarget&#34;: &#34;False&#34;,
+        &#34;FixHtmlAttachmentLinks&#34;: &#34;True&#34;,
+        &#34;GenerateMigrationComment&#34;: &#34;True&#34;,
+        &#34;MaxGracefulFailures&#34;: &#34;0&#34;,
+        &#34;PauseAfterEachWorkItem&#34;: &#34;False&#34;,
+        &#34;SkipRevisionWithInvalidAreaPath&#34;: &#34;False&#34;,
+        &#34;SkipRevisionWithInvalidIterationPath&#34;: &#34;False&#34;,
+        &#34;SourceName&#34;: &#34;Source&#34;,
+        &#34;TargetName&#34;: &#34;Target&#34;,
+        &#34;UpdateCreatedBy&#34;: &#34;True&#34;,
+        &#34;UpdateCreatedDate&#34;: &#34;True&#34;,
+        &#34;WIQLQuery&#34;: &#34;SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN (&#39;Test Suite&#39;, &#39;Test Plan&#39;,&#39;Shared Steps&#39;,&#39;Shared Parameter&#39;,&#39;Feedback Request&#39;) ORDER BY [System.ChangedDate] desc&#34;,
+        &#34;WorkItemCreateRetryLimit&#34;: &#34;5&#34;,
+        &#34;WorkItemIDs&#34;: null
+      }
+    ]
+  }
+}</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsWorkItemMigrationProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;UpdateCreatedDate&#34;: true,
+  &#34;UpdateCreatedBy&#34;: true,
+  &#34;WIQLQuery&#34;: &#34;SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN (&#39;Test Suite&#39;, &#39;Test Plan&#39;,&#39;Shared Steps&#39;,&#39;Shared Parameter&#39;,&#39;Feedback Request&#39;) ORDER BY [System.ChangedDate] desc&#34;,
+  &#34;FixHtmlAttachmentLinks&#34;: true,
+  &#34;WorkItemCreateRetryLimit&#34;: 5,
+  &#34;FilterWorkItemsThatAlreadyExistInTarget&#34;: false,
+  &#34;GenerateMigrationComment&#34;: true,
+  &#34;SourceName&#34;: &#34;Source&#34;,
+  &#34;TargetName&#34;: &#34;Target&#34;
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsWorkItemMigrationProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Ready
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Work Items</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div>
+
+
+<p>The <code>WorkItemMigrationContext</code> processor is used for migrating work items from one Azure DevOps instance to another. This encompasses a variety of activities:</p></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-work-item-overwrite-areas-as-tags-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Work Item Overwrite Areas As Tags Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>A common issue with older <em>TFS/Azure DevOps</em> instances is the proliferation of <code>Area Paths</code>. With the use of <code>Area Path</code> for <code>Teams</code> and the addition of the <code>Node Name</code> column option these extensive tag hierarchies should instad be moved to tags.</p></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/tfs-work-item-overwrite-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Tfs Work Item Overwrite Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>Reapply field mappings after a migration. Does not migrate Work Items, only reapplies changes to field mappings.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>FilterWorkItemsThatAlreadyExistInTarget</code></td>
+            <td><code>Boolean</code></td>
+            <td>This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.</td>
+            <td>
+              
+                <code>true</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>PauseAfterEachWorkItem</code></td>
+            <td><code>Boolean</code></td>
+            <td>Pause after each work item is migrated</td>
+            <td>
+              
+                <em>Not specified</em>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WIQLQuery</code></td>
+            <td><code>String</code></td>
+            <td>A work item query based on WIQL to select only important work items. To migrate all leave this empty. See 
+  <a href="#wiql-query-bits">WIQL Query Bits</a></td>
+            <td>
+              
+                <code>AND  [Microsoft.VSTS.Common.ClosedDate] = &#39;&#39; AND [System.WorkItemType] NOT IN (&#39;Test Suite&#39;, &#39;Test Plan&#39;,&#39;Shared Steps&#39;,&#39;Shared Parameter&#39;,&#39;Feedback Request&#39;)</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WorkItemCreateRetryLimit</code></td>
+            <td><code>Int32</code></td>
+            <td><strong>beta</strong> If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.</td>
+            <td>
+              
+                <code>5</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WorkItemIDs</code></td>
+            <td><code>IList</code></td>
+            <td>A list of work items to import</td>
+            <td>
+              
+                <code>[]</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;TfsWorkItemOverwriteProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;WorkItemIDs&#34;: null,
+  &#34;WIQLQuery&#34;: &#34;SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [@ReflectedWorkItemIdField] = &#39;&#39;  AND [System.WorkItemType] NOT IN (&#39;Test Suite&#39;, &#39;Test Plan&#39;,&#39;Shared Steps&#39;,&#39;Shared Parameter&#39;,&#39;Feedback Request&#39;) ORDER BY [System.ChangedDate] desc&#34;,
+  &#34;FilterWorkItemsThatAlreadyExistInTarget&#34;: false,
+  &#34;PauseAfterEachWorkItem&#34;: false,
+  &#34;WorkItemCreateRetryLimit&#34;: 0,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>TfsWorkItemOverwriteProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Preview
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">Work Items</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="/docs/reference/processors/work-item-tracking-processor/" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                Work Item Tracking Processor
+                              </a>
+                            </h5>
+                            
+                              <p class="card-text text-muted"><div class="class-description">
+    <p>This processor is intended, with the aid of 
+  <a href="../ProcessorEnrichers/index.md">ProcessorEnrichers</a>
+, to allow the migration of Work Items between two 
+  <a href="../Endpoints/index.md">Endpoints</a>
+.</p>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="options" class="position-relative">
+  Options
+  <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+  
+  
+    
+  
+
+
+
+  <div class="class-options">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>CollapseRevisions</code></td>
+            <td><code>Boolean</code></td>
+            <td>Gets or sets a value indicating whether to collapse revisions into a single work item.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>Enabled</code></td>
+            <td><code>Boolean</code></td>
+            <td>If set to <code>true</code> then the processor will run. Set to <code>false</code> and the processor will not run.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>ReplayRevisions</code></td>
+            <td><code>Boolean</code></td>
+            <td>Gets or sets a value indicating whether to replay all revisions during migration.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>SourceName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the source of the Migration. Can be null for a write only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>TargetName</code></td>
+            <td><code>String</code></td>
+            <td>This is the <code>IEndpoint</code> that will be used as the Target of the Migration. Can be null for a read only processor.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+          <tr>
+            <td><code>WorkItemCreateRetryLimit</code></td>
+            <td><code>Int32</code></td>
+            <td>Gets or sets the number of times to retry work item creation if it fails.</td>
+            <td>
+              
+                <code>missing XML code comments</code>
+              
+            </td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+
+<a href="#top">top</a>
+<h2 id="samples" class="position-relative">
+  Samples
+  <a href="#samples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+<a href="#top">top</a>
+<h3 id="sample" class="position-relative">
+  Sample
+  <a href="#sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-sample" class="position-relative">
+          Sample
+          <a href="#example-sample" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There is no sample, but you can check the classic below for a general feel.</code></pre>
+        
+      </div>
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="defaults" class="position-relative">
+  Defaults
+  <a href="#defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-defaults" class="position-relative">
+          Defaults
+          <a href="#example-defaults" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">There are no defaults! Check the sample for options!</code></pre>
+        
+      </div>
+    
+  
+    
+  
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h3 id="classic" class="position-relative">
+  Classic
+  <a href="#classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h3>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  
+  
+    
+  
+    
+  
+    
+      
+      <div class="example-item">
+        <h4 id="example-classic" class="position-relative">
+          Classic
+          <a href="#example-classic" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        
+        
+          <pre><code class="language-json">{
+  &#34;$type&#34;: &#34;WorkItemTrackingProcessorOptions&#34;,
+  &#34;Enabled&#34;: false,
+  &#34;ReplayRevisions&#34;: false,
+  &#34;CollapseRevisions&#34;: false,
+  &#34;WorkItemCreateRetryLimit&#34;: 0,
+  &#34;SourceName&#34;: null,
+  &#34;TargetName&#34;: null
+}</code></pre>
+        
+      </div>
+    
+  
+  
+
+
+<a href="#top">top</a>
+<h2 id="metadata" class="position-relative">
+  Metadata
+  <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+    <i class="fas fa-link fa-sm"></i>
+  </a>
+</h2>
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+  
+
+
+
+
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>WorkItemTrackingProcessor</code></dd>
+      
+      
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-success">
+            Missing XML Code Comments
+          </span>
+        </dd>
+      
+      
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">missing XML code comments</dd>
+      
+      
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">Processors</dd>
+      
+    </dl>
+  </div></p>
+                            
+
+                            
+                            
+                          </div>
+
+                          
+                          
+                        </div>
+                      </div>
+                    
+                  </div>
+                </div>
+              
+
+              
+              <div class="docs-body">
+                
+              </div>
+
+              
+              
+              
+                <div class="docs-getting-started mt-5">
+                  <div class="alert alert-primary" role="alert">
+                    <h4 class="alert-heading">
+                      <i class="fas fa-rocket me-2"></i>
+                      Getting Started
+                    </h4>
+                    <p class="mb-3">New to the Azure DevOps Migration Tools? Start here for a quick introduction and setup guide.</p>
+                    <a href="/docs/get-started/getting-started/" class="btn btn-primary">
+                      <i class="fas fa-play me-2"></i>
+                      Get Started
+                    </a>
+                  </div>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+      </section>
+    </main>
+
+    
+      <footer class="footer bg-dark text-white p-4 mt-auto">
+        <div class="container text-center">v#{GitVersion.SemVer}# | © 2025 Azure DevOps Migration Tools. All rights reserved.</div>
+      </footer>
+    
+
+    
+      <div id="debugArea" class="container-fluid p-2 bg-secondary-subtle">
+        <div class="container my-2">
+          <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#debugSection" aria-expanded="false" aria-controls="debugSection">Show Debug Information</button>
+          <div class="collapse" id="debugSection">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Node</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Params</td>
+                  <td><pre>{
+  &#34;date&#34;: &#34;2025-06-24T12:07:31Z&#34;,
+  &#34;draft&#34;: false,
+  &#34;iscjklanguage&#34;: false,
+  &#34;lastmod&#34;: &#34;2025-06-24T12:07:31Z&#34;,
+  &#34;publishdate&#34;: &#34;2025-06-24T12:07:31Z&#34;,
+  &#34;title&#34;: &#34;Processors&#34;
+}</pre></td>
+                </tr>
+                <tr>
+                  <td>Template</td>
+                  <td>
+  docs/list.html</td>
+                </tr>
+                <tr>
+                  <td>Layout</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Kind</td>
+                  <td>section</td>
+                </tr>
+                <tr>
+                  <td>Type</td>
+                  <td>docs</td>
+                </tr>
+                <tr>
+                  <td>Section</td>
+                  <td>docs</td>
+                </tr>
+                <tr>
+                  <td>CurrentSection</td>
+                  <td>C:/Users/MartinHinshelwoodNKD/source/repos/azure-devops-migration-tools/docs/content/docs/reference/processors/_index.md</td>
+                </tr>
+                <tr>
+                  <td>Child Sections</td>
+                  <td>
+                    
+                      <p>No child sections.</p>
+                    
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pages</td>
+                  <td>
+                    
+                    
+                      <strong>docs</strong>
+                      <ul>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/azure-devops-pipeline-processor/">Azure Dev Ops Pipeline Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/keep-outbound-link-target-processor/">Keep Outbound Link Target Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/outbound-link-checking-processor/">Outbound Link Checking Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/process-definition-processor/">Process Definition Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-export-profile-picture-from-a-d-processor/">Tfs Export Profile Picture From A D Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-export-users-for-mapping-processor/">Tfs Export Users For Mapping Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-import-profile-picture-processor/">Tfs Import Profile Picture Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-shared-query-processor/">Tfs Shared Query Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-team-settings-processor/">Tfs Team Settings Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-test-configurations-migration-processor/">Tfs Test Configurations Migration Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-test-plans-and-suites-migration-processor/">Tfs Test Plans And Suites Migration Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-test-variables-migration-processor/">Tfs Test Variables Migration Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-work-item-bulk-edit-processor/">Tfs Work Item Bulk Edit Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-work-item-delete-processor/">Tfs Work Item Delete Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-work-item-migration-processor/">Tfs Work Item Migration Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-work-item-overwrite-areas-as-tags-processor/">Tfs Work Item Overwrite Areas As Tags Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/tfs-work-item-overwrite-processor/">Tfs Work Item Overwrite Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                          <li>
+                            <a href="//localhost:1313/docs/reference/processors/work-item-tracking-processor/">Work Item Tracking Processor</a>
+                            [Type: docs]
+                          </li>
+                        
+                      </ul>
+                    
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    
+  </body>
+</html>

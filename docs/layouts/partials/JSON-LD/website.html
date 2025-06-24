@@ -1,0 +1,32 @@
+{{- $baseURL := .Site.BaseURL -}}
+{{- $siteURL := .Site.Params.siteProdUrl | default $baseURL -}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "{{ .Site.Title }}",
+  "alternateName": "ScrumExpansion.org",
+  "description": "{{ .Site.Params.description }}",
+  "url": {{ $siteURL }},
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ .Site.Title }}",
+    "url": {{ $siteURL }},
+    "logo": {
+      "@type": "ImageObject",
+      "url": {{ printf "%s%s" $siteURL "/images/logo.png" }}
+    }
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": {{ printf "%s%s" $siteURL "/search?q={search_term_string}" }}
+    },
+    "query-input": "required name=search_term_string"
+  },
+  "sameAs": [
+    {{ .Site.Params.githubUrl }}
+  ]
+}
+</script>

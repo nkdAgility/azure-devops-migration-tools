@@ -1,0 +1,57 @@
+{{/* Generate breadcrumbs for docs pages */}}
+{{ $pages := slice }}
+
+{{/* Build the breadcrumb trail */}}
+{{ $current := . }}
+{{ range $current.Ancestors.Reverse }}
+  {{ if eq .Section "docs" }}
+    {{ $pages = $pages | append . }}
+  {{ end }}
+{{ end }}
+{{ $pages = $pages | append $current }}
+
+{{ if gt (len $pages) 1 }}
+  <nav aria-label="breadcrumb" class="docs-breadcrumb mb-4">
+    <ol class="breadcrumb">
+      {{ range $index, $page := $pages }}
+        {{ if eq $index (sub (len $pages) 1) }}
+          {{/* Current page */}}
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ $page.Title }}
+          </li>
+        {{ else }}
+          {{/* Parent pages */}}
+          <li class="breadcrumb-item">
+            <a href="{{ $page.RelPermalink }}" class="text-decoration-none">
+              {{ if eq $index 0 }}
+                <i class="fas fa-home me-1"></i>
+              {{ end }}
+              {{ $page.Title }}
+            </a>
+          </li>
+        {{ end }}
+      {{ end }}
+    </ol>
+  </nav>
+{{ end }}
+
+
+<style>
+  .docs-breadcrumb .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+  }
+
+  .docs-breadcrumb .breadcrumb-item a {
+    color: var(--bs-primary);
+  }
+
+  .docs-breadcrumb .breadcrumb-item a:hover {
+    text-decoration: underline !important;
+  }
+
+  .docs-breadcrumb .breadcrumb-item.active {
+    color: var(--bs-body-color);
+  }
+</style>

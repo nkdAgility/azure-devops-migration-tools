@@ -1,0 +1,9 @@
+{{/* Get-Version Function
+  Returns version information string based on environment
+
+  Usage:
+  {{ partial "functions/get-version.html" .
+}}
+}} Returns: - Development: "v0.0.0" */}}
+{{- $version := .Site.Params.version | default "0.0.0" -}}
+{{- return (printf "v%s" $version) -}}

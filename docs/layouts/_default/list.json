@@ -1,0 +1,61 @@
+{{- $.Scratch.Add "pages" slice -}}
+
+{{- if .IsHome -}}
+  {{- range .Site.RegularPages -}}
+    {{- $.Scratch.Add "pages" (dict
+      "title" .Title
+      "url" .Permalink
+      "date" .Date
+      "summary" .Summary
+      "contentCatagory" .Section
+      "contentType" .Type
+    ) -}}
+  {{- end -}}
+
+{{- else if .IsSection -}}
+  {{- range .Pages -}} <!-- Only pages in this section -->
+    {{- $.Scratch.Add "pages" (dict
+      "title" .Title
+      "url" .Permalink
+      "date" .Date
+      "summary" .Summary
+      "contentCatagory" .Section
+      "contentType" .Type
+    ) -}}
+  {{- end -}}
+
+{{- else if .IsTaxonomy -}}
+  {{- range .Data.Pages -}} <!-- Only pages with this taxonomy term -->
+    {{- $.Scratch.Add "pages" (dict
+      "title" .Title
+      "url" .Permalink
+      "date" .Date
+      "summary" .Summary
+      "contentCatagory" .Section
+      "contentType" .Type
+    ) -}}
+  {{- end -}}
+
+{{- else if .IsTaxonomyTerm -}}
+  {{- range .Data.Terms -}} <!-- Only list taxonomy terms -->
+    {{- $.Scratch.Add "pages" (dict
+      "title" .Title
+      "url" .Permalink
+      "contentCatagory" .Name
+      "contentType" "taxonomyTerm"
+    ) -}}
+  {{- end -}}
+
+{{- else if .IsPage -}}
+  {{- $.Scratch.Add "pages" (dict
+    "title" .Title
+    "url" .Permalink
+    "date" .Date
+    "summary" .Summary
+    "contentCatagory" .Section
+    "contentType" .Type
+  ) -}}
+
+{{- end -}}
+
+{{- $.Scratch.Get "pages" | jsonify -}}

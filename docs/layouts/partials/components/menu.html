@@ -1,0 +1,140 @@
+<nav class="navbar navbar-expand-lg navbar-light py-5">
+  <div class="container">
+    <!-- Brand/Logo -->
+    <a class="navbar-brand fw-bold text-primary" href="{{ .Site.BaseURL }}" title="{{ .Site.Title }}">
+      <img id="brandLogo" data-theme-src-light="{{ .Site.Params.menu_image_light }}" data-theme-src-dark="{{ .Site.Params.menu_image_dark }}" src="{{ .Site.Params.menu_image_light }}" style="height:50px;" alt="{{ .Site.Title }}" />
+    </a>
+
+    <!-- Mobile toggle button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible navbar content -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- Main navigation menu -->
+      <ul class="navbar-nav me-auto">
+        {{ range .Site.Menus.main }}
+          <li class="nav-item">
+            {{ if or (hasPrefix .URL "http://") (hasPrefix .URL "https://") }}
+              <a class="nav-link{{ if $.IsMenuCurrent "main" . }}active{{ end }}" href="{{ .URL }}" target="_blank" rel="noopener noreferrer">
+                {{ .Name }}
+                <i class="fas fa-external-link-alt ms-1" style="font-size: 0.75em;"></i>
+              </a>
+            {{ else }}
+              <a class="nav-link{{ if $.IsMenuCurrent "main" . }}active{{ end }}" href="{{ .URL }}">
+                {{ .Name }}
+              </a>
+            {{ end }}
+          </li>
+        {{ end }}
+      </ul>
+
+      <!-- Right side controls -->
+      <div class="d-flex align-items-center gap-3">
+        <!-- Theme toggle -->
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="themeToggle" title="Toggle theme">
+          <i class="fas fa-sun" id="themeIcon"></i>
+        </button>
+
+        <!-- Search box -->
+        <form class="d-flex d-none" role="search">
+          <div class="input-group input-group-sm" style="width: 200px;">
+            <input class="form-control" type="search" placeholder="Search..." aria-label="Search" id="searchInput" />
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+
+        <!-- Download button -->
+        <a href="{{ .Site.Params.downloadUrl }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-download me-1"></i>
+          Download
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Theme toggle functionality -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const body = document.body;
+    const navbar = document.querySelector(".navbar");
+
+    // Function to update all theme-aware images
+    function updateThemeImages(theme) {
+      // Find all images with theme data attributes
+      const themeImages = document.querySelectorAll("img[data-theme-src-light], img[data-theme-src-dark]");
+
+      themeImages.forEach((img) => {
+        const lightSrc = img.getAttribute("data-theme-src-light");
+        const darkSrc = img.getAttribute("data-theme-src-dark");
+
+        if (theme === "dark" && darkSrc) {
+          img.src = darkSrc;
+        } else if (lightSrc) {
+          img.src = lightSrc;
+        }
+      });
+    }
+
+    // Check for saved theme preference or default to 'light'
+    const currentTheme = localStorage.getItem("theme") || "light";
+
+    // Apply the saved theme
+    if (currentTheme === "dark") {
+      body.setAttribute("data-bs-theme", "dark");
+      navbar.classList.remove("navbar-light");
+      navbar.classList.add("navbar-dark", "bg-dark");
+      navbar.style.backgroundColor = "";
+      themeIcon.classList.remove("fa-sun");
+      themeIcon.classList.add("fa-moon");
+      updateThemeImages("dark");
+    } else {
+      // Ensure light theme has transparent background
+      navbar.style.backgroundColor = "transparent";
+      updateThemeImages("light");
+    }
+
+    // Theme toggle click handler
+    themeToggle.addEventListener("click", function () {
+      const currentTheme = body.getAttribute("data-bs-theme");
+      if (currentTheme === "dark") {
+        // Switch to light theme
+        body.setAttribute("data-bs-theme", "light");
+        navbar.classList.remove("navbar-dark", "bg-dark");
+        navbar.classList.add("navbar-light");
+        navbar.style.backgroundColor = "transparent";
+        themeIcon.classList.remove("fa-moon");
+        themeIcon.classList.add("fa-sun");
+        localStorage.setItem("theme", "light");
+        updateThemeImages("light");
+      } else {
+        // Switch to dark theme
+        body.setAttribute("data-bs-theme", "dark");
+        navbar.classList.remove("navbar-light");
+        navbar.classList.add("navbar-dark", "bg-dark");
+        navbar.style.backgroundColor = "";
+        themeIcon.classList.remove("fa-sun");
+        themeIcon.classList.add("fa-moon");
+        localStorage.setItem("theme", "dark");
+        updateThemeImages("dark");
+      }
+    });
+
+    // Search functionality
+    const searchForm = document.querySelector('form[role="search"]');
+    searchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const searchTerm = document.getElementById("searchInput").value;
+      if (searchTerm.trim()) {
+        // You can customize this to your search implementation
+        window.location.href = `/search/?q=${encodeURIComponent(searchTerm)}`;
+      }
+    });
+  });
+</script>

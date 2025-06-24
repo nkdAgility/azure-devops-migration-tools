@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>How-To Guides for Azure DevOps Migration Tools on Azure DevOps Migration Tools</title>
+    <link>//localhost:1313/docs/how-to/</link>
+    <description>Recent content in How-To Guides for Azure DevOps Migration Tools on Azure DevOps Migration Tools</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 24 Jun 2025 12:07:31 +0000</lastBuildDate>
+    <atom:link href="//localhost:1313/docs/how-to/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>How-To: Creating area and iteration maps</title>
+      <link>//localhost:1313/docs/how-to/creating-iteration-and-area-maps/</link>
+      <pubDate>Tue, 24 Jun 2025 12:07:31 +0000</pubDate>
+      <guid>//localhost:1313/docs/how-to/creating-iteration-and-area-maps/</guid>
+      <description>&lt;p&gt;As per the &#xD;&#xA;  &lt;a href=&#34;//localhost:1313/Reference/Tools/TfsNodeStructureTool/&#34;&gt;documentation&lt;/a&gt;&#xD;&#xA;, you need to add Iteration Maps and Area Maps that adapt the old locations to new ones that are valid in the Target.&lt;/p&gt;&#xA;&lt;p&gt;Before your migration starts, it will validate that all of the Areas and Iterations from the &lt;strong&gt;Source&lt;/strong&gt; work items revisions exist on the &lt;strong&gt;Target&lt;/strong&gt;. Any that do not exist will be flagged in the logs, and if you have &lt;code&gt;&amp;quot;StopMigrationOnMissingAreaIterationNodes&amp;quot;: true,&lt;/code&gt; set, the migration will stop just after it outputs a list of the missing nodes.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>How-to: Migrating Plans and Suites</title>
+      <link>//localhost:1313/docs/how-to/migrating-plans-and-suites/</link>
+      <pubDate>Tue, 24 Jun 2025 12:07:31 +0000</pubDate>
+      <guid>//localhost:1313/docs/how-to/migrating-plans-and-suites/</guid>
+      <description>&lt;p&gt;Migrating Plans and Suites is quite convoluted since Shared Steps, which we need to map, can&amp;rsquo;t have a custom field.&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;Migrate Basic Work Items&lt;/li&gt;&#xA;&lt;li&gt;Migrate &lt;code&gt;Test Cases&lt;/code&gt; with their &lt;code&gt;Shared Steps&lt;/code&gt; and &lt;code&gt;Shared Parameter&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;Migrate &lt;code&gt;Test Variables&lt;/code&gt; &amp;amp; &lt;code&gt;Test Configurations&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;Rebuild &lt;code&gt;Test Plans&lt;/code&gt; &amp;amp; &lt;code&gt;Test Suites&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;&lt;em&gt;WARNING: The configs below are for illustration and were correct as of the version number in the &lt;code&gt;Version&lt;/code&gt; field.&lt;/em&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>How-To: User Mappings</title>
+      <link>//localhost:1313/docs/how-to/user-mappings/</link>
+      <pubDate>Tue, 24 Jun 2025 12:07:31 +0000</pubDate>
+      <guid>//localhost:1313/docs/how-to/user-mappings/</guid>
+      <description>&lt;p&gt;There was a request to have the ability to map users to try and maintain integrity across different systems. We added a &lt;code&gt;TfsUserMappingEnricher&lt;/code&gt; that allows you to map users from Source to Target&amp;hellip; this is not free and takes some work. Running the &lt;code&gt;ExportUsersForMappingConfig&lt;/code&gt; to get the list of users will produce:&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

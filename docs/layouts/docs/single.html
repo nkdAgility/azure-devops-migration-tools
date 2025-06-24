@@ -1,0 +1,233 @@
+{{- define "main" }}
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-12" style="max-width: 1800px;">
+        <div class="row">
+          {{/* Sidebar - Hidden on smaller screens */}}
+          <div class="col-12 col-xl-3 docs-navbar-container d-none d-xl-block">
+            {{ partial "docs/sidebar.html" . }}
+          </div>
+          {{/* Dropdown Navigation for smaller screens */}}
+          <div class="col-12 d-xl-none mb-3">
+            <div class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="docsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-book me-2"></i>
+                Documentation Navigation
+              </button>
+              <div class="dropdown-menu docs-dropdown-menu" aria-labelledby="docsDropdown">
+                {{ partial "docs/sidebar.html" . }}
+              </div>
+            </div>
+          </div>
+
+          {{/* Main content */}}
+          <div class="col-12 col-xl-6">
+            <div class="docs-content">
+              {{/* Breadcrumbs */}}
+              {{ partial "docs/breadcrumbs.html" . }}
+
+              {{/* Page title */}}
+              <div class="docs-header mb-4">
+                <h1 class="docs-title">{{ .Title }}</h1>
+                {{ if .Params.description }}
+                  <p class="docs-description text-muted">{{ .Params.description | markdownify }}</p>
+                {{ end }}
+
+                {{/* Edit link if available */}}
+                {{ if .File }}
+                  <div class="docs-meta mt-3">
+                    <small class="text-muted">
+                      <i class="fas fa-clock me-1"></i>
+                      Last updated:
+                      {{ .Lastmod.Format "January 2, 2006" }}
+                      {{ if .Site.Params.editPage }}
+                        {{ $raw := .File.Path }}
+                        {{ $urlpath := replace $raw "\\" "/" }}
+                        | <a href="{{ .Site.Params.editPage }}{{ $urlpath }}" target="_blank" class="text-decoration-none"> <i class="fas fa-edit me-1"></i>Edit this page </a>
+                      {{ end }}
+                      {{ if .Params.discussionId }}
+                        | <a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions/{{ .Params.discussionId }}" target="_blank" class="text-decoration-none"> <i class="fas fa-comments me-1"></i>Discuss this page </a>
+                      {{ else }}
+                        | <a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions/" target="_blank" class="text-decoration-none"> <i class="fas fa-comments me-1"></i>Discuss this page </a>
+                      {{ end }}
+                    </small>
+                  </div>
+                {{ end }}
+              </div>
+
+              {{/* Page content */}}
+              <div class="docs-body">
+                {{ .Content }}
+              </div>
+
+              <div class="docs-commnets">
+                <script
+                  src="https://giscus.app/client.js"
+                  data-repo="nkdAgility/azure-devops-migration-tools"
+                  data-repo-id="MDEwOlJlcG9zaXRvcnk1NjMxOTA3MA=="
+                  data-category-id="DIC_kwDOA1tcXs4Cj0cn"
+                  {{ if .Params.discussionId }}
+                    data-mapping="number" data-term="{{ .Params.discussionId }}"
+                  {{ else }}
+                    data-mapping="og:title" data-strict="1"
+                  {{ end }}
+                  data-reactions-enabled="1"
+                  data-emit-metadata="0"
+                  data-input-position="bottom"
+                  data-theme="light_protanopia"
+                  data-lang="en"
+                  data-loading="lazy"
+                  crossorigin="anonymous"
+                  async></script>
+              </div>
+
+              {{/* Page navigation */}}
+              <div class="docs-navigation mt-5">
+                {{ partial "docs/page-navigation.html" . }}
+              </div>
+            </div>
+          </div>
+          {{/* Table of contents (optional right sidebar) */}}
+          <div class="col-12 col-xl-3 d-none d-xl-block">
+            <div>
+              <h5>In this article</h5>
+              <div class="docs-toc">
+                <nav>
+                  <ul>
+                    {{/* Generated TOC */}}
+                    {{ if .TableOfContents }}
+                      {{ .TableOfContents | safeHTML }}
+                    {{ end }}
+                  </ul>
+                </nav>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Project Information</h6>
+              </div>
+              <div class="card-body">
+                <!-- Azure DevOps Marketplace Section -->
+                <div class="mb-4">
+                  <h6 class="text-muted mb-2"><i class="fas fa-store me-2"></i>Azure DevOps Marketplace</h6>
+                  <div class="text-center">
+                    <a href="https://marketplace.visualstudio.com/items?itemName=nkdagility.vsts-sync-migration" target="_blank" class="btn btn-outline-primary btn-sm">
+                      <img src="https://img.shields.io/visual-studio-marketplace/stars/nkdagility.vsts-sync-migration?logo=visualstudio" alt="Visual Studio Marketplace Stars" class="me-2" />
+                      View Extension
+                    </a>
+                  </div>
+                </div>
+
+                <!-- YouTube Section -->
+                <div class="mb-4">
+                  <h6 class="text-muted mb-2"><i class="fab fa-youtube me-2"></i>YouTube Channel</h6>
+                  <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="https://www.youtube.com/@nakedAgility" target="_blank" class="text-decoration-none">
+                      <img src="https://img.shields.io/youtube/channel/subscribers/UCkYqhFNmhCzkefHsHS652hw" alt="Youtube Subscribers" />
+                    </a>
+                    <a href="https://www.youtube.com/@nakedAgility" target="_blank" class="text-decoration-none">
+                      <img src="https://img.shields.io/youtube/channel/views/UCkYqhFNmhCzkefHsHS652hw" alt="Youtube Views" />
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Creator Information -->
+                <div class="mb-4 text-center">
+                  <h6 class="text-muted mb-2"><i class="fas fa-user me-2"></i>Maintainer</h6>
+                  <p class="mb-0 small">
+                    Created and maintained by
+                    <a href="https://www.linkedin.com/in/martinhinshelwood/" target="_blank" class="text-decoration-none fw-bold">Martin Hinshelwood</a>
+                    of
+                    <a href="https://nkdagility.com" target="_blank" class="text-decoration-none fw-bold">nkdagility.com</a>
+                  </p>
+                </div>
+
+                <!-- Document Versions -->
+                <div>
+                  <h6 class="text-muted mb-3"><i class="fas fa-code-branch me-2"></i>Documentation Versions</h6>
+                  <div class="row g-2">
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded">
+                        <span class="small fw-medium">Production</span>
+                        <a href="https://devopsmigration.io{{ .RelPermalink }}" target="_blank" class="text-decoration-none">
+                          <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools" alt="Azure DevOps Migration Tools Release Version" />
+                        </a>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded">
+                        <span class="small fw-medium">Preview</span>
+                        <a href="https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net{{ .RelPermalink }}" target="_blank" class="text-decoration-none">
+                          <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases" alt="Azure DevOps Migration Tools Preview Version" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card mb-3 shadow-sm">
+              <div class="card-header bg-success text-white">
+                <h6 class="mb-0 no_toc"><i class="fas fa-life-ring me-2"></i>Getting Support</h6>
+              </div>
+              <div class="card-body">
+                <!-- Community Support Section -->
+                <div class="mb-4">
+                  <h6 class="text-muted mb-3"><i class="fas fa-users me-2"></i>Community Support</h6>
+                  <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0 me-3">
+                      <i class="fab fa-github text-muted" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                      <a href="https://github.com/nkdAgility/azure-devops-migration-tools/discussions" target="_blank" class="text-decoration-none fw-semibold"> Questions & Discussions </a>
+                      <p class="text-muted small mb-0 mt-1">The first place to look for usage, configuration, and general help.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Commercial Support Section -->
+                <div>
+                  <h6 class="text-muted mb-3"><i class="fas fa-briefcase me-2"></i>Commercial Support</h6>
+                  <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0 me-3">
+                      <i class="fas fa-building text-muted" style="font-size: 1.5rem;"></i>
+                    </div>
+                    <div>
+                      <p class="mb-2">We provide training, ad-hoc support, and full service migrations through our professional services.</p>
+                      <a href="https://nkdagility.com/capabilities/azure-devops-migration-services/" title="Azure DevOps Migration Services with Naked Agility Ltd." target="_blank" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i>
+                        Azure DevOps Migration Services
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{/* Mobile sidebar toggle */}}
+    <div class="d-lg-none">
+      <button class="btn btn-outline-primary btn-sm position-fixed" type="button" data-bs-toggle="offcanvas" data-bs-target="#docsSidebarMobile" style="top: 80px; left: 10px; z-index: 1020;">
+        <i class="fas fa-bars"></i>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="docsSidebarMobile">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Documentation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          {{ partial "docs/sidebar.html" . }}
+        </div>
+      </div>
+    </div>
+  </div>
+{{- end }}
+
+{{- define "template" }}
+  docs/single.html
+{{- end }}

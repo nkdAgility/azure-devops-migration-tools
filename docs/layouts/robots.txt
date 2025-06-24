@@ -1,0 +1,11 @@
+# Robots File {{hugo.Environment}}
+{{ if eq hugo.Environment "production" }}
+User-agent: *
+Allow: /
+Sitemap: {{ "/sitemap.xml" | absURL }}
+{{ else }}
+User-agent: *
+Disallow: /
+{{ end }}
+
+

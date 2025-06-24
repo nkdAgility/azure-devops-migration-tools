@@ -1,0 +1,74 @@
+{{/* Shortcode: class-options
+  Description: Displays a table of class options/parameters
+  Usage: {{< class-options
+>}}
+(uses current page's dataFile parameter) or: {{< class-options datafile="data/reference.someclass.yaml" >}} (uses specified datafile) Parameters: - datafile: Optional - The path to the data file to load. If not provided, uses .Page.Params.dataFile */}}
+{{ $data := "" }}
+{{ $className := "" }}
+
+{{/* Use passed datafile parameter or fall back to page's dataFile parameter */}}
+{{ $dataFile := .Get "datafile" }}
+{{ if not $dataFile }}
+  {{ $dataFile = .Page.Params.dataFile }}
+{{ end }}
+
+{{/* Parse the data file path and load the YAML data */}}
+{{ if $dataFile }}
+  {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
+  {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
+  {{ $pathParts := split $cleanPath "." }}
+
+  {{/* Navigate through the nested data structure */}}
+  {{ $data = index .Site.Data $cleanPath }}
+
+  {{/* Extract class name from data or filename for the heading */}}
+  {{ if $data.className }}
+    {{ $className = $data.className }}
+  {{ else }}
+    {{ $className = index (last 1 $pathParts) 0 | humanize }}
+  {{ end }}
+{{ end }}
+
+{{ if and $data $data.options }}
+  <div class="class-options">
+    <h3 id="{{ lower (replace $className " " "-") }}-options" class="position-relative">
+      {{ $className }} Options
+      <a href="#{{ lower (replace $className " " "-") }}-options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range $data.options }}
+          <tr>
+            <td><code>{{ .parameterName }}</code></td>
+            <td><code>{{ .type }}</code></td>
+            <td>{{ .description | markdownify }}</td>
+            <td>
+              {{ if .defaultValue }}
+                <code>{{ .defaultValue }}</code>
+              {{ else }}
+                <em>Not specified</em>
+              {{ end }}
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+{{ else if not $dataFile }}
+  <div class="alert alert-warning">
+    <strong>Warning:</strong> class-options shortcode requires either a page with a "dataFile" parameter or a "datafile" parameter. Usage: <code>{{ `< class-options >` }}</code> (with dataFile in front matter) or
+    <code>{{ `< class-options datafile="data/reference.someclass.yaml" >` }}</code>
+  </div>
+{{ else }}
+  <div class="alert alert-info"><strong>Info:</strong> No options data found{{ if $className }}for "{{ $className }}"{{ end }}. Make sure the data file <code>{{ $dataFile }}</code> exists and contains an "options" section.</div>
+{{ end }}

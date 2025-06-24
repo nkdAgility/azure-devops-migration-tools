@@ -1,0 +1,7 @@
+# Robots File development
+
+User-agent: *
+Disallow: /
+
+
+
