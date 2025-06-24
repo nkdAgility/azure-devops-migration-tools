@@ -360,7 +360,7 @@ jobs:
   # Build Docs
   BuildDocs:
     name: "Build Documentation output"
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     if: ${{ success() }}
     needs: [Setup]
     env:
@@ -383,12 +383,13 @@ jobs:
         uses: peaceiris/actions-hugo@v3
         with:
           extended: true
+          hugo-version: '0.139.0'
       - name: Build
         run: |
           $environment = "${{ needs.Setup.outputs.nkdAgility_Ring }}".ToLower()
           Write-Host "Building site for $environment ";
           $env:HUGO_ENV = "$environment";
-          hugo --source docs --config hugo.yaml,hugo.$environment.yaml --logLevel info; # --minify
+          hugo --source docs --config hugo.yaml,hugo.$environment.yaml --logLevel debug; # --minify
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site2
@@ -406,7 +407,7 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
-    needs: [build, Setup]
+    needs: [build, Setup, BuildDocs]
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - uses: actions/download-artifact@v4
