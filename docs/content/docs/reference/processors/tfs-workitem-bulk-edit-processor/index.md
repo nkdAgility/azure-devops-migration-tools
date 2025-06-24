@@ -1,7 +1,7 @@
 ---
-title: Tfs Work Item Bulk Edit Processor
+title: Tfs WorkItem Bulk Edit Processor
 dataFile: data/reference.processors.tfsworkitembulkeditprocessor.yaml
-slug: tfs-work-item-bulk-edit-processor
+slug: tfs-workitem-bulk-edit-processor
 aliases:
   - /docs/Reference/Processors/TfsWorkItemBulkEditProcessor
   - /Reference/Processors/TfsWorkItemBulkEditProcessor

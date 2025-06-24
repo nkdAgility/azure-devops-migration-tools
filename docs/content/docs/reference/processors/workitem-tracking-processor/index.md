@@ -1,7 +1,7 @@
 ---
-title: Work Item Tracking Processor
+title: WorkItem Tracking Processor
 dataFile: data/reference.processors.workitemtrackingprocessor.yaml
-slug: work-item-tracking-processor
+slug: workitem-tracking-processor
 aliases:
   - /docs/Reference/Processors/WorkItemTrackingProcessor
   - /Reference/Processors/WorkItemTrackingProcessor

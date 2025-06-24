@@ -1,7 +1,7 @@
 ---
-title: Tfs Work Item Delete Processor
+title: Tfs WorkItem Delete Processor
 dataFile: data/reference.processors.tfsworkitemdeleteprocessor.yaml
-slug: tfs-work-item-delete-processor
+slug: tfs-workitem-delete-processor
 aliases:
   - /docs/Reference/Processors/TfsWorkItemDeleteProcessor
   - /Reference/Processors/TfsWorkItemDeleteProcessor

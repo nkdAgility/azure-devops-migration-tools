@@ -14,9 +14,9 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 ## Prerequisits
 
-1. [Install](/setup/installation.md) the tools using your prefered method.
-1. Check that you have the required [Permissions](/setup/permissions.md) to run the tools.
-1. Get to grips with the [Configuration](./Reference/) to understand how to configure the tool. (you can skip this for now and come back to it later)
+1. [Install]({{< ref "docs/setup/installation" >}}) the tools using your prefered method.
+1. Check that you have the required [Permissions]({{< ref "docs/setup/permissions" >}}) to run the tools.
+2. Get to grips with the [Configuration]({{< ref "docs/reference" >}}) to understand how to configure the tool. (you can skip this for now and come back to it later)
 
 ## Getting Started
 
@@ -30,11 +30,9 @@ This is going to be a crash course and I really recommend watching [What can go 
 
 You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process will likely look something like:
 
-```JSON
-{% include sampleConfig/configuration-getstarted.json %}
-```
+{{< include-file configuration-getstarted.json json >}}
 
-The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfsworkitemmigrationprocessor.md) processor will perform the following operations:
+The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tfs-workitem-migration-processor" >}}) processor will perform the following operations:
 
 - Migrate iterations and sprints
 - Attachments
@@ -42,7 +40,7 @@ The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfswo
 
 ## How to execute configuration.json with minimal adjustments
 
-> Remember to add custom field ['ReflectedWorkItemId'](server-configuration.md) to only the target team project before starting migration!
+> Remember to add custom field ['ReflectedWorkItemId']({{< ref "docs/setup/reflected-workitem-id" >}}) to only the target team project before starting migration!
 
 > [NOTE!]
 > In older versions of the tool we updated the Source work items with a link back to the Target to make migration easier. This has been removed and replaced with the `FilterWorkItemsThatAlreadyExistInTarget` option instead. **You do not need to add the reflected work item ID custom field to the Source environment.**
@@ -61,12 +59,12 @@ The default [TfsWorkItemMigrationProcesor](_reference/reference.processors.tfswo
 
 5. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
 6. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
-7. Adjust the [`NodeBasePaths`](/docs/Reference/v1/Processors/WorkItemMigrationConfig.md) or leave empty to migrate all nodes
+7. Adjust the [`NodeBasePaths`]({{< ref "docs/reference/processors/workitem-tracking-processor" >}}) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
 **Remember:** If you want a processor to run, its `Enabled` attribute must be set to `true`.
 
-Refer to the [Reference Guide](/docs/Reference/index.md) for more details.
+Refer to the [Reference Guide]({{< ref "docs/reference" >}}) for more details.
 
 ## Other Configuration Options
 

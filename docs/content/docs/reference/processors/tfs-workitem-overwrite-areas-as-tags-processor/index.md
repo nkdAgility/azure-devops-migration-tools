@@ -1,7 +1,7 @@
 ---
-title: Tfs Work Item Overwrite Areas As Tags Processor
+title: Tfs WorkItem Overwrite Areas As Tags Processor
 dataFile: data/reference.processors.tfsworkitemoverwriteareasastagsprocessor.yaml
-slug: tfs-work-item-overwrite-areas-as-tags-processor
+slug: tfs-workitem-overwrite-areas-as-tags-processor
 aliases:
   - /docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor
   - /Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor

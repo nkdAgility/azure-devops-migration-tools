@@ -1,7 +1,7 @@
 ---
-title: Tfs Work Item Overwrite Processor
+title: Tfs WorkItem Overwrite Processor
 dataFile: data/reference.processors.tfsworkitemoverwriteprocessor.yaml
-slug: tfs-work-item-overwrite-processor
+slug: tfs-workitem-overwrite-processor
 aliases:
   - /docs/Reference/Processors/TfsWorkItemOverwriteProcessor
   - /Reference/Processors/TfsWorkItemOverwriteProcessor

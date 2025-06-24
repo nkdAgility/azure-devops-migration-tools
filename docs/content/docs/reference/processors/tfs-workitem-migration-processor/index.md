@@ -1,7 +1,7 @@
 ---
-title: Tfs Work Item Migration Processor
+title: Tfs WorkItem Migration Processor
 dataFile: data/reference.processors.tfsworkitemmigrationprocessor.yaml
-slug: tfs-work-item-migration-processor
+slug: tfs-workitem-migration-processor
 aliases:
   - /docs/Reference/Processors/TfsWorkItemMigrationProcessor
   - /Reference/Processors/TfsWorkItemMigrationProcessor
@@ -117,4 +117,4 @@ A complete list of [FieldMaps](../FieldMaps/index.md) are available.
 
 ## Removed Properties
 
-- PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure](/Reference/v2/ProcessorEnrichers/TfsNodeStructure/)
+- PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure]({{< ref "docs/reference/tools/tfs-node-structure-tool" >}})

@@ -13,7 +13,7 @@ aliases:
 Install the Azure DevOps Migration Tools on Windows.
 
 These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.
-For a more detailed getting started guide please see the [documentation](/getting-started/).
+For a more detailed getting started guide please see the [documentation]({{< ref "docs/get-started/getting-started" >}}).
 
 ## Option 1: Winget
 

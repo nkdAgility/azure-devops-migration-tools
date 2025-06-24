@@ -27,8 +27,6 @@
                 <h1 class="docs-title">{{ .Title }}</h1>
                 {{ if .Params.description }}
                   <p class="docs-description text-muted">{{ .Params.description | markdownify }}</p>
-                {{ else if .Content }}
-                  <div class="docs-description">{{ .Content | markdownify }}</div>
                 {{ end }}
               </div>
 

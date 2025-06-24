@@ -1,0 +1,16 @@
+{{- $filename := .Get 0 -}}
+{{- $lang := .Get 1 | default "" -}}
+{{- if not $filename -}}
+  {{- errorf "include-file shortcode requires a filename parameter" -}}
+{{- end -}}
+{{- $resource := .Page.Resources.GetMatch $filename -}}
+{{- if not $resource -}}
+  {{- errorf "File '%s' not found in page resources" $filename -}}
+{{- end -}}
+{{- if $lang -}}
+{{- $codeBlock := printf "```%s\n%s\n```" $lang $resource.Content -}}
+{{ $codeBlock | markdownify }}
+{{- else -}}
+{{ $resource.Content | safeHTML }}
+{{- end -}}
+
