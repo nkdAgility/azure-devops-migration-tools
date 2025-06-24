@@ -68,12 +68,12 @@
           </section>
         {{ end }}
       </section>
-    </main>
-
+    </main>    
+    
     {{ block "footer" . }}
-      <footer class="footer bg-dark text-white p-4 mt-auto">
-        <div class="container text-center">v#{GitVersion.SemVer}# | © {{ now.Format "2006" }} {{ .Site.Title }}. All rights reserved.</div>
-      </footer>
+      <footer class="footer mt-auto">
+         {{ partial "components/footer.html" . }}
+          </footer>
     {{ end }}
 
     {{ if ne hugo.Environment "production" }}
