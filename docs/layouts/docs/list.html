@@ -46,11 +46,7 @@
                                 {{ .Title }}
                               </a>
                             </h5>
-                            {{ if .Params.description }}
-                              <p class="card-text text-muted">{{ .Params.description }}</p>
-                            {{ else if .Summary }}
-                              <p class="card-text text-muted">{{ .Summary }}</p>
-                            {{ end }}
+                              <p class="card-text text-muted">{{ .Description }}</p>
 
                             {{/* Show child pages count */}}
                             {{ if .Pages }}

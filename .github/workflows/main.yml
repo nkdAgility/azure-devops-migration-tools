@@ -391,9 +391,10 @@ jobs:
           extended: true
       - name: Build
         run: |
-          Write-Host "Building site for ${{ (needs.Setup.outputs.nkdAgility_AzureSitesConfig) }}";
-          $env:HUGO_ENV = "${{ (needs.Setup.outputs.nkdAgility_AzureSitesConfig) }}";
-          hugo --source docs --config hugo.yaml,hugo.${{ (needs.Setup.outputs.nkdAgility_AzureSitesConfig) }}.yaml --logLevel info; # --minify
+          $environment = "${{ needs.Setup.outputs.nkdAgility_Ring }}".ToLower()
+          Write-Host "Building site for $environment ";
+          $env:HUGO_ENV = "$environment";
+          hugo --source docs --config hugo.yaml,hugo.$environment.yaml --logLevel info; # --minify
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site2
