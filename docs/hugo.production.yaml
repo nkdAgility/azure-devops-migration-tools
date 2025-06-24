@@ -1,0 +1,5 @@
+baseURL: https://devopsmigration.io/
+Environment: "production"
+minifyOutput: true
+
+

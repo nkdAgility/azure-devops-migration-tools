@@ -377,7 +377,7 @@ jobs:
           cache-version: 0 # Increment this number if you need to re-download cached gems
       - uses: cschleiden/replace-tokens@v1
         with:
-          files: '["**/*.html"]'
+          files: '["**/*.html", "**/*.yaml"]'
           tokenPrefix: "#{"
           tokenSuffix: "}#"
         env:
@@ -385,20 +385,19 @@ jobs:
           GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
           GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
           GitVersion.SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
-      - uses: igsekor/pyspelling-any@v1.0.4
-        id: spellcheck
-        name: Spellcheck
-      - name: Build with Jekyll 2
-        # Outputs to the './_site' directory by default
-        run: bundle exec jekyll build --destination ./_site2/  --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL_AFD}}"
-        env:
-          JEKYLL_ENV: production
-      # - name: Build Jekyll
-      #   uses: jerryjvl/jekyll-build-action@v1
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          extended: true
+      - name: Build
+        run: |
+          Write-Host "Building site for ${{ (needs.Setup.outputs.nkdAgility_AzureSitesConfig) }}";
+          $env:HUGO_ENV = "${{ (needs.Setup.outputs.nkdAgility_AzureSitesConfig) }}";
+          hugo --source site --config hugo.yaml,hugo.${{ (needs.Setup.outputs.nkdAgility_AzureSitesConfig) }}.yaml --logLevel info; # --minify
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site2
-          path: ./_site2/**/*
+          path: ./public/**/*
 
 
   # GitHubRelease
