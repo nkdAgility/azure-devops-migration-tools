@@ -383,7 +383,7 @@ jobs:
         uses: peaceiris/actions-hugo@v3
         with:
           extended: true
-          hugo-version: 'v0.147.9'
+          hugo-version: 'latest'
       - name: Build
         run: |
           $environment = "${{ needs.Setup.outputs.nkdAgility_Ring }}".ToLower()
