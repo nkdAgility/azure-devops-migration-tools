@@ -360,7 +360,7 @@ jobs:
   # Build Docs
   BuildDocs:
     name: "Build Documentation output"
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     if: ${{ success() }}
     needs: [Setup]
     env:
