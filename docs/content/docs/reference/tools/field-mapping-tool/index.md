@@ -1,5 +1,6 @@
 ---
 title: Field Mapping Tool
+description: Tool for applying field mapping transformations to work items during migration, supporting various field mapping strategies like direct mapping, regex transformations, and value lookups.
 dataFile: data/reference.tools.fieldmappingtool.yaml
 slug: field-mapping-tool
 aliases:

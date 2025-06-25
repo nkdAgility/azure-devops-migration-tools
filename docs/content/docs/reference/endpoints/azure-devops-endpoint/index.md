@@ -4,14 +4,14 @@ description: Azure DevOps REST API endpoint implementation for connecting to Azu
 dataFile: data/reference.endpoints.azuredevopsendpoint.yaml
 slug: azure-devops-endpoint
 aliases:
-  - /docs/Reference/Endpoints/AzureDevOpsEndpoint
-  - /Reference/Endpoints/AzureDevOpsEndpoint
-  - /learn/azure-devops-migration-tools/Reference/Endpoints/AzureDevOpsEndpoint
-  - /learn/azure-devops-migration-tools/Reference/Endpoints/AzureDevOpsEndpoint/index.md
+- /docs/Reference/Endpoints/AzureDevOpsEndpoint
+- /Reference/Endpoints/AzureDevOpsEndpoint
+- /learn/azure-devops-migration-tools/Reference/Endpoints/AzureDevOpsEndpoint
+- /learn/azure-devops-migration-tools/Reference/Endpoints/AzureDevOpsEndpoint/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2702
----
 
+---
 The Azure DevOps Endpoint is a critical component of the Azure DevOps Migration Tools that facilitates seamless connectivity between your migration processes and Azure DevOps organizations. This endpoint leverages the Azure DevOps REST API to provide comprehensive access to projects, work items, and other Azure DevOps resources.
 
 ## Purpose and Use Cases

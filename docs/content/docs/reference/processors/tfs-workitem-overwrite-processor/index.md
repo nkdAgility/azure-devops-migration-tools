@@ -1,5 +1,6 @@
 ---
 title: Tfs WorkItem Overwrite Processor
+description: Reapply field mappings after a migration. Does not migrate Work Items, only reapplies changes to field mappings.
 dataFile: data/reference.processors.tfsworkitemoverwriteprocessor.yaml
 slug: tfs-workitem-overwrite-processor
 aliases:

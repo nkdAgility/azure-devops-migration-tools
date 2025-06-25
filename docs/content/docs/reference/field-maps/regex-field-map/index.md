@@ -1,5 +1,6 @@
 ---
 title: Regex Field Map
+description: Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.
 dataFile: data/reference.fieldmaps.regexfieldmap.yaml
 slug: regex-field-map
 aliases:

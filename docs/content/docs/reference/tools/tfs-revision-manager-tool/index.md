@@ -1,5 +1,6 @@
 ---
 title: Tfs Revision Manager Tool
+description: The TfsRevisionManagerTool manipulates the revisions of a work item to reduce the number of revisions that are migrated.
 dataFile: data/reference.tools.tfsrevisionmanagertool.yaml
 slug: tfs-revision-manager-tool
 aliases:

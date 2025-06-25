@@ -1,5 +1,6 @@
 ---
 title: Tfs Work Item Embeded Link Tool
+description: Tool for processing embedded links within work item fields, such as links in HTML fields and converting work item references between source and target systems.
 dataFile: data/reference.tools.tfsworkitemembededlinktool.yaml
 slug: tfs-work-item-embeded-link-tool
 aliases:

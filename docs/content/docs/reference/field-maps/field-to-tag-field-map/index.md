@@ -1,5 +1,6 @@
 ---
 title: Field To Tag Field Map
+description: Maps field values based on a lookup table, allowing specific source values to be translated to different target values.
 dataFile: data/reference.fieldmaps.fieldtotagfieldmap.yaml
 slug: field-to-tag-field-map
 aliases:

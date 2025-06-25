@@ -1,12 +1,12 @@
 ---
-title: "How-to: Migrating Plans and Suites"
-short_title: Migrating Plans and Suites
+title: 'How-to: Migrating Plans and Suites'
 description: |
   This guide explains how to migrate Test Plans and Suites in Azure DevOps, including handling Shared Steps and Shared Parameters, and rebuilding Test Plans and Suites.
+short_title: Migrating Plans and Suites
 discussionId: 2049
 date: 2025-06-24T12:07:31Z
----
 
+---
 Migrating Plans and Suites is quite convoluted since Shared Steps, which we need to map, can't have a custom field.
 
 1. Migrate Basic Work Items

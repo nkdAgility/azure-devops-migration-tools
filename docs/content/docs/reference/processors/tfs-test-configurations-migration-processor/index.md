@@ -1,5 +1,6 @@
 ---
 title: Tfs Test Configurations Migration Processor
+description: This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
 dataFile: data/reference.processors.tfstestconfigurationsmigrationprocessor.yaml
 slug: tfs-test-configurations-migration-processor
 aliases:

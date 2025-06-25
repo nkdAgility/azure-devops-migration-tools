@@ -10,8 +10,8 @@ aliases:
 - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldClearMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2791
----
 
+---
 {{< class-description >}}
 
 The **FieldClearMap** is used to explicitly clear a field value on migrated work items by setting the target field to `null`. This is especially useful for sanitising or removing unwanted metadata, calculated fields, or legacy data that should not be carried into the target system.

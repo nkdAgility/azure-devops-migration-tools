@@ -1,16 +1,17 @@
 ---
 title: Field Merge Map
+description: Merges values from multiple source fields into a single target field using a specified format template.
 dataFile: data/reference.fieldmaps.fieldmergemap.yaml
 slug: field-merge-map
 aliases:
-  - /docs/Reference/FieldMaps/FieldMergeMap
-  - /Reference/FieldMaps/FieldMergeMap
-  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldMergeMap
-  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldMergeMap/index.md
+- /docs/Reference/FieldMaps/FieldMergeMap
+- /Reference/FieldMaps/FieldMergeMap
+- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldMergeMap
+- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldMergeMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2682
----
 
+---
 {{< class-description >}}
 
 ## Options
