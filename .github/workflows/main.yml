@@ -44,7 +44,7 @@ jobs:
       HasChanged_src: ${{ steps.filter.outputs.src }}
       HasChanged_docs: ${{ steps.filter.outputs.docs }}
       HasChanged_automation: ${{ steps.filter.outputs.automation }}
-      nkdAgility_Ring: ${{ steps.nkdagility.outputs.Ring }}
+      nkdAgility_Ring: ${{ steps.RingDetection.outputs.Ring }}
       nkdAgility_WingetApplicationId: ${{ steps.nkdagility.outputs.WingetApplicationId }}
       nkdAgility_ReleaseDescription: ${{ steps.nkdagility.outputs.release_description }}
       nkdAgility_ReleaseDescriptionState: ${{ steps.nkdagility.outputs.release_description_state }}
@@ -78,10 +78,105 @@ jobs:
       uses: gittools/actions/gitversion/execute@v3.0.2
       with:
         useConfigFile: true
+
+    - name: "Ring Detection"
+      shell: pwsh
+      id: RingDetection
+      run: |
+        # Get Branch Name
+        Write-Output "::group::Get Branch Name"
+        Write-Output "-------------------------------------------"
+        $branchName = "${{ github.head_ref || github.ref_name }}"
+        Write-Output "We are running on: $branchName!"
+        $branchSafeName = $branchName.Replace("/", "-")
+        Write-Output "branchSafeName: $branchSafeName!"
+        Write-Output "-------------------------------------------"
+        Write-Output "::endgroup::"
+
+        # Ring Setup
+        Write-Output "::group::Ring Control Setup"
+        Write-Output "-------------------------------------------"
+        Write-Output "Ring Control Setup"
+        Write-Output "-------------------------------------------"
+        $Ring = "Canary"
+
+        # Use GitVersion output directly instead of environment variable
+        $preReleaseLabel = "${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}"
+        Write-Output "GitVersion_PreReleaseLabel: '$preReleaseLabel'"
+
+        switch ($preReleaseLabel) {
+            "" {
+                $Ring = "Production";
+            }
+            "Preview" {
+                $Ring = "Preview";
+            }
+            default {
+                $Ring = "Canary";
+            }
+        }
+
+        Write-Output "We are running for the $Ring Ring!"
+        echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+        Write-Output "-------------------------------------------"
+        Write-Output "::endgroup::"
+
+    - name: "Determine Filter Base"
+      id: filter-base
+      shell: pwsh
+      run: |
+        try {
+          # Debug current context
+          Write-Output "=== FILTER BASE DEBUG ==="
+          Write-Output "Event: ${{ github.event_name }}"
+          Write-Output "Ref: ${{ github.ref }}"
+          Write-Output "Ring: ${{ steps.RingDetection.outputs.Ring }}"
+          Write-Output "GitVersion_PreReleaseLabel: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}'"
+          Write-Output "GitVersion_SemVer: '${{ steps.gitversion.outputs.GitVersion_SemVer }}'"
+          Write-Output "=========================="
+
+          # For production builds (no pre-release label), find the last production tag
+          if ("${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}" -eq "") {
+            Write-Output "Production build detected - finding last production release"
+
+            # Get current version to exclude it from the search
+            $currentVersion = "v${{ steps.gitversion.outputs.GitVersion_SemVer }}"
+            Write-Output "Current version: $currentVersion"
+
+            # Get all production tags, exclude current, sort by version
+            $allProductionTags = git tag -l | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
+            Write-Output "All production tags found: $($allProductionTags -join ', ')"
+
+            $lastProductionTag = $allProductionTags |
+              Where-Object { $_ -ne $currentVersion } |
+              Sort-Object { [Version]($_ -replace '^v', '') } |
+              Select-Object -Last 1
+
+            if ($lastProductionTag) {
+              Write-Output "Last production tag: $lastProductionTag"
+              echo "base=$lastProductionTag" >> $env:GITHUB_OUTPUT
+            } else {
+              Write-Output "No previous production tag found - this is the first release"
+              # For first release, compare against repository root to include all files
+              $rootCommit = git rev-list --max-parents=0 HEAD
+              Write-Output "Using root commit: $rootCommit"
+              echo "base=$rootCommit" >> $env:GITHUB_OUTPUT
+            }
+          } else {
+            Write-Output "Pre-release build (Label: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}') - using default base"
+            echo "base=" >> $env:GITHUB_OUTPUT
+          }
+        } catch {
+          Write-Error "Error determining filter base: $_"
+          Write-Output "Falling back to default base"
+          echo "base=" >> $env:GITHUB_OUTPUT
+        }
+
     - uses: dorny/paths-filter@v3
       id: filter
       with:
         list-files: json
+        base: ${{ steps.filter-base.outputs.base }}
         filters: |
           src:
             - 'src/**'
@@ -94,9 +189,19 @@ jobs:
       shell: pwsh
       run: |
         Write-Output "=== PATH FILTER DEBUG ==="
-        Write-Output "src filter result: ${{ steps.filter.outputs.src }}"
-        Write-Output "docs filter result: ${{ steps.filter.outputs.docs }}"
-        Write-Output "automation filter result: ${{ steps.filter.outputs.automation }}"
+        Write-Output "Event: ${{ github.event_name }}"
+        Write-Output "Ref: ${{ github.ref }}"
+        Write-Output "Filter base used: '${{ steps.filter-base.outputs.base }}'"
+        Write-Output "Ring: '${{ steps.RingDetection.outputs.Ring }}'"
+        Write-Output "Current GitVersion: v${{ steps.gitversion.outputs.GitVersion_SemVer }}"
+        Write-Output "Pre-release label: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}'"
+        Write-Output "---"
+        Write-Output "Filter results:"
+        Write-Output "  src: ${{ steps.filter.outputs.src }}"
+        Write-Output "  docs: ${{ steps.filter.outputs.docs }}"
+        Write-Output "  automation: ${{ steps.filter.outputs.automation }}"
+        Write-Output "---"
+        Write-Output "Files that matched filters:"
         Write-Output "src files:"
         Write-Output '${{ steps.filter.outputs.src_files }}'
         Write-Output "docs files:"
@@ -124,39 +229,24 @@ jobs:
             Write-Output "-------------------------------------------"
             Write-Output "Ring Control Setup"
             Write-Output "-------------------------------------------"
-            $Ring = "Canary"
+            $Ring = "${{ steps.RingDetection.outputs.Ring }}"
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
-            $docs_deploy_folder = "./azure-devops-migration-tools/";
-            $docs_baseURL = "/learn/azure-devops-migration-tools"
-            $docs_baseURL_AFD = "/learn/azure-devops-migration-tools"
             $RunCodeRelease = 'false'
             $RunDocsRelease = 'false'
-            switch ($Env:GitVersion_PreReleaseLabel) {
-                "" {
-                    $Ring = "Production";
+            switch ("${{ steps.RingDetection.outputs.Ring }}") {
+                "Production" {
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
-                    $docs_deploy_folder = "./azure-devops-migration-tools/"
-                    $docs_baseURL = ""
-                    $docs_baseURL_AFD = ""
                     $AzureSitesEnvironment = ""
                     $RunRelease = 'true'
                 }
                 "Preview" {
-                    $Ring = "Preview";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
-                    $docs_deploy_folder = "./azure-devops-migration-tools/";
-                    $docs_baseURL = ""
-                    $docs_baseURL_AFD = ""
                     $AzureSitesEnvironment = "preview";
                     $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
                 }
                 default {
-                    $Ring = "Canary";
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
-                    $docs_deploy_folder = "./azure-devops-migration-tools/canary/$branchSafeName"
-                    $docs_baseURL = "/"
-                    $docs_baseURL_AFD = ""
-                    $AzureSitesEnvironment = "canary-${{ github.event.pull_request.number }}"
+                    $AzureSitesEnvironment = "${{ steps.RingDetection.outputs.Ring }}-${{ github.event.pull_request.number }}".ToLower()
                     $RunRelease = 'false'
                 }
             }
@@ -164,27 +254,11 @@ jobs:
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
             Write-Output "We are focused on Winget ID $WingetApplicationId!"
             echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
-            Write-Output "docs_deploy_folder=$docs_deploy_folder"
-            echo "docs_deploy_folder=$docs_deploy_folder" >> $env:GITHUB_OUTPUT
-            Write-Output "docs_baseURL=$docs_baseURL"
-            echo "docs_baseURL=$docs_baseURL" >> $env:GITHUB_OUTPUT
-            Write-Output "docs_baseURL_AFD=$docs_baseURL_AFD"
-            echo "docs_baseURL_AFD=$docs_baseURL_AFD" >> $env:GITHUB_OUTPUT
 
             Write-Output "We are running for the $AzureSitesEnvironment AzureSitesEnvironment!"
             echo "AzureSitesEnvironment=$AzureSitesEnvironment" >> $env:GITHUB_OUTPUT
             Write-Output "RunRelease=$RunRelease"
             echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
-            Write-Output "-------------------------------------------"
-            Write-Output "::endgroup::"
-            # Docs Setup
-            Write-Output "::group::Docs Setup"
-            Write-Output "-------------------------------------------"
-            Write-Output "Docs"
-            Write-Output "-------------------------------------------"
-            $docs_version_folder = "/azure-devops-migration-tools/$Env:GitVersion_SemVer"
-             Write-Output "docs_version_folder=$docs_version_folder"
-            echo "docs_version_folder=$docs_version_folder" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
             Write-Output "::endgroup::"
              # Get-ReleaseDescription
