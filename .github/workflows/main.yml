@@ -258,7 +258,7 @@ jobs:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
-    if: ${{ success() }}
+    if: ${{ success() && ( needs.Setup.outputs.HasChanged_src == 'true' || needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
