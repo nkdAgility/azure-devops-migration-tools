@@ -224,6 +224,7 @@ jobs:
             Write-Output "branchSafeName: $branchSafeName!"
             Write-Output "-------------------------------------------"
             Write-Output "::endgroup::"
+
             # Ring Setup
             Write-Output "::group::Ring Control Setup"
             Write-Output "-------------------------------------------"
@@ -231,18 +232,19 @@ jobs:
             Write-Output "-------------------------------------------"
             $Ring = "${{ steps.RingDetection.outputs.Ring }}"
             $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
-            $RunCodeRelease = 'false'
-            $RunDocsRelease = 'false'
+
             switch ("${{ steps.RingDetection.outputs.Ring }}") {
                 "Production" {
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
                     $AzureSitesEnvironment = ""
-                    $RunRelease = 'true'
+                    # Production: Release app when ForceRelease OR src changed
+                    $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
                 }
                 "Preview" {
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
                     $AzureSitesEnvironment = "preview";
-                    $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') -or ('${{ steps.filter.outputs.docs }}' -eq 'true') )
+                    # Preview: Release app when ForceRelease OR src changed
+                    $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
                 }
                 default {
                     $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
@@ -250,14 +252,14 @@ jobs:
                     $RunRelease = 'false'
                 }
             }
+
             Write-Output "We are running for the $Ring Ring!"
             echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
             Write-Output "We are focused on Winget ID $WingetApplicationId!"
             echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
-
             Write-Output "We are running for the $AzureSitesEnvironment AzureSitesEnvironment!"
             echo "AzureSitesEnvironment=$AzureSitesEnvironment" >> $env:GITHUB_OUTPUT
-            Write-Output "RunRelease=$RunRelease"
+            Write-Output "RunRelease=$RunRelease (App releases when ForceRelease OR src changed)"
             echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
             Write-Output "-------------------------------------------"
             Write-Output "::endgroup::"
@@ -348,7 +350,9 @@ jobs:
     name: "Build, Test, Sonar Cloud Analysis, & Package"
     runs-on: windows-latest
     needs: Setup
-    if: ${{ success() && ( needs.Setup.outputs.HasChanged_src == 'true' || needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
+    # Build app only when src has changed
+    if: ${{ success() && (needs.Setup.outputs.HasChanged_src == 'true'  || needs.Setup.outputs.HasChanged_automation == 'true') }}
+
     env:
       solution: '**/*.sln'
       buildPlatform: 'Any CPU'
@@ -498,7 +502,8 @@ jobs:
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
     needs: [build, Setup, BuildDocs]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
+    # Release app when RunRelease is true (ForceRelease OR src changed)
+    if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -565,7 +570,8 @@ jobs:
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
     needs: [GitHubRelease, Setup]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
+    # Only when app was released
+    if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
      - name: Create Deployment on elmah.io
        uses: elmahio/github-create-deployment-action@v1
@@ -580,7 +586,8 @@ jobs:
     name: "Release to Marketplace"
     runs-on: ubuntu-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_Ring == 'Production' ) }}
+    # Only release to marketplace when app was released and it's production
+    if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' && needs.Setup.outputs.nkdAgility_Ring == 'Production' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -609,7 +616,8 @@ jobs:
     name: "Release to Chocolatey"
     runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
+    # Only when app was released
+    if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -633,7 +641,8 @@ jobs:
     name: "Release to Winget"
     runs-on: windows-latest
     needs: [Setup, GitHubRelease]
-    if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
+    # Only when app was released
+    if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -654,6 +663,7 @@ jobs:
     name: "Release to Docs"
     runs-on: ubuntu-latest
     needs: [Setup, BuildDocs]
+    # Always deploy docs (as requested)
     if: ${{ !(github.event.pull_request.head.repo.fork) }}
     steps:
       - name: Download a single artifact
