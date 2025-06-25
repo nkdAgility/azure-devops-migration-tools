@@ -5,11 +5,11 @@ description: |
   The current permissions are governed by the requirements of the TFS Client Object Model from Microsoft.
   While Microsoft announced the deprecation of the WIT and Test Client OM in 2020, it remains the only consistent method for interacting with versions of TFS from 2010 to 2018.
 date: 2025-06-24T12:07:31Z
-discussionId:
+discussionId: 2829
 aliases:
-  - /permissions/
----
+- /permissions/
 
+---
 The current permissions are governed by the requirements of the [TFS Client Object Model](https://learn.microsoft.com/en-us/azure/devops/integrate/concepts/dotnet-client-libraries?view=azure-devops) from Microsoft. While Microsoft [announced the deprecation of the WIT and Test Client OM](https://devblogs.microsoft.com/devops/announcing-the-deprecation-of-the-wit-and-test-client-om-at-jan-1-2020-2/) in 2020, it remains the only consistent method for interacting with versions of TFS from 2010 to 2018. We are in the process of migrating our tools to the REST API, but this is a large effort and will take some time to complete.
 
 The Azure DevOps Migration Tools use a flag to bypass the Work Item rules engine, allowing data to be written into TFS/VSTS in ways that might not comply with the usual rules. For example, you can directly transition an item into the `Closed` state without starting at `New`. This is highly beneficial for migrations but requires specific pre-requisites.
