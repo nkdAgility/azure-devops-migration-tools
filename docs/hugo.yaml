@@ -32,7 +32,7 @@ params:
   supportEmail: "support@devopsmigration.io"
   githubUrl: "https://github.com/nkdAgility/azure-devops-migration-tools"
   editPage: "https://github.com/nkdAgility/azure-devops-migration-tools/tree/main/docs/content/"
-  googleTagId: "G-TSHSKGHDK"
+  googleTagId: "G-R0NEH3XJNF"
   version: "#{GitVersion.SemVer}#"
   ring: "#{ToolsTemplates_AzureSitesConfig}#"
   downloadUrl: "/download"
