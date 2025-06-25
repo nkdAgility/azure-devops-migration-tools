@@ -3,15 +3,15 @@
 #>
 param (
     # height of largest column without top bar
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$version,
 
     # name of the releaseTag
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$ring,
 
     # GH_TOKEN
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$GH_TOKEN
 
 )
@@ -35,18 +35,18 @@ $wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools"
 
 Write-Host "Winget Create with $wigetPackageId"
 switch ($ring) {
-	"Preview" {
-		$wigetPackageId = "$wigetPackageId.Preview"
+    "Preview" {
+        $wigetPackageId = "$wigetPackageId.Preview"
         ./wingetcreate.exe update --submit --token $GH_TOKEN --urls $installURL --version $version $wigetPackageId
-	}
-	"Release" {
-		$wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools"
+    }
+    "Production" {
+        $wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools"
         ./wingetcreate.exe update --submit --token $GH_TOKEN --urls $installURL --version $version $wigetPackageId
-	}
-	default {
-		$wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools.Canary"
+    }
+    default {
+        $wigetPackageId = "nkdAgility.AzureDevOpsMigrationTools.Canary"
         Write-Host "We dont ship canary builds!"
-	}
+    }
 }
 
 Write-Host "Deployed : $wigetPackageId"
