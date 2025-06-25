@@ -3,13 +3,14 @@ title: Keep Outbound Link Target Processor
 dataFile: data/reference.processors.keepoutboundlinktargetprocessor.yaml
 slug: keep-outbound-link-target-processor
 aliases:
-  - /docs/Reference/Processors/KeepOutboundLinkTargetProcessor
-  - /Reference/Processors/KeepOutboundLinkTargetProcessor
-  - /learn/azure-devops-migration-tools/Reference/Processors/KeepOutboundLinkTargetProcessor
-  - /learn/azure-devops-migration-tools/Reference/Processors/KeepOutboundLinkTargetProcessor/index.md
+- /docs/Reference/Processors/KeepOutboundLinkTargetProcessor
+- /Reference/Processors/KeepOutboundLinkTargetProcessor
+- /learn/azure-devops-migration-tools/Reference/Processors/KeepOutboundLinkTargetProcessor
+- /learn/azure-devops-migration-tools/Reference/Processors/KeepOutboundLinkTargetProcessor/index.md
 date: 2025-06-24T12:07:31Z
----
+discussionId: 2778
 
+---
 {{< class-description >}}
 
 ## Options

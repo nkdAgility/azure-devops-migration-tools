@@ -3,13 +3,14 @@ title: Tfs Node Structure Tool
 dataFile: data/reference.tools.tfsnodestructuretool.yaml
 slug: tfs-node-structure-tool
 aliases:
-  - /docs/Reference/Tools/TfsNodeStructureTool
-  - /Reference/Tools/TfsNodeStructureTool
-  - /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool
-  - /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool/index.md
+- /docs/Reference/Tools/TfsNodeStructureTool
+- /Reference/Tools/TfsNodeStructureTool
+- /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool
+- /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool/index.md
 date: 2025-06-24T12:07:31Z
----
+discussionId: 2807
 
+---
 {{< class-description >}}
 
 ## Options
