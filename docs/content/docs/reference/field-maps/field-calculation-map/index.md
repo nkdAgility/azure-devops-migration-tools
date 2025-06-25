@@ -15,6 +15,9 @@ date: 2025-06-24T12:07:31Z
 discussionId: 2756
 ---
 
+{{< class-description >}}
+
+
 ## Purpose and Use Cases
 
 This map is typically used when:
@@ -24,7 +27,6 @@ This map is typically used when:
 - You wish to **assign weights** to different numeric fields and store a computed score
 - Your source project uses **different naming or units**, and you want to normalise during migration
 
----
 
 ## Options
 
@@ -47,7 +49,6 @@ The [NCalc](https://github.com/ncalc/ncalc) engine supports:
 
 This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom.HourlyRate`.
 
----
 
 ## Behaviour and Execution
 
@@ -55,7 +56,6 @@ This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom
 - It applies to the **latest revision** only unless otherwise configured.
 - The calculated value **overwrites** any existing value in `targetField`.
 
----
 
 ## Field Resolution Rules
 
@@ -64,7 +64,6 @@ This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom
 - If a referenced field is missing or null, the expression evaluation may fail.
 - Non-numeric fields will cause an evaluation error.
 
----
 
 ## Practices
 
@@ -73,7 +72,6 @@ This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom
 - Always **test with a sample dataset** using `run-local` before production use.
 - Use `ApplyTo` to limit the map to only relevant work item types.
 
----
 
 ## Limitations
 
@@ -81,4 +79,22 @@ This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom
 - Errors during evaluation are **not recoverable** mid-run unless caught at validation.
 - Does **not support cross-work-item calculations**.
 
----
+
+
+## Samples
+
+### Sample
+
+{{< class-sample sample="sample" >}}
+
+### Defaults
+
+{{< class-sample sample="defaults" >}}
+
+### Classic
+
+{{< class-sample sample="classic" >}}
+
+## Metadata
+
+{{< class-metadata >}}

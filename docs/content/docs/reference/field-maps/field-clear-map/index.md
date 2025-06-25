@@ -10,11 +10,11 @@ aliases:
 - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldClearMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2791
-
 ---
+
+{{< class-description >}}
+
 The **FieldClearMap** is used to explicitly clear a field value on migrated work items by setting the target field to `null`. This is especially useful for sanitising or removing unwanted metadata, calculated fields, or legacy data that should not be carried into the target system.
-
----
 
 ## Purpose and Use Cases
 
@@ -24,7 +24,9 @@ This map is typically used when:
 - You're migrating to a system where a field is **no longer in use** or **read-only**.
 - A field value causes validation errors in the target and should be reset.
 
----
+## Options
+
+{{< class-options >}}
 
 ## Behaviour
 
@@ -33,7 +35,6 @@ This map is typically used when:
 - Only affects the latest revision unless the processor is configured to rewrite history.
 - Will silently **overwrite** any existing value in that field on the target.
 
----
 
 ## Practices
 
@@ -42,12 +43,27 @@ This map is typically used when:
 - Combine with `ApplyTo` to limit field clearing to specific types where the field is present.
 - Be cautious when clearing **system fields**; not all fields accept `null` values.
 
----
-
 ## Limitations
 
 - Does not validate whether the field actually exists on the target.
 - If `targetField` is a **required field** in the target process, this may cause a validation error.
 - Does not support conditional clearing; the field is always cleared if this map applies.
 
----
+
+## Samples
+
+### Sample
+
+{{< class-sample sample="sample" >}}
+
+### Defaults
+
+{{< class-sample sample="defaults" >}}
+
+### Classic
+
+{{< class-sample sample="classic" >}}
+
+## Metadata
+
+{{< class-metadata >}}
