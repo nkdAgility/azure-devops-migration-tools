@@ -1,16 +1,17 @@
 ---
 title: Tfs WorkItem Migration Processor
+description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
 dataFile: data/reference.processors.tfsworkitemmigrationprocessor.yaml
 slug: tfs-workitem-migration-processor
 aliases:
-  - /docs/Reference/Processors/TfsWorkItemMigrationProcessor
-  - /Reference/Processors/TfsWorkItemMigrationProcessor
-  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor
-  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor/index.md
+- /docs/Reference/Processors/TfsWorkItemMigrationProcessor
+- /Reference/Processors/TfsWorkItemMigrationProcessor
+- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor
+- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2681
----
 
+---
 {{< class-description >}}
 
 ## Options

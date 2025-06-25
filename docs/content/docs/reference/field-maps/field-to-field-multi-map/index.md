@@ -1,5 +1,6 @@
 ---
 title: Field To Field Multi Map
+description: Maps field values based on a lookup table, allowing specific source values to be translated to different target values.
 dataFile: data/reference.fieldmaps.fieldtofieldmultimap.yaml
 slug: field-to-field-multi-map
 aliases:

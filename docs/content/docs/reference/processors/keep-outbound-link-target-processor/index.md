@@ -1,5 +1,6 @@
 ---
 title: Keep Outbound Link Target Processor
+description: Performs mathematical calculations on numeric fields using NCalc expressions during migration.
 dataFile: data/reference.processors.keepoutboundlinktargetprocessor.yaml
 slug: keep-outbound-link-target-processor
 aliases:

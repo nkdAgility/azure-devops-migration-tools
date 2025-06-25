@@ -44,7 +44,7 @@
                                 {{ .Title }}
                               </a>
                             </h5>
-                              <p class="card-text text-muted">{{ .Description }}</p>
+                              <p class="card-text text-muted">{{ .Description | markdownify }}</p>
 
                             {{/* Show child pages count */}}
                             {{ if .Pages }}
@@ -83,6 +83,8 @@
                 {{ .Content | markdownify }}
               </div>
 
+             
+
               {{/* Getting started section */}}
               {{ $gettingStarted := .Site.GetPage "/docs/get-started/getting-started/" }}
               {{ if $gettingStarted }}
@@ -100,6 +102,10 @@
                   </div>
                 </div>
               {{ end }}
+
+               <div class="docs-comments">
+                {{ partial "docs/comments.html" . }}
+              </div>
             </div>
           </div>
         </div>

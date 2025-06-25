@@ -1,5 +1,6 @@
 ---
 title: Tfs Validate Required Field Tool
+description: Tool for validating that required fields exist in target work item types before migration, preventing migration failures due to missing required fields.
 dataFile: data/reference.tools.tfsvalidaterequiredfieldtool.yaml
 slug: tfs-validate-required-field-tool
 aliases:

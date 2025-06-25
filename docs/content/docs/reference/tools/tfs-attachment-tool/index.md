@@ -1,5 +1,6 @@
 ---
 title: Tfs Attachment Tool
+description: Tool for processing and migrating work item attachments between Team Foundation Server instances, handling file downloads, uploads, and attachment metadata.
 dataFile: data/reference.tools.tfsattachmenttool.yaml
 slug: tfs-attachment-tool
 aliases:

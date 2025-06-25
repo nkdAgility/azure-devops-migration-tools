@@ -1,5 +1,6 @@
 ---
 title: Outbound Link Checking Processor
+description: Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.
 dataFile: data/reference.processors.outboundlinkcheckingprocessor.yaml
 slug: outbound-link-checking-processor
 aliases:

@@ -1,5 +1,6 @@
 ---
 title: Tfs Node Structure Tool
+description: Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.
 dataFile: data/reference.tools.tfsnodestructuretool.yaml
 slug: tfs-node-structure-tool
 aliases:

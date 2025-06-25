@@ -1,5 +1,6 @@
 ---
 title: Field To Field Map
+description: Maps the value from a source field to a target field directly, with optional default value substitution for empty or null values.
 dataFile: data/reference.fieldmaps.fieldtofieldmap.yaml
 slug: field-to-field-map
 aliases:

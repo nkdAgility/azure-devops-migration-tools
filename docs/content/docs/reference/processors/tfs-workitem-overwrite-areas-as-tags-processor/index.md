@@ -1,5 +1,6 @@
 ---
 title: Tfs WorkItem Overwrite Areas As Tags Processor
+description: A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.
 dataFile: data/reference.processors.tfsworkitemoverwriteareasastagsprocessor.yaml
 slug: tfs-workitem-overwrite-areas-as-tags-processor
 aliases:

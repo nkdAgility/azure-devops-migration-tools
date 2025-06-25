@@ -1,5 +1,6 @@
 ---
 title: 'Tutorial: Get started with the Azure DevOps Migration Tools'
+description: Performs mathematical calculations on numeric fields using NCalc expressions during migration.
 short_title: Get Started
 weight: 1
 aliases:

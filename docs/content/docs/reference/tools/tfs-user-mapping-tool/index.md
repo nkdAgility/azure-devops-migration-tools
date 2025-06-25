@@ -1,5 +1,6 @@
 ---
 title: Tfs User Mapping Tool
+description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
 dataFile: data/reference.tools.tfsusermappingtool.yaml
 slug: tfs-user-mapping-tool
 aliases:

@@ -1,5 +1,6 @@
 ---
 title: WorkItem Tracking Processor
+description: This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
 dataFile: data/reference.processors.workitemtrackingprocessor.yaml
 slug: workitem-tracking-processor
 aliases:

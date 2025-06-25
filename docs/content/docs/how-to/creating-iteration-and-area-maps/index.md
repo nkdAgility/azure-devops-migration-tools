@@ -1,12 +1,12 @@
 ---
-title: "How-To: Creating area and iteration maps"
-short_title: Creating area and iteration maps
+title: 'How-To: Creating area and iteration maps'
 description: |
   This guide explains how to create area and iteration maps for Azure DevOps Migration Tools, allowing you to adapt old locations to new ones during migration.
+short_title: Creating area and iteration maps
 discussionId: 1846
 date: 2025-06-24T12:07:31Z
----
 
+---
 As per the [documentation]({{< ref "docs/reference/tools/tfs-node-structure-tool" >}}), you need to add Iteration Maps and Area Maps that adapt the old locations to new ones that are valid in the Target.
 
 Before your migration starts, it will validate that all of the Areas and Iterations from the **Source** work items revisions exist on the **Target**. Any that do not exist will be flagged in the logs, and if you have `"StopMigrationOnMissingAreaIterationNodes": true,` set, the migration will stop just after it outputs a list of the missing nodes.

@@ -1,8 +1,8 @@
 ---
 title: Getting Started with Git and TFVC Version Control
-short_title: Version Control
 description: |
   While we do not migrate source control for you, we do have tools to maintain the links between work items and source code.
+short_title: Version Control
 aliases:
 - /version-control/
 date: 2025-06-24T12:07:31Z
