@@ -1,0 +1,47 @@
+{{- $baseURL := .Site.BaseURL -}}
+{{- $siteURL := .Site.Params.siteProdUrl | default $baseURL -}}
+{{- $pageURL := printf "%s%s" $siteURL .RelPermalink -}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "{{ .Title }}",
+  "headline": "{{ .Title }}",
+  "description": "{{ .Page.Params.description | default .Site.Params.description }}",
+  "url": {{ $pageURL }},
+  "datePublished": "{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}",
+  "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "{{ .Site.Title }}",
+    "url": {{ $siteURL }}
+  },
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "{{ .Site.Title }}",
+    "url": {{ $siteURL }}
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": {{ $siteURL }}
+      }{{- if ne .RelPermalink "/" -}},
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ .Title }}",
+        "item": {{ $pageURL }}
+      }{{- end -}}
+    ]
+  },
+  "inLanguage": "{{ .Site.Language.LanguageCode | default "en" }}",
+  "potentialAction": {
+    "@type": "ReadAction",
+    "target": {{ $pageURL }}
+  }
+}
+</script>

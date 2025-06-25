@@ -1,0 +1,63 @@
+{{/* Shortcode: class-metadata
+  Description: Displays the metadata information for a class
+  Usage: {{< class-metadata
+>}}
+(uses current page's dataFile parameter) or: {{< class-metadata datafile="data/reference.someclass.yaml" >}} (uses specified datafile) Parameters: - datafile: Optional - The path to the data file to load. If not provided, uses .Page.Params.dataFile */}}
+{{ $data := "" }}
+
+{{/* Use passed datafile parameter or fall back to page's dataFile parameter */}}
+{{ $dataFile := .Get "datafile" }}
+{{ if not $dataFile }}
+  {{ $dataFile = .Page.Params.dataFile }}
+{{ end }}
+
+{{/* Parse the data file path and load the YAML data */}}
+{{ if $dataFile }}
+  {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
+  {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
+  {{ $pathParts := split $cleanPath "." }}
+
+  {{/* Navigate through the nested data structure */}}
+  {{ $data = index .Site.Data $cleanPath }}
+{{ end }}
+
+{{/* Additional Information */}}
+{{ if and $data (or $data.status $data.processingTarget $data.className $data.typeName) }}
+  <div class="class-metadata">
+    <h3 id="metadata" class="position-relative">
+      Metadata
+      <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+        <i class="fas fa-link fa-sm"></i>
+      </a>
+    </h3>
+    <dl class="row">
+      {{ if $data.className }}
+        <dt class="col-sm-3">Class Name</dt>
+        <dd class="col-sm-9"><code>{{ $data.className }}</code></dd>
+      {{ end }}
+      {{ if $data.status }}
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">
+          <span class="badge badge-{{ if eq $data.status "alpha" }}warning{{ else if eq $data.status "beta" }}info{{ else }}success{{ end }}">
+            {{ $data.status | title }}
+          </span>
+        </dd>
+      {{ end }}
+      {{ if $data.processingTarget }}
+        <dt class="col-sm-3">Processing Target</dt>
+        <dd class="col-sm-9">{{ $data.processingTarget }}</dd>
+      {{ end }}
+      {{ if $data.typeName }}
+        <dt class="col-sm-3">Type</dt>
+        <dd class="col-sm-9">{{ $data.typeName }}</dd>
+      {{ end }}
+    </dl>
+  </div>
+{{ else if not $dataFile }}
+  <div class="alert alert-warning">
+    <strong>Warning:</strong> class-metadata shortcode requires either a page with a "dataFile" parameter or a "datafile" parameter. Usage: <code>{{ `< class-metadata >` }}</code> (with dataFile in front matter) or
+    <code>{{ `< class-metadata datafile="data/reference.someclass.yaml" >` }}</code>
+  </div>
+{{ else if not $data }}
+  <div class="alert alert-info"><strong>Info:</strong> No data found. Make sure the data file <code>{{ $dataFile }}</code> exists.</div>
+{{ end }}

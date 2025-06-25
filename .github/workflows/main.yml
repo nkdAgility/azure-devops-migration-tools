@@ -362,22 +362,16 @@ jobs:
     name: "Build Documentation output"
     runs-on: ubuntu-latest
     if: ${{ success() }}
-    needs: [Setup, build]
+    needs: [Setup]
     env:
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1 # v1.161.0
-        with:
-          ruby-version: '3.2' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 0 # Increment this number if you need to re-download cached gems
       - uses: cschleiden/replace-tokens@v1
         with:
-          files: '["**/*.html"]'
+          files: '["**/*.html", "**/*.yaml"]'
           tokenPrefix: "#{"
           tokenSuffix: "}#"
         env:
@@ -385,20 +379,21 @@ jobs:
           GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
           GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
           GitVersion.SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
-      - uses: igsekor/pyspelling-any@v1.0.4
-        id: spellcheck
-        name: Spellcheck
-      - name: Build with Jekyll 2
-        # Outputs to the './_site' directory by default
-        run: bundle exec jekyll build --destination ./_site2/  --baseurl "${{needs.Setup.outputs.nkdAgility_DocsBaseURL_AFD}}"
-        env:
-          JEKYLL_ENV: production
-      # - name: Build Jekyll
-      #   uses: jerryjvl/jekyll-build-action@v1
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          extended: true
+          hugo-version: 'latest'
+      - name: Build
+        run: |
+          $environment = "${{ needs.Setup.outputs.nkdAgility_Ring }}".ToLower()
+          Write-Host "Building site for $environment ";
+          $env:HUGO_ENV = "$environment";
+          hugo --source docs --config hugo.yaml,hugo.$environment.yaml --logLevel debug; # --minify
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site2
-          path: ./_site2/**/*
+          path: ./public/**/*
 
 
   # GitHubRelease
@@ -412,7 +407,7 @@ jobs:
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
       GitVersion_NuGetVersion: ${{ needs.Setup.outputs.GitVersion_NuGetVersion }}
       GitVersion_PreReleaseLabel: ${{ needs.Setup.outputs.GitVersion_PreReleaseLabel }}
-    needs: [build, Setup]
+    needs: [build, Setup, BuildDocs]
     if: ${{ success() && ( needs.Setup.outputs.nkdAgility_RunRelease == 'true' ) }}
     steps:
       - uses: actions/download-artifact@v4

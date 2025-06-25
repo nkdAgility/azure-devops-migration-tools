@@ -1,0 +1,113 @@
+{{- define "main" }}
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-12" style="max-width: 1800px;">
+        <div class="row">
+          {{/* Sidebar - Hidden on smaller screens */}}
+          <div class="col-12 col-xl-3 docs-navbar-container d-none d-xl-block">
+            {{ partial "docs/sidebar.html" . }}
+          </div>
+          {{/* Dropdown Navigation for smaller screens */}}
+          <div class="col-12 d-xl-none mb-3">
+            <div class="dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="docsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-book me-2"></i>
+                Documentation Navigation
+              </button>
+              <div class="dropdown-menu docs-dropdown-menu" aria-labelledby="docsDropdown">
+                {{ partial "docs/sidebar.html" . }}
+              </div>
+            </div>
+          </div>
+          {{/* Main content */}}
+          <div class="col-12 col-xl-9">
+            <div class="docs-content">
+              {{/* Page title */}}
+              <div class="docs-header mb-4">
+                <h1 class="docs-title">{{ .Title }}</h1>
+                {{ if .Params.description }}
+                  <p class="docs-description text-muted">{{ .Params.description | markdownify }}</p>
+                {{ end }}
+              </div>
+
+              {{/* Documentation sections */}}
+              {{ if .Pages }}
+                <div class="docs-sections">
+                  <div class="row">
+                    {{ range .Pages.ByWeight.ByTitle }}
+                      <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 docs-section-card">
+                          <div class="card-body">
+                            <h5 class="card-title">
+                              <a href="{{ .RelPermalink }}" class="text-decoration-none">
+                                <i class="fas fa-folder-open me-2 text-primary"></i>
+                                {{ .Title }}
+                              </a>
+                            </h5>
+                              <p class="card-text text-muted">{{ .Description }}</p>
+
+                            {{/* Show child pages count */}}
+                            {{ if .Pages }}
+                              <small class="text-muted">
+                                <i class="fas fa-file-alt me-1"></i>
+                                {{ len .Pages }} {{ if eq (len .Pages) 1 }}page{{ else }}pages{{ end }}
+                              </small>
+                            {{ end }}
+                          </div>
+
+                          {{/* Show first few child pages */}}
+                          {{ if .Pages }}
+                            <div class="card-footer bg-transparent">
+                              <small class="text-muted">
+                                {{ range first 3 .Pages.ByWeight.ByTitle }}
+                                  <a href="{{ .RelPermalink }}" class="d-block text-decoration-none mb-1">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    {{ .Title }}
+                                  </a>
+                                {{ end }}
+                                {{ if gt (len .Pages) 3 }}
+                                  <span class="text-muted">... and {{ sub (len .Pages) 3 }} more</span>
+                                {{ end }}
+                              </small>
+                            </div>
+                          {{ end }}
+                        </div>
+                      </div>
+                    {{ end }}
+                  </div>
+                </div>
+              {{ end }}
+
+              {{/* Page content */}}
+              <div class="docs-body">
+                {{ .Content | markdownify }}
+              </div>
+
+              {{/* Getting started section */}}
+              {{ $gettingStarted := .Site.GetPage "/docs/get-started/getting-started/" }}
+              {{ if $gettingStarted }}
+                <div class="docs-getting-started mt-5">
+                  <div class="alert alert-primary" role="alert">
+                    <h4 class="alert-heading">
+                      <i class="fas fa-rocket me-2"></i>
+                      Getting Started
+                    </h4>
+                    <p class="mb-3">New to the Azure DevOps Migration Tools? Start here for a quick introduction and setup guide.</p>
+                    <a href="{{ $gettingStarted.RelPermalink }}" class="btn btn-primary">
+                      <i class="fas fa-play me-2"></i>
+                      Get Started
+                    </a>
+                  </div>
+                </div>
+              {{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{{- end }}
+
+{{- define "template" }}
+  docs/list.html
+{{- end }}

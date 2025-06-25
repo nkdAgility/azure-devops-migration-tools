@@ -1,0 +1,158 @@
+{{- define "main" }}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-sm-10">
+      <div class="text-center py-5">
+        <!-- 404 Icon/Image -->
+        <div class="mb-4">
+          <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-primary">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+          </svg>
+        </div>
+        
+        <!-- 404 Title -->
+        <h1 class="display-1 fw-bold text-primary mb-3">404</h1>
+        <h2 class="h3 mb-4">Oops! Page Not Found</h2>
+        
+        <!-- Description -->
+        <p class="lead text-muted mb-4">
+          The page you're looking for seems to have migrated to a different location. 
+          Don't worry, even the best migration tools sometimes need to redirect!
+        </p>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center mb-5">
+          <a href="{{ .Site.BaseURL }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-home me-2"></i>Go Home
+          </a>
+          <a href="{{ .Site.BaseURL }}docs/" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-book me-2"></i>Browse Documentation
+          </a>
+        </div>
+        
+        <!-- Helpful Links -->
+        <div class="card border-0 bg-light">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Looking for something specific?</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-rocket text-primary me-3"></i>
+                  <div>
+                    <h6 class="mb-1">Getting Started</h6>
+                    <small class="text-muted">New to Azure DevOps Migration Tools?</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-cogs text-primary me-3"></i>
+                  <div>
+                    <h6 class="mb-1">Configuration</h6>
+                    <small class="text-muted">Set up your migration configuration</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-question-circle text-primary me-3"></i>
+                  <div>
+                    <h6 class="mb-1">FAQ</h6>
+                    <small class="text-muted">Common questions and answers</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <i class="fab fa-github text-primary me-3"></i>
+                  <div>
+                    <h6 class="mb-1">GitHub Repository</h6>
+                    <small class="text-muted">Source code and issues</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="mt-4 pt-3 border-top">
+              <div class="row g-2">
+                <div class="col-sm-6 col-lg-3">
+                  <a href="{{ .Site.BaseURL }}docs/getting-started/" class="btn btn-sm btn-outline-secondary w-100">Getting Started</a>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                  <a href="{{ .Site.BaseURL }}docs/reference/" class="btn btn-sm btn-outline-secondary w-100">Reference</a>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                  <a href="{{ .Site.BaseURL }}support/" class="btn btn-sm btn-outline-secondary w-100">Support</a>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                  <a href="https://github.com/nkdAgility/azure-devops-migration-tools" class="btn btn-sm btn-outline-secondary w-100" target="_blank">GitHub</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Search Box -->
+        <div class="mt-4 d-none">
+          <div class="input-group input-group-lg">
+            <input type="text" class="form-control" placeholder="Search the documentation..." id="search-404">
+            <button class="btn btn-primary" type="button" onclick="performSearch()">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          <small class="text-muted mt-2 d-block">Try searching for what you were looking for</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search Script -->
+<script>
+function performSearch() {
+  var searchTerm = document.getElementById('search-404').value;
+  if (searchTerm.trim()) {
+    // Redirect to search page or implement search functionality
+    window.location.href = '{{ .Site.BaseURL }}search/?q=' + encodeURIComponent(searchTerm);
+  }
+}
+
+// Allow Enter key to trigger search
+document.getElementById('search-404').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    performSearch();
+  }
+});
+</script>
+
+<style>
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .display-1 {
+    font-size: 4rem;
+  }
+}
+</style>
+{{- end }}
+
+{{- define "template" }}
+  page/404.html
+{{- end }}

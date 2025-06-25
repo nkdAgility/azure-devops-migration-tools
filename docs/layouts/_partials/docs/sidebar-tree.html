@@ -1,0 +1,53 @@
+{{/* Recursive template for rendering docs navigation tree */}}
+{{ $pages := .pages }}
+{{ $current := .current }}
+{{ $level := .level }}
+
+{{ if $pages }}
+  <ul class="sidebar-nav">
+    {{ range $pages.ByWeight }}
+      {{ $isActive := eq .RelPermalink $current.RelPermalink }}
+      {{ $isParent := $current.IsDescendant . }}
+      {{ $hasChildren := .Pages }}
+
+
+      <li>
+        {{/* Skip the main docs index page at level 0 */}}
+        {{ if not (and (eq $level 0) (eq .Title "Documentation for the Azure DevOps Migration Tools")) }}
+          {{/* Section headers for main categories at level 0 */}}
+          {{ if eq $level 0 }}
+            <div class="sidebar-section-title">
+              {{ if .Params.short_title }}
+                {{ .Params.short_title }}
+              {{ else }}
+                {{ .Title }}
+              {{ end }}
+            </div>
+          {{ else }}
+            {{/* Regular navigation links for deeper levels */}}
+            <a title="{{ .Title }}" href="{{ .RelPermalink }}" class="nav-level-{{ $level }}{{ if $isActive }}active{{ end }}" {{ if $isActive }}aria-current="page"{{ end }}>
+              {{ if $hasChildren }}
+                <i class="fas fa-folder{{ if or $isActive $isParent }}-open{{ end }} me-2"></i>
+              {{ else }}
+                <i class="fas fa-file-alt me-2"></i>
+              {{ end }}
+              {{ if .Params.short_title }}
+                {{ .Params.short_title }}
+              {{ else }}
+                {{ .Title }}
+              {{ end }}
+            </a>
+          {{ end }}
+        {{ end }}
+
+        {{/* Render children if they exist */}}
+        {{ if $hasChildren }}
+          {{/* Always show children of level 0 pages and active/parent pages */}}
+          {{ if or (eq $level 0) $isParent $isActive }}
+            {{ partial "docs/sidebar-tree.html" (dict "pages" .Pages "current" $current "level" (add $level 1)) }}
+          {{ end }}
+        {{ end }}
+      </li>
+    {{ end }}
+  </ul>
+{{ end }}

@@ -1,0 +1,11 @@
+{{/* Main JSON-LD wrapper that determines which schema type to render */}}
+{{- $pageType := "" -}}
+{{- $isHomePage := eq .RelPermalink "/" -}}
+
+{{- if $isHomePage -}}
+  {{/* Home page gets WebSite schema */}}
+  {{- partial "JSON-LD/website.html" . -}}
+{{- else -}}
+  {{/* All other pages get WebPage schema */}}
+  {{- partial "JSON-LD/webpage.html" . -}}
+{{- end -}}

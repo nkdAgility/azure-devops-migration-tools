@@ -166,3 +166,4 @@ docs/Reference/Generated/MigrationTools.Host.xml
 logs/
 /staging/
 /docs/Reference/Generated
+/public/

@@ -1,0 +1,74 @@
+optionsClassName: AzureDevOpsEndpointOptions
+optionsClassFullName: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+configurationSamples:
+  - name: defaults
+    order: 2
+    description:
+    code: There are no defaults! Check the sample for options!
+    sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+  - name: sample
+    order: 1
+    description:
+    code: >-
+      {
+        "MigrationTools": {
+          "Version": "16.0",
+          "Endpoints": {
+            "#KEY#": {
+              "EndpointType": "AzureDevOpsEndpoint",
+              "AccessToken": "** removed as a secret ***",
+              "AuthenticationMode": "AccessToken",
+              "Organisation": "https://dev.azure.com/xxx/",
+              "Project": "myProject",
+              "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+            }
+          }
+        }
+      }
+    sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+  - name: classic
+    order: 3
+    description:
+    code: >-
+      {
+        "$type": "AzureDevOpsEndpointOptions",
+        "AuthenticationMode": "AccessToken",
+        "AccessToken": "** removed as a secret ***",
+        "Organisation": "https://dev.azure.com/xxx/",
+        "Project": "myProject",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      }
+    sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
+description: Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.
+className: AzureDevOpsEndpoint
+typeName: Endpoints
+architecture:
+options:
+  - parameterName: AccessToken
+    type: String
+    description: Personal Access Token (PAT) or other authentication token for accessing the Azure DevOps organization. Required for API authentication.
+    defaultValue: missing XML code comments
+  - parameterName: AuthenticationMode
+    type: AuthenticationMode
+    description: Authentication mode to use when connecting to Azure DevOps. Typically uses AccessToken for modern Azure DevOps organizations.
+    defaultValue: missing XML code comments
+  - parameterName: Organisation
+    type: String
+    description: URL of the Azure DevOps organization (e.g., "https://dev.azure.com/myorganization/"). Must include the full organization URL.
+    defaultValue: missing XML code comments
+  - parameterName: Project
+    type: String
+    description: Name of the Azure DevOps project within the organization to connect to. This is the project that will be used for migration operations.
+    defaultValue: missing XML code comments
+  - parameterName: ReflectedWorkItemIdField
+    type: String
+    description: Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
+    defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpoint.cs
+optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Endpoints/AzureDevOpsEndpointOptions.cs
+notes:
+  exists: false
+  path: docs/Reference/Endpoints/AzureDevOpsEndpoint-notes.md
+  markdown: ""

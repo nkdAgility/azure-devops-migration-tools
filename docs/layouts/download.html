@@ -1,0 +1,144 @@
+{{- define "main" }}
+  <section class="container py-5">
+    <div class="text-center mb-5">
+      <h1 class="display-4 mb-3">Download Azure DevOps Migration Tools</h1>
+      <h2 class="h4 text-muted">Install the Azure DevOps Migration Tools on Windows using your preferred method</h2>
+    </div>
+    <!-- Installation Section -->
+    <section class="container-fluid py-5">
+      <div class="container">
+        <div class="row g-4 mb-5">
+          <!-- Option 1: Winget -->
+          <div class="col-lg-6 col-md-6">
+            <div class="card h-100 border-0 shadow-sm" style="background-color: var(--bs-body-bg);">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="p-2 rounded-circle me-3" style="background-color: var(--bs-primary); color: white;">
+                    <i class="fa-solid fa-box-open fa-lg"></i>
+                  </div>
+                  <h4 class="card-title mb-0">Option 1: Winget</h4>
+                </div>
+                <p class="card-text text-muted mb-4">Recommended for Windows 10 and Windows 11 users. Simple one-command installation.</p>
+                <div class="mb-3">
+                  <h6 class="small text-muted mb-1">Command:</h6>
+                  <div class="p-2 rounded" style="background-color: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color);">
+                    <code class="small">winget install nkdAgility.AzureDevOpsMigrationTools</code>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <h6 class="small fw-bold mb-2">Installation Details:</h6>
+                  <ul class="small text-muted mb-0">
+                    <li>Installs to <code>%Localappdata%\Microsoft\WinGet\Packages\</code></li>
+                    <li>Creates symbolic link for <code>devopsmigration</code> command</li>
+                    <li>Run from anywhere using <code>devopsmigration init</code></li>
+                  </ul>
+                </div>
+
+                <div class="alert alert-warning small mb-0" style="background-color: var(--bs-warning-bg-subtle); border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text-emphasis);">
+                  <i class="fa-solid fa-exclamation-triangle me-1"></i>
+                  <strong>Note:</strong> Do not install using an elevated command prompt!
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Option 2: Chocolatey -->
+          <div class="col-lg-6 col-md-6">
+            <div class="card h-100 border-0 shadow-sm" style="background-color: var(--bs-body-bg);">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="p-2 rounded-circle me-3" style="background-color: #80B5E3; color: white;">
+                    <i class="fa-solid fa-cube fa-lg"></i>
+                  </div>
+                  <h4 class="card-title mb-0">Option 2: Chocolatey</h4>
+                </div>
+                <p class="card-text text-muted mb-4">Perfect for Windows Server environments and automated deployments.</p>
+                <div class="mb-3">
+                  <h6 class="small text-muted mb-1">Command:</h6>
+                  <div class="p-2 rounded" style="background-color: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color);">
+                    <code class="small">choco install vsts-sync-migrator</code>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <h6 class="small fw-bold mb-2">Installation Details:</h6>
+                  <ul class="small text-muted mb-0">
+                    <li>Installs to <code>C:\Tools\MigrationTools\</code></li>
+                    <li>Automatically added to system PATH</li>
+                    <li>Run using <code>devopsmigration.exe</code></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mb-5 justify-content-center">
+          <!-- Option 3: Manual -->
+          <div class="col-lg-6 col-md-8">
+            <div class="card h-100 border-0 shadow-sm" style="background-color: var(--bs-body-bg);">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="p-2 rounded-circle me-3" style="background-color: var(--bs-success); color: white;">
+                    <i class="fa-solid fa-download fa-lg"></i>
+                  </div>
+                  <h4 class="card-title mb-0">Option 3: Manual</h4>
+                </div>
+                <p class="card-text text-muted mb-4">Download and extract to any folder of your choice. Full control over installation location.</p>
+
+                <div class="mb-3">
+                  <h6 class="small fw-bold mb-2">Steps:</h6>
+                  <ol class="small text-muted mb-0">
+                    <li>Download the <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest" target="_blank" class="fw-bold">latest release</a> (zip file)</li>
+                    <li>Extract to your preferred folder</li>
+                    <li>Run <code>devopsmigration.exe</code> from the folder</li>
+                  </ol>
+                </div>
+
+                <div class="alert alert-info small mb-0" style="background-color: var(--bs-info-bg-subtle); border-color: var(--bs-info-border-subtle); color: var(--bs-info-text-emphasis);">
+                  <i class="fa-solid fa-info-circle me-1"></i>
+                  <strong>Tip:</strong> You may need to 'unlock' the downloaded archive. Right-click → Properties → Unblock before extracting.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center">
+          <p class="text-muted mb-3">Need more detailed instructions?</p>
+          <a href="/docs/get-started/" class="btn btn-outline-primary btn-lg">
+            <i class="fa-solid fa-book-open me-2"></i>
+            View Getting Started Guide
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- License Agreement -->
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+          <div class="text-center text-muted small">
+            By downloading and using the Azure DevOps Migration Tools, you agree to the <a href="https://github.com/nkdAgility/azure-devops-migration-tools/blob/main/LICENSE" target="_blank">license terms</a> and
+            <a href="https://nkdagility.com/company/privacy/" target="_blank">privacy statement</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Build Section -->
+    <div class="container pb-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+          <div class="text-center p-4 rounded" style="background-color: var(--bs-secondary-bg); border: 1px solid var(--bs-border-color);">
+            <h4 class="mb-3">Want new features sooner?</h4>
+            <p class="mb-0">Get the <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases" target="_blank" class="fw-bold">Preview build</a> instead.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{{- end }}
+{{- define "template" }}
+  page/download.html
+{{- end }}

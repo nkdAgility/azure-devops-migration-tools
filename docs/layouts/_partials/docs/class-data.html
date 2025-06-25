@@ -1,0 +1,128 @@
+{{/* Load the data file based on the dataFile property */}}
+{{ $dataFile := .Params.dataFile }}
+{{ $data := "" }}
+
+{{/* Parse the data file path and load the YAML data */}}
+{{ if $dataFile }}
+  {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
+  {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
+  {{ $pathParts := split $cleanPath "." }}
+
+  {{/* Navigate through the nested data structure */}}
+  {{ $data = index .Site.Data $cleanPath }}
+{{ end }}
+
+{{ if $data }}
+  {{/* Render Description */}}
+  {{ if $data.description }}
+    <div class="class-description">
+      <p>{{ $data.description | markdownify }}</p>
+    </div>
+  {{ end }}
+  {{/* Render Options as Table */}}
+  {{ if $data.options }}
+    <div class="class-options">
+      <h3 id="options" class="position-relative">
+        Options
+        <a href="#options" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+          <i class="fas fa-link fa-sm"></i>
+        </a>
+      </h3>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Default Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range $data.options }}
+            <tr>
+              <td><code>{{ .parameterName }}</code></td>
+              <td><code>{{ .type }}</code></td>
+              <td>{{ .description | markdownify }}</td>
+              <td>
+                {{ if .defaultValue }}
+                  <code>{{ .defaultValue }}</code>
+                {{ else }}
+                  <em>Not specified</em>
+                {{ end }}
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  {{ end }}
+  {{/* Render Examples */}}
+  {{ if $data.configurationSamples }}
+    <div class="class-examples">
+      <h3 id="examples" class="position-relative">
+        Examples
+        <a href="#examples" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+          <i class="fas fa-link fa-sm"></i>
+        </a>
+      </h3>
+      {{ range $data.configurationSamples }}
+        <div class="example-item">
+          <h4 id="example-{{ anchorize .name }}" class="position-relative">
+            {{ .name | title }}
+            <a href="#example-{{ anchorize .name }}" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+              <i class="fas fa-link fa-sm"></i>
+            </a>
+          </h4>
+          {{ if .description }}
+            <p>{{ .description | markdownify }}</p>
+          {{ end }}
+          {{ if .code }}
+            <pre><code class="language-json">{{ .code }}</code></pre>
+          {{ end }}
+        </div>
+      {{ end }}
+    </div>
+  {{ end }}
+  {{/* Additional Information */}}
+  {{ if or $data.status $data.processingTarget $data.className }}
+    <div class="class-metadata">
+      <h3 id="metadata" class="position-relative">
+        Metadata
+        <a href="#metadata" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+          <i class="fas fa-link fa-sm"></i>
+        </a>
+      </h3>
+      <dl class="row">
+        {{ if $data.className }}
+          <dt class="col-sm-3">Class Name</dt>
+          <dd class="col-sm-9"><code>{{ $data.className }}</code></dd>
+        {{ end }}
+        {{ if $data.status }}
+          <dt class="col-sm-3">Status</dt>
+          <dd class="col-sm-9">
+            <span class="badge badge-{{ if eq $data.status "alpha" }}warning{{ else if eq $data.status "beta" }}info{{ else }}success{{ end }}">
+              {{ $data.status | title }}
+            </span>
+          </dd>
+        {{ end }}
+        {{ if $data.processingTarget }}
+          <dt class="col-sm-3">Processing Target</dt>
+          <dd class="col-sm-9">{{ $data.processingTarget }}</dd>
+        {{ end }}
+        {{ if $data.typeName }}
+          <dt class="col-sm-3">Type</dt>
+          <dd class="col-sm-9">{{ $data.typeName }}</dd>
+        {{ end }}
+      </dl>
+    </div>
+  {{ end }}
+{{ else }}
+  <div class="alert alert-warning">
+    <strong>No data found!</strong>
+    {{ if $dataFile }}
+      Unable to load data from <code>{{ $dataFile }}</code>
+    {{ else }}
+      No <code>dataFile</code> parameter specified.
+    {{ end }}
+  </div>
+{{ end }}

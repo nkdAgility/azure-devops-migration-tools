@@ -1,0 +1,77 @@
+title: Azure DevOps Migration Tools
+
+publishDir: ../public
+resourceDir: ../resources
+
+summaryLength: 30
+
+enableRobotsTXT: true
+enableGitInfo: true
+
+# Disable default taxonomies (tags and categories)
+taxonomies: {}
+
+# Menu configuration
+# Sections will be automatically added via front matter in their _index.md files
+# Manual entries can still be added here if needed
+menu:
+  main:
+    - name: "Support"
+      pageRef: "/support"
+      weight: 50
+    - name: "Community"
+      url: "https://github.com/nkdAgility/azure-devops-migration-tools/discussions"
+      weight: 100
+
+# Site-wide parameters
+params:
+  description: "Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, Work Items, Tasks, Test Cases, and Plans & Suits from one Project to another in Azure DevOps / TFS both within the same Organisation, and between Organisations."
+  keywords: "Azure DevOps, Migration Tools, DevOps, Migration"
+  og_image: "/images/og-image.jpg" # URL to the default Open Graph image
+  siteProdUrl: "https://devopsmigration.io"
+  supportEmail: "support@devopsmigration.io"
+  githubUrl: "https://github.com/nkdAgility/azure-devops-migration-tools"
+  editPage: "https://github.com/nkdAgility/azure-devops-migration-tools/edit/main/"
+  googleTagId: "G-TSHSKGHDK"
+  version: "#{GitVersion.SemVer}#"
+  ring: "#{ToolsTemplates_AzureSitesConfig}#"
+  downloadUrl: "/download"
+  menu_image_light: "/images/logo-wide-transparent-light.png"
+  menu_image_dark: "/images/logo-wide-transparent-dark.png"
+
+# Enable sitemap and robots.txt
+sitemap:
+  filename: "sitemap.xml"
+  changefreq: "daily"
+  priority: 0.5
+
+# RSS feed settings
+rss:
+  filename: "rss.xml"
+  name: "RSS Feed"
+  description: "Subscribe to our RSS feed"
+
+outputs:
+  home: [html, json, rss]
+  section: [html, rss]
+  taxonomy: [html, rss]
+  term: [html, rss]
+  page: [html, rss]
+
+outputFormats:
+  json:
+    mediaType: "application/json"
+    baseName: "pages"
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true # Allows raw HTML in Markdown
+    extensions:
+      table: true
+      linkify: true
+      typographer: true
+    parser:
+      attribute:
+        block: true
+        title: true

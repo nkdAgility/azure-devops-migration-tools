@@ -1,13 +1,5 @@
 {
   "routes": [
-    {
-      "route": "/learn/azure-devops-migration-tools/*",
-      "redirect": "/{*}"
-    },
-    {
-      "route": "*/index.md",
-      "redirect": "{*}/"
-    }
   ],
   "responseOverrides": {
     "404": {

@@ -1,0 +1,37 @@
+{{/* Shortcode: class-description
+  Description: Displays the description of a class
+  Usage: {{< class-description
+>}}
+(uses current page's dataFile parameter) or: {{< class-description datafile="data/reference.someclass.yaml" >}} (uses specified datafile) Parameters: - datafile: Optional - The path to the data file to load. If not provided, uses .Page.Params.dataFile
+*/}}
+{{ $data := "" }}
+
+{{/* Use passed datafile parameter or fall back to page's dataFile parameter */}}
+{{ $dataFile := .Get "datafile" }}
+{{ if not $dataFile }}
+  {{ $dataFile = .Page.Params.dataFile }}
+{{ end }}
+
+{{/* Parse the data file path and load the YAML data */}}
+{{ if $dataFile }}
+  {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
+  {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
+  {{ $pathParts := split $cleanPath "." }}
+
+  {{/* Navigate through the nested data structure */}}
+  {{ $data = index .Site.Data $cleanPath }}
+{{ end }}
+
+{{/* Render Description */}}
+{{ if and $data $data.description }}
+  <div class="class-description">
+    <p>{{ $data.description | markdownify }}</p>
+  </div>
+{{ else if not $dataFile }}
+  <div class="alert alert-warning">
+    <strong>Warning:</strong> class-description shortcode requires either a page with a "dataFile" parameter or a "datafile" parameter. Usage: <code>{{ `< class-description >` }}</code> (with dataFile in front matter) or
+    <code>{{ `< class-description datafile="data/reference.someclass.yaml" >` }}</code>
+  </div>
+{{ else if not $data }}
+  <div class="alert alert-info"><strong>Info:</strong> No data found. Make sure the data file <code>{{ $dataFile }}</code> exists.</div>
+{{ end }}

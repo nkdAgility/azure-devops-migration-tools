@@ -1,0 +1,33 @@
+{{ $alertTypes := dict
+  "note" "info"
+  "tip" "success"
+  "important" "warning"
+  "warning" "warning"
+  "caution" "danger"
+}}
+{{ $alertEmoji := dict
+  "note" "ℹ️"
+  "tip" "💡"
+  "important" "⚠️"
+  "warning" "⚠️"
+  "caution" "🚨"
+}}
+
+{{ if eq .Type "alert" }}
+  <div class="alert alert-{{ index $alertTypes .AlertType | default "secondary" }}" role="alert">
+    {{ with .AlertTitle }}
+      <h4 class="alert-heading">
+        {{ index $alertEmoji .AlertType }}{{ if index $alertEmoji .AlertType }}{{ end }}{{ . }}
+      </h4>
+    {{ else }}
+      <h4 class="alert-heading">
+        {{ index $alertEmoji .AlertType }}{{ if index $alertEmoji .AlertType }}{{ end }}{{ .AlertType | title }}
+      </h4>
+    {{ end }}
+    {{ .Text | safeHTML }}
+  </div>
+{{ else }}
+  <blockquote class="blockquote">
+    {{ .Text | safeHTML }}
+  </blockquote>
+{{ end }}

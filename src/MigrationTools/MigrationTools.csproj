@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>..\..\docs\Reference\Generated\MigrationTools.xml</DocumentationFile>
+    <DocumentationFile>..\..\docs\data\generated\MigrationTools.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

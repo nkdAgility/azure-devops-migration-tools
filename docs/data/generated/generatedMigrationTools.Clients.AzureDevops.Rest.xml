@@ -1,0 +1,414 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MigrationTools.Clients.AzureDevops.Rest</name>
+    </assembly>
+    <members>
+        <member name="T:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions">
+            <summary>
+            Configuration options for the Keep Outbound Link Target Processor that preserves external links to specific Azure DevOps organizations and projects during migration cleanup operations.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions.#ctor">
+            <summary>
+            Initializes a new instance of the KeepOutboundLinkTargetProcessorOptions class with default settings.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions.WIQLQuery">
+            <summary>
+            WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions.TargetLinksToKeepOrganization">
+            <summary>
+            URL of the Azure DevOps organization whose links should be preserved during cleanup operations.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions.TargetLinksToKeepProject">
+            <summary>
+            Project name or GUID within the target organization whose links should be preserved.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions.CleanupFileName">
+            <summary>
+            File path where the cleanup script or batch file will be generated for removing unwanted outbound links.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions.PrependCommand">
+            <summary>
+            Command to prepend to each line in the cleanup script, such as "start" for Windows batch files.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.KeepOutboundLinkTargetProcessorOptions.DryRun">
+            <summary>
+            When true, performs a dry run without making actual changes, only generating the cleanup script for review.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions">
+            <summary>
+            Configuration options for the Outbound Link Checking Processor that validates work item links and identifies broken or invalid references.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions.WIQLQuery">
+            <summary>
+            WIQL (Work Item Query Language) query used to select the work items whose outbound links should be checked for validity.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Clients.AzureDevops.Rest.Processors.OutboundLinkCheckingProcessorOptions.ResultFileName">
+            <summary>
+            File name where the results of the outbound link checking process will be saved, typically containing details of broken or invalid links.
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Endpoints.AzureDevOpsEndpoint">
+            <summary>
+            Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.#ctor(Microsoft.Extensions.Options.IOptions{MigrationTools.Endpoints.AzureDevOpsEndpointOptions},MigrationTools.EndpointEnrichers.EndpointEnricherContainer,System.IServiceProvider,MigrationTools.ITelemetryLogger,Microsoft.Extensions.Logging.ILogger{MigrationTools.Endpoints.AzureDevOpsEndpoint})">
+            <summary>
+            Initializes a new instance of the AzureDevOpsEndpoint class with the specified configuration and dependencies.
+            </summary>
+            <param name="optipons">Configuration options for the Azure DevOps endpoint connection</param>
+            <param name="endpointEnrichers">Container for endpoint enrichers that can modify endpoint behavior</param>
+            <param name="serviceProvider">Service provider for dependency injection</param>
+            <param name="telemetry">Telemetry logger for tracking operations</param>
+            <param name="logger">Logger instance for diagnostic messages</param>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient(System.String)">
+            <summary>
+            Create a new instance of HttpClient including Headers
+            </summary>
+            <param name="route">route that is appended after organization and project to create the full api url</param>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient``1(System.String[])">
+            <summary>
+            Create a new instance of HttpClient including Headers
+            </summary>
+            <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetHttpClient(System.String,System.String,System.Object[])">
+            <summary>
+            Create a new instance of HttpClient including Headers
+            </summary>
+            <param name="url"></param>
+            <param name="versionParameter">allows caller to override the default api version (ie. api-version=5.1)</param>
+            <param name="routeParams">strings that are injected into the route parameters of the definitions url</param>
+            <returns>HttpClient</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetUriBuilderBasedOnEndpointAndType``1(System.String[])">
+            <summary>
+            Method to get the RESP API URLs right
+            </summary>
+            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+            <returns>UriBuilder</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionsAsync``1(System.String[],System.String,System.String,System.Boolean)">
+            <summary>
+            Generic Method to get API Definitions (Taskgroups, Variablegroups, Build- or Release Pipelines, ProcessDefinition)
+            </summary>
+            <typeparam name="DefinitionType">
+            Type of Definition. Can be: Taskgroup, Build- or Release Pipeline, ProcessDefinition
+            </typeparam>
+            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+            <param name="queryString">additional query string parameters passed to the underlying api call</param>
+            <param name="singleDefinitionQueryString">additional query string parameter passed when pulling the single instance details (ie. $expands, etc)</param>
+            <param name="queryForDetails">a boolean flag to allow caller to skip the calls for each individual definition details</param>
+            <returns>List of API Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.GetApiDefinitionAsync``1(System.String[],System.String)">
+            <summary>
+            Get a single instance of a defined type
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="routeParameters">strings that are injected into the route parameters of the definitions url</param>
+            <param name="queryString">additional query string parameters passed to the underlying api call</param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateTaskGroupsAsync(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Make HTTP Request to add Revision / Version of Task Group
+            </summary>
+            <param name="rootDefinitions"></param>
+            <param name="updatedDefinitions"></param>
+            <returns>List of Mappings</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.CreateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0},System.String[])">
+            <summary>
+            Make HTTP Request to create a Definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="definitionsToBeMigrated"></param>
+            <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+            <returns>List of Mappings</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.UpdateApiDefinitionsAsync``1(System.Collections.Generic.IEnumerable{``0},System.String[])">
+            <summary>
+            Make HTTP Request to update a Definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="definitionsToBeMigrated"></param>
+            <param name="parentIds">strings that are injected into the route parameters of the definitions url</param>
+            <returns>List of Mappings</returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.SyncDefinition``1(``0,``0,System.String[])">
+            <summary>
+            Performs an update or create operation on the target definition
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="sourceDef"></param>
+            <param name="targetDef"></param>
+            <param name="parentIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemGroupToNewPage(MigrationTools.DataContracts.Process.WorkItemGroup,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Move work item group to another page and section
+            </summary>
+            <param name="group"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="pageId"></param>
+            <param name="sectionId"></param>
+            <param name="oldPageId"></param>
+            <param name="oldSectionId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemGroupWithinPage(MigrationTools.DataContracts.Process.WorkItemGroup,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Move a work item group from one Layout->Section to another Layout->Section
+            </summary>
+            <param name="group"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="pageId"></param>
+            <param name="sectionId"></param>
+            <param name="oldSectionId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.MoveWorkItemControlToOtherGroup(MigrationTools.DataContracts.Process.WorkItemControl,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Move a work item control from out Layout->Group to another Layout->Group
+            </summary>
+            <param name="control"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="groupId"></param>
+            <param name="fieldName"></param>
+            <param name="oldGroupId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MigrationTools.Endpoints.AzureDevOpsEndpoint.AddWorkItemControlToGroup(MigrationTools.DataContracts.Process.WorkItemControl,System.String,System.String,System.String,System.String)">
+            <summary>
+            Adds a work item control to an existing Layout->Group
+            </summary>
+            <param name="control"></param>
+            <param name="processId"></param>
+            <param name="witRefName"></param>
+            <param name="groupId"></param>
+            <param name="fieldName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:MigrationTools.Endpoints.AzureDevOpsEndpointOptions">
+            <summary>
+            Configuration options for connecting to an Azure DevOps organization endpoint. Provides authentication and project access settings for Azure DevOps REST API operations.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Endpoints.AzureDevOpsEndpointOptions.AuthenticationMode">
+            <summary>
+            Authentication mode to use when connecting to Azure DevOps. Typically uses AccessToken for modern Azure DevOps organizations.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Endpoints.AzureDevOpsEndpointOptions.AccessToken">
+            <summary>
+            Personal Access Token (PAT) or other authentication token for accessing the Azure DevOps organization. Required for API authentication.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Endpoints.AzureDevOpsEndpointOptions.Organisation">
+            <summary>
+            URL of the Azure DevOps organization (e.g., "https://dev.azure.com/myorganization/"). Must include the full organization URL.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Endpoints.AzureDevOpsEndpointOptions.Project">
+            <summary>
+            Name of the Azure DevOps project within the organization to connect to. This is the project that will be used for migration operations.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Endpoints.AzureDevOpsEndpointOptions.ReflectedWorkItemIdField">
+            <summary>
+            Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.AzureDevOpsPipelineProcessor">
+            <summary>
+            Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Pipelines</processingtarget>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.MigratePipelinesAsync">
+            <summary>
+            Executes Method for migrating Taskgroups, Variablegroups or Pipelines, depinding on what
+            is set in the config.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FindExistingMappings``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.List{MigrationTools.DataContracts.Mapping})">
+            <summary>
+            Map the taskgroups that are already migrated
+            </summary>
+            <typeparam name="DefintionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <param name="newMappings"></param>
+            <returns>Mapping list</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutExistingDefinitions``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Filter existing Definitions
+            </summary>
+            <typeparam name="DefinitionType"></typeparam>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutIncompatibleBuildDefinitions(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.BuildDefinition},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskDefinition},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Mapping})">
+            <summary>
+            Filter incompatible TaskGroups
+            </summary>
+            <param name="sourceDefinitions"></param>
+            <param name="availableTasks"></param>
+            <param name="taskGroupMapping"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutExistingTaskGroups(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Filter existing TaskGroups
+            </summary>
+            <param name="sourceDefinitions"></param>
+            <param name="targetDefinitions"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.FilterOutIncompatibleTaskGroups(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup},System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskDefinition})">
+            <summary>
+            Filter incompatible TaskGroups
+            </summary>
+            <param name="filteredTaskGroups"></param>
+            <param name="availableTasks"></param>
+            <returns>List of filtered Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.SortDefinitionsByVersion(System.Collections.Generic.IEnumerable{MigrationTools.DataContracts.Pipelines.TaskGroup})">
+            <summary>
+            Group and Sort Definitions by Version numer
+            </summary>
+            <param name="sourceDefinitions"></param>
+            <returns>List of sorted Definitions</returns>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessor.GetSelectedDefinitionsFromEndpointAsync``1(MigrationTools.Endpoints.AzureDevOpsEndpoint,System.Collections.Generic.List{System.String})">
+            <summary>
+            Retrieve the selected pipeline definitions from the Azure DevOps Endpoint for the <typeparamref name="DefinitionType"/> type.
+            </summary>
+            <typeparam name="DefinitionType">The type of Pipeline definition to query. The type must inherit from <see cref="T:MigrationTools.DataContracts.RestApiDefinition"/>.</typeparam>
+            <param name="endpoint">The <see cref="T:MigrationTools.Endpoints.AzureDevOpsEndpoint"/> to query against.</param>
+            <param name="definitionNames">The list of definitions to query for. If the value is <c>null</c> or an empty list, all definitions will be queried.</param>
+            <returns></returns>
+        </member>
+        <member name="T:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions">
+            <summary>
+            Configuration options for the Azure DevOps Pipeline Processor that migrates build pipelines, release pipelines, task groups, variable groups, and service connections between Azure DevOps organizations.
+            </summary>
+        </member>
+        <member name="M:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.#ctor">
+            <summary>
+            Initializes a new instance of the AzureDevOpsPipelineProcessorOptions class with default settings.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateBuildPipelines">
+            <summary>
+            Migrate Build Pipelines
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateReleasePipelines">
+            <summary>
+            Migrate Release Pipelines
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateTaskGroups">
+            <summary>
+            Migrate Task Groups
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateVariableGroups">
+            <summary>
+            Migrate Variable Groups
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.MigrateServiceConnections">
+            <summary>
+            Migrate Service Connections **secrets need to be entered manually**
+            </summary>
+            <default>true</default>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.BuildPipelines">
+            <summary>
+            List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.ReleasePipelines">
+            <summary>
+            List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions.RepositoryNameMaps">
+            <summary>
+            Map of Source Repository to Target Repository Names 
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.ProcessDefinitionModel">
+            <summary>
+            Model that carries meta and state of an individual process definition
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.WorkItemTypeModel">
+            <summary>
+            Model that carries meta and state of an individual work item type
+            </summary>
+        </member>
+        <member name="T:MigrationTools.Processors.ProcessDefinitionProcessor">
+            <summary>
+            Process definition processor used to keep processes between two orgs in sync
+            </summary>
+            <status>Beta</status>
+            <processingtarget>Pipelines</processingtarget>
+        </member>
+        <member name="T:MigrationTools.Processors.ProcessDefinitionProcessorOptions">
+            <summary>
+            Configuration options for the Process Definition Processor that migrates Azure DevOps process definitions and work item types between organizations.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.ProcessDefinitionProcessorOptions.Processes">
+            <summary>
+            Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.ProcessDefinitionProcessorOptions.ProcessMaps">
+            <summary>
+            Dictionary mapping source process names to target process names for process template transformations during migration.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.ProcessDefinitionProcessorOptions.UpdateProcessDetails">
+            <summary>
+            Indicates whether to update existing process details in the target organization or only create new processes.
+            </summary>
+        </member>
+        <member name="P:MigrationTools.Processors.ProcessDefinitionProcessorOptions.MaxDegreeOfParallelism">
+            <summary>
+            Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.
+            </summary>
+        </member>
+    </members>
+</doc>

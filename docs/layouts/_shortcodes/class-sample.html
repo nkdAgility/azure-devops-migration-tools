@@ -1,0 +1,60 @@
+{{/* Shortcode: class-sample
+  Description: Displays a specific configuration sample for a class
+  Usage: {{< class-sample sample="classic"
+>}}
+(uses current page's dataFile parameter) or: {{< class-sample datafile="data/reference.someclass.yaml" sample="defaults" >}} (uses specified datafile) Parameters: - datafile: Optional - The path to the data file to load. If not provided, uses
+.Page.Params.dataFile - sample: Required - The name of the sample to display ("classic", "defaults", "sample", etc.) */}}
+{{ $data := "" }}
+{{ $sampleName := .Get "sample" }}
+
+{{/* Use passed datafile parameter or fall back to page's dataFile parameter */}}
+{{ $dataFile := .Get "datafile" }}
+{{ if not $dataFile }}
+  {{ $dataFile = .Page.Params.dataFile }}
+{{ end }}
+
+{{/* Parse the data file path and load the YAML data */}}
+{{ if $dataFile }}
+  {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
+  {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
+  {{ $pathParts := split $cleanPath "." }}
+
+  {{/* Navigate through the nested data structure */}}
+  {{ $data = index .Site.Data $cleanPath }}
+{{ end }}
+
+{{/* Find and render the specific sample */}}
+{{ if and $data $data.configurationSamples $sampleName }}
+  {{ $foundSample := false }}
+  {{ range $data.configurationSamples }}
+    {{ if eq .name $sampleName }}
+      {{ $foundSample = true }}
+      <div class="example-item">
+        <h4 id="example-{{ anchorize .name }}" class="position-relative">
+          {{ .name | title }}
+          <a href="#example-{{ anchorize .name }}" class="text-decoration-none text-muted ms-2" title="Link to this heading">
+            <i class="fas fa-link fa-sm"></i>
+          </a>
+        </h4>
+        {{ if .description }}
+          <p>{{ .description | markdownify }}</p>
+        {{ end }}
+        {{ if .code }}
+          <pre><code class="language-json">{{ .code }}</code></pre>
+        {{ end }}
+      </div>
+    {{ end }}
+  {{ end }}
+  {{ if not $foundSample }}
+    <div class="alert alert-warning"><strong>Warning:</strong> Sample "{{ $sampleName }}" not found in the data file.</div>
+  {{ end }}
+{{ else if not $sampleName }}
+  <div class="alert alert-warning"><strong>Warning:</strong> class-sample shortcode requires a "sample" parameter. Usage: <code>{{ `< class-sample sample="classic" >` }}</code></div>
+{{ else if not $dataFile }}
+  <div class="alert alert-warning">
+    <strong>Warning:</strong> class-sample shortcode requires either a page with a "dataFile" parameter or a "datafile" parameter. Usage: <code>{{ `< class-sample sample="classic" >` }}</code> (with dataFile in front matter) or
+    <code>{{ `< class-sample datafile="data/reference.someclass.yaml" sample="classic" >` }}</code>
+  </div>
+{{ else if not $data }}
+  <div class="alert alert-info"><strong>Info:</strong> No data found. Make sure the data file <code>{{ $dataFile }}</code> exists.</div>
+{{ end }}
