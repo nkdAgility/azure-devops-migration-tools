@@ -11,7 +11,8 @@
     })(window,document,'script','dataLayer','{{ .Site.Params.googleTagId }}');</script>
     <!-- End Google Tag Manager -->
     <title>{{ .Title }} | {{ .Site.Title }}</title>
-    <link rel="icon" href="{{ .Site.Params.favicon | default "/favicon.ico" }}" type="image/x-icon" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <meta name="description" content="{{ ( .Page.Params.description | default  .Site.Params.description) | plainify }}" />
     <meta name="keywords" content="{{ .Keywords | default .Site.Params.keywords }}" />
     <link rel="canonical" href="{{ .Site.Params.siteProdUrl }}{{ .RelPermalink }}" />
