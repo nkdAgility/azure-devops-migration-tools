@@ -81,15 +81,31 @@ jobs:
     - uses: dorny/paths-filter@v3
       id: filter
       with:
+        list-files: json
         filters: |
           src:
-            - '**'
-            - '!docs/**'
+            - 'src/**'
           docs:
             - 'docs/**'
           automation:
             - 'build/**'
-            - '.github/workflows/**'
+            - '.github/**'
+    - name: "Debug Filter Results"
+      shell: pwsh
+      run: |
+        Write-Output "=== PATH FILTER DEBUG ==="
+        Write-Output "src filter result: ${{ steps.filter.outputs.src }}"
+        Write-Output "docs filter result: ${{ steps.filter.outputs.docs }}"
+        Write-Output "automation filter result: ${{ steps.filter.outputs.automation }}"
+        Write-Output "src files:"
+        Write-Output '${{ steps.filter.outputs.src_files }}'
+        Write-Output "docs files:"
+        Write-Output '${{ steps.filter.outputs.docs_files }}'
+        Write-Output "automation files:"
+        Write-Output '${{ steps.filter.outputs.automation_files }}'
+        Write-Output "changes array:"
+        Write-Output '${{ steps.filter.outputs.changes }}'
+        Write-Output "========================="
     - name: "Build NKDAgility Outputs"
       shell: pwsh
       id: nkdagility
