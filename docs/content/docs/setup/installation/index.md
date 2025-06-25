@@ -4,12 +4,13 @@ description: |
   Install the Azure DevOps Migration Tools on Windows.
   These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.
 short_title: Installation
-discussionId:
 aliases:
-  - /installation/
-  - /setup/installation/
----
+- /installation/
+- /setup/installation/
+date: 2025-06-24T09:30:12Z
+discussionId: 2824
 
+---
 Install the Azure DevOps Migration Tools on Windows.
 
 These tools are available as a portable application and can be installed in a number of ways, including manually from a zip.

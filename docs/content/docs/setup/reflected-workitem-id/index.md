@@ -4,11 +4,12 @@ short_title: ReflectedWorkItemId
 description: |
   The Azure DevOps migrations Tools has no internal state, and uses a field on the work item to track the migration of work items. This field is always referred to in the docs as `ReflectedWorkItemId` and is used to track the work item in the target.
 redirect_from:
-  - /Reference/ReflectedWorkItemId/
-  - /server-configuration/
+- /Reference/ReflectedWorkItemId/
+- /server-configuration/
 date: 2025-06-24T12:07:31Z
----
+discussionId: 2825
 
+---
 The Azure DevOps migrations Tools has no internal state, and uses a field on the work item to track the migration of work items. This field is always referred to in the docs as `ReflectedWorkItemId` and is used to track the work item in the target. It enables the ability to resume migrations as well as to be able to scope the work items based on a query and have multiple runs overlap.
 
 Se below how to add the `ReflectedWorkItemId` to your target project as its different for Azure DevOps, TFS, and if you imported your Collection from TFS to Azure DevOps.

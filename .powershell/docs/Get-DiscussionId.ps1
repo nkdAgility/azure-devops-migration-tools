@@ -703,7 +703,7 @@ This discussion is for questions, feedback, and community support related to the
 }
 
 # Main processing
-$hugoMarkdownObjects = Get-RecentHugoMarkdownResources -Path ".\docs\content\docs\reference\" 
+$hugoMarkdownObjects = Get-RecentHugoMarkdownResources -Path ".\docs\content\docs\" 
 
 Write-InformationLog "Processing ({count}) HugoMarkdown Objects." -PropertyValues ($hugoMarkdownObjects.Count)
 
@@ -755,7 +755,7 @@ foreach ($hugoMarkdown in $hugoMarkdownObjects) {
                     $docUrl = "https://devopsmigration.io/docs/reference/$($hugoMarkdown.FrontMatter.slug)/"
                 }
                 elseif ($hugoMarkdown.ReferencePath) {
-                    $relativePath = $hugoMarkdown.ReferencePath.Replace('docs/', '').Replace('\', '/')
+                    $relativePath = $hugoMarkdown.ReferencePath.Replace('\', '/')
                     $docUrl = "https://devopsmigration.io/$relativePath/"
                 }
                 

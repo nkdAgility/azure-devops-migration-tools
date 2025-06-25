@@ -4,11 +4,11 @@
     <div class="container">
       <div class="row align-items-center min-vh-50">
         <div class="col-lg-8 mx-auto text-center">
-          <img src="/images/azure-devops-migration-tools-logo.png" alt="Azure DevOps Migration Tools Logo" class="mb-4" style="max-width: 400px;" />
+          <img src="/images/azure-devops-migration-tools-logo-wide-dark.png" alt="Azure DevOps Migration Tools Logo" class="mb-4" style="max-width: 400px;" />
           <h1 class="display-3 fw-bold mb-4">Migrate your Azure DevOps data with confidence</h1>
           <p class="lead mb-4 fs-4">The most comprehensive tool for bulk editing and migrating data between Team Projects on Microsoft Team Foundation Server (TFS) and Azure DevOps Services.</p>
           <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="/docs/get-started/" class="btn btn-light btn-lg px-4 py-3"> <i class="fas fa-rocket me-2"></i>Get Started </a>
+            <a href="{{ relref . "/docs/get-started" }}" class="btn btn-light btn-lg px-4 py-3"> <i class="fas fa-rocket me-2"></i>Get Started </a>
             <a href="https://github.com/nkdAgility/azure-devops-migration-tools" class="btn btn-outline-light btn-lg px-4 py-3"> <i class="fab fa-github me-2"></i>View on GitHub </a>
           </div>
           
@@ -216,8 +216,8 @@
               <code class="text-light">winget install nkdAgility.AzureDevOpsMigrationTools</code>
             </div>
             <div class="d-flex gap-3 justify-content-center flex-wrap">
-              <a href="/docs/get-started/" class="btn btn-light btn-lg"> <i class="fas fa-book-open me-2"></i>View Documentation </a>
-              <a href="/download" class="btn btn-outline-light btn-lg"> <i class="fas fa-download me-2"></i>Download </a>
+              <a href="{{ relref . "/docs/get-started" }}" class="btn btn-light btn-lg"> <i class="fas fa-book-open me-2"></i>View Documentation </a>
+              <a href="{{ relref . "/download" }}" class="btn btn-outline-light btn-lg"> <i class="fas fa-download me-2"></i>Download </a>
             </div>
           </div>
         </div>
@@ -251,7 +251,7 @@
               <h4 class="text-center fw-bold mb-3">Commercial Support</h4>
               <p class="text-muted text-center mb-4">Need professional assistance with your migration? Our Azure DevOps Migration Services provide expert guidance and hands-on support.</p>
               <div class="text-center">
-                <a href="/support/" class="btn btn-primary">Learn More</a>
+                <a href="{{ relref . "/support" }}" class="btn btn-primary">Learn More</a>
               </div>
             </div>
           </div>
