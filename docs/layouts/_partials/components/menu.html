@@ -51,7 +51,7 @@
         <div class="dropdown">
           <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="versionsDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Documentation Versions">
             <i class="fas fa-code-branch me-1"></i>
-            {{ hugo.Environment}}
+            {{ hugo.Environment | title}}
           </button>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="versionsDropdown" style="min-width: 300px;">
             <h6 class="dropdown-header">
@@ -59,17 +59,57 @@
             </h6>
             <div class="dropdown-item-text">
               <a href="https://devopsmigration.io{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+                {{ if eq hugo.Environment "production" }}
+                <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded mb-2 dropdown-item-hover position-relative">
+                  <span class="small fw-medium text-dark d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Production
+                    <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
+                  </span>
+                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools" alt="Azure DevOps Migration Tools Release Version" />
+                </div>
+                {{ else }}
                 <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded mb-2 dropdown-item-hover">
                   <span class="small fw-medium text-dark">Production</span>
                   <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools" alt="Azure DevOps Migration Tools Release Version" />
                 </div>
+                {{ end }}
               </a>
               <a href="https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+                {{ if eq hugo.Environment "preview" }}
+                <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded dropdown-item-hover position-relative">
+                  <span class="small fw-medium text-dark d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Preview
+                    <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
+                  </span>
+                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases" alt="Azure DevOps Migration Tools Preview Version" />
+                </div>
+                {{ else }}
                 <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded dropdown-item-hover">
                   <span class="small fw-medium text-dark">Preview</span>
                   <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases" alt="Azure DevOps Migration Tools Preview Version" />
                 </div>
+                {{ end }}
               </a>
+               {{ if or (ne hugo.Environment "production") (ne hugo.Environment "preview") }}
+               <hr />
+               <a href="https://devopsmigration.io{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+                <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded mb-2 dropdown-item-hover position-relative">
+                  <span class="small fw-medium text-dark d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    {{hugo.Environment | title}}
+   
+                    <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
+                  </span>
+                   {{ if ne hugo.Environment "development" }}
+                   {{ .Site.Params.version }}
+                   {{ else }}
+                   v0.0.0
+                   {{ end }}
+                </div>
+              </a>             
+               {{ end }}
             </div>
           </div>
         </div>
@@ -112,6 +152,15 @@
   
   [data-bs-theme="dark"] .dropdown-header {
     color: #adb5bd !important;
+  }
+  
+  /* Current version indicator styling for dark mode */
+  [data-bs-theme="dark"] .bg-success.bg-opacity-25 {
+    background-color: rgba(25, 135, 84, 0.3) !important;
+  }
+  
+  [data-bs-theme="dark"] .border-success {
+    border-color: #198754 !important;
   }
 </style>
 <script>
