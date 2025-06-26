@@ -58,6 +58,14 @@
               <i class="fas fa-code-branch me-2"></i>Documentation Versions
             </h6>
             <div class="dropdown-item-text">
+            {{/* Fetch GitHub releases */}}
+            {{ $releases := resources.GetRemote "https://api.github.com/repos/nkdAgility/azure-devops-migration-tools/releases" }}
+            {{ $releases = $releases | transform.Unmarshal }}
+            {{/* Get latest stable and prerelease versions */}}
+            {{ $latestRelease := index (where $releases "prerelease" false) 0 }}
+            {{ $latestPrerelease := index (where $releases "prerelease" true) 0 }}
+              
+
               <a href="https://devopsmigration.io{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
                 {{ if eq hugo.Environment "production" }}
                 <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded mb-2 dropdown-item-hover position-relative">
@@ -66,12 +74,12 @@
                     Production
                     <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
                   </span>
-                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools" alt="Azure DevOps Migration Tools Release Version" />
+                  <span class="badge bg-primary text-white">{{ $latestRelease.tag_name}}</span>
                 </div>
                 {{ else }}
                 <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded mb-2 dropdown-item-hover">
                   <span class="small fw-medium text-dark">Production</span>
-                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools" alt="Azure DevOps Migration Tools Release Version" />
+                  <span class="badge bg-primary text-white">{{ $latestRelease.tag_name}}</span>
                 </div>
                 {{ end }}
               </a>
@@ -83,12 +91,12 @@
                     Preview
                     <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
                   </span>
-                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases" alt="Azure DevOps Migration Tools Preview Version" />
+                  <span class="badge preview-badge">{{ $latestPrerelease.tag_name }}</span>
                 </div>
                 {{ else }}
                 <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded dropdown-item-hover">
                   <span class="small fw-medium text-dark">Preview</span>
-                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases" alt="Azure DevOps Migration Tools Preview Version" />
+                  <span class="badge preview-badge">{{ $latestPrerelease.tag_name }}</span>
                 </div>
                 {{ end }}
               </a>
@@ -103,9 +111,9 @@
                     <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
                   </span>
                    {{ if ne hugo.Environment "development" }}
-                   {{ .Site.Params.version }}
+                   <span class="badge bg-danger ">{{ .Site.Params.version }}</span>
                    {{ else }}
-                   v0.0.0
+                   <span class="badge bg-danger">v0.0.0</span>
                    {{ end }}
                 </div>
               </a>             
@@ -161,6 +169,17 @@
   
   [data-bs-theme="dark"] .border-success {
     border-color: #198754 !important;
+  }
+  
+  /* Preview badge styling for better contrast */
+  .preview-badge {
+    background-color: #fd7e14 !important; /* Orange background */
+    color: white !important;
+  }
+  
+  [data-bs-theme="dark"] .preview-badge {
+    background-color: #e67e22 !important; /* Darker orange for dark mode */
+    color: white !important;
   }
 </style>
 <script>
