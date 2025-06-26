@@ -72,19 +72,19 @@ class Program
 
             saveData.WriteYamlDataToDataFolder(classData);
             Console.Write($" [Yaml]");
-            
-            saveData.WriteJsonSchemaToDataFolder(classData);
+
+            saveData.WriteJsonSchemaToDataFolder(classData, classDataList);
             Console.Write($" [Schema]");
-            
+
             // Removed markdown generation as it's no longer needed
             Console.WriteLine();
         }
-        
+
         // Generate the complete configuration schema
         Console.Write("Out: Full Configuration Schema");
         saveData.WriteFullConfigurationSchema(classDataList);
         Console.WriteLine(" [Schema]");
-        
+
         Console.WriteLine("-----------");
 
     }

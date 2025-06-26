@@ -34,29 +34,29 @@ namespace MigrationTools.ConsoleDataGenerator
             return yaml;
         }
 
-        public string WriteJsonSchemaToDataFolder(ClassData data)
+        public string WriteJsonSchemaToDataFolder(ClassData data, List<ClassData> allClassData = null)
         {
             // Ensure the schema directory exists
             Directory.CreateDirectory(schemaPath);
 
             string filename = $"schema.{data.TypeName}.{data.ClassName}";
             string filePath = Path.Combine(schemaPath, filename.ToLower());
-            string jsonSchema = GenerateJsonSchemaForClass(data);
+            string jsonSchema = GenerateJsonSchemaForClass(data, allClassData);
             File.WriteAllText($"{filePath}.json", jsonSchema);
             return jsonSchema;
         }
 
-        public static string GenerateJsonSchemaForClass(ClassData data)
+        public static string GenerateJsonSchemaForClass(ClassData data, List<ClassData> allClassData = null)
         {
             try
             {
                 // Create a JSON schema using Newtonsoft.Json.Schema
                 var generator = new JSchemaGenerator();
-                
+
                 // Configure the generator
                 generator.SchemaIdGenerationHandling = SchemaIdGenerationHandling.TypeName;
                 generator.SchemaLocationHandling = SchemaLocationHandling.Definitions;
-                
+
                 // Create a basic object schema
                 var schema = new JSchema
                 {
@@ -77,8 +77,35 @@ namespace MigrationTools.ConsoleDataGenerator
                         Description = option.Description.ToString()
                     };
 
+                    // Special handling for FieldMappingTool's fieldMaps property
+                    if (data.ClassName.Equals("FieldMappingTool", StringComparison.OrdinalIgnoreCase) &&
+                        propertyName.Equals("fieldMaps", StringComparison.OrdinalIgnoreCase) &&
+                        allClassData != null)
+                    {
+                        // Get all field map classes
+                        var fieldMaps = allClassData.Where(cd => cd.TypeName.Equals("FieldMaps", StringComparison.OrdinalIgnoreCase)).ToList();
+
+                        if (fieldMaps.Any())
+                        {
+                            // Create array schema with oneOf for different field map types
+                            propertySchema = new JSchema
+                            {
+                                Type = JSchemaType.Array,
+                                Description = option.Description.ToString()
+                            };
+
+                            // Create the items schema with oneOf
+                            var itemsSchema = new JSchema();
+                            foreach (var fm in fieldMaps)
+                            {
+                                itemsSchema.OneOf.Add(CreateSchemaFromClassData(fm));
+                            }
+                            propertySchema.Items.Add(itemsSchema);
+                        }
+                    }
+
                     // Add default value if available and not "missing XML code comments"
-                    if (option.DefaultValue != null && 
+                    if (option.DefaultValue != null &&
                         !option.DefaultValue.ToString().Contains("missing XML code comments") &&
                         !string.IsNullOrEmpty(option.DefaultValue.ToString()))
                     {
@@ -133,16 +160,16 @@ namespace MigrationTools.ConsoleDataGenerator
                 var migrationToolsSchema = new JSchema { Type = JSchemaType.Object };
 
                 // Add version property
-                migrationToolsSchema.Properties.Add("version", new JSchema 
-                { 
-                    Type = JSchemaType.String, 
-                    Description = "Version of the migration tools configuration format" 
+                migrationToolsSchema.Properties.Add("version", new JSchema
+                {
+                    Type = JSchemaType.String,
+                    Description = "Version of the migration tools configuration format"
                 });
 
                 // Add endpoints section
                 var endpointsSchema = new JSchema { Type = JSchemaType.Object };
                 var endpointClasses = allClassData.Where(cd => cd.TypeName.Equals("Endpoints", StringComparison.OrdinalIgnoreCase)).ToList();
-                
+
                 foreach (var endpointClass in endpointClasses)
                 {
                     var endpointSchema = CreateSchemaFromClassData(endpointClass);
@@ -153,17 +180,17 @@ namespace MigrationTools.ConsoleDataGenerator
                 // Add processors section
                 var processorsSchema = new JSchema { Type = JSchemaType.Array };
                 var processorClasses = allClassData.Where(cd => cd.TypeName.Equals("Processors", StringComparison.OrdinalIgnoreCase)).ToList();
-                
+
                 if (processorClasses.Any())
                 {
                     var processorUnion = new JSchema();
                     foreach (var processorClass in processorClasses)
                     {
                         var processorSchema = CreateSchemaFromClassData(processorClass);
-                        processorSchema.Properties.Add("processorType", new JSchema 
-                        { 
-                            Type = JSchemaType.String, 
-                            Enum = { processorClass.ClassName } 
+                        processorSchema.Properties.Add("processorType", new JSchema
+                        {
+                            Type = JSchemaType.String,
+                            Enum = { processorClass.ClassName }
                         });
                         processorUnion.AnyOf.Add(processorSchema);
                     }
@@ -174,7 +201,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 // Add tools section
                 var toolsSchema = new JSchema { Type = JSchemaType.Object };
                 var toolClasses = allClassData.Where(cd => cd.TypeName.Equals("Tools", StringComparison.OrdinalIgnoreCase)).ToList();
-                
+
                 foreach (var toolClass in toolClasses)
                 {
                     var toolSchema = CreateSchemaFromClassData(toolClass);
@@ -185,14 +212,14 @@ namespace MigrationTools.ConsoleDataGenerator
                 fullSchema.Properties.Add("MigrationTools", migrationToolsSchema);
 
                 // Add Serilog section for logging configuration
-                var serilogSchema = new JSchema 
-                { 
+                var serilogSchema = new JSchema
+                {
                     Type = JSchemaType.Object,
                     Description = "Serilog logging configuration"
                 };
-                serilogSchema.Properties.Add("MinimumLevel", new JSchema 
-                { 
-                    Type = JSchemaType.String, 
+                serilogSchema.Properties.Add("MinimumLevel", new JSchema
+                {
+                    Type = JSchemaType.String,
                     Description = "Minimum logging level",
                     Enum = { "Verbose", "Debug", "Information", "Warning", "Error", "Fatal" }
                 });
@@ -225,7 +252,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 };
 
                 // Add default value if available and not "missing XML code comments"
-                if (option.DefaultValue != null && 
+                if (option.DefaultValue != null &&
                     !option.DefaultValue.ToString().Contains("missing XML code comments") &&
                     !string.IsNullOrEmpty(option.DefaultValue.ToString()))
                 {
