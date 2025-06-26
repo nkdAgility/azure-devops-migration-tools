@@ -100,7 +100,7 @@
                 </div>
                 {{ end }}
               </a>
-               {{ if or (ne hugo.Environment "production") (ne hugo.Environment "preview") }}
+               {{ if and (ne hugo.Environment "production") (ne hugo.Environment "preview") }}
                <hr />
                <a href="https://devopsmigration.io{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
                 <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded mb-2 dropdown-item-hover position-relative">
