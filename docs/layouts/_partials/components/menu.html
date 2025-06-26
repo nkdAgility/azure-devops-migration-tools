@@ -47,6 +47,33 @@
           </div>
         </form>
 
+        <!-- Document Versions dropdown -->
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="versionsDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Documentation Versions">
+            <i class="fas fa-code-branch me-1"></i>
+            {{ hugo.Environment}}
+          </button>
+          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="versionsDropdown" style="min-width: 300px;">
+            <h6 class="dropdown-header">
+              <i class="fas fa-code-branch me-2"></i>Documentation Versions
+            </h6>
+            <div class="dropdown-item-text">
+              <a href="https://devopsmigration.io{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+                <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded mb-2 dropdown-item-hover">
+                  <span class="small fw-medium text-dark">Production</span>
+                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools" alt="Azure DevOps Migration Tools Release Version" />
+                </div>
+              </a>
+              <a href="https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+                <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded dropdown-item-hover">
+                  <span class="small fw-medium text-dark">Preview</span>
+                  <img src="https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases" alt="Azure DevOps Migration Tools Preview Version" />
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- Download button -->
         <a href="{{ relref . .Site.Params.downloadUrl }}" class="btn btn-primary btn-sm">
           <i class="fas fa-download me-1"></i>
@@ -58,12 +85,54 @@
 </nav>
 
 <!-- Theme toggle functionality -->
+<style>
+  .dropdown-item-hover:hover {
+    background-color: #e9ecef !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+  }
+  
+  /* Dark mode styles for dropdown content */
+  [data-bs-theme="dark"] .dropdown-item-hover {
+    background-color: #495057 !important;
+  }
+  
+  [data-bs-theme="dark"] .dropdown-item-hover:hover {
+    background-color: #6c757d !important;
+  }
+  
+  [data-bs-theme="dark"] .dropdown-item-text .text-dark {
+    color: #fff !important;
+  }
+  
+  [data-bs-theme="dark"] .dropdown-menu {
+    background-color: #212529 !important;
+    border-color: #495057 !important;
+  }
+  
+  [data-bs-theme="dark"] .dropdown-header {
+    color: #adb5bd !important;
+  }
+</style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const themeToggle = document.getElementById("themeToggle");
     const themeIcon = document.getElementById("themeIcon");
     const body = document.body;
     const navbar = document.querySelector(".navbar");
+
+    // Function to update theme-aware button styling
+    function updateButtonStyling(theme) {
+      const versionsDropdown = document.getElementById("versionsDropdown");
+      
+      if (theme === "dark") {
+        versionsDropdown.style.color = "#fff";
+        versionsDropdown.style.borderColor = "#6c757d";
+      } else {
+        versionsDropdown.style.color = "#212529";
+        versionsDropdown.style.borderColor = "#6c757d";
+      }
+    }
 
     // Function to update all theme-aware images
     function updateThemeImages(theme) {
@@ -94,10 +163,12 @@
       themeIcon.classList.remove("fa-sun");
       themeIcon.classList.add("fa-moon");
       updateThemeImages("dark");
+      updateButtonStyling("dark");
     } else {
       // Ensure light theme has transparent background
       navbar.style.backgroundColor = "transparent";
       updateThemeImages("light");
+      updateButtonStyling("light");
     }
 
     // Theme toggle click handler
