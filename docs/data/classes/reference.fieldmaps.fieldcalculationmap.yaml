@@ -71,26 +71,26 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.FieldCalculationMapOptions
-description: missing XML code comments
+description: Performs mathematical calculations on numeric fields using NCalc expressions during migration.
 className: FieldCalculationMap
 typeName: FieldMaps
 options:
 - parameterName: ApplyTo
   type: List
-  description: missing XML code comments
+  description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
 - parameterName: expression
   type: String
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., "[x]*2").
+  defaultValue: null
 - parameterName: parameters
   type: Dictionary
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Gets or sets a dictionary mapping variable names used in the expression to source field reference names.
+  defaultValue: '{}'
 - parameterName: targetField
   type: String
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Gets or sets the target field reference name where the calculated result will be stored.
+  defaultValue: null
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldCalculationMap.cs

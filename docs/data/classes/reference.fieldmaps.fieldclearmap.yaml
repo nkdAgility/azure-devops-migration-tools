@@ -59,17 +59,17 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.FieldClearMapOptions
-description: missing XML code comments
+description: Clears a target field by setting its value to null, useful for removing data from specific fields during migration.
 className: FieldClearMap
 typeName: FieldMaps
 options:
 - parameterName: ApplyTo
   type: List
-  description: missing XML code comments
+  description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
 - parameterName: targetField
   type: String
-  description: missing XML code comments
+  description: Gets or sets the name of the target field to be cleared/set to null during work item migration.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

@@ -70,55 +70,55 @@ configurationSamples:
       "TargetName": "targetName"
     }
   sampleFor: MigrationTools.Processors.AzureDevOpsPipelineProcessorOptions
-description: missing XML code comments
+description: Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
 className: AzureDevOpsPipelineProcessor
 typeName: Processors
 options:
 - parameterName: BuildPipelines
   type: List
-  description: missing XML code comments
+  description: List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
   defaultValue: missing XML code comments
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: MigrateBuildPipelines
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Migrate Build Pipelines
+  defaultValue: true
 - parameterName: MigrateReleasePipelines
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Migrate Release Pipelines
+  defaultValue: true
 - parameterName: MigrateServiceConnections
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Migrate Service Connections **secrets need to be entered manually**
+  defaultValue: true
 - parameterName: MigrateTaskGroups
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Migrate Task Groups
+  defaultValue: true
 - parameterName: MigrateVariableGroups
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Migrate Variable Groups
+  defaultValue: true
 - parameterName: ReleasePipelines
   type: List
-  description: missing XML code comments
+  description: List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
   defaultValue: missing XML code comments
 - parameterName: RepositoryNameMaps
   type: Dictionary
-  description: missing XML code comments
+  description: Map of Source Repository to Target Repository Names
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
-status: missing XML code comments
-processingTarget: missing XML code comments
+status: Beta
+processingTarget: Pipelines
 classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessorOptions.cs

@@ -14,7 +14,9 @@ namespace MigrationTools.ConsoleDataGenerator
         private IConfiguration configuration;
         public ClassDataLoader(string rootPath, DataSerialization saveData, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
-            codeDocs = new CodeDocumentation(Path.Combine(rootPath, "docs/data/classes/"));
+            // XML documentation files are in the binary output directory
+            string xmlDocsPath = AppDomain.CurrentDomain.BaseDirectory;
+            codeDocs = new CodeDocumentation(xmlDocsPath);
             codeFinder = new CodeFileFinder(rootPath);
             this.saveData = saveData;
             this.configuration = configuration;

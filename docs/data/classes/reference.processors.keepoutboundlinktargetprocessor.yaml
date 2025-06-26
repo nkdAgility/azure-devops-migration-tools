@@ -20,7 +20,7 @@ configurationSamples:
       "Enabled": false,
       "WIQLQuery": "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'",
       "TargetLinksToKeepOrganization": "https://dev.azure.com/nkdagility",
-      "TargetLinksToKeepProject": "4c7f87c0-b786-4b93-9d3b-61e362802c98",
+      "TargetLinksToKeepProject": "09d3cbab-3cbb-47e6-99e1-4028fa6dd9d0",
       "CleanupFileName": "c:/temp/OutboundLinkTargets.bat",
       "PrependCommand": "start",
       "DryRun": true,
@@ -34,39 +34,39 @@ typeName: Processors
 options:
 - parameterName: CleanupFileName
   type: String
-  description: missing XML code comments
+  description: File path where the cleanup script or batch file will be generated for removing unwanted outbound links.
   defaultValue: missing XML code comments
 - parameterName: DryRun
   type: Boolean
-  description: missing XML code comments
+  description: When true, performs a dry run without making actual changes, only generating the cleanup script for review.
   defaultValue: missing XML code comments
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: PrependCommand
   type: String
-  description: missing XML code comments
+  description: Command to prepend to each line in the cleanup script, such as "start" for Windows batch files.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetLinksToKeepOrganization
   type: String
-  description: missing XML code comments
+  description: URL of the Azure DevOps organization whose links should be preserved during cleanup operations.
   defaultValue: missing XML code comments
 - parameterName: TargetLinksToKeepProject
   type: String
-  description: missing XML code comments
+  description: Project name or GUID within the target organization whose links should be preserved.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
-  description: missing XML code comments
+  description: WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

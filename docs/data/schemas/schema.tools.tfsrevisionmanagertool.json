@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/tools/tfsrevisionmanagertool",
+  "title": "TfsRevisionManagerTool",
+  "description": "The TfsRevisionManagerTool manipulates the revisions of a work item to reduce the number of revisions that are migrated.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "maxRevisions": {
+      "description": "Sets the maximum number of revisions that will be migrated. \"First + Last N = Max\". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.",
+      "type": "integer",
+      "default": "0"
+    },
+    "replayRevisions": {
+      "description": "You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.",
+      "type": "boolean",
+      "default": "true"
+    }
+  }
+}

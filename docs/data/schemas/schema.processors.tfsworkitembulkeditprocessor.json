@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/processors/tfsworkitembulkeditprocessor",
+  "title": "TfsWorkItemBulkEditProcessor",
+  "description": "This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "filterWorkItemsThatAlreadyExistInTarget": {
+      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+      "type": "boolean",
+      "default": "true"
+    },
+    "pauseAfterEachWorkItem": {
+      "description": "Pause after each work item is migrated",
+      "type": "boolean",
+      "default": "false"
+    },
+    "sourceName": {
+      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+      "type": "string"
+    },
+    "targetName": {
+      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+      "type": "string"
+    },
+    "whatIf": {
+      "description": "Gets or sets a value indicating whether to run in \"what if\" mode without making actual changes to work items.",
+      "type": "boolean",
+      "default": "false"
+    },
+    "wIQLQuery": {
+      "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+      "type": "string",
+      "default": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
+    },
+    "workItemCreateRetryLimit": {
+      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+      "type": "integer",
+      "default": "5"
+    },
+    "workItemIDs": {
+      "description": "A list of work items to import",
+      "type": "array",
+      "default": "[]"
+    }
+  }
+}

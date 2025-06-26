@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/fieldmaps/regexfieldmap",
+  "title": "RegexFieldMap",
+  "description": "Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.",
+  "type": "object",
+  "properties": {
+    "applyTo": {
+      "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+      "type": "array"
+    },
+    "pattern": {
+      "description": "Gets or sets the regular expression pattern to match against the source field value.",
+      "type": "string"
+    },
+    "replacement": {
+      "description": "Gets or sets the replacement pattern that defines how matched groups should be used to construct the target value.",
+      "type": "string"
+    },
+    "sourceField": {
+      "description": "Gets or sets the name of the source field to read data from and apply regex pattern matching.",
+      "type": "string"
+    },
+    "targetField": {
+      "description": "Gets or sets the name of the target field to write the regex-transformed data to.",
+      "type": "string"
+    }
+  }
+}

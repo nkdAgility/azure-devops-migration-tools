@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/tools/tfsteamsettingstool",
+  "title": "TfsTeamSettingsTool",
+  "description": "Tool for migrating team settings including team configurations, area paths, iterations, and team-specific settings from source to target Team Foundation Server or Azure DevOps.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "migrateTeamCapacities": {
+      "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
+      "type": "boolean",
+      "default": "false"
+    },
+    "migrateTeamSettings": {
+      "description": "Migrate original team settings after their creation on target team project",
+      "type": "boolean",
+      "default": "false"
+    },
+    "teams": {
+      "description": "List of Teams to process. If this is `null` then all teams will be processed.",
+      "type": "array"
+    },
+    "updateTeamSettings": {
+      "description": "Reset the target team settings to match the source if the team exists",
+      "type": "boolean",
+      "default": "false"
+    },
+    "useUserMapping": {
+      "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.",
+      "type": "boolean"
+    }
+  }
+}

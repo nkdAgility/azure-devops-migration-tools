@@ -26,39 +26,39 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools.Processors.ProcessDefinitionProcessorOptions
-description: missing XML code comments
+description: Process definition processor used to keep processes between two orgs in sync
 className: ProcessDefinitionProcessor
 typeName: Processors
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: MaxDegreeOfParallelism
   type: Int32
-  description: missing XML code comments
+  description: Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.
   defaultValue: missing XML code comments
 - parameterName: Processes
   type: Dictionary
-  description: missing XML code comments
+  description: Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.
   defaultValue: missing XML code comments
 - parameterName: ProcessMaps
   type: Dictionary
-  description: missing XML code comments
+  description: Dictionary mapping source process names to target process names for process template transformations during migration.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: UpdateProcessDetails
   type: Boolean
-  description: missing XML code comments
+  description: Indicates whether to update existing process details in the target organization or only create new processes.
   defaultValue: missing XML code comments
-status: missing XML code comments
-processingTarget: missing XML code comments
+status: Beta
+processingTarget: Pipelines
 classFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.AzureDevops.Rest/Processors/ProcessDefinitionProcessorOptions.cs

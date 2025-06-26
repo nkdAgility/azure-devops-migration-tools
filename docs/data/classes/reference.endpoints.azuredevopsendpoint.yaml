@@ -39,29 +39,29 @@ configurationSamples:
       "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
     }
   sampleFor: MigrationTools.Endpoints.AzureDevOpsEndpointOptions
-description: missing XML code comments
+description: Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.
 className: AzureDevOpsEndpoint
 typeName: Endpoints
 options:
 - parameterName: AccessToken
   type: String
-  description: missing XML code comments
+  description: Personal Access Token (PAT) or other authentication token for accessing the Azure DevOps organization. Required for API authentication.
   defaultValue: missing XML code comments
 - parameterName: AuthenticationMode
   type: AuthenticationMode
-  description: missing XML code comments
+  description: Authentication mode to use when connecting to Azure DevOps. Typically uses AccessToken for modern Azure DevOps organizations.
   defaultValue: missing XML code comments
 - parameterName: Organisation
   type: String
-  description: missing XML code comments
+  description: URL of the Azure DevOps organization (e.g., "https://dev.azure.com/myorganization/"). Must include the full organization URL.
   defaultValue: missing XML code comments
 - parameterName: Project
   type: String
-  description: missing XML code comments
+  description: Name of the Azure DevOps project within the organization to connect to. This is the project that will be used for migration operations.
   defaultValue: missing XML code comments
 - parameterName: ReflectedWorkItemIdField
   type: String
-  description: missing XML code comments
+  description: Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/fieldmaps/fieldvaluemap",
+  "title": "FieldValueMap",
+  "description": "Maps field values based on a lookup table, allowing specific source values to be translated to different target values.",
+  "type": "object",
+  "properties": {
+    "applyTo": {
+      "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+      "type": "array"
+    },
+    "defaultValue": {
+      "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
+      "type": "string"
+    },
+    "sourceField": {
+      "description": "Gets or sets the name of the source field to read values from during migration.",
+      "type": "string"
+    },
+    "targetField": {
+      "description": "Gets or sets the name of the target field to write mapped values to during migration.",
+      "type": "string"
+    },
+    "valueMapping": {
+      "description": "Gets or sets the dictionary that maps source field values to target field values. Key is the source value, value is the target value.",
+      "type": "object"
+    }
+  }
+}

@@ -92,23 +92,23 @@ typeName: Endpoints
 options:
 - parameterName: Authentication
   type: TfsAuthenticationOptions
-  description: missing XML code comments
+  description: Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.
   defaultValue: missing XML code comments
 - parameterName: Collection
   type: Uri
-  description: missing XML code comments
+  description: URI of the TFS collection (e.g., "http://tfsserver:8080/tfs/DefaultCollection"). Must be a valid absolute URL pointing to the TFS collection.
   defaultValue: missing XML code comments
 - parameterName: LanguageMaps
   type: TfsLanguageMapOptions
-  description: missing XML code comments
+  description: Language mapping configuration for translating area and iteration path names between different language versions of TFS.
   defaultValue: missing XML code comments
 - parameterName: Project
   type: String
-  description: missing XML code comments
+  description: Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.
   defaultValue: missing XML code comments
 - parameterName: ReflectedWorkItemIdField
   type: String
-  description: missing XML code comments
+  description: Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

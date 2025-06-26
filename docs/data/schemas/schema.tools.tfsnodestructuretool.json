@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/tools/tfsnodestructuretool",
+  "title": "TfsNodeStructureTool",
+  "description": "Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.",
+  "type": "object",
+  "properties": {
+    "areas": {
+      "description": "Rules to apply to the Area Path. Is an object of NodeOptions e.g. { \"Filters\": [\"*/**\"], \"Mappings\": [{\"Match\": \"^oldProjectName([\\\\\\\\]?.*)$\", \"Replacement\": \"targetProjectA$1\"}] }",
+      "type": "string",
+      "default": "{\"Filters\": [], \"Mappings\": []}"
+    },
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "iterations": {
+      "description": "Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { \"Filters\": [\"*/**\"], \"Mappings\": [{\"Match\": \"^oldProjectName([\\\\\\\\]?.*)$\", \"Replacement\": \"targetProjectA$1\"}] }",
+      "type": "string",
+      "default": "{\"Filters\": [], \"Mappings\": []}"
+    },
+    "migrateRootNodes": {
+      "description": "By default, only child nodes in node structures are migrated. Turning this on migrates even the root node (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate default area in source to some sub-area in target project. You have to set proper mapping for this to work. If after mapping the target node is still just root node (so it is not migrated under some child node), nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.",
+      "type": "boolean"
+    },
+    "replicateAllExistingNodes": {
+      "description": "missing XML code comments",
+      "type": "boolean"
+    },
+    "shouldCreateMissingRevisionPaths": {
+      "description": "When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.",
+      "type": "boolean"
+    }
+  }
+}

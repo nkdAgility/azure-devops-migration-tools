@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/processors/tfsexportusersformappingprocessor",
+  "title": "TfsExportUsersForMappingProcessor",
+  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "exportAllUsers": {
+      "description": "Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .",
+      "type": "boolean"
+    },
+    "onlyListUsersInWorkItems": {
+      "description": "`OnlyListUsersInWorkItems`",
+      "type": "boolean",
+      "default": "true"
+    },
+    "sourceName": {
+      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+      "type": "string"
+    },
+    "targetName": {
+      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+      "type": "string"
+    },
+    "userExportFile": {
+      "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if  is set to .",
+      "type": "string"
+    },
+    "wIQLQuery": {
+      "description": "WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.",
+      "type": "string"
+    }
+  }
+}

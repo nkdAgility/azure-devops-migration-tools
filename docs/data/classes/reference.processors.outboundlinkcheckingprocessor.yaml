@@ -30,23 +30,23 @@ typeName: Processors
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: ResultFileName
   type: String
-  description: missing XML code comments
+  description: File name where the results of the outbound link checking process will be saved, typically containing details of broken or invalid links.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WIQLQuery
   type: String
-  description: missing XML code comments
+  description: WIQL (Work Item Query Language) query used to select the work items whose outbound links should be checked for validity.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

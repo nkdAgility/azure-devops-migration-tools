@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/tools/tfschangesetmappingtool",
+  "title": "TfsChangeSetMappingTool",
+  "description": "missing XML code comments",
+  "type": "object",
+  "properties": {
+    "changeSetMappingFile": {
+      "description": "missing XML code comments",
+      "type": "string"
+    },
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    }
+  }
+}

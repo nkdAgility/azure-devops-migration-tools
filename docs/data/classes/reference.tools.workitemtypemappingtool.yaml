@@ -50,18 +50,18 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.WorkItemTypeMappingToolOptions
-description: missing XML code comments
+description: Provides mapping functionality for transforming work item types from source to target systems during migration, allowing different work item type names to be used in the target.
 className: WorkItemTypeMappingTool
 typeName: Tools
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: Mappings
   type: Dictionary
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: List of work item mappings.
+  defaultValue: '{}'
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools/Tools/WorkItemTypeMappingTool.cs

@@ -5,10 +5,12 @@
 
 .DESCRIPTION
     This script runs the MigrationTools.ConsoleDataGenerator to generate YAML data files 
-    by reflecting over the migration tools' types and options.
+    and JSON schemas by reflecting over the migration tools' types and options.
     
     The generated files are placed in:
     - YAML data: docs/data/classes/
+    - JSON schemas: docs/data/schemas/
+    - JSON schemas: docs/data/classes/
 
 .PARAMETER Configuration
     The build configuration to use (Debug or Release). Default is Debug.
@@ -98,15 +100,21 @@ try {
     
     # Display summary of generated files
     $docsDataPath = Join-Path $RepoRoot "docs" "data" "classes"
+    $docsSchemaPath = Join-Path $RepoRoot "docs" "data" "schemas"
     
     if (Test-Path $docsDataPath) {
         $yamlFiles = Get-ChildItem -Path $docsDataPath -Filter "*.yaml" -Recurse | Measure-Object
         Write-Host "📄 Generated $($yamlFiles.Count) YAML data files in docs/data/classes/" -ForegroundColor Green
     }
     
+    if (Test-Path $docsSchemaPath) {
+        $schemaFiles = Get-ChildItem -Path $docsSchemaPath -Filter "*.json" -Recurse | Measure-Object
+        Write-Host "📋 Generated $($schemaFiles.Count) JSON schema files in docs/data/schemas/" -ForegroundColor Green
+    }
+    
     Write-Host ""
     Write-Host "🎉 Documentation generation completed!" -ForegroundColor Cyan
-    Write-Host "Generated YAML files are ready for use in the documentation site." -ForegroundColor Gray
+    Write-Host "Generated YAML files and JSON schemas are ready for use in the documentation site." -ForegroundColor Gray
     
 }
 catch {

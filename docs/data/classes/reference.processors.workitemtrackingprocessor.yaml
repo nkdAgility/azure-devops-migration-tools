@@ -25,33 +25,33 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools.Processors.WorkItemTrackingProcessorOptions
-description: missing XML code comments
+description: This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).
 className: WorkItemTrackingProcessor
 typeName: Processors
 options:
 - parameterName: CollapseRevisions
   type: Boolean
-  description: missing XML code comments
+  description: Gets or sets a value indicating whether to collapse revisions into a single work item.
   defaultValue: missing XML code comments
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: ReplayRevisions
   type: Boolean
-  description: missing XML code comments
+  description: Gets or sets a value indicating whether to replay all revisions during migration.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
-  description: missing XML code comments
+  description: Gets or sets the number of times to retry work item creation if it fails.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

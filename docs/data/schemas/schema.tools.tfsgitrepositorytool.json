@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/tools/tfsgitrepositorytool",
+  "title": "TfsGitRepositoryTool",
+  "description": "missing XML code comments",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "mappings": {
+      "description": "Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration.",
+      "type": "object",
+      "default": "{}"
+    },
+    "shouldDropChangedSetLinks": {
+      "description": "When set to true, changeset links in work items will be removed during migration to prevent broken links when repositories are not migrated.",
+      "type": "boolean"
+    }
+  }
+}

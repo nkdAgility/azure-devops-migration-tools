@@ -226,17 +226,17 @@ configurationSamples:
       "FieldMaps": []
     }
   sampleFor: MigrationTools.Tools.FieldMappingToolOptions
-description: missing XML code comments
+description: Tool for applying field mapping transformations to work items during migration, supporting various field mapping strategies like direct mapping, regex transformations, and value lookups.
 className: FieldMappingTool
 typeName: Tools
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: FieldMaps
   type: List
-  description: missing XML code comments
+  description: Gets or sets the list of field mapping configurations to apply.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

@@ -61,22 +61,22 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.StringManipulatorToolOptions
-description: missing XML code comments
+description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
 className: StringManipulatorTool
 typeName: Tools
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: Manipulators
   type: List
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
+  defaultValue: '{}'
 - parameterName: MaxStringLength
   type: Int32
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Max number of chars in a string. Applied last, and set to 1000000 by default.
+  defaultValue: 1000000
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools/Tools/StringManipulatorTool.cs

@@ -22,23 +22,23 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsTestConfigurationsMigrationProcessorOptions
-description: missing XML code comments
+description: This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.
 className: TfsTestConfigurationsMigrationProcessor
 typeName: Processors
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
-status: missing XML code comments
-processingTarget: missing XML code comments
+status: Beta
+processingTarget: Suites & Plans
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestConfigurationsMigrationProcessorOptions.cs

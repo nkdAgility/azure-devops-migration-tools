@@ -28,15 +28,15 @@ typeName: ProcessorEnrichers
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: If enabled this will run this migrator
+  defaultValue: true
 - parameterName: OptionFor
   type: String
   description: missing XML code comments
   defaultValue: missing XML code comments
 - parameterName: RefName
   type: String
-  description: missing XML code comments
+  description: For internal use
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

@@ -40,17 +40,17 @@ configurationSamples:
       ]
     }
   sampleFor: MigrationTools.Tools.FieldSkipMapOptions
-description: missing XML code comments
+description: Skips field mapping for a specific target field, effectively leaving the field unchanged during migration.
 className: FieldSkipMap
 typeName: FieldMaps
 options:
 - parameterName: ApplyTo
   type: List
-  description: missing XML code comments
+  description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
 - parameterName: targetField
   type: String
-  description: missing XML code comments
+  description: Gets or sets the name of the target field that should be skipped during migration, resetting it to its original value.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments

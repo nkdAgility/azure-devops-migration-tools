@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.migrationtools.com/tools/fieldmappingtool",
+  "title": "FieldMappingTool",
+  "description": "Tool for applying field mapping transformations to work items during migration, supporting various field mapping strategies like direct mapping, regex transformations, and value lookups.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "fieldMaps": {
+      "description": "Gets or sets the list of field mapping configurations to apply.",
+      "type": "array"
+    }
+  }
+}

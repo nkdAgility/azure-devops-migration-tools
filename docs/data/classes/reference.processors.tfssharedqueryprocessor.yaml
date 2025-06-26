@@ -25,35 +25,35 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
-description: missing XML code comments
+description: The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
 className: TfsSharedQueryProcessor
 typeName: Processors
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 - parameterName: PrefixProjectToNodes
   type: Boolean
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Do we add the source project name into the folder path
+  defaultValue: false
 - parameterName: SharedFolderName
   type: String
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: The name of the shared folder, made a parameter incase it every needs to be edited
+  defaultValue: Shared Queries
 - parameterName: SourceName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
 - parameterName: SourceToTargetFieldMappings
   type: Dictionary
-  description: missing XML code comments
+  description: Mapping of the source to the target
   defaultValue: missing XML code comments
 - parameterName: TargetName
   type: String
-  description: missing XML code comments
+  description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
-status: missing XML code comments
-processingTarget: missing XML code comments
+status: Beta
+processingTarget: Queries
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessor.cs
 optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsSharedQueryProcessorOptions.cs

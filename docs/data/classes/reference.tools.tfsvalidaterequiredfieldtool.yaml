@@ -20,13 +20,13 @@ configurationSamples:
       "Enabled": false
     }
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
-description: missing XML code comments
+description: Tool for validating that required fields exist in target work item types before migration, preventing migration failures due to missing required fields.
 className: TfsValidateRequiredFieldTool
 typeName: Tools
 options:
 - parameterName: Enabled
   type: Boolean
-  description: missing XML code comments
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
