@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools;
-using MigrationTools.Clients;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Configuration.Processing;
-using MigrationTools._EngineV1.DataContracts;
-
-using MigrationTools.DataContracts;
 using Microsoft.Extensions.Options;
-using MigrationTools.Tools;
-using MigrationTools.Processors.Infrastructure;
+using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools._EngineV1.DataContracts;
+using MigrationTools.Clients;
+using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
+using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
@@ -69,9 +64,9 @@ namespace MigrationTools.Processors
                 {
                     Log.LogInformation("...Exists");
                     TfsExtensions.ToWorkItem(targetFound).Open();
-                   CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
+                    CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
                     CommonTools.WorkItemEmbededLink.Enrich(this, null, targetFound);
-                    CommonTools.EmbededImages.FixEmbededImages(this, sourceWI, targetFound);
+                    CommonTools.EmbededImages.FixEmbededImages(this, targetFound);
                     if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
                     {
                         try

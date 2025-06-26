@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,6 +13,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
+using MigrationTools.Options;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
@@ -24,7 +26,6 @@ namespace MigrationTools.Tools
         private const string TargetDummyWorkItemTitle = "***** DELETE THIS - Migration Tool Generated Dummy Work Item For TfsEmbededImagesTool *****";
 
         private Project _targetProject;
-        private TfsTeamProjectEndpointOptions _targetConfig;
 
         private readonly IDictionary<string, string> _cachedUploadedUrisBySourceValue;
 
@@ -35,15 +36,22 @@ namespace MigrationTools.Tools
             _cachedUploadedUrisBySourceValue = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-
-        public int FixEmbededImages(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        public int FixEmbededImages(TfsProcessor processor, WorkItemData targetWorkItem)
         {
             _processor = processor;
             _targetProject = processor.Target.WorkItems.Project.ToProject();
-            _targetConfig = processor.Target.Options;
-            FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, processor.Source.Options.Authentication.AccessToken);
+            string? accessToken = processor.Source.Options.Authentication.AuthenticationMode switch
+            {
+                AuthenticationMode.AccessToken => processor.Source.Options.Authentication.AccessToken,
+                AuthenticationMode.Windows => GetWindowsAuthToken(processor.Source.Options.Authentication.NetworkCredentials),
+                _ => null
+            };
+            FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, accessToken);
             return 0;
         }
+
+        private string GetWindowsAuthToken(NetworkCredentials cred)
+            => Convert.ToBase64String(Encoding.ASCII.GetBytes($"{cred.Domain}\\{cred.UserName}:{cred.Password}"));
 
         public void ProcessorExecutionEnd(TfsProcessor processor)
         {
@@ -124,7 +132,7 @@ namespace MigrationTools.Tools
                 {
                     if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
                     {
-                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken))));
+                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", sourcePersonalAccessToken);
                     }
                     var result = DownloadFile(httpClient, matchedSourceUri, fullImageFilePath);
                     if (!result.IsSuccessStatusCode)
@@ -182,7 +190,7 @@ namespace MigrationTools.Tools
             }
 
             // Attaches it with dummy work item and removes it just to be able to make the image visible to all the users.
-            // VS402330: Unauthorized Read access to the attachment under the areas 
+            // VS402330: Unauthorized Read access to the attachment under the areas
             var payload = new Microsoft.VisualStudio.Services.WebApi.Patch.Json.JsonPatchDocument();
             payload.Add(new Microsoft.VisualStudio.Services.WebApi.Patch.Json.JsonPatchOperation()
             {
