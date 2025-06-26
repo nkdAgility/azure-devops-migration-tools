@@ -1,0 +1,67 @@
+{{- define "main" }}
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-12" style="max-width: 1200px;">
+      
+      {{/* Page header */}}
+      <div class="text-center mb-5">
+        <h1 class="display-4 text-primary mb-3">
+          <i class="fas fa-magic me-3"></i>Configuration Wizard
+        </h1>
+        <p class="lead">Build your Azure DevOps Migration Tools configuration step-by-step</p>
+      </div>
+
+      {{/* Wizard container */}}
+      <div id="config-wizard-app">
+        {{/* Loading state */}}
+        <div class="wizard-loading text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3">Loading configuration wizard...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{{/* Load the wizard JavaScript and CSS */}}
+<link rel="stylesheet" href="/css/config-wizard.css">
+<script type="module" src="/js/config-wizard.js"></script>
+
+{{/* Pass Hugo data to JavaScript */}}
+<script>
+  window.migrationToolsData = {
+    processors: {
+      {{- range $key, $value := .Site.Data }}
+        {{- if hasPrefix $key "reference.processors." }}
+          "{{ strings.TrimPrefix "reference.processors." $key }}": {{ $value | jsonify }},
+        {{- end }}
+      {{- end }}
+    },
+    endpoints: {
+      {{- range $key, $value := .Site.Data }}
+        {{- if hasPrefix $key "reference.endpoints." }}
+          "{{ strings.TrimPrefix "reference.endpoints." $key }}": {{ $value | jsonify }},
+        {{- end }}
+      {{- end }}
+    },
+    fieldMaps: {
+      {{- range $key, $value := .Site.Data }}
+        {{- if hasPrefix $key "reference.fieldmaps." }}
+          "{{ strings.TrimPrefix "reference.fieldmaps." $key }}": {{ $value | jsonify }},
+        {{- end }}
+      {{- end }}
+    },
+    tools: {
+      {{- range $key, $value := .Site.Data }}
+        {{- if hasPrefix $key "reference.tools." }}
+          "{{ strings.TrimPrefix "reference.tools." $key }}": {{ $value | jsonify }},
+        {{- end }}
+      {{- end }}
+    },
+    baseURL: {{ .Site.BaseURL | jsonify }}
+  };
+</script>
+{{- end }}
