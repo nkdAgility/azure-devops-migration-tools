@@ -1,4 +1,5 @@
 title: Azure DevOps Migration Tools
+baseURL: https://devopsmigration.io/
 
 publishDir: ../public
 resourceDir: ../resources

@@ -1,6 +1,10 @@
+baseURL: "https://blue-river-093197403-#{GitHub.PullRequestNumber}#.westeurope.5.azurestaticapps.net/"
 environment: "canary"
 minifyOutput: true
 
 buildDrafts: true
 buildFuture: true
 buildExpired: true
+
+
+# PullRequestNumber
