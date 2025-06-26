@@ -13,7 +13,7 @@
       "description": "Gets or sets the list of field mapping configurations to apply.",
       "type": "array",
       "prefixItems": {
-        "oneOf": [
+        "anyOf": [
           {
             "title": "FieldCalculationMap",
             "description": "Performs mathematical calculations on numeric fields using NCalc expressions during migration.",

@@ -87,20 +87,24 @@ namespace MigrationTools.ConsoleDataGenerator
 
                         if (fieldMaps.Any())
                         {
-                            // Create array schema with oneOf for different field map types
-                            propertySchema = new JSchema
+                            // Create JSON manually with items as a single schema with anyOf
+                            var itemSchemas = fieldMaps.Select(fm => CreateSchemaFromClassData(fm)).ToList();
+                            
+                            var arraySchemaJson = new JObject();
+                            arraySchemaJson["type"] = "array";
+                            arraySchemaJson["description"] = option.Description.ToString();
+                            
+                            // Create items as a single schema with anyOf allowing any field map type
+                            var itemsSchema = new JObject();
+                            var anyOfArray = new JArray();
+                            foreach (var itemSchema in itemSchemas)
                             {
-                                Type = JSchemaType.Array,
-                                Description = option.Description.ToString()
-                            };
-
-                            // Create the items schema with oneOf
-                            var itemsSchema = new JSchema();
-                            foreach (var fm in fieldMaps)
-                            {
-                                itemsSchema.OneOf.Add(CreateSchemaFromClassData(fm));
+                                anyOfArray.Add(JObject.Parse(itemSchema.ToString()));
                             }
-                            propertySchema.Items.Add(itemsSchema);
+                            itemsSchema["anyOf"] = anyOfArray;
+                            arraySchemaJson["items"] = itemsSchema;
+                            
+                            propertySchema = JSchema.Parse(arraySchemaJson.ToString());
                         }
                     }
 
@@ -204,7 +208,9 @@ namespace MigrationTools.ConsoleDataGenerator
 
                 foreach (var toolClass in toolClasses)
                 {
-                    var toolSchema = CreateSchemaFromClassData(toolClass);
+                    // Use the enhanced schema generation that includes field maps for FieldMappingTool
+                    var toolSchemaJson = GenerateJsonSchemaForClass(toolClass, allClassData);
+                    var toolSchema = JSchema.Parse(toolSchemaJson);
                     toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), toolSchema);
                 }
                 migrationToolsSchema.Properties.Add("commonTools", toolsSchema);
