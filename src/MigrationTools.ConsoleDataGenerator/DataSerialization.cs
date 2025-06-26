@@ -18,7 +18,7 @@ namespace MigrationTools.ConsoleDataGenerator
         public DataSerialization(string rootPath)
         {
             dataPath = Path.Combine(rootPath, "docs/data/classes");
-            schemaPath = Path.Combine(rootPath, "docs/data/schemas");
+            schemaPath = Path.Combine(rootPath, "docs/static/schema");
             // No longer need referencePath since we're not generating markdown
         }
 
@@ -61,7 +61,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 var schema = new JSchema
                 {
                     SchemaVersion = new Uri("https://json-schema.org/draft/2020-12/schema"),
-                    Id = new Uri($"https://schema.migrationtools.com/{data.TypeName.ToLower()}/{data.ClassName.ToLower()}"),
+                    Id = new Uri($"https://devopsmigration.io/schema/schema.{data.TypeName.ToLower()}.{data.ClassName.ToLower()}.json"),
                     Title = data.ClassName,
                     Description = data.Description,
                     Type = JSchemaType.Object
@@ -155,7 +155,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 var fullSchema = new JSchema
                 {
                     SchemaVersion = new Uri("https://json-schema.org/draft/2020-12/schema"),
-                    Id = new Uri("https://schema.migrationtools.com/configuration"),
+                    Id = new Uri("https://devopsmigration.io/schema/configuration.schema.json"),
                     Title = "Azure DevOps Migration Tools Configuration",
                     Description = "Complete configuration schema for Azure DevOps Migration Tools",
                     Type = JSchemaType.Object

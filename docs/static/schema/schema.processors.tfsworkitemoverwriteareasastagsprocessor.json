@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.processors.tfsworkitemoverwriteareasastagsprocessor.json",
+  "title": "TfsWorkItemOverwriteAreasAsTagsProcessor",
+  "description": "A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.",
+  "type": "object",
+  "properties": {
+    "areaIterationPath": {
+      "description": "This is a required parameter. That define the root path of the iteration. To get the full path use `\\`",
+      "type": "string",
+      "default": "\\"
+    },
+    "enabled": {
+      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "sourceName": {
+      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+      "type": "string"
+    },
+    "targetName": {
+      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+      "type": "string"
+    }
+  }
+}

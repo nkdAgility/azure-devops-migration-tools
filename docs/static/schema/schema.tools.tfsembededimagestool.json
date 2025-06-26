@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.tools.tfsembededimagestool.json",
+  "title": "TfsEmbededImagesTool",
+  "description": "missing XML code comments",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.processors.tfsworkitemmigrationprocessor.json",
+  "title": "TfsWorkItemMigrationProcessor",
+  "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "filterWorkItemsThatAlreadyExistInTarget": {
+      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+      "type": "boolean",
+      "default": "true"
+    },
+    "fixHtmlAttachmentLinks": {
+      "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.",
+      "type": "boolean",
+      "default": "true"
+    },
+    "generateMigrationComment": {
+      "description": "If enabled, adds a comment recording the migration",
+      "type": "boolean",
+      "default": "true"
+    },
+    "sourceName": {
+      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+      "type": "string"
+    },
+    "targetName": {
+      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+      "type": "string"
+    },
+    "updateCreatedBy": {
+      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+      "type": "boolean",
+      "default": "true"
+    },
+    "updateCreatedDate": {
+      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+      "type": "boolean",
+      "default": "true"
+    },
+    "wIQLQuery": {
+      "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+      "type": "string",
+      "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+    },
+    "workItemCreateRetryLimit": {
+      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+      "type": "integer",
+      "default": "5"
+    }
+  }
+}

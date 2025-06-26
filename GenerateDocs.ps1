@@ -100,7 +100,7 @@ try {
     
     # Display summary of generated files
     $docsDataPath = Join-Path $RepoRoot "docs" "data" "classes"
-    $docsSchemaPath = Join-Path $RepoRoot "docs" "data" "schemas"
+    $docsSchemaPath = Join-Path $RepoRoot "docs" "static" "schema"
     
     if (Test-Path $docsDataPath) {
         $yamlFiles = Get-ChildItem -Path $docsDataPath -Filter "*.yaml" -Recurse | Measure-Object
@@ -109,7 +109,7 @@ try {
     
     if (Test-Path $docsSchemaPath) {
         $schemaFiles = Get-ChildItem -Path $docsSchemaPath -Filter "*.json" -Recurse | Measure-Object
-        Write-Host "📋 Generated $($schemaFiles.Count) JSON schema files in docs/data/schemas/" -ForegroundColor Green
+        Write-Host "📋 Generated $($schemaFiles.Count) JSON schema files in docs/static/schema/" -ForegroundColor Green
     }
     
     Write-Host ""
