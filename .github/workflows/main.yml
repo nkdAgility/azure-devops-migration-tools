@@ -485,7 +485,9 @@ jobs:
           Write-Host "Building site for $environment ";
           $env:HUGO_ENV = "$environment";
           Write-Host "HUGO_ENV is set to $env:HUGO_ENV"
-          hugo --source docs --config hugo.yaml,hugo.$environment.yaml --logLevel debug; # --minify
+          $configFiles = "hugo.yaml,hugo.$environment.yaml"
+          Write-Host "Using config files: $configFiles"
+          hugo --source docs --config $configFiles --logLevel debug; # --minify
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site2
