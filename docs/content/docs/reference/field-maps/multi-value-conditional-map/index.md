@@ -1,7 +1,7 @@
 ---
 title: Multi Value Conditional Map
 description: Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.
-dataFile: data/reference.fieldmaps.multivalueconditionalmap.yaml
+dataFile: reference.fieldmaps.multivalueconditionalmap.yaml
 slug: multi-value-conditional-map
 aliases:
 - /docs/Reference/FieldMaps/MultiValueConditionalMap

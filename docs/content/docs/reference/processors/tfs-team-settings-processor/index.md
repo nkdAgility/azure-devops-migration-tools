@@ -1,7 +1,7 @@
 ---
 title: Tfs Team Settings Processor
 description: Native TFS Processor, does not work with any other Endpoints.
-dataFile: data/reference.processors.tfsteamsettingsprocessor.yaml
+dataFile: reference.processors.tfsteamsettingsprocessor.yaml
 slug: tfs-team-settings-processor
 aliases:
 - /docs/Reference/Processors/TfsTeamSettingsProcessor

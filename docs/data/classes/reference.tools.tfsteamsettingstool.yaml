@@ -1,0 +1,93 @@
+optionsClassName: TfsTeamSettingsToolOptions
+optionsClassFullName: MigrationTools.Tools.TfsTeamSettingsToolOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsTeamSettingsTool": {
+            "Enabled": "True",
+            "MigrateTeamCapacities": "True",
+            "MigrateTeamSettings": "True",
+            "Teams": null,
+            "UpdateTeamSettings": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
+- name: sample
+  order: 1
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsTeamSettingsTool": {
+            "Enabled": "True",
+            "MigrateTeamCapacities": "True",
+            "MigrateTeamSettings": "True",
+            "Teams": [
+              "Team 1",
+              "Team 2"
+            ],
+            "UpdateTeamSettings": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "TfsTeamSettingsToolOptions",
+      "Enabled": true,
+      "MigrateTeamSettings": true,
+      "UpdateTeamSettings": true,
+      "MigrateTeamCapacities": true,
+      "UseUserMapping": false,
+      "Teams": [
+        "Team 1",
+        "Team 2"
+      ]
+    }
+  sampleFor: MigrationTools.Tools.TfsTeamSettingsToolOptions
+description: missing XML code comments
+className: TfsTeamSettingsTool
+typeName: Tools
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: MigrateTeamCapacities
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: MigrateTeamSettings
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: Teams
+  type: List
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: UpdateTeamSettings
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: UseUserMapping
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsTeamSettingsToolOptions.cs

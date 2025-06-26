@@ -17,7 +17,7 @@
 {{ if $dataFile }}
   {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
   {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
-  {{ $pathParts := split $cleanPath "." }}
+  {{ $pathParts := split $cleanPath.classes "." }}
 
   {{/* Navigate through the nested data structure */}}
   {{ $data = index .Site.Data $cleanPath }}

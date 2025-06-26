@@ -1,7 +1,7 @@
 ---
 title: Tfs Test Variables Migration Processor
 description: This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.
-dataFile: data/reference.processors.tfstestvariablesmigrationprocessor.yaml
+dataFile: reference.processors.tfstestvariablesmigrationprocessor.yaml
 slug: tfs-test-variables-migration-processor
 aliases:
 - /docs/Reference/Processors/TfsTestVariablesMigrationProcessor

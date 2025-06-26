@@ -1,0 +1,49 @@
+optionsClassName: TfsTestVariablesMigrationProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: There are no defaults! Check the sample for options!
+  sampleFor: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
+- name: sample
+  order: 1
+  description: 
+  code: There is no sample, but you can check the classic below for a general feel.
+  sampleFor: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "TfsTestVariablesMigrationProcessorOptions",
+      "Enabled": false,
+      "Processor": "TestVariablesMigrationContext",
+      "SourceName": null,
+      "TargetName": null
+    }
+  sampleFor: MigrationTools.Processors.TfsTestVariablesMigrationProcessorOptions
+description: missing XML code comments
+className: TfsTestVariablesMigrationProcessor
+typeName: Processors
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: Processor
+  type: String
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: SourceName
+  type: String
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: TargetName
+  type: String
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestVariablesMigrationProcessorOptions.cs

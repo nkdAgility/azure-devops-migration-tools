@@ -1,7 +1,7 @@
 ---
 title: Tfs WorkItem Bulk Edit Processor
 description: This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.
-dataFile: data/reference.processors.tfsworkitembulkeditprocessor.yaml
+dataFile: reference.processors.tfsworkitembulkeditprocessor.yaml
 slug: tfs-workitem-bulk-edit-processor
 aliases:
 - /docs/Reference/Processors/TfsWorkItemBulkEditProcessor

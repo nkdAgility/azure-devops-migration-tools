@@ -1,0 +1,125 @@
+optionsClassName: TfsNodeStructureToolOptions
+optionsClassFullName: MigrationTools.Tools.TfsNodeStructureToolOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "Areas": {
+              "Filters": null,
+              "Mappings": null
+            },
+            "Enabled": "True",
+            "Iterations": {
+              "Filters": null,
+              "Mappings": null
+            },
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+- name: sample
+  order: 1
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsNodeStructureTool": {
+            "Areas": {
+              "Filters": null,
+              "Mappings": [
+                {
+                  "Match": "^Skypoint Cloud$",
+                  "Replacement": "MigrationTest5"
+                }
+              ]
+            },
+            "Enabled": "True",
+            "Iterations": {
+              "Filters": null,
+              "Mappings": [
+                {
+                  "Match": "^Skypoint Cloud\\\\Sprint 1$",
+                  "Replacement": "MigrationTest5\\Sprint 1"
+                }
+              ]
+            },
+            "ReplicateAllExistingNodes": "True",
+            "ShouldCreateMissingRevisionPaths": "True"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "TfsNodeStructureToolOptions",
+      "Enabled": true,
+      "Areas": {
+        "Filters": [],
+        "Mappings": [
+          {
+            "Match": "^Skypoint Cloud$",
+            "Replacement": "MigrationTest5"
+          }
+        ]
+      },
+      "Iterations": {
+        "Filters": [],
+        "Mappings": [
+          {
+            "Match": "^Skypoint Cloud\\\\Sprint 1$",
+            "Replacement": "MigrationTest5\\Sprint 1"
+          }
+        ]
+      },
+      "ShouldCreateMissingRevisionPaths": true,
+      "ReplicateAllExistingNodes": true,
+      "MigrateRootNodes": false
+    }
+  sampleFor: MigrationTools.Tools.TfsNodeStructureToolOptions
+description: missing XML code comments
+className: TfsNodeStructureTool
+typeName: Tools
+options:
+- parameterName: Areas
+  type: NodeOptions
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: Iterations
+  type: NodeOptions
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: MigrateRootNodes
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: ReplicateAllExistingNodes
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: ShouldCreateMissingRevisionPaths
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureToolOptions.cs

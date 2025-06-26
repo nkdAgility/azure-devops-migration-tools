@@ -1,7 +1,7 @@
 ---
 title: Field Skip Map
 description: Skips field mapping for a specific target field, effectively leaving the field unchanged during migration.
-dataFile: data/reference.fieldmaps.fieldskipmap.yaml
+dataFile: reference.fieldmaps.fieldskipmap.yaml
 slug: field-skip-map
 aliases:
 - /docs/Reference/FieldMaps/FieldSkipMap

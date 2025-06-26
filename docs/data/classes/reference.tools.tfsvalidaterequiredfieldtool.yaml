@@ -1,0 +1,34 @@
+optionsClassName: TfsValidateRequiredFieldToolOptions
+optionsClassFullName: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: There are no defaults! Check the sample for options!
+  sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
+- name: sample
+  order: 1
+  description: 
+  code: There is no sample, but you can check the classic below for a general feel.
+  sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "TfsValidateRequiredFieldToolOptions",
+      "Enabled": false
+    }
+  sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
+description: missing XML code comments
+className: TfsValidateRequiredFieldTool
+typeName: Tools
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldTool.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldToolOptions.cs

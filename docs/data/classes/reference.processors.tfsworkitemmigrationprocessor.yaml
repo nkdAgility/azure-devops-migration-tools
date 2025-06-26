@@ -1,0 +1,120 @@
+optionsClassName: TfsWorkItemMigrationProcessorOptions
+optionsClassFullName: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Processors": [
+          {
+            "ProcessorType": "TfsWorkItemMigrationProcessor",
+            "AttachRevisionHistory": "False",
+            "Enabled": "False",
+            "FilterWorkItemsThatAlreadyExistInTarget": "False",
+            "FixHtmlAttachmentLinks": "True",
+            "GenerateMigrationComment": "True",
+            "MaxGracefulFailures": "0",
+            "PauseAfterEachWorkItem": "False",
+            "SkipRevisionWithInvalidAreaPath": "False",
+            "SkipRevisionWithInvalidIterationPath": "False",
+            "SourceName": "Source",
+            "TargetName": "Target",
+            "UpdateCreatedBy": "True",
+            "UpdateCreatedDate": "True",
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+            "WorkItemCreateRetryLimit": "5",
+            "WorkItemIDs": null
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
+- name: sample
+  order: 1
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Processors": [
+          {
+            "ProcessorType": "TfsWorkItemMigrationProcessor",
+            "Enabled": "False",
+            "FilterWorkItemsThatAlreadyExistInTarget": "False",
+            "SourceName": "Source",
+            "TargetName": "Target",
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+          }
+        ]
+      }
+    }
+  sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "TfsWorkItemMigrationProcessorOptions",
+      "Enabled": false,
+      "UpdateCreatedDate": true,
+      "UpdateCreatedBy": true,
+      "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+      "FixHtmlAttachmentLinks": true,
+      "WorkItemCreateRetryLimit": 5,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
+      "GenerateMigrationComment": true,
+      "SourceName": "Source",
+      "TargetName": "Target"
+    }
+  sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
+description: missing XML code comments
+className: TfsWorkItemMigrationProcessor
+typeName: Processors
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: FilterWorkItemsThatAlreadyExistInTarget
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: FixHtmlAttachmentLinks
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: GenerateMigrationComment
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: SourceName
+  type: String
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: TargetName
+  type: String
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: UpdateCreatedBy
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: UpdateCreatedDate
+  type: Boolean
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: WIQLQuery
+  type: String
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+- parameterName: WorkItemCreateRetryLimit
+  type: Int32
+  description: missing XML code comments
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessorOptions.cs
