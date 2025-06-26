@@ -113,12 +113,13 @@
                    {{ if ne hugo.Environment "development" }}
                    <span class="badge bg-danger ">{{ .Site.Params.version }}</span>
                    {{ else }}
-                   <span class="badge bg-danger">v0.0.0</span>
+                   <span class="badge bg-danger">v0.0.0-local.{{ .Page.GitInfo.AbbreviatedHash}}</span>
                    {{ end }}
                 </div>
               </a>             
                {{ end }}
             </div>
+            
           </div>
         </div>
 
