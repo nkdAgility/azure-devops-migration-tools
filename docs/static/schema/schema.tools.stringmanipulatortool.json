@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.tools.stringmanipulatortool.json",
+  "title": "StringManipulatorTool",
+  "description": "Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "manipulators": {
+      "description": "List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.",
+      "type": "array",
+      "default": "{}"
+    },
+    "maxStringLength": {
+      "description": "Max number of chars in a string. Applied last, and set to 1000000 by default.",
+      "type": "integer",
+      "default": "1000000"
+    }
+  }
+}

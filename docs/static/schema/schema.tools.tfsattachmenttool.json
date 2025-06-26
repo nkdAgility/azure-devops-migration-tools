@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.tools.tfsattachmenttool.json",
+  "title": "TfsAttachmentTool",
+  "description": "Tool for processing and migrating work item attachments between Team Foundation Server instances, handling file downloads, uploads, and attachment metadata.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "exportBasePath": {
+      "description": "`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.",
+      "type": "string",
+      "default": "C:\\temp\\Migration\\"
+    },
+    "maxAttachmentSize": {
+      "description": "`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).",
+      "type": "integer",
+      "default": "480000000"
+    }
+  }
+}

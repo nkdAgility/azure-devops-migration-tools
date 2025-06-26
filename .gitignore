@@ -159,11 +159,9 @@ $RECYCLE.BIN/
 /.vs
 
 
-docs/Reference/Generated/MigrationTools.Host.xml
-/docs/Reference/Generated/MigrationTools.Host.xml
 /docs/.obsidian
 /output/
 logs/
 /staging/
-/docs/Reference/Generated
 /public/
+/docs/data/generated

@@ -4,12 +4,13 @@
     Generates documentation by running the MigrationTools.ConsoleDataGenerator application.
 
 .DESCRIPTION
-    This script runs the MigrationTools.ConsoleDataGenerator to generate YAML data files and 
-    Markdown documentation by reflecting over the migration tools' types and options.
+    This script runs the MigrationTools.ConsoleDataGenerator to generate YAML data files 
+    and JSON schemas by reflecting over the migration tools' types and options.
     
     The generated files are placed in:
-    - YAML data: docs/_data/
-    - Markdown documentation: docs/Reference/Generated/
+    - YAML data: docs/data/classes/
+    - JSON schemas: docs/data/schemas/
+    - JSON schemas: docs/data/classes/
 
 .PARAMETER Configuration
     The build configuration to use (Debug or Release). Default is Debug.
@@ -98,22 +99,22 @@ try {
     Write-Host ""
     
     # Display summary of generated files
-    $docsDataPath = Join-Path $RepoRoot "docs" "_data"
-    $docsReferencePath = Join-Path $RepoRoot "docs" "Reference" "Generated"
+    $docsDataPath = Join-Path $RepoRoot "docs" "data" "classes"
+    $docsSchemaPath = Join-Path $RepoRoot "docs" "static" "schema"
     
     if (Test-Path $docsDataPath) {
         $yamlFiles = Get-ChildItem -Path $docsDataPath -Filter "*.yaml" -Recurse | Measure-Object
-        Write-Host "📄 Generated $($yamlFiles.Count) YAML data files in docs/_data/" -ForegroundColor Green
+        Write-Host "📄 Generated $($yamlFiles.Count) YAML data files in docs/data/classes/" -ForegroundColor Green
     }
     
-    if (Test-Path $docsReferencePath) {
-        $mdFiles = Get-ChildItem -Path $docsReferencePath -Filter "*.md" -Recurse | Measure-Object
-        Write-Host "📖 Generated $($mdFiles.Count) Markdown files in docs/Reference/Generated/" -ForegroundColor Green
+    if (Test-Path $docsSchemaPath) {
+        $schemaFiles = Get-ChildItem -Path $docsSchemaPath -Filter "*.json" -Recurse | Measure-Object
+        Write-Host "📋 Generated $($schemaFiles.Count) JSON schema files in docs/static/schema/" -ForegroundColor Green
     }
     
     Write-Host ""
     Write-Host "🎉 Documentation generation completed!" -ForegroundColor Cyan
-    Write-Host "Generated files are ready for use in the documentation site." -ForegroundColor Gray
+    Write-Host "Generated YAML files and JSON schemas are ready for use in the documentation site." -ForegroundColor Gray
     
 }
 catch {

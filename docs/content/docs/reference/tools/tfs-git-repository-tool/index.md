@@ -1,7 +1,7 @@
 ---
 title: Tfs Git Repository Tool
 description: Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.
-dataFile: data/reference.tools.tfsgitrepositorytool.yaml
+dataFile: reference.tools.tfsgitrepositorytool.yaml
 slug: tfs-git-repository-tool
 aliases:
 - /docs/Reference/Tools/TfsGitRepositoryTool

@@ -1,7 +1,7 @@
 ---
 title: Field Clear Map
 description: Removes data from a specified field by setting its value to null during work item migration.
-dataFile: data/reference.fieldmaps.fieldclearmap.yaml
+dataFile: reference.fieldmaps.fieldclearmap.yaml
 slug: field-clear-map
 aliases:
 - /docs/Reference/FieldMaps/FieldClearMap

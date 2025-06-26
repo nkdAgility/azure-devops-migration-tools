@@ -1,7 +1,7 @@
 ---
 title: Process Definition Processor
 description: Process definition processor used to keep processes between two orgs in sync
-dataFile: data/reference.processors.processdefinitionprocessor.yaml
+dataFile: reference.processors.processdefinitionprocessor.yaml
 slug: process-definition-processor
 aliases:
 - /docs/Reference/Processors/ProcessDefinitionProcessor

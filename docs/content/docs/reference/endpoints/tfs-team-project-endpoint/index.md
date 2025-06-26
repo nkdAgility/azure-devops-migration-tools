@@ -2,7 +2,7 @@
 title: Tfs Team Project Endpoint
 description: |
   This document provides an overview of the Tfs Team Project Endpoint used in the Azure DevOps Migration Tools, including its configuration and usage.
-dataFile: data/reference.endpoints.tfsteamprojectendpoint.yaml
+dataFile: reference.endpoints.tfsteamprojectendpoint.yaml
 slug: tfs-team-project-endpoint
 aliases:
 - /docs/Reference/Endpoints/TfsTeamProjectEndpoint

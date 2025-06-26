@@ -1,7 +1,7 @@
 ---
 title: Pause After Each Item
 description: Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
-dataFile: data/reference.processorenrichers.pauseaftereachitem.yaml
+dataFile: reference.processorenrichers.pauseaftereachitem.yaml
 slug: pause-after-each-item
 aliases:
 - /docs/Reference/ProcessorEnrichers/PauseAfterEachItem

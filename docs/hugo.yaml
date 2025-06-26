@@ -12,6 +12,11 @@ enableGitInfo: true
 # Disable default taxonomies (tags and categories)
 taxonomies: {}
 
+module:
+  mounts:
+    - source: docs\data\schemas
+      target: schema
+
 # Menu configuration
 # Sections will be automatically added via front matter in their _index.md files
 # Manual entries can still be added here if needed
@@ -63,6 +68,10 @@ outputFormats:
   json:
     mediaType: "application/json"
     baseName: "pages"
+  schema-catalog:
+    mediaType: "application/json"
+    baseName: "catalog"
+    path: "schema/"
 
 markup:
   goldmark:

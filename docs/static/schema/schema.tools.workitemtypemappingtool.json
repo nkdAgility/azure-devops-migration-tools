@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.tools.workitemtypemappingtool.json",
+  "title": "WorkItemTypeMappingTool",
+  "description": "Provides mapping functionality for transforming work item types from source to target systems during migration, allowing different work item type names to be used in the target.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "mappings": {
+      "description": "List of work item mappings.",
+      "type": "object",
+      "default": "{}"
+    }
+  }
+}

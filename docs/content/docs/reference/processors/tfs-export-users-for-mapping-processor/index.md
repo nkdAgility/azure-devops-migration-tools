@@ -1,7 +1,7 @@
 ---
 title: Tfs Export Users For Mapping Processor
 description: ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.
-dataFile: data/reference.processors.tfsexportusersformappingprocessor.yaml
+dataFile: reference.processors.tfsexportusersformappingprocessor.yaml
 slug: tfs-export-users-for-mapping-processor
 aliases:
 - /docs/Reference/Processors/TfsExportUsersForMappingProcessor

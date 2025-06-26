@@ -4,7 +4,7 @@ description: |
   The Field Calculation Map is a specialised field map used in the Azure DevOps Migration Tools. It allows you to compute values dynamically during migration by applying mathematical or logical operations on numeric fields. Calculations are defined using NCalc expressions and can reference one or more source fields using named parameters.
 
   This is especially useful for scenarios where derived values need to be migrated, such as calculating cost based on effort and rate, or generating summary fields that are not explicitly stored in the source system.
-dataFile: data/reference.fieldmaps.fieldcalculationmap.yaml
+dataFile: reference.fieldmaps.fieldcalculationmap.yaml
 slug: field-calculation-map
 aliases:
 - /docs/Reference/FieldMaps/FieldCalculationMap

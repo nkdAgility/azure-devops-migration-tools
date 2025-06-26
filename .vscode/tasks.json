@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/MigrationTools.ConsoleCore/MigrationTools.ConsoleCore.csproj",
+                "${workspaceFolder}/src/MigrationTools.ConsoleFull/MigrationTools.ConsoleFull.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -20,7 +20,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/MigrationTools.ConsoleCore/MigrationTools.ConsoleCore.csproj",
+                "${workspaceFolder}/src/MigrationTools.ConsoleFull/MigrationTools.ConsoleFull.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

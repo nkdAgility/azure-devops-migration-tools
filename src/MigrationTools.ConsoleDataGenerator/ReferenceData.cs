@@ -7,26 +7,8 @@ using Microsoft.VisualStudio.Services.CircuitBreaker;
 
 namespace MigrationTools.ConsoleDataGenerator.ReferenceData
 {
-    public class ClassGroup
-    {
-        public ClassGroup() {
-            Items = new List<DataItem>();
-        }
-        public string Name { get; set; }
-        public List<DataItem> Items { get; set; }
-    }
-    public class DataItem
-    {
-        public ClassData classData { get; set; }
-        public JekyllData jekyllData { get; set; }
-
-        public DataItem()
-        {
-            classData = new ClassData();
-            jekyllData = new JekyllData();
-        }
-
-    }
+    // Removed ClassGroup and DataItem classes as they are no longer needed
+    // since we're only generating YAML files and not markdown
 
     public class ClassData
     {
@@ -42,33 +24,16 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public string? Description { get; set; }
         public string? ClassName { get; set; }
         public string? TypeName { get; set; }
-        [Obsolete]
-        public string? Architecture { get; set; }
-        public List<OptionsItem> Options { get;  set; }
+        public List<OptionsItem> Options { get; set; }
         public string Status { get; internal set; }
         public string ProcessingTarget { get; internal set; }
         public string ClassFile { get; internal set; }
         public string OptionsClassFile { get; internal set; }
-        public NotesInfo Notes { get; internal set; }
+        // Removed Notes property as we no longer handle notes files
     }
 
-    public class JekyllData
-    {
-        public List<string> Redirect_from { get;  set; }
-        public string layout { get;  set; }
-        public bool toc { get;  set; }
-        public string Permalink { get;  set; }
-        public string title { get; internal set; }
-        public List<string> categories { get; internal set; }
-        public List<MarkdownInfo> Topics { get; internal set; }
-        public JekyllData()
-        {
-            Redirect_from = new List<string>();
-            categories = new List<string>();
-            Topics = new List<MarkdownInfo>();  
-        }
-       
-    }
+    // Removed ClassGroup, DataItem, JekyllData, and NotesInfo classes as they are no longer needed
+    // since we're only generating YAML files and not markdown
 
     public class OptionsItem
     {
@@ -81,17 +46,9 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
     public class ConfigurationSample
     {
         public string Name { get; set; }
-
         public int Order { get; set; }
         public string Description { get; set; }
         public string Code { get; set; }
-        public string SampleFor { get;  set; }
-    }
-
-    public class NotesInfo
-    {
-        public bool Exists { get; internal set; }
-        public string Path { get; internal set; }
-        public string Markdown { get; internal set; }
+        public string SampleFor { get; set; }
     }
 }

@@ -19,7 +19,7 @@
   {{ $pathParts := split $cleanPath "." }}
 
   {{/* Navigate through the nested data structure */}}
-  {{ $data = index .Site.Data $cleanPath }}
+  {{ $data = index .Site.Data.classes $cleanPath }}
 {{ end }}
 
 {{/* Render Description */}}

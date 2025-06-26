@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.fieldmaps.multivalueconditionalmap.json",
+  "title": "MultiValueConditionalMap",
+  "description": "missing XML code comments",
+  "type": "object",
+  "properties": {
+    "applyTo": {
+      "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+      "type": "array"
+    },
+    "sourceFieldsAndValues": {
+      "description": "missing XML code comments",
+      "type": "object"
+    },
+    "targetFieldsAndValues": {
+      "description": "missing XML code comments",
+      "type": "object"
+    }
+  }
+}

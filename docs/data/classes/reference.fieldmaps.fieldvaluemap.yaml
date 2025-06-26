@@ -1,0 +1,99 @@
+optionsClassName: FieldValueMapOptions
+optionsClassFullName: MigrationTools.Tools.FieldValueMapOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValueMap",
+                "ApplyTo": [
+                  "*"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldValueMapOptions
+- name: sample
+  order: 1
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "FieldMappingTool": {
+            "FieldMaps": [
+              {
+                "FieldMapType": "FieldValueMap",
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "defaultValue": "StateB",
+                "sourceField": "System.State",
+                "targetField": "System.State",
+                "valueMapping": {
+                  "StateA": "StateB"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Tools.FieldValueMapOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "FieldValueMapOptions",
+      "sourceField": "System.State",
+      "targetField": "System.State",
+      "defaultValue": "StateB",
+      "valueMapping": {
+        "StateA": "StateB"
+      },
+      "ApplyTo": [
+        "*",
+        "SomeWorkItemType"
+      ]
+    }
+  sampleFor: MigrationTools.Tools.FieldValueMapOptions
+description: Maps field values based on a lookup table, allowing specific source values to be translated to different target values.
+className: FieldValueMap
+typeName: FieldMaps
+options:
+- parameterName: ApplyTo
+  type: List
+  description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
+  defaultValue: missing XML code comments
+- parameterName: defaultValue
+  type: String
+  description: Gets or sets the default value to use when no mapping is found for the source field value.
+  defaultValue: missing XML code comments
+- parameterName: sourceField
+  type: String
+  description: Gets or sets the name of the source field to read values from during migration.
+  defaultValue: missing XML code comments
+- parameterName: targetField
+  type: String
+  description: Gets or sets the name of the target field to write mapped values to during migration.
+  defaultValue: missing XML code comments
+- parameterName: valueMapping
+  type: Dictionary
+  description: Gets or sets the dictionary that maps source field values to target field values. Key is the source value, value is the target value.
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/FieldValueMap.cs
+optionsClassFile: src/MigrationTools/Tools/FieldMappingTool/FieldMaps/FieldValueMapOptions.cs
