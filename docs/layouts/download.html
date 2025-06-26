@@ -1,7 +1,38 @@
 {{- define "main" }}
+
+  {{ $releases := resources.GetRemote "https://api.github.com/repos/nkdAgility/azure-devops-migration-tools/releases" }}
+  {{ $releases = $releases | transform.Unmarshal }}
+
+  {{/* Get latest stable and prerelease versions */}}
+  {{ $releaseInfo := "" }}
+  {{ $latestRelease := "" }}
+  {{ $latestPrerelease := "" }}
+  {{ if $releases }}
+    {{ $latestRelease = index (where $releases "prerelease" false) 0 }}
+    {{ $latestPrerelease = index (where $releases "prerelease" true) 0 }}
+  {{ end }}
+  {{ if eq hugo.Environment "production" }}
+    {{ $releaseInfo = $latestRelease }}
+  {{ else }}
+    {{ $releaseInfo = $latestPrerelease }}
+  {{ end }}
+
   <section class="container py-5">
     <div class="text-center mb-5">
       <h1 class="display-4 mb-3">Download Azure DevOps Migration Tools</h1>
+      {{ if $releaseInfo }}
+        <div class="mb-3">
+          <span class="badge {{ if $releaseInfo.prerelease }}bg-warning text-dark{{ else }}bg-success{{ end }} fs-6 mb-2">
+            {{ if $releaseInfo.prerelease }}Preview {{ end }}Version {{ $releaseInfo.tag_name }}
+          </span>
+          {{ if $releaseInfo.prerelease }}
+            <div class="alert alert-info mx-auto" style="max-width: 600px;">
+              <i class="fa-solid fa-info-circle me-2"></i>
+              You're viewing the preview version. <a href="https://devopsmigration.io{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/download/{{ end }}" class="fw-bold">Switch to stable release</a>
+            </div>
+          {{ end }}
+        </div>
+      {{ end }}
       <h2 class="h4 text-muted">Install the Azure DevOps Migration Tools on Windows using your preferred method</h2>
     </div>
     <!-- Installation Section -->
@@ -22,7 +53,11 @@
                 <div class="mb-3">
                   <h6 class="small text-muted mb-1">Command:</h6>
                   <div class="p-2 rounded" style="background-color: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color);">
-                    <code class="small">winget install nkdAgility.AzureDevOpsMigrationTools</code>
+                    {{ if and $releaseInfo $releaseInfo.prerelease }}
+                      <code class="small">winget install nkdagility.azure-devops-migration-tools.Preview --version {{ replace $releaseInfo.tag_name "v" "" }}</code>
+                    {{ else }}
+                      <code class="small">winget install nkdAgility.AzureDevOpsMigrationTools</code>
+                    {{ end }}
                   </div>
                 </div>
 
@@ -38,6 +73,10 @@
                 <div class="alert alert-warning small mb-0" style="background-color: var(--bs-warning-bg-subtle); border-color: var(--bs-warning-border-subtle); color: var(--bs-warning-text-emphasis);">
                   <i class="fa-solid fa-exclamation-triangle me-1"></i>
                   <strong>Note:</strong> Do not install using an elevated command prompt!
+                  {{ if and $releaseInfo $releaseInfo.prerelease }}
+                    <br><strong>Preview:</strong> This version may contain new features but could be less stable.
+                    <br><strong>Approval Delay:</strong> Preview versions may take a few days to appear in the Winget store after release.
+                  {{ end }}
                 </div>
               </div>
             </div>
@@ -57,7 +96,11 @@
                 <div class="mb-3">
                   <h6 class="small text-muted mb-1">Command:</h6>
                   <div class="p-2 rounded" style="background-color: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color);">
-                    <code class="small">choco install vsts-sync-migrator</code>
+                    {{ if and $releaseInfo $releaseInfo.prerelease }}
+                      <code class="small">choco install vsts-sync-migrator --version {{ replace (replace $releaseInfo.tag_name "v" "") "-Preview." "-preview000" }}</code>
+                    {{ else }}
+                      <code class="small">choco install vsts-sync-migrator</code>
+                    {{ end }}
                   </div>
                 </div>
 
@@ -69,6 +112,13 @@
                     <li>Run using <code>devopsmigration.exe</code></li>
                   </ul>
                 </div>
+
+                {{ if and $releaseInfo $releaseInfo.prerelease }}
+                <div class="alert alert-info small mb-0" style="background-color: var(--bs-info-bg-subtle); border-color: var(--bs-info-border-subtle); color: var(--bs-info-text-emphasis);">
+                  <i class="fa-solid fa-clock me-1"></i>
+                  <strong>Approval Delay:</strong> Preview versions may take a few hours to appear in the Chocolatey store after release.
+                </div>
+                {{ end }}
               </div>
             </div>
           </div>
@@ -90,7 +140,21 @@
                 <div class="mb-3">
                   <h6 class="small fw-bold mb-2">Steps:</h6>
                   <ol class="small text-muted mb-0">
-                    <li>Download the <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest" target="_blank" class="fw-bold">latest release</a> (zip file)</li>
+                    {{ if $releaseInfo }}
+                      {{ $zipAsset := "" }}
+                      {{ range $releaseInfo.assets }}
+                        {{ if and (strings.HasSuffix .name ".zip") (not (strings.Contains .name ".vsix")) }}
+                          {{ $zipAsset = . }}
+                        {{ end }}
+                      {{ end }}
+                      {{ if $zipAsset }}
+                        <li>Download the <a href="{{ $zipAsset.browser_download_url }}" target="_blank" class="fw-bold">{{ $zipAsset.name }}</a> ({{ div $zipAsset.size 1048576 | math.Round }} MB)</li>
+                      {{ else }}
+                        <li>Download the <a href="{{ $releaseInfo.html_url }}" target="_blank" class="fw-bold">latest release</a> (zip file)</li>
+                      {{ end }}
+                    {{ else }}
+                      <li>Download the <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest" target="_blank" class="fw-bold">latest release</a> (zip file)</li>
+                    {{ end }}
                     <li>Extract to your preferred folder</li>
                     <li>Run <code>devopsmigration.exe</code> from the folder</li>
                   </ol>
@@ -126,13 +190,18 @@
       </div>
     </div>
 
-    <!-- Preview Build Section -->
+    <!-- Preview/Stable Build Section -->
     <div class="container pb-5">
       <div class="row justify-content-center">
         <div class="col-lg-6 col-md-8">
           <div class="text-center p-4 rounded" style="background-color: var(--bs-secondary-bg); border: 1px solid var(--bs-border-color);">
-            <h4 class="mb-3">Want new features sooner?</h4>
-            <p class="mb-0">Get the <a href="https://github.com/nkdAgility/azure-devops-migration-tools/releases" target="_blank" class="fw-bold">Preview build</a> instead.</p>
+            {{ if and $releaseInfo $releaseInfo.prerelease }}
+              <h4 class="mb-3">Prefer stable releases?</h4>
+              <p class="mb-0">Switch to the <a href="https://devopsmigration.io{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/download/{{ end }}" class="fw-bold">stable release</a> instead.</p>
+            {{ else }}
+              <h4 class="mb-3">Want new features sooner?</h4>
+              <p class="mb-0">Get the <a href="https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/download/{{ end }}" class="fw-bold">Preview build</a> instead.</p>
+            {{ end }}
           </div>
         </div>
       </div>
