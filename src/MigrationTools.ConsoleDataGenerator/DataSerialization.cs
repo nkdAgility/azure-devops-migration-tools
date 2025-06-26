@@ -222,19 +222,23 @@ namespace MigrationTools.ConsoleDataGenerator
                         var fieldMaps = allClassData.Where(cd => cd.TypeName.Equals("FieldMaps", StringComparison.OrdinalIgnoreCase)).ToList();
                         if (fieldMaps.Any())
                         {
-                            // Create the fieldMaps property with prefixItems structure
+                            // Create the fieldMaps property with prefixItems structure like the working individual schema
                             var fieldMapsSchema = new JSchema
                             {
                                 Type = JSchemaType.Array,
                                 Description = "Gets or sets the list of field mapping configurations to apply."
                             };
                             
-                            // Add each field map schema as a prefixItems option
+                            // Create a single prefixItems schema with anyOf for all field map types
+                            var prefixItemSchema = new JSchema();
                             foreach (var fieldMap in fieldMaps)
                             {
                                 var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
-                                fieldMapsSchema.Items.Add(fieldMapSchema);
+                                prefixItemSchema.AnyOf.Add(fieldMapSchema);
                             }
+                            
+                            // Add the single prefixItems schema to the array
+                            fieldMapsSchema.Items.Add(prefixItemSchema);
                             
                             // Replace the fieldMaps property
                             if (enhancedToolSchema.Properties.ContainsKey("fieldMaps"))
