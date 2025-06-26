@@ -184,6 +184,7 @@
         themeIcon.classList.add("fa-sun");
         localStorage.setItem("theme", "light");
         updateThemeImages("light");
+        updateButtonStyling("light");
       } else {
         // Switch to dark theme
         body.setAttribute("data-bs-theme", "dark");
@@ -194,6 +195,7 @@
         themeIcon.classList.add("fa-moon");
         localStorage.setItem("theme", "dark");
         updateThemeImages("dark");
+        updateButtonStyling("dark");
       }
     });
 
