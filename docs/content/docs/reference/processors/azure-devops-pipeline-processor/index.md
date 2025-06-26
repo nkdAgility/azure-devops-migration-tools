@@ -1,7 +1,7 @@
 ---
 title: Azure Dev Ops Pipeline Processor
 description: Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.
-dataFile: data/reference.processors.azuredevopspipelineprocessor.yaml
+dataFile: reference.processors.azuredevopspipelineprocessor.yaml
 slug: azure-devops-pipeline-processor
 aliases:
 - /docs/Reference/Processors/AzureDevOpsPipelineProcessor

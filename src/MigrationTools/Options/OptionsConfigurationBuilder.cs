@@ -21,15 +21,15 @@ using Serilog.Core;
 namespace MigrationTools.Options
 {
 
-  
 
-    public  class OptionsConfigurationBuilder
+
+    public class OptionsConfigurationBuilder
     {
-        
+
 
         readonly ILogger logger;
         readonly IConfiguration configuration;
-        
+
 
         OptionsContainer optionsContainer;
 
@@ -79,10 +79,11 @@ namespace MigrationTools.Options
 
         public void AddOption(OptionItem option)
         {
-            if (option != null && option.Option !=null )
+            if (option != null && option.Option != null)
             {
                 optionsContainer.AddOption(option);
-            } else
+            }
+            else
             {
                 logger.LogWarning("Could not add OptionItem as it was null or its IOption was!");
             }
@@ -96,7 +97,8 @@ namespace MigrationTools.Options
                 {
                     AddOption(item);
                 }
-            } else
+            }
+            else
             {
                 logger.LogWarning("Could not add options as they were null");
             }
@@ -104,7 +106,7 @@ namespace MigrationTools.Options
 
         public void AddOption(string optionName)
         {
-            AddOption(CreateOptionFromString(optionName));            
+            AddOption(CreateOptionFromString(optionName));
         }
         private IOptions CreateOptionFromString(string optionName)
         {
@@ -126,7 +128,8 @@ namespace MigrationTools.Options
             if (option != null)
             {
                 optionsContainer.AddOption(new OptionItem(key, option));
-            } else
+            }
+            else
             {
                 logger.LogWarning("Could not add option as it was null");
             }
@@ -134,13 +137,14 @@ namespace MigrationTools.Options
 
         public void AddOption(string optionName, string key)
         {
-            optionsContainer.AddOption(new OptionItem(key, CreateOptionFromString(optionName)));     
+            optionsContainer.AddOption(new OptionItem(key, CreateOptionFromString(optionName)));
         }
 
         public string Build()
         {
             logger.LogInformation("Building Configuration");
             JObject configJson = new JObject();
+            configJson["$schema"] = "https://devopsmigration.io/schema/configuration.schema.json";
             configJson["Serilog"] = new JObject();
             configJson["Serilog"]["MinimumLevel"] = $"Information";
             var version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -159,7 +163,7 @@ namespace MigrationTools.Options
                 {
                     configJson = AddOptionToConfig(configuration, configJson, item.Option);
                 }
-               
+
             }
             return configJson.ToString(Newtonsoft.Json.Formatting.Indented);
         }
@@ -176,7 +180,7 @@ namespace MigrationTools.Options
                 var hardPath = $"MigrationTools:Endpoints:{key}";
                 logger.LogDebug("Building Option: {item} to {hardPath}", option.GetType().Name, hardPath);
                 configJson = OptionsConfigurationCompiler.AddOptionsToConfiguration(configJson, option, hardPath, true);
-                
+
             }
             catch (Exception)
             {
@@ -203,7 +207,7 @@ namespace MigrationTools.Options
             {
                 logger.LogDebug("Building Option: {item} to {path}", option.GetType().Name, option.ConfigurationMetadata.PathToInstance);
                 configJson = OptionsConfigurationCompiler.AddOptionsToConfiguration(configJson, option, false);
-                
+
             }
             catch (Exception)
             {
@@ -214,7 +218,7 @@ namespace MigrationTools.Options
             return configJson;
         }
 
-        
+
     }
 
     public class KeyGenerator

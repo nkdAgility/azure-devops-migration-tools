@@ -1,7 +1,7 @@
 ---
 title: Tfs Import Profile Picture Processor
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
-dataFile: data/reference.processors.tfsimportprofilepictureprocessor.yaml
+dataFile: reference.processors.tfsimportprofilepictureprocessor.yaml
 slug: tfs-import-profile-picture-processor
 aliases:
 - /docs/Reference/Processors/TfsImportProfilePictureProcessor

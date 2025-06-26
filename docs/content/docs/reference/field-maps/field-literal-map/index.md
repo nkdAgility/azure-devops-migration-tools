@@ -1,7 +1,7 @@
 ---
 title: Field Literal Map
 description: Maps a literal (static) value to a target field, useful for setting constant values across all migrated work items.
-dataFile: data/reference.fieldmaps.fieldliteralmap.yaml
+dataFile: reference.fieldmaps.fieldliteralmap.yaml
 slug: field-literal-map
 aliases:
 - /docs/Reference/FieldMaps/FieldLiteralMap

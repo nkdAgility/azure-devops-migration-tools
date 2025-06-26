@@ -1,7 +1,7 @@
 ---
 title: Azure DevOps Endpoint
 description: Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.
-dataFile: data/reference.endpoints.azuredevopsendpoint.yaml
+dataFile: reference.endpoints.azuredevopsendpoint.yaml
 slug: azure-devops-endpoint
 aliases:
 - /docs/Reference/Endpoints/AzureDevOpsEndpoint

@@ -2,7 +2,7 @@
 title: Tfs Team Settings Endpoint
 description: |
   This document provides an overview of the Tfs Team Settings Endpoint used in the Azure DevOps Migration Tools, including its configuration and usage.
-dataFile: data/reference.endpoints.tfsteamsettingsendpoint.yaml
+dataFile: reference.endpoints.tfsteamsettingsendpoint.yaml
 slug: tfs-team-settings-endpoint
 aliases:
 - /docs/Reference/Endpoints/TfsTeamSettingsEndpoint

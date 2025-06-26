@@ -1,7 +1,7 @@
 ---
 title: Tfs Team Settings Tool
 description: Tool for migrating team settings including team configurations, area paths, iterations, and team-specific settings from source to target Team Foundation Server or Azure DevOps.
-dataFile: data/reference.tools.tfsteamsettingstool.yaml
+dataFile: reference.tools.tfsteamsettingstool.yaml
 slug: tfs-team-settings-tool
 aliases:
 - /docs/Reference/Tools/TfsTeamSettingsTool

@@ -1,7 +1,7 @@
 ---
 title: Field Merge Map
 description: Merges values from multiple source fields into a single target field using a specified format template.
-dataFile: data/reference.fieldmaps.fieldmergemap.yaml
+dataFile: reference.fieldmaps.fieldmergemap.yaml
 slug: field-merge-map
 aliases:
 - /docs/Reference/FieldMaps/FieldMergeMap

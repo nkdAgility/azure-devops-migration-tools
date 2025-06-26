@@ -1,0 +1,116 @@
+optionsClassName: TfsTeamProjectEndpointOptions
+optionsClassFullName: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Endpoints": {
+          "#KEY#": {
+            "EndpointType": "TfsTeamProjectEndpoint",
+            "AllowCrossProjectLinking": "False",
+            "Authentication": {
+              "AccessToken": "",
+              "AuthenticationMode": "AccessToken",
+              "NetworkCredentials": {
+                "Domain": "",
+                "Password": "",
+                "UserName": ""
+              }
+            },
+            "AuthenticationMode": "AccessToken",
+            "Collection": "",
+            "LanguageMaps": {
+              "AreaPath": "Area",
+              "IterationPath": "Iteration"
+            },
+            "Project": "",
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
+- name: sample
+  order: 1
+  description: 
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "Endpoints": {
+          "#KEY#": {
+            "EndpointType": "TfsTeamProjectEndpoint",
+            "AllowCrossProjectLinking": "False",
+            "Authentication": {
+              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+              "AuthenticationMode": "AccessToken",
+              "NetworkCredentials": {
+                "Domain": "",
+                "Password": "",
+                "UserName": ""
+              }
+            },
+            "Collection": "https://dev.azure.com/nkdagility-preview/",
+            "Project": "migrationSource1",
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+          }
+        }
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "TfsTeamProjectEndpointOptions",
+      "Collection": "https://dev.azure.com/nkdagility-preview/",
+      "Project": "migrationSource1",
+      "Authentication": {
+        "AuthenticationMode": "AccessToken",
+        "NetworkCredentials": {
+          "Domain": "",
+          "UserName": "",
+          "Password": "** removed as a secret ***"
+        },
+        "AccessToken": "** removed as a secret ***"
+      },
+      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+      "LanguageMaps": {
+        "AreaPath": "Area",
+        "IterationPath": "Iteration"
+      }
+    }
+  sampleFor: MigrationTools.Endpoints.TfsTeamProjectEndpointOptions
+description: missing XML code comments
+className: TfsTeamProjectEndpoint
+typeName: Endpoints
+options:
+- parameterName: Authentication
+  type: TfsAuthenticationOptions
+  description: Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.
+  defaultValue: missing XML code comments
+- parameterName: Collection
+  type: Uri
+  description: URI of the TFS collection (e.g., "http://tfsserver:8080/tfs/DefaultCollection"). Must be a valid absolute URL pointing to the TFS collection.
+  defaultValue: missing XML code comments
+- parameterName: LanguageMaps
+  type: TfsLanguageMapOptions
+  description: Language mapping configuration for translating area and iteration path names between different language versions of TFS.
+  defaultValue: missing XML code comments
+- parameterName: Project
+  type: String
+  description: Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.
+  defaultValue: missing XML code comments
+- parameterName: ReflectedWorkItemIdField
+  type: String
+  description: Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
+  defaultValue: missing XML code comments
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsTeamProjectEndpoint.cs
+optionsClassFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsTeamProjectEndPointOptions.cs

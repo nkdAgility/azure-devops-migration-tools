@@ -1,7 +1,7 @@
 ---
 title: Work Item Type Mapping Tool
 description: Provides mapping functionality for transforming work item types from source to target systems during migration, allowing different work item type names to be used in the target.
-dataFile: data/reference.tools.workitemtypemappingtool.yaml
+dataFile: reference.tools.workitemtypemappingtool.yaml
 slug: work-item-type-mapping-tool
 aliases:
 - /docs/Reference/Tools/WorkItemTypeMappingTool

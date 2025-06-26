@@ -1,5 +1,10 @@
 {{- define "main" }}
-  _default/list.html
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-12" style="max-width: 1800px;">
+  <div class="docs-body">
+    {{ .Content | markdownify }}
+  </div> </div> </div> </div>
 {{- end }}
 {{- define "template" }}
   _default/list.html

@@ -1,7 +1,7 @@
 ---
 title: Tree To Tag Field Map
 description: Maps work item area path or iteration path hierarchies to tags, allowing tree structures to be represented as flat tag collections.
-dataFile: data/reference.fieldmaps.treetotagfieldmap.yaml
+dataFile: reference.fieldmaps.treetotagfieldmap.yaml
 slug: tree-to-tag-field-map
 aliases:
 - /docs/Reference/FieldMaps/TreeToTagFieldMap

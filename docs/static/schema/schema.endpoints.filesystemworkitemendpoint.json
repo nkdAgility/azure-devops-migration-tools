@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.endpoints.filesystemworkitemendpoint.json",
+  "title": "FileSystemWorkItemEndpoint",
+  "description": "missing XML code comments",
+  "type": "object",
+  "properties": {
+    "fileStore": {
+      "description": "Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.",
+      "type": "string"
+    }
+  }
+}
