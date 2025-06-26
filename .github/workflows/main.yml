@@ -465,7 +465,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cschleiden/replace-tokens@v1
         with:
-          files: '["**/*.html", "**/*.yaml"]'
+          files: '["**/*.html", "**/*.yaml", "**/*.yml"]'
           tokenPrefix: "#{"
           tokenSuffix: "}#"
         env:
@@ -473,6 +473,7 @@ jobs:
           GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
           GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
           GitVersion.SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+          GitHub.PullRequestNumber: ${{ github.event.pull_request.number || '0' }}
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
@@ -483,7 +484,10 @@ jobs:
           $environment = "${{ needs.Setup.outputs.nkdAgility_Ring }}".ToLower()
           Write-Host "Building site for $environment ";
           $env:HUGO_ENV = "$environment";
-          hugo --source docs --config hugo.yaml,hugo.$environment.yaml --logLevel debug; # --minify
+          Write-Host "HUGO_ENV is set to $env:HUGO_ENV"
+          $configFiles = "hugo.yaml,hugo.$environment.yaml"
+          Write-Host "Using config files: $configFiles"
+          hugo --source docs --config $configFiles --logLevel debug;
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Site2
