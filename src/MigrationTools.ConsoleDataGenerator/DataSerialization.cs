@@ -91,20 +91,20 @@ namespace MigrationTools.ConsoleDataGenerator
                             var arraySchemaJson = new JObject();
                             arraySchemaJson["type"] = "array";
                             arraySchemaJson["description"] = option.Description.ToString();
-                            
+
                             // Create prefixItems with anyOf structure (matching working schema)
                             var prefixItemsObj = new JObject();
                             var anyOfArray = new JArray();
-                            
+
                             foreach (var fieldMap in fieldMaps)
                             {
                                 var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
                                 anyOfArray.Add(JObject.Parse(fieldMapSchema.ToString()));
                             }
-                            
+
                             prefixItemsObj["anyOf"] = anyOfArray;
                             arraySchemaJson["prefixItems"] = prefixItemsObj;
-                            
+
                             propertySchema = JSchema.Parse(arraySchemaJson.ToString());
                         }
                     }
@@ -217,7 +217,7 @@ namespace MigrationTools.ConsoleDataGenerator
                         // Generate the enhanced schema but use CreateSchemaFromClassData for main config
                         // to avoid parsing the complex prefixItems structure
                         var enhancedToolSchema = CreateSchemaFromClassData(toolClass);
-                        
+
                         // Add the fieldMaps property manually with the prefixItems structure
                         var fieldMaps = allClassData.Where(cd => cd.TypeName.Equals("FieldMaps", StringComparison.OrdinalIgnoreCase)).ToList();
                         if (fieldMaps.Any())
@@ -228,7 +228,7 @@ namespace MigrationTools.ConsoleDataGenerator
                                 Type = JSchemaType.Array,
                                 Description = "Gets or sets the list of field mapping configurations to apply."
                             };
-                            
+
                             // Create a single prefixItems schema with anyOf for all field map types
                             var prefixItemSchema = new JSchema();
                             foreach (var fieldMap in fieldMaps)
@@ -236,17 +236,17 @@ namespace MigrationTools.ConsoleDataGenerator
                                 var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
                                 prefixItemSchema.AnyOf.Add(fieldMapSchema);
                             }
-                            
+
                             // Add the single prefixItems schema to the array
                             fieldMapsSchema.Items.Add(prefixItemSchema);
-                            
+
                             // Replace the fieldMaps property
                             if (enhancedToolSchema.Properties.ContainsKey("fieldMaps"))
                             {
                                 enhancedToolSchema.Properties["fieldMaps"] = fieldMapsSchema;
                             }
                         }
-                        
+
                         toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), enhancedToolSchema);
                     }
                     else
