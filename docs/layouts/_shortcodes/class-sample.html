@@ -17,10 +17,10 @@
 {{ if $dataFile }}
   {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
   {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
-  {{ $pathParts := split $cleanPath.classes "." }}
+  {{ $pathParts := split $cleanPath "." }}
 
   {{/* Navigate through the nested data structure */}}
-  {{ $data = index .Site.Data $cleanPath }}
+  {{ $data = index .Site.Data.classes $cleanPath }}
 {{ end }}
 
 {{/* Find and render the specific sample */}}
