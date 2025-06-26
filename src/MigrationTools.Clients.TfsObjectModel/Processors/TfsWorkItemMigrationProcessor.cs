@@ -598,7 +598,7 @@ namespace MigrationTools.Processors
         {
             if (targetWorkItem != null && Options.FixHtmlAttachmentLinks)
             {
-                CommonTools.EmbededImages.FixEmbededImages(this, null, targetWorkItem);
+                CommonTools.EmbededImages.FixEmbededImages(this, targetWorkItem);
             }
         }
 
