@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.fieldmaps.fieldtofieldmap.json",
+  "title": "FieldToFieldMap",
+  "description": "Maps the value from a source field to a target field directly, with optional default value substitution for empty or null values.",
+  "type": "object",
+  "properties": {
+    "applyTo": {
+      "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+      "type": "array"
+    },
+    "defaultValue": {
+      "description": "Gets or sets the default value to use when the source field is empty or null.",
+      "type": "string"
+    },
+    "sourceField": {
+      "description": "Gets or sets the name of the source field to copy data from during migration.",
+      "type": "string"
+    },
+    "targetField": {
+      "description": "Gets or sets the name of the target field to copy data to during migration.",
+      "type": "string"
+    }
+  }
+}

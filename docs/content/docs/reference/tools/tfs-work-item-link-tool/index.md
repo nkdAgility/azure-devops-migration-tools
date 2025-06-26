@@ -1,7 +1,7 @@
 ---
 title: Tfs Work Item Link Tool
 description: Tool for migrating work item links and relationships between work items, including shared steps and parameters for test cases.
-dataFile: data/reference.tools.tfsworkitemlinktool.yaml
+dataFile: reference.tools.tfsworkitemlinktool.yaml
 slug: tfs-work-item-link-tool
 aliases:
 - /docs/Reference/Tools/TfsWorkItemLinkTool

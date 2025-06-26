@@ -9,13 +9,14 @@ using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.ConsoleDataGenerator;
+
 class Program
 {
     private static IConfiguration configuration = GetConfiguration();
     private static string rootPath = GetRepositoryRoot();
     private static DataSerialization saveData = new DataSerialization(rootPath);
     private static ClassDataLoader cdLoader = new ClassDataLoader(rootPath, saveData, configuration);
-    private static MarkdownLoader mdLoader = new MarkdownLoader(Path.Combine(rootPath, "docs/Reference/"));
+    // Removed MarkdownLoader as we no longer need notes and introduction files
 
 
     static void Main(string[] args)
@@ -66,64 +67,39 @@ class Program
         foreach (var classData in classDataList)
         {
             Console.Write($"Out: {classData.ClassName}");
-            
-            // Add notes information to the ClassData
-            var notesInfo = mdLoader.GetMarkdownForTopic(classData, "notes");
-            classData.Notes = new NotesInfo
-            {
-                Exists = notesInfo.Exists,
-                Path = notesInfo.Path,
-                Markdown = notesInfo.Markdown
-            };
-            
+
+            // No longer need to add notes information as we've removed this requirement
+
             saveData.WriteYamlDataToDataFolder(classData);
             Console.Write($" [Yaml]");
-            JekyllData jekyllData = GetJekyllData(classData);
 
-            saveData.WriteMarkdownDataToCollectionFolder(classData, jekyllData);
-            Console.Write($" [Markdown]");
+            saveData.WriteJsonSchemaToDataFolder(classData, classDataList);
+            Console.Write($" [Schema]");
+
+            // Removed markdown generation as it's no longer needed
             Console.WriteLine();
         }
+
+        // Generate the complete configuration schema
+        Console.Write("Out: Full Configuration Schema");
+        saveData.WriteFullConfigurationSchema(classDataList);
+        Console.WriteLine(" [Schema]");
+
         Console.WriteLine("-----------");
 
-    }
-
-    private static JekyllData GetJekyllData(ClassData classData)
-    {
-        JekyllData data = new JekyllData();
-        data.Permalink = $"/Reference/{classData.TypeName}/{classData.ClassName}/";
-        data.layout = "reference";
-        data.toc = true;
-        data.title = classData.ClassName;
-        data.categories.Add(classData.TypeName);
-        data.categories.Add(classData.Architecture);
-        data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "notes"));
-        data.Topics.Add(mdLoader.GetMarkdownForTopic(classData, "introduction"));
-        List<string> posibleOldUrls = new List<string>()
-        {
-            $"/Reference/{classData.TypeName}/{classData.OptionsClassName}/"
-        };
-        foreach (var possible in posibleOldUrls)
-        {
-            if (possible != data.Permalink)
-            {
-                data.Redirect_from.Add(possible);
-            }
-        }
-        return data;
     }
 
     private static IConfiguration GetConfiguration()
     {
         // Create a new ConfigurationBuilder
         var configurationBuilder = new ConfigurationBuilder();
-        
+
         // Calculate the absolute path to the repository root appsettings.json
         var repoRoot = GetRepositoryRoot();
-        
+
         configurationBuilder.SetBasePath(repoRoot);
         configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-        
+
         // Build the configuration
         return configurationBuilder.Build();
     }
@@ -132,7 +108,7 @@ class Program
     {
         // Start from current directory and walk up to find the repository root
         string currentDir = Directory.GetCurrentDirectory();
-        
+
         while (currentDir != null)
         {
             // Look for indicators of repository root (like .git, src folder, or MigrationTools.sln)
@@ -141,19 +117,19 @@ class Program
             {
                 return currentDir;
             }
-            
+
             string parentDir = Directory.GetParent(currentDir)?.FullName;
             if (parentDir == currentDir) // Reached root of filesystem
                 break;
             currentDir = parentDir;
         }
-        
+
         // Fallback: try the original relative paths
         if (Directory.Exists("../../src"))
             return "../../";
         else if (Directory.Exists("../../../../../src"))
             return "../../../../../";
-        
+
         throw new DirectoryNotFoundException("Could not locate repository root directory. Please run from project directory or bin directory.");
     }
 

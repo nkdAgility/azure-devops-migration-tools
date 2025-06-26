@@ -1,7 +1,7 @@
 ---
 title: String Manipulator Tool
 description: Used to process the String fields of a work item. This is useful for cleaning up data. It will limit fields to a max length and apply regex replacements based on what is configured. Each regex replacement is applied in order and can be enabled or disabled.
-dataFile: data/reference.tools.stringmanipulatortool.yaml
+dataFile: reference.tools.stringmanipulatortool.yaml
 slug: string-manipulator-tool
 aliases:
 - /docs/Reference/Tools/StringManipulatorTool

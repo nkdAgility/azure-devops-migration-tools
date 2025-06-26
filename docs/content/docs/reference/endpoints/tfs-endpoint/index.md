@@ -2,7 +2,7 @@
 title: Tfs Endpoint
 description: |
   This document provides an overview of the Tfs Endpoint used in the Azure DevOps Migration Tools, including its configuration and usage.
-dataFile: data/reference.endpoints.tfsendpoint.yaml
+dataFile: reference.endpoints.tfsendpoint.yaml
 slug: tfs-endpoint
 aliases:
 - /docs/Reference/Endpoints/TfsEndpoint

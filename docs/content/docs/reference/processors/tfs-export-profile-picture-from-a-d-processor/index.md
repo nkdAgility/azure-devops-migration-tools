@@ -1,7 +1,7 @@
 ---
 title: Tfs Export Profile Picture From A D Processor
 description: Downloads corporate images and updates TFS/Azure DevOps profiles
-dataFile: data/reference.processors.tfsexportprofilepicturefromadprocessor.yaml
+dataFile: reference.processors.tfsexportprofilepicturefromadprocessor.yaml
 slug: tfs-export-profile-picture-from-a-d-processor
 aliases:
 - /docs/Reference/Processors/TfsExportProfilePictureFromADProcessor

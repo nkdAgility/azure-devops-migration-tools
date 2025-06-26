@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.processors.tfstestvariablesmigrationprocessor.json",
+  "title": "TfsTestVariablesMigrationProcessor",
+  "description": "This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "processor": {
+      "description": "Gets the processor identifier for test variables migration.",
+      "type": "string"
+    },
+    "sourceName": {
+      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+      "type": "string"
+    },
+    "targetName": {
+      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+      "type": "string"
+    }
+  }
+}

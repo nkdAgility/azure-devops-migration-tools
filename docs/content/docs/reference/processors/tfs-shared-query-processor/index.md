@@ -1,7 +1,7 @@
 ---
 title: Tfs Shared Query Processor
 description: The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
-dataFile: data/reference.processors.tfssharedqueryprocessor.yaml
+dataFile: reference.processors.tfssharedqueryprocessor.yaml
 slug: tfs-shared-query-processor
 aliases:
 - /docs/Reference/Processors/TfsSharedQueryProcessor

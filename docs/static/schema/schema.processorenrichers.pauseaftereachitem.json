@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.processorenrichers.pauseaftereachitem.json",
+  "title": "PauseAfterEachItem",
+  "description": "missing XML code comments",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If enabled this will run this migrator",
+      "type": "boolean",
+      "default": "true"
+    },
+    "optionFor": {
+      "description": "missing XML code comments",
+      "type": "string"
+    },
+    "refName": {
+      "description": "For internal use",
+      "type": "string"
+    }
+  }
+}

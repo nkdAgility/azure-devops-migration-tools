@@ -1,0 +1,62 @@
+{{- $type := .Get "type" -}}
+{{- $schemas := slice -}}
+
+{{- /* Get all schema files from the static/schema directory */ -}}
+{{- $schemaFiles := slice -}}
+{{- range (readDir "static/schema") -}}
+  {{- if (strings.HasSuffix .Name ".json") -}}
+    {{- $schemaFiles = $schemaFiles | append .Name -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Filter schemas by type if specified */ -}}
+{{- if $type -}}
+  {{- range $schemaFiles -}}
+    {{- if (strings.HasPrefix . (printf "schema.%s." $type)) -}}
+      {{- $schemas = $schemas | append . -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- $schemas = $schemaFiles -}}
+{{- end -}}
+
+{{- /* Sort schemas alphabetically */ -}}
+{{- $schemas = sort $schemas -}}
+
+<ul>
+{{- range $schemas -}}
+  {{- $filename := . -}}
+  {{- $name := . -}}
+  {{- $description := "" -}}
+  
+  {{- /* Try to read schema metadata from the JSON file */ -}}
+  {{- $schemaPath := printf "static/schema/%s" . -}}
+  {{- if fileExists $schemaPath -}}
+    {{- $schemaContent := readFile $schemaPath | unmarshal -}}
+    {{- if $schemaContent.title -}}
+      {{- $name = $schemaContent.title -}}
+    {{- end -}}
+    {{- if $schemaContent.description -}}
+      {{- $description = $schemaContent.description -}}
+    {{- end -}}
+  {{- end -}}
+  
+  {{- /* Fallback to filename-based name if no title found */ -}}
+  {{- if or (not $name) (eq $name $filename) -}}
+    {{- if (strings.HasPrefix . "schema.") -}}
+      {{- $name = . | replaceRE "^schema\\.(.*)\\.json$" "$1" -}}
+      {{- /* Convert to title case and add spaces before capitals */ -}}
+      {{- $name = $name | title | replaceRE "([a-z])([A-Z])" "$1 $2" -}}
+    {{- else if (eq . "configuration.schema.json") -}}
+      {{- $name = "Configuration Schema" -}}
+    {{- end -}}
+  {{- end -}}
+  
+  <li>
+    <a href="{{ $filename }}"><strong>{{ $name }}</strong></a>
+    {{- if $description -}}
+      <br><small class="text-muted">{{ $description | truncate 100 }}</small>
+    {{- end -}}
+  </li>
+{{- end -}}
+</ul>
