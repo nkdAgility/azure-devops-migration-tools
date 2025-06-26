@@ -87,22 +87,23 @@ namespace MigrationTools.ConsoleDataGenerator
 
                         if (fieldMaps.Any())
                         {
-                            // Create JSON manually with items as a single schema with anyOf
-                            var itemSchemas = fieldMaps.Select(fm => CreateSchemaFromClassData(fm)).ToList();
-                            
+                            // Create JSON manually using prefixItems with anyOf (same as working individual schema)
                             var arraySchemaJson = new JObject();
                             arraySchemaJson["type"] = "array";
                             arraySchemaJson["description"] = option.Description.ToString();
                             
-                            // Create items as a single schema with anyOf allowing any field map type
-                            var itemsSchema = new JObject();
+                            // Create prefixItems with anyOf structure (matching working schema)
+                            var prefixItemsObj = new JObject();
                             var anyOfArray = new JArray();
-                            foreach (var itemSchema in itemSchemas)
+                            
+                            foreach (var fieldMap in fieldMaps)
                             {
-                                anyOfArray.Add(JObject.Parse(itemSchema.ToString()));
+                                var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
+                                anyOfArray.Add(JObject.Parse(fieldMapSchema.ToString()));
                             }
-                            itemsSchema["anyOf"] = anyOfArray;
-                            arraySchemaJson["items"] = itemsSchema;
+                            
+                            prefixItemsObj["anyOf"] = anyOfArray;
+                            arraySchemaJson["prefixItems"] = prefixItemsObj;
                             
                             propertySchema = JSchema.Parse(arraySchemaJson.ToString());
                         }
@@ -208,10 +209,47 @@ namespace MigrationTools.ConsoleDataGenerator
 
                 foreach (var toolClass in toolClasses)
                 {
-                    // Use the enhanced schema generation that includes field maps for FieldMappingTool
-                    var toolSchemaJson = GenerateJsonSchemaForClass(toolClass, allClassData);
-                    var toolSchema = JSchema.Parse(toolSchemaJson);
-                    toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), toolSchema);
+                    // For FieldMappingTool, use the enhanced schema generation with field maps
+                    // For other tools, use the simple CreateSchemaFromClassData approach
+                    // This avoids parsing issues with the complex prefixItems structure
+                    if (toolClass.ClassName.Equals("FieldMappingTool", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Generate the enhanced schema but use CreateSchemaFromClassData for main config
+                        // to avoid parsing the complex prefixItems structure
+                        var enhancedToolSchema = CreateSchemaFromClassData(toolClass);
+                        
+                        // Add the fieldMaps property manually with the prefixItems structure
+                        var fieldMaps = allClassData.Where(cd => cd.TypeName.Equals("FieldMaps", StringComparison.OrdinalIgnoreCase)).ToList();
+                        if (fieldMaps.Any())
+                        {
+                            // Create the fieldMaps property with prefixItems structure
+                            var fieldMapsSchema = new JSchema
+                            {
+                                Type = JSchemaType.Array,
+                                Description = "Gets or sets the list of field mapping configurations to apply."
+                            };
+                            
+                            // Add each field map schema as a prefixItems option
+                            foreach (var fieldMap in fieldMaps)
+                            {
+                                var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
+                                fieldMapsSchema.Items.Add(fieldMapSchema);
+                            }
+                            
+                            // Replace the fieldMaps property
+                            if (enhancedToolSchema.Properties.ContainsKey("fieldMaps"))
+                            {
+                                enhancedToolSchema.Properties["fieldMaps"] = fieldMapsSchema;
+                            }
+                        }
+                        
+                        toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), enhancedToolSchema);
+                    }
+                    else
+                    {
+                        var toolSchema = CreateSchemaFromClassData(toolClass);
+                        toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), toolSchema);
+                    }
                 }
                 migrationToolsSchema.Properties.Add("commonTools", toolsSchema);
 
