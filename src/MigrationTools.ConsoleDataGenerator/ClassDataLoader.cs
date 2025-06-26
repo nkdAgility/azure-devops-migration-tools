@@ -14,7 +14,7 @@ namespace MigrationTools.ConsoleDataGenerator
         private IConfiguration configuration;
         public ClassDataLoader(string rootPath, DataSerialization saveData, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
-            codeDocs = new CodeDocumentation(Path.Combine(rootPath, "docs/Reference/Generated/"));
+            codeDocs = new CodeDocumentation(Path.Combine(rootPath, "docs/data/classes/"));
             codeFinder = new CodeFileFinder(rootPath);
             this.saveData = saveData;
             this.configuration = configuration;

@@ -11,30 +11,18 @@ namespace MigrationTools.ConsoleDataGenerator
     {
 
         private readonly string dataPath;
-        private readonly string referencePath;
 
         public DataSerialization(string rootPath)
         {
-            dataPath = Path.Combine(rootPath, "docs/_data");
-            referencePath = Path.Combine(rootPath, "docs/collections/_reference");
-        }
-
-        public string SeraliseData(DataItem data, string apiVersion, string dataTypeName)
-        {
-            string filename = $"reference.{apiVersion}.{dataTypeName}.{data.classData.ClassName}";
-            string filePath = Path.Combine(dataPath, filename.ToLower());
-            string yaml = SeraliseDataToYaml(data);
-            File.WriteAllText($"{filePath}.yaml", yaml);
-            yaml = "---" + '\n';
-            yaml = yaml + SeraliseDataToYaml(data.classData) + '\n' + SeraliseDataToYaml(data.jekyllData);
-            yaml = yaml + '\n' + "---";
-            filePath = Path.Combine(referencePath, filename.ToLower());
-            File.WriteAllText($"{filePath}.md", yaml);
-            return yaml;
+            dataPath = Path.Combine(rootPath, "docs/data/classes");
+            // No longer need referencePath since we're not generating markdown
         }
 
         public string WriteYamlDataToDataFolder(ClassData data)
         {
+            // Ensure the directory exists
+            Directory.CreateDirectory(dataPath);
+
             string filename = $"reference.{data.TypeName}.{data.ClassName}";
             string filePath = Path.Combine(dataPath, filename.ToLower());
             string yaml = SeraliseDataToYaml(data);
@@ -42,29 +30,6 @@ namespace MigrationTools.ConsoleDataGenerator
             return yaml;
         }
 
-        public string WriteMarkdownDataToCollectionFolder(ClassData cdata, JekyllData jdata)
-        {
-            string filename = $"reference.{cdata.TypeName}.{cdata.ClassName}";
-            string filePath = Path.Combine(referencePath, filename.ToLower());
-            string yaml = "---" + '\n';
-            yaml = yaml + SeraliseDataToYaml(cdata) + '\n';
-            yaml = yaml + SeraliseDataToYaml(jdata) + '\n';
-            yaml = yaml + "---";
-            File.WriteAllText($"{filePath}.md", yaml);
-            return yaml;
-        }
-
-
-        public string SeraliseData(ClassGroup data, string apiVersion, string dataTypeName)
-        {
-            string filename = $"reference.{apiVersion}.{dataTypeName}";
-            string filePath = Path.Combine(dataPath, filename.ToLower());
-            string json = SeraliseDataToJson(data);
-            File.WriteAllText($"{filePath}.json", json);
-            string yaml = SeraliseDataToYaml(data);
-            File.WriteAllText($"{filePath}.yaml", yaml);
-            return json;
-        }
 
         public string SeraliseDataToJson(object data)
         {
@@ -76,16 +41,15 @@ namespace MigrationTools.ConsoleDataGenerator
             };
 
             // Add our custom converter if a type is specified
-            if (typeof(IOptions).IsAssignableFrom(data.GetType()))
+            if (data is IOptions)
             {
-
                 settings.Converters.Add(new ConditionalTypeConverter(data.GetType()));
             }
 
             return JsonConvert.SerializeObject(data, settings);
         }
 
-        public string SeraliseDataToYaml(object data)
+        public static string SeraliseDataToYaml(object data)
         {
             var serializer = new SerializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
