@@ -3,6 +3,8 @@ title: "JSON Schemas"
 description: "JSON Schema definitions for Azure DevOps Migration Tools configuration"
 weight: 10
 outputs: ["html", "schema-catalog"]
+aliases:
+  - /schema/
 ---
 
 The Azure DevOps Migration Tools provide JSON Schema definitions for configuration validation and IDE support.
