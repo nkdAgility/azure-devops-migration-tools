@@ -22,7 +22,7 @@
 {{ end }}
 
 {{/* Load the schema file from the /static/schema directory */}}
-{{ $schemaPath := printf "static/schema/schema.%s.%s.json" $data.typeName $data.className }}
+{{ $schemaPath := printf "static/schema/schema.%s.%s.json" $data.typeName $data.className | lower }}
 {{ $schemaContent := readFile $schemaPath }}
 
 {{ if $schemaContent }}
