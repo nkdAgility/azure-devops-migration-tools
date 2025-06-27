@@ -4,3 +4,7 @@ minifyOutput: true
 
 buildDrafts: true
 buildFuture: true
+
+params:
+  features:
+    configWizard: true
