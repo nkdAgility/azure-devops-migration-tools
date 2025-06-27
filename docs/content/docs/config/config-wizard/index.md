@@ -1,5 +1,6 @@
 ---
-title: Interactive Configuration Wizard
+title: Interactive Configuration Wizard for the Azur eDevOps Migration Tools
+short_title: Config Wizard
 description: Build your Azure DevOps Migration Tools configuration with our interactive step-by-step wizard supporting three migration type architectures
 weight: 50
 date: 2025-06-26T12:00:00Z

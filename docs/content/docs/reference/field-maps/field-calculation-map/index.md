@@ -7,16 +7,15 @@ description: |
 dataFile: reference.fieldmaps.fieldcalculationmap.yaml
 slug: field-calculation-map
 aliases:
-- /docs/Reference/FieldMaps/FieldCalculationMap
-- /Reference/FieldMaps/FieldCalculationMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldCalculationMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldCalculationMap/index.md
+  - /docs/Reference/FieldMaps/FieldCalculationMap
+  - /Reference/FieldMaps/FieldCalculationMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldCalculationMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldCalculationMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2756
-
 ---
-{{< class-description >}}
 
+{{< class-description >}}
 
 ## Purpose and Use Cases
 
@@ -26,7 +25,6 @@ This map is typically used when:
 - You need to **convert days to hours** or apply rounding
 - You wish to **assign weights** to different numeric fields and store a computed score
 - Your source project uses **different naming or units**, and you want to normalise during migration
-
 
 ## Options
 
@@ -49,13 +47,11 @@ The [NCalc](https://github.com/ncalc/ncalc) engine supports:
 
 This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom.HourlyRate`.
 
-
 ## Behaviour and Execution
 
 - The field map executes during **work item migration** and **before saving** to the target.
 - It applies to the **latest revision** only unless otherwise configured.
 - The calculated value **overwrites** any existing value in `targetField`.
-
 
 ## Field Resolution Rules
 
@@ -64,7 +60,6 @@ This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom
 - If a referenced field is missing or null, the expression evaluation may fail.
 - Non-numeric fields will cause an evaluation error.
 
-
 ## Practices
 
 - Use consistent **naming conventions** for parameters to avoid confusion.
@@ -72,14 +67,11 @@ This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom
 - Always **test with a sample dataset** using `run-local` before production use.
 - Use `ApplyTo` to limit the map to only relevant work item types.
 
-
 ## Limitations
 
 - Only works with **numeric** source fields.
 - Errors during evaluation are **not recoverable** mid-run unless caught at validation.
 - Does **not support cross-work-item calculations**.
-
-
 
 ## Samples
 
@@ -98,3 +90,7 @@ This multiplies the values of the two fields `Custom.EstimatedHours` and `Custom
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

@@ -4,14 +4,14 @@ description: The `WorkItemDelete` processor allows you to delete any amount of w
 dataFile: reference.processors.tfsworkitemdeleteprocessor.yaml
 slug: tfs-workitem-delete-processor
 aliases:
-- /docs/Reference/Processors/TfsWorkItemDeleteProcessor
-- /Reference/Processors/TfsWorkItemDeleteProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemDeleteProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemDeleteProcessor/index.md
+  - /docs/Reference/Processors/TfsWorkItemDeleteProcessor
+  - /Reference/Processors/TfsWorkItemDeleteProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemDeleteProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemDeleteProcessor/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2816
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2816
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

@@ -4,14 +4,14 @@ description: Removes data from a specified field by setting its value to null du
 dataFile: reference.fieldmaps.fieldclearmap.yaml
 slug: field-clear-map
 aliases:
-- /docs/Reference/FieldMaps/FieldClearMap
-- /Reference/FieldMaps/FieldClearMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldClearMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldClearMap/index.md
+  - /docs/Reference/FieldMaps/FieldClearMap
+  - /Reference/FieldMaps/FieldClearMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldClearMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldClearMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2791
-
 ---
+
 {{< class-description >}}
 
 The **FieldClearMap** is used to explicitly clear a field value on migrated work items by setting the target field to `null`. This is especially useful for sanitising or removing unwanted metadata, calculated fields, or legacy data that should not be carried into the target system.
@@ -35,7 +35,6 @@ This map is typically used when:
 - Only affects the latest revision unless the processor is configured to rewrite history.
 - Will silently **overwrite** any existing value in that field on the target.
 
-
 ## Practices
 
 - Ensure that the `targetField` is **writable** in the target project.
@@ -48,7 +47,6 @@ This map is typically used when:
 - Does not validate whether the field actually exists on the target.
 - If `targetField` is a **required field** in the target process, this may cause a validation error.
 - Does not support conditional clearing; the field is always cleared if this map applies.
-
 
 ## Samples
 
@@ -67,3 +65,7 @@ This map is typically used when:
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

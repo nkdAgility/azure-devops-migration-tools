@@ -1,14 +1,14 @@
 ---
-title: 'Tutorial: Get started with the Azure DevOps Migration Tools'
+title: "Tutorial: Get started with the Azure DevOps Migration Tools"
 description: Performs mathematical calculations on numeric fields using NCalc expressions during migration.
 short_title: Get Started
 weight: 1
 aliases:
-- /getting-started/
+  - /getting-started/
 date: 2025-06-24T12:07:31Z
 discussionId: 2828
-
 ---
+
 If you want to perform a bulk edit or a migration then you need to start here. This tool has been tested on updating from 100 to 250,000 work items by its users.
 
 Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 minutes. This tool is complicated and it's not always easy to discover what you need to do.
@@ -23,7 +23,7 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 This is going to be a crash course and I really recommend watching [What can go wrong and what can go right with a migration via Azure DevOps](https://youtu.be/3jYFD-6_kZk?si=xxvBoljBWjGAOVuv) and then [Basic Work Item Migration with the Azure DevOps Migration Tools](https://youtu.be/Qt1Ywu_KLrc?si=uEXjLS2pwe244ugV) before you get started! This will prep you for the journey ahead.
 
-> **New to migration tools?** Try our [Interactive Configuration Wizard]({{< ref "docs/config-wizard" >}}) to build your configuration step-by-step with guided explanations!
+> **New to migration tools?** Try our [Interactive Configuration Wizard]({{< ref "docs/config/config-wizard" >}}) to build your configuration step-by-step with guided explanations!
 
 ### 1. Create a default configuration file
 

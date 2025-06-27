@@ -4,14 +4,14 @@ description: Skips field mapping for a specific target field, effectively leavin
 dataFile: reference.fieldmaps.fieldskipmap.yaml
 slug: field-skip-map
 aliases:
-- /docs/Reference/FieldMaps/FieldSkipMap
-- /Reference/FieldMaps/FieldSkipMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldSkipMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldSkipMap/index.md
+  - /docs/Reference/FieldMaps/FieldSkipMap
+  - /Reference/FieldMaps/FieldSkipMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldSkipMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldSkipMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2789
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2789
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

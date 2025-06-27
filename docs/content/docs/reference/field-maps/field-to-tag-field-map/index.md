@@ -4,14 +4,14 @@ description: Maps field values based on a lookup table, allowing specific source
 dataFile: reference.fieldmaps.fieldtotagfieldmap.yaml
 slug: field-to-tag-field-map
 aliases:
-- /docs/Reference/FieldMaps/FieldToTagFieldMap
-- /Reference/FieldMaps/FieldToTagFieldMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToTagFieldMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToTagFieldMap/index.md
+  - /docs/Reference/FieldMaps/FieldToTagFieldMap
+  - /Reference/FieldMaps/FieldToTagFieldMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToTagFieldMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToTagFieldMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2786
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2786
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

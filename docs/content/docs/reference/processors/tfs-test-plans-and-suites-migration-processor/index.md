@@ -4,14 +4,14 @@ description: Rebuilds Suits and plans for Test Cases migrated using the WorkItem
 dataFile: reference.processors.tfstestplansandsuitesmigrationprocessor.yaml
 slug: tfs-test-plans-and-suites-migration-processor
 aliases:
-- /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor
-- /Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor/index.md
+  - /docs/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor
+  - /Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsTestPlansAndSuitesMigrationProcessor/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2613
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2613
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

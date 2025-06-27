@@ -4,14 +4,14 @@ description: WorkItemMigrationConfig is the main processor used to Migrate Work 
 dataFile: reference.processors.tfsworkitemmigrationprocessor.yaml
 slug: tfs-workitem-migration-processor
 aliases:
-- /docs/Reference/Processors/TfsWorkItemMigrationProcessor
-- /Reference/Processors/TfsWorkItemMigrationProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor/index.md
+  - /docs/Reference/Processors/TfsWorkItemMigrationProcessor
+  - /Reference/Processors/TfsWorkItemMigrationProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemMigrationProcessor/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2681
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,6 +35,12 @@ discussionId: 2681
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}
+
+## More Information
 
 The `WorkItemMigrationContext` processor is used for migrating work items from one Azure DevOps instance to another. This encompasses a variety of activities:
 

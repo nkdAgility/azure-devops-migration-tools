@@ -4,14 +4,14 @@ description: Tool for validating that required fields exist in target work item 
 dataFile: reference.tools.tfsvalidaterequiredfieldtool.yaml
 slug: tfs-validate-required-field-tool
 aliases:
-- /docs/Reference/Tools/TfsValidateRequiredFieldTool
-- /Reference/Tools/TfsValidateRequiredFieldTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsValidateRequiredFieldTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsValidateRequiredFieldTool/index.md
+  - /docs/Reference/Tools/TfsValidateRequiredFieldTool
+  - /Reference/Tools/TfsValidateRequiredFieldTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsValidateRequiredFieldTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsValidateRequiredFieldTool/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2803
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2803
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

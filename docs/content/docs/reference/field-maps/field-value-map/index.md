@@ -4,14 +4,14 @@ description: Maps field values based on a lookup table, allowing specific source
 dataFile: reference.fieldmaps.fieldvaluemap.yaml
 slug: field-value-map
 aliases:
-- /docs/Reference/FieldMaps/FieldValueMap
-- /Reference/FieldMaps/FieldValueMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldValueMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldValueMap/index.md
+  - /docs/Reference/FieldMaps/FieldValueMap
+  - /Reference/FieldMaps/FieldValueMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldValueMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldValueMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2785
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2785
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

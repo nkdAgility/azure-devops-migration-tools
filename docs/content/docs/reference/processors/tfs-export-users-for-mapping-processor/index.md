@@ -4,14 +4,14 @@ description: ExportUsersForMappingContext is a tool used to create a starter map
 dataFile: reference.processors.tfsexportusersformappingprocessor.yaml
 slug: tfs-export-users-for-mapping-processor
 aliases:
-- /docs/Reference/Processors/TfsExportUsersForMappingProcessor
-- /Reference/Processors/TfsExportUsersForMappingProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsExportUsersForMappingProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsExportUsersForMappingProcessor/index.md
+  - /docs/Reference/Processors/TfsExportUsersForMappingProcessor
+  - /Reference/Processors/TfsExportUsersForMappingProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsExportUsersForMappingProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsExportUsersForMappingProcessor/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2820
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2820
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}
