@@ -9,6 +9,8 @@ summaryLength: 30
 enableRobotsTXT: true
 enableGitInfo: true
 
+
+
 # Disable default taxonomies (tags and categories)
 taxonomies: {}
 
@@ -44,6 +46,8 @@ params:
   downloadUrl: "/download"
   menu_image_light: "/images/logo-wide-transparent-light.png"
   menu_image_dark: "/images/logo-wide-transparent-dark.png"
+  features:
+    configWizard: "none"
 
 # Enable sitemap and robots.txt
 sitemap:

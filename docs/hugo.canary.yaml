@@ -6,5 +6,8 @@ buildDrafts: true
 buildFuture: true
 buildExpired: true
 
+params:
+  features:
+    configWizard: true
 
 # PullRequestNumber

@@ -1,6 +1,6 @@
 /**
  * Azure DevOps Migration Tools Configuration Wizard
- * Interactive configuration builder for migration tools
+ * Interactive configuration builder for migration tools using JSON Schema
  */
 
 class ConfigurationWizard {
@@ -8,6 +8,7 @@ class ConfigurationWizard {
     this.currentStep = 1;
     this.totalSteps = 6;
     this.configuration = {
+      "$schema": "https://devopsmigration.io/schema/configuration.schema.json",
       Serilog: {
         MinimumLevel: "Information"
       },
@@ -21,13 +22,173 @@ class ConfigurationWizard {
     this.selectedMigrationType = null;
     this.selectedProcessors = [];
     this.savedAdvancedOptions = null;
+    this.schema = null;
+    this.availableProcessors = [];
+    this.availableEndpoints = [];
     this.init();
   }
 
-  init() {
+  async init() {
     this.render();
     this.attachEventListeners();
+    await this.loadSchema();
     this.loadStep1();
+  }
+
+  async loadSchema() {
+    try {
+      // Load the JSON schema
+      const schemaURL = window.migrationToolsData?.schemaURL || '/schema/configuration.schema.json';
+      console.log('Loading schema from:', schemaURL);
+      
+      const response = await fetch(schemaURL);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch schema: ${response.status} ${response.statusText}`);
+      }
+      
+      this.schema = await response.json();
+      console.log('Schema loaded successfully, structure:', {
+        hasProperties: !!this.schema.properties,
+        hasMigrationTools: !!this.schema.properties?.MigrationTools,
+        hasProcessors: !!this.schema.properties?.MigrationTools?.properties?.processors,
+        hasEndpoints: !!this.schema.properties?.MigrationTools?.properties?.endpoints
+      });
+      
+      // Extract processors and endpoints from schema
+      this.extractAvailableOptions();
+      
+      console.log('Schema extraction completed:', {
+        processors: this.availableProcessors.length,
+        endpoints: this.availableEndpoints.length
+      });
+    } catch (error) {
+      console.error('Failed to load schema:', error);
+      // Fallback to legacy data if schema loading fails
+      console.log('Falling back to legacy data');
+      this.extractLegacyData();
+    }
+  }
+
+  extractAvailableOptions() {
+    if (!this.schema?.properties?.MigrationTools?.properties) {
+      console.warn('Schema structure not as expected');
+      return;
+    }
+
+    // Extract processors from schema
+    const processorsSchema = this.schema.properties.MigrationTools.properties.processors;
+    if (processorsSchema?.prefixItems?.anyOf) {
+      this.availableProcessors = processorsSchema.prefixItems.anyOf.map(processor => ({
+        name: processor.title,
+        description: processor.description || 'No description available',
+        properties: processor.properties || {},
+        schema: processor
+      }));
+    }
+
+    // Extract endpoints from schema
+    const endpointsSchema = this.schema.properties.MigrationTools.properties.endpoints;
+    if (endpointsSchema?.properties) {
+      this.availableEndpoints = Object.entries(endpointsSchema.properties).map(([key, endpoint]) => ({
+        name: endpoint.title,
+        key: key,
+        description: endpoint.description || 'No description available',
+        properties: endpoint.properties || {},
+        schema: endpoint
+      }));
+    }
+
+    console.log('Schema extraction results:', {
+      processors: this.availableProcessors.length,
+      processorNames: this.availableProcessors.map(p => p.name),
+      endpoints: this.availableEndpoints.length,
+      endpointNames: this.availableEndpoints.map(e => e.name)
+    });
+  }
+
+  extractLegacyData() {
+    console.log('Using legacy data fallback');
+    
+    // Fallback to existing Hugo data structure
+    if (window.migrationToolsData?.processors) {
+      this.availableProcessors = Object.entries(window.migrationToolsData.processors).map(([key, processor]) => ({
+        name: key,
+        description: processor.description || 'No description available',
+        properties: processor.options || {},
+        schema: processor
+      }));
+      console.log('Legacy processors loaded:', this.availableProcessors.length);
+    }
+
+    if (window.migrationToolsData?.endpoints) {
+      this.availableEndpoints = Object.entries(window.migrationToolsData.endpoints).map(([key, endpoint]) => ({
+        name: key,
+        key: key,
+        description: endpoint.description || 'No description available',
+        properties: endpoint.options || {},
+        schema: endpoint
+      }));
+      console.log('Legacy endpoints loaded:', this.availableEndpoints.length);
+    }
+
+    // If we still don't have processors, create some fallback ones
+    if (this.availableProcessors.length === 0) {
+      console.warn('No processors found in legacy data, creating fallback processors');
+      this.availableProcessors = [
+        {
+          name: 'TfsWorkItemMigrationProcessor',
+          description: 'Migrates work items from source to target with their history, attachments, and links.',
+          properties: { enabled: { type: 'boolean' } },
+          schema: {}
+        },
+        {
+          name: 'AzureDevOpsPipelineProcessor', 
+          description: 'Migrates Azure DevOps pipelines including build and release definitions.',
+          properties: { enabled: { type: 'boolean' } },
+          schema: {}
+        },
+        {
+          name: 'TfsTeamSettingsProcessor',
+          description: 'Migrates team settings including areas and iterations.',
+          properties: { enabled: { type: 'boolean' } },
+          schema: {}
+        }
+      ];
+    }
+
+    // If we still don't have endpoints, create some fallback ones
+    if (this.availableEndpoints.length === 0) {
+      console.warn('No endpoints found in legacy data, creating fallback endpoints');
+      this.availableEndpoints = [
+        {
+          name: 'TfsTeamProjectEndpoint',
+          key: 'tfsTeamProjectEndpoint',
+          description: 'Connects to TFS or Azure DevOps for work item and team project operations.',
+          properties: { 
+            Collection: { type: 'string' },
+            Project: { type: 'string' },
+            AccessToken: { type: 'string' }
+          },
+          schema: {}
+        },
+        {
+          name: 'AzureDevOpsEndpoint',
+          key: 'azureDevOpsEndpoint', 
+          description: 'Connects to Azure DevOps for pipeline and REST API operations.',
+          properties: {
+            Organization: { type: 'string' },
+            Project: { type: 'string' }, 
+            AccessToken: { type: 'string' }
+          },
+          schema: {}
+        }
+      ];
+    }
+
+    console.log('Final fallback data:', {
+      processors: this.availableProcessors.length,
+      endpoints: this.availableEndpoints.length
+    });
   }
 
   render() {
@@ -181,72 +342,124 @@ class ConfigurationWizard {
 
   loadStep1() {
     const content = document.getElementById('wizard-step-content');
+    
+    // Create migration type options based on available processors
+    const migrationTypes = this.getMigrationTypes();
+    console.log('Step 1 - Migration types generated:', migrationTypes);
+    
+    if (migrationTypes.length === 0) {
+      content.innerHTML = `
+        <h2 class="text-primary mb-4">Choose Your Migration Type</h2>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>No migration types available.</strong> 
+          This might be due to a schema loading issue. Please check the browser console for details.
+        </div>
+        <div class="alert alert-info">
+          <strong>Debug Info:</strong>
+          <ul>
+            <li>Available Processors: ${this.availableProcessors.length}</li>
+            <li>Available Endpoints: ${this.availableEndpoints.length}</li>
+            <li>Schema Loaded: ${this.schema ? 'Yes' : 'No'}</li>
+          </ul>
+        </div>
+      `;
+      return;
+    }
+    
     content.innerHTML = `
       <h2 class="text-primary mb-4">Choose Your Migration Type</h2>
       <p class="lead mb-4">What would you like to migrate? This will determine which processors and endpoint configurations are needed.</p>
       
       <div class="config-section">
         <div class="row">
-          <div class="col-md-6 mb-3">
-            <div class="config-option" data-migration-type="work-items">
-              <div class="config-option-title">
-                <i class="fas fa-tasks text-primary me-2"></i>Work Items
-              </div>
-              <div class="config-option-description">
-                Migrate work items (User Stories, Bugs, Tasks, etc.) with their history, attachments, and links. Uses TfsWorkItemEndpoint.
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="config-option" data-migration-type="test-plans">
-              <div class="config-option-title">
-                <i class="fas fa-clipboard-check text-primary me-2"></i>Test Plans
-              </div>
-              <div class="config-option-description">
-                Migrate test plans, test suites, and test cases. Uses TfsWorkItemEndpoint for test artifacts.
+          ${migrationTypes.map(type => `
+            <div class="col-md-6 mb-3">
+              <div class="config-option" data-migration-type="${type.key}">
+                <div class="config-option-title">
+                  <i class="${type.icon} text-primary me-2"></i>${type.name}
+                </div>
+                <div class="config-option-description">
+                  ${type.description}
+                </div>
+                <div class="config-option-processors">
+                  <small class="text-muted">Processors: ${type.processors.join(', ')}</small>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="config-option" data-migration-type="pipelines">
-              <div class="config-option-title">
-                <i class="fas fa-code-branch text-primary me-2"></i>Pipelines
-              </div>
-              <div class="config-option-description">
-                Migrate Azure DevOps pipelines (Build and Release definitions). Uses AzureDevOpsEndpoint.
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 mb-3">
-            <div class="config-option" data-migration-type="work-items-test-plans">
-              <div class="config-option-title">
-                <i class="fas fa-layer-group text-primary me-2"></i>Work Items + Test Plans
-              </div>
-              <div class="config-option-description">
-                Migrate both work items and test plans together. Uses TfsWorkItemEndpoint for both.
-              </div>
-            </div>
-          </div>
+          `).join('')}
         </div>
       </div>
     `;
 
-    // Add click handlers for migration type selection
-    content.querySelectorAll('.config-option').forEach(option => {
+    // Attach click handlers for migration type selection
+    document.querySelectorAll('.config-option[data-migration-type]').forEach(option => {
       option.addEventListener('click', () => {
         // Remove previous selection
-        content.querySelectorAll('.config-option').forEach(opt => opt.classList.remove('selected'));
-        // Add selection to clicked option
+        document.querySelectorAll('.config-option').forEach(opt => 
+          opt.classList.remove('selected'));
+        
+        // Mark current selection
         option.classList.add('selected');
         this.selectedMigrationType = option.dataset.migrationType;
+        
+        // Enable next button
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.disabled = false;
       });
     });
   }
 
+  getMigrationTypes() {
+    // Define the three main migration type templates
+    const migrationTypes = [];
+
+    // Work Items category
+    const workItemProcessors = this.availableProcessors.filter(p => 
+      p.name.toLowerCase().includes('workitem') || 
+      p.name.toLowerCase().includes('tfsworkitem') ||
+      p.name.toLowerCase().includes('workitemtracking')
+    );
+    
+    migrationTypes.push({
+      key: 'work-items',
+      name: 'Work Items',
+      icon: 'fas fa-tasks',
+      description: 'Migrate work items (User Stories, Bugs, Tasks, etc.) with their history, attachments, and links. Includes related processors for work item migration.',
+      processors: workItemProcessors.length > 0 ? workItemProcessors.map(p => p.name) : ['TfsWorkItemMigrationProcessor', 'WorkItemTrackingProcessor'],
+      recommendedEndpoints: ['TfsTeamProjectEndpoint', 'TfsWorkItemEndpoint']
+    });
+
+    // Pipelines category
+    const pipelineProcessors = this.availableProcessors.filter(p => 
+      p.name.toLowerCase().includes('pipeline')
+    );
+    
+    migrationTypes.push({
+      key: 'pipelines',
+      name: 'Pipelines',
+      icon: 'fas fa-code-branch',
+      description: 'Migrate Azure DevOps pipelines including Build and Release definitions, Task Groups, Variable Groups, and Service Connections.',
+      processors: pipelineProcessors.length > 0 ? pipelineProcessors.map(p => p.name) : ['AzureDevOpsPipelineProcessor'],
+      recommendedEndpoints: ['AzureDevOpsEndpoint']
+    });
+
+    // Custom migration option
+    migrationTypes.push({
+      key: 'custom',
+      name: 'Custom',
+      icon: 'fas fa-cogs',
+      description: 'Create a custom migration configuration by selecting specific processors and endpoints. Perfect for specialized migration scenarios or when you need fine-grained control.',
+      processors: this.availableProcessors.map(p => p.name),
+      recommendedEndpoints: ['TfsTeamProjectEndpoint', 'AzureDevOpsEndpoint']
+    });
+
+    return migrationTypes;
+  }
+
   loadStep2() {
     const content = document.getElementById('wizard-step-content');
-    const endpointType = this.getEndpointTypeForMigration();
-    const endpointDescription = this.getEndpointDescription();
+    const recommendedEndpoints = this.getRecommendedEndpoints();
     
     content.innerHTML = `
       <h2 class="text-primary mb-4">Configure Source and Target Endpoints</h2>
@@ -254,21 +467,20 @@ class ConfigurationWizard {
       
       <div class="alert alert-info mb-4">
         <i class="fas fa-info-circle me-2"></i>
-        <strong>Endpoint Type:</strong> Your migration type requires <code>${endpointType}</code> endpoints.
-        <br><small>${endpointDescription}</small>
+        <strong>Recommended Endpoints:</strong> Based on your migration type, we recommend using these endpoint types.
       </div>
       
       <div class="row">
         <div class="col-md-6">
           <div class="config-section">
             <h3><i class="fas fa-upload text-success me-2"></i>Source Endpoint</h3>
-            ${this.renderEndpointForm('source', endpointType)}
+            ${this.renderEndpointSelection('source', recommendedEndpoints)}
           </div>
         </div>
         <div class="col-md-6">
           <div class="config-section">
             <h3><i class="fas fa-download text-info me-2"></i>Target Endpoint</h3>
-            ${this.renderEndpointForm('target', endpointType)}
+            ${this.renderEndpointSelection('target', recommendedEndpoints)}
           </div>
         </div>
       </div>
@@ -279,6 +491,139 @@ class ConfigurationWizard {
         They are not stored or transmitted anywhere.
       </div>
     `;
+
+    // Add event handlers for endpoint type changes
+    this.attachEndpointFormHandlers();
+  }
+
+  getRecommendedEndpoints() {
+    // Get the migration type and return its recommended endpoints
+    const migrationTypes = this.getMigrationTypes();
+    const selectedType = migrationTypes.find(t => t.key === this.selectedMigrationType);
+    return selectedType?.recommendedEndpoints || ['TfsTeamProjectEndpoint'];
+  }
+
+  renderEndpointSelection(type, recommendedEndpoints) {
+    // Get available endpoints that match the recommendations
+    const availableEndpoints = this.availableEndpoints.filter(endpoint => 
+      recommendedEndpoints.some(rec => endpoint.name.includes(rec))
+    );
+
+    // Default to first recommended if no matches found
+    if (availableEndpoints.length === 0 && this.availableEndpoints.length > 0) {
+      availableEndpoints.push(this.availableEndpoints[0]);
+    }
+
+    return `
+      <div class="wizard-form-group">
+        <label class="wizard-form-label">Endpoint Type</label>
+        <select class="form-control" id="${type}EndpointType" onchange="wizard.updateEndpointForm('${type}')">
+          ${availableEndpoints.map(endpoint => `
+            <option value="${endpoint.name}" ${recommendedEndpoints.includes(endpoint.name) ? 'selected' : ''}>
+              ${endpoint.name}
+            </option>
+          `).join('')}
+        </select>
+        <div class="wizard-form-help">
+          ${availableEndpoints.find(e => recommendedEndpoints.includes(e.name))?.description || 'Select an endpoint type'}
+        </div>
+      </div>
+      <div id="${type}EndpointForm">
+        ${this.renderEndpointForm(type, availableEndpoints[0]?.name)}
+      </div>
+    `;
+  }
+
+  updateEndpointForm(type) {
+    const select = document.getElementById(`${type}EndpointType`);
+    const endpointType = select.value;
+    const formContainer = document.getElementById(`${type}EndpointForm`);
+    formContainer.innerHTML = this.renderEndpointForm(type, endpointType);
+  }
+
+  renderEndpointForm(type, endpointTypeName) {
+    // Find the endpoint schema
+    const endpointSchema = this.availableEndpoints.find(e => e.name === endpointTypeName);
+    if (!endpointSchema) {
+      return '<p class="text-muted">No configuration required for this endpoint type.</p>';
+    }
+
+    // Generate form fields based on the schema properties
+    const properties = endpointSchema.properties || {};
+    const formFields = [];
+
+    Object.entries(properties).forEach(([propName, propSchema]) => {
+      // Skip internal properties
+      if (propName === 'EndpointType' || propName === 'enabled') {
+        return;
+      }
+
+      const fieldId = `${type}${propName}`;
+      const fieldType = this.getInputTypeFromSchema(propSchema);
+      const placeholder = this.getPlaceholderFromProperty(propName, type);
+      const description = propSchema.description || '';
+
+      formFields.push(`
+        <div class="wizard-form-group">
+          <label class="wizard-form-label">${this.formatPropertyName(propName)}</label>
+          <input type="${fieldType}" class="form-control" id="${fieldId}" placeholder="${placeholder}" />
+          ${description ? `<div class="wizard-form-help">${description}</div>` : ''}
+        </div>
+      `);
+    });
+
+    return formFields.join('');
+  }
+
+  getInputTypeFromSchema(propSchema) {
+    if (propSchema.type === 'string') {
+      const propName = propSchema.description?.toLowerCase() || '';
+      if (propName.includes('url') || propName.includes('organization')) {
+        return 'url';
+      }
+      if (propName.includes('token') || propName.includes('password')) {
+        return 'password';
+      }
+      if (propName.includes('email')) {
+        return 'email';
+      }
+    }
+    return 'text';
+  }
+
+  getPlaceholderFromProperty(propName, type) {
+    const lowerName = propName.toLowerCase();
+    
+    if (lowerName.includes('organization') || lowerName.includes('organisation')) {
+      return 'https://dev.azure.com/yourorg/';
+    }
+    if (lowerName.includes('collection')) {
+      return 'https://dev.azure.com/yourorg or https://tfs.company.com/tfs/DefaultCollection';
+    }
+    if (lowerName.includes('project')) {
+      return `${type === 'source' ? 'Source' : 'Target'} project name`;
+    }
+    if (lowerName.includes('token')) {
+      return 'Your PAT token';
+    }
+    if (lowerName.includes('url')) {
+      return 'https://';
+    }
+    
+    return `Enter ${this.formatPropertyName(propName)}`;
+  }
+
+  formatPropertyName(propName) {
+    // Convert camelCase to Title Case
+    return propName
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, str => str.toUpperCase())
+      .trim();
+  }
+
+  attachEndpointFormHandlers() {
+    // Make the wizard instance globally available for the onchange handlers
+    window.wizard = this;
   }
 
   getEndpointTypeForMigration() {
@@ -366,16 +711,19 @@ class ConfigurationWizard {
       <p class="lead mb-4">Choose which processors to include based on your migration type.</p>
       
       <div class="config-section">
-        <h3>Required Processors</h3>
-        <p class="text-muted mb-3">These processors are automatically included for your migration type:</p>
+        <h3>Recommended Processors</h3>
+        <p class="text-muted mb-3">These processors are recommended for your migration type:</p>
         <div class="row">
-          ${processors.required.map(proc => `
+          ${processors.recommended.map(proc => `
             <div class="col-md-6 mb-3">
-              <div class="config-option selected">
+              <div class="config-option selected" data-processor="${proc.name}">
                 <div class="config-option-title">
                   <i class="fas fa-check-circle text-success me-2"></i>${proc.name}
                 </div>
                 <div class="config-option-description">${proc.description}</div>
+                <div class="config-option-meta">
+                  <small class="text-muted">Properties: ${Object.keys(proc.properties).length}</small>
+                </div>
               </div>
             </div>
           `).join('')}
@@ -383,36 +731,74 @@ class ConfigurationWizard {
       </div>
       
       <div class="config-section">
-        <h3>Optional Processors</h3>
-        <p class="text-muted mb-3">Select additional processors you might need:</p>
+        <h3>Additional Processors</h3>
+        <p class="text-muted mb-3">Select additional processors if needed:</p>
         <div class="row">
-          ${processors.optional.map(proc => `
+          ${processors.additional.map(proc => `
             <div class="col-md-6 mb-3">
-              <div class="config-option" data-processor="${proc.id}">
+              <div class="config-option" data-processor="${proc.name}">
                 <div class="config-option-title">
                   <i class="fas fa-plus-circle text-primary me-2"></i>${proc.name}
                 </div>
                 <div class="config-option-description">${proc.description}</div>
+                <div class="config-option-meta">
+                  <small class="text-muted">Properties: ${Object.keys(proc.properties).length}</small>
+                </div>
               </div>
             </div>
           `).join('')}
         </div>
       </div>
+      
+      ${processors.additional.length === 0 ? 
+        '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>All available processors for your migration type are already recommended above.</div>' : 
+        ''
+      }
     `;
 
-    // Add click handlers for optional processors
+    // Add click handlers for all processors
     content.querySelectorAll('.config-option[data-processor]').forEach(option => {
       option.addEventListener('click', () => {
         option.classList.toggle('selected');
-        const processorId = option.dataset.processor;
-        const index = this.selectedProcessors.indexOf(processorId);
+        const processorName = option.dataset.processor;
+        const index = this.selectedProcessors.findIndex(p => p === processorName);
         if (index === -1) {
-          this.selectedProcessors.push(processorId);
+          this.selectedProcessors.push(processorName);
         } else {
           this.selectedProcessors.splice(index, 1);
         }
       });
     });
+
+    // Pre-select recommended processors
+    processors.recommended.forEach(proc => {
+      if (!this.selectedProcessors.includes(proc.name)) {
+        this.selectedProcessors.push(proc.name);
+      }
+    });
+  }
+
+  getProcessorsForMigrationType() {
+    // Get the migration type configuration
+    const migrationTypes = this.getMigrationTypes();
+    const selectedType = migrationTypes.find(t => t.key === this.selectedMigrationType);
+    
+    if (!selectedType) {
+      return { recommended: [], additional: [] };
+    }
+
+    // Get recommended processors for this migration type
+    const recommendedProcessorNames = selectedType.processors;
+    const recommended = this.availableProcessors.filter(proc => 
+      recommendedProcessorNames.includes(proc.name)
+    );
+
+    // Get additional processors (all others not in recommended)
+    const additional = this.availableProcessors.filter(proc => 
+      !recommendedProcessorNames.includes(proc.name)
+    );
+
+    return { recommended, additional };
   }
 
   loadStep4() {
@@ -628,62 +1014,124 @@ class ConfigurationWizard {
   }
 
   generateConfiguration() {
-    const endpointType = this.getEndpointTypeForMigration();
+    // Start with base configuration that includes $schema
+    this.configuration = {
+      "$schema": "https://devopsmigration.io/schema/configuration.schema.json",
+      Serilog: {
+        MinimumLevel: this.savedAdvancedOptions?.logLevel || 'Information'
+      },
+      MigrationTools: {
+        Version: "16.0",
+        Endpoints: {},
+        Processors: [],
+        CommonTools: {}
+      }
+    };
+
+    // Generate endpoints based on user selections
+    this.generateEndpointsConfiguration();
     
-    // Update logging level from saved step 5 data
-    const logLevel = this.savedAdvancedOptions?.logLevel || 'Information';
-    this.configuration.Serilog.MinimumLevel = logLevel;
-    
-    // Generate the complete configuration based on user selections
-    if (endpointType === 'AzureDevOpsEndpoint') {
-      // For pipeline migrations
-      this.configuration.MigrationTools.Endpoints = {
-        Source: {
-          EndpointType: "AzureDevOpsEndpoint",
-          Organization: document.getElementById('sourceOrganization')?.value || "",
-          Project: document.getElementById('sourceProject')?.value || "",
-          Authentication: {
-            AuthenticationMode: "AccessToken",
-            AccessToken: "**redacted**"
-          }
-        },
-        Target: {
-          EndpointType: "AzureDevOpsEndpoint", 
-          Organization: document.getElementById('targetOrganization')?.value || "",
-          Project: document.getElementById('targetProject')?.value || "",
-          Authentication: {
-            AuthenticationMode: "AccessToken",
-            AccessToken: "**redacted**"
-          }
-        }
-      };
-    } else {
-      // For work item and test plan migrations
-      this.configuration.MigrationTools.Endpoints = {
-        Source: {
-          EndpointType: "TfsTeamProjectEndpoint",
-          Collection: document.getElementById('sourceCollection')?.value || "",
-          Project: document.getElementById('sourceProject')?.value || "",
-          Authentication: {
-            AuthenticationMode: document.getElementById('sourceAuthMode')?.value || "AccessToken",
-            AccessToken: "**redacted**"
-          }
-        },
-        Target: {
-          EndpointType: "TfsTeamProjectEndpoint",
-          Collection: document.getElementById('targetCollection')?.value || "",
-          Project: document.getElementById('targetProject')?.value || "",
-          Authentication: {
-            AuthenticationMode: document.getElementById('targetAuthMode')?.value || "AccessToken",
-            AccessToken: "**redacted**"
-          },
-          ReflectedWorkItemIdField: document.getElementById('targetReflectedField')?.value || "Custom.ReflectedWorkItemId"
-        }
-      };
+    // Generate processors based on user selections
+    this.generateProcessorsConfiguration();
+  }
+
+  generateEndpointsConfiguration() {
+    const sourceEndpointType = document.getElementById('sourceEndpointType')?.value;
+    const targetEndpointType = document.getElementById('targetEndpointType')?.value;
+
+    // Generate source endpoint
+    if (sourceEndpointType) {
+      this.configuration.MigrationTools.Endpoints.Source = this.generateEndpointConfig('source', sourceEndpointType);
     }
 
-    // Add processors based on migration type and selections
-    this.configuration.MigrationTools.Processors = this.getSelectedProcessorsConfig();
+    // Generate target endpoint  
+    if (targetEndpointType) {
+      this.configuration.MigrationTools.Endpoints.Target = this.generateEndpointConfig('target', targetEndpointType);
+    }
+  }
+
+  generateEndpointConfig(type, endpointTypeName) {
+    const endpointSchema = this.availableEndpoints.find(e => e.name === endpointTypeName);
+    if (!endpointSchema) {
+      return { EndpointType: endpointTypeName };
+    }
+
+    const config = { EndpointType: endpointTypeName };
+    const properties = endpointSchema.properties || {};
+
+    // Generate configuration values from form inputs
+    Object.keys(properties).forEach(propName => {
+      if (propName === 'EndpointType') return;
+
+      const inputElement = document.getElementById(`${type}${propName}`);
+      if (inputElement) {
+        let value = inputElement.value;
+        
+        // Redact sensitive information
+        if (propName.toLowerCase().includes('token') || propName.toLowerCase().includes('password')) {
+          value = value ? '**redacted**' : '';
+        }
+        
+        // Set the value if provided
+        if (value) {
+          config[propName] = value;
+        }
+      }
+    });
+
+    return config;
+  }
+
+  generateProcessorsConfiguration() {
+    // Generate processor configurations based on selected processors
+    this.configuration.MigrationTools.Processors = this.selectedProcessors.map(processorName => {
+      const processorSchema = this.availableProcessors.find(p => p.name === processorName);
+      if (!processorSchema) {
+        return { ProcessorType: processorName, Enabled: true };
+      }
+
+      const config = { 
+        ProcessorType: processorName,
+        Enabled: true
+      };
+
+      // Add default values for processor properties based on schema
+      const properties = processorSchema.properties || {};
+      Object.entries(properties).forEach(([propName, propSchema]) => {
+        if (propName === 'ProcessorType' || propName === 'Enabled') return;
+
+        // Add default values based on schema
+        if (propSchema.default !== undefined) {
+          config[propName] = propSchema.default;
+        } else {
+          // Generate sensible defaults based on property type
+          config[propName] = this.getDefaultValueForProperty(propName, propSchema);
+        }
+      });
+
+      return config;
+    });
+  }
+
+  getDefaultValueForProperty(propName, propSchema) {
+    const type = propSchema.type;
+    const lowerName = propName.toLowerCase();
+
+    if (type === 'boolean') {
+      return lowerName.includes('enabled') ? true : false;
+    } else if (type === 'string') {
+      if (lowerName.includes('source')) return 'Source';
+      if (lowerName.includes('target')) return 'Target';
+      return null;
+    } else if (type === 'integer' || type === 'number') {
+      return 0;
+    } else if (type === 'array') {
+      return [];
+    } else if (type === 'object') {
+      return {};
+    }
+    
+    return null;
   }
 
   getProcessorsForMigrationType() {
