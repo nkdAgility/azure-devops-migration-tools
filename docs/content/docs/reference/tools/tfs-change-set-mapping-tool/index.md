@@ -4,14 +4,14 @@ description: Tool for creating missing area and iteration path nodes in the targ
 dataFile: reference.tools.tfschangesetmappingtool.yaml
 slug: tfs-change-set-mapping-tool
 aliases:
-- /docs/Reference/Tools/TfsChangeSetMappingTool
-- /Reference/Tools/TfsChangeSetMappingTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsChangeSetMappingTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsChangeSetMappingTool/index.md
+  - /docs/Reference/Tools/TfsChangeSetMappingTool
+  - /Reference/Tools/TfsChangeSetMappingTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsChangeSetMappingTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsChangeSetMappingTool/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2809
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2809
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

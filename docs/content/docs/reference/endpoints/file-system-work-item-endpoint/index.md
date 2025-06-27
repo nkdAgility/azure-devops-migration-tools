@@ -5,14 +5,14 @@ description: |
 dataFile: reference.endpoints.filesystemworkitemendpoint.yaml
 slug: file-system-work-item-endpoint
 aliases:
-- /docs/Reference/Endpoints/FileSystemWorkItemEndpoint
-- /Reference/Endpoints/FileSystemWorkItemEndpoint
-- /learn/azure-devops-migration-tools/Reference/Endpoints/FileSystemWorkItemEndpoint
-- /learn/azure-devops-migration-tools/Reference/Endpoints/FileSystemWorkItemEndpoint/index.md
+  - /docs/Reference/Endpoints/FileSystemWorkItemEndpoint
+  - /Reference/Endpoints/FileSystemWorkItemEndpoint
+  - /learn/azure-devops-migration-tools/Reference/Endpoints/FileSystemWorkItemEndpoint
+  - /learn/azure-devops-migration-tools/Reference/Endpoints/FileSystemWorkItemEndpoint/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2797
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -36,3 +36,7 @@ discussionId: 2797
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

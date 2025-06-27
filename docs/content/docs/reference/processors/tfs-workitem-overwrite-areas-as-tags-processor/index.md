@@ -4,14 +4,14 @@ description: A common issue with older *TFS/Azure DevOps* instances is the proli
 dataFile: reference.processors.tfsworkitemoverwriteareasastagsprocessor.yaml
 slug: tfs-workitem-overwrite-areas-as-tags-processor
 aliases:
-- /docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor
-- /Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor
-- /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor/index.md
+  - /docs/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor
+  - /Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor
+  - /learn/azure-devops-migration-tools/Reference/Processors/TfsWorkItemOverwriteAreasAsTagsProcessor/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2815
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2815
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

@@ -4,14 +4,14 @@ description: Maps field values based on a lookup table, allowing specific source
 dataFile: reference.fieldmaps.fieldtofieldmultimap.yaml
 slug: field-to-field-multi-map
 aliases:
-- /docs/Reference/FieldMaps/FieldToFieldMultiMap
-- /Reference/FieldMaps/FieldToFieldMultiMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToFieldMultiMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToFieldMultiMap/index.md
+  - /docs/Reference/FieldMaps/FieldToFieldMultiMap
+  - /Reference/FieldMaps/FieldToFieldMultiMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToFieldMultiMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/FieldToFieldMultiMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2787
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2787
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

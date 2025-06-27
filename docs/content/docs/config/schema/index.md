@@ -9,7 +9,7 @@ The Azure DevOps Migration Tools provide JSON Schema definitions for configurati
 
 ## Main Configuration Schema
 
-- **[Configuration Schema](configuration.schema.json)** - Complete configuration schema for Azure DevOps Migration Tools
+- **[Configuration Schema](/schema/configuration.schema.json)** - Complete configuration schema for Azure DevOps Migration Tools
 
 ## Component Schemas
 
@@ -17,7 +17,7 @@ The Azure DevOps Migration Tools provide JSON Schema definitions for configurati
 
 {{< schema-list type="processors" >}}
 
-### Tools  
+### Tools
 
 {{< schema-list type="tools" >}}
 

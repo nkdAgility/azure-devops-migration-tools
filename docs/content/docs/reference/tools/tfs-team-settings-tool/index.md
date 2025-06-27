@@ -4,14 +4,14 @@ description: Tool for migrating team settings including team configurations, are
 dataFile: reference.tools.tfsteamsettingstool.yaml
 slug: tfs-team-settings-tool
 aliases:
-- /docs/Reference/Tools/TfsTeamSettingsTool
-- /Reference/Tools/TfsTeamSettingsTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsTeamSettingsTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsTeamSettingsTool/index.md
+  - /docs/Reference/Tools/TfsTeamSettingsTool
+  - /Reference/Tools/TfsTeamSettingsTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsTeamSettingsTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsTeamSettingsTool/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2805
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2805
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

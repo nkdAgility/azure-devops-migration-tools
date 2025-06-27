@@ -4,14 +4,14 @@ description: Tool for processing and migrating work item attachments between Tea
 dataFile: reference.tools.tfsattachmenttool.yaml
 slug: tfs-attachment-tool
 aliases:
-- /docs/Reference/Tools/TfsAttachmentTool
-- /Reference/Tools/TfsAttachmentTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsAttachmentTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsAttachmentTool/index.md
+  - /docs/Reference/Tools/TfsAttachmentTool
+  - /Reference/Tools/TfsAttachmentTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsAttachmentTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsAttachmentTool/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2810
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2810
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}

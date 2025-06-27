@@ -4,14 +4,14 @@ description: Tool for creating missing area and iteration path nodes in the targ
 dataFile: reference.tools.tfsnodestructuretool.yaml
 slug: tfs-node-structure-tool
 aliases:
-- /docs/Reference/Tools/TfsNodeStructureTool
-- /Reference/Tools/TfsNodeStructureTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool
-- /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool/index.md
+  - /docs/Reference/Tools/TfsNodeStructureTool
+  - /Reference/Tools/TfsNodeStructureTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool
+  - /learn/azure-devops-migration-tools/Reference/Tools/TfsNodeStructureTool/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2807
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,6 +35,10 @@ discussionId: 2807
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}
 
 ## Iteration Maps and Area Maps
 

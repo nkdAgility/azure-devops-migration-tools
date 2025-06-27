@@ -1,0 +1,38 @@
+{{/* Shortcode: class-schema
+  Description: Displays the JSON schema for a class
+  Usage: {{< class-schema
+>}}
+*/}}
+{{ $data := "" }}
+
+{{/* Use passed datafile parameter or fall back to page's dataFile parameter */}}
+{{ $dataFile := .Get "datafile" }}
+{{ if not $dataFile }}
+  {{ $dataFile = .Page.Params.dataFile }}
+{{ end }}
+
+{{/* Parse the data file path and load the YAML data */}}
+{{ if $dataFile }}
+  {{ $cleanPath := strings.TrimPrefix "data/" $dataFile }}
+  {{ $cleanPath = strings.TrimSuffix ".yaml" $cleanPath }}
+  {{ $pathParts := split $cleanPath "." }}
+
+  {{/* Navigate through the nested data structure */}}
+  {{ $data = index .Site.Data.classes $cleanPath }}
+{{ end }}
+
+{{/* Load the schema file from the /static/schema directory */}}
+{{ $schemaPath := printf "static/schema/schema.%s.%s.json" $data.typeName $data.className }}
+{{ $schemaContent := readFile $schemaPath }}
+
+{{ if $schemaContent }}
+  <div class="schema-content">
+    <p>This is the JSON schema that defines the structure and validation rules for this configuration.</p>
+    <pre><code class="language-json">{{ $schemaContent }}</code></pre>
+  </div>
+{{ else }}
+  <div class="alert alert-info">
+    <strong>Debug:</strong> Schema file <code>{{ $schemaPath }}</code> not found at <code>{{ $schemaPath }}</code> <br /><strong>Available schema files:</strong>
+    {{ range readDir "static/schema" }}{{ .Name }},{{ end }}
+  </div>
+{{ end }}

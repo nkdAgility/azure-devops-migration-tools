@@ -4,14 +4,14 @@ description: Maps work item area path or iteration path hierarchies to tags, all
 dataFile: reference.fieldmaps.treetotagfieldmap.yaml
 slug: tree-to-tag-field-map
 aliases:
-- /docs/Reference/FieldMaps/TreeToTagFieldMap
-- /Reference/FieldMaps/TreeToTagFieldMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/TreeToTagFieldMap
-- /learn/azure-devops-migration-tools/Reference/FieldMaps/TreeToTagFieldMap/index.md
+  - /docs/Reference/FieldMaps/TreeToTagFieldMap
+  - /Reference/FieldMaps/TreeToTagFieldMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/TreeToTagFieldMap
+  - /learn/azure-devops-migration-tools/Reference/FieldMaps/TreeToTagFieldMap/index.md
 date: 2025-06-24T12:07:31Z
 discussionId: 2782
-
 ---
+
 {{< class-description >}}
 
 ## Options
@@ -35,3 +35,7 @@ discussionId: 2782
 ## Metadata
 
 {{< class-metadata >}}
+
+## Schema
+
+{{< class-schema >}}
