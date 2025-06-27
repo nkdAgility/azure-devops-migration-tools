@@ -23,6 +23,8 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 This is going to be a crash course and I really recommend watching [What can go wrong and what can go right with a migration via Azure DevOps](https://youtu.be/3jYFD-6_kZk?si=xxvBoljBWjGAOVuv) and then [Basic Work Item Migration with the Azure DevOps Migration Tools](https://youtu.be/Qt1Ywu_KLrc?si=uEXjLS2pwe244ugV) before you get started! This will prep you for the journey ahead.
 
+> **New to migration tools?** Try our [Interactive Configuration Wizard]({{< ref "docs/config-wizard" >}}) to build your configuration step-by-step with guided explanations!
+
 ### 1. Create a default configuration file
 
 1. Open your [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) in your chosen working folder

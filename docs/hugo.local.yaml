@@ -6,3 +6,8 @@ buildFuture: true
 buildExpired: true
 
 disableAliases: true
+
+
+params:
+  features:
+    configWizard: true

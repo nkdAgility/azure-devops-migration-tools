@@ -1,12 +1,10 @@
 {{- define "main" }}
   <div class="container-fluid py-4">
     <div class="row justify-content-center">
-      <div class="col-12" style="max-width: 1800px;">
+      <div class="col-12" style="max-width: 1800px">
         <div class="row">
           {{/* Sidebar - Hidden on smaller screens */}}
-          <div class="col-12 col-xl-3 docs-navbar-container d-none d-xl-block">
-            {{ partial "docs/sidebar.html" . }}
-          </div>
+          <div class="col-12 col-xl-3 docs-navbar-container d-none d-xl-block">{{ partial "docs/sidebar.html" . }}</div>
           {{/* Dropdown Navigation for smaller screens */}}
           <div class="col-12 d-xl-none mb-3">
             <div class="dropdown">
@@ -44,7 +42,7 @@
                                 {{ .Title }}
                               </a>
                             </h5>
-                              <p class="card-text text-muted">{{ .Description | markdownify }}</p>
+                            <p class="card-text text-muted">{{ .Description | markdownify }}</p>
 
                             {{/* Show child pages count */}}
                             {{ if .Pages }}
@@ -77,13 +75,46 @@
                   </div>
                 </div>
               {{ end }}
-
               {{/* Page content */}}
-              <div class="docs-body">
-                {{ .Content | markdownify }}
-              </div>
+              <div class="docs-body">{{ .Content | markdownify }}</div>
 
-             
+              {{ if eq .RelPermalink "/docs/" }}
+                {{ if .Site.Params.features.configWizard }}
+                  <h2>Quick Start Options</h2>
+                  <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                      <div class="card h-100 border-primary">
+                        <div class="card-body text-center">
+                          <div class="mb-3">
+                            <i class="fas fa-magic fa-3x text-primary"></i>
+                          </div>
+                          <h5 class="card-title">Configuration Wizard</h5>
+                          <p class="card-text">Build your configuration step-by-step with our interactive wizard. Perfect for beginners!</p>
+                          <a href="config-wizard/" class="btn btn-primary">
+                            <i class="fas fa-magic me-2"></i>
+                            Start Wizard
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card h-100 border-success">
+                        <div class="card-body text-center">
+                          <div class="mb-3">
+                            <i class="fas fa-book fa-3x text-success"></i>
+                          </div>
+                          <h5 class="card-title">Manual Configuration</h5>
+                          <p class="card-text">Follow our comprehensive getting started guide for manual configuration setup.</p>
+                          <a href="get-started/" class="btn btn-success">
+                            <i class="fas fa-book me-2"></i>
+                            Get Started
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {{ end }}
+              {{ end }}
 
               {{/* Getting started section */}}
               {{ $gettingStarted := .Site.GetPage "/docs/get-started/getting-started/" }}
@@ -103,9 +134,8 @@
                 </div>
               {{ end }}
 
-               <div class="docs-comments">
-                {{ partial "docs/comments.html" . }}
-              </div>
+
+              <div class="docs-comments">{{ partial "docs/comments.html" . }}</div>
             </div>
           </div>
         </div>
@@ -114,6 +144,4 @@
   </div>
 {{- end }}
 
-{{- define "template" }}
-  docs/list.html
-{{- end }}
+{{- define "template" }}docs/list.html{{- end }}
