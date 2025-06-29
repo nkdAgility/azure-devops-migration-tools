@@ -110,7 +110,7 @@ namespace MigrationTools.Processors
             foreach (TeamFoundationTeam sourceTeam in sourceTeams)
             {
                 Stopwatch witstopwatch = Stopwatch.StartNew();
-                var foundTargetTeam = (from x in targetTeams where x.Name == sourceTeam.Name select x).SingleOrDefault();
+                var foundTargetTeam = targetTeams.FirstOrDefault(x => string.Equals(x.Name, sourceTeam.Name, StringComparison.OrdinalIgnoreCase));
                 if (foundTargetTeam == null || Options.UpdateTeamSettings)
                 {
                     Log.LogDebug("Processing team '{0}':", sourceTeam.Name);
@@ -131,7 +131,7 @@ namespace MigrationTools.Processors
                             {
                                 var iterationMap = new Dictionary<string, string>();
 
-                                var targetConfig = targetConfigurations.FirstOrDefault(t => t.TeamName == sourceConfig.TeamName);
+                                var targetConfig = targetConfigurations.FirstOrDefault(t => string.Equals(t.TeamName, sourceConfig.TeamName, StringComparison.OrdinalIgnoreCase));
                                 if (targetConfig == null)
                                 {
                                     Log.LogDebug("-> Settings for team '{sourceTeamName}'.. not found", sourceTeam.Name);
@@ -209,7 +209,7 @@ namespace MigrationTools.Processors
             //{
             //    Stopwatch witstopwatch = new Stopwatch();
             //    witstopwatch.Start();
-            //    var foundTargetTeam = (from x in targetTL where x.Name == sourceTeam.Name select x).SingleOrDefault();
+            //    var foundTargetTeam = targetTL.FirstOrDefault(x => string.Equals(x.Name, sourceTeam.Name, StringComparison.OrdinalIgnoreCase));
             //    if (foundTargetTeam == null)
             //    {
             //        TLog.LogInformation("Processing team {0}", sourceTeam.Name));
@@ -239,7 +239,7 @@ namespace MigrationTools.Processors
 
         internal static string SwitchProjectName(string expressionString, string sourceProjectName, string targetProjectName)
         {
-            if (expressionString == sourceProjectName)
+            if (string.Equals(expressionString, sourceProjectName, StringComparison.OrdinalIgnoreCase))
             {
                 return targetProjectName;
             }
@@ -248,7 +248,7 @@ namespace MigrationTools.Processors
             if (slashIndex > 0)
             {
                 var subValue = expressionString.Substring(0, slashIndex);
-                if (subValue == sourceProjectName)
+                if (string.Equals(subValue, sourceProjectName, StringComparison.OrdinalIgnoreCase))
                 {
                     return targetProjectName + expressionString.Substring(slashIndex);
                 }
