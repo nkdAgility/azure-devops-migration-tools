@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MigrationTools.Clients;
-using MigrationTools._EngineV1.Containers;
-using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
-using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Tools;
-using Serilog;
 
 namespace MigrationTools
 {
@@ -30,7 +25,7 @@ namespace MigrationTools
             context.AddSingleton<TfsNodeStructureTool>().AddMigrationToolsOptions<TfsNodeStructureToolOptions, TfsNodeStructureToolOptionsValidator>(configuration);
             context.AddSingleton<TfsRevisionManagerTool>().AddMigrationToolsOptions<TfsRevisionManagerToolOptions>(configuration);
             context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
-            context.AddSingleton< TfsChangeSetMappingTool>().AddMigrationToolsOptions<TfsChangeSetMappingToolOptions>(configuration);
+            context.AddSingleton<TfsChangeSetMappingTool>().AddMigrationToolsOptions<TfsChangeSetMappingToolOptions>(configuration);
         }
 
         public static void AddMigrationToolServicesForClientTfs_Processors(this IServiceCollection context)
@@ -72,19 +67,20 @@ namespace MigrationTools
         public static void AddMigrationToolServicesForClientLegacyAzureDevOpsObjectModel(this IServiceCollection context)
         {
             // Field Mapps
-            context.AddTransient< FieldSkipMap>();
-            context.AddTransient< FieldLiteralMap>();
-            context.AddTransient< FieldMergeMap>();  
-            context.AddTransient< FieldToFieldMap>();
-            context.AddTransient< FieldToFieldMultiMap>();
-            context.AddTransient< FieldToTagFieldMap>();
-            context.AddTransient< FieldValuetoTagMap>();
-            context.AddTransient< FieldToFieldMap>();
-            context.AddTransient< FieldValueMap>();
-            context.AddTransient< MultiValueConditionalMap>();
-            context.AddTransient< RegexFieldMap>();
-            context.AddTransient< TreeToTagFieldMap>();
-            
+            context.AddTransient<FieldSkipMap>();
+            context.AddTransient<FieldLiteralMap>();
+            context.AddTransient<FieldMergeMap>();
+            context.AddTransient<FieldToFieldMap>();
+            context.AddTransient<FieldToFieldMultiMap>();
+            context.AddTransient<FieldToTagFieldMap>();
+            context.AddTransient<FieldValuetoTagMap>();
+            context.AddTransient<FieldToFieldMap>();
+            context.AddTransient<FieldValueMap>();
+            context.AddTransient<MultiValueConditionalMap>();
+            context.AddTransient<RegexFieldMap>();
+            context.AddTransient<TreeToTagFieldMap>();
+            context.AddTransient<FieldCalculationMap>();
+
             // Core
             context.AddTransient<IMigrationClient, TfsTeamProjectEndpoint>();
             context.AddTransient<IWorkItemMigrationClient, TfsWorkItemMigrationClient>();
