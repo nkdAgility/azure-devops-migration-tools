@@ -164,4 +164,5 @@ $RECYCLE.BIN/
 logs/
 /staging/
 /public/
+/docs/public/
 /docs/data/generated
