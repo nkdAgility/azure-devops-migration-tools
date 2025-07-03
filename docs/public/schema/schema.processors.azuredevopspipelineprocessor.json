@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.processors.azuredevopspipelineprocessor.json",
+  "title": "AzureDevOpsPipelineProcessor",
+  "description": "Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.",
+  "type": "object",
+  "properties": {
+    "buildPipelines": {
+      "description": "List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.",
+      "type": "array"
+    },
+    "enabled": {
+      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "migrateBuildPipelines": {
+      "description": "Migrate Build Pipelines",
+      "type": "boolean",
+      "default": "true"
+    },
+    "migrateReleasePipelines": {
+      "description": "Migrate Release Pipelines",
+      "type": "boolean",
+      "default": "true"
+    },
+    "migrateServiceConnections": {
+      "description": "Migrate Service Connections **secrets need to be entered manually**",
+      "type": "boolean",
+      "default": "true"
+    },
+    "migrateTaskGroups": {
+      "description": "Migrate Task Groups",
+      "type": "boolean",
+      "default": "true"
+    },
+    "migrateVariableGroups": {
+      "description": "Migrate Variable Groups",
+      "type": "boolean",
+      "default": "true"
+    },
+    "releasePipelines": {
+      "description": "List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.",
+      "type": "array"
+    },
+    "repositoryNameMaps": {
+      "description": "Map of Source Repository to Target Repository Names",
+      "type": "object"
+    },
+    "sourceName": {
+      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+      "type": "string"
+    },
+    "targetName": {
+      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+      "type": "string"
+    }
+  }
+}

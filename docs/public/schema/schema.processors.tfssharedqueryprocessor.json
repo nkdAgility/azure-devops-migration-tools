@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.processors.tfssharedqueryprocessor.json",
+  "title": "TfsSharedQueryProcessor",
+  "description": "The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
+    "prefixProjectToNodes": {
+      "description": "Do we add the source project name into the folder path",
+      "type": "boolean",
+      "default": "false"
+    },
+    "sharedFolderName": {
+      "description": "The name of the shared folder, made a parameter incase it every needs to be edited",
+      "type": "string",
+      "default": "Shared Queries"
+    },
+    "sourceName": {
+      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+      "type": "string"
+    },
+    "sourceToTargetFieldMappings": {
+      "description": "Mapping of the source to the target",
+      "type": "object"
+    },
+    "targetName": {
+      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+      "type": "string"
+    }
+  }
+}
