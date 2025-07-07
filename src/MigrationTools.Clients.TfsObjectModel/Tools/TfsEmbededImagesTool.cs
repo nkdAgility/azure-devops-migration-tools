@@ -132,7 +132,7 @@ namespace MigrationTools.Tools
                 {
                     if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
                     {
-                        if (!string.IsNullOrEmpty(sourcePersonalAccessToken) && matchedSourceUri.Contains("tfs/DefaultCollection"))
+                        if (!string.IsNullOrEmpty(sourcePersonalAccessToken) && new Uri(matchedSourceUri).PathAndQuery.StartsWith("/tfs/"))
                         {
                             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken)));
                             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
