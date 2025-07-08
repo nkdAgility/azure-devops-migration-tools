@@ -132,16 +132,18 @@ namespace MigrationTools.Tools
                 {
                     if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
                     {
-                        if (!string.IsNullOrEmpty(sourcePersonalAccessToken) && new Uri(matchedSourceUri).PathAndQuery.StartsWith("/tfs/"))
+                        var host = new Uri(matchedSourceUri).Host.ToLowerInvariant();
+                        if (host.Contains("dev.azure.com") || host.Contains("visualstudio.com"))
+                        {
+                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", sourcePersonalAccessToken);
+                        }
+                        else
                         {
                             string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", sourcePersonalAccessToken)));
                             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
                         }
-                        else if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
-                        {
-                            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", sourcePersonalAccessToken);
-                        }
                     }
+
                     var result = DownloadFile(httpClient, matchedSourceUri, fullImageFilePath);
                     if (!result.IsSuccessStatusCode)
                     {
