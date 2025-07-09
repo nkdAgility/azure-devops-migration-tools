@@ -525,7 +525,10 @@ namespace MigrationTools.Processors
             foreach (Field f in oldWorkItem.Fields)
             {
                 CommonTools.UserMapping.MapUserIdentityField(f);
-                CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
+                if (newWorkItem.Fields.Contains(f.ReferenceName))
+                {
+                    CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
+                }
 
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
