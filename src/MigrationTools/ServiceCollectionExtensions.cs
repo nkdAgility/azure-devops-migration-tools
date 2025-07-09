@@ -1,26 +1,19 @@
 ﻿using System;
-using System.Configuration;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MigrationTools._EngineV1.Containers;
 using MigrationTools.EndpointEnrichers;
-using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
-using MigrationTools.Services;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Interfaces;
-using Serilog;
 
 namespace MigrationTools
 {
     public static partial class ServiceCollectionExtensions
     {
-
         public static OptionsBuilder<TOptions> AddMigrationToolsOptions<TOptions>(this IServiceCollection services, IConfiguration configuration) where TOptions : class
         {
             IOptions options = (IOptions)Activator.CreateInstance<TOptions>();
@@ -31,7 +24,7 @@ namespace MigrationTools
         {
             IOptions options = (IOptions)Activator.CreateInstance<TOptions>();
             services.AddSingleton<IValidateOptions<TOptions>, TOptionsValidator>();
-           return services.AddOptions<TOptions>().Bind(configuration.GetSection(options.ConfigurationMetadata.PathToInstance));
+            return services.AddOptions<TOptions>().Bind(configuration.GetSection(options.ConfigurationMetadata.PathToInstance));
         }
 
         public static void AddMigrationToolServices(this IServiceCollection context, IConfiguration configuration, string configFile = "configuration.json")
@@ -39,9 +32,6 @@ namespace MigrationTools
             // Infra
             context.AddSingleton<OptionsConfigurationBuilder>();
             context.AddSingleton<OptionsConfigurationUpgrader>();
-
-
-            
 
             context.AddConfiguredEndpoints(configuration);
             //Containers
@@ -54,9 +44,11 @@ namespace MigrationTools
             //context.AddTransient<FilterWorkItemsThatAlreadyExistInTarget>();
             //context.AddTransient<SkipToFinalRevisedWorkItemType>();
 
-                    context.AddSingleton<IStringManipulatorTool, StringManipulatorTool>().AddMigrationToolsOptions<StringManipulatorToolOptions>(configuration);
-                    context.AddSingleton<IWorkItemTypeMappingTool, WorkItemTypeMappingTool>().AddMigrationToolsOptions<WorkItemTypeMappingToolOptions>(configuration);
-                   // context.AddSingleton<GitRepoMappingTool>().AddMigrationToolsOptions<GitRepoMappingToolOptions>(configuration);
+            context.AddSingleton<IStringManipulatorTool, StringManipulatorTool>().AddMigrationToolsOptions<StringManipulatorToolOptions>(configuration);
+            context.AddSingleton<IWorkItemTypeMappingTool, WorkItemTypeMappingTool>().AddMigrationToolsOptions<WorkItemTypeMappingToolOptions>(configuration);
+            context.AddSingleton<IFieldReferenceNameMappingTool, FieldReferenceNameMappingTool>().AddMigrationToolsOptions<FieldReferenceNameMappingToolOptions>(configuration);
+
+            // context.AddSingleton<GitRepoMappingTool>().AddMigrationToolsOptions<GitRepoMappingToolOptions>(configuration);
 
             context.AddSingleton<ProcessorContainer>()
                 .AddSingleton<IConfigureOptions<ProcessorContainerOptions>, ProcessorContainerOptions.ConfigureOptions>()
@@ -65,11 +57,9 @@ namespace MigrationTools
             //    return new WritableOptions<ProcessorContainerOptions>(sp.GetRequiredService<IOptionsMonitor<ProcessorContainerOptions>>(),ProcessorContainerOptions.ConfigurationSectionName, configFile);
             //});
 
-
             context.AddSingleton<IFieldMappingTool, FieldMappingTool>().AddSingleton<IConfigureOptions<FieldMappingToolOptions>, FieldMappingToolOptions.ConfigureOptions>();
             context.AddSingleton<VersionOptions>().AddSingleton<IConfigureOptions<VersionOptions>, VersionOptions.ConfigureOptions>();
             context.AddSingleton<CommonTools>();
-
 
             //context.AddTransient<WorkItemAttachmentEnricher>();
             //context.AddTransient<WorkItemCreatedEnricher>();
@@ -78,8 +68,6 @@ namespace MigrationTools
             //context.AddTransient<WorkItemLinkEnricher>();
             // processor Enrichers
             context.AddTransient<PauseAfterEachItem>();
-
-            
         }
 
         [Obsolete("This is the v1 Archtiecture, we are movign to V2", false)]

@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
-using MigrationTools.Processors;
+using MigrationTools.Shadows;
 using MigrationTools.Tests;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Interfaces;
 using MigrationTools.Tools.Shadows;
-using MigrationTools.Shadows;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using System.Text;
-using MigrationTools.Endpoints.Infrastructure;
 
 namespace MigrationTools.Endpoints.Tests
 {
@@ -72,6 +71,7 @@ namespace MigrationTools.Endpoints.Tests
             services.AddSingleton<CommonTools>();
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IFieldReferenceNameMappingTool, MockFieldReferenceNameMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
             services.AddSingleton<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();
             services.AddSingleton<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
@@ -81,7 +81,7 @@ namespace MigrationTools.Endpoints.Tests
             {
                 IOptions<TfsWorkItemEndpointOptions> wrappedOptions = Microsoft.Extensions.Options.Options.Create(new TfsWorkItemEndpointOptions()
                 {
-                    Collection = options != null? options.Collection : new Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Collection = options != null ? options.Collection : new Uri("https://dev.azure.com/nkdagility-preview/"),
                     Project = options != null ? options.Project : "migrationSource1",
                     Authentication = new TfsAuthenticationOptions()
                     {
@@ -100,7 +100,7 @@ namespace MigrationTools.Endpoints.Tests
                 });
                 return ActivatorUtilities.CreateInstance(sp, typeof(TfsWorkItemEndpoint), wrappedOptions);
             });
-           
+
             return (TfsWorkItemEndpoint)services.BuildServiceProvider().GetRequiredKeyedService<IEndpoint>(key);
         }
 
@@ -175,7 +175,7 @@ namespace MigrationTools.Endpoints.Tests
                       ""IterationPath"": ""Iteration""
                     }
                   }
-                },  
+                },
               }
             }";
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));

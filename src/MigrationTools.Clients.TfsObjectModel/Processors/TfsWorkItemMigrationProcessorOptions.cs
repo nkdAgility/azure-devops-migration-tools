@@ -1,12 +1,7 @@
 ﻿using System.Collections.Generic;
-using MigrationTools.Enrichers;
-using MigrationTools.Processors;
+using System.ComponentModel.DataAnnotations;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Options;
-using System.Text.RegularExpressions;
-using System.DirectoryServices.AccountManagement;
 using Newtonsoft.Json;
 
 namespace MigrationTools.Processors
@@ -16,8 +11,6 @@ namespace MigrationTools.Processors
     /// </summary>
     public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
-
-
         /// <summary>
         /// If this is enabled the creation process on the target project will create the items with the original creation date.
         /// (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
@@ -35,7 +28,6 @@ namespace MigrationTools.Processors
         /// <default>true</default>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool UpdateCreatedBy { get; set; } = true;
-
 
         /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
@@ -115,7 +107,20 @@ namespace MigrationTools.Processors
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool SkipRevisionWithInvalidAreaPath { get; set; } = false;
-    }
 
- 
+        /// <summary>
+        /// Validates if all fields in source work item exist in the target work item type.
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool ValidateWorkItemFields { get; set; } = false;
+
+        /// <summary>
+        /// Used when validating work item fields (<see cref="ValidateWorkItemFields"/> is <see langword="true"/>).
+        /// If set to <see langword="true"/>, the migration will continue even if some fields in the source work item
+        /// do not exist in the target work item type. If set to <see langword="false"/>, the migration will stop with
+        /// error in this case. Default value is <see langword="false"/>.
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool ContinueIfMissingFieldsInTarget { get; set; } = false;
+    }
 }
