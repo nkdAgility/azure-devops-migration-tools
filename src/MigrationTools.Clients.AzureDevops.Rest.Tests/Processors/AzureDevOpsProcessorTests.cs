@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.Services.Commerce;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
@@ -27,6 +25,7 @@ namespace MigrationTools.Processors.Tests
             services.AddSingleton<CommonTools>();
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IFieldReferenceNameMappingTool, MockFieldReferenceNameMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
 
             services.AddSingleton<AzureDevOpsPipelineProcessor>();
@@ -37,7 +36,7 @@ namespace MigrationTools.Processors.Tests
                 o.Enabled = options != null ? options.Enabled : true;
                 o.BuildPipelines = options != null ? options.BuildPipelines : null;
                 o.ReleasePipelines = options != null ? options.ReleasePipelines : null;
-                o.SourceName = options != null ? options.SourceName : "Source"; 
+                o.SourceName = options != null ? options.SourceName : "Source";
                 o.TargetName = options != null ? options.SourceName : "Target";
                 o.Enrichers = options != null ? options.Enrichers : null;
                 o.MigrateTaskGroups = options != null ? options.MigrateTaskGroups : true;
@@ -49,7 +48,7 @@ namespace MigrationTools.Processors.Tests
                 o.RefName = options != null ? options.RefName : null;
                 o.RepositoryNameMaps = options != null ? options.RepositoryNameMaps : null;
             }));
-            
+
             return services.BuildServiceProvider().GetService<AzureDevOpsPipelineProcessor>();
         }
 
@@ -77,9 +76,9 @@ namespace MigrationTools.Processors.Tests
 
         public static object GetValueFromProperty(LogEventPropertyValue value) =>
             value switch
-        {
-            ScalarValue v => v.Value,
-            _ => value.ToString(),
-        };
+            {
+                ScalarValue v => v.Value,
+                _ => value.ToString(),
+            };
     }
 }
