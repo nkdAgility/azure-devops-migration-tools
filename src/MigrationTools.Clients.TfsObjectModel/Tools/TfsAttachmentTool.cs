@@ -5,17 +5,11 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
-using MigrationTools._EngineV1.Configuration.Processing;
 using MigrationTools.DataContracts;
-using MigrationTools.Endpoints;
-using MigrationTools.Enrichers;
-using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
-using Serilog;
 
 namespace MigrationTools.Tools
 {
@@ -35,9 +29,13 @@ namespace MigrationTools.Tools
         /// <param name="services">Service provider for dependency injection</param>
         /// <param name="logger">Logger for the tool operations</param>
         /// <param name="telemetryLogger">Telemetry logger for tracking operations</param>
-        public TfsAttachmentTool(IOptions<TfsAttachmentToolOptions> options, IServiceProvider services, ILogger<TfsAttachmentTool> logger, ITelemetryLogger telemetryLogger) : base(options,services, logger, telemetryLogger)
+        public TfsAttachmentTool(
+            IOptions<TfsAttachmentToolOptions> options,
+            IServiceProvider services,
+            ILogger<TfsAttachmentTool> logger,
+            ITelemetryLogger telemetryLogger)
+            : base(options, services, logger, telemetryLogger)
         {
-
         }
 
         /// <summary>
@@ -66,7 +64,6 @@ namespace MigrationTools.Tools
                 Directory.Delete(_exportWiPath, true);
             }
             Directory.CreateDirectory(_exportWiPath);
-
 
             int count = 0;
             foreach (Attachment wia in source.ToWorkItem().Attachments) // TODO#1 Limit to 100 attachements
@@ -150,6 +147,8 @@ namespace MigrationTools.Tools
 
         private void ImportAttachment(WorkItem targetWorkItem, Attachment wia, string filepath)
         {
+            const int MaxCommentLength = 255;
+
             var filename = Path.GetFileName(filepath);
             FileInfo fi = new FileInfo(filepath);
             if (Options.MaxAttachmentSize > fi.Length)
@@ -157,6 +156,12 @@ namespace MigrationTools.Tools
                 string originalId = "[originalId:" + wia.Id + "]";
                 var attachments = targetWorkItem.Attachments.Cast<Attachment>();
                 var attachment = attachments.Where(a => a.Name == wia.Name && a.Length == wia.Length && a.Comment.Contains(originalId)).FirstOrDefault();
+                if (attachment is null)
+                {
+                    attachment = attachments.Where(a => a.Name.Equals(wia.Name, StringComparison.OrdinalIgnoreCase)
+                        && a.Comment.Equals(wia.Comment, StringComparison.OrdinalIgnoreCase))
+                        .FirstOrDefault();
+                }
                 if (attachment == null)
                 {
                     Attachment a = new Attachment(filepath);
@@ -171,7 +176,8 @@ namespace MigrationTools.Tools
                             originalComment = originalComment.Replace(match.Value, "");
                         }
                         originalComment = originalComment.Trim();
-                        a.Comment = originalComment + " " + originalId;
+                        string newComment = originalComment + " " + originalId;
+                        a.Comment = newComment.Length > MaxCommentLength ? originalComment : newComment;
                     }
                     targetWorkItem.Attachments.Add(a);
                 }
@@ -199,6 +205,5 @@ namespace MigrationTools.Tools
                 _workItemServer = processer.Source.GetService<WorkItemServer>();
             }
         }
-
     }
 }
