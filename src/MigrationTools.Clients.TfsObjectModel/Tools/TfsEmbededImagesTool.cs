@@ -36,22 +36,27 @@ namespace MigrationTools.Tools
             _cachedUploadedUrisBySourceValue = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public int FixEmbededImages(TfsProcessor processor, WorkItemData targetWorkItem)
+        public void FixEmbededImages(TfsProcessor processor, WorkItemData targetWorkItem)
         {
+            static string GenerateAuthToken(string username, string password)
+                => Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+
             _processor = processor;
             _targetProject = processor.Target.WorkItems.Project.ToProject();
-            string? accessToken = processor.Source.Options.Authentication.AuthenticationMode switch
-            {
-                AuthenticationMode.AccessToken => processor.Source.Options.Authentication.AccessToken,
-                AuthenticationMode.Windows => GetWindowsAuthToken(processor.Source.Options.Authentication.NetworkCredentials),
-                _ => null
-            };
-            FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, accessToken);
-            return 0;
-        }
 
-        private string GetWindowsAuthToken(NetworkCredentials cred)
-            => Convert.ToBase64String(Encoding.ASCII.GetBytes($"{cred.Domain}\\{cred.UserName}:{cred.Password}"));
+            string? accessToken = null;
+            if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.AccessToken)
+            {
+                accessToken = GenerateAuthToken(string.Empty, processor.Source.Options.Authentication.AccessToken);
+            }
+            else if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.Windows)
+            {
+                NetworkCredentials credentials = processor.Source.Options.Authentication.NetworkCredentials;
+                accessToken = GenerateAuthToken($"{credentials.Domain}\\{credentials.UserName}", credentials.Password);
+            }
+
+            FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, accessToken);
+        }
 
         public void ProcessorExecutionEnd(TfsProcessor processor)
         {
@@ -134,6 +139,7 @@ namespace MigrationTools.Tools
                     {
                         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", sourcePersonalAccessToken);
                     }
+
                     var result = DownloadFile(httpClient, matchedSourceUri, fullImageFilePath);
                     if (!result.IsSuccessStatusCode)
                     {

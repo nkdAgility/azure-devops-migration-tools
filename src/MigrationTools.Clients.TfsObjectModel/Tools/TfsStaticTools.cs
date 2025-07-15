@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MigrationTools.Tools.Interfaces;
+﻿using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
@@ -29,22 +22,24 @@ namespace MigrationTools.Tools
         /// <param name="TfsGitRepositoryTool">Tool for git repository operations</param>
         /// <param name="StringManipulatorTool">Tool for string field manipulation</param>
         /// <param name="workItemTypeMapping">Tool for work item type mapping</param>
+        /// <param name="fieldReferenceNameMappingTool">Tool for work item fields mapping</param>
         /// <param name="fieldMappingTool">Tool for field mapping operations</param>
         public TfsCommonTools(
             TfsUserMappingTool userMappingEnricher,
-                                        TfsAttachmentTool attachmentEnricher,
-                                        TfsNodeStructureTool nodeStructureEnricher,
-                                        TfsRevisionManagerTool revisionManager,
-                                        TfsWorkItemLinkTool workItemLinkEnricher,
-                                        TfsWorkItemEmbededLinkTool workItemEmbeddedLinkEnricher,
-                                        TfsValidateRequiredFieldTool requiredFieldValidator,
-                                        TfsTeamSettingsTool teamSettingsEnricher,
-                                        TfsEmbededImagesTool embededImagesEnricher,
-                                        TfsGitRepositoryTool TfsGitRepositoryTool,
-                                        IStringManipulatorTool StringManipulatorTool,
-                                        IWorkItemTypeMappingTool workItemTypeMapping,
-                                        IFieldMappingTool fieldMappingTool
-            ) : base(StringManipulatorTool, workItemTypeMapping, fieldMappingTool)
+            TfsAttachmentTool attachmentEnricher,
+            TfsNodeStructureTool nodeStructureEnricher,
+            TfsRevisionManagerTool revisionManager,
+            TfsWorkItemLinkTool workItemLinkEnricher,
+            TfsWorkItemEmbededLinkTool workItemEmbeddedLinkEnricher,
+            TfsValidateRequiredFieldTool requiredFieldValidator,
+            TfsTeamSettingsTool teamSettingsEnricher,
+            TfsEmbededImagesTool embededImagesEnricher,
+            TfsGitRepositoryTool TfsGitRepositoryTool,
+            IStringManipulatorTool StringManipulatorTool,
+            IWorkItemTypeMappingTool workItemTypeMapping,
+            IFieldReferenceNameMappingTool fieldReferenceNameMappingTool,
+            IFieldMappingTool fieldMappingTool
+            ) : base(StringManipulatorTool, workItemTypeMapping, fieldReferenceNameMappingTool, fieldMappingTool)
         {
             UserMapping = userMappingEnricher;
             Attachment = attachmentEnricher;

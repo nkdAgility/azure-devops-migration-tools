@@ -1,22 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Tests;
-using MigrationTools.Processors.Infrastructure;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using MigrationTools.Enrichers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Clients;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Endpoints;
+using MigrationTools.Endpoints.Infrastructure;
+using MigrationTools.Enrichers;
+using MigrationTools.Shadows;
+using MigrationTools.Tests;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Interfaces;
 using MigrationTools.Tools.Shadows;
-using MigrationTools.Shadows;
-using MigrationTools.Endpoints;
-using MigrationTools.Clients;
-using MigrationTools.Endpoints.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
-using Microsoft.VisualStudio.Services.Commerce;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -41,6 +38,7 @@ namespace MigrationTools.Processors.Tests
             services.AddSingleton<CommonTools>();
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IFieldReferenceNameMappingTool, MockFieldReferenceNameMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
             services.AddSingleton<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();
             services.AddSingleton<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
@@ -60,7 +58,7 @@ namespace MigrationTools.Processors.Tests
                     },
                     ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId",
                 });
-               return ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), options);
+                return ActivatorUtilities.CreateInstance(sp, typeof(TfsTeamSettingsEndpoint), options);
             });
             services.AddKeyedSingleton(typeof(IEndpoint), TargetName, (sp, key) =>
             {
@@ -110,6 +108,7 @@ namespace MigrationTools.Processors.Tests
             services.AddSingleton<CommonTools>();
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IFieldReferenceNameMappingTool, MockFieldReferenceNameMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
             services.TryAddScoped<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();
 
@@ -168,7 +167,7 @@ namespace MigrationTools.Processors.Tests
                 o.Enrichers = options != null ? options.Enrichers : null;
                 o.RefName = options != null ? options.RefName : null;
                 /// Add custom
-                o.SourceToTargetFieldMappings = options != null ? options.SourceToTargetFieldMappings : new System.Collections.Generic.Dictionary<string, string> { {"sourceFieldA", "targetFieldB" } };
+                o.SourceToTargetFieldMappings = options != null ? options.SourceToTargetFieldMappings : new System.Collections.Generic.Dictionary<string, string> { { "sourceFieldA", "targetFieldB" } };
                 o.PrefixProjectToNodes = options != null ? options.PrefixProjectToNodes : false;
                 o.SharedFolderName = options != null ? options.SharedFolderName : "Shared Queries";
             }));

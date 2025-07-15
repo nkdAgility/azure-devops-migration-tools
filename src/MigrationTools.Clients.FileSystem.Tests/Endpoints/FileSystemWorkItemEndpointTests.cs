@@ -1,16 +1,14 @@
-﻿using System.Xml.Linq;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Enrichers;
-using MigrationTools.Tests;
+using MigrationTools.Shadows;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Interfaces;
 using MigrationTools.Tools.Shadows;
-using MigrationTools.Shadows;
-using System;
 
 namespace MigrationTools.Endpoints.Tests
 {
@@ -49,7 +47,7 @@ namespace MigrationTools.Endpoints.Tests
             CleanAndAdd(e1, 10);
             FileSystemWorkItemEndpoint e2 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Target");
             CleanAndAdd(e2, 10);
-            
+
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(0, e1.Count);
         }
@@ -60,7 +58,7 @@ namespace MigrationTools.Endpoints.Tests
             FileSystemWorkItemEndpoint e1 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Source");
             CleanAndAdd(e1, 20);
             FileSystemWorkItemEndpoint e2 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Target");
-            CleanAndAdd(e2, 10);            
+            CleanAndAdd(e2, 10);
             e1.Filter(e2.GetWorkItems());
             Assert.AreEqual(10, e1.Count);
         }
@@ -72,7 +70,7 @@ namespace MigrationTools.Endpoints.Tests
             CleanAndAdd(e1, 20);
             FileSystemWorkItemEndpoint e2 = (FileSystemWorkItemEndpoint)Services.GetKeyedService<IEndpoint>("Target");
             CleanAndAdd(e2, 10);
-            
+
             foreach (WorkItemData item in e1.GetWorkItems())
             {
                 e2.PersistWorkItem(item);
@@ -118,6 +116,7 @@ namespace MigrationTools.Endpoints.Tests
             services.AddSingleton<CommonTools>();
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IFieldReferenceNameMappingTool, MockFieldReferenceNameMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
 
             services.AddKeyedSingleton(typeof(IEndpoint), "Source", (sp, key) =>
