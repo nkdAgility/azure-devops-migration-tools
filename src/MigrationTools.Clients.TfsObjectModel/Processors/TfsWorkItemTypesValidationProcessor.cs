@@ -10,6 +10,11 @@ using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Processor for validating work item types in source againts work item types in target.
+    /// It checks if all work item types and their fields in source exist in target. It respects work item type mappings
+    /// (<see cref="WorkItemTypeMappingTool"/>) and can have field mappings configured in options.
+    /// </summary>
     public class TfsWorkItemTypesValidationProcessor : TfsProcessor
     {
         public TfsWorkItemTypesValidationProcessor(

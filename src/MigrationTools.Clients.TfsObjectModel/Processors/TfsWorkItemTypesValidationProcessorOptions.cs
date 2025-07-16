@@ -4,6 +4,10 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
+    /// <summary>
+    /// Options for the <see cref="TfsWorkItemTypesValidationProcessor"/> which validates work item types and their fields
+    /// in source against target.
+    /// </summary>
     public class TfsWorkItemTypesValidationProcessorOptions : ProcessorOptions
     {
         /// <summary>
@@ -14,16 +18,31 @@ namespace MigrationTools.Processors
         private static readonly StringComparer _normalizedComparer = StringComparer.OrdinalIgnoreCase;
         private bool _isNormalized = false;
 
+        /// <summary>
+        /// List of work item types which will be validated. If this list and <see cref="ExcludeWorkItemtypes"/> list are both
+        /// empty, all work item types will be validated. Only this list, or <see cref="ExcludeWorkItemtypes"/> list can be set,
+        /// but not both of them at the same time.
+        /// </summary>
         public List<string> IncludeWorkItemtypes { get; set; } = [];
+
+        /// <summary>
+        /// List of work item types which will not be validated. If this list and <see cref="IncludeWorkItemtypes"/> list are both
+        /// empty, all work item types will be validated. Only this list, or <see cref="IncludeWorkItemtypes"/> list can be set,
+        /// but not both of them at the same time.
+        /// </summary>
         public List<string> ExcludeWorkItemtypes { get; set; } = [];
 
-
+        /// <summary>
+        /// Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
+        /// target field name. Target field name can be empty string to indicate that this field will not be validated in target.
+        /// As work item type name, you can use <c>*</c> to define mappings which will be applied to all work item types.
+        /// </summary>
         public Dictionary<string, Dictionary<string, string>> TargetFieldsMappings { get; set; } = [];
 
         /// <summary>
         /// If set to <see langword="true"/>, migration processor will stop with error if some fields or work item types are
         /// missing in target. If set to <see langword="false"/>, it will log all missing fields and the migration will continue.
-        /// Default value is <see langword="true"/>.
+        /// Default value is <see langword="true"/> to allow user resolve missing fields.
         /// </summary>
         public bool StopIfMissingFieldsInTarget { get; set; } = true;
 
@@ -78,7 +97,7 @@ namespace MigrationTools.Processors
         /// <summary>
         /// Normalizes <see cref="TargetFieldsMappings"/> so all the dictionaries uses case-insensitive keys.
         /// </summary>
-        public void Normalize()
+        internal void Normalize()
         {
             if (_isNormalized)
             {
@@ -102,9 +121,8 @@ namespace MigrationTools.Processors
 
             IncludeWorkItemtypes ??= [];
             ExcludeWorkItemtypes ??= [];
-
-            _isNormalized = true;
             TargetFieldsMappings = newMappings;
+            _isNormalized = true;
         }
     }
 }
