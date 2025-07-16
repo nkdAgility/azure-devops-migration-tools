@@ -14,6 +14,10 @@ namespace MigrationTools.Processors
         private static readonly StringComparer _normalizedComparer = StringComparer.OrdinalIgnoreCase;
         private bool _isNormalized = false;
 
+        public List<string> IncludeWorkItemtypes { get; set; } = [];
+        public List<string> ExcludeWorkItemtypes { get; set; } = [];
+
+
         public Dictionary<string, Dictionary<string, string>> TargetFieldsMappings { get; set; } = [];
 
         /// <summary>
@@ -95,6 +99,9 @@ namespace MigrationTools.Processors
                     newMappings[mapping.Key.Trim()] = normalizedValues;
                 }
             }
+
+            IncludeWorkItemtypes ??= [];
+            ExcludeWorkItemtypes ??= [];
 
             _isNormalized = true;
             TargetFieldsMappings = newMappings;

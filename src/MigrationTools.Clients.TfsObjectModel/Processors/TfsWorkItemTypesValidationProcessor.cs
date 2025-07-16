@@ -28,34 +28,40 @@ namespace MigrationTools.Processors
 
         protected override void InternalExecute()
         {
-            ValidateWorkItemTypes(GetAllSourceWorkItemTypes().ToList(), GetAllTargetWorkItemTypes().ToList());
+            ValidateWorkItemTypes(GetAllSourceWorkItemTypes(), GetAllTargetWorkItemTypes());
         }
 
-        private IEnumerable<WorkItemType> GetAllSourceWorkItemTypes()
+        private List<WorkItemType> GetAllSourceWorkItemTypes()
         {
             Log.LogInformation("Retrieving all source work item types.");
             return Source.WorkItems.Project
                 .ToProject()
                 .WorkItemTypes
-                .Cast<WorkItemType>();
+                .Cast<WorkItemType>()
+                .ToList();
         }
 
-        private IEnumerable<WorkItemType> GetAllTargetWorkItemTypes()
+        private List<WorkItemType> GetAllTargetWorkItemTypes()
         {
             Log.LogInformation("Retrieving all target work item types.");
             return Target.WorkItems.Project
                 .ToProject()
                 .WorkItemTypes
-                .Cast<WorkItemType>();
+                .Cast<WorkItemType>()
+                .ToList();
         }
 
-        private void ValidateWorkItemTypes(ICollection<WorkItemType> sourceWits, ICollection<WorkItemType> targetWits)
+        private void ValidateWorkItemTypes(List<WorkItemType> sourceWits, List<WorkItemType> targetWits)
         {
             LogWorkItemTypes(sourceWits, targetWits);
 
-            bool allFieldsAreMapped = true;
+            bool isValid = true;
             foreach (WorkItemType sourceWit in sourceWits)
             {
+                if (!ShouldValidateWorkItemType(sourceWit.Name))
+                {
+                    continue;
+                }
                 Log.LogInformation("Validating fields of work item type '{sourceWit}'", sourceWit.Name);
                 string targetWitName = GetTargetWorkItemType(sourceWit.Name);
                 WorkItemType targetWit = targetWits
@@ -63,20 +69,18 @@ namespace MigrationTools.Processors
                 if (targetWit is null)
                 {
                     Log.LogWarning("Work item type '{targetWit}' is not present in target system.", targetWitName);
-                    allFieldsAreMapped = false;
+                    isValid = false;
                 }
                 else
                 {
                     if (!ValidateWorkItemTypeFields(sourceWit, targetWit))
                     {
-                        allFieldsAreMapped = false;
+                        isValid = false;
                     }
                 }
             }
-            if (LogFieldsAreNotMapped(allFieldsAreMapped))
-            {
-                Environment.Exit(-1);
-            }
+            LogValidationResult(isValid);
+            StopIfRequested(isValid);
         }
 
         private bool ValidateWorkItemTypeFields(WorkItemType sourceWit, WorkItemType targetWit)
@@ -116,6 +120,28 @@ namespace MigrationTools.Processors
             return result;
         }
 
+        private bool ShouldValidateWorkItemType(string workItemTypeName)
+        {
+            if ((Options.IncludeWorkItemtypes.Count > 0)
+                && !Options.IncludeWorkItemtypes.Contains(workItemTypeName, StringComparer.OrdinalIgnoreCase))
+            {
+                Log.LogInformation(
+                    "Skipping validation of work item type '{sourceWit}' because it is not included in validation list.",
+                    workItemTypeName);
+                return false;
+            }
+            if ((Options.ExcludeWorkItemtypes.Count > 0)
+                && Options.ExcludeWorkItemtypes.Contains(workItemTypeName, StringComparer.OrdinalIgnoreCase))
+            {
+                Log.LogInformation(
+                    "Skipping validation of work item type '{sourceWit}' because it is excluded from validation.",
+                    workItemTypeName);
+                return false;
+            }
+
+            return true;
+        }
+
         private string GetTargetWorkItemType(string sourceWit)
         {
             string targetWit = sourceWit;
@@ -132,35 +158,29 @@ namespace MigrationTools.Processors
             string targetFieldName = Options.GetTargetFieldName(targetWitName, sourceFieldName, out bool isMapped);
             if (isMapped)
             {
-                if (string.IsNullOrEmpty(targetFieldName))
-                {
-                    Log.LogInformation(
-                        "  Source field '{sourceFieldName}' is explicitly mapped as empty string, so it is not checked in target.",
-                        sourceFieldName, targetFieldName);
-                }
-                else
-                {
-                    Log.LogInformation("  Source field '{sourceFieldName}' is mapped as '{targetFieldName}' in target.",
-                        sourceFieldName, targetFieldName);
-                }
+                string message = string.IsNullOrEmpty(targetFieldName)
+                    ? "  Source field '{sourceFieldName}' is mapped as empty string, so it is not validated in target."
+                    : "  Source field '{sourceFieldName}' is mapped as '{targetFieldName}' in target.";
+                Log.LogInformation(message, sourceFieldName, targetFieldName);
             }
             return targetFieldName;
         }
 
         private void LogWorkItemTypes(ICollection<WorkItemType> sourceWits, ICollection<WorkItemType> targetWits)
         {
-            Log.LogInformation("Validating::Check that all fields in source work items exists in target work items.");
-            Log.LogInformation("Validating fields of source work item types: {sourceWits}.",
+            Log.LogInformation("Validating work item types if they exist in target system with all properties in source system.");
+            Log.LogInformation("Source work item types are: {sourceWits}.",
                 string.Join(", ", sourceWits.Select(wit => wit.Name)));
-            Log.LogInformation("Available target work item types are: {targetWits}.",
+            Log.LogInformation("Target work item types are: {targetWits}.",
                 string.Join(", ", targetWits.Select(wit => wit.Name)));
         }
 
-        private bool LogFieldsAreNotMapped(bool allFieldsAreMapped)
+        private void LogValidationResult(bool isValid)
         {
-            if (allFieldsAreMapped)
+            if (isValid)
             {
-                return false;
+                Log.LogInformation("All work item types are valid.");
+                return;
             }
 
             const string message = "Some fields are not present in the target system (see previous logs)." +
@@ -172,7 +192,6 @@ namespace MigrationTools.Processors
             {
                 Log.LogError(message);
                 Log.LogInformation($"'{opt}' is set to 'true' so migration process will stop now.");
-                return true;
             }
             else
             {
@@ -180,7 +199,14 @@ namespace MigrationTools.Processors
                 Log.LogInformation($"'{opt}' is set to 'false' so migration process will continue. Set it to 'true'" +
                     " if you want to stop and resolve missing fields.");
             }
-            return false;
+        }
+
+        private void StopIfRequested(bool isValid)
+        {
+            if (!isValid && Options.StopIfMissingFieldsInTarget)
+            {
+                Environment.Exit(-1);
+            }
         }
     }
 }

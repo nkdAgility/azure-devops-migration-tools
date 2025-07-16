@@ -34,6 +34,7 @@ namespace MigrationTools
             context.AddTransient<IValidateOptions<TfsWorkItemMigrationProcessorOptions>, TfsWorkItemMigrationProcessorOptionsValidator>();
 
             context.AddSingleton<TfsWorkItemTypesValidationProcessor>();
+            context.AddSingleton<IValidateOptions<TfsWorkItemTypesValidationProcessorOptions>, TfsWorkItemTypesValidationProcessorOptionsValidator>();
 
             context.AddSingleton<TfsTestConfigurationsMigrationProcessor>();
             context.AddSingleton<TfsTestPlansAndSuitesMigrationProcessor>();
