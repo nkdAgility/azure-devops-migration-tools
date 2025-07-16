@@ -21,6 +21,7 @@ namespace MigrationTools.Processors
             ILogger<TfsWorkItemCheckerProcessor> logger)
             : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
+            options.Value.Normalize();
         }
 
         public new TfsWorkItemCheckerProcessorOptions Options => (TfsWorkItemCheckerProcessorOptions)base.Options;
@@ -128,8 +129,7 @@ namespace MigrationTools.Processors
 
         private string GetTargetFieldName(string targetWitName, string sourceFieldName)
         {
-            string targetFieldName = CommonTools.FieldReferenceNameMappingTool
-                .GetTargetFieldName(targetWitName, sourceFieldName, out bool isMapped);
+            string targetFieldName = Options.GetTargetFieldName(targetWitName, sourceFieldName, out bool isMapped);
             if (isMapped)
             {
                 if (string.IsNullOrEmpty(targetFieldName))
