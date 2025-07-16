@@ -22,7 +22,6 @@ namespace MigrationTools.Tools
         /// <param name="TfsGitRepositoryTool">Tool for git repository operations</param>
         /// <param name="StringManipulatorTool">Tool for string field manipulation</param>
         /// <param name="workItemTypeMapping">Tool for work item type mapping</param>
-        /// <param name="fieldReferenceNameMappingTool">Tool for work item fields mapping</param>
         /// <param name="fieldMappingTool">Tool for field mapping operations</param>
         public TfsCommonTools(
             TfsUserMappingTool userMappingEnricher,
@@ -37,9 +36,8 @@ namespace MigrationTools.Tools
             TfsGitRepositoryTool TfsGitRepositoryTool,
             IStringManipulatorTool StringManipulatorTool,
             IWorkItemTypeMappingTool workItemTypeMapping,
-            IFieldReferenceNameMappingTool fieldReferenceNameMappingTool,
             IFieldMappingTool fieldMappingTool
-            ) : base(StringManipulatorTool, workItemTypeMapping, fieldReferenceNameMappingTool, fieldMappingTool)
+            ) : base(StringManipulatorTool, workItemTypeMapping, fieldMappingTool)
         {
             UserMapping = userMappingEnricher;
             Attachment = attachmentEnricher;

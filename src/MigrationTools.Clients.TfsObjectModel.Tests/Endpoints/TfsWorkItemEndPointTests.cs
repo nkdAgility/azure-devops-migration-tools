@@ -71,7 +71,6 @@ namespace MigrationTools.Endpoints.Tests
             services.AddSingleton<CommonTools>();
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
-            services.AddSingleton<IFieldReferenceNameMappingTool, MockFieldReferenceNameMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
             services.AddSingleton<IWorkItemQueryBuilderFactory, WorkItemQueryBuilderFactory>();
             services.AddSingleton<IWorkItemQueryBuilder, WorkItemQueryBuilder>();
