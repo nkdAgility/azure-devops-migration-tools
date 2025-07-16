@@ -10,21 +10,21 @@ using MigrationTools.Tools;
 
 namespace MigrationTools.Processors
 {
-    public class TfsWorkItemCheckerProcessor : TfsProcessor
+    public class TfsWorkItemTypesValidationProcessor : TfsProcessor
     {
-        public TfsWorkItemCheckerProcessor(
-            IOptions<TfsWorkItemCheckerProcessorOptions> options,
+        public TfsWorkItemTypesValidationProcessor(
+            IOptions<TfsWorkItemTypesValidationProcessorOptions> options,
             TfsCommonTools tfsCommonTools,
             ProcessorEnricherContainer processorEnrichers,
             IServiceProvider services,
             ITelemetryLogger telemetry,
-            ILogger<TfsWorkItemCheckerProcessor> logger)
+            ILogger<TfsWorkItemTypesValidationProcessor> logger)
             : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
             options.Value.Normalize();
         }
 
-        public new TfsWorkItemCheckerProcessorOptions Options => (TfsWorkItemCheckerProcessorOptions)base.Options;
+        public new TfsWorkItemTypesValidationProcessorOptions Options => (TfsWorkItemTypesValidationProcessorOptions)base.Options;
 
         protected override void InternalExecute()
         {
@@ -166,8 +166,8 @@ namespace MigrationTools.Processors
             const string message = "Some fields are not present in the target system (see previous logs)." +
                 " If the migration will continue, you will not have all information in work items in target system." +
                 " Either add these fields into target work items, or map source fields to other target fields" +
-                $" using '{nameof(FieldReferenceNameMappingTool)}'.";
-            const string opt = nameof(TfsWorkItemCheckerProcessorOptions.StopIfMissingFieldsInTarget);
+                $" in options ({nameof(TfsWorkItemTypesValidationProcessorOptions.TargetFieldsMappings)}).";
+            const string opt = nameof(TfsWorkItemTypesValidationProcessorOptions.StopIfMissingFieldsInTarget);
             if (Options.StopIfMissingFieldsInTarget)
             {
                 Log.LogError(message);

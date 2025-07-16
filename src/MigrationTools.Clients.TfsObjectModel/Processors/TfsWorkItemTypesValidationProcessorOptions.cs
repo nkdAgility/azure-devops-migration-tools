@@ -4,7 +4,7 @@ using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors
 {
-    public class TfsWorkItemCheckerProcessorOptions : ProcessorOptions
+    public class TfsWorkItemTypesValidationProcessorOptions : ProcessorOptions
     {
         /// <summary>
         /// Special key, meaning this mapping applied to all work item types.
