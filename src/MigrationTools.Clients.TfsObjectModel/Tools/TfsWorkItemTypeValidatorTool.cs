@@ -108,7 +108,8 @@ namespace MigrationTools.Tools
                 else
                 {
                     Log.LogWarning("  Missing field '{targetFieldName}' in '{targetWit}'.", targetFieldName, targetWit.Name);
-                    Log.LogInformation("    Source field name: {sourceFieldName}", sourceFieldName);
+                    Log.LogInformation("    Source field reference name: {sourceFieldReferenceName}", sourceFieldName);
+                    Log.LogInformation("    Source field name: {sourceFieldName}", sourceField.Name);
                     Log.LogInformation("    Field type: {fieldType}", sourceField.FieldType);
                     IEnumerable<string> allowedValues = sourceField.AllowedValues.OfType<string>().Select(val => $"'{val}'");
                     Log.LogInformation("    Allowed values: {allowedValues}", string.Join(", ", allowedValues));
