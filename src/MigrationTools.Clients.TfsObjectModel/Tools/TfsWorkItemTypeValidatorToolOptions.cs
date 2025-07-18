@@ -36,13 +36,6 @@ namespace MigrationTools.Tools
         public Dictionary<string, Dictionary<string, string>> FieldMappings { get; set; } = [];
 
         /// <summary>
-        /// If set to <see langword="true"/>, migration processor will stop with error if some fields or work item types are
-        /// missing in target. If set to <see langword="false"/>, it will log all missing fields and the migration will continue.
-        /// Default value is <see langword="true"/> to allow user resolve missing fields.
-        /// </summary>
-        public bool StopWhenNotValid { get; set; } = true;
-
-        /// <summary>
         /// Normalizes properties, that all of them are set (not <see langword="null"/>) and all dictionaries uses
         /// case-insensitive keys.
         /// </summary>

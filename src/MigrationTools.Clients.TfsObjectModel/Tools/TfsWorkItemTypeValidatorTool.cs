@@ -22,31 +22,45 @@ namespace MigrationTools.Tools
             : base(options, services, logger, telemetry)
         {
             _witMappingTool = witMappingTool ?? throw new ArgumentNullException(nameof(witMappingTool));
+            Options.Normalize();
         }
 
 
-        public void ValidateWorkItemTypes(List<WorkItemType> sourceWits, List<WorkItemType> targetWits)
+        public bool ValidateWorkItemTypes(
+            List<WorkItemType> sourceWits,
+            List<WorkItemType> targetWits,
+            string reflectedWorkItemIdField)
         {
             LogWorkItemTypes(sourceWits, targetWits);
 
+            List<string> targetWitNames = targetWits.Select(wit => wit.Name).ToList();
             bool isValid = true;
             foreach (WorkItemType sourceWit in sourceWits)
             {
-                if (!ShouldValidateWorkItemType(sourceWit.Name))
+                string sourceWitName = sourceWit.Name;
+                if (!ShouldValidateWorkItemType(sourceWitName))
                 {
                     continue;
                 }
-                Log.LogInformation("Validating work item type '{sourceWit}'", sourceWit.Name);
-                string targetWitName = GetTargetWorkItemType(sourceWit.Name);
+                Log.LogInformation("Validating work item type '{sourceWit}'", sourceWitName);
+                string targetWitName = GetTargetWorkItemType(sourceWitName);
                 WorkItemType targetWit = targetWits
                     .FirstOrDefault(wit => wit.Name.Equals(targetWitName, StringComparison.OrdinalIgnoreCase));
                 if (targetWit is null)
                 {
-                    Log.LogWarning("Work item type '{targetWit}' is not present in target system.", targetWitName);
+                    Log.LogWarning("Work item type '{targetWit}' does not exist in target system.", targetWitName);
+                    if (TryFindSimilarWorkItemType(sourceWitName, targetWitNames, out string suggestedName))
+                    {
+                        Log.LogInformation(" Suggested mapping: '{0}' – '{1}'", sourceWitName, suggestedName);
+                    }
                     isValid = false;
                 }
                 else
                 {
+                    if (!ValidateReflectedWorkItemIdField(targetWit, reflectedWorkItemIdField))
+                    {
+                        isValid = false;
+                    }
                     if (!ValidateWorkItemTypeFields(sourceWit, targetWit))
                     {
                         isValid = false;
@@ -54,7 +68,23 @@ namespace MigrationTools.Tools
                 }
             }
             LogValidationResult(isValid);
-            StopIfRequested(isValid);
+            return isValid;
+        }
+
+        private bool ValidateReflectedWorkItemIdField(WorkItemType targetWit, string reflectedWorkItemIdField)
+        {
+            if (targetWit.FieldDefinitions.Contains(reflectedWorkItemIdField))
+            {
+                Log.LogDebug("  '{targetWit}' contains reflected work item ID field '{fieldName}'.",
+                    targetWit.Name, reflectedWorkItemIdField);
+            }
+            else
+            {
+                Log.LogWarning("  '{targetWit}' does not contain reflected work item ID field {fieldName}",
+                    targetWit.Name, reflectedWorkItemIdField);
+                return false;
+            }
+            return true;
         }
 
         private bool ValidateWorkItemTypeFields(WorkItemType sourceWit, WorkItemType targetWit)
@@ -143,7 +173,7 @@ namespace MigrationTools.Tools
         private void LogWorkItemTypes(ICollection<WorkItemType> sourceWits, ICollection<WorkItemType> targetWits)
         {
             Log.LogInformation(
-                "Validating work item types: their existence in target system, fields and reflected work item ID field.");
+                "Validating work item types.");
             Log.LogInformation("Source work item types are: {sourceWits}.",
                 string.Join(", ", sourceWits.Select(wit => wit.Name)));
             Log.LogInformation("Target work item types are: {targetWits}.",
@@ -160,29 +190,65 @@ namespace MigrationTools.Tools
 
             const string message =
                 "Some work item types or their fields are not present in the target system (see previous logs)." +
-                " If the migration will continue, you will not have all information in work items in target system." +
                 " Either add these fields into target work items, or map source fields to other target fields" +
                 $" in options ({nameof(TfsWorkItemTypeValidatorToolOptions.FieldMappings)}).";
-            const string opt = nameof(TfsWorkItemTypeValidatorToolOptions.StopWhenNotValid);
-            if (Options.StopWhenNotValid)
-            {
-                Log.LogError(message);
-                Log.LogInformation($"'{opt}' is set to 'true' so migration process will stop now.");
-            }
-            else
-            {
-                Log.LogWarning(message);
-                Log.LogInformation($"'{opt}' is set to 'false' so migration process will continue. Set it to 'true'" +
-                    " if you want to stop and resolve missing fields.");
-            }
+            Log.LogError(message);
         }
 
-        private void StopIfRequested(bool isValid)
+        private static bool TryFindSimilarWorkItemType(
+            string sourceWitName,
+            List<string> targetWitNames,
+            out string? suggestedName)
         {
-            if (!isValid && Options.StopWhenNotValid)
+            foreach (string targetWit in targetWitNames)
             {
-                Environment.Exit(-1);
+                if (AreVisuallySimilar(sourceWitName, targetWit))
+                {
+                    suggestedName = targetWit;
+                }
             }
+            suggestedName = null;
+            return false;
+        }
+
+        private static bool AreVisuallySimilar(string a, string b)
+        {
+            if (a.Equals(b, StringComparison.OrdinalIgnoreCase))
+            {
+                // Already matched normally
+                return false;
+            }
+
+            if (a.Length != b.Length)
+            {
+                return false;
+            }
+
+            int similarCount = 0;
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                var aChar = a[i];
+                var bChar = b[i];
+
+                if (aChar == bChar)
+                {
+                    similarCount++;
+                    continue;
+                }
+
+                // Check known lookalike characters (expandable)
+                if ((aChar == '\u0399' && bChar == 'I') || (aChar == 'I' && bChar == '\u0399'))
+                {
+                    similarCount++;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return similarCount == a.Length;
         }
     }
 }

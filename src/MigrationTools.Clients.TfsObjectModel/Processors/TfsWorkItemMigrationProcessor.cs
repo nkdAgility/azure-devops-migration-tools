@@ -133,7 +133,11 @@ namespace MigrationTools.Processors
                     .WorkItemTypes
                     .Cast<WorkItemType>()
                     .ToList();
-                CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(sourceWits, targetWits);
+                if (!CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(
+                    sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField))
+                {
+                    Environment.Exit(-1);
+                }
             }
 
             CommonTools.NodeStructure.ProcessorExecutionBegin(this);
@@ -159,8 +163,6 @@ namespace MigrationTools.Processors
                     sourceWorkItems.Count);
 
                 //////////////////////////////////////////////////
-                ValidateWorkItemTypesExistInTarget(sourceWorkItems);
-                ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(sourceWorkItems);
                 CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
@@ -302,128 +304,6 @@ namespace MigrationTools.Processors
         //        contextLog.Error("nodeStructureEnricher is disabled! Please enable it in the config.");
         //    }
         //}
-
-        private void ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(List<WorkItemData> sourceWorkItems)
-        {
-            contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
-
-            var result = CommonTools.ValidateRequiredField.ValidatingRequiredField(this,
-                Target.Options.ReflectedWorkItemIdField, sourceWorkItems);
-            if (!result)
-            {
-                var ex = new InvalidFieldValueException(
-                    "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                Environment.Exit(-1);
-            }
-        }
-
-        private void ValidateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
-        {
-            contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
-
-            var sourceWorkItemTypes = sourceWorkItems
-                .SelectMany(x => x.Revisions.Values)
-                .Select(x => x.Type)
-                .Distinct()
-                .ToList();
-
-            Log.LogDebug("Validating::WorkItemTypes::sourceWorkItemTypes: {count} WorkItemTypes in the full source history: {sourceWorkItemTypesString}",
-                sourceWorkItemTypes.Count, string.Join(",", sourceWorkItemTypes));
-
-            var targetWorkItemTypes = Target.WorkItems.Project
-                .ToProject()
-                .WorkItemTypes
-                .Cast<WorkItemType>()
-                .Select(x => x.Name)
-                .Distinct()
-                .ToList();
-
-
-
-            Log.LogDebug("Validating::WorkItemTypes::targetWorkItemTypes: {count} WorkItemTypes in Target process: {targetWorkItemTypesString}",
-                targetWorkItemTypes.Count, string.Join(",", targetWorkItemTypes));
-
-            var missingWorkItemTypes = new List<string>();
-
-            foreach (var sourceWit in sourceWorkItemTypes)
-            {
-                var witToFind = sourceWit;
-                if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(sourceWit))
-                {
-                    witToFind = CommonTools.WorkItemTypeMapping.Mappings[sourceWit];
-                    Log.LogDebug("Validating::WorkItemTypes::sourceWit: `{sourceWit}` is mapped to `{witToFind}`", sourceWit, witToFind);
-                }
-                if (!targetWorkItemTypes.Contains(witToFind, StringComparer.OrdinalIgnoreCase))
-                {
-                    missingWorkItemTypes.Add(witToFind);
-                }
-            }
-
-            if (missingWorkItemTypes.Count > 0)
-            {
-                Log.LogWarning("There are {count} WorkItemTypes used in source history that do not exist in the target. These may need to be mapped.", missingWorkItemTypes.Count);
-
-                foreach (var sourceWit in missingWorkItemTypes)
-                {
-                    Log.LogWarning("Missing Source WIT: '{sourceWit}' (Unicode: {unicode})",
-                        sourceWit,
-                        string.Join(" ", sourceWit.Select(c => $"U+{(int)c:X4}")));
-
-                    // Try to suggest a match based on character similarity
-                    foreach (var targetWit in targetWorkItemTypes)
-                    {
-                        if (AreVisuallySimilar(sourceWit, targetWit))
-                        {
-                            Log.LogWarning("→ Suggested mapping: \"{0}\": \"{1}\"", sourceWit, targetWit);
-                        }
-                    }
-
-                    if (!CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(sourceWit))
-                    {
-                        Log.LogWarning("WorkItemType '{0}' is not mapped in your config. Add to WorkItemTypeDefinition if needed.", sourceWit);
-                    }
-                }
-
-                var ex = new Exception("Some Work Item Types in the source do not exist in the target. Either map or filter them.");
-                Log.LogError(ex, "Validation failed: unmapped or missing work item types.");
-                Environment.Exit(-1);
-            }
-        }
-
-        private static bool AreVisuallySimilar(string a, string b)
-        {
-            if (a.Equals(b, StringComparison.OrdinalIgnoreCase)) return false; // Already matched normally
-
-            if (a.Length != b.Length) return false;
-
-            int similarCount = 0;
-
-            for (int i = 0; i < a.Length; i++)
-            {
-                var aChar = a[i];
-                var bChar = b[i];
-
-                if (aChar == bChar)
-                {
-                    similarCount++;
-                    continue;
-                }
-
-                // Check known lookalike characters (expandable)
-                if ((aChar == '\u0399' && bChar == 'I') || (aChar == 'I' && bChar == '\u0399'))
-                {
-                    similarCount++;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return similarCount == a.Length;
-        }
-
 
         private void ValidatePatTokenRequirement()
         {
