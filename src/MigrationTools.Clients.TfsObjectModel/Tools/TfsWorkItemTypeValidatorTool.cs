@@ -179,11 +179,13 @@ namespace MigrationTools.Tools
                 return;
             }
 
-            const string message =
-                "Some work item types or their fields are not present in the target system (see previous logs)." +
-                " Either add these fields into target work items, or map source fields to other target fields" +
-                $" in options ({nameof(TfsWorkItemTypeValidatorToolOptions.FieldMappings)}).";
-            Log.LogError(message);
+            const string message1 = "Some work item types or their fields are not present in the target system (see previous logs)."
+                + " Either add these fields into target work items, or map source fields to other target fields"
+                + $" in options ({nameof(TfsWorkItemTypeValidatorToolOptions.FieldMappings)}).";
+            Log.LogError(message1);
+            const string message2 = "If you have some field mappings defined for validation, do not forget also to configure"
+                + $" proper field mapping in {nameof(FieldMappingTool)} so data will preserved during migration.";
+            Log.LogInformation(message2);
         }
 
         private static bool TryFindSimilarWorkItemType(
