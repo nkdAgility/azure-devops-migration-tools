@@ -79,7 +79,7 @@ namespace MigrationTools.Tools
             }
             else
             {
-                Log.LogWarning("  '{targetWit}' does not contain reflected work item ID field {fieldName}.",
+                Log.LogWarning("  '{targetWit}' does not contain reflected work item ID field '{fieldName}'.",
                     targetWit.Name, reflectedWorkItemIdField);
                 return false;
             }
