@@ -121,24 +121,7 @@ namespace MigrationTools.Processors
             ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
 
-            if (CommonTools.WorkItemTypeValidatorTool.Enabled)
-            {
-                var sourceWits = Source.WorkItems.Project
-                    .ToProject()
-                    .WorkItemTypes
-                    .Cast<WorkItemType>()
-                    .ToList();
-                var targetWits = Target.WorkItems.Project
-                    .ToProject()
-                    .WorkItemTypes
-                    .Cast<WorkItemType>()
-                    .ToList();
-                if (!CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(
-                    sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField))
-                {
-                    Environment.Exit(-1);
-                }
-            }
+            ValidateWorkItemTypes();
 
             CommonTools.NodeStructure.ProcessorExecutionBegin(this);
             if (CommonTools.TeamSettings.Enabled)
@@ -261,6 +244,36 @@ namespace MigrationTools.Processors
                     contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
                 }
 
+            }
+        }
+
+        private void ValidateWorkItemTypes()
+        {
+            if (CommonTools.WorkItemTypeValidatorTool.Enabled)
+            {
+                var sourceWits = Source.WorkItems.Project
+                    .ToProject()
+                    .WorkItemTypes
+                    .Cast<WorkItemType>()
+                    .ToList();
+                var targetWits = Target.WorkItems.Project
+                    .ToProject()
+                    .WorkItemTypes
+                    .Cast<WorkItemType>()
+                    .ToList();
+                if (!CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(
+                    sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField))
+                {
+                    Environment.Exit(-1);
+                }
+            }
+            else
+            {
+                const string msg = $"Validation of work item types ({nameof(TfsWorkItemTypeValidatorTool)}) is disabled."
+                    + " We suggest to enable this tool, so work item types in target system are properly validated."
+                    + " If they are not validated, some data in source system may not be migrated,"
+                    + " or migration may not work at all.";
+                Log.LogWarning(msg);
             }
         }
 

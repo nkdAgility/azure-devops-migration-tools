@@ -14,6 +14,11 @@ namespace MigrationTools.Tools
         private static readonly StringComparer _normalizedComparer = StringComparer.OrdinalIgnoreCase;
         private bool _isNormalized = false;
 
+        public TfsWorkItemTypeValidatorToolOptions()
+        {
+            Enabled = true; // Make this validator enabled by default, so it will run even if not explicitly configured.
+        }
+
         /// <summary>
         /// List of work item types which will be validated. If this list and <see cref="ExcludeWorkItemtypes"/> list are both
         /// empty, all work item types will be validated. Only this list, or <see cref="ExcludeWorkItemtypes"/> list can be set,
