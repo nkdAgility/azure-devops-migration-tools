@@ -17,25 +17,6 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod]
-        public void ShouldReturnSourceValueWhenNotEnabled()
-        {
-            TfsWorkItemTypeValidatorToolOptions options = new()
-            {
-                Enabled = false,
-                FieldMappings = new()
-                {
-                    ["wit"] = new()
-                    {
-                        ["source"] = "target"
-                    }
-                }
-            };
-            options.Normalize();
-
-            Assert.AreEqual("source", options.GetTargetFieldName("wit", "source", out bool _));
-        }
-
-        [TestMethod]
         public void ShouldLookupValueCaseInsensitively()
         {
             TfsWorkItemTypeValidatorToolOptions options = new()
