@@ -80,7 +80,7 @@ namespace MigrationTools.Tools
             }
             else
             {
-                Log.LogWarning("  '{targetWit}' does not contain reflected work item ID field {fieldName}",
+                Log.LogWarning("  '{targetWit}' does not contain reflected work item ID field {fieldName}.",
                     targetWit.Name, reflectedWorkItemIdField);
                 return false;
             }
@@ -108,7 +108,7 @@ namespace MigrationTools.Tools
                 }
                 else
                 {
-                    Log.LogWarning("  Missing field '{targetFieldName}' in '{targetWit}'", targetFieldName, targetWit.Name);
+                    Log.LogWarning("  Missing field '{targetFieldName}' in '{targetWit}'.", targetFieldName, targetWit.Name);
                     Log.LogInformation("    Source field name: {sourceFieldName}", sourceFieldName);
                     Log.LogInformation("    Field type: {fieldType}", sourceField.FieldType);
                     IEnumerable<string> allowedValues = sourceField.AllowedValues.OfType<string>().Select(val => $"'{val}'");
