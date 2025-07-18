@@ -20,18 +20,9 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
-        /// List of work item types which will be validated. If this list and <see cref="ExcludeWorkItemtypes"/> list are both
-        /// empty, all work item types will be validated. Only this list, or <see cref="ExcludeWorkItemtypes"/> list can be set,
-        /// but not both of them at the same time.
+        /// List of work item types which will be validated. If this list is empty, all work item types will be validated.
         /// </summary>
         public List<string> IncludeWorkItemtypes { get; set; } = [];
-
-        /// <summary>
-        /// List of work item types which will not be validated. If this list and <see cref="IncludeWorkItemtypes"/> list are both
-        /// empty, all work item types will be validated. Only this list, or <see cref="IncludeWorkItemtypes"/> list can be set,
-        /// but not both of them at the same time.
-        /// </summary>
-        public List<string> ExcludeWorkItemtypes { get; set; } = [];
 
         /// <summary>
         /// Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
@@ -67,7 +58,6 @@ namespace MigrationTools.Tools
             }
 
             IncludeWorkItemtypes ??= [];
-            ExcludeWorkItemtypes ??= [];
 
             FieldMappings = newMappings;
             _isNormalized = true;
