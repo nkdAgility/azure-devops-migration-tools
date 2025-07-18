@@ -25,7 +25,6 @@ namespace MigrationTools.Tools
             Options.Normalize();
         }
 
-
         public bool ValidateWorkItemTypes(
             List<WorkItemType> sourceWits,
             List<WorkItemType> targetWits,
