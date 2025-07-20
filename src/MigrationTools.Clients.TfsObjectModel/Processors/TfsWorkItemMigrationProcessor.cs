@@ -79,7 +79,14 @@ namespace MigrationTools.Processors
 
         public WorkItemMetrics workItemMetrics { get; private set; }
 
-        public TfsWorkItemMigrationProcessor(IOptions<TfsWorkItemMigrationProcessorOptions> options, TfsCommonTools tfsCommonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<TfsWorkItemMigrationProcessor> logger) : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
+        public TfsWorkItemMigrationProcessor(
+            IOptions<TfsWorkItemMigrationProcessorOptions> options,
+            TfsCommonTools tfsCommonTools,
+            ProcessorEnricherContainer processorEnrichers,
+            IServiceProvider services,
+            ITelemetryLogger telemetry,
+            ILogger<TfsWorkItemMigrationProcessor> logger)
+            : base(options, tfsCommonTools, processorEnrichers, services, telemetry, logger)
         {
             contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
             workItemMetrics = services.GetRequiredService<WorkItemMetrics>();
@@ -90,7 +97,6 @@ namespace MigrationTools.Processors
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 
         new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
-
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
@@ -104,10 +110,8 @@ namespace MigrationTools.Processors
             workItemLog.Write(level, workItemLogTemplate + message);
         }
 
-
         protected override void InternalExecute()
         {
-
             Log.LogDebug("WorkItemMigrationContext::InternalExecute ");
             if (Options == null)
             {
@@ -116,6 +120,9 @@ namespace MigrationTools.Processors
             //////////////////////////////////////////////////
             ValidatePatTokenRequirement();
             //////////////////////////////////////////////////
+
+            ValidateWorkItemTypes();
+
             CommonTools.NodeStructure.ProcessorExecutionBegin(this);
             if (CommonTools.TeamSettings.Enabled)
             {
@@ -130,8 +137,6 @@ namespace MigrationTools.Processors
 
             try
             {
-
-
                 PopulateIgnoreList();
 
                 // Inform the user that he maybe has to be patient now
@@ -141,12 +146,6 @@ namespace MigrationTools.Processors
                     sourceWorkItems.Count);
 
                 //////////////////////////////////////////////////
-                ValidateWorkItemTypesExistInTarget(sourceWorkItems);
-                ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(sourceWorkItems);
-                if (Options.ValidateWorkItemFields)
-                {
-                    ValidateWorkItemFields(sourceWorkItems);
-                }
                 CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
@@ -248,6 +247,36 @@ namespace MigrationTools.Processors
             }
         }
 
+        private void ValidateWorkItemTypes()
+        {
+            if (CommonTools.WorkItemTypeValidatorTool.Enabled)
+            {
+                var sourceWits = Source.WorkItems.Project
+                    .ToProject()
+                    .WorkItemTypes
+                    .Cast<WorkItemType>()
+                    .ToList();
+                var targetWits = Target.WorkItems.Project
+                    .ToProject()
+                    .WorkItemTypes
+                    .Cast<WorkItemType>()
+                    .ToList();
+                if (!CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(
+                    sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField))
+                {
+                    Environment.Exit(-1);
+                }
+            }
+            else
+            {
+                const string msg = $"Validation of work item types ({nameof(TfsWorkItemTypeValidatorTool)}) is disabled."
+                    + " We suggest to enable this tool, so work item types in target system are properly validated."
+                    + " If they are not validated, some data in source system may not be migrated,"
+                    + " or migration may not work at all.";
+                Log.LogWarning(msg);
+            }
+        }
+
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         {
             if (CommonTools.UserMapping.Options.SkipValidateAllUsersExistOrAreMapped)
@@ -288,245 +317,6 @@ namespace MigrationTools.Processors
         //        contextLog.Error("nodeStructureEnricher is disabled! Please enable it in the config.");
         //    }
         //}
-
-        private void ValidateAllWorkItemTypesHaveReflectedWorkItemIdField(List<WorkItemData> sourceWorkItems)
-        {
-            contextLog.Information("Validating::Check all Target Work Items have the RefectedWorkItemId field");
-
-            var result = CommonTools.ValidateRequiredField.ValidatingRequiredField(this,
-                Target.Options.ReflectedWorkItemIdField, sourceWorkItems);
-            if (!result)
-            {
-                var ex = new InvalidFieldValueException(
-                    "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                Log.LogError(ex, "Not all work items in scope contain a valid ReflectedWorkItemId Field!");
-                Environment.Exit(-1);
-            }
-        }
-
-        private void ValidateWorkItemTypesExistInTarget(List<WorkItemData> sourceWorkItems)
-        {
-            contextLog.Information("Validating::Check that all work item types needed in the Target exist or are mapped");
-
-            var sourceWorkItemTypes = sourceWorkItems
-                .SelectMany(x => x.Revisions.Values)
-                .Select(x => x.Type)
-                .Distinct()
-                .ToList();
-
-            Log.LogDebug("Validating::WorkItemTypes::sourceWorkItemTypes: {count} WorkItemTypes in the full source history: {sourceWorkItemTypesString}",
-                sourceWorkItemTypes.Count, string.Join(",", sourceWorkItemTypes));
-
-            var targetWorkItemTypes = Target.WorkItems.Project
-                .ToProject()
-                .WorkItemTypes
-                .Cast<WorkItemType>()
-                .Select(x => x.Name)
-                .Distinct()
-                .ToList();
-
-
-
-            Log.LogDebug("Validating::WorkItemTypes::targetWorkItemTypes: {count} WorkItemTypes in Target process: {targetWorkItemTypesString}",
-                targetWorkItemTypes.Count, string.Join(",", targetWorkItemTypes));
-
-            var missingWorkItemTypes = new List<string>();
-
-            foreach (var sourceWit in sourceWorkItemTypes)
-            {
-                var witToFind = sourceWit;
-                if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(sourceWit))
-                {
-                    witToFind = CommonTools.WorkItemTypeMapping.Mappings[sourceWit];
-                    Log.LogDebug("Validating::WorkItemTypes::sourceWit: `{sourceWit}` is mapped to `{witToFind}`", sourceWit, witToFind);
-                }
-                if (!targetWorkItemTypes.Contains(witToFind, StringComparer.OrdinalIgnoreCase))
-                {
-                    missingWorkItemTypes.Add(witToFind);
-                }
-            }
-
-            if (missingWorkItemTypes.Count > 0)
-            {
-                Log.LogWarning("There are {count} WorkItemTypes used in source history that do not exist in the target. These may need to be mapped.", missingWorkItemTypes.Count);
-
-                foreach (var sourceWit in missingWorkItemTypes)
-                {
-                    Log.LogWarning("Missing Source WIT: '{sourceWit}' (Unicode: {unicode})",
-                        sourceWit,
-                        string.Join(" ", sourceWit.Select(c => $"U+{(int)c:X4}")));
-
-                    // Try to suggest a match based on character similarity
-                    foreach (var targetWit in targetWorkItemTypes)
-                    {
-                        if (AreVisuallySimilar(sourceWit, targetWit))
-                        {
-                            Log.LogWarning("→ Suggested mapping: \"{0}\": \"{1}\"", sourceWit, targetWit);
-                        }
-                    }
-
-                    if (!CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(sourceWit))
-                    {
-                        Log.LogWarning("WorkItemType '{0}' is not mapped in your config. Add to WorkItemTypeDefinition if needed.", sourceWit);
-                    }
-                }
-
-                var ex = new Exception("Some Work Item Types in the source do not exist in the target. Either map or filter them.");
-                Log.LogError(ex, "Validation failed: unmapped or missing work item types.");
-                Environment.Exit(-1);
-            }
-        }
-
-        private void ValidateWorkItemFields(List<WorkItemData> sourceWorkItems)
-        {
-            contextLog.Information("Validating::Check that all fields in source work items exists in target work items.");
-
-            var sourceWitNames = sourceWorkItems
-                .SelectMany(x => x.Revisions.Values)
-                .Select(x => x.Type)
-                .Distinct()
-                .ToList();
-
-            var sourceWits = Source.WorkItems.Project
-                .ToProject()
-                .WorkItemTypes
-                .Cast<WorkItemType>()
-                .Where(wit => sourceWitNames.Contains(wit.Name, StringComparer.OrdinalIgnoreCase))
-                .ToList();
-
-            Log.LogInformation("Validating fields of {count} work item types in the full source history: {sourceWits}.",
-                sourceWits.Count, string.Join(", ", sourceWits.Select(wit => wit.Name)));
-
-            var targetWits = Target.WorkItems.Project
-                .ToProject()
-                .WorkItemTypes
-                .Cast<WorkItemType>()
-                .ToDictionary(wit => wit.Name, wit => wit, StringComparer.OrdinalIgnoreCase);
-            Log.LogInformation("Available target work item types are: {targetWits}.", string.Join(", ", targetWits.Keys));
-
-            bool allFieldsAreMapped = true;
-            foreach (var sourceWit in sourceWits)
-            {
-                bool witIsMapped = false;
-                var witToFind = sourceWit.Name;
-                if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(sourceWit.Name))
-                {
-                    witToFind = CommonTools.WorkItemTypeMapping.Mappings[sourceWit.Name];
-                    witIsMapped = true;
-                }
-                Log.LogInformation("Validating fields of work item type '{sourceWit}'", sourceWit.Name);
-                if (witIsMapped)
-                {
-                    Log.LogInformation("  This work item type is mapped to '{targetWit}' in target.", witToFind);
-                }
-                WorkItemType targetWit = targetWits[witToFind];
-                if (ValidateWorkItemTypeFields(sourceWit, targetWit))
-                {
-                    Log.LogInformation("  All fields are either present or mapped.");
-                }
-                else
-                {
-                    allFieldsAreMapped = false;
-                }
-            }
-            if (!allFieldsAreMapped)
-            {
-                const string message = "Some fields are not present in the target system (see previous logs)." +
-                    " If the migration will continue, you will not have all information in work items in target system." +
-                    " Either add these fields into target work items, or map source fields to other target fields" +
-                    $" using '{nameof(FieldReferenceNameMappingTool)}'.";
-                const string opt = nameof(TfsWorkItemMigrationProcessorOptions.ContinueIfMissingFieldsInTarget);
-                if (Options.ContinueIfMissingFieldsInTarget)
-                {
-                    Log.LogWarning(message);
-                    Log.LogInformation($"'{opt}' is set to 'true' so migration process will continue. Set it to 'false'" +
-                        $" if you want to stop and resolve missing fields.");
-                }
-                else
-                {
-                    Log.LogError(message);
-                    Log.LogInformation($"'{opt}' is set to 'false' so migration process will stop now.");
-                    Environment.Exit(-1);
-                }
-            }
-        }
-
-        private bool ValidateWorkItemTypeFields(WorkItemType sourceWit, WorkItemType targetWit)
-        {
-            bool result = true;
-            var sourceFields = sourceWit.FieldDefinitions.Cast<FieldDefinition>()
-                .ToList();
-            var targetFields = targetWit.FieldDefinitions.Cast<FieldDefinition>()
-                .ToDictionary(f => f.ReferenceName, f => f, StringComparer.OrdinalIgnoreCase);
-            foreach (var sourceField in sourceFields)
-            {
-                string sourceFieldName = sourceField.ReferenceName;
-                string targetField = CommonTools.FieldReferenceNameMappingTool
-                    .GetTargetFieldName(targetWit.Name, sourceFieldName, out bool isMapped);
-                if (isMapped)
-                {
-                    if (string.IsNullOrEmpty(targetField))
-                    {
-                        Log.LogInformation(
-                            "  Source field '{sourceField}' is explicitly mapped as empty string, so it is not checked in target.",
-                            sourceFieldName, targetField);
-                    }
-                    else
-                    {
-                        Log.LogInformation("  Source field '{sourceField}' is mapped as '{targetField}' in target.",
-                            sourceFieldName, targetField);
-                    }
-                }
-                else if (!targetFields.ContainsKey(sourceFieldName))
-                {
-                    Log.LogWarning("  Missing field '{sourceFieldReferenceName}'", sourceFieldName);
-                    Log.LogInformation("    Name: {name}", sourceFieldName);
-                    Log.LogInformation("    Field type: {fieldType}", sourceField.FieldType);
-                    var allowedValues = sourceField.AllowedValues.OfType<string>().Select(val => $"'{val}'");
-                    Log.LogInformation("    Allowed values: {allowedValues}", string.Join(", ", allowedValues));
-                    result = false;
-                }
-                else
-                {
-                    Log.LogDebug("  Source field '{sourceField}' exists in target.", sourceFieldName);
-                }
-            }
-            return result;
-        }
-
-        private static bool AreVisuallySimilar(string a, string b)
-        {
-            if (a.Equals(b, StringComparison.OrdinalIgnoreCase)) return false; // Already matched normally
-
-            if (a.Length != b.Length) return false;
-
-            int similarCount = 0;
-
-            for (int i = 0; i < a.Length; i++)
-            {
-                var aChar = a[i];
-                var bChar = b[i];
-
-                if (aChar == bChar)
-                {
-                    similarCount++;
-                    continue;
-                }
-
-                // Check known lookalike characters (expandable)
-                if ((aChar == '\u0399' && bChar == 'I') || (aChar == 'I' && bChar == '\u0399'))
-                {
-                    similarCount++;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return similarCount == a.Length;
-        }
-
 
         private void ValidatePatTokenRequirement()
         {

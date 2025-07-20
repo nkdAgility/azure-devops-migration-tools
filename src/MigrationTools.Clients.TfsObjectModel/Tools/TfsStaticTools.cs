@@ -22,7 +22,7 @@ namespace MigrationTools.Tools
         /// <param name="TfsGitRepositoryTool">Tool for git repository operations</param>
         /// <param name="StringManipulatorTool">Tool for string field manipulation</param>
         /// <param name="workItemTypeMapping">Tool for work item type mapping</param>
-        /// <param name="fieldReferenceNameMappingTool">Tool for work item fields mapping</param>
+        /// <param name="workItemTypeValidatorTool">Tool for work item type validation.</param>
         /// <param name="fieldMappingTool">Tool for field mapping operations</param>
         public TfsCommonTools(
             TfsUserMappingTool userMappingEnricher,
@@ -37,9 +37,9 @@ namespace MigrationTools.Tools
             TfsGitRepositoryTool TfsGitRepositoryTool,
             IStringManipulatorTool StringManipulatorTool,
             IWorkItemTypeMappingTool workItemTypeMapping,
-            IFieldReferenceNameMappingTool fieldReferenceNameMappingTool,
+            TfsWorkItemTypeValidatorTool workItemTypeValidatorTool,
             IFieldMappingTool fieldMappingTool
-            ) : base(StringManipulatorTool, workItemTypeMapping, fieldReferenceNameMappingTool, fieldMappingTool)
+            ) : base(StringManipulatorTool, workItemTypeMapping,fieldMappingTool)
         {
             UserMapping = userMappingEnricher;
             Attachment = attachmentEnricher;
@@ -51,6 +51,7 @@ namespace MigrationTools.Tools
             TeamSettings = teamSettingsEnricher;
             EmbededImages = embededImagesEnricher;
             GitRepository = TfsGitRepositoryTool;
+            WorkItemTypeValidatorTool = workItemTypeValidatorTool;
         }
 
         public TfsUserMappingTool UserMapping { get; private set; }
@@ -66,6 +67,9 @@ namespace MigrationTools.Tools
 
         public TfsGitRepositoryTool GitRepository { get; private set; }
 
-
+        /// <summary>
+        /// Tool for work item type validation.
+        /// </summary>
+        public TfsWorkItemTypeValidatorTool WorkItemTypeValidatorTool { get; private set; }
     }
 }

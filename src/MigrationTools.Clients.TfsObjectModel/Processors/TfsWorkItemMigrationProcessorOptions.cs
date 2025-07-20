@@ -107,20 +107,5 @@ namespace MigrationTools.Processors
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool SkipRevisionWithInvalidAreaPath { get; set; } = false;
-
-        /// <summary>
-        /// Validates if all fields in source work item exist in the target work item type.
-        /// </summary>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool ValidateWorkItemFields { get; set; } = false;
-
-        /// <summary>
-        /// Used when validating work item fields (<see cref="ValidateWorkItemFields"/> is <see langword="true"/>).
-        /// If set to <see langword="true"/>, the migration will continue even if some fields in the source work item
-        /// do not exist in the target work item type. If set to <see langword="false"/>, the migration will stop with
-        /// error in this case. Default value is <see langword="false"/>.
-        /// </summary>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool ContinueIfMissingFieldsInTarget { get; set; } = false;
     }
 }

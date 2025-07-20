@@ -46,7 +46,6 @@ namespace MigrationTools
 
             context.AddSingleton<IStringManipulatorTool, StringManipulatorTool>().AddMigrationToolsOptions<StringManipulatorToolOptions>(configuration);
             context.AddSingleton<IWorkItemTypeMappingTool, WorkItemTypeMappingTool>().AddMigrationToolsOptions<WorkItemTypeMappingToolOptions>(configuration);
-            context.AddSingleton<IFieldReferenceNameMappingTool, FieldReferenceNameMappingTool>().AddMigrationToolsOptions<FieldReferenceNameMappingToolOptions>(configuration);
 
             // context.AddSingleton<GitRepoMappingTool>().AddMigrationToolsOptions<GitRepoMappingToolOptions>(configuration);
 
