@@ -9,7 +9,22 @@ configurationSamples:
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "TfsValidateRequiredFieldTool": {
+            "Enabled": "True",
+            "Exclusions": [
+              "Work Request",
+              "Opertunity",
+              "Assumption"
+            ]
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 - name: classic
   order: 3
@@ -17,7 +32,12 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsValidateRequiredFieldToolOptions",
-      "Enabled": false
+      "Enabled": true,
+      "Exclusions": [
+        "Work Request",
+        "Opertunity",
+        "Assumption"
+      ]
     }
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 description: Tool for validating that required fields exist in target work item types before migration, preventing migration failures due to missing required fields.
@@ -28,6 +48,10 @@ options:
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+- parameterName: Exclusions
+  type: List
+  description: 'Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison. WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.'
+  defaultValue: '[]'
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsValidateRequiredFieldTool.cs
