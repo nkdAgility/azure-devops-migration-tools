@@ -914,6 +914,35 @@
                 }
               },
               {
+                "title": "TfsWorkItemTypeValidatorProcessor",
+                "description": "Work item type validation processor. Basically it just runs the  to validate work item types. The validation is run always, even if the tool iself is disabled. Neither this processor, nor the tool do not perform any changes to the source or target system.",
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                    "type": "boolean"
+                  },
+                  "sourceName": {
+                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                    "type": "string"
+                  },
+                  "stopIfValidationFails": {
+                    "description": "If set to , migration process will stop if there are some validation errors. If set to , migration process will continue, for example to support some other validation processors. Default value is .",
+                    "type": "boolean"
+                  },
+                  "targetName": {
+                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                    "type": "string"
+                  },
+                  "processorType": {
+                    "type": "string",
+                    "enum": [
+                      "TfsWorkItemTypeValidatorProcessor"
+                    ]
+                  }
+                }
+              },
+              {
                 "title": "WorkItemTrackingProcessor",
                 "description": "This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).",
                 "type": "object",
