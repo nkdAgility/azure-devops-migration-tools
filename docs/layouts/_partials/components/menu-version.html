@@ -1,0 +1,106 @@
+<script src="/js/version-loader.js"></script>
+<!-- Document Versions dropdown -->
+<div class="dropdown">
+  <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="versionsDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Documentation Versions">
+    <i class="fas fa-code-branch me-1"></i>
+    {{ hugo.Environment | title }}
+  </button>
+  <div class="dropdown-menu dropdown-menu-end" aria-labelledby="versionsDropdown" style="min-width: 300px;">
+    <h6 class="dropdown-header"><i class="fas fa-code-branch me-2"></i>Documentation Versions</h6>
+    <div class="dropdown-item-text">
+      {{/* Fetch GitHub releases */}}
+      {{ $releases := resources.GetRemote "https://api.github.com/repos/nkdAgility/azure-devops-migration-tools/releases" }}
+      {{ $releases = $releases | transform.Unmarshal }}
+      {{/* Get latest stable and prerelease versions */}}
+      {{ $latestRelease := index (where $releases "prerelease" false) 0 }}
+      {{ $latestPrerelease := index (where $releases "prerelease" true) 0 }}
+
+
+      <a href="{{ .Site.Params.siteProdUrl }}{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+        {{ if eq hugo.Environment "production" }}
+          <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded mb-2 dropdown-item-hover position-relative">
+            <span class="small fw-medium text-dark d-flex align-items-center">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              Production
+              <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
+            </span>
+            <span class="badge bg-primary text-white">{{ .Site.Params.version }}</span>
+          </div>
+        {{ else }}
+          <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded mb-2 dropdown-item-hover">
+            <span class="small fw-medium text-dark">Production</span>
+            <span class="badge bg-primary text-white" id="version-production">{{ $latestRelease.tag_name }}</span>
+          </div>
+          <script>
+            // Load production version dynamically
+            document.addEventListener("DOMContentLoaded", async () => {
+              try {
+                const prodVersion = await getVersion("{{ .Site.Params.siteProdUrl }}/version.json");
+                const prodElement = document.getElementById("version-production");
+                if (prodElement) {
+                  prodElement.textContent = prodVersion;
+                }
+              } catch (error) {
+                console.warn("Could not load production version, keeping fallback:", error.message);
+                // Fallback value from server-side rendering remains
+              }
+            });
+          </script>
+        {{ end }}
+      </a>
+      <a href="{{ .Site.Params.sitePreviewUrl }}{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+        {{ if eq hugo.Environment "preview" }}
+          <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded dropdown-item-hover position-relative">
+            <span class="small fw-medium text-dark d-flex align-items-center">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              Preview
+              <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
+            </span>
+            <span class="badge preview-badge">{{ .Site.Params.version }}</span>
+          </div>
+        {{ else }}
+          <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded dropdown-item-hover">
+            <span class="small fw-medium text-dark">Preview</span>
+            <span class="badge preview-badge" id="version-preview">{{ $latestPrerelease.tag_name }}</span>
+          </div>
+          <script>
+            // Load preview version dynamically
+            document.addEventListener("DOMContentLoaded", async () => {
+              try {
+                const previewVersion = await getVersion("{{ .Site.Params.sitePreviewUrl }}/version.json");
+                const previewElement = document.getElementById("version-preview");
+                if (previewElement) {
+                  previewElement.textContent = previewVersion;
+                }
+              } catch (error) {
+                console.warn("Could not load preview version, keeping fallback:", error.message);
+                // Fallback value from server-side rendering remains
+              }
+            });
+          </script>
+        {{ end }}
+      </a>
+      {{ if and (ne hugo.Environment "production") (ne hugo.Environment "preview") }}
+        <hr />
+        <a href="{{ if .RelPermalink }}{{ .RelPermalink }}{{ else }}/{{ end }}" target="_blank" class="text-decoration-none">
+          <div class="d-flex align-items-center justify-content-between p-2 bg-success bg-opacity-25 border border-success rounded mb-2 dropdown-item-hover position-relative">
+            <span class="small fw-medium text-dark d-flex align-items-center">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              {{ hugo.Environment | title }}
+              <span class="badge bg-success mx-2" style="font-size: 0.6rem;">CURRENT</span>
+            </span>
+            {{ if ne hugo.Environment "development" }}
+              <span class="badge bg-danger ">{{ .Site.Params.version }}</span>
+            {{ else }}
+              {{ if .Page.GitInfo }}
+                <span class="badge bg-danger">v0.0.0-local.{{ .Page.GitInfo.AbbreviatedHash }}</span>
+              {{ else }}
+                <span class="badge bg-danger">v0.0.0-local.dev</span>
+              {{ end }}
+            {{ end }}
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  </div>
+</div>

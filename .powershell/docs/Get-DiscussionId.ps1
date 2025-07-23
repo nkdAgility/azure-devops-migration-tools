@@ -529,7 +529,7 @@ function Find-OrCreateDiscussion {
         if (-not $docCategory) {
             Write-ErrorLog "Documentation category '$GitHubDiscussionCategory' not found"
             Write-InformationLog "Available categories: $($categories.name -join ', ')"
-            return $null
+            exit 1
         }
         
         # Generate documentation URL

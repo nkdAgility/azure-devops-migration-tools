@@ -4,20 +4,20 @@ short_title: Config Wizard
 description: Build your Azure DevOps Migration Tools configuration with our interactive step-by-step wizard supporting three migration type architectures
 weight: 50
 date: 2025-06-26T12:00:00Z
-discussionId:
+discussionId: 2902
 aliases:
-  - /config-wizard/
-  - /wizard/
-  - /configure/
+- /config-wizard/
+- /wizard/
+- /configure/
 layout: config-wizard
 cascade:
-  - build:
-      list: never
-      render: never
-    target:
-      environment: production
----
+- build:
+    list: never
+    render: never
+  target:
+    environment: production
 
+---
 Use this interactive wizard to build your Azure DevOps Migration Tools configuration. The wizard supports three primary migration types:
 
 - **Work Items**: Standard work item migration with pre-configured TfsWorkItemEndpoint and TfsWorkItemMigrationProcessor
