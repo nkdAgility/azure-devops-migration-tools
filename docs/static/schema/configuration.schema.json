@@ -1444,6 +1444,10 @@
                   "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the users will be mapped by their email address first. If no match is found, then the display name will be used.",
                   "type": "boolean"
                 },
+                "projectCollectionValidUsersGroupName": {
+                  "description": "This is the regionalized \"Project Collection Valid Users\" group name. Default is \"Project Collection Valid Users\".",
+                  "type": "string"
+                },
                 "userMappingFile": {
                   "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.",
                   "type": "string"
