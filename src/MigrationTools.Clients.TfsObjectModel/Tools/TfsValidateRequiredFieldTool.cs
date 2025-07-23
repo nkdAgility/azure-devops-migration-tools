@@ -54,6 +54,11 @@ namespace MigrationTools.Tools
                 {
 
                     var workItemTypeName = sourceWorkItemType.Name;
+                    if (Options.Exclusions.Any(exclusion => string.Equals(exclusion, sourceWorkItemType.Name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        Log.LogDebug("ValidatingRequiredField: Skipping excluded work item type {WorkItemTypeName}", workItemTypeName);
+                        continue;
+                    }
                     if (workItemTypeMappingTool.Mappings != null && workItemTypeMappingTool.Mappings.ContainsKey(workItemTypeName))
                     {
                         workItemTypeName = workItemTypeMappingTool.Mappings[workItemTypeName];
@@ -79,22 +84,5 @@ namespace MigrationTools.Tools
             return result;
         }
 
-        //private void ConfigValidation()
-        //{
-        //    //Make sure that the ReflectedWorkItemId field name specified in the config exists in the target process, preferably on each work item type
-        //    var fields = _witClient.GetFieldsAsync(Engine.Target.Config.AsTeamProjectConfig().Project).Result;
-        //    bool rwiidFieldExists = fields.Any(x => x.ReferenceName == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField || x.Name == Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField);
-        //    contextLog.Information("Found {FieldsFoundCount} work item fields.", fields.Count.ToString("n0"));
-        //    if (rwiidFieldExists)
-        //        contextLog.Information("Found '{ReflectedWorkItemIdField}' in this project, proceeding.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField);
-        //    else
-        //    {
-        //        contextLog.Information("Config file specifies '{ReflectedWorkItemIdField}', which wasn't found.", Engine.Target.Config.AsTeamProjectConfig().ReflectedWorkItemIdField);
-        //        contextLog.Information("Instead, found:");
-        //        foreach (var field in fields.OrderBy(x => x.Name))
-        //            contextLog.Information("{FieldType} - {FieldName} - {FieldRefName}", field.Type.ToString().PadLeft(15), field.Name.PadRight(20), field.ReferenceName ?? "");
-        //        throw new Exception("Running a replay migration requires a ReflectedWorkItemId field to be defined in the target project's process.");
-        //    }
-        //}
     }
 }
