@@ -121,7 +121,7 @@ namespace MigrationTools.Tools
 
         private List<IdentityItemData> GetUsersListFromServer(IGroupSecurityService gss)
         {
-            Identity allIdentities = gss.ReadIdentity(SearchFactor.AccountName, "Project Collection Valid Users", QueryMembership.Expanded);
+            Identity allIdentities = gss.ReadIdentity(SearchFactor.AccountName, Options.ProjectCollectionValidUsersGroupName, QueryMembership.Expanded);
             Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer Found {count} identities (users and groups) in server.", allIdentities.Members.Length);
 
             List<IdentityItemData> foundUsers = new List<IdentityItemData>();

@@ -71,7 +71,8 @@ configurationSamples:
         "Microsoft.VSTS.Common.ClosedBy"
       ],
       "UserMappingFile": "C:\\temp\\userExport.json",
-      "MatchUsersByEmail": false
+      "MatchUsersByEmail": false,
+      "ProjectCollectionValidUsersGroupName": "Project Collection Valid Users"
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
 description: The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.
@@ -89,6 +90,10 @@ options:
 - parameterName: MatchUsersByEmail
   type: Boolean
   description: By default, users in source are mapped to target users by their display name. If this is set to true, then the users will be mapped by their email address first. If no match is found, then the display name will be used.
+  defaultValue: missing XML code comments
+- parameterName: ProjectCollectionValidUsersGroupName
+  type: String
+  description: This is the regionalized "Project Collection Valid Users" group name. Default is "Project Collection Valid Users".
   defaultValue: missing XML code comments
 - parameterName: UserMappingFile
   type: String
