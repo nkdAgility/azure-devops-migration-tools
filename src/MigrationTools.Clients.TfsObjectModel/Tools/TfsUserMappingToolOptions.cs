@@ -31,6 +31,12 @@ namespace MigrationTools.Tools
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool SkipValidateAllUsersExistOrAreMapped { get; set; } = false;
+
+        /// <summary>
+        /// This is the regionalized "Project Collection Valid Users" group name. Default is "Project Collection Valid Users".
+        /// </summary>
+        public string ProjectCollectionValidUsersGroupName { get; set; } = "Project Collection Valid Users";
+
     }
 
     public interface ITfsUserMappingToolOptions
