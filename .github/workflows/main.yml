@@ -9,11 +9,11 @@ on:
     branches: ["main"]
     tags-ignore: ["v*-*"]
   pull_request:
-      branches: ["main"]
+    branches: ["main"]
   workflow_dispatch:
     inputs:
       ForceRelease:
-        description: 'Force a release! Use when changes hapen out of sync and `src` and `docs` folder changes are not detected.'
+        description: "Force a release! Use when changes hapen out of sync and `src` and `docs` folder changes are not detected."
         required: false
         default: false
         type: boolean
@@ -27,8 +27,7 @@ defaults:
     shell: pwsh
 
 jobs:
-
-   # Setup & Configuration
+  # Setup & Configuration
   Setup:
     name: "Setup & Configuration "
     runs-on: ubuntu-latest
@@ -55,247 +54,247 @@ jobs:
       nkdAgility_RunRelease: ${{ steps.nkdagility.outputs.RunRelease }}
       nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: "Fix contibutions if main"
-      shell: pwsh
-      if: ${{ (github.event.pull_request.head.repo.fork && github.ref == 'refs/heads/main') }}
-      id: contributionbranchfix
-      run: |
-        # Get environment variables
-        $branchName = "pr-temp-${{ github.event.pull_request.number }}"
-        $newBranchName = "contrib/$branchName"
-        git checkout -b $newBranchName
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v3.0.2
-      with:
-        versionSpec: '5.x'
-        includePrerelease: true
-    - name: Execute GitVersion
-      id: gitversion
-      uses: gittools/actions/gitversion/execute@v3.0.2
-      with:
-        useConfigFile: true
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Fix contibutions if main"
+        shell: pwsh
+        if: ${{ (github.event.pull_request.head.repo.fork && github.ref == 'refs/heads/main') }}
+        id: contributionbranchfix
+        run: |
+          # Get environment variables
+          $branchName = "pr-temp-${{ github.event.pull_request.number }}"
+          $newBranchName = "contrib/$branchName"
+          git checkout -b $newBranchName
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.0.2
+        with:
+          versionSpec: "5.x"
+          includePrerelease: true
+      - name: Execute GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3.0.2
+        with:
+          useConfigFile: true
 
-    - name: "Ring Detection"
-      shell: pwsh
-      id: RingDetection
-      run: |
-        # Get Branch Name
-        Write-Output "::group::Get Branch Name"
-        Write-Output "-------------------------------------------"
-        $branchName = "${{ github.head_ref || github.ref_name }}"
-        Write-Output "We are running on: $branchName!"
-        $branchSafeName = $branchName.Replace("/", "-")
-        Write-Output "branchSafeName: $branchSafeName!"
-        Write-Output "-------------------------------------------"
-        Write-Output "::endgroup::"
+      - name: "Ring Detection"
+        shell: pwsh
+        id: RingDetection
+        run: |
+          # Get Branch Name
+          Write-Output "::group::Get Branch Name"
+          Write-Output "-------------------------------------------"
+          $branchName = "${{ github.head_ref || github.ref_name }}"
+          Write-Output "We are running on: $branchName!"
+          $branchSafeName = $branchName.Replace("/", "-")
+          Write-Output "branchSafeName: $branchSafeName!"
+          Write-Output "-------------------------------------------"
+          Write-Output "::endgroup::"
 
-        # Ring Setup
-        Write-Output "::group::Ring Control Setup"
-        Write-Output "-------------------------------------------"
-        Write-Output "Ring Control Setup"
-        Write-Output "-------------------------------------------"
-        $Ring = "Canary"
+          # Ring Setup
+          Write-Output "::group::Ring Control Setup"
+          Write-Output "-------------------------------------------"
+          Write-Output "Ring Control Setup"
+          Write-Output "-------------------------------------------"
+          $Ring = "Canary"
 
-        # Use GitVersion output directly instead of environment variable
-        $preReleaseLabel = "${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}"
-        Write-Output "GitVersion_PreReleaseLabel: '$preReleaseLabel'"
+          # Use GitVersion output directly instead of environment variable
+          $preReleaseLabel = "${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}"
+          Write-Output "GitVersion_PreReleaseLabel: '$preReleaseLabel'"
 
-        switch ($preReleaseLabel) {
-            "" {
-                $Ring = "Production";
-            }
-            "Preview" {
-                $Ring = "Preview";
-            }
-            default {
-                $Ring = "Canary";
-            }
-        }
+          switch ($preReleaseLabel) {
+              "" {
+                  $Ring = "Production";
+              }
+              "Preview" {
+                  $Ring = "Preview";
+              }
+              default {
+                  $Ring = "Canary";
+              }
+          }
 
-        Write-Output "We are running for the $Ring Ring!"
-        echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
-        Write-Output "-------------------------------------------"
-        Write-Output "::endgroup::"
+          Write-Output "We are running for the $Ring Ring!"
+          echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+          Write-Output "-------------------------------------------"
+          Write-Output "::endgroup::"
 
-    - name: "Determine Filter Base"
-      id: filter-base
-      shell: pwsh
-      run: |
-        try {
-          # Debug current context
-          Write-Output "=== FILTER BASE DEBUG ==="
-          Write-Output "Event: ${{ github.event_name }}"
-          Write-Output "Ref: ${{ github.ref }}"
-          Write-Output "Ring: ${{ steps.RingDetection.outputs.Ring }}"
-          Write-Output "GitVersion_PreReleaseLabel: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}'"
-          Write-Output "GitVersion_SemVer: '${{ steps.gitversion.outputs.GitVersion_SemVer }}'"
-          Write-Output "=========================="
+      - name: "Determine Filter Base"
+        id: filter-base
+        shell: pwsh
+        run: |
+          try {
+            # Debug current context
+            Write-Output "=== FILTER BASE DEBUG ==="
+            Write-Output "Event: ${{ github.event_name }}"
+            Write-Output "Ref: ${{ github.ref }}"
+            Write-Output "Ring: ${{ steps.RingDetection.outputs.Ring }}"
+            Write-Output "GitVersion_PreReleaseLabel: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}'"
+            Write-Output "GitVersion_SemVer: '${{ steps.gitversion.outputs.GitVersion_SemVer }}'"
+            Write-Output "=========================="
 
-          # For production builds (no pre-release label), find the last production tag
-          if ("${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}" -eq "") {
-            Write-Output "Production build detected - finding last production release"
+            # For production builds (no pre-release label), find the last production tag
+            if ("${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}" -eq "") {
+              Write-Output "Production build detected - finding last production release"
 
-            # Get current version to exclude it from the search
-            $currentVersion = "v${{ steps.gitversion.outputs.GitVersion_SemVer }}"
-            Write-Output "Current version: $currentVersion"
+              # Get current version to exclude it from the search
+              $currentVersion = "v${{ steps.gitversion.outputs.GitVersion_SemVer }}"
+              Write-Output "Current version: $currentVersion"
 
-            # Get all production tags, exclude current, sort by version
-            $allProductionTags = git tag -l | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
-            Write-Output "All production tags found: $($allProductionTags -join ', ')"
+              # Get all production tags, exclude current, sort by version
+              $allProductionTags = git tag -l | Where-Object { $_ -match '^v\d+\.\d+\.\d+$' }
+              Write-Output "All production tags found: $($allProductionTags -join ', ')"
 
-            $lastProductionTag = $allProductionTags |
-              Where-Object { $_ -ne $currentVersion } |
-              Sort-Object { [Version]($_ -replace '^v', '') } |
-              Select-Object -Last 1
+              $lastProductionTag = $allProductionTags |
+                Where-Object { $_ -ne $currentVersion } |
+                Sort-Object { [Version]($_ -replace '^v', '') } |
+                Select-Object -Last 1
 
-            if ($lastProductionTag) {
-              Write-Output "Last production tag: $lastProductionTag"
-              echo "base=$lastProductionTag" >> $env:GITHUB_OUTPUT
+              if ($lastProductionTag) {
+                Write-Output "Last production tag: $lastProductionTag"
+                echo "base=$lastProductionTag" >> $env:GITHUB_OUTPUT
+              } else {
+                Write-Output "No previous production tag found - this is the first release"
+                # For first release, compare against repository root to include all files
+                $rootCommit = git rev-list --max-parents=0 HEAD
+                Write-Output "Using root commit: $rootCommit"
+                echo "base=$rootCommit" >> $env:GITHUB_OUTPUT
+              }
             } else {
-              Write-Output "No previous production tag found - this is the first release"
-              # For first release, compare against repository root to include all files
-              $rootCommit = git rev-list --max-parents=0 HEAD
-              Write-Output "Using root commit: $rootCommit"
-              echo "base=$rootCommit" >> $env:GITHUB_OUTPUT
+              Write-Output "Pre-release build (Label: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}') - using default base"
+              echo "base=" >> $env:GITHUB_OUTPUT
             }
-          } else {
-            Write-Output "Pre-release build (Label: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}') - using default base"
+          } catch {
+            Write-Error "Error determining filter base: $_"
+            Write-Output "Falling back to default base"
             echo "base=" >> $env:GITHUB_OUTPUT
           }
-        } catch {
-          Write-Error "Error determining filter base: $_"
-          Write-Output "Falling back to default base"
-          echo "base=" >> $env:GITHUB_OUTPUT
-        }
 
-    - uses: dorny/paths-filter@v3
-      id: filter
-      with:
-        list-files: json
-        base: ${{ steps.filter-base.outputs.base }}
-        filters: |
-          src:
-            - 'src/**'
-          docs:
-            - 'docs/**'
-          automation:
-            - 'build/**'
-            - '.github/**'
-    - name: "Debug Filter Results"
-      shell: pwsh
-      run: |
-        Write-Output "=== PATH FILTER DEBUG ==="
-        Write-Output "Event: ${{ github.event_name }}"
-        Write-Output "Ref: ${{ github.ref }}"
-        Write-Output "Filter base used: '${{ steps.filter-base.outputs.base }}'"
-        Write-Output "Ring: '${{ steps.RingDetection.outputs.Ring }}'"
-        Write-Output "Current GitVersion: v${{ steps.gitversion.outputs.GitVersion_SemVer }}"
-        Write-Output "Pre-release label: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}'"
-        Write-Output "---"
-        Write-Output "Filter results:"
-        Write-Output "  src: ${{ steps.filter.outputs.src }}"
-        Write-Output "  docs: ${{ steps.filter.outputs.docs }}"
-        Write-Output "  automation: ${{ steps.filter.outputs.automation }}"
-        Write-Output "---"
-        Write-Output "Files that matched filters:"
-        Write-Output "src files:"
-        Write-Output '${{ steps.filter.outputs.src_files }}'
-        Write-Output "docs files:"
-        Write-Output '${{ steps.filter.outputs.docs_files }}'
-        Write-Output "automation files:"
-        Write-Output '${{ steps.filter.outputs.automation_files }}'
-        Write-Output "changes array:"
-        Write-Output '${{ steps.filter.outputs.changes }}'
-        Write-Output "========================="
-    - name: "Build NKDAgility Outputs"
-      shell: pwsh
-      id: nkdagility
-      run: |
-            # Get Branch Name
-            Write-Output "::group::Get Branch Name"
-            Write-Output "-------------------------------------------"
-            $branchName = "${{ github.head_ref || github.ref_name }}"
-            Write-Output "We are running on: $branchName!"
-            $branchSafeName = $branchName.Replace("/", "-")
-            Write-Output "branchSafeName: $branchSafeName!"
-            Write-Output "-------------------------------------------"
-            Write-Output "::endgroup::"
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          list-files: json
+          base: ${{ steps.filter-base.outputs.base }}
+          filters: |
+            src:
+              - 'src/**'
+            docs:
+              - 'docs/**'
+            automation:
+              - 'build/**'
+              - '.github/**'
+      - name: "Debug Filter Results"
+        shell: pwsh
+        run: |
+          Write-Output "=== PATH FILTER DEBUG ==="
+          Write-Output "Event: ${{ github.event_name }}"
+          Write-Output "Ref: ${{ github.ref }}"
+          Write-Output "Filter base used: '${{ steps.filter-base.outputs.base }}'"
+          Write-Output "Ring: '${{ steps.RingDetection.outputs.Ring }}'"
+          Write-Output "Current GitVersion: v${{ steps.gitversion.outputs.GitVersion_SemVer }}"
+          Write-Output "Pre-release label: '${{ steps.gitversion.outputs.GitVersion_PreReleaseLabel }}'"
+          Write-Output "---"
+          Write-Output "Filter results:"
+          Write-Output "  src: ${{ steps.filter.outputs.src }}"
+          Write-Output "  docs: ${{ steps.filter.outputs.docs }}"
+          Write-Output "  automation: ${{ steps.filter.outputs.automation }}"
+          Write-Output "---"
+          Write-Output "Files that matched filters:"
+          Write-Output "src files:"
+          Write-Output '${{ steps.filter.outputs.src_files }}'
+          Write-Output "docs files:"
+          Write-Output '${{ steps.filter.outputs.docs_files }}'
+          Write-Output "automation files:"
+          Write-Output '${{ steps.filter.outputs.automation_files }}'
+          Write-Output "changes array:"
+          Write-Output '${{ steps.filter.outputs.changes }}'
+          Write-Output "========================="
+      - name: "Build NKDAgility Outputs"
+        shell: pwsh
+        id: nkdagility
+        run: |
+          # Get Branch Name
+          Write-Output "::group::Get Branch Name"
+          Write-Output "-------------------------------------------"
+          $branchName = "${{ github.head_ref || github.ref_name }}"
+          Write-Output "We are running on: $branchName!"
+          $branchSafeName = $branchName.Replace("/", "-")
+          Write-Output "branchSafeName: $branchSafeName!"
+          Write-Output "-------------------------------------------"
+          Write-Output "::endgroup::"
 
-            # Ring Setup
-            Write-Output "::group::Ring Control Setup"
-            Write-Output "-------------------------------------------"
-            Write-Output "Ring Control Setup"
-            Write-Output "-------------------------------------------"
-            $Ring = "${{ steps.RingDetection.outputs.Ring }}"
-            $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
+          # Ring Setup
+          Write-Output "::group::Ring Control Setup"
+          Write-Output "-------------------------------------------"
+          Write-Output "Ring Control Setup"
+          Write-Output "-------------------------------------------"
+          $Ring = "${{ steps.RingDetection.outputs.Ring }}"
+          $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
 
-            switch ("${{ steps.RingDetection.outputs.Ring }}") {
-                "Production" {
-                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
-                    $AzureSitesEnvironment = ""
-                    # Production: Release app when ForceRelease OR src changed
-                    $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
-                }
-                "Preview" {
-                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
-                    $AzureSitesEnvironment = "preview";
-                    # Preview: Release app when ForceRelease OR src changed
-                    $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
-                }
-                default {
-                    $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
-                    $AzureSitesEnvironment = "${{ steps.RingDetection.outputs.Ring }}-${{ github.event.pull_request.number }}".ToLower()
-                    $RunRelease = 'false'
-                }
-            }
+          switch ("${{ steps.RingDetection.outputs.Ring }}") {
+              "Production" {
+                  $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
+                  $AzureSitesEnvironment = ""
+                  # Production: Release app when ForceRelease OR src changed
+                  $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
+              }
+              "Preview" {
+                  $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
+                  $AzureSitesEnvironment = "preview";
+                  # Preview: Release app when ForceRelease OR src changed
+                  $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
+              }
+              default {
+                  $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
+                  $AzureSitesEnvironment = "${{ steps.RingDetection.outputs.Ring }}-${{ github.event.pull_request.number }}".ToLower()
+                  $RunRelease = 'false'
+              }
+          }
 
-            Write-Output "We are running for the $Ring Ring!"
-            echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
-            Write-Output "We are focused on Winget ID $WingetApplicationId!"
-            echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
-            Write-Output "We are running for the $AzureSitesEnvironment AzureSitesEnvironment!"
-            echo "AzureSitesEnvironment=$AzureSitesEnvironment" >> $env:GITHUB_OUTPUT
-            Write-Output "RunRelease=$RunRelease (App releases when ForceRelease OR src changed)"
-            echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
-            Write-Output "-------------------------------------------"
-            Write-Output "::endgroup::"
-             # Get-ReleaseDescription
-            Write-Output "::group::Release Description Setup"
-            Write-Output "-------------------------------------------"
-            Write-Output "Get-ReleaseDescription"
-            Write-Output "-------------------------------------------"
-            if ($env:GITHUB_EVENT_NAME -ne "pull_request" -and $eventName -ne "pull_request_target")
-            {
-                Write-Output "Running Get-ReleaseDescription.ps1"
-                . .\build\include\Get-ReleaseDescription.ps1
-                $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
-                if ($description -eq $null) {
-                    $description = "No release description found";
-                    echo "release_description_state=false" >> $env:GITHUB_OUTPUT
-                } else {
-                    echo "release_description_state=true" >> $env:GITHUB_OUTPUT
+          Write-Output "We are running for the $Ring Ring!"
+          echo "Ring=$Ring" >> $env:GITHUB_OUTPUT
+          Write-Output "We are focused on Winget ID $WingetApplicationId!"
+          echo "WingetApplicationId=$WingetApplicationId" >> $env:GITHUB_OUTPUT
+          Write-Output "We are running for the $AzureSitesEnvironment AzureSitesEnvironment!"
+          echo "AzureSitesEnvironment=$AzureSitesEnvironment" >> $env:GITHUB_OUTPUT
+          Write-Output "RunRelease=$RunRelease (App releases when ForceRelease OR src changed)"
+          echo "RunRelease=$RunRelease" >> $env:GITHUB_OUTPUT
+          Write-Output "-------------------------------------------"
+          Write-Output "::endgroup::"
+           # Get-ReleaseDescription
+          Write-Output "::group::Release Description Setup"
+          Write-Output "-------------------------------------------"
+          Write-Output "Get-ReleaseDescription"
+          Write-Output "-------------------------------------------"
+          if ($env:GITHUB_EVENT_NAME -ne "pull_request" -and $eventName -ne "pull_request_target")
+          {
+              Write-Output "Running Get-ReleaseDescription.ps1"
+              . .\build\include\Get-ReleaseDescription.ps1
+              $description = Get-ReleaseDescription -mode log -OPEN_AI_KEY ${{ secrets.OPENAI_API_KEY }}
+              if ($description -eq $null) {
+                  $description = "No release description found";
+                  echo "release_description_state=false" >> $env:GITHUB_OUTPUT
+              } else {
+                  echo "release_description_state=true" >> $env:GITHUB_OUTPUT
 
-                }
-                $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
-                echo "release_description<<$EOF" >> $env:GITHUB_OUTPUT
-                echo $description >> $env:GITHUB_OUTPUT
-                echo "$EOF" >> $env:GITHUB_OUTPUT
-            } else {
-                $description = "Skipping for PR!"
-                echo "release_description=$description"  >> $env:GITHUB_OUTPUT
-                Write-Output $description
-            }
+              }
+              $EOF = -join (1..15 | ForEach {[char]((48..57)+(65..90)+(97..122) | Get-Random)})
+              echo "release_description<<$EOF" >> $env:GITHUB_OUTPUT
+              echo $description >> $env:GITHUB_OUTPUT
+              echo "$EOF" >> $env:GITHUB_OUTPUT
+          } else {
+              $description = "Skipping for PR!"
+              echo "release_description=$description"  >> $env:GITHUB_OUTPUT
+              Write-Output $description
+          }
 
-            Write-Output "-------------------------------------------"
-            Write-Output "::endgroup::"
-    - uses: actions/upload-artifact@v4
-      with:
-        name: AzureDevOpsMigrationTools-Scripts
-        path: ./build/**
+          Write-Output "-------------------------------------------"
+          Write-Output "::endgroup::"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AzureDevOpsMigrationTools-Scripts
+          path: ./build/**
 
   # Setup Validator
   SetupSummeryStage:
@@ -303,46 +302,46 @@ jobs:
     runs-on: ubuntu-latest
     needs: Setup
     steps:
-    - name: "Show Summery"
-      if: always()
-      shell: pwsh
-      id: nkdagility-summery
-      run: |
-            $markdown = @"
-               ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
-               ### NKDAgility
-                 - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
-                 - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
-                 - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
-                 - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
-                 - nkdAgility_DocsBaseURL: ${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}
-                 - nkdAgility_AzureSitesEnvironment: ${{needs.Setup.outputs.nkdAgility_AzureSitesEnvironment}}
-                 - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
-                 - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
-               ### GitVersion
-                 - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
-                 - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
-                 - GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}
-                 - GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}
-                 - GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}
-                 - GitVersion_NuGetVersion: ${{needs.Setup.outputs.GitVersion_NuGetVersion}}
-               ### Has Changed
-                 - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
-                 - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
-                 - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
-            "@
-            echo $markdown >> $Env:GITHUB_STEP_SUMMARY
-    - name: "Show Release Description"
-      if: always()
-      shell: pwsh
-      id: nkdAgility_ReleaseDescription
-      run: |
-            Write-Host "::debug::nkdAgility_ReleaseDescription | $Env:GITHUB_STEP_SUMMARY"
-            $markdown = @"
-               ## nkdAgility_ReleaseDescription
-               ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
-            "@
-            echo $markdown >> $Env:GITHUB_STEP_SUMMARY
+      - name: "Show Summery"
+        if: always()
+        shell: pwsh
+        id: nkdagility-summery
+        run: |
+          $markdown = @"
+             ## ${{needs.Setup.outputs.GitVersion_SemVer}} (${{needs.Setup.outputs.nkdAgility_Ring}})
+             ### NKDAgility
+               - nkdAgility_Ring: ${{needs.Setup.outputs.nkdAgility_Ring}}
+               - nkdAgility_WingetApplicationId: ${{needs.Setup.outputs.nkdAgility_WingetApplicationId}}
+               - nkdAgility_DocsVersionFolder: ${{needs.Setup.outputs.nkdAgility_DocsVersionFolder}}
+               - nkdAgility_DocsDeployFolder: ${{needs.Setup.outputs.nkdAgility_DocsDeployFolder}}
+               - nkdAgility_DocsBaseURL: ${{needs.Setup.outputs.nkdAgility_DocsBaseURL}}
+               - nkdAgility_AzureSitesEnvironment: ${{needs.Setup.outputs.nkdAgility_AzureSitesEnvironment}}
+               - nkdAgility_ReleaseDescriptionState: ${{needs.Setup.outputs.nkdAgility_ReleaseDescriptionState}}
+               - nkdAgility_RunRelease: ${{needs.Setup.outputs.nkdAgility_RunRelease}}
+             ### GitVersion
+               - GitVersion_BranchName: ${{needs.Setup.outputs.GitVersion_BranchName}}
+               - GitVersion_SemVer: ${{needs.Setup.outputs.GitVersion_SemVer}}
+               - GitVersion_PreReleaseLabel: ${{needs.Setup.outputs.GitVersion_PreReleaseLabel}}
+               - GitVersion_AssemblySemVer: ${{needs.Setup.outputs.GitVersion_AssemblySemVer}}
+               - GitVersion_InformationalVersion: ${{needs.Setup.outputs.GitVersion_InformationalVersion}}
+               - GitVersion_NuGetVersion: ${{needs.Setup.outputs.GitVersion_NuGetVersion}}
+             ### Has Changed
+               - HasChanged_src: ${{needs.Setup.outputs.HasChanged_src}}
+               - HasChanged_docs: ${{needs.Setup.outputs.HasChanged_docs}}
+               - HasChanged_automation: ${{needs.Setup.outputs.HasChanged_automation}}
+          "@
+          echo $markdown >> $Env:GITHUB_STEP_SUMMARY
+      - name: "Show Release Description"
+        if: always()
+        shell: pwsh
+        id: nkdAgility_ReleaseDescription
+        run: |
+          Write-Host "::debug::nkdAgility_ReleaseDescription | $Env:GITHUB_STEP_SUMMARY"
+          $markdown = @"
+             ## nkdAgility_ReleaseDescription
+             ${{needs.Setup.outputs.nkdAgility_ReleaseDescription}}
+          "@
+          echo $markdown >> $Env:GITHUB_STEP_SUMMARY
 
   # Build, Test, Sonar Cloud Analysis, & Package
 
@@ -354,9 +353,9 @@ jobs:
     if: ${{ success() && (needs.Setup.outputs.HasChanged_src == 'true'  || needs.Setup.outputs.HasChanged_automation == 'true') }}
 
     env:
-      solution: '**/*.sln'
-      buildPlatform: 'Any CPU'
-      buildConfiguration: 'Release'
+      solution: "**/*.sln"
+      buildPlatform: "Any CPU"
+      buildConfiguration: "Release"
       nkdAgility_Ring: ${{ needs.Setup.outputs.nkdAgility_Ring }}
       GitVersion_SemVer: ${{ needs.Setup.outputs.GitVersion_SemVer }}
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
@@ -371,7 +370,7 @@ jobs:
         if: ${{ !(github.event.pull_request.head.repo.fork) }}
         with:
           java-version: 17
-          distribution: 'zulu'
+          distribution: "zulu"
       - name: Checkout
         uses: actions/checkout@v4
       - uses: cschleiden/replace-tokens@v1
@@ -383,36 +382,36 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-              8.x
+            8.x
       - name: "Find solution files"
         shell: pwsh
         run: |
-            Get-Item -Path .\
-            Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
+          Get-Item -Path .\
+          Get-ChildItem -Path .\ -Recurse -Filter '*.sln' | ForEach-Object { $_.FullName }
       - name: sonar install
         if: ${{ !(github.event.pull_request.head.repo.fork) }}
         run: dotnet tool install --global dotnet-sonarscanner
       - name: sonar begin
         if: ${{ !(github.event.pull_request.head.repo.fork) }}
         run: dotnet sonarscanner begin
-              /o:"nkdagility"
-              /k:"vsts-sync-migrator:master"
-              /d:sonar.host.url="https://sonarcloud.io"
-              /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          /o:"nkdagility"
+          /k:"vsts-sync-migrator:master"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - run: dotnet build MigrationTools.sln /p:Version=${{ env.GitVersion_SemVer }} /p:FileVersion=${{ env.GitVersion_AssemblySemVer }} /p:InformationalVersion=${{ env.GitVersion_InformationalVersion }} /p:GitVersionTag=${{ env.GitVersion_PreReleaseLabel }}
         name: Build MigrationTools.sln
         id: Build
       - name: "Check that required files exist!"
         shell: pwsh
         run: |
-            $foundFiles = Get-ChildItem -Path .\ -Recurse -Filter '*WITDataStore64*' | ForEach-Object { $_.FullName }
-            if ($foundFiles -eq $null) {
-                Write-Output "No WITDataStore64 found"
-                exit 1
-            } else {
-              Write-Output "Found WITDataStore64"
-            }
-            $foundFiles
+          $foundFiles = Get-ChildItem -Path .\ -Recurse -Filter '*WITDataStore64*' | ForEach-Object { $_.FullName }
+          if ($foundFiles -eq $null) {
+              Write-Output "No WITDataStore64 found"
+              exit 1
+          } else {
+            Write-Output "Found WITDataStore64"
+          }
+          $foundFiles
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L0|TestCategory=L1)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory=L2|TestCategory=L3)"
       - run: dotnet test "MigrationTools.sln" --results-directory ".\test-results\" --logger trx --collect "Code coverage" --no-build --filter "(TestCategory!=L0&TestCategory!=L1&TestCategory!=L2&TestCategory!=L3)"
@@ -424,24 +423,24 @@ jobs:
         shell: pwsh
         if: ${{ steps.Build.outcome == 'success' }}
         run: |
-           ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
+          ./build/packageExecutable.ps1 -version ${{ env.GitVersion_SemVer }} -outfolder "./staging"
       - name: "Package Chocolatey Files"
         shell: pwsh
         if: ${{ steps.packageExecutable.outcome == 'success' }}
         run: |
-            $item = Get-ChildItem -Path ./staging/ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
-            Write-Output "Found: $item.FullName"
-            .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsFilename $item.FullName
+          $item = Get-ChildItem -Path ./staging/ -Recurse -Filter 'MigrationTools-${{ env.GitVersion_SemVer }}.zip' | Select-Object -First 1
+          Write-Output "Found: $item.FullName"
+          .\build\packageChocolatey.ps1 -SemVer ${{ env.GitVersion_SemVer }} -NuGetVersion ${{ env.GitVersion_NuGetVersion }} -outfolder "./staging" -migrationToolsFilename $item.FullName
       - name: "Package Extension Files"
         shell: pwsh
         if: ${{ steps.Build.outcome == 'success' }}
         run: |
-            .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging"
+          .\build\packageExtension.ps1 -version ${{ env.GitVersion_AssemblySemVer }} -outfolder "./staging"
       - name: "List Package Files"
         shell: pwsh
         if: ${{ steps.Build.outcome == 'success' }}
         run: |
-                 Get-ChildItem -Path ./staging/ -Recurse | ForEach-Object { $_.FullName }
+          Get-ChildItem -Path ./staging/ -Recurse | ForEach-Object { $_.FullName }
       - uses: actions/upload-artifact@v4
         with:
           name: AzureDevOpsMigrationTools-Packages
@@ -465,7 +464,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cschleiden/replace-tokens@v1
         with:
-          files: '["**/*.html", "**/*.yaml", "**/*.yml"]'
+          files: '["**/*.html", "**/*.yaml", "**/*.yml", "**/*.json"]'
           tokenPrefix: "#{"
           tokenSuffix: "}#"
         env:
@@ -478,7 +477,7 @@ jobs:
         uses: peaceiris/actions-hugo@v3
         with:
           extended: true
-          hugo-version: 'latest'
+          hugo-version: "latest"
       - name: Build
         run: |
           $environment = "${{ needs.Setup.outputs.nkdAgility_Ring }}".ToLower()
@@ -492,7 +491,6 @@ jobs:
         with:
           name: AzureDevOpsMigrationTools-Site2
           path: ./public/**/*
-
 
   # GitHubRelease
   GitHubRelease:
@@ -524,14 +522,14 @@ jobs:
       - name: "Package  Files"
         shell: pwsh
         run: |
-             Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
+          Get-ChildItem -Path .\ -Recurse | ForEach-Object { $_.FullName }
       - name: "Release options"
         id: release-options
         shell: pwsh
         run: |
-             if ($Env:nkdAgility_Ring -eq 'Production') {
-                echo "discussion_category_name=Releases" >> $env:GITHUB_OUTPUT
-             }
+          if ($Env:nkdAgility_Ring -eq 'Production') {
+             echo "discussion_category_name=Releases" >> $env:GITHUB_OUTPUT
+          }
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -567,7 +565,7 @@ jobs:
 
           append_body: true
 
-# ElmahDeployment
+  # ElmahDeployment
   ElmahDeployemnt:
     name: "Create Elmah.io Deployment"
     runs-on: ubuntu-latest
@@ -577,13 +575,12 @@ jobs:
     # Only when app was released
     if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
-     - name: Create Deployment on elmah.io
-       uses: elmahio/github-create-deployment-action@v1
-       with:
-         apiKey: ${{ secrets.ELMAH_IO_API_KEY }}
-         version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
-         logId: ${{ secrets.ELMAH_IO_LOG_ID }}
-
+      - name: Create Deployment on elmah.io
+        uses: elmahio/github-create-deployment-action@v1
+        with:
+          apiKey: ${{ secrets.ELMAH_IO_API_KEY }}
+          version: ${{ needs.Setup.outputs.GitVersion_SemVer }}
+          logId: ${{ secrets.ELMAH_IO_LOG_ID }}
 
   # Release to Marketplace
   MarketplaceRelease:
@@ -599,21 +596,20 @@ jobs:
       - name: "Find files"
         shell: pwsh
         run: |
-            Get-Item -Path .\
-            Write-Output "Build Files"
-            Get-ChildItem -Path .\ -Recurse -Filter '*.ps1' | ForEach-Object { $_.FullName }
+          Get-Item -Path .\
+          Write-Output "Build Files"
+          Get-ChildItem -Path .\ -Recurse -Filter '*.ps1' | ForEach-Object { $_.FullName }
       - name: "Marketplace"
         shell: pwsh
         run: |
-            $vsixFile =  Get-ChildItem -Path .\ -Recurse -Filter '*.vsix'
-            if ($vsixFile -eq $null) {
-                Write-Output "No VSIX file found"
-                exit 1
-            } else {
-              Write-Output $"Running with {$vsixFile}"
-            }
-            .\build\releaseExtension.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
-
+          $vsixFile =  Get-ChildItem -Path .\ -Recurse -Filter '*.vsix'
+          if ($vsixFile -eq $null) {
+              Write-Output "No VSIX file found"
+              exit 1
+          } else {
+            Write-Output $"Running with {$vsixFile}"
+          }
+          .\build\releaseExtension.ps1 -vsixFile $vsixFile.FullName -marketplaceToken ${{ secrets.VS_MARKET_TOKEN }}
 
   # Release to Chocolatey
   ChocolateyRelease:
@@ -629,16 +625,15 @@ jobs:
       - name: "Choco"
         shell: pwsh
         run: |
-            $chocoFile =  Get-ChildItem -Path .\ -Recurse -Filter 'vsts-sync-migrator.${{ needs.Setup.outputs.GitVersion_NuGetVersion }}.nupkg'
-            if ($chocoFile -eq $null) {
-                Write-Output "No Choco file found"
-                exit 1
-            } else {
-              Write-Output $"Running with {$chocoFile}"
-            }
-            Write-Output 'choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"'
-            choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"
-
+          $chocoFile =  Get-ChildItem -Path .\ -Recurse -Filter 'vsts-sync-migrator.${{ needs.Setup.outputs.GitVersion_NuGetVersion }}.nupkg'
+          if ($chocoFile -eq $null) {
+              Write-Output "No Choco file found"
+              exit 1
+          } else {
+            Write-Output $"Running with {$chocoFile}"
+          }
+          Write-Output 'choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"'
+          choco push "$chocoFile" --key "${{ secrets.CHOCO_APIKEY }}" --source "https://push.chocolatey.org/"
 
   # Release to Winget
   WingetRelease:
@@ -654,13 +649,13 @@ jobs:
       - name: "Find files"
         shell: pwsh
         run: |
-            Get-Item -Path .\
-            Write-Output "Build Files"
-            Get-ChildItem -Path .\ -Recurse -Filter '*.ps1' | ForEach-Object { $_.FullName }
+          Get-Item -Path .\
+          Write-Output "Build Files"
+          Get-ChildItem -Path .\ -Recurse -Filter '*.ps1' | ForEach-Object { $_.FullName }
       - name: "Winget Release"
         shell: pwsh
         run: |
-            .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.NKD_MRHINSH_TOKEN }}
+          .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.NKD_MRHINSH_TOKEN }}
 
   # Release to Docs
   DocsRelease:
@@ -678,7 +673,7 @@ jobs:
       - name: "Find  files"
         shell: pwsh
         run: |
-            Get-Item -Path .\
+          Get-Item -Path .\
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -690,15 +685,15 @@ jobs:
         id: azureDeploy
         with:
           repo_token: ${{ steps.app-token.outputs.token }}
-          action: 'upload'
+          action: "upload"
           app_location: ./_site2
           skip_app_build: true
           skip_api_build: true
-          output_location: ''
+          output_location: ""
           deployment_environment: ${{ (needs.Setup.outputs.nkdAgility_AzureSitesEnvironment) }}
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
 
-      - name: 'Show Summery'
+      - name: "Show Summery"
         if: always()
         shell: pwsh
         id: nkdagility-summery

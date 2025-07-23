@@ -35,6 +35,7 @@ params:
   keywords: "Azure DevOps, Migration Tools, DevOps, Migration"
   og_image: "/images/og-image.jpg" # URL to the default Open Graph image
   siteProdUrl: "https://devopsmigration.io"
+  sitePreviewUrl: "https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net"
   supportEmail: "support@devopsmigration.io"
   githubUrl: "https://github.com/nkdAgility/azure-devops-migration-tools"
   editPage: "https://github.com/nkdAgility/azure-devops-migration-tools/tree/main/docs/content/"
