@@ -23,6 +23,10 @@
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
               },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
+              },
               "expression": {
                 "description": "Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., \"[x]*2\").",
                 "type": "string",
@@ -49,6 +53,10 @@
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
               },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
+              },
               "targetField": {
                 "description": "Gets or sets the name of the target field to be cleared/set to null during work item migration.",
                 "type": "string"
@@ -63,6 +71,10 @@
               "applyTo": {
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
+              },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
               },
               "targetField": {
                 "description": "Gets or sets the name of the target field that will be set to the specified literal value.",
@@ -82,6 +94,10 @@
               "applyTo": {
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
+              },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
               },
               "formatExpression": {
                 "description": "missing XML code comments",
@@ -106,6 +122,10 @@
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
               },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
+              },
               "targetField": {
                 "description": "Gets or sets the name of the target field that should be skipped during migration, resetting it to its original value.",
                 "type": "string"
@@ -124,6 +144,10 @@
               "defaultValue": {
                 "description": "Gets or sets the default value to use when the source field is empty or null.",
                 "type": "string"
+              },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
               },
               "sourceField": {
                 "description": "Gets or sets the name of the source field to copy data from during migration.",
@@ -144,6 +168,10 @@
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
               },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
+              },
               "sourceToTargetMappings": {
                 "description": "missing XML code comments",
                 "type": "object"
@@ -158,6 +186,10 @@
               "applyTo": {
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
+              },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
               },
               "formatExpression": {
                 "description": "missing XML code comments",
@@ -182,6 +214,10 @@
                 "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
                 "type": "string"
               },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
+              },
               "sourceField": {
                 "description": "Gets or sets the name of the source field to read values from during migration.",
                 "type": "string"
@@ -205,6 +241,10 @@
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
               },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
+              },
               "sourceFieldsAndValues": {
                 "description": "missing XML code comments",
                 "type": "object"
@@ -223,6 +263,10 @@
               "applyTo": {
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
+              },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
               },
               "pattern": {
                 "description": "Gets or sets the regular expression pattern to match against the source field value.",
@@ -250,6 +294,10 @@
               "applyTo": {
                 "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                 "type": "array"
+              },
+              "enabled": {
+                "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                "type": "boolean"
               },
               "timeTravel": {
                 "description": "Gets or sets the number of months to travel back in time when looking up historical area path values. Use 0 for current values.",

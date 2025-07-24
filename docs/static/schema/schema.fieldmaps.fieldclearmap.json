@@ -9,6 +9,10 @@
       "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
       "type": "array"
     },
+    "enabled": {
+      "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
     "targetField": {
       "description": "Gets or sets the name of the target field to be cleared/set to null during work item migration.",
       "type": "string"

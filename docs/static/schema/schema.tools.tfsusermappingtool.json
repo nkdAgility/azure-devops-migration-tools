@@ -21,6 +21,10 @@
       "description": "This is the regionalized \"Project Collection Valid Users\" group name. Default is \"Project Collection Valid Users\".",
       "type": "string"
     },
+    "skipValidateAllUsersExistOrAreMapped": {
+      "description": "When set to true, this setting will skip a validation that all users exists or mapped",
+      "type": "boolean"
+    },
     "userMappingFile": {
       "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.",
       "type": "string"

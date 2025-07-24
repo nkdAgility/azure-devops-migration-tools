@@ -81,6 +81,10 @@ options:
   type: String
   description: Gets or sets the default value to use when no mapping is found for the source field value.
   defaultValue: missing XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+  defaultValue: missing XML code comments
 - parameterName: sourceField
   type: String
   description: Gets or sets the name of the source field to read values from during migration.

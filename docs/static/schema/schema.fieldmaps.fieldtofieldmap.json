@@ -13,6 +13,10 @@
       "description": "Gets or sets the default value to use when the source field is empty or null.",
       "type": "string"
     },
+    "enabled": {
+      "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
     "sourceField": {
       "description": "Gets or sets the name of the source field to copy data from during migration.",
       "type": "string"

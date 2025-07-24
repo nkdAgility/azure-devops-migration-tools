@@ -13,6 +13,18 @@
       "description": "Authentication mode to use when connecting to Azure DevOps. Typically uses AccessToken for modern Azure DevOps organizations.",
       "type": "string"
     },
+    "enabled": {
+      "description": "Will be used if enabled",
+      "type": "boolean"
+    },
+    "endpointEnrichers": {
+      "description": "missing XML code comments",
+      "type": "array"
+    },
+    "name": {
+      "description": "missing XML code comments",
+      "type": "string"
+    },
     "organisation": {
       "description": "URL of the Azure DevOps organization (e.g., \"https://dev.azure.com/myorganization/\"). Must include the full organization URL.",
       "type": "string"

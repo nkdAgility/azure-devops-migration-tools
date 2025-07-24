@@ -24,9 +24,21 @@ description: missing XML code comments
 className: FileSystemWorkItemEndpoint
 typeName: Endpoints
 options:
+- parameterName: Enabled
+  type: Boolean
+  description: Will be used if enabled
+  defaultValue: missing XML code comments
+- parameterName: EndpointEnrichers
+  type: List
+  description: missing XML code comments
+  defaultValue: missing XML code comments
 - parameterName: FileStore
   type: String
   description: Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.
+  defaultValue: missing XML code comments
+- parameterName: Name
+  type: String
+  description: missing XML code comments
   defaultValue: missing XML code comments
 status: missing XML code comments
 processingTarget: missing XML code comments
