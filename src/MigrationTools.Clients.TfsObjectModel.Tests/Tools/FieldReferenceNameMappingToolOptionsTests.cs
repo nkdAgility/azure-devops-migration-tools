@@ -10,10 +10,10 @@ namespace MigrationTools.Tests.Tools
         public void FieldMappingsMustNotBeNullWhenNormalized()
         {
             TfsWorkItemTypeValidatorToolOptions options = new() { Enabled = true };
-            options.FieldMappings = null;
+            options.SourceFieldMappings = null;
             options.Normalize();
 
-            Assert.IsNotNull(options.FieldMappings);
+            Assert.IsNotNull(options.SourceFieldMappings);
         }
 
         [TestMethod]
@@ -22,7 +22,7 @@ namespace MigrationTools.Tests.Tools
             TfsWorkItemTypeValidatorToolOptions options = new()
             {
                 Enabled = true,
-                FieldMappings = new()
+                SourceFieldMappings = new()
                 {
                     ["wit"] = new()
                     {
@@ -44,7 +44,7 @@ namespace MigrationTools.Tests.Tools
             TfsWorkItemTypeValidatorToolOptions options = new()
             {
                 Enabled = true,
-                FieldMappings = new()
+                SourceFieldMappings = new()
                 {
                     ["wit"] = new()
                     {
@@ -64,7 +64,7 @@ namespace MigrationTools.Tests.Tools
             TfsWorkItemTypeValidatorToolOptions options = new()
             {
                 Enabled = true,
-                FieldMappings = new()
+                SourceFieldMappings = new()
                 {
                     ["wit"] = new()
                     {
@@ -86,7 +86,7 @@ namespace MigrationTools.Tests.Tools
             TfsWorkItemTypeValidatorToolOptions options = new()
             {
                 Enabled = true,
-                FieldMappings = new()
+                SourceFieldMappings = new()
                 {
                     [TfsWorkItemTypeValidatorToolOptions.AllWorkItemTypes] = new()
                     {

@@ -283,7 +283,7 @@ namespace MigrationTools.Tools
 
             const string message1 = "Some work item types or their fields are not present in the target system (see previous logs)."
                 + " Either add these fields into target work items, or map source fields to other target fields"
-                + $" in options ({nameof(TfsWorkItemTypeValidatorToolOptions.FieldMappings)}).";
+                + $" in options ({nameof(TfsWorkItemTypeValidatorToolOptions.SourceFieldMappings)}).";
             Log.LogError(message1);
             const string message2 = "If you have some field mappings defined for validation, do not forget also to configure"
                 + $" proper field mapping in {nameof(FieldMappingTool)} so data will preserved during migration.";

@@ -30,7 +30,7 @@ namespace MigrationTools.Tools
         /// target field name. Target field name can be empty string to indicate that this field will not be validated in target.
         /// As work item type name, you can use <c>*</c> to define mappings which will be applied to all work item types.
         /// </summary>
-        public Dictionary<string, Dictionary<string, string>> FieldMappings { get; set; } = [];
+        public Dictionary<string, Dictionary<string, string>> SourceFieldMappings { get; set; } = [];
 
         /// <summary>
         /// <para>
@@ -57,7 +57,7 @@ namespace MigrationTools.Tools
                 return;
             }
 
-            Dictionary<string, Dictionary<string, string>> oldMappings = FieldMappings;
+            Dictionary<string, Dictionary<string, string>> oldMappings = SourceFieldMappings;
             Dictionary<string, Dictionary<string, string>> newMappings = new(_normalizedComparer);
             if (oldMappings is not null)
             {
@@ -84,7 +84,7 @@ namespace MigrationTools.Tools
 
             IncludeWorkItemtypes ??= [];
             FixedTargetFields = newFixedFields;
-            FieldMappings = newMappings;
+            SourceFieldMappings = newMappings;
             _isNormalized = true;
         }
 
@@ -141,7 +141,7 @@ namespace MigrationTools.Tools
 
         private bool TryGetTargetFieldName(string workItemType, string sourceFieldName, out string targetFieldName)
         {
-            if (FieldMappings.TryGetValue(workItemType, out Dictionary<string, string> mappings))
+            if (SourceFieldMappings.TryGetValue(workItemType, out Dictionary<string, string> mappings))
             {
                 if (mappings.TryGetValue(sourceFieldName, out targetFieldName))
                 {
