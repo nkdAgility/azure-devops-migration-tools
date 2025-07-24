@@ -3,6 +3,7 @@ using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using MigrationTools.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -121,20 +122,60 @@ namespace MigrationTools.ConsoleDataGenerator
         private List<OptionsItem> populateOptions(object item, JObject joptions)
         {
             List<OptionsItem> options = new List<OptionsItem>();
-            if (!(joptions is null))
+
+            // Use reflection to get all public properties, not just those in the JSON serialization
+            // This ensures properties with DefaultValueHandling.Ignore are still documented
+            var properties = item.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                .Where(p => p.CanRead && p.CanWrite)
+                .OrderBy(p => p.Name);
+
+            foreach (var property in properties)
             {
-                var jpropertys = joptions.Properties().OrderBy(t => t.Name);
-                foreach (JProperty jproperty in jpropertys)
-                {
-                    OptionsItem optionsItem = new OptionsItem();
-                    optionsItem.ParameterName = jproperty.Name;
-                    optionsItem.Type = codeDocs.GetPropertyType(item, jproperty);
-                    optionsItem.Description = codeDocs.GetPropertyData(item, joptions, jproperty, "summary");
-                    optionsItem.DefaultValue = codeDocs.GetPropertyData(item, joptions, jproperty, "default");
-                    options.Add(optionsItem);
-                }
+                // Get the property value and handle complex objects appropriately for JProperty
+                var propertyValue = GetSimplePropertyValue(property, item);
+
+                // Create a temporary JProperty for compatibility with existing code documentation methods
+                var tempJProperty = new JProperty(property.Name, propertyValue);
+
+                OptionsItem optionsItem = new OptionsItem();
+                optionsItem.ParameterName = property.Name;
+                optionsItem.Type = property.PropertyType.Name.Replace("`1", "").Replace("`2", "").Replace("`", "");
+                optionsItem.Description = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "summary");
+                optionsItem.DefaultValue = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
+                options.Add(optionsItem);
             }
+
             return options;
+        }
+
+        private object GetSimplePropertyValue(System.Reflection.PropertyInfo property, object instance)
+        {
+            try
+            {
+                var value = property.GetValue(instance);
+
+                // Handle complex objects by returning a simple representation
+                if (value == null)
+                    return null;
+
+                // For simple types, return the value as is
+                if (property.PropertyType.IsPrimitive || property.PropertyType == typeof(string) || property.PropertyType == typeof(DateTime) || property.PropertyType.IsEnum)
+                    return value;
+
+                // For complex objects, return a simple string representation to avoid JSON serialization issues
+                return value.ToString();
+            }
+            catch
+            {
+                // Return a default value for the property type if we can't get the actual value
+                if (property.PropertyType == typeof(string))
+                    return "";
+                if (property.PropertyType == typeof(bool))
+                    return false;
+                if (property.PropertyType.IsValueType)
+                    return Activator.CreateInstance(property.PropertyType);
+                return null;
+            }
         }
 
         static string ConvertSectionWithPathToJson(IConfiguration configuration, IConfigurationSection section, IOptions option = null)
