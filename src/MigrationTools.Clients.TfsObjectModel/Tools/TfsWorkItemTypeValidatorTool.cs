@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -103,7 +104,16 @@ namespace MigrationTools.Tools
 
                 if (targetFields.ContainsKey(targetFieldName))
                 {
-                    Log.LogDebug("  Source field '{sourceFieldName}' exists in '{targetWit}'.", sourceFieldName, targetWit.Name);
+                    if (sourceField.IsIdentity)
+                    {
+                        const string message = "  Source field '{sourceFieldName}' is identity field."
+                            + " Validation is not performed on identity fields, because they usually differ in allowed values.";
+                        Log.LogDebug(message, sourceFieldName);
+                    }
+                    else
+                    {
+                        ValidateField(sourceField, targetFields[targetFieldName], targetWit.Name);
+                    }
                 }
                 else
                 {
@@ -111,8 +121,9 @@ namespace MigrationTools.Tools
                     Log.LogInformation("    Source field reference name: {sourceFieldReferenceName}", sourceFieldName);
                     Log.LogInformation("    Source field name: {sourceFieldName}", sourceField.Name);
                     Log.LogInformation("    Field type: {fieldType}", sourceField.FieldType);
-                    IEnumerable<string> allowedValues = sourceField.AllowedValues.OfType<string>().Select(val => $"'{val}'");
-                    Log.LogInformation("    Allowed values: {allowedValues}", string.Join(", ", allowedValues));
+                    (string valueType, List<string> allowedValues) = GetAllowedValues(sourceField);
+                    Log.LogInformation("    Allowed values: {allowedValues}", string.Join(", ", allowedValues.Select(v => $"'{v}'")));
+                    Log.LogInformation("    Allowed values type: {allowedValuesType}", valueType);
                     result = false;
                 }
             }
@@ -122,6 +133,97 @@ namespace MigrationTools.Tools
                 Log.LogInformation("  All fields are either present or mapped.");
             }
             return result;
+        }
+
+        private void ValidateField(FieldDefinition sourceField, FieldDefinition targetField, string targetWitName)
+        {
+            // If target field is in 'FixedTargetFields' list, it means, that user resolved this filed somehow.
+            // For example by value mapping. So any discrepancies found will be logged just as information.
+            // Otherwise, discrepancies are logged as warning.
+            LogLevel logLevel = Options.IsFieldFixed(targetWitName, targetField.ReferenceName)
+                ? LogLevel.Information
+                : LogLevel.Warning;
+            bool isValid = ValidateFieldType(sourceField, targetField, logLevel);
+            isValid &= ValidateFieldAllowedValues(sourceField, targetField, logLevel);
+            if (isValid)
+            {
+                Log.LogDebug("  Target field '{targetFieldName}' exists in '{targetWit}' and is valid.",
+                    targetField.ReferenceName, targetWitName);
+            }
+            else if (logLevel == LogLevel.Information)
+            {
+                Log.LogInformation("  Target field '{targetFieldName}' in '{targetWit}' is considered valid,"
+                    + $" because it is listed in '{nameof(Options.FixedTargetFields)}'.",
+                    targetField.ReferenceName, targetWitName, sourceField.ReferenceName);
+            }
+        }
+
+        private bool ValidateFieldType(FieldDefinition sourceField, FieldDefinition targetField, LogLevel logLevel)
+        {
+            if (sourceField.FieldType != targetField.FieldType)
+            {
+                Log.Log(logLevel,
+                    "  Source field '{sourceField}' and target field '{targetField}' have different types:"
+                    + " source = '{sourceFieldType}', target = '{targetFieldType}'.",
+                    sourceField.ReferenceName, targetField.ReferenceName, sourceField.FieldType, targetField.FieldType);
+                return false;
+            }
+            return true;
+        }
+
+        private bool ValidateFieldAllowedValues(FieldDefinition sourceField, FieldDefinition targetField, LogLevel logLevel)
+        {
+            bool isValid = true;
+            (string sourceValueType, List<string> sourceAllowedValues) = GetAllowedValues(sourceField);
+            (string targetValueType, List<string> targetAllowedValues) = GetAllowedValues(targetField);
+            if (!sourceValueType.Equals(targetValueType, StringComparison.OrdinalIgnoreCase))
+            {
+                isValid = false;
+                Log.Log(logLevel,
+                    "  Source field '{sourceField}' and target field '{targetField}' have different allowed values types:"
+                    + " source = '{sourceFieldAllowedValueType}', target = '{targetFieldAllowedValueType}'.",
+                    sourceField.ReferenceName, targetField.ReferenceName, sourceValueType, targetValueType);
+            }
+            if (!AllowedValuesAreSame(sourceAllowedValues, targetAllowedValues))
+            {
+                isValid = false;
+                Log.Log(logLevel,
+                    "  Source field '{sourceField}' and target field '{targetField}' have different allowed values.",
+                    sourceField.ReferenceName, targetField.ReferenceName);
+                Log.LogInformation("    Source allowed values: {sourceAllowedValues}",
+                    string.Join(", ", sourceAllowedValues.Select(val => $"'{val}'")));
+                Log.LogInformation("    Target allowed values: {targetAllowedValues}",
+                    string.Join(", ", targetAllowedValues.Select(val => $"'{val}'")));
+            }
+
+            return isValid;
+        }
+
+        private bool AllowedValuesAreSame(List<string> sourceAllowedValues, List<string> targetAllowedValues)
+        {
+            if (sourceAllowedValues.Count != targetAllowedValues.Count)
+            {
+                return false;
+            }
+            foreach (string sourceValue in sourceAllowedValues)
+            {
+                if (!targetAllowedValues.Contains(sourceValue, StringComparer.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private (string valueType, List<string> allowedValues) GetAllowedValues(FieldDefinition field)
+        {
+            string valueType = field.SystemType.Name;
+            List<string> allowedValues = [];
+            for (int i = 0; i < field.AllowedValues.Count; i++)
+            {
+                allowedValues.Add(field.AllowedValues[i]);
+            }
+            return (valueType, allowedValues);
         }
 
         private bool ShouldValidateWorkItemType(string workItemTypeName)
@@ -186,6 +288,9 @@ namespace MigrationTools.Tools
             const string message2 = "If you have some field mappings defined for validation, do not forget also to configure"
                 + $" proper field mapping in {nameof(FieldMappingTool)} so data will preserved during migration.";
             Log.LogInformation(message2);
+            const string message3 = "If you have different allowed values in some field, either update target field to match"
+                + $" allowed values from source, or configure {nameof(FieldValueMap)} in {nameof(FieldMappingTool)}.";
+            Log.LogInformation(message3);
         }
 
         private static bool TryFindSimilarWorkItemType(

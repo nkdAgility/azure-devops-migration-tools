@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -32,6 +33,20 @@ namespace MigrationTools.Tools
         public Dictionary<string, Dictionary<string, string>> FieldMappings { get; set; } = [];
 
         /// <summary>
+        /// <para>
+        /// List of target fields, that are considered as fixed. It means, even if the field is different against
+        /// source field, no warning will be triggered, jus information about the differences.
+        /// Use this list, whan you know about the differences between fields, but resolved it for example by
+        /// using <see cref="FieldMappingTool"/>.
+        /// </para>
+        /// <para>
+        /// Key is target work item type name. As this name, you can use <c>*</c> to define fixed fields which will be applied
+        /// to all work item types.
+        /// </para>
+        /// </summary>
+        public Dictionary<string, List<string>> FixedTargetFields { get; set; } = [];
+
+        /// <summary>
         /// Normalizes properties, that all of them are set (not <see langword="null"/>) and all dictionaries uses
         /// case-insensitive keys.
         /// </summary>
@@ -57,10 +72,39 @@ namespace MigrationTools.Tools
                 }
             }
 
-            IncludeWorkItemtypes ??= [];
+            Dictionary<string, List<string>> oldFixedFields = FixedTargetFields;
+            Dictionary<string, List<string>> newFixedFields = new(_normalizedComparer);
+            if (oldFixedFields is not null)
+            {
+                foreach (KeyValuePair<string, List<string>> mapping in oldFixedFields)
+                {
+                    newFixedFields[mapping.Key.Trim()] = mapping.Value;
+                }
+            }
 
+            IncludeWorkItemtypes ??= [];
+            FixedTargetFields = newFixedFields;
             FieldMappings = newMappings;
             _isNormalized = true;
+        }
+
+        /// <summary>
+        /// Returns true, if field <paramref name="targetFieldName"/> from work item type <paramref name="workItemType"/>
+        /// is in list of fixed target fields. Handles also fields defined for all work item types (<c>*</c>).
+        /// </summary>
+        /// <param name="workItemType">Work item type name.</param>
+        /// <param name="targetFieldName">Target field reference name.</param>
+        public bool IsFieldFixed(string workItemType, string targetFieldName)
+        {
+            if (FixedTargetFields.TryGetValue(workItemType, out List<string> fixedFields))
+            {
+                return fixedFields.Contains(targetFieldName, _normalizedComparer);
+            }
+            if (FixedTargetFields.TryGetValue(AllWorkItemTypes, out fixedFields))
+            {
+                return fixedFields.Contains(targetFieldName, _normalizedComparer);
+            }
+            return false;
         }
 
         /// <summary>
