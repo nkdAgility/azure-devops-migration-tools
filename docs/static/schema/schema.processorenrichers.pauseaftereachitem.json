@@ -10,10 +10,6 @@
       "type": "boolean",
       "default": "true"
     },
-    "optionFor": {
-      "description": "missing XML code comments",
-      "type": "string"
-    },
     "refName": {
       "description": "For internal use",
       "type": "string"

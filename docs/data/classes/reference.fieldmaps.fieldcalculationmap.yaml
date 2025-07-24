@@ -79,6 +79,10 @@ options:
   type: List
   description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+  defaultValue: missing XML code comments
 - parameterName: expression
   type: String
   description: Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., "[x]*2").

@@ -9,6 +9,10 @@
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
+    "enrichers": {
+      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+      "type": "array"
+    },
     "maxDegreeOfParallelism": {
       "description": "Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.",
       "type": "integer"
@@ -20,6 +24,10 @@
     "processMaps": {
       "description": "Dictionary mapping source process names to target process names for process template transformations during migration.",
       "type": "object"
+    },
+    "refName": {
+      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+      "type": "string"
     },
     "sourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",

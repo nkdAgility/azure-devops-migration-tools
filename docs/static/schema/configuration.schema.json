@@ -28,6 +28,18 @@
                   "description": "Authentication mode to use when connecting to Azure DevOps. Typically uses AccessToken for modern Azure DevOps organizations.",
                   "type": "string"
                 },
+                "enabled": {
+                  "description": "Will be used if enabled",
+                  "type": "boolean"
+                },
+                "endpointEnrichers": {
+                  "description": "missing XML code comments",
+                  "type": "array"
+                },
+                "name": {
+                  "description": "missing XML code comments",
+                  "type": "string"
+                },
                 "organisation": {
                   "description": "URL of the Azure DevOps organization (e.g., \"https://dev.azure.com/myorganization/\"). Must include the full organization URL.",
                   "type": "string"
@@ -47,8 +59,20 @@
               "description": "missing XML code comments",
               "type": "object",
               "properties": {
+                "enabled": {
+                  "description": "Will be used if enabled",
+                  "type": "boolean"
+                },
+                "endpointEnrichers": {
+                  "description": "missing XML code comments",
+                  "type": "array"
+                },
                 "fileStore": {
                   "description": "Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "missing XML code comments",
                   "type": "string"
                 }
               }
@@ -58,6 +82,10 @@
               "description": "missing XML code comments",
               "type": "object",
               "properties": {
+                "allowCrossProjectLinking": {
+                  "description": "When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.",
+                  "type": "boolean"
+                },
                 "authentication": {
                   "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
                   "type": "string"
@@ -66,8 +94,20 @@
                   "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
                   "type": "string"
                 },
+                "enabled": {
+                  "description": "Will be used if enabled",
+                  "type": "boolean"
+                },
+                "endpointEnrichers": {
+                  "description": "missing XML code comments",
+                  "type": "array"
+                },
                 "languageMaps": {
                   "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "missing XML code comments",
                   "type": "string"
                 },
                 "project": {
@@ -85,6 +125,10 @@
               "description": "missing XML code comments",
               "type": "object",
               "properties": {
+                "allowCrossProjectLinking": {
+                  "description": "When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.",
+                  "type": "boolean"
+                },
                 "authentication": {
                   "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
                   "type": "string"
@@ -93,8 +137,20 @@
                   "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
                   "type": "string"
                 },
+                "enabled": {
+                  "description": "Will be used if enabled",
+                  "type": "boolean"
+                },
+                "endpointEnrichers": {
+                  "description": "missing XML code comments",
+                  "type": "array"
+                },
                 "languageMaps": {
                   "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "missing XML code comments",
                   "type": "string"
                 },
                 "project": {
@@ -112,6 +168,10 @@
               "description": "missing XML code comments",
               "type": "object",
               "properties": {
+                "allowCrossProjectLinking": {
+                  "description": "When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.",
+                  "type": "boolean"
+                },
                 "authentication": {
                   "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
                   "type": "string"
@@ -120,8 +180,20 @@
                   "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
                   "type": "string"
                 },
+                "enabled": {
+                  "description": "Will be used if enabled",
+                  "type": "boolean"
+                },
+                "endpointEnrichers": {
+                  "description": "missing XML code comments",
+                  "type": "array"
+                },
                 "languageMaps": {
                   "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "missing XML code comments",
                   "type": "string"
                 },
                 "project": {
@@ -139,6 +211,10 @@
               "description": "missing XML code comments",
               "type": "object",
               "properties": {
+                "allowCrossProjectLinking": {
+                  "description": "When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.",
+                  "type": "boolean"
+                },
                 "authentication": {
                   "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
                   "type": "string"
@@ -147,8 +223,20 @@
                   "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
                   "type": "string"
                 },
+                "enabled": {
+                  "description": "Will be used if enabled",
+                  "type": "boolean"
+                },
+                "endpointEnrichers": {
+                  "description": "missing XML code comments",
+                  "type": "array"
+                },
                 "languageMaps": {
                   "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "missing XML code comments",
                   "type": "string"
                 },
                 "project": {
@@ -184,6 +272,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "migrateBuildPipelines": {
                     "description": "Migrate Build Pipelines",
                     "type": "boolean",
@@ -208,6 +300,10 @@
                     "description": "Migrate Variable Groups",
                     "type": "boolean",
                     "default": "true"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "releasePipelines": {
                     "description": "List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.",
@@ -250,8 +346,16 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "prependCommand": {
                     "description": "Command to prepend to each line in the cleanup script, such as \"start\" for Windows batch files.",
+                    "type": "string"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
                     "type": "string"
                   },
                   "sourceName": {
@@ -291,6 +395,14 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
+                  },
                   "resultFileName": {
                     "description": "File name where the results of the outbound link checking process will be saved, typically containing details of broken or invalid links.",
                     "type": "string"
@@ -324,6 +436,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "maxDegreeOfParallelism": {
                     "description": "Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.",
                     "type": "integer"
@@ -335,6 +451,10 @@
                   "processMaps": {
                     "description": "Dictionary mapping source process names to target process names for process template transformations during migration.",
                     "type": "object"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -370,6 +490,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "password": {
                     "description": "The password of the user that is used to export the pictures.",
                     "type": "string",
@@ -379,6 +503,10 @@
                     "description": "TODO: You wpuld need to customise this for your system. Clone repo and run in Debug",
                     "type": "string",
                     "default": "String.Empty"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -410,6 +538,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "exportAllUsers": {
                     "description": "Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .",
                     "type": "boolean"
@@ -418,6 +550,10 @@
                     "description": "`OnlyListUsersInWorkItems`",
                     "type": "boolean",
                     "default": "true"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -452,6 +588,14 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
+                  },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
                     "type": "string"
@@ -477,10 +621,18 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "prefixProjectToNodes": {
                     "description": "Do we add the source project name into the folder path",
                     "type": "boolean",
                     "default": "false"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sharedFolderName": {
                     "description": "The name of the shared folder, made a parameter incase it every needs to be edited",
@@ -516,6 +668,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "migrateTeamCapacities": {
                     "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
                     "type": "boolean",
@@ -530,6 +686,10 @@
                     "description": "Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.",
                     "type": "boolean",
                     "default": "false"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -569,6 +729,14 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
+                  },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
                     "type": "string"
@@ -594,6 +762,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "filterCompleted": {
                     "description": "missing XML code comments",
                     "type": "boolean"
@@ -607,6 +779,10 @@
                     "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
                     "type": "string",
                     "default": "`String.Empty`"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "removeAllLinks": {
                     "description": "??Not sure what this does. Check code.",
@@ -652,8 +828,12 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
-                  "processor": {
-                    "description": "Gets the processor identifier for test variables migration.",
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
                     "type": "string"
                   },
                   "sourceName": {
@@ -681,6 +861,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "filterWorkItemsThatAlreadyExistInTarget": {
                     "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                     "type": "boolean",
@@ -690,6 +874,10 @@
                     "description": "Pause after each work item is migrated",
                     "type": "boolean",
                     "default": "false"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -736,6 +924,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "filterWorkItemsThatAlreadyExistInTarget": {
                     "description": "Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.",
                     "type": "boolean"
@@ -743,6 +935,10 @@
                   "pauseAfterEachWorkItem": {
                     "description": "Gets or sets a value indicating whether to pause after each work item is deleted for review or debugging purposes.",
                     "type": "boolean"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -778,9 +974,18 @@
                 "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
                 "type": "object",
                 "properties": {
+                  "attachRevisionHistory": {
+                    "description": "This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.",
+                    "type": "boolean",
+                    "default": "false"
+                  },
                   "enabled": {
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
+                  },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
                   },
                   "filterWorkItemsThatAlreadyExistInTarget": {
                     "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
@@ -796,6 +1001,28 @@
                     "description": "If enabled, adds a comment recording the migration",
                     "type": "boolean",
                     "default": "true"
+                  },
+                  "maxGracefulFailures": {
+                    "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.",
+                    "type": "integer",
+                    "default": "0"
+                  },
+                  "pauseAfterEachWorkItem": {
+                    "description": "Pause after each work item is migrated",
+                    "type": "boolean",
+                    "default": "false"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
+                  },
+                  "skipRevisionWithInvalidAreaPath": {
+                    "description": "When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.",
+                    "type": "boolean"
+                  },
+                  "skipRevisionWithInvalidIterationPath": {
+                    "description": "This will skip a revision if the source iteration has not been migrated i.e. it was deleted",
+                    "type": "boolean"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -825,6 +1052,11 @@
                     "type": "integer",
                     "default": "5"
                   },
+                  "workItemIDs": {
+                    "description": "A list of work items to import",
+                    "type": "array",
+                    "default": "[]"
+                  },
                   "processorType": {
                     "type": "string",
                     "enum": [
@@ -846,6 +1078,14 @@
                   "enabled": {
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
+                  },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -872,6 +1112,10 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
                   "filterWorkItemsThatAlreadyExistInTarget": {
                     "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                     "type": "boolean",
@@ -881,6 +1125,10 @@
                     "description": "Pause after each work item is migrated",
                     "type": "boolean",
                     "default": "false"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -922,6 +1170,14 @@
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
                   },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
+                  },
                   "sourceName": {
                     "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
                     "type": "string"
@@ -954,6 +1210,14 @@
                   "enabled": {
                     "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
                     "type": "boolean"
+                  },
+                  "enrichers": {
+                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                    "type": "array"
+                  },
+                  "refName": {
+                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                    "type": "string"
                   },
                   "replayRevisions": {
                     "description": "Gets or sets a value indicating whether to replay all revisions during migration.",
@@ -1008,6 +1272,10 @@
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
                           },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
+                          },
                           "expression": {
                             "description": "Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., \"[x]*2\").",
                             "type": "string",
@@ -1034,6 +1302,10 @@
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
                           },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
+                          },
                           "targetField": {
                             "description": "Gets or sets the name of the target field to be cleared/set to null during work item migration.",
                             "type": "string"
@@ -1048,6 +1320,10 @@
                           "applyTo": {
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
+                          },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
                           },
                           "targetField": {
                             "description": "Gets or sets the name of the target field that will be set to the specified literal value.",
@@ -1067,6 +1343,10 @@
                           "applyTo": {
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
+                          },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
                           },
                           "formatExpression": {
                             "description": "missing XML code comments",
@@ -1091,6 +1371,10 @@
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
                           },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
+                          },
                           "targetField": {
                             "description": "Gets or sets the name of the target field that should be skipped during migration, resetting it to its original value.",
                             "type": "string"
@@ -1109,6 +1393,10 @@
                           "defaultValue": {
                             "description": "Gets or sets the default value to use when the source field is empty or null.",
                             "type": "string"
+                          },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
                           },
                           "sourceField": {
                             "description": "Gets or sets the name of the source field to copy data from during migration.",
@@ -1129,6 +1417,10 @@
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
                           },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
+                          },
                           "sourceToTargetMappings": {
                             "description": "missing XML code comments",
                             "type": "object"
@@ -1143,6 +1435,10 @@
                           "applyTo": {
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
+                          },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
                           },
                           "formatExpression": {
                             "description": "missing XML code comments",
@@ -1167,6 +1463,10 @@
                             "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
                             "type": "string"
                           },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
+                          },
                           "sourceField": {
                             "description": "Gets or sets the name of the source field to read values from during migration.",
                             "type": "string"
@@ -1190,6 +1490,10 @@
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
                           },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
+                          },
                           "sourceFieldsAndValues": {
                             "description": "missing XML code comments",
                             "type": "object"
@@ -1208,6 +1512,10 @@
                           "applyTo": {
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
+                          },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
                           },
                           "pattern": {
                             "description": "Gets or sets the regular expression pattern to match against the source field value.",
@@ -1235,6 +1543,10 @@
                           "applyTo": {
                             "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
                             "type": "array"
+                          },
+                          "enabled": {
+                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                            "type": "boolean"
                           },
                           "timeTravel": {
                             "description": "Gets or sets the number of months to travel back in time when looking up historical area path values. Use 0 for current values.",
@@ -1447,6 +1759,10 @@
                 "projectCollectionValidUsersGroupName": {
                   "description": "This is the regionalized \"Project Collection Valid Users\" group name. Default is \"Project Collection Valid Users\".",
                   "type": "string"
+                },
+                "skipValidateAllUsersExistOrAreMapped": {
+                  "description": "When set to true, this setting will skip a validation that all users exists or mapped",
+                  "type": "boolean"
                 },
                 "userMappingFile": {
                   "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.",

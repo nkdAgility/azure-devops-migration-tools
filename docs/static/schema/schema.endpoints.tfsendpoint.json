@@ -5,6 +5,10 @@
   "description": "missing XML code comments",
   "type": "object",
   "properties": {
+    "allowCrossProjectLinking": {
+      "description": "When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.",
+      "type": "boolean"
+    },
     "authentication": {
       "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
       "type": "string"
@@ -13,8 +17,20 @@
       "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
       "type": "string"
     },
+    "enabled": {
+      "description": "Will be used if enabled",
+      "type": "boolean"
+    },
+    "endpointEnrichers": {
+      "description": "missing XML code comments",
+      "type": "array"
+    },
     "languageMaps": {
       "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
+      "type": "string"
+    },
+    "name": {
+      "description": "missing XML code comments",
       "type": "string"
     },
     "project": {

@@ -9,6 +9,10 @@
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
+    "enrichers": {
+      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+      "type": "array"
+    },
     "filterCompleted": {
       "description": "missing XML code comments",
       "type": "boolean"
@@ -22,6 +26,10 @@
       "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
       "type": "string",
       "default": "`String.Empty`"
+    },
+    "refName": {
+      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+      "type": "string"
     },
     "removeAllLinks": {
       "description": "??Not sure what this does. Check code.",

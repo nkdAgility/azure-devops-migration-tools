@@ -5,9 +5,18 @@
   "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
   "type": "object",
   "properties": {
+    "attachRevisionHistory": {
+      "description": "This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.",
+      "type": "boolean",
+      "default": "false"
+    },
     "enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
+    },
+    "enrichers": {
+      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+      "type": "array"
     },
     "filterWorkItemsThatAlreadyExistInTarget": {
       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
@@ -23,6 +32,28 @@
       "description": "If enabled, adds a comment recording the migration",
       "type": "boolean",
       "default": "true"
+    },
+    "maxGracefulFailures": {
+      "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.",
+      "type": "integer",
+      "default": "0"
+    },
+    "pauseAfterEachWorkItem": {
+      "description": "Pause after each work item is migrated",
+      "type": "boolean",
+      "default": "false"
+    },
+    "refName": {
+      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+      "type": "string"
+    },
+    "skipRevisionWithInvalidAreaPath": {
+      "description": "When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.",
+      "type": "boolean"
+    },
+    "skipRevisionWithInvalidIterationPath": {
+      "description": "This will skip a revision if the source iteration has not been migrated i.e. it was deleted",
+      "type": "boolean"
     },
     "sourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -51,6 +82,11 @@
       "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
       "type": "integer",
       "default": "5"
+    },
+    "workItemIDs": {
+      "description": "A list of work items to import",
+      "type": "array",
+      "default": "[]"
     }
   }
 }

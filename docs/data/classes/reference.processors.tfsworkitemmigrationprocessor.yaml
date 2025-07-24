@@ -74,9 +74,17 @@ description: WorkItemMigrationConfig is the main processor used to Migrate Work 
 className: TfsWorkItemMigrationProcessor
 typeName: Processors
 options:
+- parameterName: AttachRevisionHistory
+  type: Boolean
+  description: This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.
+  defaultValue: false
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
+  defaultValue: missing XML code comments
+- parameterName: Enrichers
+  type: List
+  description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
@@ -90,6 +98,26 @@ options:
   type: Boolean
   description: If enabled, adds a comment recording the migration
   defaultValue: true
+- parameterName: MaxGracefulFailures
+  type: Int32
+  description: The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.
+  defaultValue: 0
+- parameterName: PauseAfterEachWorkItem
+  type: Boolean
+  description: Pause after each work item is migrated
+  defaultValue: false
+- parameterName: RefName
+  type: String
+  description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
+  defaultValue: missing XML code comments
+- parameterName: SkipRevisionWithInvalidAreaPath
+  type: Boolean
+  description: When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
+  defaultValue: missing XML code comments
+- parameterName: SkipRevisionWithInvalidIterationPath
+  type: Boolean
+  description: This will skip a revision if the source iteration has not been migrated i.e. it was deleted
+  defaultValue: missing XML code comments
 - parameterName: SourceName
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
@@ -114,6 +142,10 @@ options:
   type: Int32
   description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'
   defaultValue: 5
+- parameterName: WorkItemIDs
+  type: IList
+  description: A list of work items to import
+  defaultValue: '[]'
 status: ready
 processingTarget: Work Items
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs

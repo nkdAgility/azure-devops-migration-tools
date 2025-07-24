@@ -30,10 +30,6 @@ options:
   type: Boolean
   description: If enabled this will run this migrator
   defaultValue: true
-- parameterName: OptionFor
-  type: String
-  description: missing XML code comments
-  defaultValue: missing XML code comments
 - parameterName: RefName
   type: String
   description: For internal use

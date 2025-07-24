@@ -13,6 +13,10 @@
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
+    "enrichers": {
+      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+      "type": "array"
+    },
     "migrateBuildPipelines": {
       "description": "Migrate Build Pipelines",
       "type": "boolean",
@@ -37,6 +41,10 @@
       "description": "Migrate Variable Groups",
       "type": "boolean",
       "default": "true"
+    },
+    "refName": {
+      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+      "type": "string"
     },
     "releasePipelines": {
       "description": "List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.",

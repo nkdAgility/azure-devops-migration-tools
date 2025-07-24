@@ -5,8 +5,20 @@
   "description": "missing XML code comments",
   "type": "object",
   "properties": {
+    "enabled": {
+      "description": "Will be used if enabled",
+      "type": "boolean"
+    },
+    "endpointEnrichers": {
+      "description": "missing XML code comments",
+      "type": "array"
+    },
     "fileStore": {
       "description": "Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.",
+      "type": "string"
+    },
+    "name": {
+      "description": "missing XML code comments",
       "type": "string"
     }
   }

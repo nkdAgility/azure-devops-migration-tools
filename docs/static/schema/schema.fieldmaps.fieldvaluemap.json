@@ -13,6 +13,10 @@
       "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
       "type": "string"
     },
+    "enabled": {
+      "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+      "type": "boolean"
+    },
     "sourceField": {
       "description": "Gets or sets the name of the source field to read values from during migration.",
       "type": "string"
