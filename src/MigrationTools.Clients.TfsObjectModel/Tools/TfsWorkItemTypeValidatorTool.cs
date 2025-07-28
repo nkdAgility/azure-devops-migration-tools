@@ -112,7 +112,7 @@ namespace MigrationTools.Tools
                     }
                     else
                     {
-                        ValidateField(sourceField, targetFields[targetFieldName], targetWit.Name);
+                        result &= ValidateField(sourceField, targetFields[targetFieldName], targetWit.Name);
                     }
                 }
                 else
@@ -135,7 +135,7 @@ namespace MigrationTools.Tools
             return result;
         }
 
-        private void ValidateField(FieldDefinition sourceField, FieldDefinition targetField, string targetWitName)
+        private bool ValidateField(FieldDefinition sourceField, FieldDefinition targetField, string targetWitName)
         {
             // If target field is in 'FixedTargetFields' list, it means, that user resolved this filed somehow.
             // For example by value mapping. So any discrepancies found will be logged just as information.
@@ -156,6 +156,7 @@ namespace MigrationTools.Tools
                     + $" because it is listed in '{nameof(Options.FixedTargetFields)}'.",
                     targetField.ReferenceName, targetWitName, sourceField.ReferenceName);
             }
+            return (logLevel == LogLevel.Information) || isValid;
         }
 
         private bool ValidateFieldType(FieldDefinition sourceField, FieldDefinition targetField, LogLevel logLevel)
