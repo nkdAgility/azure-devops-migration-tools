@@ -133,7 +133,10 @@
                       "AccessToken": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AuthenticationMode"
+                    ]
                   },
                   "Collection": {
                     "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
@@ -162,7 +165,11 @@
                       "IterationPath": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AreaPath",
+                      "IterationPath"
+                    ]
                   },
                   "Name": {
                     "description": "missing XML code comments",
@@ -214,7 +221,10 @@
                       "AccessToken": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AuthenticationMode"
+                    ]
                   },
                   "Collection": {
                     "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
@@ -243,7 +253,11 @@
                       "IterationPath": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AreaPath",
+                      "IterationPath"
+                    ]
                   },
                   "Name": {
                     "description": "missing XML code comments",
@@ -295,7 +309,10 @@
                       "AccessToken": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AuthenticationMode"
+                    ]
                   },
                   "Collection": {
                     "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
@@ -324,7 +341,11 @@
                       "IterationPath": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AreaPath",
+                      "IterationPath"
+                    ]
                   },
                   "Name": {
                     "description": "missing XML code comments",
@@ -376,7 +397,10 @@
                       "AccessToken": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AuthenticationMode"
+                    ]
                   },
                   "Collection": {
                     "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
@@ -405,7 +429,11 @@
                       "IterationPath": {
                         "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "AreaPath",
+                      "IterationPath"
+                    ]
                   },
                   "Name": {
                     "description": "missing XML code comments",
@@ -428,7 +456,10 @@
                           "type": "string"
                         }
                       }
-                    }
+                    },
+                    "required": [
+                      "Query"
+                    ]
                   },
                   "ReflectedWorkItemIdField": {
                     "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",

@@ -523,6 +523,11 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 var ps = BuildSchemaForType(p.PropertyType);
                 schema.Properties[p.Name] = ps;
+                // Capture required attribute for nested complex types
+                if (p.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), inherit: true).Any())
+                {
+                    schema.Required.Add(p.Name);
+                }
             }
             return schema;
         }

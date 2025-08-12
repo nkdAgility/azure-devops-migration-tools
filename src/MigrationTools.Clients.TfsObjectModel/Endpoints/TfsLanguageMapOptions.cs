@@ -2,6 +2,9 @@
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 
 namespace MigrationTools.Endpoints
 {
@@ -14,12 +17,14 @@ namespace MigrationTools.Endpoints
         /// Gets or sets the field name for the area path in the TFS system language (e.g., "Area" for English, "Zone" for French).
         /// </summary>
         /// <default>Area</default>
+        [Required]
         public string AreaPath { get; set; }
         
         /// <summary>
         /// Gets or sets the field name for the iteration path in the TFS system language (e.g., "Iteration" for English, "Itération" for French).
         /// </summary>
         /// <default>Iteration</default>
+        [Required]
         public string IterationPath { get; set; }
 
         public ValidateOptionsResult Validate(string name, TfsLanguageMapOptions options)
