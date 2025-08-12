@@ -17,7 +17,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
         {
             WIQLQuery = "Select [System.Id] From WorkItems Where [System.TeamProject] = @project and not [System.WorkItemType] contains 'Test Suite, Test Plan,Shared Steps,Shared Parameter,Feedback Request'";
             TargetLinksToKeepOrganization = "https://dev.azure.com/nkdagility";
-            TargetLinksToKeepProject = Guid.NewGuid().ToString();
+            TargetLinksToKeepProject = "950311ea-ec93-4bf3-be62-de5e7eaff847";
             DryRun = true;
             CleanupFileName = "c:/temp/OutboundLinkTargets.bat";
             PrependCommand = "start";
