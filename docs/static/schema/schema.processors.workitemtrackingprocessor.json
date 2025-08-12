@@ -37,5 +37,10 @@
       "description": "Gets or sets the number of times to retry work item creation if it fails.",
       "type": "integer"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }

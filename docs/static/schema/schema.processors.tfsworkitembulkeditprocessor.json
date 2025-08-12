@@ -55,5 +55,11 @@
       "type": "array",
       "default": "[]"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName",
+    "wIQLQuery"
+  ]
 }

@@ -42,5 +42,10 @@
       "description": "WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.",
       "type": "string"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }

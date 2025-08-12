@@ -41,6 +41,7 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public object Type { get; internal set; }
         public object Description { get; internal set; }
         public object DefaultValue { get; internal set; }
+        public bool IsRequired { get; set; } // Add this property to track required fields
     }
 
     public class ConfigurationSample

@@ -119,6 +119,15 @@ namespace MigrationTools.ConsoleDataGenerator
 
                     schema.Properties.Add(propertyName, propertySchema);
                 }
+                // Add required properties
+                var requiredProperties = data.Options
+                    .Where(opt => opt.IsRequired)
+                    .Select(opt => opt.ParameterName.Substring(0, 1).ToLower() + opt.ParameterName.Substring(1))
+                    .ToList();
+                foreach (var req in requiredProperties)
+                {
+                    schema.Required.Add(req);
+                }
 
                 return schema.ToString(SchemaVersion.Draft2020_12);
             }

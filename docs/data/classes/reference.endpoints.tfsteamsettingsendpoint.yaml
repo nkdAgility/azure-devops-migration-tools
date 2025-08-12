@@ -35,38 +35,47 @@ options:
   type: Boolean
   description: When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: Authentication
   type: TfsAuthenticationOptions
   description: Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: Collection
   type: Uri
   description: URI of the TFS collection (e.g., "http://tfsserver:8080/tfs/DefaultCollection"). Must be a valid absolute URL pointing to the TFS collection.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: Enabled
   type: Boolean
   description: Will be used if enabled
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: EndpointEnrichers
   type: List
   description: missing XML code comments
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: LanguageMaps
   type: TfsLanguageMapOptions
   description: Language mapping configuration for translating area and iteration path names between different language versions of TFS.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: Name
   type: String
   description: missing XML code comments
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: Project
   type: String
   description: Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: ReflectedWorkItemIdField
   type: String
   description: Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
   defaultValue: missing XML code comments
+  isRequired: true
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/EndPoints/TfsTeamSettingsEndpoint.cs

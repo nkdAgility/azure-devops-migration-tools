@@ -31,18 +31,22 @@ options:
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: FixedTargetFields
   type: Dictionary
   description: List of target fields, that are considered as fixed. It means, even if the field is different against source field, no warning will be triggered, jus information about the differences. Use this list, whan you know about the differences between fields, but resolved it for example by using .  Key is target work item type name. As this name, you can use * to define fixed fields which will be applied to all work item types.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: IncludeWorkItemtypes
   type: List
   description: List of work item types which will be validated. If this list is empty, all work item types will be validated.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: SourceFieldMappings
   type: Dictionary
   description: Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to target field name. Target field name can be empty string to indicate that this field will not be validated in target. As work item type name, you can use * to define mappings which will be applied to all work item types.
   defaultValue: missing XML code comments
+  isRequired: false
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemTypeValidatorTool.cs

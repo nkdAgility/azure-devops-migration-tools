@@ -56,14 +56,17 @@ options:
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: Mappings
   type: Dictionary
   description: Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration.
   defaultValue: '{}'
+  isRequired: false
 - parameterName: ShouldDropChangedSetLinks
   type: Boolean
   description: When set to true, changeset links in work items will be removed during migration to prevent broken links when repositories are not migrated.
   defaultValue: missing XML code comments
+  isRequired: false
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs

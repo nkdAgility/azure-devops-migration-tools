@@ -41,5 +41,10 @@
       "description": "Indicates whether to update existing process details in the target organization or only create new processes.",
       "type": "boolean"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }

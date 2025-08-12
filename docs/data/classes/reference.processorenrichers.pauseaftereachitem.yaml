@@ -30,10 +30,12 @@ options:
   type: Boolean
   description: If enabled this will run this migrator
   defaultValue: true
+  isRequired: false
 - parameterName: RefName
   type: String
   description: For internal use
   defaultValue: missing XML code comments
+  isRequired: false
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools/Processors/Enrichers/PauseAfterEachItem.cs

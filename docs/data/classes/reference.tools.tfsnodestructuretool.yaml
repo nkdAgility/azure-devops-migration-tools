@@ -99,26 +99,32 @@ options:
   type: NodeOptions
   description: 'Rules to apply to the Area Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }'
   defaultValue: '{"Filters": [], "Mappings": []}'
+  isRequired: false
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: Iterations
   type: NodeOptions
   description: 'Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { "Filters": ["*/**"], "Mappings": [{"Match": "^oldProjectName([\\\\]?.*)$", "Replacement": "targetProjectA$1"}] }'
   defaultValue: '{"Filters": [], "Mappings": []}'
+  isRequired: false
 - parameterName: MigrateRootNodes
   type: Boolean
   description: By default, only child nodes in node structures are migrated. Turning this on migrates even the root node (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate default area in source to some sub-area in target project. You have to set proper mapping for this to work. If after mapping the target node is still just root node (so it is not migrated under some child node), nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: ReplicateAllExistingNodes
   type: Boolean
   description: missing XML code comments
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: ShouldCreateMissingRevisionPaths
   type: Boolean
   description: When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.
   defaultValue: missing XML code comments
+  isRequired: false
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsNodeStructureTool.cs

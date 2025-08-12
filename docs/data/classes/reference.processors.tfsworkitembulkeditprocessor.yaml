@@ -36,46 +36,57 @@ options:
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: Enrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
   description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
   defaultValue: true
+  isRequired: false
 - parameterName: PauseAfterEachWorkItem
   type: Boolean
   description: Pause after each work item is migrated
   defaultValue: false
+  isRequired: false
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: SourceName
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: WhatIf
   type: Boolean
   description: Gets or sets a value indicating whether to run in "what if" mode without making actual changes to work items.
   defaultValue: false
+  isRequired: false
 - parameterName: WIQLQuery
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
   defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')
+  isRequired: true
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
   description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'
   defaultValue: 5
+  isRequired: false
 - parameterName: WorkItemIDs
   type: IList
   description: A list of work items to import
   defaultValue: '[]'
+  isRequired: false
 status: missing XML code comments
 processingTarget: WorkItem
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemBulkEditProcessor.cs

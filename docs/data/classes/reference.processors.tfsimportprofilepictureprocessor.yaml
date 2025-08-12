@@ -30,22 +30,27 @@ options:
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: Enrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
   defaultValue: missing XML code comments
+  isRequired: false
 - parameterName: SourceName
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
+  isRequired: true
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
+  isRequired: true
 status: alpha
 processingTarget: Profiles
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsImportProfilePictureProcessor.cs
