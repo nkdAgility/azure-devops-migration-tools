@@ -50,19 +50,9 @@ namespace MigrationTools.Host.Commands
             int _exitCode;
             try
             {
-                // KILL if the config is not valid
-                // if (!VersionOptions.ConfigureOptions.IsConfigValid(Configuration))
-                // {
-                //     CommandActivity.AddEvent(new ActivityEvent("ConfigIsNotValid"));
-                //     BoilerplateCli.ConfigIsNotValidMessage(Configuration, Log.Logger);
-                //     return Task.FromResult(-1);
-                // }
-                // KILL if the schema is not valid
-                
                 if (!VersionOptions.ConfigureOptions.IsConfigSchemaValid(settings.ConfigFile))
                 {
                     CommandActivity.AddEvent(new ActivityEvent("ConfigIsNotValid"));
-                    BoilerplateCli.ConfigIsNotValidMessage(Configuration, Log.Logger);
                     return Task.FromResult(-1);
                 }
 

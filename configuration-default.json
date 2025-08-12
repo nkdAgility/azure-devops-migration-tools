@@ -7,8 +7,8 @@
     "Endpoints": {
         "Source": {
             "EndpointType": "TfsTeamProjectEndpoint",
-            "Collection": "https://dev.azure.com/nkdagility-preview/",
-            "Project": "migrationSource1",
+            "missing": "https://dev.azure.com/nkdagility-preview/",
+            "missing2": "migrationSource1",
             "AllowCrossProjectLinking": false,
             "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
             "Authentication": {
