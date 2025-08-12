@@ -1,0 +1,77 @@
+<Solution>
+  <Folder Name="/.build/">
+    <File Path="build/azure-pipeline.yml" />
+    <File Path="build/build.ps1" />
+    <File Path="build/buildDocs.ps1" />
+    <File Path="build/compile-and-test.ps1" />
+    <File Path="build/install-prerequsits.ps1" />
+    <File Path="build/packageChocolatey.ps1" />
+    <File Path="build/packageExecutable.ps1" />
+    <File Path="build/packageExtension.ps1" />
+    <File Path="build/packageNuget.ps1" />
+    <File Path="build/packageWinget.ps1" />
+    <File Path="build/releaseExtension.ps1" />
+    <File Path="build/releaseGitHubRelease.ps1" />
+    <File Path="build/releaseWingetPackage.ps1" />
+    <File Path="build/versioning.ps1" />
+  </Folder>
+  <Folder Name="/Classic/">
+    <Project Path="src/MigrationTools.Clients.TfsObjectModel/MigrationTools.Clients.TfsObjectModel.csproj" />
+    <Project Path="src/MigrationTools.ConsoleFull/MigrationTools.ConsoleFull.csproj" />
+  </Folder>
+  <Folder Name="/Classic/Tests/">
+    <Project Path="src/MigrationTools.Clients.TfsObjectModel.Tests/MigrationTools.Clients.TfsObjectModel.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Modern/">
+    <Project Path="src/MigrationTools.Clients.AzureDevops.Rest/MigrationTools.Clients.AzureDevops.Rest.csproj" />
+    <Project Path="src/MigrationTools.Clients.FileSystem/MigrationTools.Clients.FileSystem.csproj" />
+    <Project Path="src/MigrationTools.ConsoleCore/MigrationTools.ConsoleCore.csproj" />
+    <Project Path="src/MigrationTools.ConsoleDataGenerator/MigrationTools.ConsoleDataGenerator.csproj" />
+    <Project Path="src/MigrationTools.Host/MigrationTools.Host.csproj" />
+    <Project Path="src/MigrationTools.Telemetery/MigrationTools.Telemetery.csproj" />
+    <Project Path="src/MigrationTools/MigrationTools.csproj" />
+  </Folder>
+  <Folder Name="/Modern/Tests/">
+    <Project Path="src/MigrationTools.Clients.AzureDevops.Rest.Tests/MigrationTools.Clients.AzureDevops.Rest.Tests.csproj" />
+    <Project Path="src/MigrationTools.Clients.FileSystem.Tests/MigrationTools.Clients.FileSystem.Tests.csproj" />
+    <Project Path="src/MigrationTools.Host.Tests/MigrationTools.Host.Tests.csproj" />
+    <Project Path="src/MigrationTools.Shadows/MigrationTools.Shadows.csproj" />
+    <Project Path="src/MigrationTools.Tests/MigrationTools.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="appsettings.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="GitVersion.yml" />
+    <File Path="mkdocs.yml" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/Distribution/" />
+  <Folder Name="/Solution Items/Distribution/Chocolatey/">
+    <File Path="src/MigrationTools.Chocolatey/chocolateyInstall.ps1" />
+    <File Path="src/MigrationTools.Chocolatey/chocolateyUninstall.ps1" />
+    <File Path="src/MigrationTools.Chocolatey/vstssyncmigration.nuspec" />
+  </Folder>
+  <Folder Name="/Solution Items/Distribution/Extension/">
+    <File Path="src/MigrationTools.Extension/LICENSE.txt" />
+    <File Path="src/MigrationTools.Extension/README.md" />
+    <File Path="src/MigrationTools.Extension/vss-extension.json" />
+  </Folder>
+  <Folder Name="/Solution Items/Distribution/Extension/images/">
+    <File Path="src/MigrationTools.Extension/images/azure-devops-migration-tools-naked-agility-martin-hinshelwood.png" />
+    <File Path="src/MigrationTools.Extension/images/extension-icon.png" />
+    <File Path="src/MigrationTools.Extension/images/screenshot-01.png" />
+  </Folder>
+  <Folder Name="/Solution Items/Distribution/SampleConfigs/">
+    <File Path="src/MigrationTools.Samples/configuration.json" />
+    <File Path="src/MigrationTools.Samples/demo-mapping-scrum2Agile.json" />
+    <File Path="src/MigrationTools.Samples/demo-migration-reset.json" />
+    <File Path="src/MigrationTools.Samples/demo-migration.json" />
+  </Folder>
+  <Properties Name="CodealikeProperties" Scope="PostLoad">
+    <Property Name="SolutionGuid" Value="51c92075-0694-476b-8366-efd65c9a9b77" />
+  </Properties>
+</Solution>
