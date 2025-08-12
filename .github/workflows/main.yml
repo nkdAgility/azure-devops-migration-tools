@@ -507,10 +507,10 @@ jobs:
     # Release app when RunRelease is true (ForceRelease OR src changed)
     if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Packages
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Scripts
           path: ./build/
@@ -592,7 +592,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
       - name: "Find files"
         shell: pwsh
         run: |
@@ -619,7 +619,7 @@ jobs:
     # Only when app was released
     if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Packages
       - name: "Choco"
@@ -645,7 +645,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
       - name: "Find files"
         shell: pwsh
         run: |
@@ -666,7 +666,7 @@ jobs:
     if: ${{ !(github.event.pull_request.head.repo.fork) }}
     steps:
       - name: Download a single artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Site2
           path: ./_site2
