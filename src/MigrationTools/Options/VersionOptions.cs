@@ -101,7 +101,29 @@ namespace MigrationTools.Options
                 return isValid;
             }
 
-            private static bool ValidateAgainstJsonSchema(IConfiguration configuration)
+            public static bool IsConfigSchemaValid(string configFile)
+            {
+                var stringConfigFile= File.ReadAllText(configFile);
+                var configJson = JObject.Parse(stringConfigFile);
+
+                var selectedSchema = configJson["$schema"]?.ToString();
+
+                var schema = LoadConfigurationSchema();
+                // Validate the configuration against the schema
+                IList<string> messages;
+                bool isValid = configJson.IsValid(schema, out messages);
+                if (!isValid)
+                {
+                    // Log the validation errors (but still return true for backward compatibility)
+                    foreach (var message in messages)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Configuration validation warning: {message}");
+                    }
+                }
+                return isValid;
+            }
+
+            public static bool ValidateAgainstJsonSchema(IConfiguration configuration)
             {
                 try
                 {
@@ -202,19 +224,11 @@ namespace MigrationTools.Options
                 try
                 {
                     // Try to load schema from embedded resource or local file first
-                    var schemaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "schema", "configuration.schema.json");
+                    var schemaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "configuration.schema.json");
 
                     if (File.Exists(schemaPath))
                     {
                         var schemaJson = File.ReadAllText(schemaPath);
-                        return JSchema.Parse(schemaJson);
-                    }
-
-                    // Fallback: try to load from docs folder relative to the solution
-                    var docsSchemaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "docs", "static", "schema", "configuration.schema.json");
-                    if (File.Exists(docsSchemaPath))
-                    {
-                        var schemaJson = File.ReadAllText(docsSchemaPath);
                         return JSchema.Parse(schemaJson);
                     }
 

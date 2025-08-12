@@ -92,18 +92,18 @@ namespace MigrationTools.ConsoleDataGenerator
                             arraySchemaJson["type"] = "array";
                             arraySchemaJson["description"] = option.Description.ToString();
 
-                            // Create prefixItems with anyOf structure (matching working schema)
-                            var prefixItemsObj = new JObject();
+                            // Create prefixItems as an array containing the anyOf object
                             var anyOfArray = new JArray();
-
                             foreach (var fieldMap in fieldMaps)
                             {
                                 var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
                                 anyOfArray.Add(JObject.Parse(fieldMapSchema.ToString()));
                             }
-
-                            prefixItemsObj["anyOf"] = anyOfArray;
-                            arraySchemaJson["prefixItems"] = prefixItemsObj;
+                            var anyOfObj = new JObject();
+                            anyOfObj["anyOf"] = anyOfArray;
+                            var prefixItemsArray = new JArray();
+                            prefixItemsArray.Add(anyOfObj);
+                            arraySchemaJson["prefixItems"] = prefixItemsArray;
 
                             propertySchema = JSchema.Parse(arraySchemaJson.ToString());
                         }
@@ -188,7 +188,8 @@ namespace MigrationTools.ConsoleDataGenerator
 
                 if (processorClasses.Any())
                 {
-                    var processorUnion = new JSchema();
+                    // Manually construct prefixItems as an array containing an anyOf object
+                    var anyOfArray = new JArray();
                     foreach (var processorClass in processorClasses)
                     {
                         var processorSchema = CreateSchemaFromClassData(processorClass);
@@ -197,9 +198,17 @@ namespace MigrationTools.ConsoleDataGenerator
                             Type = JSchemaType.String,
                             Enum = { processorClass.ClassName }
                         });
-                        processorUnion.AnyOf.Add(processorSchema);
+                        anyOfArray.Add(JObject.Parse(processorSchema.ToString()));
                     }
-                    processorsSchema.Items.Add(processorUnion);
+                    var anyOfObj = new JObject();
+                    anyOfObj["anyOf"] = anyOfArray;
+                    var prefixItemsArray = new JArray();
+                    prefixItemsArray.Add(anyOfObj);
+
+                    // Use JObject to set prefixItems, then parse back to JSchema
+                    var processorsSchemaJson = JObject.Parse(processorsSchema.ToString());
+                    processorsSchemaJson["prefixItems"] = prefixItemsArray;
+                    processorsSchema = JSchema.Parse(processorsSchemaJson.ToString());
                 }
                 migrationToolsSchema.Properties.Add("processors", processorsSchema);
 
@@ -229,16 +238,22 @@ namespace MigrationTools.ConsoleDataGenerator
                                 Description = "Gets or sets the list of field mapping configurations to apply."
                             };
 
-                            // Create a single prefixItems schema with anyOf for all field map types
-                            var prefixItemSchema = new JSchema();
+                            // Manually construct prefixItems as an array containing an anyOf object
+                            var anyOfArray = new JArray();
                             foreach (var fieldMap in fieldMaps)
                             {
                                 var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
-                                prefixItemSchema.AnyOf.Add(fieldMapSchema);
+                                anyOfArray.Add(JObject.Parse(fieldMapSchema.ToString()));
                             }
+                            var anyOfObj = new JObject();
+                            anyOfObj["anyOf"] = anyOfArray;
+                            var prefixItemsArray = new JArray();
+                            prefixItemsArray.Add(anyOfObj);
 
-                            // Add the single prefixItems schema to the array
-                            fieldMapsSchema.Items.Add(prefixItemSchema);
+                            // Use JObject to set prefixItems, then parse back to JSchema
+                            var fieldMapsSchemaJson = JObject.Parse(fieldMapsSchema.ToString());
+                            fieldMapsSchemaJson["prefixItems"] = prefixItemsArray;
+                            fieldMapsSchema = JSchema.Parse(fieldMapsSchemaJson.ToString());
 
                             // Replace the fieldMaps property
                             if (enhancedToolSchema.Properties.ContainsKey("fieldMaps"))

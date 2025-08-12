@@ -21,7 +21,7 @@ namespace MigrationTools.Host
             
             string exeName = Path.GetFileName(Assembly.GetEntryAssembly().Location);
             AnsiConsole.WriteLine();
-            AnsiConsole.Write(new Markup($"[red]!!ACTION REQUIRED!![/] we no longer support the [yellow]{version.schema.ToString()} config schema[/]...  "));
+            AnsiConsole.Write(new Markup($"[red]!!ACTION REQUIRED!![/] we no longer support the [yellow]{version.schema.ToString()} config schema detected from `{version.str}`[/]...  "));
             AnsiConsole.WriteLine();
             AnsiConsole.WriteLine();
             AnsiConsole.WriteLine("You are using a deprecated version of the configuration, please update to the latest version.");

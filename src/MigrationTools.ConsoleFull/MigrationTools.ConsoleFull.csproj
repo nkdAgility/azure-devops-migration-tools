@@ -34,6 +34,9 @@
     <Content Include="..\..\configuration-default.json" Link="configuration-default.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\docs\static\schema\configuration.schema.json" Link="configuration.schema.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

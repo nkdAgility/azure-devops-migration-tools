@@ -257,994 +257,996 @@
         },
         "processors": {
           "type": "array",
-          "prefixItems": {
-            "anyOf": [
-              {
-                "title": "AzureDevOpsPipelineProcessor",
-                "description": "Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.",
-                "type": "object",
-                "properties": {
-                  "buildPipelines": {
-                    "description": "List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.",
-                    "type": "array"
-                  },
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "migrateBuildPipelines": {
-                    "description": "Migrate Build Pipelines",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "migrateReleasePipelines": {
-                    "description": "Migrate Release Pipelines",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "migrateServiceConnections": {
-                    "description": "Migrate Service Connections **secrets need to be entered manually**",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "migrateTaskGroups": {
-                    "description": "Migrate Task Groups",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "migrateVariableGroups": {
-                    "description": "Migrate Variable Groups",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "releasePipelines": {
-                    "description": "List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.",
-                    "type": "array"
-                  },
-                  "repositoryNameMaps": {
-                    "description": "Map of Source Repository to Target Repository Names",
-                    "type": "object"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "AzureDevOpsPipelineProcessor"
-                    ]
+          "prefixItems": [
+            {
+              "anyOf": [
+                {
+                  "title": "AzureDevOpsPipelineProcessor",
+                  "description": "Azure DevOps Processor that migrates Taskgroups, Build- and Release Pipelines.",
+                  "type": "object",
+                  "properties": {
+                    "buildPipelines": {
+                      "description": "List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.",
+                      "type": "array"
+                    },
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "migrateBuildPipelines": {
+                      "description": "Migrate Build Pipelines",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "migrateReleasePipelines": {
+                      "description": "Migrate Release Pipelines",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "migrateServiceConnections": {
+                      "description": "Migrate Service Connections **secrets need to be entered manually**",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "migrateTaskGroups": {
+                      "description": "Migrate Task Groups",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "migrateVariableGroups": {
+                      "description": "Migrate Variable Groups",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "releasePipelines": {
+                      "description": "List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.",
+                      "type": "array"
+                    },
+                    "repositoryNameMaps": {
+                      "description": "Map of Source Repository to Target Repository Names",
+                      "type": "object"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "AzureDevOpsPipelineProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "KeepOutboundLinkTargetProcessor",
+                  "description": "missing XML code comments",
+                  "type": "object",
+                  "properties": {
+                    "cleanupFileName": {
+                      "description": "File path where the cleanup script or batch file will be generated for removing unwanted outbound links.",
+                      "type": "string"
+                    },
+                    "dryRun": {
+                      "description": "When true, performs a dry run without making actual changes, only generating the cleanup script for review.",
+                      "type": "boolean"
+                    },
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "prependCommand": {
+                      "description": "Command to prepend to each line in the cleanup script, such as \"start\" for Windows batch files.",
+                      "type": "string"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetLinksToKeepOrganization": {
+                      "description": "URL of the Azure DevOps organization whose links should be preserved during cleanup operations.",
+                      "type": "string"
+                    },
+                    "targetLinksToKeepProject": {
+                      "description": "Project name or GUID within the target organization whose links should be preserved.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "wIQLQuery": {
+                      "description": "WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "KeepOutboundLinkTargetProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "OutboundLinkCheckingProcessor",
+                  "description": "missing XML code comments",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "resultFileName": {
+                      "description": "File name where the results of the outbound link checking process will be saved, typically containing details of broken or invalid links.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "wIQLQuery": {
+                      "description": "WIQL (Work Item Query Language) query used to select the work items whose outbound links should be checked for validity.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "OutboundLinkCheckingProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "ProcessDefinitionProcessor",
+                  "description": "Process definition processor used to keep processes between two orgs in sync",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "maxDegreeOfParallelism": {
+                      "description": "Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.",
+                      "type": "integer"
+                    },
+                    "processes": {
+                      "description": "Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.",
+                      "type": "object"
+                    },
+                    "processMaps": {
+                      "description": "Dictionary mapping source process names to target process names for process template transformations during migration.",
+                      "type": "object"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "updateProcessDetails": {
+                      "description": "Indicates whether to update existing process details in the target organization or only create new processes.",
+                      "type": "boolean"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "ProcessDefinitionProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsExportProfilePictureFromADProcessor",
+                  "description": "Downloads corporate images and updates TFS/Azure DevOps profiles",
+                  "type": "object",
+                  "properties": {
+                    "domain": {
+                      "description": "The source domain where the pictures should be exported.",
+                      "type": "string",
+                      "default": "String.Empty"
+                    },
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "password": {
+                      "description": "The password of the user that is used to export the pictures.",
+                      "type": "string",
+                      "default": "String.Empty"
+                    },
+                    "pictureEmpIDFormat": {
+                      "description": "TODO: You wpuld need to customise this for your system. Clone repo and run in Debug",
+                      "type": "string",
+                      "default": "String.Empty"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "username": {
+                      "description": "The user name of the user that is used to export the pictures.",
+                      "type": "string",
+                      "default": "String.Empty"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsExportProfilePictureFromADProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsExportUsersForMappingProcessor",
+                  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "exportAllUsers": {
+                      "description": "Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .",
+                      "type": "boolean"
+                    },
+                    "onlyListUsersInWorkItems": {
+                      "description": "`OnlyListUsersInWorkItems`",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "userExportFile": {
+                      "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if  is set to .",
+                      "type": "string"
+                    },
+                    "wIQLQuery": {
+                      "description": "WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsExportUsersForMappingProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsImportProfilePictureProcessor",
+                  "description": "Downloads corporate images and updates TFS/Azure DevOps profiles",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsImportProfilePictureProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsSharedQueryProcessor",
+                  "description": "The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "prefixProjectToNodes": {
+                      "description": "Do we add the source project name into the folder path",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sharedFolderName": {
+                      "description": "The name of the shared folder, made a parameter incase it every needs to be edited",
+                      "type": "string",
+                      "default": "Shared Queries"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "sourceToTargetFieldMappings": {
+                      "description": "Mapping of the source to the target",
+                      "type": "object"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsSharedQueryProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsTeamSettingsProcessor",
+                  "description": "Native TFS Processor, does not work with any other Endpoints.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "migrateTeamCapacities": {
+                      "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "migrateTeamSettings": {
+                      "description": "Migrate original team settings after their creation on target team project",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "prefixProjectToNodes": {
+                      "description": "Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "teams": {
+                      "description": "List of Teams to process. If this is `null` then all teams will be processed.",
+                      "type": "array"
+                    },
+                    "updateTeamSettings": {
+                      "description": "Reset the target team settings to match the source if the team exists",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "useUserMapping": {
+                      "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.",
+                      "type": "boolean"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsTeamSettingsProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsTestConfigurationsMigrationProcessor",
+                  "description": "This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsTestConfigurationsMigrationProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsTestPlansAndSuitesMigrationProcessor",
+                  "description": "Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "filterCompleted": {
+                      "description": "missing XML code comments",
+                      "type": "boolean"
+                    },
+                    "migrationDelay": {
+                      "description": "??Not sure what this does. Check code.",
+                      "type": "integer",
+                      "default": "0"
+                    },
+                    "onlyElementsWithTag": {
+                      "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
+                      "type": "string",
+                      "default": "`String.Empty`"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "removeAllLinks": {
+                      "description": "??Not sure what this does. Check code.",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "removeInvalidTestSuiteLinks": {
+                      "description": "Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "testPlanIds": {
+                      "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789]   Works optimally when \"TestPlanQuery\" is set to null.",
+                      "type": "string"
+                    },
+                    "testPlanQuery": {
+                      "description": "Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.",
+                      "type": "string",
+                      "default": "`String.Empty`"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsTestPlansAndSuitesMigrationProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsTestVariablesMigrationProcessor",
+                  "description": "This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsTestVariablesMigrationProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsWorkItemBulkEditProcessor",
+                  "description": "This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "filterWorkItemsThatAlreadyExistInTarget": {
+                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "pauseAfterEachWorkItem": {
+                      "description": "Pause after each work item is migrated",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "whatIf": {
+                      "description": "Gets or sets a value indicating whether to run in \"what if\" mode without making actual changes to work items.",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "wIQLQuery": {
+                      "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+                      "type": "string",
+                      "default": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
+                    },
+                    "workItemCreateRetryLimit": {
+                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+                      "type": "integer",
+                      "default": "5"
+                    },
+                    "workItemIDs": {
+                      "description": "A list of work items to import",
+                      "type": "array",
+                      "default": "[]"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsWorkItemBulkEditProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsWorkItemDeleteProcessor",
+                  "description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "filterWorkItemsThatAlreadyExistInTarget": {
+                      "description": "Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.",
+                      "type": "boolean"
+                    },
+                    "pauseAfterEachWorkItem": {
+                      "description": "Gets or sets a value indicating whether to pause after each work item is deleted for review or debugging purposes.",
+                      "type": "boolean"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "wIQLQuery": {
+                      "description": "Gets or sets the WIQL query used to select work items for deletion. Should return a list of work item IDs.",
+                      "type": "string",
+                      "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+                    },
+                    "workItemCreateRetryLimit": {
+                      "description": "Gets or sets the number of retry attempts for work item deletion operations when they fail due to transient errors.",
+                      "type": "integer"
+                    },
+                    "workItemIDs": {
+                      "description": "Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.",
+                      "type": "array"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsWorkItemDeleteProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsWorkItemMigrationProcessor",
+                  "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
+                  "type": "object",
+                  "properties": {
+                    "attachRevisionHistory": {
+                      "description": "This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "filterWorkItemsThatAlreadyExistInTarget": {
+                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "fixHtmlAttachmentLinks": {
+                      "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "generateMigrationComment": {
+                      "description": "If enabled, adds a comment recording the migration",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "maxGracefulFailures": {
+                      "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.",
+                      "type": "integer",
+                      "default": "0"
+                    },
+                    "pauseAfterEachWorkItem": {
+                      "description": "Pause after each work item is migrated",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "skipRevisionWithInvalidAreaPath": {
+                      "description": "When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.",
+                      "type": "boolean"
+                    },
+                    "skipRevisionWithInvalidIterationPath": {
+                      "description": "This will skip a revision if the source iteration has not been migrated i.e. it was deleted",
+                      "type": "boolean"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "updateCreatedBy": {
+                      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "updateCreatedDate": {
+                      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "wIQLQuery": {
+                      "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+                      "type": "string",
+                      "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+                    },
+                    "workItemCreateRetryLimit": {
+                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+                      "type": "integer",
+                      "default": "5"
+                    },
+                    "workItemIDs": {
+                      "description": "A list of work items to import",
+                      "type": "array",
+                      "default": "[]"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsWorkItemMigrationProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsWorkItemOverwriteAreasAsTagsProcessor",
+                  "description": "A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.",
+                  "type": "object",
+                  "properties": {
+                    "areaIterationPath": {
+                      "description": "This is a required parameter. That define the root path of the iteration. To get the full path use `\\`",
+                      "type": "string",
+                      "default": "\\"
+                    },
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsWorkItemOverwriteAreasAsTagsProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsWorkItemOverwriteProcessor",
+                  "description": "Reapply field mappings after a migration. Does not migrate Work Items, only reapplies changes to field mappings.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "filterWorkItemsThatAlreadyExistInTarget": {
+                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+                      "type": "boolean",
+                      "default": "true"
+                    },
+                    "pauseAfterEachWorkItem": {
+                      "description": "Pause after each work item is migrated",
+                      "type": "boolean",
+                      "default": "false"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "wIQLQuery": {
+                      "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
+                      "type": "string",
+                      "default": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
+                    },
+                    "workItemCreateRetryLimit": {
+                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+                      "type": "integer",
+                      "default": "5"
+                    },
+                    "workItemIDs": {
+                      "description": "A list of work items to import",
+                      "type": "array",
+                      "default": "[]"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsWorkItemOverwriteProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "TfsWorkItemTypeValidatorProcessor",
+                  "description": "Work item type validation processor. Basically it just runs the  to validate work item types. The validation is run always, even if the tool iself is disabled. Neither this processor, nor the tool do not perform any changes to the source or target system.",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "stopIfValidationFails": {
+                      "description": "If set to , migration process will stop if there are some validation errors. If set to , migration process will continue, for example to support some other validation processors. Default value is .",
+                      "type": "boolean"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "TfsWorkItemTypeValidatorProcessor"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "title": "WorkItemTrackingProcessor",
+                  "description": "This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).",
+                  "type": "object",
+                  "properties": {
+                    "collapseRevisions": {
+                      "description": "Gets or sets a value indicating whether to collapse revisions into a single work item.",
+                      "type": "boolean"
+                    },
+                    "enabled": {
+                      "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
+                      "type": "boolean"
+                    },
+                    "enrichers": {
+                      "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
+                      "type": "array"
+                    },
+                    "refName": {
+                      "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
+                      "type": "string"
+                    },
+                    "replayRevisions": {
+                      "description": "Gets or sets a value indicating whether to replay all revisions during migration.",
+                      "type": "boolean"
+                    },
+                    "sourceName": {
+                      "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
+                      "type": "string"
+                    },
+                    "targetName": {
+                      "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
+                      "type": "string"
+                    },
+                    "workItemCreateRetryLimit": {
+                      "description": "Gets or sets the number of times to retry work item creation if it fails.",
+                      "type": "integer"
+                    },
+                    "processorType": {
+                      "type": "string",
+                      "enum": [
+                        "WorkItemTrackingProcessor"
+                      ]
+                    }
                   }
                 }
-              },
-              {
-                "title": "KeepOutboundLinkTargetProcessor",
-                "description": "missing XML code comments",
-                "type": "object",
-                "properties": {
-                  "cleanupFileName": {
-                    "description": "File path where the cleanup script or batch file will be generated for removing unwanted outbound links.",
-                    "type": "string"
-                  },
-                  "dryRun": {
-                    "description": "When true, performs a dry run without making actual changes, only generating the cleanup script for review.",
-                    "type": "boolean"
-                  },
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "prependCommand": {
-                    "description": "Command to prepend to each line in the cleanup script, such as \"start\" for Windows batch files.",
-                    "type": "string"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetLinksToKeepOrganization": {
-                    "description": "URL of the Azure DevOps organization whose links should be preserved during cleanup operations.",
-                    "type": "string"
-                  },
-                  "targetLinksToKeepProject": {
-                    "description": "Project name or GUID within the target organization whose links should be preserved.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "wIQLQuery": {
-                    "description": "WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "KeepOutboundLinkTargetProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "OutboundLinkCheckingProcessor",
-                "description": "missing XML code comments",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "resultFileName": {
-                    "description": "File name where the results of the outbound link checking process will be saved, typically containing details of broken or invalid links.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "wIQLQuery": {
-                    "description": "WIQL (Work Item Query Language) query used to select the work items whose outbound links should be checked for validity.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "OutboundLinkCheckingProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "ProcessDefinitionProcessor",
-                "description": "Process definition processor used to keep processes between two orgs in sync",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "maxDegreeOfParallelism": {
-                    "description": "Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.",
-                    "type": "integer"
-                  },
-                  "processes": {
-                    "description": "Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.",
-                    "type": "object"
-                  },
-                  "processMaps": {
-                    "description": "Dictionary mapping source process names to target process names for process template transformations during migration.",
-                    "type": "object"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "updateProcessDetails": {
-                    "description": "Indicates whether to update existing process details in the target organization or only create new processes.",
-                    "type": "boolean"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "ProcessDefinitionProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsExportProfilePictureFromADProcessor",
-                "description": "Downloads corporate images and updates TFS/Azure DevOps profiles",
-                "type": "object",
-                "properties": {
-                  "domain": {
-                    "description": "The source domain where the pictures should be exported.",
-                    "type": "string",
-                    "default": "String.Empty"
-                  },
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "password": {
-                    "description": "The password of the user that is used to export the pictures.",
-                    "type": "string",
-                    "default": "String.Empty"
-                  },
-                  "pictureEmpIDFormat": {
-                    "description": "TODO: You wpuld need to customise this for your system. Clone repo and run in Debug",
-                    "type": "string",
-                    "default": "String.Empty"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "username": {
-                    "description": "The user name of the user that is used to export the pictures.",
-                    "type": "string",
-                    "default": "String.Empty"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsExportProfilePictureFromADProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsExportUsersForMappingProcessor",
-                "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "exportAllUsers": {
-                    "description": "Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .",
-                    "type": "boolean"
-                  },
-                  "onlyListUsersInWorkItems": {
-                    "description": "`OnlyListUsersInWorkItems`",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "userExportFile": {
-                    "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if  is set to .",
-                    "type": "string"
-                  },
-                  "wIQLQuery": {
-                    "description": "WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsExportUsersForMappingProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsImportProfilePictureProcessor",
-                "description": "Downloads corporate images and updates TFS/Azure DevOps profiles",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsImportProfilePictureProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsSharedQueryProcessor",
-                "description": "The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "prefixProjectToNodes": {
-                    "description": "Do we add the source project name into the folder path",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sharedFolderName": {
-                    "description": "The name of the shared folder, made a parameter incase it every needs to be edited",
-                    "type": "string",
-                    "default": "Shared Queries"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "sourceToTargetFieldMappings": {
-                    "description": "Mapping of the source to the target",
-                    "type": "object"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsSharedQueryProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsTeamSettingsProcessor",
-                "description": "Native TFS Processor, does not work with any other Endpoints.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "migrateTeamCapacities": {
-                    "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "migrateTeamSettings": {
-                    "description": "Migrate original team settings after their creation on target team project",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "prefixProjectToNodes": {
-                    "description": "Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "teams": {
-                    "description": "List of Teams to process. If this is `null` then all teams will be processed.",
-                    "type": "array"
-                  },
-                  "updateTeamSettings": {
-                    "description": "Reset the target team settings to match the source if the team exists",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "useUserMapping": {
-                    "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.",
-                    "type": "boolean"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsTeamSettingsProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsTestConfigurationsMigrationProcessor",
-                "description": "This processor can migrate `test configuration`. This should be run before `LinkMigrationConfig`.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsTestConfigurationsMigrationProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsTestPlansAndSuitesMigrationProcessor",
-                "description": "Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "filterCompleted": {
-                    "description": "missing XML code comments",
-                    "type": "boolean"
-                  },
-                  "migrationDelay": {
-                    "description": "??Not sure what this does. Check code.",
-                    "type": "integer",
-                    "default": "0"
-                  },
-                  "onlyElementsWithTag": {
-                    "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
-                    "type": "string",
-                    "default": "`String.Empty`"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "removeAllLinks": {
-                    "description": "??Not sure what this does. Check code.",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "removeInvalidTestSuiteLinks": {
-                    "description": "Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "testPlanIds": {
-                    "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789]   Works optimally when \"TestPlanQuery\" is set to null.",
-                    "type": "string"
-                  },
-                  "testPlanQuery": {
-                    "description": "Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.",
-                    "type": "string",
-                    "default": "`String.Empty`"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsTestPlansAndSuitesMigrationProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsTestVariablesMigrationProcessor",
-                "description": "This processor can migrate test variables that are defined in the test plans / suites. This must run before `TestPlansAndSuitesMigrationConfig`.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsTestVariablesMigrationProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsWorkItemBulkEditProcessor",
-                "description": "This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "filterWorkItemsThatAlreadyExistInTarget": {
-                    "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "pauseAfterEachWorkItem": {
-                    "description": "Pause after each work item is migrated",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "whatIf": {
-                    "description": "Gets or sets a value indicating whether to run in \"what if\" mode without making actual changes to work items.",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "wIQLQuery": {
-                    "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
-                    "type": "string",
-                    "default": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
-                  },
-                  "workItemCreateRetryLimit": {
-                    "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
-                    "type": "integer",
-                    "default": "5"
-                  },
-                  "workItemIDs": {
-                    "description": "A list of work items to import",
-                    "type": "array",
-                    "default": "[]"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsWorkItemBulkEditProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsWorkItemDeleteProcessor",
-                "description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "filterWorkItemsThatAlreadyExistInTarget": {
-                    "description": "Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.",
-                    "type": "boolean"
-                  },
-                  "pauseAfterEachWorkItem": {
-                    "description": "Gets or sets a value indicating whether to pause after each work item is deleted for review or debugging purposes.",
-                    "type": "boolean"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "wIQLQuery": {
-                    "description": "Gets or sets the WIQL query used to select work items for deletion. Should return a list of work item IDs.",
-                    "type": "string",
-                    "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
-                  },
-                  "workItemCreateRetryLimit": {
-                    "description": "Gets or sets the number of retry attempts for work item deletion operations when they fail due to transient errors.",
-                    "type": "integer"
-                  },
-                  "workItemIDs": {
-                    "description": "Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.",
-                    "type": "array"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsWorkItemDeleteProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsWorkItemMigrationProcessor",
-                "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
-                "type": "object",
-                "properties": {
-                  "attachRevisionHistory": {
-                    "description": "This will create a json file with the revision history and attach it to the work item. Best used with `MaxRevisions` or `ReplayRevisions`.",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "filterWorkItemsThatAlreadyExistInTarget": {
-                    "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "fixHtmlAttachmentLinks": {
-                    "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "generateMigrationComment": {
-                    "description": "If enabled, adds a comment recording the migration",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "maxGracefulFailures": {
-                    "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.",
-                    "type": "integer",
-                    "default": "0"
-                  },
-                  "pauseAfterEachWorkItem": {
-                    "description": "Pause after each work item is migrated",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "skipRevisionWithInvalidAreaPath": {
-                    "description": "When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.",
-                    "type": "boolean"
-                  },
-                  "skipRevisionWithInvalidIterationPath": {
-                    "description": "This will skip a revision if the source iteration has not been migrated i.e. it was deleted",
-                    "type": "boolean"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "updateCreatedBy": {
-                    "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "updateCreatedDate": {
-                    "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "wIQLQuery": {
-                    "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
-                    "type": "string",
-                    "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
-                  },
-                  "workItemCreateRetryLimit": {
-                    "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
-                    "type": "integer",
-                    "default": "5"
-                  },
-                  "workItemIDs": {
-                    "description": "A list of work items to import",
-                    "type": "array",
-                    "default": "[]"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsWorkItemMigrationProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsWorkItemOverwriteAreasAsTagsProcessor",
-                "description": "A common issue with older *TFS/Azure DevOps* instances is the proliferation of `Area Paths`. With the use of `Area Path` for `Teams` and the addition of the `Node Name` column option these extensive tag hierarchies should instad be moved to tags.",
-                "type": "object",
-                "properties": {
-                  "areaIterationPath": {
-                    "description": "This is a required parameter. That define the root path of the iteration. To get the full path use `\\`",
-                    "type": "string",
-                    "default": "\\"
-                  },
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsWorkItemOverwriteAreasAsTagsProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsWorkItemOverwriteProcessor",
-                "description": "Reapply field mappings after a migration. Does not migrate Work Items, only reapplies changes to field mappings.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "filterWorkItemsThatAlreadyExistInTarget": {
-                    "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
-                    "type": "boolean",
-                    "default": "true"
-                  },
-                  "pauseAfterEachWorkItem": {
-                    "description": "Pause after each work item is migrated",
-                    "type": "boolean",
-                    "default": "false"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "wIQLQuery": {
-                    "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
-                    "type": "string",
-                    "default": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
-                  },
-                  "workItemCreateRetryLimit": {
-                    "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
-                    "type": "integer",
-                    "default": "5"
-                  },
-                  "workItemIDs": {
-                    "description": "A list of work items to import",
-                    "type": "array",
-                    "default": "[]"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsWorkItemOverwriteProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "TfsWorkItemTypeValidatorProcessor",
-                "description": "Work item type validation processor. Basically it just runs the  to validate work item types. The validation is run always, even if the tool iself is disabled. Neither this processor, nor the tool do not perform any changes to the source or target system.",
-                "type": "object",
-                "properties": {
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "stopIfValidationFails": {
-                    "description": "If set to , migration process will stop if there are some validation errors. If set to , migration process will continue, for example to support some other validation processors. Default value is .",
-                    "type": "boolean"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "TfsWorkItemTypeValidatorProcessor"
-                    ]
-                  }
-                }
-              },
-              {
-                "title": "WorkItemTrackingProcessor",
-                "description": "This processor is intended, with the aid of [ProcessorEnrichers](../ProcessorEnrichers/index.md), to allow the migration of Work Items between two [Endpoints](../Endpoints/index.md).",
-                "type": "object",
-                "properties": {
-                  "collapseRevisions": {
-                    "description": "Gets or sets a value indicating whether to collapse revisions into a single work item.",
-                    "type": "boolean"
-                  },
-                  "enabled": {
-                    "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                    "type": "boolean"
-                  },
-                  "enrichers": {
-                    "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-                    "type": "array"
-                  },
-                  "refName": {
-                    "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-                    "type": "string"
-                  },
-                  "replayRevisions": {
-                    "description": "Gets or sets a value indicating whether to replay all revisions during migration.",
-                    "type": "boolean"
-                  },
-                  "sourceName": {
-                    "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                    "type": "string"
-                  },
-                  "targetName": {
-                    "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                    "type": "string"
-                  },
-                  "workItemCreateRetryLimit": {
-                    "description": "Gets or sets the number of times to retry work item creation if it fails.",
-                    "type": "integer"
-                  },
-                  "processorType": {
-                    "type": "string",
-                    "enum": [
-                      "WorkItemTrackingProcessor"
-                    ]
-                  }
-                }
-              }
-            ]
-          }
+              ]
+            }
+          ]
         },
         "commonTools": {
           "type": "object",
@@ -1261,305 +1263,307 @@
                 "fieldMaps": {
                   "description": "Gets or sets the list of field mapping configurations to apply.",
                   "type": "array",
-                  "prefixItems": {
-                    "anyOf": [
-                      {
-                        "title": "FieldCalculationMap",
-                        "description": "Performs mathematical calculations on numeric fields using NCalc expressions during migration.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "expression": {
-                            "description": "Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., \"[x]*2\").",
-                            "type": "string",
-                            "default": "null"
-                          },
-                          "parameters": {
-                            "description": "Gets or sets a dictionary mapping variable names used in the expression to source field reference names.",
-                            "type": "object",
-                            "default": "{}"
-                          },
-                          "targetField": {
-                            "description": "Gets or sets the target field reference name where the calculated result will be stored.",
-                            "type": "string",
-                            "default": "null"
+                  "prefixItems": [
+                    {
+                      "anyOf": [
+                        {
+                          "title": "FieldCalculationMap",
+                          "description": "Performs mathematical calculations on numeric fields using NCalc expressions during migration.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "expression": {
+                              "description": "Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., \"[x]*2\").",
+                              "type": "string",
+                              "default": "null"
+                            },
+                            "parameters": {
+                              "description": "Gets or sets a dictionary mapping variable names used in the expression to source field reference names.",
+                              "type": "object",
+                              "default": "{}"
+                            },
+                            "targetField": {
+                              "description": "Gets or sets the target field reference name where the calculated result will be stored.",
+                              "type": "string",
+                              "default": "null"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldClearMap",
+                          "description": "Clears a target field by setting its value to null, useful for removing data from specific fields during migration.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "targetField": {
+                              "description": "Gets or sets the name of the target field to be cleared/set to null during work item migration.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldLiteralMap",
+                          "description": "Maps a literal (static) value to a target field, useful for setting constant values across all migrated work items.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "targetField": {
+                              "description": "Gets or sets the name of the target field that will be set to the specified literal value.",
+                              "type": "string"
+                            },
+                            "value": {
+                              "description": "Gets or sets the literal value that will be assigned to the target field during migration.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldMergeMap",
+                          "description": "Merges values from multiple source fields into a single target field using a specified format template.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "formatExpression": {
+                              "description": "missing XML code comments",
+                              "type": "string"
+                            },
+                            "sourceFields": {
+                              "description": "missing XML code comments",
+                              "type": "array"
+                            },
+                            "targetField": {
+                              "description": "missing XML code comments",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldSkipMap",
+                          "description": "Skips field mapping for a specific target field, effectively leaving the field unchanged during migration.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "targetField": {
+                              "description": "Gets or sets the name of the target field that should be skipped during migration, resetting it to its original value.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldToFieldMap",
+                          "description": "Maps the value from a source field to a target field directly, with optional default value substitution for empty or null values.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "defaultValue": {
+                              "description": "Gets or sets the default value to use when the source field is empty or null.",
+                              "type": "string"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "sourceField": {
+                              "description": "Gets or sets the name of the source field to copy data from during migration.",
+                              "type": "string"
+                            },
+                            "targetField": {
+                              "description": "Gets or sets the name of the target field to copy data to during migration.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldToFieldMultiMap",
+                          "description": "missing XML code comments",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "sourceToTargetMappings": {
+                              "description": "missing XML code comments",
+                              "type": "object"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldToTagFieldMap",
+                          "description": "missing XML code comments",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "formatExpression": {
+                              "description": "missing XML code comments",
+                              "type": "string"
+                            },
+                            "sourceField": {
+                              "description": "missing XML code comments",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldValueMap",
+                          "description": "Maps field values based on a lookup table, allowing specific source values to be translated to different target values.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "defaultValue": {
+                              "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
+                              "type": "string"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "sourceField": {
+                              "description": "Gets or sets the name of the source field to read values from during migration.",
+                              "type": "string"
+                            },
+                            "targetField": {
+                              "description": "Gets or sets the name of the target field to write mapped values to during migration.",
+                              "type": "string"
+                            },
+                            "valueMapping": {
+                              "description": "Gets or sets the dictionary that maps source field values to target field values. Key is the source value, value is the target value.",
+                              "type": "object"
+                            }
+                          }
+                        },
+                        {
+                          "title": "MultiValueConditionalMap",
+                          "description": "missing XML code comments",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "sourceFieldsAndValues": {
+                              "description": "missing XML code comments",
+                              "type": "object"
+                            },
+                            "targetFieldsAndValues": {
+                              "description": "missing XML code comments",
+                              "type": "object"
+                            }
+                          }
+                        },
+                        {
+                          "title": "RegexFieldMap",
+                          "description": "Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "pattern": {
+                              "description": "Gets or sets the regular expression pattern to match against the source field value.",
+                              "type": "string"
+                            },
+                            "replacement": {
+                              "description": "Gets or sets the replacement pattern that defines how matched groups should be used to construct the target value.",
+                              "type": "string"
+                            },
+                            "sourceField": {
+                              "description": "Gets or sets the name of the source field to read data from and apply regex pattern matching.",
+                              "type": "string"
+                            },
+                            "targetField": {
+                              "description": "Gets or sets the name of the target field to write the regex-transformed data to.",
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "title": "TreeToTagFieldMap",
+                          "description": "Maps work item area path or iteration path hierarchies to tags, allowing tree structures to be represented as flat tag collections.",
+                          "type": "object",
+                          "properties": {
+                            "applyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array"
+                            },
+                            "enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "timeTravel": {
+                              "description": "Gets or sets the number of months to travel back in time when looking up historical area path values. Use 0 for current values.",
+                              "type": "integer"
+                            },
+                            "toSkip": {
+                              "description": "Gets or sets the number of levels to skip from the root when converting area path hierarchy to tags. For example, if set to 2, \"ProjectName\\Level1\\Level2\\Level3\" would skip \"ProjectName\\Level1\" and start from \"Level2\".",
+                              "type": "integer"
+                            }
                           }
                         }
-                      },
-                      {
-                        "title": "FieldClearMap",
-                        "description": "Clears a target field by setting its value to null, useful for removing data from specific fields during migration.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "targetField": {
-                            "description": "Gets or sets the name of the target field to be cleared/set to null during work item migration.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "title": "FieldLiteralMap",
-                        "description": "Maps a literal (static) value to a target field, useful for setting constant values across all migrated work items.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "targetField": {
-                            "description": "Gets or sets the name of the target field that will be set to the specified literal value.",
-                            "type": "string"
-                          },
-                          "value": {
-                            "description": "Gets or sets the literal value that will be assigned to the target field during migration.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "title": "FieldMergeMap",
-                        "description": "Merges values from multiple source fields into a single target field using a specified format template.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "formatExpression": {
-                            "description": "missing XML code comments",
-                            "type": "string"
-                          },
-                          "sourceFields": {
-                            "description": "missing XML code comments",
-                            "type": "array"
-                          },
-                          "targetField": {
-                            "description": "missing XML code comments",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "title": "FieldSkipMap",
-                        "description": "Skips field mapping for a specific target field, effectively leaving the field unchanged during migration.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "targetField": {
-                            "description": "Gets or sets the name of the target field that should be skipped during migration, resetting it to its original value.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "title": "FieldToFieldMap",
-                        "description": "Maps the value from a source field to a target field directly, with optional default value substitution for empty or null values.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "defaultValue": {
-                            "description": "Gets or sets the default value to use when the source field is empty or null.",
-                            "type": "string"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "sourceField": {
-                            "description": "Gets or sets the name of the source field to copy data from during migration.",
-                            "type": "string"
-                          },
-                          "targetField": {
-                            "description": "Gets or sets the name of the target field to copy data to during migration.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "title": "FieldToFieldMultiMap",
-                        "description": "missing XML code comments",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "sourceToTargetMappings": {
-                            "description": "missing XML code comments",
-                            "type": "object"
-                          }
-                        }
-                      },
-                      {
-                        "title": "FieldToTagFieldMap",
-                        "description": "missing XML code comments",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "formatExpression": {
-                            "description": "missing XML code comments",
-                            "type": "string"
-                          },
-                          "sourceField": {
-                            "description": "missing XML code comments",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "title": "FieldValueMap",
-                        "description": "Maps field values based on a lookup table, allowing specific source values to be translated to different target values.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "defaultValue": {
-                            "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
-                            "type": "string"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "sourceField": {
-                            "description": "Gets or sets the name of the source field to read values from during migration.",
-                            "type": "string"
-                          },
-                          "targetField": {
-                            "description": "Gets or sets the name of the target field to write mapped values to during migration.",
-                            "type": "string"
-                          },
-                          "valueMapping": {
-                            "description": "Gets or sets the dictionary that maps source field values to target field values. Key is the source value, value is the target value.",
-                            "type": "object"
-                          }
-                        }
-                      },
-                      {
-                        "title": "MultiValueConditionalMap",
-                        "description": "missing XML code comments",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "sourceFieldsAndValues": {
-                            "description": "missing XML code comments",
-                            "type": "object"
-                          },
-                          "targetFieldsAndValues": {
-                            "description": "missing XML code comments",
-                            "type": "object"
-                          }
-                        }
-                      },
-                      {
-                        "title": "RegexFieldMap",
-                        "description": "Applies regular expression transformations to map values from a source field to a target field using pattern matching and replacement.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "pattern": {
-                            "description": "Gets or sets the regular expression pattern to match against the source field value.",
-                            "type": "string"
-                          },
-                          "replacement": {
-                            "description": "Gets or sets the replacement pattern that defines how matched groups should be used to construct the target value.",
-                            "type": "string"
-                          },
-                          "sourceField": {
-                            "description": "Gets or sets the name of the source field to read data from and apply regex pattern matching.",
-                            "type": "string"
-                          },
-                          "targetField": {
-                            "description": "Gets or sets the name of the target field to write the regex-transformed data to.",
-                            "type": "string"
-                          }
-                        }
-                      },
-                      {
-                        "title": "TreeToTagFieldMap",
-                        "description": "Maps work item area path or iteration path hierarchies to tags, allowing tree structures to be represented as flat tag collections.",
-                        "type": "object",
-                        "properties": {
-                          "applyTo": {
-                            "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-                            "type": "array"
-                          },
-                          "enabled": {
-                            "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
-                            "type": "boolean"
-                          },
-                          "timeTravel": {
-                            "description": "Gets or sets the number of months to travel back in time when looking up historical area path values. Use 0 for current values.",
-                            "type": "integer"
-                          },
-                          "toSkip": {
-                            "description": "Gets or sets the number of levels to skip from the root when converting area path hierarchy to tags. For example, if set to 2, \"ProjectName\\Level1\\Level2\\Level3\" would skip \"ProjectName\\Level1\" and start from \"Level2\".",
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    ]
-                  }
+                      ]
+                    }
+                  ]
                 }
               }
             },
