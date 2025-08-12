@@ -16,16 +16,23 @@
             "name": "Full execute",
             "type": "clr",
             "request": "launch",
-            "preLaunchTask": "build full framework",
-            "program": "${workspaceFolder}/src/MigrationTools.ConsoleFull/bin/Debug/net472/migration.exe",
+            // Use a lightweight build to avoid long pre-launch chains that delay debugger attach
+            "preLaunchTask": "build",
+            // Full .NET Framework exe built for net472 – coreclr debugger can launch it.
+            "program": "${workspaceFolder}/src/MigrationTools.ConsoleFull/bin/Debug/net472/devopsmigration.exe",
             "args": [
                 "execute",
                 "-c",
-                "configuration.json"
+                "configuration-default.json"
             ],
-            "cwd": "${workspaceFolder}/src/MigrationTools.ConsoleFull/bin/Debug/net472/",
+            "cwd": "${workspaceFolder}/src/MigrationTools.ConsoleFull/bin/Debug/net472",
+            // Use external terminal so it opens a new window and stays after exit (pause handled in code when env var set)
             "console": "externalTerminal",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "env": {
+                "MIGRATIONTOOLS_PAUSE_ON_EXIT": "1"
+            }
         },
         {
             "name": "Attach to .NET Functions",

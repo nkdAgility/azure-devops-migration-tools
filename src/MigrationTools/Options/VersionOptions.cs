@@ -240,8 +240,9 @@ namespace MigrationTools.Options
                     // For now, return null to indicate schema couldn't be loaded
                     return null;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Log.Error(ex.ToString());
                     return null;
                 }
             }
