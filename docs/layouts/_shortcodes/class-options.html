@@ -32,44 +32,51 @@
 {{ if and $data $data.options }}
   <div class="class-options">
     <!-- Header row for larger screens -->
-    <div class="row d-none d-md-flex bg-light border-bottom border-2 fw-bold py-2 mb-2">
-      <div class="col-md-3">Parameter</div>
-      <div class="col-md-2">Type</div>
-      <div class="col-md-5">Description</div>
-      <div class="col-md-2">Default Value</div>
-    </div>
+      <div class="row d-none d-md-flex bg-light border-bottom border-2 fw-bold py-2 mb-2">
+          <div class="col-md-3">Parameter</div>
+          <div class="col-md-2">Type</div>
+          <div class="col-md-3">Required</div>
+          <div class="col-md-5">Description</div>
+          <div class="col-md-2">Default Value</div>
+      </div>
     
     <!-- Options rows -->
     {{ range $data.options }}
-      <div class="row border-bottom py-3 mb-2">
-        <!-- Parameter -->
-        <div class="col-12 col-md-3 mb-2 mb-md-0">
+  <div class="row border-bottom py-3 mb-2">
+      <!-- Parameter -->
+      <div class="col-12 col-md-3 mb-2 mb-md-0">
           <div class="d-md-none fw-bold text-muted small">Parameter:</div>
           <code class="text-primary">{{ .parameterName }}</code>
-        </div>
-        
-        <!-- Type -->
-        <div class="col-12 col-md-2 mb-2 mb-md-0">
+      </div>
+
+      <!-- Type -->
+      <div class="col-12 col-md-2 mb-2 mb-md-0">
           <div class="d-md-none fw-bold text-muted small">Type:</div>
           <code class="text-info">{{ .type }}</code>
-        </div>
-        
-        <!-- Description -->
-        <div class="col-12 col-md-5 mb-2 mb-md-0">
+      </div>
+
+      <!-- Type -->
+      <div class="col-12 col-md-2 mb-2 mb-md-0">
+          <div class="d-md-none fw-bold text-muted small">Required:</div>
+          <code class="text-info">{{ .isRequired }}</code>
+      </div>
+
+      <!-- Description -->
+      <div class="col-12 col-md-5 mb-2 mb-md-0">
           <div class="d-md-none fw-bold text-muted small">Description:</div>
           <div>{{ .description | markdownify }}</div>
-        </div>
-        
-        <!-- Default Value -->
-        <div class="col-12 col-md-2">
+      </div>
+
+      <!-- Default Value -->
+      <div class="col-12 col-md-2">
           <div class="d-md-none fw-bold text-muted small">Default Value:</div>
           {{ if .defaultValue }}
-            <code class="text-success">{{ .defaultValue }}</code>
+          <code class="text-success">{{ .defaultValue }}</code>
           {{ else }}
-            <em class="text-muted">Not specified</em>
+          <em class="text-muted">Not specified</em>
           {{ end }}
-        </div>
       </div>
+  </div>
     {{ end }}
   </div>
 {{ else if not $dataFile }}
