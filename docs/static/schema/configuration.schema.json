@@ -66,6 +66,11 @@
                   }
                 },
                 "required": [
+                  "AccessToken",
+                  "AuthenticationMode",
+                  "Organisation",
+                  "Project",
+                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               },
@@ -179,6 +184,11 @@
                   }
                 },
                 "required": [
+                  "Authentication",
+                  "Collection",
+                  "LanguageMaps",
+                  "Project",
+                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               },
@@ -255,6 +265,11 @@
                   }
                 },
                 "required": [
+                  "Authentication",
+                  "Collection",
+                  "LanguageMaps",
+                  "Project",
+                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               },
@@ -331,6 +346,11 @@
                   }
                 },
                 "required": [
+                  "Authentication",
+                  "Collection",
+                  "LanguageMaps",
+                  "Project",
+                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               },
@@ -422,6 +442,11 @@
                   }
                 },
                 "required": [
+                  "Authentication",
+                  "Collection",
+                  "LanguageMaps",
+                  "Project",
+                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               }
@@ -519,7 +544,12 @@
                         "AzureDevOpsPipelineProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "KeepOutboundLinkTargetProcessor",
@@ -581,7 +611,13 @@
                         "KeepOutboundLinkTargetProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName",
+                    "WIQLQuery"
+                  ]
                 },
                 {
                   "title": "OutboundLinkCheckingProcessor",
@@ -627,7 +663,14 @@
                         "OutboundLinkCheckingProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "ResultFileName",
+                    "SourceName",
+                    "TargetName",
+                    "WIQLQuery"
+                  ]
                 },
                 {
                   "title": "ProcessDefinitionProcessor",
@@ -692,7 +735,12 @@
                         "ProcessDefinitionProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsExportProfilePictureFromADProcessor",
@@ -750,7 +798,12 @@
                         "TfsExportProfilePictureFromADProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsExportUsersForMappingProcessor",
@@ -805,7 +858,12 @@
                         "TfsExportUsersForMappingProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsImportProfilePictureProcessor",
@@ -843,7 +901,12 @@
                         "TfsImportProfilePictureProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsSharedQueryProcessor",
@@ -898,7 +961,12 @@
                         "TfsSharedQueryProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsTeamSettingsProcessor",
@@ -969,7 +1037,12 @@
                         "TfsTeamSettingsProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsTestConfigurationsMigrationProcessor",
@@ -1007,7 +1080,12 @@
                         "TfsTestConfigurationsMigrationProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsTestPlansAndSuitesMigrationProcessor",
@@ -1083,7 +1161,12 @@
                         "TfsTestPlansAndSuitesMigrationProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsTestVariablesMigrationProcessor",
@@ -1121,7 +1204,12 @@
                         "TfsTestVariablesMigrationProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsWorkItemBulkEditProcessor",
@@ -1194,7 +1282,13 @@
                         "TfsWorkItemBulkEditProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName",
+                    "WIQLQuery"
+                  ]
                 },
                 {
                   "title": "TfsWorkItemDeleteProcessor",
@@ -1258,7 +1352,12 @@
                         "TfsWorkItemDeleteProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsWorkItemMigrationProcessor",
@@ -1364,7 +1463,13 @@
                         "TfsWorkItemMigrationProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName",
+                    "WIQLQuery"
+                  ]
                 },
                 {
                   "title": "TfsWorkItemOverwriteAreasAsTagsProcessor",
@@ -1407,7 +1512,12 @@
                         "TfsWorkItemOverwriteAreasAsTagsProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "TfsWorkItemOverwriteProcessor",
@@ -1475,7 +1585,13 @@
                         "TfsWorkItemOverwriteProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName",
+                    "WIQLQuery"
+                  ]
                 },
                 {
                   "title": "TfsWorkItemTypeValidatorProcessor",
@@ -1517,7 +1633,12 @@
                         "TfsWorkItemTypeValidatorProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 },
                 {
                   "title": "WorkItemTrackingProcessor",
@@ -1567,7 +1688,12 @@
                         "WorkItemTrackingProcessor"
                       ]
                     }
-                  }
+                  },
+                  "required": [
+                    "Enabled",
+                    "SourceName",
+                    "TargetName"
+                  ]
                 }
               ]
             }

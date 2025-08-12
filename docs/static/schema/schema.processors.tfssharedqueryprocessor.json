@@ -39,5 +39,10 @@
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }

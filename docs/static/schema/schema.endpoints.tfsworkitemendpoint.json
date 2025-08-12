@@ -45,5 +45,12 @@
       "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",
       "type": "string"
     }
-  }
+  },
+  "required": [
+    "authentication",
+    "collection",
+    "languageMaps",
+    "project",
+    "reflectedWorkItemIdField"
+  ]
 }

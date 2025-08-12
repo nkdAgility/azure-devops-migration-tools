@@ -36,7 +36,7 @@ options:
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
-  isRequired: false
+  isRequired: true
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enrichers
   type: List
@@ -66,13 +66,13 @@ options:
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
-  isRequired: false
+  isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
-  isRequired: false
+  isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WhatIf
   type: Boolean
@@ -84,7 +84,7 @@ options:
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
   defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')
-  isRequired: false
+  isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WorkItemCreateRetryLimit
   type: Int32

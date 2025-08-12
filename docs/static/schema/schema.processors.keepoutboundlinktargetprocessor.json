@@ -49,5 +49,11 @@
       "description": "WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.",
       "type": "string"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName",
+    "wIQLQuery"
+  ]
 }

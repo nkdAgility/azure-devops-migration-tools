@@ -45,5 +45,10 @@
       "type": "string",
       "default": "String.Empty"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }

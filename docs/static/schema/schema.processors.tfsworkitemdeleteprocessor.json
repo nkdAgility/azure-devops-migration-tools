@@ -46,5 +46,10 @@
       "description": "Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.",
       "type": "array"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }

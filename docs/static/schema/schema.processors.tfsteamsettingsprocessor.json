@@ -53,5 +53,10 @@
       "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.",
       "type": "boolean"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }
