@@ -17,10 +17,20 @@
             "request": "launch",
             "preLaunchTask": "build full framework",
             "program": "${workspaceFolder}/src/MigrationTools.ConsoleFull/bin/Debug/net472/migration.exe",
-            "args": ["execute", "-c", "configuration.json"],
+            "args": [
+                "execute",
+                "-c",
+                "configuration.json"
+            ],
             "cwd": "${workspaceFolder}/src/MigrationTools.ConsoleFull/bin/Debug/net472/",
             "console": "externalTerminal",
             "stopAtEntry": false
+        },
+        {
+            "name": "Attach to .NET Functions",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:azureFunctions.pickProcess}"
         }
     ]
 }
