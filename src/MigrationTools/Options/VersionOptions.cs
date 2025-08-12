@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
+using Serilog;
 
 namespace MigrationTools.Options
 {
@@ -114,11 +115,14 @@ namespace MigrationTools.Options
                 bool isValid = configJson.IsValid(schema, out messages);
                 if (!isValid)
                 {
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine($"Configuration file '{configFile}' is not valid against the schema.");
                     // Log the validation errors (but still return true for backward compatibility)
                     foreach (var message in messages)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Configuration validation warning: {message}");
+                        sb.AppendLine($"{message}");
                     }
+                    Log.Error(sb.ToString());
                 }
                 return isValid;
             }

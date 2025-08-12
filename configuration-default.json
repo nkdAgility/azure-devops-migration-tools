@@ -5,26 +5,26 @@
   "MigrationTools": {
     "Version": "16.0",
     "Endpoints": {
-      "Source": {
-        "EndpointType": "TfsTeamProjectEndpoint",
-        "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "migrationSource1",
-        "AllowCrossProjectLinking": false,
-        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
-        "Authentication": {
-          "AuthenticationMode": "AccessToken",
-          "AccessToken": "",
-          "NetworkCredentials": {
-            "UserName": "",
-            "Password": "",
-            "Domain": ""
-          }
+        "Source": {
+            "EndpointType": "TfsTeamProjectEndpoint",
+            "Collection": "https://dev.azure.com/nkdagility-preview/",
+            "Project": "migrationSource1",
+            "AllowCrossProjectLinking": false,
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+            "Authentication": {
+                "AuthenticationMode": "AccessToken",
+                "AccessToken": "",
+                "NetworkCredentials": {
+                    "UserName": "",
+                    "Password": "",
+                    "Domain": ""
+                }
+            },
+            "LanguageMaps": {
+                "AreaPath": "Area",
+                "IterationPath": "Iteration"
+            }
         },
-        "LanguageMaps": {
-          "AreaPath": "Area",
-          "IterationPath": "Iteration"
-        }
-      },
       "Target": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-preview/",

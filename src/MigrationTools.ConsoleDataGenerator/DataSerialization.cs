@@ -70,7 +70,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 // Add properties from the class data
                 foreach (var option in data.Options)
                 {
-                    var propertyName = option.ParameterName.Substring(0, 1).ToLower() + option.ParameterName.Substring(1); // camelCase
+                    var propertyName = option.ParameterName;
                     var propertySchema = new JSchema
                     {
                         Type = GetJsonSchemaType(option.Type.ToString()),
@@ -79,7 +79,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
                     // Special handling for FieldMappingTool's fieldMaps property
                     if (data.ClassName.Equals("FieldMappingTool", StringComparison.OrdinalIgnoreCase) &&
-                        propertyName.Equals("fieldMaps", StringComparison.OrdinalIgnoreCase) &&
+                        propertyName.Equals("FieldMaps", StringComparison.OrdinalIgnoreCase) &&
                         allClassData != null)
                     {
                         // Get all field map classes
@@ -174,22 +174,45 @@ namespace MigrationTools.ConsoleDataGenerator
                 var migrationToolsSchema = new JSchema { Type = JSchemaType.Object };
 
                 // Add version property
-                migrationToolsSchema.Properties.Add("version", new JSchema
+                migrationToolsSchema.Properties.Add("Version", new JSchema
                 {
                     Type = JSchemaType.String,
                     Description = "Version of the migration tools configuration format"
                 });
+                migrationToolsSchema.Required.Add("Version");
 
                 // Add endpoints section
                 var endpointsSchema = new JSchema { Type = JSchemaType.Object };
                 var endpointClasses = allClassData.Where(cd => cd.TypeName.Equals("Endpoints", StringComparison.OrdinalIgnoreCase)).ToList();
 
-                foreach (var endpointClass in endpointClasses)
+                if (endpointClasses.Any())
                 {
-                    var endpointSchema = CreateSchemaFromClassData(endpointClass);
-                    endpointsSchema.Properties.Add(endpointClass.ClassName.ToLower(), endpointSchema);
+                    var anyOfArray = new JArray();
+                    foreach (var endpointClass in endpointClasses)
+                    {
+                        var endpointSchema = CreateSchemaFromClassData(endpointClass);
+                        // Ensure EndpointType is present and required
+                        if (!endpointSchema.Properties.ContainsKey("EndpointType"))
+                        {
+                            var endpointTypeSchema = new JSchema
+                            {
+                                Type = JSchemaType.String,
+                                Enum = { endpointClass.ClassName }
+                            };
+                            endpointSchema.Properties.Add("EndpointType", endpointTypeSchema);
+                            endpointSchema.Required.Add("EndpointType");
+                        }
+                        anyOfArray.Add(JObject.Parse(endpointSchema.ToString()));
+                    }
+                    var anyOfObj = new JObject();
+                    anyOfObj["anyOf"] = anyOfArray;
+
+                    // Use JObject to set additionalProperties, then parse back to JSchema
+                    var endpointsSchemaJson = JObject.Parse(endpointsSchema.ToString());
+                    endpointsSchemaJson["additionalProperties"] = anyOfObj;
+                    endpointsSchema = JSchema.Parse(endpointsSchemaJson.ToString());
                 }
-                migrationToolsSchema.Properties.Add("endpoints", endpointsSchema);
+                migrationToolsSchema.Properties.Add("Endpoints", endpointsSchema);
 
                 // Add processors section
                 var processorsSchema = new JSchema { Type = JSchemaType.Array };
@@ -202,7 +225,7 @@ namespace MigrationTools.ConsoleDataGenerator
                     foreach (var processorClass in processorClasses)
                     {
                         var processorSchema = CreateSchemaFromClassData(processorClass);
-                        processorSchema.Properties.Add("processorType", new JSchema
+                        processorSchema.Properties.Add("ProcessorType", new JSchema
                         {
                             Type = JSchemaType.String,
                             Enum = { processorClass.ClassName }
@@ -219,7 +242,7 @@ namespace MigrationTools.ConsoleDataGenerator
                     processorsSchemaJson["prefixItems"] = prefixItemsArray;
                     processorsSchema = JSchema.Parse(processorsSchemaJson.ToString());
                 }
-                migrationToolsSchema.Properties.Add("processors", processorsSchema);
+                migrationToolsSchema.Properties.Add("Processors", processorsSchema);
 
                 // Add tools section
                 var toolsSchema = new JSchema { Type = JSchemaType.Object };
@@ -265,21 +288,21 @@ namespace MigrationTools.ConsoleDataGenerator
                             fieldMapsSchema = JSchema.Parse(fieldMapsSchemaJson.ToString());
 
                             // Replace the fieldMaps property
-                            if (enhancedToolSchema.Properties.ContainsKey("fieldMaps"))
+                            if (enhancedToolSchema.Properties.ContainsKey("FieldMaps"))
                             {
-                                enhancedToolSchema.Properties["fieldMaps"] = fieldMapsSchema;
+                                enhancedToolSchema.Properties["FieldMaps"] = fieldMapsSchema;
                             }
                         }
 
-                        toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), enhancedToolSchema);
+                        toolsSchema.Properties.Add(toolClass.ClassName, enhancedToolSchema);
                     }
                     else
                     {
                         var toolSchema = CreateSchemaFromClassData(toolClass);
-                        toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), toolSchema);
+                        toolsSchema.Properties.Add(toolClass.ClassName, toolSchema);
                     }
                 }
-                migrationToolsSchema.Properties.Add("commonTools", toolsSchema);
+                migrationToolsSchema.Properties.Add("CommonTools", toolsSchema);
 
                 fullSchema.Properties.Add("MigrationTools", migrationToolsSchema);
 
@@ -316,7 +339,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
             foreach (var option in classData.Options)
             {
-                var propertyName = option.ParameterName.Substring(0, 1).ToLower() + option.ParameterName.Substring(1); // camelCase
+                var propertyName = option.ParameterName;
                 var propertySchema = new JSchema
                 {
                     Type = GetJsonSchemaType(option.Type.ToString()),
@@ -332,6 +355,16 @@ namespace MigrationTools.ConsoleDataGenerator
                 }
 
                 schema.Properties.Add(propertyName, propertySchema);
+            }
+
+            // Add required properties
+            var requiredProperties = classData.Options
+                .Where(opt => opt.IsRequired)
+                .Select(opt => opt.ParameterName)
+                .ToList();
+            foreach (var req in requiredProperties)
+            {
+                schema.Required.Add(req);
             }
 
             return schema;

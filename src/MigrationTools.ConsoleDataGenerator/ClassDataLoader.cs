@@ -123,13 +123,18 @@ namespace MigrationTools.ConsoleDataGenerator
         {
             List<OptionsItem> options = new List<OptionsItem>();
 
+            // Use reflection to get all public properties, not just those in the JSON serialization
+            // This ensures properties with DefaultValueHandling.Ignore are still documented
             var properties = item.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
                 .Where(p => p.CanRead && p.CanWrite)
                 .OrderBy(p => p.Name);
 
             foreach (var property in properties)
             {
+                // Get the property value and handle complex objects appropriately for JProperty
                 var propertyValue = GetSimplePropertyValue(property, item);
+
+                // Create a temporary JProperty for compatibility with existing code documentation methods
                 var tempJProperty = new JProperty(property.Name, propertyValue);
 
                 OptionsItem optionsItem = new OptionsItem();
@@ -137,8 +142,6 @@ namespace MigrationTools.ConsoleDataGenerator
                 optionsItem.Type = property.PropertyType.Name.Replace("`1", "").Replace("`2", "").Replace("`", "");
                 optionsItem.Description = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "summary");
                 optionsItem.DefaultValue = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
-                // Detect [Required] attribute
-                optionsItem.IsRequired = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), true).Any();
                 options.Add(optionsItem);
             }
 
