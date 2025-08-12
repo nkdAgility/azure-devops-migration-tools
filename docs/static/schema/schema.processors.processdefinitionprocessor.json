@@ -5,41 +5,46 @@
   "description": "Process definition processor used to keep processes between two orgs in sync",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "enrichers": {
+    "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
       "type": "array"
     },
-    "maxDegreeOfParallelism": {
+    "MaxDegreeOfParallelism": {
       "description": "Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.",
       "type": "integer"
     },
-    "processes": {
+    "Processes": {
       "description": "Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.",
       "type": "object"
     },
-    "processMaps": {
+    "ProcessMaps": {
       "description": "Dictionary mapping source process names to target process names for process template transformations during migration.",
       "type": "object"
     },
-    "refName": {
+    "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
       "type": "string"
     },
-    "sourceName": {
+    "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
     },
-    "targetName": {
+    "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "updateProcessDetails": {
+    "UpdateProcessDetails": {
       "description": "Indicates whether to update existing process details in the target organization or only create new processes.",
       "type": "boolean"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName"
+  ]
 }

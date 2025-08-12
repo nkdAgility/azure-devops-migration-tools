@@ -9,7 +9,7 @@
     },
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c configuration.json --disableTelemetry"
+      "commandLineArgs": "execute -c configuration-default.json --disableTelemetry"
     },
     "execute --help": {
       "commandName": "Project",

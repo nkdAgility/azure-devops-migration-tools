@@ -49,18 +49,26 @@ options:
   type: List
   description: A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use "*" to apply to all Work Item Types.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: timeTravel
   type: Int32
   description: Gets or sets the number of months to travel back in time when looking up historical area path values. Use 0 for current values.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: toSkip
   type: Int32
   description: Gets or sets the number of levels to skip from the root when converting area path hierarchy to tags. For example, if set to 2, "ProjectName\Level1\Level2\Level3" would skip "ProjectName\Level1" and start from "Level2".
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/FieldMappingTool/FieldMaps/TreeToTagFieldMap.cs

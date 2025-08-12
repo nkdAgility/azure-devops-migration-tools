@@ -5,19 +5,19 @@
   "description": "missing XML code comments",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "fixedTargetFields": {
+    "FixedTargetFields": {
       "description": "List of target fields, that are considered as fixed. It means, even if the field is different against source field, no warning will be triggered, jus information about the differences. Use this list, whan you know about the differences between fields, but resolved it for example by using .  Key is target work item type name. As this name, you can use * to define fixed fields which will be applied to all work item types.",
       "type": "object"
     },
-    "includeWorkItemtypes": {
+    "IncludeWorkItemtypes": {
       "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
       "type": "array"
     },
-    "sourceFieldMappings": {
+    "SourceFieldMappings": {
       "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to target field name. Target field name can be empty string to indicate that this field will not be validated in target. As work item type name, you can use * to define mappings which will be applied to all work item types.",
       "type": "object"
     }

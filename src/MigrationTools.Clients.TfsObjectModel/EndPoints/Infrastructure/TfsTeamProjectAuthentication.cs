@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,7 @@ namespace MigrationTools.Endpoints.Infrastructure
     public class TfsAuthenticationOptions : IValidateOptions<TfsAuthenticationOptions>
     {
         [JsonConverter(typeof(StringEnumConverter))]
+        [Required]
         public AuthenticationMode AuthenticationMode { get; set; }
 
         [JsonProperty( NullValueHandling = NullValueHandling.Ignore)]

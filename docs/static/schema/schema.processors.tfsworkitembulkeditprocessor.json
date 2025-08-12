@@ -5,55 +5,61 @@
   "description": "This processor allows you to make changes in place where we load from the Target and update the Target. This is used for bulk updates with the most common reason being a process template change.",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "enrichers": {
+    "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
       "type": "array"
     },
-    "filterWorkItemsThatAlreadyExistInTarget": {
+    "FilterWorkItemsThatAlreadyExistInTarget": {
       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
       "type": "boolean",
       "default": "true"
     },
-    "pauseAfterEachWorkItem": {
+    "PauseAfterEachWorkItem": {
       "description": "Pause after each work item is migrated",
       "type": "boolean",
       "default": "false"
     },
-    "refName": {
+    "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
       "type": "string"
     },
-    "sourceName": {
+    "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
     },
-    "targetName": {
+    "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "whatIf": {
+    "WhatIf": {
       "description": "Gets or sets a value indicating whether to run in \"what if\" mode without making actual changes to work items.",
       "type": "boolean",
       "default": "false"
     },
-    "wIQLQuery": {
+    "WIQLQuery": {
       "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
       "type": "string",
       "default": "AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
     },
-    "workItemCreateRetryLimit": {
+    "WorkItemCreateRetryLimit": {
       "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
       "type": "integer",
       "default": "5"
     },
-    "workItemIDs": {
+    "WorkItemIDs": {
       "description": "A list of work items to import",
       "type": "array",
       "default": "[]"
     }
-  }
+  },
+  "required": [
+    "enabled",
+    "sourceName",
+    "targetName",
+    "wIQLQuery"
+  ]
 }

@@ -37,50 +37,74 @@ options:
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: true
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Collections.Generic.List`1[[MigrationTools.Enrichers.IProcessorEnricherOptions, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FilterCompleted
   type: Boolean
   description: missing XML code comments
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: MigrationDelay
   type: Int32
   description: ??Not sure what this does. Check code.
   defaultValue: 0
+  isRequired: false
+  dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: OnlyElementsWithTag
   type: String
   description: The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.
   defaultValue: '`String.Empty`'
+  isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: RemoveAllLinks
   type: Boolean
   description: ??Not sure what this does. Check code.
   defaultValue: false
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: RemoveInvalidTestSuiteLinks
   type: Boolean
   description: Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used
   defaultValue: false
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SourceName
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
+  isRequired: true
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
+  isRequired: true
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: TestPlanIds
   type: Int32[]
   description: 'This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: "TestPlanIds": [123, 456, 789]   Works optimally when "TestPlanQuery" is set to null.'
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Int32[], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: TestPlanQuery
   type: String
   description: Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.
   defaultValue: '`String.Empty`'
+  isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: Beta
 processingTarget: Suites & Plans
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsTestPlansAndSuitesMigrationProcessor.cs

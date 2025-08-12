@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -56,6 +57,20 @@ namespace VstsSyncMigrator.ConsoleApp
                         services.AddMigrationToolServicesForClientTfs_Processors();
                     });
                 await hostBuilder.RunConsoleAsync();
+
+                // Optional pause so an external terminal launched under the debugger stays open.
+                try
+                {
+                    var pauseEnv = Environment.GetEnvironmentVariable("MIGRATIONTOOLS_PAUSE_ON_EXIT");
+                    if (Debugger.IsAttached || (pauseEnv != null && (pauseEnv.Equals("1", StringComparison.OrdinalIgnoreCase) || pauseEnv.Equals("true", StringComparison.OrdinalIgnoreCase))))
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("Execution complete.");
+                        Console.Write("Press Enter to close this window...");
+                        Console.ReadLine();
+                    }
+                }
+                catch { /* swallow any console IO exceptions (e.g., redirected output) */ }
             }
         }
 

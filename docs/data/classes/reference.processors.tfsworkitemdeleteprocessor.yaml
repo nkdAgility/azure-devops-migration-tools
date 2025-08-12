@@ -35,42 +35,62 @@ options:
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
+  isRequired: true
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enrichers
   type: List
   description: List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Collections.Generic.List`1[[MigrationTools.Enrichers.IProcessorEnricherOptions, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
   description: Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: PauseAfterEachWorkItem
   type: Boolean
   description: Gets or sets a value indicating whether to pause after each work item is deleted for review or debugging purposes.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: RefName
   type: String
   description: '`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.'
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SourceName
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
   defaultValue: missing XML code comments
+  isRequired: true
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
   defaultValue: missing XML code comments
+  isRequired: true
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WIQLQuery
   type: String
   description: Gets or sets the WIQL query used to select work items for deletion. Should return a list of work item IDs.
   defaultValue: SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc
+  isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
   description: Gets or sets the number of retry attempts for work item deletion operations when they fail due to transient errors.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WorkItemIDs
   type: IList
   description: Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Collections.Generic.IList`1[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: ready
 processingTarget: WorkItem
 classFile: src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemDeleteProcessor.cs

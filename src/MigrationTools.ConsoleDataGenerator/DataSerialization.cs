@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
+using Newtonsoft.Json.Serialization;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -70,7 +71,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 // Add properties from the class data
                 foreach (var option in data.Options)
                 {
-                    var propertyName = option.ParameterName.Substring(0, 1).ToLower() + option.ParameterName.Substring(1); // camelCase
+                    var propertyName = option.ParameterName;
                     var propertySchema = new JSchema
                     {
                         Type = GetJsonSchemaType(option.Type.ToString()),
@@ -79,7 +80,7 @@ namespace MigrationTools.ConsoleDataGenerator
 
                     // Special handling for FieldMappingTool's fieldMaps property
                     if (data.ClassName.Equals("FieldMappingTool", StringComparison.OrdinalIgnoreCase) &&
-                        propertyName.Equals("fieldMaps", StringComparison.OrdinalIgnoreCase) &&
+                        propertyName.Equals("FieldMaps", StringComparison.OrdinalIgnoreCase) &&
                         allClassData != null)
                     {
                         // Get all field map classes
@@ -92,18 +93,18 @@ namespace MigrationTools.ConsoleDataGenerator
                             arraySchemaJson["type"] = "array";
                             arraySchemaJson["description"] = option.Description.ToString();
 
-                            // Create prefixItems with anyOf structure (matching working schema)
-                            var prefixItemsObj = new JObject();
+                            // Create prefixItems as an array containing the anyOf object
                             var anyOfArray = new JArray();
-
                             foreach (var fieldMap in fieldMaps)
                             {
                                 var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
                                 anyOfArray.Add(JObject.Parse(fieldMapSchema.ToString()));
                             }
-
-                            prefixItemsObj["anyOf"] = anyOfArray;
-                            arraySchemaJson["prefixItems"] = prefixItemsObj;
+                            var anyOfObj = new JObject();
+                            anyOfObj["anyOf"] = anyOfArray;
+                            var prefixItemsArray = new JArray();
+                            prefixItemsArray.Add(anyOfObj);
+                            arraySchemaJson["prefixItems"] = prefixItemsArray;
 
                             propertySchema = JSchema.Parse(arraySchemaJson.ToString());
                         }
@@ -119,8 +120,19 @@ namespace MigrationTools.ConsoleDataGenerator
 
                     schema.Properties.Add(propertyName, propertySchema);
                 }
+                // Add required properties
+                var requiredProperties = data.Options
+                    .Where(opt => opt.IsRequired)
+                    .Select(opt => opt.ParameterName.Substring(0, 1).ToLower() + opt.ParameterName.Substring(1))
+                    .ToList();
+                foreach (var req in requiredProperties)
+                {
+                    schema.Required.Add(req);
+                }
 
-                return schema.ToString(SchemaVersion.Draft2020_12);
+                var json = schema.ToString(SchemaVersion.Draft2020_12);
+                json = FixPrefixItems(json);
+                return json;
             }
             catch (Exception ex)
             {
@@ -165,22 +177,45 @@ namespace MigrationTools.ConsoleDataGenerator
                 var migrationToolsSchema = new JSchema { Type = JSchemaType.Object };
 
                 // Add version property
-                migrationToolsSchema.Properties.Add("version", new JSchema
+                migrationToolsSchema.Properties.Add("Version", new JSchema
                 {
                     Type = JSchemaType.String,
                     Description = "Version of the migration tools configuration format"
                 });
+                migrationToolsSchema.Required.Add("Version");
 
                 // Add endpoints section
                 var endpointsSchema = new JSchema { Type = JSchemaType.Object };
                 var endpointClasses = allClassData.Where(cd => cd.TypeName.Equals("Endpoints", StringComparison.OrdinalIgnoreCase)).ToList();
 
-                foreach (var endpointClass in endpointClasses)
+                if (endpointClasses.Any())
                 {
-                    var endpointSchema = CreateSchemaFromClassData(endpointClass);
-                    endpointsSchema.Properties.Add(endpointClass.ClassName.ToLower(), endpointSchema);
+                    var anyOfArray = new JArray();
+                    foreach (var endpointClass in endpointClasses)
+                    {
+                        var endpointSchema = CreateSchemaFromClassData(endpointClass);
+                        // Ensure EndpointType is present and required
+                        if (!endpointSchema.Properties.ContainsKey("EndpointType"))
+                        {
+                            var endpointTypeSchema = new JSchema
+                            {
+                                Type = JSchemaType.String,
+                                Enum = { endpointClass.ClassName }
+                            };
+                            endpointSchema.Properties.Add("EndpointType", endpointTypeSchema);
+                            endpointSchema.Required.Add("EndpointType");
+                        }
+                        anyOfArray.Add(JObject.Parse(endpointSchema.ToString()));
+                    }
+                    var anyOfObj = new JObject();
+                    anyOfObj["anyOf"] = anyOfArray;
+
+                    // Use JObject to set additionalProperties, then parse back to JSchema
+                    var endpointsSchemaJson = JObject.Parse(endpointsSchema.ToString());
+                    endpointsSchemaJson["additionalProperties"] = anyOfObj;
+                    endpointsSchema = JSchema.Parse(endpointsSchemaJson.ToString());
                 }
-                migrationToolsSchema.Properties.Add("endpoints", endpointsSchema);
+                migrationToolsSchema.Properties.Add("Endpoints", endpointsSchema);
 
                 // Add processors section
                 var processorsSchema = new JSchema { Type = JSchemaType.Array };
@@ -188,20 +223,29 @@ namespace MigrationTools.ConsoleDataGenerator
 
                 if (processorClasses.Any())
                 {
-                    var processorUnion = new JSchema();
+                    // Manually construct prefixItems as an array containing an anyOf object
+                    var anyOfArray = new JArray();
                     foreach (var processorClass in processorClasses)
                     {
                         var processorSchema = CreateSchemaFromClassData(processorClass);
-                        processorSchema.Properties.Add("processorType", new JSchema
+                        processorSchema.Properties.Add("ProcessorType", new JSchema
                         {
                             Type = JSchemaType.String,
                             Enum = { processorClass.ClassName }
                         });
-                        processorUnion.AnyOf.Add(processorSchema);
+                        anyOfArray.Add(JObject.Parse(processorSchema.ToString()));
                     }
-                    processorsSchema.Items.Add(processorUnion);
+                    var anyOfObj = new JObject();
+                    anyOfObj["anyOf"] = anyOfArray;
+                    var prefixItemsArray = new JArray();
+                    prefixItemsArray.Add(anyOfObj);
+
+                    // Use JObject to set prefixItems, then parse back to JSchema
+                    var processorsSchemaJson = JObject.Parse(processorsSchema.ToString());
+                    processorsSchemaJson["prefixItems"] = prefixItemsArray;
+                    processorsSchema = JSchema.Parse(processorsSchemaJson.ToString());
                 }
-                migrationToolsSchema.Properties.Add("processors", processorsSchema);
+                migrationToolsSchema.Properties.Add("Processors", processorsSchema);
 
                 // Add tools section
                 var toolsSchema = new JSchema { Type = JSchemaType.Object };
@@ -229,33 +273,39 @@ namespace MigrationTools.ConsoleDataGenerator
                                 Description = "Gets or sets the list of field mapping configurations to apply."
                             };
 
-                            // Create a single prefixItems schema with anyOf for all field map types
-                            var prefixItemSchema = new JSchema();
+                            // Manually construct prefixItems as an array containing an anyOf object
+                            var anyOfArray = new JArray();
                             foreach (var fieldMap in fieldMaps)
                             {
                                 var fieldMapSchema = CreateSchemaFromClassData(fieldMap);
-                                prefixItemSchema.AnyOf.Add(fieldMapSchema);
+                                anyOfArray.Add(JObject.Parse(fieldMapSchema.ToString()));
                             }
+                            var anyOfObj = new JObject();
+                            anyOfObj["anyOf"] = anyOfArray;
+                            var prefixItemsArray = new JArray();
+                            prefixItemsArray.Add(anyOfObj);
 
-                            // Add the single prefixItems schema to the array
-                            fieldMapsSchema.Items.Add(prefixItemSchema);
+                            // Use JObject to set prefixItems, then parse back to JSchema
+                            var fieldMapsSchemaJson = JObject.Parse(fieldMapsSchema.ToString());
+                            fieldMapsSchemaJson["prefixItems"] = prefixItemsArray;
+                            fieldMapsSchema = JSchema.Parse(fieldMapsSchemaJson.ToString());
 
                             // Replace the fieldMaps property
-                            if (enhancedToolSchema.Properties.ContainsKey("fieldMaps"))
+                            if (enhancedToolSchema.Properties.ContainsKey("FieldMaps"))
                             {
-                                enhancedToolSchema.Properties["fieldMaps"] = fieldMapsSchema;
+                                enhancedToolSchema.Properties["FieldMaps"] = fieldMapsSchema;
                             }
                         }
 
-                        toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), enhancedToolSchema);
+                        toolsSchema.Properties.Add(toolClass.ClassName, enhancedToolSchema);
                     }
                     else
                     {
                         var toolSchema = CreateSchemaFromClassData(toolClass);
-                        toolsSchema.Properties.Add(toolClass.ClassName.ToLower(), toolSchema);
+                        toolsSchema.Properties.Add(toolClass.ClassName, toolSchema);
                     }
                 }
-                migrationToolsSchema.Properties.Add("commonTools", toolsSchema);
+                migrationToolsSchema.Properties.Add("CommonTools", toolsSchema);
 
                 fullSchema.Properties.Add("MigrationTools", migrationToolsSchema);
 
@@ -273,11 +323,57 @@ namespace MigrationTools.ConsoleDataGenerator
                 });
                 fullSchema.Properties.Add("Serilog", serilogSchema);
 
-                return fullSchema.ToString(SchemaVersion.Draft2020_12);
+                var json = fullSchema.ToString(SchemaVersion.Draft2020_12);
+                json = FixPrefixItems(json);
+                return json;
             }
             catch (Exception ex)
             {
                 return $"{{ \"error\": \"Failed to generate full configuration schema: {ex.Message}\" }}";
+            }
+        }
+
+        /// <summary>
+        /// Workaround for Newtonsoft.Json.Schema emitting draft 2020-12 'prefixItems' as a single object when only one schema exists.
+        /// The spec requires 'prefixItems' to be an array. This normalises any object-valued prefixItems into a single-element array.
+        /// Also defensive against accidental non-array emission elsewhere.
+        /// </summary>
+        private static string FixPrefixItems(string json)
+        {
+            try
+            {
+                var root = JToken.Parse(json);
+                FixPrefixItemsRecursive(root);
+                return root.ToString(Formatting.Indented);
+            }
+            catch
+            {
+                // If anything goes wrong, fall back to original JSON
+                return json;
+            }
+        }
+
+        private static void FixPrefixItemsRecursive(JToken token)
+        {
+            if (token is JObject obj)
+            {
+                // If prefixItems is an object (not array), wrap it
+                if (obj.TryGetValue("prefixItems", out var prefixItemsToken) && prefixItemsToken is JObject)
+                {
+                    obj["prefixItems"] = new JArray(prefixItemsToken);
+                }
+                // Recurse properties
+                foreach (var prop in obj.Properties().ToList())
+                {
+                    FixPrefixItemsRecursive(prop.Value);
+                }
+            }
+            else if (token is JArray arr)
+            {
+                foreach (var child in arr.ToList())
+                {
+                    FixPrefixItemsRecursive(child);
+                }
             }
         }
 
@@ -292,12 +388,8 @@ namespace MigrationTools.ConsoleDataGenerator
 
             foreach (var option in classData.Options)
             {
-                var propertyName = option.ParameterName.Substring(0, 1).ToLower() + option.ParameterName.Substring(1); // camelCase
-                var propertySchema = new JSchema
-                {
-                    Type = GetJsonSchemaType(option.Type.ToString()),
-                    Description = option.Description.ToString()
-                };
+                var propertyName = option.ParameterName;
+                var propertySchema = BuildPropertySchema(option);
 
                 // Add default value if available and not "missing XML code comments"
                 if (option.DefaultValue != null &&
@@ -310,7 +402,189 @@ namespace MigrationTools.ConsoleDataGenerator
                 schema.Properties.Add(propertyName, propertySchema);
             }
 
+            // Add required properties
+            var requiredProperties = classData.Options
+                .Where(opt => opt.IsRequired)
+                .Select(opt => opt.ParameterName)
+                .ToList();
+            foreach (var req in requiredProperties)
+            {
+                schema.Required.Add(req);
+            }
+
             return schema;
+        }
+
+        private static bool IsSimpleDotNetType(Type t)
+        {
+            if (t.IsPrimitive) return true;
+            if (t.IsEnum) return true;
+            if (t == typeof(string) || t == typeof(decimal) || t == typeof(Guid) || t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(TimeSpan) || t == typeof(Uri)) return true;
+            return false;
+        }
+
+        private static bool IsConfigComplex(Type t)
+        {
+            if (t == null) return false;
+            if (IsSimpleDotNetType(t)) return false;
+            if (!t.IsClass) return false;
+            if (t.Name.EndsWith("Options", StringComparison.Ordinal)) return true;
+            // Could extend with interface checks similar to resolver if needed
+            return false;
+        }
+
+        private static JSchema BuildPropertySchema(OptionsItem option)
+        {
+            // If we captured the runtime type, prefer that path for richer schema
+            if (option.DotNetType != null)
+            {
+                var t = option.DotNetType;
+
+                // Handle nullable<T>
+                if (Nullable.GetUnderlyingType(t) is Type underlying)
+                {
+                    t = underlying;
+                }
+
+                // Arrays / IEnumerable<T>
+                if (TryGetEnumerableElementType(t, out var elemType))
+                {
+                    var arrSchema = new JSchema { Type = JSchemaType.Array, Description = option.Description?.ToString() };
+                    arrSchema.Items.Add(BuildSchemaForType(elemType));
+                    return arrSchema;
+                }
+
+                // Dictionary<string, TValue>
+                if (TryGetDictionaryValueType(t, out var valueType))
+                {
+                    var dictSchema = new JSchema { Type = JSchemaType.Object, Description = option.Description?.ToString() };
+                    dictSchema.AdditionalProperties = BuildSchemaForType(valueType);
+                    return dictSchema;
+                }
+
+                // Simple
+                if (IsSimpleDotNetType(t))
+                {
+                    return new JSchema { Type = GetJsonSchemaType(t.Name), Description = option.Description?.ToString() };
+                }
+
+                // Complex Option object -> build inline object schema of its simple+config properties
+                if (IsConfigComplex(t))
+                {
+                    return BuildInlineObjectSchemaFromType(t, option.Description?.ToString());
+                }
+            }
+
+            // Fallback to original string-based mapping
+            return new JSchema
+            {
+                Type = GetJsonSchemaType(option.Type.ToString()),
+                Description = option.Description?.ToString()
+            };
+        }
+
+        private static JSchema BuildSchemaForType(Type t)
+        {
+            if (Nullable.GetUnderlyingType(t) is Type underlying)
+            {
+                t = underlying;
+            }
+
+            if (IsSimpleDotNetType(t))
+            {
+                return new JSchema { Type = GetJsonSchemaType(t.Name) };
+            }
+            if (TryGetEnumerableElementType(t, out var elemType))
+            {
+                var a = new JSchema { Type = JSchemaType.Array };
+                a.Items.Add(BuildSchemaForType(elemType));
+                return a;
+            }
+            if (TryGetDictionaryValueType(t, out var valueType))
+            {
+                var d = new JSchema { Type = JSchemaType.Object };
+                d.AdditionalProperties = BuildSchemaForType(valueType);
+                return d;
+            }
+            if (IsConfigComplex(t))
+            {
+                return BuildInlineObjectSchemaFromType(t, null);
+            }
+            // Unknown complex -> treat as object with free-form properties
+            return new JSchema { Type = JSchemaType.Object };
+        }
+
+        private static JSchema BuildInlineObjectSchemaFromType(Type t, string description)
+        {
+            var schema = new JSchema { Type = JSchemaType.Object, Description = description };
+            var props = t.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                         .Where(p => p.CanRead && p.CanWrite);
+            foreach (var p in props)
+            {
+                var ps = BuildSchemaForType(p.PropertyType);
+                schema.Properties[p.Name] = ps;
+                // Capture required attribute for nested complex types
+                if (p.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), inherit: true).Any())
+                {
+                    schema.Required.Add(p.Name);
+                }
+            }
+            return schema;
+        }
+
+        private static bool TryGetEnumerableElementType(Type t, out Type elementType)
+        {
+            elementType = null;
+            if (t == typeof(string)) return false;
+            if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(t)) return false;
+            if (t.IsArray)
+            {
+                elementType = t.GetElementType();
+                return true;
+            }
+            if (t.IsGenericType)
+            {
+                var genArgs = t.GetGenericArguments();
+                if (genArgs.Length == 1)
+                {
+                    elementType = genArgs[0];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool TryGetDictionaryValueType(Type t, out Type valueType)
+        {
+            valueType = null;
+            if (!t.IsGenericType) return false;
+            var genDef = t.GetGenericTypeDefinition();
+            if (genDef == typeof(Dictionary<,>) || genDef == typeof(IDictionary<,>))
+            {
+                var args = t.GetGenericArguments();
+                if (args[0] == typeof(string))
+                {
+                    valueType = args[1];
+                    return true;
+                }
+            }
+            foreach (var i in t.GetInterfaces())
+            {
+                if (i.IsGenericType)
+                {
+                    var igd = i.GetGenericTypeDefinition();
+                    if (igd == typeof(IDictionary<,>))
+                    {
+                        var args = i.GetGenericArguments();
+                        if (args[0] == typeof(string))
+                        {
+                            valueType = args[1];
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         public string WriteFullConfigurationSchema(List<ClassData> allClassData)
@@ -331,7 +605,8 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 TypeNameHandling = TypeNameHandling.None, // Disable automatic $type handling
                 Formatting = Formatting.Indented,        // For better readability
-                NullValueHandling = NullValueHandling.Ignore // Ignore null values
+                NullValueHandling = NullValueHandling.Ignore, // Ignore null values
+                ContractResolver = new ConfigSampleContractResolver()
             };
 
             // Add our custom converter if a type is specified
@@ -383,6 +658,157 @@ namespace MigrationTools.ConsoleDataGenerator
         {
             // Deserialize normally
             return serializer.Deserialize(reader, objectType);
+        }
+    }
+
+    /// <summary>
+    /// Contract resolver that limits JSON output to the properties that would realistically
+    /// appear in a configuration file: public read/write scalar properties (and collections/dictionaries of scalars).
+    /// Excludes internal/operational members (e.g. ConfigurationMetadata) and complex nested objects to avoid noisy samples.
+    /// </summary>
+    internal class ConfigSampleContractResolver : DefaultContractResolver
+    {
+        private static readonly HashSet<string> ExcludedNames = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "ConfigurationMetadata",
+            "TelemetryContext", // safety if present
+        };
+
+        // Marker interface names we treat as configuration-bearing complex option types
+        private static readonly string[] OptionInterfaceNames = new[]
+        {
+            nameof(MigrationTools.Endpoints.Infrastructure.IEndpointOptions),
+            nameof(MigrationTools.Processors.Infrastructure.IProcessorOptions),
+            nameof(MigrationTools.Tools.Infrastructure.IToolOptions),
+            nameof(MigrationTools.Tools.Infrastructure.IFieldMapOptions),
+            nameof(MigrationTools.Enrichers.IProcessorEnricherOptions),
+            nameof(MigrationTools.EndpointEnrichers.IEndpointEnricherOptions)
+        };
+
+        private static bool IsConfigComplex(Type t)
+        {
+            if (t == null) return false;
+            if (t.IsPrimitive) return false;
+            if (t == typeof(string)) return false;
+            if (t.IsEnum) return false;
+            if (!t.IsClass) return false;
+            if (t.Namespace == null) return false;
+
+            // Heuristic: option classes usually end with 'Options'
+            if (t.Name.EndsWith("Options", StringComparison.Ordinal)) return true;
+
+            // Or implement one of the marker option interfaces
+            foreach (var i in t.GetInterfaces())
+            {
+                if (OptionInterfaceNames.Contains(i.Name)) return true;
+            }
+            return false;
+        }
+
+        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+        {
+            var props = base.CreateProperties(type, memberSerialization);
+            var filtered = props
+                .Where(p => IncludeProperty(type, p))
+                .ToList();
+            return filtered;
+        }
+
+        private bool IncludeProperty(Type declaringType, JsonProperty prop)
+        {
+            if (prop.Ignored) return false;
+            if (ExcludedNames.Contains(prop.PropertyName)) return false;
+            if (prop.Writable == false || prop.Readable == false) return false;
+
+            var pt = prop.PropertyType;
+
+            // Always allow simple types
+            if (IsSimple(pt)) return true;
+
+            // Arrays / IEnumerable<T>
+            if (TryGetEnumerableElementType(pt, out var elemType))
+            {
+                // Include if element type simple OR is a config complex (so we emit an array of objects with filtered properties)
+                return IsSimple(elemType) || IsConfigComplex(elemType);
+            }
+
+            // Dictionary<string, TValue>
+            if (TryGetDictionaryValueType(pt, out var valueType))
+            {
+                return IsSimple(valueType) || IsConfigComplex(valueType);
+            }
+
+            // Allow nested config-bearing complex types (rendered with same filtering rules)
+            if (IsConfigComplex(pt)) return true;
+
+            // Otherwise skip complex objects
+            return false;
+        }
+
+        private static bool IsSimple(Type t)
+        {
+            if (t.IsPrimitive) return true;
+            if (t.IsEnum) return true;
+            if (t == typeof(string) || t == typeof(decimal) || t == typeof(Guid) || t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(TimeSpan) || t == typeof(Uri)) return true;
+            return false;
+        }
+
+        private static bool TryGetEnumerableElementType(Type t, out Type elementType)
+        {
+            elementType = null;
+            if (t == typeof(string)) return false; // string is IEnumerable<char>, ignore
+            if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(t)) return false;
+
+            if (t.IsArray)
+            {
+                elementType = t.GetElementType();
+                return true;
+            }
+
+            if (t.IsGenericType)
+            {
+                var genArgs = t.GetGenericArguments();
+                if (genArgs.Length == 1)
+                {
+                    elementType = genArgs[0];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool TryGetDictionaryValueType(Type t, out Type valueType)
+        {
+            valueType = null;
+            if (!t.IsGenericType) return false;
+            var genDef = t.GetGenericTypeDefinition();
+            if (genDef == typeof(Dictionary<,>) || genDef == typeof(IDictionary<,>))
+            {
+                var args = t.GetGenericArguments();
+                if (args[0] == typeof(string))
+                {
+                    valueType = args[1];
+                    return true;
+                }
+            }
+            // Check interfaces
+            foreach (var i in t.GetInterfaces())
+            {
+                if (i.IsGenericType)
+                {
+                    var igd = i.GetGenericTypeDefinition();
+                    if (igd == typeof(IDictionary<,>))
+                    {
+                        var args = i.GetGenericArguments();
+                        if (args[0] == typeof(string))
+                        {
+                            valueType = args[1];
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 

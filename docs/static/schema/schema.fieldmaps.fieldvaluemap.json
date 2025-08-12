@@ -5,7 +5,7 @@
   "description": "Maps field values based on a lookup table, allowing specific source values to be translated to different target values.",
   "type": "object",
   "properties": {
-    "applyTo": {
+    "ApplyTo": {
       "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
       "type": "array"
     },
@@ -13,7 +13,7 @@
       "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
       "type": "string"
     },
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },

@@ -26,8 +26,8 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 // Query the data and write out a subset of contacts
                 query = (from c in GetXDocument(item).Root.Descendants("member")
-                         where c.Attribute("name").Value == $"T:{item.FullName}"
-                         select c.Element(element).Value).SingleOrDefault();
+                         where c?.Attribute("name")?.Value == $"T:{item.FullName}"
+                         select c?.Element(element)?.Value)?.SingleOrDefault();
             }
             catch (Exception)
             {
