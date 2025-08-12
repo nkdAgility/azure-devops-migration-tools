@@ -130,7 +130,9 @@ namespace MigrationTools.ConsoleDataGenerator
                     schema.Required.Add(req);
                 }
 
-                return schema.ToString(SchemaVersion.Draft2020_12);
+                var json = schema.ToString(SchemaVersion.Draft2020_12);
+                json = FixPrefixItems(json);
+                return json;
             }
             catch (Exception ex)
             {
@@ -321,11 +323,57 @@ namespace MigrationTools.ConsoleDataGenerator
                 });
                 fullSchema.Properties.Add("Serilog", serilogSchema);
 
-                return fullSchema.ToString(SchemaVersion.Draft2020_12);
+                var json = fullSchema.ToString(SchemaVersion.Draft2020_12);
+                json = FixPrefixItems(json);
+                return json;
             }
             catch (Exception ex)
             {
                 return $"{{ \"error\": \"Failed to generate full configuration schema: {ex.Message}\" }}";
+            }
+        }
+
+        /// <summary>
+        /// Workaround for Newtonsoft.Json.Schema emitting draft 2020-12 'prefixItems' as a single object when only one schema exists.
+        /// The spec requires 'prefixItems' to be an array. This normalises any object-valued prefixItems into a single-element array.
+        /// Also defensive against accidental non-array emission elsewhere.
+        /// </summary>
+        private static string FixPrefixItems(string json)
+        {
+            try
+            {
+                var root = JToken.Parse(json);
+                FixPrefixItemsRecursive(root);
+                return root.ToString(Formatting.Indented);
+            }
+            catch
+            {
+                // If anything goes wrong, fall back to original JSON
+                return json;
+            }
+        }
+
+        private static void FixPrefixItemsRecursive(JToken token)
+        {
+            if (token is JObject obj)
+            {
+                // If prefixItems is an object (not array), wrap it
+                if (obj.TryGetValue("prefixItems", out var prefixItemsToken) && prefixItemsToken is JObject)
+                {
+                    obj["prefixItems"] = new JArray(prefixItemsToken);
+                }
+                // Recurse properties
+                foreach (var prop in obj.Properties().ToList())
+                {
+                    FixPrefixItemsRecursive(prop.Value);
+                }
+            }
+            else if (token is JArray arr)
+            {
+                foreach (var child in arr.ToList())
+                {
+                    FixPrefixItemsRecursive(child);
+                }
             }
         }
 
