@@ -5,44 +5,37 @@
   "description": "Azure DevOps REST API endpoint implementation for connecting to Azure DevOps organizations. Provides HTTP client access and pipeline-related API operations for migration scenarios.",
   "type": "object",
   "properties": {
-    "accessToken": {
+    "AccessToken": {
       "description": "Personal Access Token (PAT) or other authentication token for accessing the Azure DevOps organization. Required for API authentication.",
       "type": "string"
     },
-    "authenticationMode": {
+    "AuthenticationMode": {
       "description": "Authentication mode to use when connecting to Azure DevOps. Typically uses AccessToken for modern Azure DevOps organizations.",
       "type": "string"
     },
-    "enabled": {
+    "Enabled": {
       "description": "Will be used if enabled",
       "type": "boolean"
     },
-    "endpointEnrichers": {
+    "EndpointEnrichers": {
       "description": "missing XML code comments",
       "type": "array"
     },
-    "name": {
+    "Name": {
       "description": "missing XML code comments",
       "type": "string"
     },
-    "organisation": {
+    "Organisation": {
       "description": "URL of the Azure DevOps organization (e.g., \"https://dev.azure.com/myorganization/\"). Must include the full organization URL.",
       "type": "string"
     },
-    "project": {
+    "Project": {
       "description": "Name of the Azure DevOps project within the organization to connect to. This is the project that will be used for migration operations.",
       "type": "string"
     },
-    "reflectedWorkItemIdField": {
+    "ReflectedWorkItemIdField": {
       "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",
       "type": "string"
     }
-  },
-  "required": [
-    "accessToken",
-    "authenticationMode",
-    "organisation",
-    "project",
-    "reflectedWorkItemIdField"
-  ]
+  }
 }

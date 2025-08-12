@@ -5,11 +5,11 @@
   "description": "Tool for validating that required fields exist in target work item types before migration, preventing migration failures due to missing required fields.",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "exclusions": {
+    "Exclusions": {
       "description": "Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison. WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.",
       "type": "array",
       "default": "[]"

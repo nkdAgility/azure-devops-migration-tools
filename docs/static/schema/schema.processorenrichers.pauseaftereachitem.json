@@ -5,12 +5,12 @@
   "description": "missing XML code comments",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If enabled this will run this migrator",
       "type": "boolean",
       "default": "true"
     },
-    "refName": {
+    "RefName": {
       "description": "For internal use",
       "type": "string"
     }

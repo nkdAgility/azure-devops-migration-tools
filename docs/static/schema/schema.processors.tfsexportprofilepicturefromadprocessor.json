@@ -5,50 +5,45 @@
   "description": "Downloads corporate images and updates TFS/Azure DevOps profiles",
   "type": "object",
   "properties": {
-    "domain": {
+    "Domain": {
       "description": "The source domain where the pictures should be exported.",
       "type": "string",
       "default": "String.Empty"
     },
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "enrichers": {
+    "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
       "type": "array"
     },
-    "password": {
+    "Password": {
       "description": "The password of the user that is used to export the pictures.",
       "type": "string",
       "default": "String.Empty"
     },
-    "pictureEmpIDFormat": {
+    "PictureEmpIDFormat": {
       "description": "TODO: You wpuld need to customise this for your system. Clone repo and run in Debug",
       "type": "string",
       "default": "String.Empty"
     },
-    "refName": {
+    "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
       "type": "string"
     },
-    "sourceName": {
+    "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
     },
-    "targetName": {
+    "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "username": {
+    "Username": {
       "description": "The user name of the user that is used to export the pictures.",
       "type": "string",
       "default": "String.Empty"
     }
-  },
-  "required": [
-    "enabled",
-    "sourceName",
-    "targetName"
-  ]
+  }
 }

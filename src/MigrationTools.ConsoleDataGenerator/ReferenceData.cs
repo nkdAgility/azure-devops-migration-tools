@@ -42,6 +42,8 @@ namespace MigrationTools.ConsoleDataGenerator.ReferenceData
         public object Description { get; internal set; }
         public object DefaultValue { get; internal set; }
         public bool IsRequired { get; set; } // Add this property to track required fields
+    // Holds the actual System.Type for richer schema generation (not serialized to YAML/JSON samples directly)
+    public Type DotNetType { get; internal set; }
     }
 
     public class ConfigurationSample

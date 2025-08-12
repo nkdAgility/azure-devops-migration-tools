@@ -5,51 +5,46 @@
   "description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "enrichers": {
+    "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
       "type": "array"
     },
-    "filterWorkItemsThatAlreadyExistInTarget": {
+    "FilterWorkItemsThatAlreadyExistInTarget": {
       "description": "Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.",
       "type": "boolean"
     },
-    "pauseAfterEachWorkItem": {
+    "PauseAfterEachWorkItem": {
       "description": "Gets or sets a value indicating whether to pause after each work item is deleted for review or debugging purposes.",
       "type": "boolean"
     },
-    "refName": {
+    "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
       "type": "string"
     },
-    "sourceName": {
+    "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
     },
-    "targetName": {
+    "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "wIQLQuery": {
+    "WIQLQuery": {
       "description": "Gets or sets the WIQL query used to select work items for deletion. Should return a list of work item IDs.",
       "type": "string",
       "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
     },
-    "workItemCreateRetryLimit": {
+    "WorkItemCreateRetryLimit": {
       "description": "Gets or sets the number of retry attempts for work item deletion operations when they fail due to transient errors.",
       "type": "integer"
     },
-    "workItemIDs": {
+    "WorkItemIDs": {
       "description": "Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.",
       "type": "array"
     }
-  },
-  "required": [
-    "enabled",
-    "sourceName",
-    "targetName"
-  ]
+  }
 }

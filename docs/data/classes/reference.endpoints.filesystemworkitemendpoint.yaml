@@ -29,21 +29,25 @@ options:
   description: Will be used if enabled
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: EndpointEnrichers
   type: List
   description: missing XML code comments
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.Collections.Generic.List`1[[MigrationTools.EndpointEnrichers.IEndpointEnricherOptions, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FileStore
   type: String
   description: Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Name
   type: String
   description: missing XML code comments
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.FileSystem/Endpoints/FileSystemWorkItemEndpoint.cs

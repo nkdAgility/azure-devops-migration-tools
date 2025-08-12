@@ -140,6 +140,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 OptionsItem optionsItem = new OptionsItem();
                 optionsItem.ParameterName = property.Name;
                 optionsItem.Type = property.PropertyType.Name.Replace("`1", "").Replace("`2", "").Replace("`", "");
+                optionsItem.DotNetType = property.PropertyType;
                 optionsItem.Description = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "summary");
                 optionsItem.DefaultValue = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
                 options.Add(optionsItem);

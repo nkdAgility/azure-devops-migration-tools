@@ -5,47 +5,42 @@
   "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "enrichers": {
+    "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
       "type": "array"
     },
-    "exportAllUsers": {
+    "ExportAllUsers": {
       "description": "Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .",
       "type": "boolean"
     },
-    "onlyListUsersInWorkItems": {
+    "OnlyListUsersInWorkItems": {
       "description": "`OnlyListUsersInWorkItems`",
       "type": "boolean",
       "default": "true"
     },
-    "refName": {
+    "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
       "type": "string"
     },
-    "sourceName": {
+    "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
     },
-    "targetName": {
+    "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "userExportFile": {
+    "UserExportFile": {
       "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if  is set to .",
       "type": "string"
     },
-    "wIQLQuery": {
+    "WIQLQuery": {
       "description": "WIQL (Work Item Query Language) query used to select the work items from which user information should be extracted.",
       "type": "string"
     }
-  },
-  "required": [
-    "enabled",
-    "sourceName",
-    "targetName"
-  ]
+  }
 }

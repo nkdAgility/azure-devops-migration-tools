@@ -5,58 +5,53 @@
   "description": "Native TFS Processor, does not work with any other Endpoints.",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "enrichers": {
+    "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
       "type": "array"
     },
-    "migrateTeamCapacities": {
+    "MigrateTeamCapacities": {
       "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
       "type": "boolean",
       "default": "false"
     },
-    "migrateTeamSettings": {
+    "MigrateTeamSettings": {
       "description": "Migrate original team settings after their creation on target team project",
       "type": "boolean",
       "default": "false"
     },
-    "prefixProjectToNodes": {
+    "PrefixProjectToNodes": {
       "description": "Prefix your iterations and areas with the project name. If you have enabled this in `NodeStructuresMigrationConfig` you must do it here too.",
       "type": "boolean",
       "default": "false"
     },
-    "refName": {
+    "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
       "type": "string"
     },
-    "sourceName": {
+    "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
     },
-    "targetName": {
+    "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "teams": {
+    "Teams": {
       "description": "List of Teams to process. If this is `null` then all teams will be processed.",
       "type": "array"
     },
-    "updateTeamSettings": {
+    "UpdateTeamSettings": {
       "description": "Reset the target team settings to match the source if the team exists",
       "type": "boolean",
       "default": "false"
     },
-    "useUserMapping": {
+    "UseUserMapping": {
       "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.",
       "type": "boolean"
     }
-  },
-  "required": [
-    "enabled",
-    "sourceName",
-    "targetName"
-  ]
+  }
 }

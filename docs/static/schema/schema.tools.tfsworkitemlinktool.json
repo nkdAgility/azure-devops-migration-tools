@@ -5,15 +5,15 @@
   "description": "Tool for migrating work item links and relationships between work items, including shared steps and parameters for test cases.",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "filterIfLinkCountMatches": {
+    "FilterIfLinkCountMatches": {
       "description": "Skip validating links if the number of links in the source and the target matches!",
       "type": "boolean"
     },
-    "saveAfterEachLinkIsAdded": {
+    "SaveAfterEachLinkIsAdded": {
       "description": "Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.",
       "type": "boolean",
       "default": "false"

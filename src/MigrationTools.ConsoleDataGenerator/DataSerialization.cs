@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
+using Newtonsoft.Json.Serialization;
 
 namespace MigrationTools.ConsoleDataGenerator
 {
@@ -340,11 +341,7 @@ namespace MigrationTools.ConsoleDataGenerator
             foreach (var option in classData.Options)
             {
                 var propertyName = option.ParameterName;
-                var propertySchema = new JSchema
-                {
-                    Type = GetJsonSchemaType(option.Type.ToString()),
-                    Description = option.Description.ToString()
-                };
+                var propertySchema = BuildPropertySchema(option);
 
                 // Add default value if available and not "missing XML code comments"
                 if (option.DefaultValue != null &&
@@ -370,6 +367,173 @@ namespace MigrationTools.ConsoleDataGenerator
             return schema;
         }
 
+        private static bool IsSimpleDotNetType(Type t)
+        {
+            if (t.IsPrimitive) return true;
+            if (t.IsEnum) return true;
+            if (t == typeof(string) || t == typeof(decimal) || t == typeof(Guid) || t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(TimeSpan) || t == typeof(Uri)) return true;
+            return false;
+        }
+
+        private static bool IsConfigComplex(Type t)
+        {
+            if (t == null) return false;
+            if (IsSimpleDotNetType(t)) return false;
+            if (!t.IsClass) return false;
+            if (t.Name.EndsWith("Options", StringComparison.Ordinal)) return true;
+            // Could extend with interface checks similar to resolver if needed
+            return false;
+        }
+
+        private static JSchema BuildPropertySchema(OptionsItem option)
+        {
+            // If we captured the runtime type, prefer that path for richer schema
+            if (option.DotNetType != null)
+            {
+                var t = option.DotNetType;
+
+                // Handle nullable<T>
+                if (Nullable.GetUnderlyingType(t) is Type underlying)
+                {
+                    t = underlying;
+                }
+
+                // Arrays / IEnumerable<T>
+                if (TryGetEnumerableElementType(t, out var elemType))
+                {
+                    var arrSchema = new JSchema { Type = JSchemaType.Array, Description = option.Description?.ToString() };
+                    arrSchema.Items.Add(BuildSchemaForType(elemType));
+                    return arrSchema;
+                }
+
+                // Dictionary<string, TValue>
+                if (TryGetDictionaryValueType(t, out var valueType))
+                {
+                    var dictSchema = new JSchema { Type = JSchemaType.Object, Description = option.Description?.ToString() };
+                    dictSchema.AdditionalProperties = BuildSchemaForType(valueType);
+                    return dictSchema;
+                }
+
+                // Simple
+                if (IsSimpleDotNetType(t))
+                {
+                    return new JSchema { Type = GetJsonSchemaType(t.Name), Description = option.Description?.ToString() };
+                }
+
+                // Complex Option object -> build inline object schema of its simple+config properties
+                if (IsConfigComplex(t))
+                {
+                    return BuildInlineObjectSchemaFromType(t, option.Description?.ToString());
+                }
+            }
+
+            // Fallback to original string-based mapping
+            return new JSchema
+            {
+                Type = GetJsonSchemaType(option.Type.ToString()),
+                Description = option.Description?.ToString()
+            };
+        }
+
+        private static JSchema BuildSchemaForType(Type t)
+        {
+            if (Nullable.GetUnderlyingType(t) is Type underlying)
+            {
+                t = underlying;
+            }
+
+            if (IsSimpleDotNetType(t))
+            {
+                return new JSchema { Type = GetJsonSchemaType(t.Name) };
+            }
+            if (TryGetEnumerableElementType(t, out var elemType))
+            {
+                var a = new JSchema { Type = JSchemaType.Array };
+                a.Items.Add(BuildSchemaForType(elemType));
+                return a;
+            }
+            if (TryGetDictionaryValueType(t, out var valueType))
+            {
+                var d = new JSchema { Type = JSchemaType.Object };
+                d.AdditionalProperties = BuildSchemaForType(valueType);
+                return d;
+            }
+            if (IsConfigComplex(t))
+            {
+                return BuildInlineObjectSchemaFromType(t, null);
+            }
+            // Unknown complex -> treat as object with free-form properties
+            return new JSchema { Type = JSchemaType.Object };
+        }
+
+        private static JSchema BuildInlineObjectSchemaFromType(Type t, string description)
+        {
+            var schema = new JSchema { Type = JSchemaType.Object, Description = description };
+            var props = t.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                         .Where(p => p.CanRead && p.CanWrite);
+            foreach (var p in props)
+            {
+                var ps = BuildSchemaForType(p.PropertyType);
+                schema.Properties[p.Name] = ps;
+            }
+            return schema;
+        }
+
+        private static bool TryGetEnumerableElementType(Type t, out Type elementType)
+        {
+            elementType = null;
+            if (t == typeof(string)) return false;
+            if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(t)) return false;
+            if (t.IsArray)
+            {
+                elementType = t.GetElementType();
+                return true;
+            }
+            if (t.IsGenericType)
+            {
+                var genArgs = t.GetGenericArguments();
+                if (genArgs.Length == 1)
+                {
+                    elementType = genArgs[0];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool TryGetDictionaryValueType(Type t, out Type valueType)
+        {
+            valueType = null;
+            if (!t.IsGenericType) return false;
+            var genDef = t.GetGenericTypeDefinition();
+            if (genDef == typeof(Dictionary<,>) || genDef == typeof(IDictionary<,>))
+            {
+                var args = t.GetGenericArguments();
+                if (args[0] == typeof(string))
+                {
+                    valueType = args[1];
+                    return true;
+                }
+            }
+            foreach (var i in t.GetInterfaces())
+            {
+                if (i.IsGenericType)
+                {
+                    var igd = i.GetGenericTypeDefinition();
+                    if (igd == typeof(IDictionary<,>))
+                    {
+                        var args = i.GetGenericArguments();
+                        if (args[0] == typeof(string))
+                        {
+                            valueType = args[1];
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         public string WriteFullConfigurationSchema(List<ClassData> allClassData)
         {
             // Ensure the schema directory exists
@@ -388,7 +552,8 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 TypeNameHandling = TypeNameHandling.None, // Disable automatic $type handling
                 Formatting = Formatting.Indented,        // For better readability
-                NullValueHandling = NullValueHandling.Ignore // Ignore null values
+                NullValueHandling = NullValueHandling.Ignore, // Ignore null values
+                ContractResolver = new ConfigSampleContractResolver()
             };
 
             // Add our custom converter if a type is specified
@@ -440,6 +605,157 @@ namespace MigrationTools.ConsoleDataGenerator
         {
             // Deserialize normally
             return serializer.Deserialize(reader, objectType);
+        }
+    }
+
+    /// <summary>
+    /// Contract resolver that limits JSON output to the properties that would realistically
+    /// appear in a configuration file: public read/write scalar properties (and collections/dictionaries of scalars).
+    /// Excludes internal/operational members (e.g. ConfigurationMetadata) and complex nested objects to avoid noisy samples.
+    /// </summary>
+    internal class ConfigSampleContractResolver : DefaultContractResolver
+    {
+        private static readonly HashSet<string> ExcludedNames = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "ConfigurationMetadata",
+            "TelemetryContext", // safety if present
+        };
+
+        // Marker interface names we treat as configuration-bearing complex option types
+        private static readonly string[] OptionInterfaceNames = new[]
+        {
+            nameof(MigrationTools.Endpoints.Infrastructure.IEndpointOptions),
+            nameof(MigrationTools.Processors.Infrastructure.IProcessorOptions),
+            nameof(MigrationTools.Tools.Infrastructure.IToolOptions),
+            nameof(MigrationTools.Tools.Infrastructure.IFieldMapOptions),
+            nameof(MigrationTools.Enrichers.IProcessorEnricherOptions),
+            nameof(MigrationTools.EndpointEnrichers.IEndpointEnricherOptions)
+        };
+
+        private static bool IsConfigComplex(Type t)
+        {
+            if (t == null) return false;
+            if (t.IsPrimitive) return false;
+            if (t == typeof(string)) return false;
+            if (t.IsEnum) return false;
+            if (!t.IsClass) return false;
+            if (t.Namespace == null) return false;
+
+            // Heuristic: option classes usually end with 'Options'
+            if (t.Name.EndsWith("Options", StringComparison.Ordinal)) return true;
+
+            // Or implement one of the marker option interfaces
+            foreach (var i in t.GetInterfaces())
+            {
+                if (OptionInterfaceNames.Contains(i.Name)) return true;
+            }
+            return false;
+        }
+
+        protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+        {
+            var props = base.CreateProperties(type, memberSerialization);
+            var filtered = props
+                .Where(p => IncludeProperty(type, p))
+                .ToList();
+            return filtered;
+        }
+
+        private bool IncludeProperty(Type declaringType, JsonProperty prop)
+        {
+            if (prop.Ignored) return false;
+            if (ExcludedNames.Contains(prop.PropertyName)) return false;
+            if (prop.Writable == false || prop.Readable == false) return false;
+
+            var pt = prop.PropertyType;
+
+            // Always allow simple types
+            if (IsSimple(pt)) return true;
+
+            // Arrays / IEnumerable<T>
+            if (TryGetEnumerableElementType(pt, out var elemType))
+            {
+                // Include if element type simple OR is a config complex (so we emit an array of objects with filtered properties)
+                return IsSimple(elemType) || IsConfigComplex(elemType);
+            }
+
+            // Dictionary<string, TValue>
+            if (TryGetDictionaryValueType(pt, out var valueType))
+            {
+                return IsSimple(valueType) || IsConfigComplex(valueType);
+            }
+
+            // Allow nested config-bearing complex types (rendered with same filtering rules)
+            if (IsConfigComplex(pt)) return true;
+
+            // Otherwise skip complex objects
+            return false;
+        }
+
+        private static bool IsSimple(Type t)
+        {
+            if (t.IsPrimitive) return true;
+            if (t.IsEnum) return true;
+            if (t == typeof(string) || t == typeof(decimal) || t == typeof(Guid) || t == typeof(DateTime) || t == typeof(DateTimeOffset) || t == typeof(TimeSpan) || t == typeof(Uri)) return true;
+            return false;
+        }
+
+        private static bool TryGetEnumerableElementType(Type t, out Type elementType)
+        {
+            elementType = null;
+            if (t == typeof(string)) return false; // string is IEnumerable<char>, ignore
+            if (!typeof(System.Collections.IEnumerable).IsAssignableFrom(t)) return false;
+
+            if (t.IsArray)
+            {
+                elementType = t.GetElementType();
+                return true;
+            }
+
+            if (t.IsGenericType)
+            {
+                var genArgs = t.GetGenericArguments();
+                if (genArgs.Length == 1)
+                {
+                    elementType = genArgs[0];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool TryGetDictionaryValueType(Type t, out Type valueType)
+        {
+            valueType = null;
+            if (!t.IsGenericType) return false;
+            var genDef = t.GetGenericTypeDefinition();
+            if (genDef == typeof(Dictionary<,>) || genDef == typeof(IDictionary<,>))
+            {
+                var args = t.GetGenericArguments();
+                if (args[0] == typeof(string))
+                {
+                    valueType = args[1];
+                    return true;
+                }
+            }
+            // Check interfaces
+            foreach (var i in t.GetInterfaces())
+            {
+                if (i.IsGenericType)
+                {
+                    var igd = i.GetGenericTypeDefinition();
+                    if (igd == typeof(IDictionary<,>))
+                    {
+                        var args = i.GetGenericArguments();
+                        if (args[0] == typeof(string))
+                        {
+                            valueType = args[1];
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
     }
 

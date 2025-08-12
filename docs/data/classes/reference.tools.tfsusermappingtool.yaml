@@ -84,31 +84,37 @@ options:
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: IdentityFieldsToCheck
   type: List
   description: This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: MatchUsersByEmail
   type: Boolean
   description: By default, users in source are mapped to target users by their display name. If this is set to true, then the users will be mapped by their email address first. If no match is found, then the display name will be used.
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: ProjectCollectionValidUsersGroupName
   type: String
   description: This is the regionalized "Project Collection Valid Users" group name. Default is "Project Collection Valid Users".
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SkipValidateAllUsersExistOrAreMapped
   type: Boolean
   description: When set to true, this setting will skip a validation that all users exists or mapped
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: UserMappingFile
   type: String
   description: This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
   defaultValue: missing XML code comments
   isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingTool.cs

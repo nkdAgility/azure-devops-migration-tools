@@ -5,63 +5,58 @@
   "description": "Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration",
   "type": "object",
   "properties": {
-    "enabled": {
+    "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
       "type": "boolean"
     },
-    "enrichers": {
+    "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
       "type": "array"
     },
-    "filterCompleted": {
+    "FilterCompleted": {
       "description": "missing XML code comments",
       "type": "boolean"
     },
-    "migrationDelay": {
+    "MigrationDelay": {
       "description": "??Not sure what this does. Check code.",
       "type": "integer",
       "default": "0"
     },
-    "onlyElementsWithTag": {
+    "OnlyElementsWithTag": {
       "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
       "type": "string",
       "default": "`String.Empty`"
     },
-    "refName": {
+    "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
       "type": "string"
     },
-    "removeAllLinks": {
+    "RemoveAllLinks": {
       "description": "??Not sure what this does. Check code.",
       "type": "boolean",
       "default": "false"
     },
-    "removeInvalidTestSuiteLinks": {
+    "RemoveInvalidTestSuiteLinks": {
       "description": "Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used",
       "type": "boolean",
       "default": "false"
     },
-    "sourceName": {
+    "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
     },
-    "targetName": {
+    "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "testPlanIds": {
+    "TestPlanIds": {
       "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789]   Works optimally when \"TestPlanQuery\" is set to null.",
       "type": "string"
     },
-    "testPlanQuery": {
+    "TestPlanQuery": {
       "description": "Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.",
       "type": "string",
       "default": "`String.Empty`"
     }
-  },
-  "required": [
-    "enabled",
-    "sourceName",
-    "targetName"
-  ]
+  }
 }
