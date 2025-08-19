@@ -78,7 +78,9 @@ configurationSamples:
       }
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemTypeValidatorToolOptions
-description: This tool checks if the work item types in the source system have corresponding types in the target system, and validates their fields and mappings.
+description: >-
+  This tool checks if the work item types in the source system have corresponding types in the target system,
+   and validates their fields and mappings.
 className: TfsWorkItemTypeValidatorTool
 typeName: Tools
 options:
@@ -90,7 +92,16 @@ options:
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FixedTargetFields
   type: Dictionary
-  description: List of target fields that are considered as `fixed`. A field marked as fixed will not stop the migration if differences are found. Instead of a warning, only an informational message will be logged. Use this list when you already know about the differences and have resolved them, for example by using `FieldMappingTool`. The key is the target work item type name. You can also use `*` to define fixed fields that apply to all work item types.
+  description: >-
+    List of target fields that are considered as `fixed`. 
+     A field marked as fixed will not stop the migration if differences are found. 
+     Instead of a warning, only an informational message will be logged. 
+
+     Use this list when you already know about the differences and have resolved them, 
+     for example by using `FieldMappingTool`. 
+
+     The key is the target work item type name. 
+     You can also use `*` to define fixed fields that apply to all work item types.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
@@ -102,7 +113,10 @@ options:
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SourceFieldMappings
   type: Dictionary
-  description: Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to target field name. Target field name can be empty string to indicate that this field will not be validated in target. As work item type name, you can use `*` to define mappings which will be applied to all work item types.
+  description: >-
+    Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
+     target field name. Target field name can be empty string to indicate that this field will not be validated in target.
+     As work item type name, you can use `*` to define mappings which will be applied to all work item types.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

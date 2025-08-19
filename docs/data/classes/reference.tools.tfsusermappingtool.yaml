@@ -93,7 +93,9 @@ options:
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: MatchUsersByEmail
   type: Boolean
-  description: By default, users in source are mapped to target users by their display name. If this is set to true, then the users will be mapped by their email address first. If no match is found, then the display name will be used.
+  description: >-
+    By default, users in source are mapped to target users by their display name. If this is set to true, then the
+     users will be mapped by their email address first. If no match is found, then the display name will be used.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

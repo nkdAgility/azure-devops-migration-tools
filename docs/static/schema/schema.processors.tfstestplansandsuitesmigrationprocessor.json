@@ -50,7 +50,7 @@
       "type": "string"
     },
     "TestPlanIds": {
-      "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789] Works optimally when \"TestPlanQuery\" is set to null.",
+      "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789] \r\n Works optimally when \"TestPlanQuery\" is set to null.",
       "type": "string"
     },
     "TestPlanQuery": {

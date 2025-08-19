@@ -838,7 +838,7 @@
                 },
                 {
                   "title": "TfsExportUsersForMappingProcessor",
-                  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.",
+                  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.\r\n Use `ExportUsersForMappingConfig` to configure.",
                   "type": "object",
                   "properties": {
                     "Enabled": {
@@ -855,7 +855,7 @@
                       ]
                     },
                     "ExportAllUsers": {
-                      "description": "Set to `true`, if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in `UserExportFile`.",
+                      "description": "Set to `true`, if you want to export all users in source and target server.\r\n The lists of user can be useful, if you need tu manually edit mapping file.\r\n Users will be exported to file set in `UserExportFile`.",
                       "type": "boolean"
                     },
                     "OnlyListUsersInWorkItems": {
@@ -876,7 +876,7 @@
                       "type": "string"
                     },
                     "UserExportFile": {
-                      "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if `ExportAllUsers` is set to `true`.",
+                      "description": "Path to export file where all source and target servers' users will be exported.\r\n Users are exported only if `ExportAllUsers` is set to `true`.",
                       "type": "string"
                     },
                     "WIQLQuery": {
@@ -1059,7 +1059,7 @@
                       "default": "false"
                     },
                     "UseUserMapping": {
-                      "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.",
+                      "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities.\r\n By default, users in source are matched in target users by current display name. When this is set to `true`,\r\n users are matched also by mapped name from user mapping file.",
                       "type": "boolean"
                     },
                     "ProcessorType": {
@@ -1173,7 +1173,7 @@
                       "type": "string"
                     },
                     "TestPlanIds": {
-                      "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789] Works optimally when \"TestPlanQuery\" is set to null.",
+                      "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789] \r\n Works optimally when \"TestPlanQuery\" is set to null.",
                       "type": "array",
                       "prefixItems": [
                         {
@@ -1261,7 +1261,7 @@
                       ]
                     },
                     "FilterWorkItemsThatAlreadyExistInTarget": {
-                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                       "type": "boolean",
                       "default": "true"
                     },
@@ -1293,7 +1293,7 @@
                       "default": "AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
                     },
                     "WorkItemCreateRetryLimit": {
-                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.\r\n This allows for periodic network glitches not to end the process.",
                       "type": "integer",
                       "default": "5"
                     },
@@ -1323,7 +1323,7 @@
                 },
                 {
                   "title": "TfsWorkItemDeleteProcessor",
-                  "description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.",
+                  "description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.\r\n **DANGER:** This is not a recoverable action and should be use with extream caution.",
                   "type": "object",
                   "properties": {
                     "Enabled": {
@@ -1392,7 +1392,7 @@
                 },
                 {
                   "title": "TfsWorkItemMigrationProcessor",
-                  "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
+                  "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.\r\n Use `WorkItemMigrationConfig` to configure.",
                   "type": "object",
                   "properties": {
                     "AttachRevisionHistory": {
@@ -1414,12 +1414,12 @@
                       ]
                     },
                     "FilterWorkItemsThatAlreadyExistInTarget": {
-                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                       "type": "boolean",
                       "default": "true"
                     },
                     "FixHtmlAttachmentLinks": {
-                      "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.",
+                      "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML\r\n fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;\r\n TFS should use integrated authentication.",
                       "type": "boolean",
                       "default": "true"
                     },
@@ -1429,7 +1429,7 @@
                       "default": "true"
                     },
                     "MaxGracefulFailures": {
-                      "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.",
+                      "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will\r\n continue until the number of failed items reaches the configured value, after which the migration fails.",
                       "type": "integer",
                       "default": "0"
                     },
@@ -1459,12 +1459,12 @@
                       "type": "string"
                     },
                     "UpdateCreatedBy": {
-                      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+                      "description": "If this is enabled the creation process on the target project will create the items with the original creation date.\r\n (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,\r\n not the internal create date)",
                       "type": "boolean",
                       "default": "true"
                     },
                     "UpdateCreatedDate": {
-                      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+                      "description": "If this is enabled the creation process on the target project will create the items with the original creation date.\r\n (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,\r\n not the internal create date)",
                       "type": "boolean",
                       "default": "true"
                     },
@@ -1474,7 +1474,7 @@
                       "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
                     },
                     "WorkItemCreateRetryLimit": {
-                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.\r\n This allows for periodic network glitches not to end the process.",
                       "type": "integer",
                       "default": "5"
                     },
@@ -1569,7 +1569,7 @@
                       ]
                     },
                     "FilterWorkItemsThatAlreadyExistInTarget": {
-                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+                      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                       "type": "boolean",
                       "default": "true"
                     },
@@ -1596,7 +1596,7 @@
                       "default": "AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')"
                     },
                     "WorkItemCreateRetryLimit": {
-                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+                      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.\r\n This allows for periodic network glitches not to end the process.",
                       "type": "integer",
                       "default": "5"
                     },
@@ -1626,7 +1626,7 @@
                 },
                 {
                   "title": "TfsWorkItemTypeValidatorProcessor",
-                  "description": "Work item type validation processor. Basically it just runs the `TfsWorkItemTypeValidatorTool` to validate work item types. The validation is run always, even if the tool iself is disabled. Neither this processor, nor the tool do not perform any changes to the source or target system.",
+                  "description": "Work item type validation processor. Basically it just runs the `TfsWorkItemTypeValidatorTool`\r\n to validate work item types. The validation is run always, even if the tool iself is disabled.\r\n Neither this processor, nor the tool do not perform any changes to the source or target system.",
                   "type": "object",
                   "properties": {
                     "Enabled": {
@@ -1651,7 +1651,7 @@
                       "type": "string"
                     },
                     "StopIfValidationFails": {
-                      "description": "If set to `true`, migration process will stop if there are some validation errors. If set to `false`, migration process will continue, for example to support some other validation processors. Default value is `true`.",
+                      "description": "If set to `true`, migration process will stop if there are some validation errors.\r\n If set to `false`, migration process will continue, for example to support some other validation\r\n processors.\r\n Default value is `true`.",
                       "type": "boolean"
                     },
                     "TargetName": {
@@ -2170,7 +2170,7 @@
                   "default": "C:\\temp\\Migration\\"
                 },
                 "MaxAttachmentSize": {
-                  "description": "`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).",
+                  "description": "`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.\r\n For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).",
                   "type": "integer",
                   "default": "480000000"
                 }
@@ -2281,7 +2281,7 @@
                   }
                 },
                 "MigrateRootNodes": {
-                  "description": "By default, only child nodes in node structures are migrated. Turning this on migrates even the root node (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate default area in source to some sub-area in target project. You have to set proper mapping for this to work. If after mapping the target node is still just root node (so it is not migrated under some child node), nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.",
+                  "description": "By default, only child nodes in node structures are migrated. Turning this on migrates even the root node\r\n (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate\r\n default area in source to some sub-area in target project. You have to set proper mapping for this to work.\r\n If after mapping the target node is still just root node (so it is not migrated under some child node),\r\n nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.",
                   "type": "boolean"
                 },
                 "ReplicateAllExistingNodes": {
@@ -2304,12 +2304,12 @@
                   "type": "boolean"
                 },
                 "MaxRevisions": {
-                  "description": "Sets the maximum number of revisions that will be migrated. \"First + Last N = Max\". If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.",
+                  "description": "Sets the maximum number of revisions that will be migrated. \"First + Last N = Max\".\r\n If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.",
                   "type": "integer",
                   "default": "0"
                 },
                 "ReplayRevisions": {
-                  "description": "You can choose to migrate the tip only (a single write) or all of the revisions (many writes). If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.",
+                  "description": "You can choose to migrate the tip only (a single write) or all of the revisions (many writes).\r\n If you are setting this to `false` to migrate only the tip then you should set `BuildFieldTable` to `true`.",
                   "type": "boolean",
                   "default": "true"
                 }
@@ -2349,7 +2349,7 @@
                   "default": "false"
                 },
                 "UseUserMapping": {
-                  "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities. By default, users in source are matched in target users by current display name. When this is set to `true`, users are matched also by mapped name from user mapping file.",
+                  "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities.\r\n By default, users in source are matched in target users by current display name. When this is set to `true`,\r\n users are matched also by mapped name from user mapping file.",
                   "type": "boolean"
                 }
               }
@@ -2373,7 +2373,7 @@
                   ]
                 },
                 "MatchUsersByEmail": {
-                  "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the users will be mapped by their email address first. If no match is found, then the display name will be used.",
+                  "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the\r\n users will be mapped by their email address first. If no match is found, then the display name will be used.",
                   "type": "boolean"
                 },
                 "ProjectCollectionValidUsersGroupName": {
@@ -2400,7 +2400,7 @@
                   "type": "boolean"
                 },
                 "Exclusions": {
-                  "description": "Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison. WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.",
+                  "description": "Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison.\r\n WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.",
                   "type": "array",
                   "default": "[]",
                   "prefixItems": [
@@ -2444,7 +2444,7 @@
             },
             "TfsWorkItemTypeValidatorTool": {
               "title": "TfsWorkItemTypeValidatorTool",
-              "description": "This tool checks if the work item types in the source system have corresponding types in the target system, and validates their fields and mappings.",
+              "description": "This tool checks if the work item types in the source system have corresponding types in the target system,\r\n and validates their fields and mappings.",
               "type": "object",
               "properties": {
                 "Enabled": {
@@ -2452,7 +2452,7 @@
                   "type": "boolean"
                 },
                 "FixedTargetFields": {
-                  "description": "List of target fields that are considered as `fixed`. A field marked as fixed will not stop the migration if differences are found. Instead of a warning, only an informational message will be logged. Use this list when you already know about the differences and have resolved them, for example by using `FieldMappingTool`. The key is the target work item type name. You can also use `*` to define fixed fields that apply to all work item types.",
+                  "description": "List of target fields that are considered as `fixed`. \r\n A field marked as fixed will not stop the migration if differences are found. \r\n Instead of a warning, only an informational message will be logged. \r\n\n Use this list when you already know about the differences and have resolved them, \r\n for example by using `FieldMappingTool`. \r\n\n The key is the target work item type name. \r\n You can also use `*` to define fixed fields that apply to all work item types.",
                   "type": "object",
                   "additionalProperties": {
                     "type": "array",
@@ -2474,7 +2474,7 @@
                   ]
                 },
                 "SourceFieldMappings": {
-                  "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to target field name. Target field name can be empty string to indicate that this field will not be validated in target. As work item type name, you can use `*` to define mappings which will be applied to all work item types.",
+                  "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to\r\n target field name. Target field name can be empty string to indicate that this field will not be validated in target.\r\n As work item type name, you can use `*` to define mappings which will be applied to all work item types.",
                   "type": "object",
                   "additionalProperties": {
                     "type": "object",

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.processors.tfsexportusersformappingprocessor.json",
   "title": "TfsExportUsersForMappingProcessor",
-  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems. Use `ExportUsersForMappingConfig` to configure.",
+  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.\r\n Use `ExportUsersForMappingConfig` to configure.",
   "type": "object",
   "properties": {
     "Enabled": {
@@ -14,7 +14,7 @@
       "type": "array"
     },
     "ExportAllUsers": {
-      "description": "Set to `true`, if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in `UserExportFile`.",
+      "description": "Set to `true`, if you want to export all users in source and target server.\r\n The lists of user can be useful, if you need tu manually edit mapping file.\r\n Users will be exported to file set in `UserExportFile`.",
       "type": "boolean"
     },
     "OnlyListUsersInWorkItems": {
@@ -35,7 +35,7 @@
       "type": "string"
     },
     "UserExportFile": {
-      "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if `ExportAllUsers` is set to `true`.",
+      "description": "Path to export file where all source and target servers' users will be exported.\r\n Users are exported only if `ExportAllUsers` is set to `true`.",
       "type": "string"
     },
     "WIQLQuery": {

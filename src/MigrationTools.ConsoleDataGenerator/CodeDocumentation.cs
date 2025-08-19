@@ -44,7 +44,7 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 Console.WriteLine($"- Description Loaded: {item.FullName}");
                 // Convert XML documentation to Markdown
-                query = XmlDocToMarkdownConverter.ConvertToSingleLine(query);
+                query = XmlDocToMarkdownConverter.Convert(query);
             }
             else
             {
@@ -77,7 +77,7 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 Console.WriteLine($"- - {element} Loaded: {jproperty.Name}");
                 // Convert XML documentation to Markdown
-                query = XmlDocToMarkdownConverter.ConvertToSingleLine(query);
+                query = XmlDocToMarkdownConverter.Convert(query);
             }
             else
             {
@@ -111,7 +111,7 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 Console.WriteLine($"- - Default Loaded: {jproperty.Name}");
                 // Convert XML documentation to Markdown  
-                defaultvalue = XmlDocToMarkdownConverter.ConvertToSingleLine(defaultvalue);
+                defaultvalue = XmlDocToMarkdownConverter.Convert(defaultvalue);
             }
             else
             {

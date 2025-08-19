@@ -115,7 +115,12 @@ options:
   dotNetType: MigrationTools.Tools.NodeOptions, MigrationTools.Clients.TfsObjectModel, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 - parameterName: MigrateRootNodes
   type: Boolean
-  description: By default, only child nodes in node structures are migrated. Turning this on migrates even the root node (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate default area in source to some sub-area in target project. You have to set proper mapping for this to work. If after mapping the target node is still just root node (so it is not migrated under some child node), nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.
+  description: >-
+    By default, only child nodes in node structures are migrated. Turning this on migrates even the root node
+     (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate
+     default area in source to some sub-area in target project. You have to set proper mapping for this to work.
+     If after mapping the target node is still just root node (so it is not migrated under some child node),
+     nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
