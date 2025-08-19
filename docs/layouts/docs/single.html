@@ -4,11 +4,11 @@
       <div class="col-12" style="max-width: 1800px;">
         <div class="row">
           {{/* Sidebar - Hidden on smaller screens */}}
-          <div class="col-12 col-xl-2 docs-navbar-container d-none d-xl-block">
+          <div class="col-12 col-xl-3 docs-navbar-container d-none d-xl-block">
             {{ partial "docs/sidebar.html" . }}
           </div>
           {{/* Dropdown Navigation for smaller screens */}}
-          <div class="col-12 d-xl-none mb-2">
+          <div class="col-12 d-xl-none mb-3">
             <div class="dropdown">
               <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="docsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-book me-2"></i>
@@ -21,7 +21,7 @@
           </div>
 
           {{/* Main content */}}
-          <div class="col-12 col-xl-8">
+          <div class="col-12 col-xl-7">
             <div class="docs-content">
               {{/* Breadcrumbs */}}
               {{ partial "docs/breadcrumbs.html" . }}
