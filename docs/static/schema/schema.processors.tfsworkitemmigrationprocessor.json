@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.processors.tfsworkitemmigrationprocessor.json",
   "title": "TfsWorkItemMigrationProcessor",
-  "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.",
+  "description": "WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.\r\n Use `WorkItemMigrationConfig` to configure.",
   "type": "object",
   "properties": {
     "AttachRevisionHistory": {
@@ -19,12 +19,12 @@
       "type": "array"
     },
     "FilterWorkItemsThatAlreadyExistInTarget": {
-      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
       "type": "boolean",
       "default": "true"
     },
     "FixHtmlAttachmentLinks": {
-      "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication.",
+      "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML\r\n fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;\r\n TFS should use integrated authentication.",
       "type": "boolean",
       "default": "true"
     },
@@ -34,7 +34,7 @@
       "default": "true"
     },
     "MaxGracefulFailures": {
-      "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.",
+      "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will\r\n continue until the number of failed items reaches the configured value, after which the migration fails.",
       "type": "integer",
       "default": "0"
     },
@@ -64,12 +64,12 @@
       "type": "string"
     },
     "UpdateCreatedBy": {
-      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+      "description": "If this is enabled the creation process on the target project will create the items with the original creation date.\r\n (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,\r\n not the internal create date)",
       "type": "boolean",
       "default": "true"
     },
     "UpdateCreatedDate": {
-      "description": "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)",
+      "description": "If this is enabled the creation process on the target project will create the items with the original creation date.\r\n (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,\r\n not the internal create date)",
       "type": "boolean",
       "default": "true"
     },
@@ -79,7 +79,7 @@
       "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
     },
     "WorkItemCreateRetryLimit": {
-      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.",
+      "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.\r\n This allows for periodic network glitches not to end the process.",
       "type": "integer",
       "default": "5"
     },

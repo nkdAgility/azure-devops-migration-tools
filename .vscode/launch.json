@@ -39,6 +39,21 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:azureFunctions.pickProcess}"
+        },
+        {
+            "name": "Documentation Generator",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build only",
+            "program": "${workspaceFolder}/src/MigrationTools.ConsoleDataGenerator/bin/Debug/net8.0/MigrationTools.ConsoleDataGenerator.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/MigrationTools.ConsoleDataGenerator/bin/Debug/net8.0",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
         }
     ]
 }

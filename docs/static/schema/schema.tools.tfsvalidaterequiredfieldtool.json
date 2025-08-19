@@ -7,10 +7,11 @@
   "properties": {
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "Exclusions": {
-      "description": "Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison. WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.",
+      "description": "Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison.\r\n WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.",
       "type": "array",
       "default": "[]"
     }

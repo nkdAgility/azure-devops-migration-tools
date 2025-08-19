@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.processors.tfsworkitemdeleteprocessor.json",
   "title": "TfsWorkItemDeleteProcessor",
-  "description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.",
+  "description": "The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query.\r\n **DANGER:** This is not a recoverable action and should be use with extream caution.",
   "type": "object",
   "properties": {
     "Enabled": {

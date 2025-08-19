@@ -7,7 +7,8 @@
   "properties": {
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "FieldMaps": {
       "description": "Gets or sets the list of field mapping configurations to apply.",

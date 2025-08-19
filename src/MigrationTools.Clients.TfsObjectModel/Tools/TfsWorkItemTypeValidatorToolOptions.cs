@@ -15,14 +15,10 @@ namespace MigrationTools.Tools
         private static readonly StringComparer _normalizedComparer = StringComparer.OrdinalIgnoreCase;
         private bool _isNormalized = false;
 
-        public TfsWorkItemTypeValidatorToolOptions()
-        {
-            Enabled = true; // Make this validator enabled by default, so it will run even if not explicitly configured.
-        }
-
         /// <summary>
         /// List of work item types which will be validated. If this list is empty, all work item types will be validated.
         /// </summary>
+        /// <default>null</default>
         public List<string> IncludeWorkItemtypes { get; set; } = [];
 
         /// <summary>
@@ -30,20 +26,25 @@ namespace MigrationTools.Tools
         /// target field name. Target field name can be empty string to indicate that this field will not be validated in target.
         /// As work item type name, you can use <c>*</c> to define mappings which will be applied to all work item types.
         /// </summary>
+        /// <default>null</default>
         public Dictionary<string, Dictionary<string, string>> SourceFieldMappings { get; set; } = [];
 
         /// <summary>
         /// <para>
-        /// List of target fields, that are considered as fixed. It means, even if the field is different against
-        /// source field, no warning will be triggered, jus information about the differences.
-        /// Use this list, whan you know about the differences between fields, but resolved it for example by
-        /// using <see cref="FieldMappingTool"/>.
+        /// List of target fields that are considered as <c>fixed</c>.  
+        /// A field marked as fixed will not stop the migration if differences are found.  
+        /// Instead of a warning, only an informational message will be logged.  
         /// </para>
         /// <para>
-        /// Key is target work item type name. As this name, you can use <c>*</c> to define fixed fields which will be applied
-        /// to all work item types.
+        /// Use this list when you already know about the differences and have resolved them,  
+        /// for example by using <see cref="FieldMappingTool"/>.  
+        /// </para>
+        /// <para>
+        /// The key is the target work item type name.  
+        /// You can also use <c>*</c> to define fixed fields that apply to all work item types.  
         /// </para>
         /// </summary>
+        /// <default>null</default>
         public Dictionary<string, List<string>> FixedTargetFields { get; set; } = [];
 
         /// <summary>

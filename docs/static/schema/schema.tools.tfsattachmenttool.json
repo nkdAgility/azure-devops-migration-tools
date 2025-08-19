@@ -7,7 +7,8 @@
   "properties": {
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "ExportBasePath": {
       "description": "`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.",
@@ -15,7 +16,7 @@
       "default": "C:\\temp\\Migration\\"
     },
     "MaxAttachmentSize": {
-      "description": "`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites. For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).",
+      "description": "`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.\r\n For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).",
       "type": "integer",
       "default": "480000000"
     }

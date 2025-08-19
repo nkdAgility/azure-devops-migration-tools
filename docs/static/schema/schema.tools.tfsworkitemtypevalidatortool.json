@@ -2,24 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.tools.tfsworkitemtypevalidatortool.json",
   "title": "TfsWorkItemTypeValidatorTool",
-  "description": "missing XML code comments",
+  "description": "This tool checks if the work item types in the source system have corresponding types in the target system,\r\n and validates their fields and mappings.",
   "type": "object",
   "properties": {
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "FixedTargetFields": {
-      "description": "List of target fields, that are considered as fixed. It means, even if the field is different against source field, no warning will be triggered, jus information about the differences. Use this list, whan you know about the differences between fields, but resolved it for example by using .  Key is target work item type name. As this name, you can use * to define fixed fields which will be applied to all work item types.",
-      "type": "object"
+      "description": "List of target fields that are considered as `fixed`. \r\n A field marked as fixed will not stop the migration if differences are found. \r\n Instead of a warning, only an informational message will be logged. \r\n\n Use this list when you already know about the differences and have resolved them, \r\n for example by using `FieldMappingTool`. \r\n\n The key is the target work item type name. \r\n You can also use `*` to define fixed fields that apply to all work item types.",
+      "type": "object",
+      "default": "null"
     },
     "IncludeWorkItemtypes": {
       "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
-      "type": "array"
+      "type": "array",
+      "default": "null"
     },
     "SourceFieldMappings": {
-      "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to target field name. Target field name can be empty string to indicate that this field will not be validated in target. As work item type name, you can use * to define mappings which will be applied to all work item types.",
-      "type": "object"
+      "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to\r\n target field name. Target field name can be empty string to indicate that this field will not be validated in target.\r\n As work item type name, you can use `*` to define mappings which will be applied to all work item types.",
+      "type": "object",
+      "default": "null"
     }
   }
 }

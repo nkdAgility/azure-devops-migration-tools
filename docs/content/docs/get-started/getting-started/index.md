@@ -65,6 +65,49 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 7. Adjust the [`NodeBasePaths`]({{< ref "docs/reference/processors/workitem-tracking-processor" >}}) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
+### Common Issue: Work Item Type Validation Failures
+
+> **⚠️ IMPORTANT:** The migration tools include automatic validation that runs before migration starts and can cause your migration to fail if source and target systems have different work item types or fields.
+
+The [TfsWorkItemTypeValidatorTool]({{< ref "docs/reference/tools/tfsworkitemtypevalidatortool" >}}) automatically validates that:
+
+- All source work item types exist in the target system (or have mappings configured)
+- Required fields exist in target work item types
+- Field types are compatible between source and target
+- The ReflectedWorkItemId field exists in target work item types
+
+**If validation fails**, the migration will stop immediately with detailed error messages. Here's how to resolve common validation issues:
+
+**Missing Work Item Types:**
+
+```text
+Work item type 'Risk' does not exist in target system.
+```
+
+- **Solution 1:** Create the missing work item type in your target system
+- **Solution 2:** Configure a work item type mapping to map 'Risk' to an existing type like 'Issue'
+- **Solution 3:** Exclude the work item type from your migration query
+
+**Missing ReflectedWorkItemId Field:**
+
+```text
+'User Story' does not contain reflected work item ID field 'Custom.ReflectedWorkItemId'.
+```
+
+- **Solution:** Add the custom field to ALL work item types in your target project (see [ReflectedWorkItemId setup]({{< ref "docs/setup/reflected-workitem-id" >}}))
+
+**Missing Custom Fields:**
+
+```text
+Missing field 'Microsoft.VSTS.Common.CustomField' in 'User Story'.
+```
+
+- **Solution 1:** Add the missing field to the target work item type
+- **Solution 2:** Configure field mapping to map to an existing field
+- **Solution 3:** Exclude the field from validation if it's not needed
+
+For detailed troubleshooting and configuration options, see the [TfsWorkItemTypeValidatorTool documentation]({{< ref "docs/reference/tools/tfsworkitemtypevalidatortool" >}}).
+
 **Remember:** If you want a processor to run, its `Enabled` attribute must be set to `true`.
 
 Refer to the [Reference Guide]({{< ref "docs/reference" >}}) for more details.

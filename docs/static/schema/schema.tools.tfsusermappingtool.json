@@ -7,14 +7,15 @@
   "properties": {
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "IdentityFieldsToCheck": {
       "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.",
       "type": "array"
     },
     "MatchUsersByEmail": {
-      "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the users will be mapped by their email address first. If no match is found, then the display name will be used.",
+      "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the\r\n users will be mapped by their email address first. If no match is found, then the display name will be used.",
       "type": "boolean"
     },
     "ProjectCollectionValidUsersGroupName": {

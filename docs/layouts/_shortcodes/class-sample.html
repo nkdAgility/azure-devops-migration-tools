@@ -30,12 +30,12 @@
     {{ if eq .name $sampleName }}
       {{ $foundSample = true }}
       <div class="example-item">
-        <h4 id="example-{{ anchorize .name }}" class="position-relative">
+        {{/*  <h4 id="example-{{ anchorize .name }}" class="position-relative">
           {{ .name | title }}
           <a href="#example-{{ anchorize .name }}" class="text-decoration-none text-muted ms-2" title="Link to this heading">
             <i class="fas fa-link fa-sm"></i>
           </a>
-        </h4>
+        </h4>  */}}
         {{ if .description }}
           <p>{{ .description | markdownify }}</p>
         {{ end }}

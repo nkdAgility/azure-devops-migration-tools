@@ -46,7 +46,9 @@ options:
   dotNetType: System.Collections.Generic.List`1[[MigrationTools.Enrichers.IProcessorEnricherOptions, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
-  description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+  description: >-
+    This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+     While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
@@ -83,12 +85,14 @@ options:
 - parameterName: WIQLQuery
   type: String
   description: A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
-  defaultValue: AND  [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')
+  defaultValue: AND [Microsoft.VSTS.Common.ClosedDate] = '' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request')
   isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
-  description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'
+  description: >-
+    **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+     This allows for periodic network glitches not to end the process.
   defaultValue: 5
   isRequired: false
   dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

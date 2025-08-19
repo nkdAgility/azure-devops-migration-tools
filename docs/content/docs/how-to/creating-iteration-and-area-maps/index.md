@@ -7,13 +7,13 @@ discussionId: 1846
 date: 2025-06-24T12:07:31Z
 
 ---
-As per the [documentation]({{< ref "docs/reference/tools/tfs-node-structure-tool" >}}), you need to add Iteration Maps and Area Maps that adapt the old locations to new ones that are valid in the Target.
+As per the [documentation]({{< ref "docs/reference/tools/tfsnodestructuretool" >}}), you need to add Iteration Maps and Area Maps that adapt the old locations to new ones that are valid in the Target.
 
 **NOTE: It is NOT possible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item. If the path does not exist, the work item will not be created. _There is no way around this!_**
 
 Before your migration starts, it will validate that all of the Areas and Iterations from the **Source** work items revisions exist on the **Target**. Any that do not exist will be flagged in the logs, and if you have `"StopMigrationOnMissingAreaIterationNodes": true,` set, the migration will stop just after it outputs a list of the missing nodes.
 
-Our algorithm that converts the Source nodes to Target nodes processes the [mappings]({{< ref "docs/reference/tools/tfs-node-structure-tool" >}}) at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message, as they are already altered to be valid.
+Our algorithm that converts the Source nodes to Target nodes processes the [mappings]({{< ref "docs/reference/tools/tfsnodestructuretool" >}}) at that time. This means that any valid mapped nodes will never be caught by the `This path is not anchored in the source project` message, as they are already altered to be valid.
 
 > We recently updated the logging for this part of the system to more easily debug both your mappings and to see what the system is doing with the nodes and their current state. You can set `"LogLevel": "Debug"` to see the details.
 
@@ -248,4 +248,4 @@ Here's a complete example showing the TfsNodeStructureTool configuration with bo
 }
 ```
 
-For more detailed information and advanced configuration options, refer to the complete [TFS Node Structure Tool documentation]({{< ref "docs/reference/tools/tfs-node-structure-tool" >}}).
+For more detailed information and advanced configuration options, refer to the complete [TFS Node Structure Tool documentation]({{< ref "docs/reference/tools/tfsnodestructuretool" >}}).

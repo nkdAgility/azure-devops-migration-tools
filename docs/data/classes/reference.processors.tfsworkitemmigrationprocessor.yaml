@@ -70,7 +70,9 @@ configurationSamples:
       "TargetName": "Target"
     }
   sampleFor: MigrationTools.Processors.TfsWorkItemMigrationProcessorOptions
-description: WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments. Use `WorkItemMigrationConfig` to configure.
+description: >-
+  WorkItemMigrationConfig is the main processor used to Migrate Work Items, Links, and Attachments.
+   Use `WorkItemMigrationConfig` to configure.
 className: TfsWorkItemMigrationProcessor
 typeName: Processors
 options:
@@ -94,13 +96,18 @@ options:
   dotNetType: System.Collections.Generic.List`1[[MigrationTools.Enrichers.IProcessorEnricherOptions, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
-  description: This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run. While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+  description: >-
+    This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
+     While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FixHtmlAttachmentLinks
   type: Boolean
-  description: "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps; TFS should use integrated authentication."
+  description: >-
+    **beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML
+     fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;
+     TFS should use integrated authentication.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
@@ -112,7 +119,9 @@ options:
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: MaxGracefulFailures
   type: Int32
-  description: The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will continue until the number of failed items reaches the configured value, after which the migration fails.
+  description: >-
+    The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
+     continue until the number of failed items reaches the configured value, after which the migration fails.
   defaultValue: 0
   isRequired: false
   dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
@@ -154,13 +163,19 @@ options:
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: UpdateCreatedBy
   type: Boolean
-  description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
+  description: >-
+    If this is enabled the creation process on the target project will create the items with the original creation date.
+     (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
+     not the internal create date)
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: UpdateCreatedDate
   type: Boolean
-  description: "If this is enabled the creation process on the target project will create the items with the original creation date. (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate, not the internal create date)"
+  description: >-
+    If this is enabled the creation process on the target project will create the items with the original creation date.
+     (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
+     not the internal create date)
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
@@ -172,7 +187,9 @@ options:
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WorkItemCreateRetryLimit
   type: Int32
-  description: '**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count. This allows for periodic network glitches not to end the process.'
+  description: >-
+    **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
+     This allows for periodic network glitches not to end the process.
   defaultValue: 5
   isRequired: false
   dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

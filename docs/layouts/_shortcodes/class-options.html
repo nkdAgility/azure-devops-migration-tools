@@ -35,9 +35,9 @@
       <div class="row d-none d-md-flex bg-light border-bottom border-2 fw-bold py-2 mb-2">
           <div class="col-md-3">Parameter</div>
           <div class="col-md-2">Type</div>
-          <div class="col-md-3">Required</div>
+          <div class="col-md-1">Required</div>
           <div class="col-md-5">Description</div>
-          <div class="col-md-2">Default Value</div>
+          <div class="col-md-1">Default Value</div>
       </div>
     
     <!-- Options rows -->
@@ -56,7 +56,7 @@
       </div>
 
       <!-- Type -->
-      <div class="col-12 col-md-2 mb-2 mb-md-0">
+      <div class="col-12 col-md-1 mb-2 mb-md-0">
           <div class="d-md-none fw-bold text-muted small">Required:</div>
           <code class="text-info">{{ .isRequired }}</code>
       </div>
@@ -68,8 +68,8 @@
       </div>
 
       <!-- Default Value -->
-      <div class="col-12 col-md-2">
-          <div class="d-md-none fw-bold text-muted small">Default Value:</div>
+      <div class="col-12 col-md-1">
+          <div class="d-md-none fw-bold text-muted small">Default:</div>
           {{ if .defaultValue }}
           <code class="text-success">{{ .defaultValue }}</code>
           {{ else }}

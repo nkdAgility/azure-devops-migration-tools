@@ -23,7 +23,10 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsWorkItemTypeValidatorProcessorOptions
-description: Work item type validation processor. Basically it just runs the  to validate work item types. The validation is run always, even if the tool iself is disabled. Neither this processor, nor the tool do not perform any changes to the source or target system.
+description: >-
+  Work item type validation processor. Basically it just runs the `TfsWorkItemTypeValidatorTool`
+   to validate work item types. The validation is run always, even if the tool iself is disabled.
+   Neither this processor, nor the tool do not perform any changes to the source or target system.
 className: TfsWorkItemTypeValidatorProcessor
 typeName: Processors
 options:
@@ -53,7 +56,11 @@ options:
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: StopIfValidationFails
   type: Boolean
-  description: If set to , migration process will stop if there are some validation errors. If set to , migration process will continue, for example to support some other validation processors. Default value is .
+  description: >-
+    If set to `true`, migration process will stop if there are some validation errors.
+     If set to `false`, migration process will continue, for example to support some other validation
+     processors.
+     Default value is `true`.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

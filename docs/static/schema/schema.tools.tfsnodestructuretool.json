@@ -12,7 +12,8 @@
     },
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "Iterations": {
       "description": "Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { \"Filters\": [\"*/**\"], \"Mappings\": [{\"Match\": \"^oldProjectName([\\\\\\\\]?.*)$\", \"Replacement\": \"targetProjectA$1\"}] }",
@@ -20,7 +21,7 @@
       "default": "{\"Filters\": [], \"Mappings\": []}"
     },
     "MigrateRootNodes": {
-      "description": "By default, only child nodes in node structures are migrated. Turning this on migrates even the root node (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate default area in source to some sub-area in target project. You have to set proper mapping for this to work. If after mapping the target node is still just root node (so it is not migrated under some child node), nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.",
+      "description": "By default, only child nodes in node structures are migrated. Turning this on migrates even the root node\r\n (default area/iteration). This is useful, when you do not have any child areas ion source, but want to migrate\r\n default area in source to some sub-area in target project. You have to set proper mapping for this to work.\r\n If after mapping the target node is still just root node (so it is not migrated under some child node),\r\n nothing happens – so migrating root nodes works only if the are remapped to some child node in target project.",
       "type": "boolean"
     },
     "ReplicateAllExistingNodes": {
