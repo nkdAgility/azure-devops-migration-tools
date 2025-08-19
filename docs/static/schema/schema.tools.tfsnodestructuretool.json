@@ -12,7 +12,8 @@
     },
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "Iterations": {
       "description": "Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { \"Filters\": [\"*/**\"], \"Mappings\": [{\"Match\": \"^oldProjectName([\\\\\\\\]?.*)$\", \"Replacement\": \"targetProjectA$1\"}] }",

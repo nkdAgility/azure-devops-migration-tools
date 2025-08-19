@@ -1740,7 +1740,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "FieldMaps": {
                   "description": "Gets or sets the list of field mapping configurations to apply.",
@@ -2136,7 +2137,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "Manipulators": {
                   "description": "List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.",
@@ -2162,7 +2164,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "ExportBasePath": {
                   "description": "`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.",
@@ -2187,7 +2190,8 @@
                 },
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 }
               }
             },
@@ -2198,7 +2202,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 }
               }
             },
@@ -2209,7 +2214,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "Mappings": {
                   "description": "Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration.",
@@ -2255,7 +2261,8 @@
                 },
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "Iterations": {
                   "description": "Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { \"Filters\": [\"*/**\"], \"Mappings\": [{\"Match\": \"^oldProjectName([\\\\\\\\]?.*)$\", \"Replacement\": \"targetProjectA$1\"}] }",
@@ -2301,7 +2308,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "MaxRevisions": {
                   "description": "Sets the maximum number of revisions that will be migrated. \"First + Last N = Max\".\r\n If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.",
@@ -2322,7 +2330,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "MigrateTeamCapacities": {
                   "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
@@ -2361,7 +2370,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "IdentityFieldsToCheck": {
                   "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.",
@@ -2397,7 +2407,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "Exclusions": {
                   "description": "Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison.\r\n WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.",
@@ -2418,7 +2429,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 }
               }
             },
@@ -2429,7 +2441,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "FilterIfLinkCountMatches": {
                   "description": "Skip validating links if the number of links in the source and the target matches!",
@@ -2449,11 +2462,13 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "FixedTargetFields": {
                   "description": "List of target fields that are considered as `fixed`. \r\n A field marked as fixed will not stop the migration if differences are found. \r\n Instead of a warning, only an informational message will be logged. \r\n\n Use this list when you already know about the differences and have resolved them, \r\n for example by using `FieldMappingTool`. \r\n\n The key is the target work item type name. \r\n You can also use `*` to define fixed fields that apply to all work item types.",
                   "type": "object",
+                  "default": "null",
                   "additionalProperties": {
                     "type": "array",
                     "prefixItems": [
@@ -2466,7 +2481,7 @@
                 "IncludeWorkItemtypes": {
                   "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
                   "type": "array",
-                  "default": "All work item types are included.",
+                  "default": "null",
                   "prefixItems": [
                     {
                       "type": "string"
@@ -2476,6 +2491,7 @@
                 "SourceFieldMappings": {
                   "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to\r\n target field name. Target field name can be empty string to indicate that this field will not be validated in target.\r\n As work item type name, you can use `*` to define mappings which will be applied to all work item types.",
                   "type": "object",
+                  "default": "null",
                   "additionalProperties": {
                     "type": "object",
                     "additionalProperties": {
@@ -2492,7 +2508,8 @@
               "properties": {
                 "Enabled": {
                   "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": "true"
                 },
                 "Mappings": {
                   "description": "List of work item mappings.",

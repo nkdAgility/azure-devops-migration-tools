@@ -7,7 +7,8 @@
   "properties": {
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "true"
     },
     "MaxRevisions": {
       "description": "Sets the maximum number of revisions that will be migrated. \"First + Last N = Max\".\r\n If this was set to 5 and there were 10 revisions you would get the first 1 (creation) and the latest 4 migrated.",
