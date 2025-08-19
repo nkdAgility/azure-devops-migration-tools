@@ -18,7 +18,7 @@ namespace MigrationTools.Tools
         /// <summary>
         /// List of work item types which will be validated. If this list is empty, all work item types will be validated.
         /// </summary>
-        /// <default>All work item types are included.</default>
+        /// <default>null</default>
         public List<string> IncludeWorkItemtypes { get; set; } = [];
 
         /// <summary>
@@ -26,6 +26,7 @@ namespace MigrationTools.Tools
         /// target field name. Target field name can be empty string to indicate that this field will not be validated in target.
         /// As work item type name, you can use <c>*</c> to define mappings which will be applied to all work item types.
         /// </summary>
+        /// <default>null</default>
         public Dictionary<string, Dictionary<string, string>> SourceFieldMappings { get; set; } = [];
 
         /// <summary>
@@ -43,6 +44,7 @@ namespace MigrationTools.Tools
         /// You can also use <c>*</c> to define fixed fields that apply to all work item types.  
         /// </para>
         /// </summary>
+        /// <default>null</default>
         public Dictionary<string, List<string>> FixedTargetFields { get; set; } = [];
 
         /// <summary>
