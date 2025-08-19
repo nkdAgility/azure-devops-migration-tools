@@ -10,6 +10,10 @@ using MigrationTools.Tools.Interfaces;
 
 namespace MigrationTools.Tools
 {
+    /// <summary>
+    /// This tool checks if the work item types in the source system have corresponding types in the target system,
+    /// and validates their fields and mappings.
+    /// </summary>
     public class TfsWorkItemTypeValidatorTool : Tool<TfsWorkItemTypeValidatorToolOptions>
     {
         private readonly IWorkItemTypeMappingTool _witMappingTool;

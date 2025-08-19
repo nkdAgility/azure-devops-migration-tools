@@ -249,6 +249,11 @@ namespace MigrationTools.Processors
 
         private void ValidateWorkItemTypes()
         {
+            Log.LogInformation("[ValidateWorkItemTypes]");
+            Log.LogInformation("------------------------------------");
+            Log.LogInformation("Starting Pre-Validation: Validating work item types and fields with `WorkItemTypeValidatorTool`.");
+            Log.LogInformation("Refer to https://devopsmigration.io/TfsWorkItemTypeValidatorTool/ for configuration.");
+            Log.LogInformation("------------------------------------");
             if (CommonTools.WorkItemTypeValidatorTool.Enabled)
             {
                 var sourceWits = Source.WorkItems.Project
@@ -264,6 +269,7 @@ namespace MigrationTools.Processors
                 if (!CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(
                     sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField))
                 {
+                    Log.LogError("Validation of work item types failed.");
                     Environment.Exit(-1);
                 }
             }
@@ -275,6 +281,8 @@ namespace MigrationTools.Processors
                     + " or migration may not work at all.";
                 Log.LogWarning(msg);
             }
+            Log.LogInformation("------------------------------------");
+            Log.LogInformation("[/ValidateWorkItemTypes]");
         }
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)

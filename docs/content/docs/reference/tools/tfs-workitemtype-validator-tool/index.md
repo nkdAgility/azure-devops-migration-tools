@@ -5,6 +5,7 @@ dataFile: reference.tools.tfsworkitemtypevalidatortool.yaml
 schemaFile: schema.tools.tfsworkitemtypevalidatortool.json
 slug: work-item-type-validator-tool
 aliases:
+- /TfsWorkItemTypeValidatorTool
 - /docs/Reference/Tools/WorkItemTypeValidatorTool
 - /Reference/Tools/WorkItemTypeValidatorTool
 - /learn/azure-devops-migration-tools/Reference/Tools/WorkItemTypeValidatorTool
