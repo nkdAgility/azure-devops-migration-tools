@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.tools.tfsworkitemtypevalidatortool.json",
   "title": "TfsWorkItemTypeValidatorTool",
-  "description": "missing XML code comments",
+  "description": "This tool checks if the work item types in the source system have corresponding types in the target system, and validates their fields and mappings.",
   "type": "object",
   "properties": {
     "Enabled": {
