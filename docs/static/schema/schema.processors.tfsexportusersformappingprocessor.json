@@ -14,7 +14,7 @@
       "type": "array"
     },
     "ExportAllUsers": {
-      "description": "Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .",
+      "description": "Set to `true`, if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in `UserExportFile`.",
       "type": "boolean"
     },
     "OnlyListUsersInWorkItems": {
@@ -35,7 +35,7 @@
       "type": "string"
     },
     "UserExportFile": {
-      "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if  is set to .",
+      "description": "Path to export file where all source and target servers' users will be exported. Users are exported only if `ExportAllUsers` is set to `true`.",
       "type": "string"
     },
     "WIQLQuery": {

@@ -25,9 +25,15 @@ namespace MigrationTools.ConsoleDataGenerator
             try
             {
                 // Query the data and write out a subset of contacts
-                query = (from c in GetXDocument(item).Root.Descendants("member")
-                         where c?.Attribute("name")?.Value == $"T:{item.FullName}"
-                         select c?.Element(element)?.Value)?.SingleOrDefault();
+                var element_xml = (from c in GetXDocument(item).Root.Descendants("member")
+                                  where c?.Attribute("name")?.Value == $"T:{item.FullName}"
+                                  select c?.Element(element))?.SingleOrDefault();
+                
+                if (element_xml != null)
+                {
+                    // Get inner XML content to preserve XML tags like <see cref="..."/> and <c>...</c>
+                    query = string.Join("", element_xml.Nodes().Select(x => x.ToString()));
+                }
             }
             catch (Exception)
             {
@@ -37,13 +43,15 @@ namespace MigrationTools.ConsoleDataGenerator
             if (query != null)
             {
                 Console.WriteLine($"- Description Loaded: {item.FullName}");
+                // Convert XML documentation to Markdown
+                query = XmlDocToMarkdownConverter.ConvertToSingleLine(query);
             }
             else
             {
                 query = "missing XML code comments";
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
             }
-            return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
+            return query;
         }
 
         public string GetPropertyData(object targetObject, JObject joptions, JProperty jproperty, string element)
@@ -68,13 +76,15 @@ namespace MigrationTools.ConsoleDataGenerator
             if (query != null)
             {
                 Console.WriteLine($"- - {element} Loaded: {jproperty.Name}");
+                // Convert XML documentation to Markdown
+                query = XmlDocToMarkdownConverter.ConvertToSingleLine(query);
             }
             else
             {
                 // Console.WriteLine($"- Description FAILED: {item.FullName}");
                 query = "missing XML code comments";
             }
-            return query.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
+            return query;
         }
 
         public string GetPropertyDefault(IOptions options, JObject joptions, JProperty jproperty)
@@ -100,6 +110,8 @@ namespace MigrationTools.ConsoleDataGenerator
             if (!string.IsNullOrEmpty(defaultvalue))
             {
                 Console.WriteLine($"- - Default Loaded: {jproperty.Name}");
+                // Convert XML documentation to Markdown  
+                defaultvalue = XmlDocToMarkdownConverter.ConvertToSingleLine(defaultvalue);
             }
             else
             {
@@ -107,7 +119,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 defaultvalue = "missing XML code comments";
             }
 
-            return defaultvalue.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "").Replace("            ", " ").Trim();
+            return defaultvalue;
         }
 
         public object GetPropertyType(object options, JProperty jproperty)
@@ -128,10 +140,17 @@ namespace MigrationTools.ConsoleDataGenerator
         {
             try
             {
-                var query = (from c in GetXDocument(type).Root.Descendants("member")
-                             where c.Attribute("name").Value == $"P:{type.FullName}.{propertyName}"
-                             select c.Element(element)?.Value).SingleOrDefault();
-                return query;
+                var element_xml = (from c in GetXDocument(type).Root.Descendants("member")
+                                  where c.Attribute("name").Value == $"P:{type.FullName}.{propertyName}"
+                                  select c.Element(element)).SingleOrDefault();
+                
+                if (element_xml != null)
+                {
+                    // Get inner XML content to preserve XML tags like <see cref="..."/> and <c>...</c>
+                    return string.Join("", element_xml.Nodes().Select(x => x.ToString()));
+                }
+                
+                return null;
             }
             catch (Exception)
             {

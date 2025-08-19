@@ -9,22 +9,7 @@ configurationSamples:
 - name: sample
   order: 1
   description: 
-  code: >-
-    {
-      "MigrationTools": {
-        "Version": "16.0",
-        "CommonTools": {
-          "TfsValidateRequiredFieldTool": {
-            "Enabled": "True",
-            "Exclusions": [
-              "Work Request",
-              "Opertunity",
-              "Assumption"
-            ]
-          }
-        }
-      }
-    }
+  code: There is no sample, but you can check the classic below for a general feel.
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 - name: classic
   order: 3
@@ -32,12 +17,8 @@ configurationSamples:
   code: >-
     {
       "$type": "TfsValidateRequiredFieldToolOptions",
-      "Enabled": true,
-      "Exclusions": [
-        "Work Request",
-        "Opertunity",
-        "Assumption"
-      ]
+      "Enabled": false,
+      "Exclusions": []
     }
   sampleFor: MigrationTools.Tools.TfsValidateRequiredFieldToolOptions
 description: Tool for validating that required fields exist in target work item types before migration, preventing migration failures due to missing required fields.

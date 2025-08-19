@@ -44,7 +44,7 @@ options:
   dotNetType: System.Collections.Generic.List`1[[MigrationTools.Enrichers.IProcessorEnricherOptions, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: ExportAllUsers
   type: Boolean
-  description: Set to , if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in .
+  description: Set to `true`, if you want to export all users in source and target server. The lists of user can be useful, if you need tu manually edit mapping file. Users will be exported to file set in `UserExportFile`.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
@@ -74,7 +74,7 @@ options:
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: UserExportFile
   type: String
-  description: Path to export file where all source and target servers' users will be exported. Users are exported only if  is set to .
+  description: Path to export file where all source and target servers' users will be exported. Users are exported only if `ExportAllUsers` is set to `true`.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

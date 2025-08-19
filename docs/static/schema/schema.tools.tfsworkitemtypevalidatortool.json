@@ -10,15 +10,16 @@
       "type": "boolean"
     },
     "FixedTargetFields": {
-      "description": "List of target fields, that are considered as fixed. It means, even if the field is different against source field, no warning will be triggered, jus information about the differences. Use this list, whan you know about the differences between fields, but resolved it for example by using .  Key is target work item type name. As this name, you can use * to define fixed fields which will be applied to all work item types.",
+      "description": "List of target fields that are considered as `fixed`. A field marked as fixed will not stop the migration if differences are found. Instead of a warning, only an informational message will be logged. Use this list when you already know about the differences and have resolved them, for example by using `FieldMappingTool`. The key is the target work item type name. You can also use `*` to define fixed fields that apply to all work item types.",
       "type": "object"
     },
     "IncludeWorkItemtypes": {
       "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
-      "type": "array"
+      "type": "array",
+      "default": "All work item types are included."
     },
     "SourceFieldMappings": {
-      "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to target field name. Target field name can be empty string to indicate that this field will not be validated in target. As work item type name, you can use * to define mappings which will be applied to all work item types.",
+      "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to target field name. Target field name can be empty string to indicate that this field will not be validated in target. As work item type name, you can use `*` to define mappings which will be applied to all work item types.",
       "type": "object"
     }
   }
