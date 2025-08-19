@@ -67,14 +67,14 @@ This field map is commonly used for:
 }
 ```
 
-#### Prefixed Tag Creation
+#### Formatted Tag Creation
 
 ```json
 {
   "FieldMapType": "FieldToTagFieldMap",
   "ApplyTo": ["*"],
   "sourceField": "Microsoft.VSTS.Common.Priority",
-  "tagPrefix": "Priority-"
+  "formatExpression": "Priority-{0}"
 }
 ```
 
@@ -96,7 +96,7 @@ This field map is commonly used for:
   "FieldMapType": "FieldToTagFieldMap",
   "ApplyTo": ["Feature"],
   "sourceField": "Custom.BusinessValue",
-  "tagPrefix": "BizValue-"
+  "formatExpression": "BizValue-{0}"
 }
 ```
 
@@ -161,13 +161,13 @@ This field map is commonly used for:
     "FieldMapType": "FieldToTagFieldMap",
     "ApplyTo": ["*"],
     "sourceField": "Custom.Department",
-    "tagPrefix": "Dept-"
+    "formatExpression": "Dept-{0}"
   },
   {
     "FieldMapType": "FieldToTagFieldMap",
     "ApplyTo": ["*"],
     "sourceField": "Custom.Component",
-    "tagPrefix": "Component-"
+    "formatExpression": "Component-{0}"
   }
 ]
 ```
@@ -186,7 +186,7 @@ This field map is commonly used for:
     "FieldMapType": "FieldToTagFieldMap",
     "ApplyTo": ["Bug"],
     "sourceField": "Custom.BugType",
-    "tagPrefix": "Type-"
+    "formatExpression": "Type-{0}"
   }
 ]
 ```

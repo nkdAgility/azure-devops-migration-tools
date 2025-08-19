@@ -57,43 +57,36 @@ This field map is essential for:
 
 ### Basic Examples
 
-#### Area Path to Tags
+#### Skip Root Levels and Apply Time Travel
 
 ```json
 {
   "FieldMapType": "TreeToTagFieldMap",
   "ApplyTo": ["*"],
-  "sourceField": "System.AreaPath",
-  "tagPrefix": "Area-",
-  "includeCompletePath": true,
-  "includeIndividualLevels": false
+  "toSkip": 2,
+  "timeTravel": 0
 }
 ```
 
-#### Iteration Path with Level Tags
-
-```json
-{
-  "FieldMapType": "TreeToTagFieldMap",
-  "ApplyTo": ["*"],
-  "sourceField": "System.IterationPath", 
-  "tagPrefix": "Sprint-",
-  "includeCompletePath": false,
-  "includeIndividualLevels": true
-}
-```
-
-#### Complete Path and Level Breakdown
+#### Skip First Level Only
 
 ```json
 {
   "FieldMapType": "TreeToTagFieldMap",
   "ApplyTo": ["User Story", "Bug"],
-  "sourceField": "System.AreaPath",
-  "tagPrefix": "Team-",
-  "includeCompletePath": true,
-  "includeIndividualLevels": true,
-  "levelSeparator": " > "
+  "toSkip": 1,
+  "timeTravel": 0
+}
+```
+
+#### Use Historical Area Path Values
+
+```json
+{
+  "FieldMapType": "TreeToTagFieldMap",
+  "ApplyTo": ["*"],
+  "toSkip": 0,
+  "timeTravel": 6
 }
 ```
 
@@ -141,10 +134,8 @@ When teams are restructuring but want to maintain historical context:
 {
   "FieldMapType": "TreeToTagFieldMap",
   "ApplyTo": ["*"],
-  "sourceField": "System.AreaPath",
-  "tagPrefix": "OriginalTeam-",
-  "includeCompletePath": true,
-  "includeIndividualLevels": false
+  "toSkip": 1,
+  "timeTravel": 0
 }
 ```
 
@@ -156,10 +147,8 @@ Maintaining sprint information for historical analysis:
 {
   "FieldMapType": "TreeToTagFieldMap", 
   "ApplyTo": ["*"],
-  "sourceField": "System.IterationPath",
-  "tagPrefix": "CompletedIn-",
-  "includeCompletePath": true,
-  "includeIndividualLevels": false
+  "toSkip": 0,
+  "timeTravel": 3
 }
 ```
 
@@ -172,18 +161,14 @@ Creating tags for different organizational levels:
   {
     "FieldMapType": "TreeToTagFieldMap",
     "ApplyTo": ["*"],
-    "sourceField": "System.AreaPath",
-    "tagPrefix": "Division-",
-    "includeCompletePath": false,
-    "includeIndividualLevels": true
+    "toSkip": 2,
+    "timeTravel": 0
   },
   {
     "FieldMapType": "TreeToTagFieldMap",
     "ApplyTo": ["*"], 
-    "sourceField": "System.IterationPath",
-    "tagPrefix": "Release-",
-    "includeCompletePath": true,
-    "includeIndividualLevels": false
+    "toSkip": 0,
+    "timeTravel": 6
   }
 ]
 ```
@@ -191,16 +176,19 @@ Creating tags for different organizational levels:
 ## Best Practices
 
 ### Tag Organization
+
 - Use consistent prefixes to group related path tags
 - Consider tag naming conventions that align with organizational standards
 - Plan for tag management and cleanup procedures
 
 ### Performance Considerations
+
 - Monitor tag proliferation in large organizations
 - Consider the impact on query performance
 - Balance between detail and manageability
 
 ### Migration Planning
+
 - Document the mapping strategy for stakeholders
 - Test with representative data before full migration
 - Coordinate with teams on new tagging conventions
@@ -208,11 +196,13 @@ Creating tags for different organizational levels:
 ## Integration with Other Field Maps
 
 ### Complementary Usage
+
 - **Field Clear Map**: Clear original path fields after tag creation
 - **Field Skip Map**: Preserve original paths while adding tags
 - **Field Value Map**: Transform path values before tag conversion
 
 ### Sequential Processing
+
 - Tree To Tag maps typically run after basic field mappings
 - Consider order when combining with other path-related mappings
 - Ensure tag creation doesn't conflict with other field operations
@@ -220,12 +210,14 @@ Creating tags for different organizational levels:
 ## Troubleshooting
 
 ### Common Issues
+
 - **Invalid Path Formats**: Ensure source paths follow Azure DevOps conventions
 - **Tag Length Limits**: Monitor generated tag lengths
 - **Duplicate Tags**: Handle cases where multiple paths generate same tags
 - **Special Characters**: Test with paths containing special characters
 
 ### Validation Tips
+
 - Test with various path structures
 - Verify tag generation with sample data
 - Check for tag naming conflicts
