@@ -1,6 +1,6 @@
 ---
-title: Tfs WorkItemType Validator Tool
-description: Validates Work Item Types against a set of rules. Does not migrate Work Items, only validates types.
+title: TFS Work Item Type Validator Tool
+description: Validates work item types and fields between source and target systems before migration begins, ensuring compatibility and preventing migration failures due to missing or incompatible work item configurations.
 dataFile: reference.tools.tfsworkitemtypevalidatortool.yaml
 schemaFile: schema.tools.tfsworkitemtypevalidatortool.json
 slug: work-item-type-validator-tool
