@@ -124,4 +124,4 @@ A complete list of [FieldMaps](../FieldMaps/index.md) are available.
 
 ## Removed Properties
 
-- PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure]({{< ref "docs/reference/tools/tfs-node-structure-tool" >}})
+- PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure]({{< ref "docs/reference/tools/tfsnodestructuretool" >}})

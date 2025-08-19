@@ -30,14 +30,17 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// <para>
-        /// List of target fields, that are considered as fixed. It means, even if the field is different against
-        /// source field, no warning will be triggered, jus information about the differences.
-        /// Use this list, whan you know about the differences between fields, but resolved it for example by
-        /// using <see cref="FieldMappingTool"/>.
+        /// List of target fields that are considered as <c>fixed</c>.  
+        /// A field marked as fixed will not stop the migration if differences are found.  
+        /// Instead of a warning, only an informational message will be logged.  
         /// </para>
         /// <para>
-        /// Key is target work item type name. As this name, you can use <c>*</c> to define fixed fields which will be applied
-        /// to all work item types.
+        /// Use this list when you already know about the differences and have resolved them,  
+        /// for example by using <see cref="FieldMappingTool"/>.  
+        /// </para>
+        /// <para>
+        /// The key is the target work item type name.  
+        /// You can also use <c>*</c> to define fixed fields that apply to all work item types.  
         /// </para>
         /// </summary>
         public Dictionary<string, List<string>> FixedTargetFields { get; set; } = [];
