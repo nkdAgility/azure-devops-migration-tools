@@ -1,7 +1,8 @@
 ---
-title: Tfs Node Structure Tool
-description: Tool for creating missing area and iteration path nodes in the target project during migration. Configurable through TfsNodeStructureToolOptions to specify which node types to create.
+title: TFS Node Structure Tool
+description: Migrates area path and iteration path structures between source and target systems, creating missing nodes and managing hierarchical project structures during work item migration.
 dataFile: reference.tools.tfsnodestructuretool.yaml
+schemaFile: schema.tools.tfsnodestructuretool.json
 slug: tfs-node-structure-tool
 aliases:
   - /docs/Reference/Tools/TfsNodeStructureTool
@@ -12,13 +13,48 @@ date: 2025-06-24T12:07:31Z
 discussionId: 2807
 ---
 
-{{< class-description >}}
+## Overview
 
-## Options
+The TFS Node Structure Tool manages the migration of area path and iteration path structures between source and target systems. This tool is essential for ensuring that the hierarchical organization of projects is properly maintained during work item migration.
+
+The tool creates missing area and iteration nodes in the target project and provides mapping capabilities to handle structural differences between source and target environments.
+
+### How It Works
+
+The TFS Node Structure Tool operates during project structure migration:
+
+1. **Structure Discovery**: Analyzes area and iteration path structures in the source project
+2. **Node Creation**: Creates missing area and iteration nodes in the target project
+3. **Hierarchy Preservation**: Maintains parent-child relationships in node structures
+4. **Mapping Application**: Applies configured mappings for node path transformations
+5. **Validation**: Ensures all required nodes exist before work item migration
+
+The tool is typically run before work item migration to ensure target project structure compatibility.
+
+### Critical Migration Requirement
+
+> **IMPORTANT**: It is NOT possible to migrate a work item if the Area or Iteration path does not exist in the target project. Work items are created with the same Area and Iteration paths as the source work item. If the path does not exist, the work item creation will fail.
+
+You have two options to solve this problem:
+
+1. **Manual Creation**: Manually create the missing nodes in the target project (suitable for small numbers of missing nodes)
+2. **Path Mapping**: Use `Areas.Mappings` and `Iterations.Mappings` to remap nodes to existing paths in the target project
+
+### Use Cases
+
+Common scenarios where the TFS Node Structure Tool is essential:
+
+- **Project Structure Migration**: Replicating area and iteration hierarchies in target projects
+- **Path Standardization**: Mapping different path structures between source and target
+- **Missing Node Creation**: Automatically creating required nodes for work item migration
+- **Cross-Project Migration**: Handling path differences when moving work items between projects
+- **Structure Consolidation**: Combining multiple source structures into unified target hierarchies
+
+## Configuration Structure
+
+### Options
 
 {{< class-options >}}
-
-## Samples
 
 ### Sample
 
@@ -28,26 +64,7 @@ discussionId: 2807
 
 {{< class-sample sample="defaults" >}}
 
-### Classic
-
-{{< class-sample sample="classic" >}}
-
-## Metadata
-
-{{< class-metadata >}}
-
-## Schema
-
-{{< class-schema >}}
-
-## Iteration Maps and Area Maps
-
-**NOTE: It is NOT posible to migrate a work item if the Area or Iteration path does not exist on the target project. This is because the work item will be created with the same Area and Iteration path as the source work item. If the path does not exist, the work item will not be created. _There is not way around this!_**
-
-You have two options to solve this problem:
-
-1. You can manually create the mentioned work items. This is a good option if you have a small number of work items or a small number of missing nodes. This will not work if you have work items that were moved from one project to another. Those Nodes are impossible to create in the target project.
-2. You can use the `Areas.Mappings` and `Iterations.Mappings` to remap the nodes to existing nodes in the target project. This is a good option if you have a large number of work items or a large number of missing nodes.
+### Basic Examples
 
 ### Overview
 

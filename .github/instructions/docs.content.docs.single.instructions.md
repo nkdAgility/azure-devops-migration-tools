@@ -1,11 +1,12 @@
 ---
-applyTo: "docs/content/docs/**"
+applyTo: "docs/content/docs/**/index.md"
 ---
 
 # Documentation Standards
 
 All documentation content **must stay in sync with the codebase**.  
-Every page must accurately reflect the associated **data files** and **schemas**.
+Every page must accurately reflect the associated **data files** and **schemas**.  
+Existing manually added content must be preserved. Reorganise or adapt it as needed, but do not remove it.
 
 ---
 
@@ -25,7 +26,8 @@ Each documentation file **may include** the following properties:
 
 ## Documentation Structure
 
-Documentation files should generally include these sections (in order):
+Documentation files should generally include these sections (in order).  
+Manually added content should be placed into the most relevant section, or reorganised if necessary.
 
 1. **Overview**  
    - Subsections: *How It Works*, *Use Cases*  
