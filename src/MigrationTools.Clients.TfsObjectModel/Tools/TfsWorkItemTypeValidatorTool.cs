@@ -189,7 +189,7 @@ namespace MigrationTools.Tools
                     + " source = '{sourceFieldAllowedValueType}', target = '{targetFieldAllowedValueType}'.",
                     sourceField.ReferenceName, targetField.ReferenceName, sourceValueType, targetValueType);
             }
-            if (!AllowedValuesAreSame(sourceAllowedValues, targetAllowedValues))
+            if (!DoesTargetContainsAllSourceValues(sourceAllowedValues, targetAllowedValues))
             {
                 isValid = false;
                 Log.Log(logLevel,
@@ -204,21 +204,9 @@ namespace MigrationTools.Tools
             return isValid;
         }
 
-        private bool AllowedValuesAreSame(List<string> sourceAllowedValues, List<string> targetAllowedValues)
-        {
-            if (sourceAllowedValues.Count != targetAllowedValues.Count)
-            {
-                return false;
-            }
-            foreach (string sourceValue in sourceAllowedValues)
-            {
-                if (!targetAllowedValues.Contains(sourceValue, StringComparer.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        private bool DoesTargetContainsAllSourceValues(List<string> sourceAllowedValues, List<string> targetAllowedValues) =>
+            sourceAllowedValues.Except(targetAllowedValues, StringComparer.OrdinalIgnoreCase).Count() == 0;
+
 
         private (string valueType, List<string> allowedValues) GetAllowedValues(FieldDefinition field)
         {
