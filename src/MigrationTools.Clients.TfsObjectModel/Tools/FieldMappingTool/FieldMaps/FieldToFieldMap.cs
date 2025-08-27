@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.Tools;
@@ -40,14 +41,23 @@ public class FieldToFieldMap : FieldMapBase
         {
             return;
         }
-
-        var value = Convert.ToString(source.Fields[Config.sourceField]?.Value);
+        string value;
+        switch (Config.fieldMapMode)
+        {
+            case FieldMapMode.SourceToTarget:
+                value = Convert.ToString(source.Fields[Config.sourceField]?.Value);
+                break;
+            case FieldMapMode.TargetToTarget:
+                value = Convert.ToString(target.Fields[Config.sourceField]?.Value);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
         if (string.IsNullOrEmpty(value) && Config.defaultValue is not null)
         {
             value = Config.defaultValue;
         }
-
         target.Fields[Config.targetField].Value = value;
-        Log.LogDebug("FieldToFieldMap: [UPDATE] field mapped {0}:{1} to {2}:{3}", source.Id, Config.sourceField, target.Id, Config.targetField);
+        Log.LogDebug("FieldToFieldMap: [UPDATE] field mapped {0}:{1} to {2}:{3} as {4}", source.Id, Config.sourceField, target.Id, Config.targetField, Config.fieldMapMode.ToString());
     }
 }

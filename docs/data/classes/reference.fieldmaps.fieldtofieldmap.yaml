@@ -54,6 +54,7 @@ configurationSamples:
   code: >-
     {
       "$type": "FieldToFieldMapOptions",
+      "fieldMapMode": "SourceToTarget",
       "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
       "targetField": "Microsoft.VSTS.Common.StackRank",
       "defaultValue": "42",
@@ -85,6 +86,12 @@ options:
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: fieldMapMode
+  type: FieldMapMode
+  description: Gets or sets the mode of field mapping to be applied during migration. SourceToTarget will get data from the source system and apply it to the target. TargetToTarget will move data between the target fields.
+  defaultValue: SourceToTarget
+  isRequired: false
+  dotNetType: MigrationTools.Tools.FieldMapMode, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 - parameterName: sourceField
   type: String
   description: Gets or sets the name of the source field to copy data from during migration.

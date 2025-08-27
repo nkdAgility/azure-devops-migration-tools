@@ -68,6 +68,7 @@ The important bits:
         "FieldMaps": [
           {
             "FieldMapType": "FieldToFieldMap",
+            "fieldMapMode": "TargetToTarget",
             "sourceField": "Custom.ReflectedWorkItemId",
             "targetField": "Microsoft.VSTS.Build.IntegrationBuild",
             "defaultValue": "",
