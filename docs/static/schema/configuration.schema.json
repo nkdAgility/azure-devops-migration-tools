@@ -1922,6 +1922,11 @@
                               "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
                               "type": "boolean"
                             },
+                            "fieldMapMode": {
+                              "description": "Gets or sets the mode of field mapping to be applied during migration. SourceToTarget will get data from the source system and apply it to the target. TargetToTarget will move data between the target fields.",
+                              "type": "string",
+                              "default": "SourceToTarget"
+                            },
                             "sourceField": {
                               "description": "Gets or sets the name of the source field to copy data from during migration.",
                               "type": "string"
