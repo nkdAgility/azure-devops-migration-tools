@@ -369,13 +369,10 @@ namespace MigrationTools.Processors
                 activity?.Stop();
                 activity?.SetStatus(ActivityStatusCode.Ok);
                 activity?.SetTag("http.response.status_code", "200");
-                if (Options.UpdateCreatedBy)
+                if (Target.Options.ProductVersion != Endpoints.TfsProductVersion.OnPremisesClassic)
                 {
                     newwit.Fields["System.CreatedBy"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value;
                     workItemLog.Debug("Setting 'System.CreatedBy'={SystemCreatedBy}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedBy"].Value);
-                }
-                if (Options.UpdateCreatedDate)
-                {
                     newwit.Fields["System.CreatedDate"].Value = currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value;
                     workItemLog.Debug("Setting 'System.CreatedDate'={SystemCreatedDate}", currentRevisionWorkItem.ToWorkItem().Revisions[0].Fields["System.CreatedDate"].Value);
                 }

@@ -63,16 +63,6 @@
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
       "type": "string"
     },
-    "UpdateCreatedBy": {
-      "description": "If this is enabled the creation process on the target project will create the items with the original creation date.\r\n (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,\r\n not the internal create date)",
-      "type": "boolean",
-      "default": "true"
-    },
-    "UpdateCreatedDate": {
-      "description": "If this is enabled the creation process on the target project will create the items with the original creation date.\r\n (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,\r\n not the internal create date)",
-      "type": "boolean",
-      "default": "true"
-    },
     "WIQLQuery": {
       "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
       "type": "string",

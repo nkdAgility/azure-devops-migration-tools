@@ -12,24 +12,6 @@ namespace MigrationTools.Processors
     public class TfsWorkItemMigrationProcessorOptions : ProcessorOptions, IWorkItemProcessorConfig
     {
         /// <summary>
-        /// If this is enabled the creation process on the target project will create the items with the original creation date.
-        /// (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
-        /// not the internal create date)
-        /// </summary>
-        /// <default>true</default>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool UpdateCreatedDate { get; set; } = true;
-
-        /// <summary>
-        /// If this is enabled the creation process on the target project will create the items with the original creation date.
-        /// (Important: The item history is always pointed to the date of the migration, it's change only the data column CreateDate,
-        /// not the internal create date)
-        /// </summary>
-        /// <default>true</default>
-        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool UpdateCreatedBy { get; set; } = true;
-
-        /// <summary>
         /// A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)
         /// </summary>
         /// <default>SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc</default>

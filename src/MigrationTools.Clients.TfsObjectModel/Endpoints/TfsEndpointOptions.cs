@@ -19,17 +19,17 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Represents legacy Team Foundation Server versions prior to 2013. Not technically supported but may work.
         /// </summary>
-        OnPremisesClassic,
+        OnPremisesClassic = 0,
 
         /// <summary>
         /// Represents on-premises Team Foundation Server 2013+ and Azure DevOps Server (default).
         /// </summary>
-        OnPremises,
+        OnPremises = 1,
 
         /// <summary>
         /// Represents Azure DevOps Services (cloud version).
         /// </summary>
-        Cloud
+        Cloud = 2
     }
 
     /// <summary>
