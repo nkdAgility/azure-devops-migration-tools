@@ -20,11 +20,12 @@ configurationSamples:
       "Collection": null,
       "Project": null,
       "Authentication": null,
-      "ReflectedWorkItemIdField": null,
+      "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
       "LanguageMaps": {
         "AreaPath": "Area",
         "IterationPath": "Iteration"
-      }
+      },
+      "ProductVersion": "OnPremises"
     }
   sampleFor: MigrationTools.Endpoints.TfsTeamSettingsEndpointOptions
 description: missing XML code comments
@@ -65,7 +66,7 @@ options:
   type: TfsLanguageMapOptions
   description: Language mapping configuration for translating area and iteration path names between different language versions of TFS.
   defaultValue: missing XML code comments
-  isRequired: true
+  isRequired: false
   dotNetType: MigrationTools.Endpoints.TfsLanguageMapOptions, MigrationTools.Clients.TfsObjectModel, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 - parameterName: Name
   type: String
@@ -73,6 +74,12 @@ options:
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: ProductVersion
+  type: TfsProductVersion
+  description: Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.
+  defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: MigrationTools.Endpoints.TfsProductVersion, MigrationTools.Clients.TfsObjectModel, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 - parameterName: Project
   type: String
   description: Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.
@@ -83,7 +90,7 @@ options:
   type: String
   description: Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
   defaultValue: missing XML code comments
-  isRequired: true
+  isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
 processingTarget: missing XML code comments

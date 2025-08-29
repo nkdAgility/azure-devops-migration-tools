@@ -175,6 +175,10 @@
                     "description": "missing XML code comments",
                     "type": "string"
                   },
+                  "ProductVersion": {
+                    "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
+                    "type": "string"
+                  },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
                     "type": "string"
@@ -193,9 +197,7 @@
                 "required": [
                   "Authentication",
                   "Collection",
-                  "LanguageMaps",
                   "Project",
-                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               },
@@ -263,6 +265,10 @@
                     "description": "missing XML code comments",
                     "type": "string"
                   },
+                  "ProductVersion": {
+                    "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
+                    "type": "string"
+                  },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
                     "type": "string"
@@ -281,9 +287,7 @@
                 "required": [
                   "Authentication",
                   "Collection",
-                  "LanguageMaps",
                   "Project",
-                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               },
@@ -351,6 +355,10 @@
                     "description": "missing XML code comments",
                     "type": "string"
                   },
+                  "ProductVersion": {
+                    "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
+                    "type": "string"
+                  },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
                     "type": "string"
@@ -369,9 +377,7 @@
                 "required": [
                   "Authentication",
                   "Collection",
-                  "LanguageMaps",
                   "Project",
-                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               },
@@ -439,6 +445,10 @@
                     "description": "missing XML code comments",
                     "type": "string"
                   },
+                  "ProductVersion": {
+                    "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
+                    "type": "string"
+                  },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
                     "type": "string"
@@ -475,9 +485,7 @@
                 "required": [
                   "Authentication",
                   "Collection",
-                  "LanguageMaps",
                   "Project",
-                  "ReflectedWorkItemIdField",
                   "EndpointType"
                 ]
               }
