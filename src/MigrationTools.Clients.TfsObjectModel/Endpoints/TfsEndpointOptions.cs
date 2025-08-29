@@ -12,6 +12,26 @@ using TfsUrlParser;
 
 namespace MigrationTools.Endpoints
 {
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum TfsProductVersion
+    {
+        /// <summary>
+        /// Represents legacy Team Foundation Server versions prior to 2013. Not technically supported but may work.
+        /// </summary>
+        OnPremisesClassic,
+
+        /// <summary>
+        /// Represents on-premises Team Foundation Server 2013+ and Azure DevOps Server (default).
+        /// </summary>
+        OnPremises,
+
+        /// <summary>
+        /// Represents Azure DevOps Services (cloud version).
+        /// </summary>
+        Cloud
+    }
+
     /// <summary>
     /// Configuration options for connecting to a Team Foundation Server (TFS) or Azure DevOps Server endpoint. Provides authentication and project access settings for on-premises TFS operations.
     /// </summary>
@@ -23,7 +43,7 @@ namespace MigrationTools.Endpoints
         [JsonProperty(Order = -3)]
         [Required]
         public Uri Collection { get; set; }
-        
+
         /// <summary>
         /// Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.
         /// </summary>
@@ -41,8 +61,7 @@ namespace MigrationTools.Endpoints
         /// Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
         /// </summary>
         [JsonProperty(Order = -1)]
-        [Required]
-        public string ReflectedWorkItemIdField { get; set; }
+        public string ReflectedWorkItemIdField { get; set; } = "Custom.ReflectedWorkItemId";
 
         /// <summary>
         /// When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.
@@ -53,9 +72,14 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Language mapping configuration for translating area and iteration path names between different language versions of TFS.
         /// </summary>
-        [Required]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public TfsLanguageMapOptions LanguageMaps { get; set; } = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" }; 
+        public TfsLanguageMapOptions LanguageMaps { get; set; } = new TfsLanguageMapOptions() { AreaPath = "Area", IterationPath = "Iteration" };
+
+        /// <summary>
+        /// Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public TfsProductVersion ProductVersion { get; set; } = TfsProductVersion.OnPremises;
     }
 
     public class TfsEndpointOptionsValidator : IValidateOptions<TfsEndpointOptions>
@@ -71,7 +95,7 @@ namespace MigrationTools.Endpoints
             }
             else
             {
-                Uri output; 
+                Uri output;
                 if (!Uri.TryCreate(Uri.UnescapeDataString(options.Collection.ToString()), UriKind.Absolute, out output))
                 {
                     errors.Add("The Collection property must be a valid URL.");
