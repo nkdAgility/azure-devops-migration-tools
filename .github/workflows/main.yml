@@ -183,8 +183,7 @@ jobs:
               - 'docs/**'
             automation:
               - 'build/**'
-              - '.github/**'
-              - '!.github/instructions/**'
+              - '.github/workfows/**'
       - name: "Debug Filter Results"
         shell: pwsh
         run: |
