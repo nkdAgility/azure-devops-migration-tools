@@ -47,11 +47,16 @@ namespace MigrationTools.Processors
                 .WorkItemTypes
                 .Cast<WorkItemType>()
                 .ToList();
+            bool containsReflectedWorkItemId = CommonTools.WorkItemTypeValidatorTool
+                .ValidateReflectedWorkItemIdField(sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField);
             bool validationResult = CommonTools.WorkItemTypeValidatorTool
-                .ValidateWorkItemTypes(sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField);
-            if (Options.StopIfValidationFails && !validationResult)
+                .ValidateWorkItemTypes(sourceWits, targetWits);
+            if ((Options.StopIfValidationFails && !validationResult) || (!containsReflectedWorkItemId))
             {
-                Log.LogInformation($"'{nameof(Options.StopIfValidationFails)}' is set to 'true', so migration process will stop now.");
+                const string message =
+                    "Either the reflected work item type ID field '{ReflectedWorkItemIdField}' is missing in some of the target work item types"
+                    + $" or '{nameof(Options.StopIfValidationFails)}' is set to 'true', so migration process will stop now.";
+                Log.LogInformation(message, Target.Options.ReflectedWorkItemIdField);
                 Environment.Exit(-1);
             }
         }
