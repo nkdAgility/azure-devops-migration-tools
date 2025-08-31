@@ -184,6 +184,7 @@ jobs:
             automation:
               - 'build/**'
               - '.github/**'
+              - '!.github/instructions/**'
       - name: "Debug Filter Results"
         shell: pwsh
         run: |
