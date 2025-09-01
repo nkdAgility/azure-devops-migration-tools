@@ -688,9 +688,8 @@ jobs:
 
           # Paths to main and environment-specific config files
           $environment = ("${{ (needs.Setup.outputs.nkdAgility_Ring) }}").ToLower()
-          $rootConfig = "./_site/staticwebapp.config.json"
-          $environmentConfig = "./_site/staticwebapp.config.$environment.json"
-          # $routesConfig = "./_site/staticwebapp.config.routes.json"
+          $rootConfig = "./_site2/staticwebapp.config.json"
+          $environmentConfig = "./_site2/staticwebapp.config.$environment.json"
 
           # Check if both target files exist
           if ((Test-Path -Path $rootConfig -ErrorAction Stop) -and (Test-Path -Path $environmentConfig -ErrorAction Stop)) {
@@ -700,7 +699,7 @@ jobs:
 
                   if ($mergedContent -ne "") {
                       # Write the merged content to the output file
-                      $mergedContent | Set-Content -Path "./staticwebapp.config.json"
+                      $mergedContent | Set-Content -Path "./_site2/staticwebapp.config.json"
                       Write-Host "Merged JSON files successfully."
                   }
                   else {
