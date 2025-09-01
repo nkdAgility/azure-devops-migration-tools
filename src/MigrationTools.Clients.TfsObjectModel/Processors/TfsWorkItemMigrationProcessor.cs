@@ -254,24 +254,25 @@ namespace MigrationTools.Processors
             Log.LogInformation("Starting Pre-Validation: Validating work item types and fields with `WorkItemTypeValidatorTool`.");
             Log.LogInformation("Refer to https://devopsmigration.io/TfsWorkItemTypeValidatorTool/ for configuration.");
             Log.LogInformation("------------------------------------");
+
+            var sourceWits = Source.WorkItems.Project
+                .ToProject()
+                .WorkItemTypes
+                .Cast<WorkItemType>()
+                .ToList();
+            var targetWits = Target.WorkItems.Project
+                .ToProject()
+                .WorkItemTypes
+                .Cast<WorkItemType>()
+                .ToList();
+
+            // Reflected work item ID field is mandatory for migration, so it is validated even if the validator tool is disabled.
+            bool containsReflectedWorkItemId = CommonTools.WorkItemTypeValidatorTool.ValidateReflectedWorkItemIdField(
+                sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField);
+            bool validationResult = true;
             if (CommonTools.WorkItemTypeValidatorTool.Enabled)
             {
-                var sourceWits = Source.WorkItems.Project
-                    .ToProject()
-                    .WorkItemTypes
-                    .Cast<WorkItemType>()
-                    .ToList();
-                var targetWits = Target.WorkItems.Project
-                    .ToProject()
-                    .WorkItemTypes
-                    .Cast<WorkItemType>()
-                    .ToList();
-                if (!CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(
-                    sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField))
-                {
-                    Log.LogError("Validation of work item types failed.");
-                    Environment.Exit(-1);
-                }
+                validationResult = CommonTools.WorkItemTypeValidatorTool.ValidateWorkItemTypes(sourceWits, targetWits);
             }
             else
             {
@@ -280,6 +281,11 @@ namespace MigrationTools.Processors
                     + " If they are not validated, some data in source system may not be migrated,"
                     + " or migration may not work at all.";
                 Log.LogWarning(msg);
+            }
+            if (!containsReflectedWorkItemId || !validationResult)
+            {
+                Log.LogError("Validation of work item types failed.");
+                Environment.Exit(-1);
             }
             Log.LogInformation("------------------------------------");
             Log.LogInformation("[/ValidateWorkItemTypes]");
