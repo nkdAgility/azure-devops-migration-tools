@@ -687,7 +687,7 @@ jobs:
           }
 
           # Paths to main and environment-specific config files
-          $environment = (${{ (needs.Setup.outputs.nkdAgility_Ring) }}).ToLower()
+          $environment = ("${{ (needs.Setup.outputs.nkdAgility_Ring) }}").ToLower()
           $rootConfig = "./_site/staticwebapp.config.json"
           $environmentConfig = "./_site/staticwebapp.config.$environment.json"
           # $routesConfig = "./_site/staticwebapp.config.routes.json"
