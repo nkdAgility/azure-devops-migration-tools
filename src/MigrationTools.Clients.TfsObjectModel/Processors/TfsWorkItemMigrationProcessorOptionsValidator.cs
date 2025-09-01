@@ -13,7 +13,7 @@ namespace MigrationTools.Processors
     {
         public ValidateOptionsResult Validate(string name, TfsWorkItemMigrationProcessorOptions options)
         {
-            
+
             var errors = new List<string>();
             ValidateOptionsResult baseResult = options.Validate(name, options);
             if (baseResult != ValidateOptionsResult.Success)
@@ -50,7 +50,7 @@ namespace MigrationTools.Processors
         private bool ContainsTeamProjectCondition(string query)
         {
             // Regex to match '[System.TeamProject] = @TeamProject'
-            string teamProjectPattern = @"\[System\.TeamProject\]\s*=\s*@TeamProject";
+            string teamProjectPattern = @"\[System\.TeamProject\]\s*=\s*'?@TeamProject'?";
 
             return Regex.IsMatch(query, teamProjectPattern, RegexOptions.IgnoreCase);
         }
