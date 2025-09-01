@@ -1,8 +1,2 @@
 {
-    "globalHeaders": {
-        "Access-Control-Allow-Origin": "https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Vary": "Origin"
-    }
 }
