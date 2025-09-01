@@ -721,7 +721,7 @@ jobs:
 
           # Verify and read the merged file content
           try {
-              $content = Get-Content -Path "./staticwebapp.config.json" -ErrorAction Stop
+              $content = Get-Content -Path "./_site2/staticwebapp.config.json" -ErrorAction Stop
               Write-Host "Content of merged config file:"
               Write-Output $content
           }
