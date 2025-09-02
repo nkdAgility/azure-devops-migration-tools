@@ -10,6 +10,10 @@
       "type": "boolean",
       "default": "true"
     },
+    "ExcludeDefaultWorkItemTypes": {
+      "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemtypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.",
+      "type": "boolean"
+    },
     "ExcludeWorkItemtypes": {
       "description": "List of work item types which will be excluded from validation.",
       "type": "array"

@@ -11,14 +11,8 @@ configurationSamples:
         "CommonTools": {
           "TfsWorkItemTypeValidatorTool": {
             "Enabled": "True",
-            "ExcludeWorkItemtypes": [
-              "Code Review Request",
-              "Code Review Response",
-              "Feedback Request",
-              "Feedback Response",
-              "Shared Parameter",
-              "Shared Steps"
-            ],
+            "ExcludeDefaultWorkItemTypes": "True",
+            "ExcludeWorkItemtypes": null,
             "FixedTargetFields": null,
             "SourceFieldMappings": null
           }
@@ -60,14 +54,8 @@ configurationSamples:
       "$type": "TfsWorkItemTypeValidatorToolOptions",
       "Enabled": true,
       "IncludeWorkItemtypes": [],
-      "ExcludeWorkItemtypes": [
-        "Code Review Request",
-        "Code Review Response",
-        "Feedback Request",
-        "Feedback Response",
-        "Shared Parameter",
-        "Shared Steps"
-      ],
+      "ExcludeWorkItemtypes": [],
+      "ExcludeDefaultWorkItemTypes": true,
       "SourceFieldMappings": {
         "User Story": {
           "Microsoft.VSTS.Common.Prirucka": "Custom.Prirucka"
@@ -90,6 +78,15 @@ options:
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
   defaultValue: true
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: ExcludeDefaultWorkItemTypes
+  type: Boolean
+  description: >-
+    If `true`, some work item types will be automatically added to `ExcludeWorkItemtypes` list.
+     Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,
+     Feedback Response, Shared Parameter, Shared Steps.
+  defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: ExcludeWorkItemtypes
