@@ -14,6 +14,14 @@ namespace MigrationTools.Tools
 
         private static readonly StringComparer _normalizedComparer = StringComparer.OrdinalIgnoreCase;
         private bool _isNormalized = false;
+        private static string[] _defaultExcludedWorkItemTypes = [
+            "Code Review Request",
+            "Code Review Response",
+            "Feedback Request",
+            "Feedback Response",
+            "Shared Parameter",
+            "Shared Steps"
+        ];
 
         /// <summary>
         /// List of work item types which will be validated. If this list is empty, all work item types will be validated.
@@ -25,6 +33,13 @@ namespace MigrationTools.Tools
         /// List of work item types which will be excluded from validation.
         /// </summary>
         public List<string> ExcludeWorkItemtypes { get; set; } = [];
+
+        /// <summary>
+        /// If <see langword="true"/>, some work item types will be automatically added to <see cref="ExcludeWorkItemtypes"/> list.
+        /// Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,
+        /// Feedback Response, Shared Parameter, Shared Steps.
+        /// </summary>
+        public bool ExcludeDefaultWorkItemTypes { get; set; } = true;
 
         /// <summary>
         /// Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
@@ -90,6 +105,17 @@ namespace MigrationTools.Tools
 
             IncludeWorkItemtypes ??= [];
             ExcludeWorkItemtypes ??= [];
+            if (ExcludeDefaultWorkItemTypes)
+            {
+                foreach (string defaultExcludedWit in _defaultExcludedWorkItemTypes)
+                {
+                    if (!ExcludeWorkItemtypes.Contains(defaultExcludedWit, _normalizedComparer))
+                    {
+                        ExcludeWorkItemtypes.Add(defaultExcludedWit);
+                    }
+                }
+            }
+
             FixedTargetFields = newFixedFields;
             SourceFieldMappings = newMappings;
             _isNormalized = true;

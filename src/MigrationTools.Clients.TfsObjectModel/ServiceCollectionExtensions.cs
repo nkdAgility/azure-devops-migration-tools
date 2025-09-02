@@ -27,6 +27,7 @@ namespace MigrationTools
             context.AddSingleton<TfsTeamSettingsTool>().AddMigrationToolsOptions<TfsTeamSettingsToolOptions>(configuration);
             context.AddSingleton<TfsChangeSetMappingTool>().AddMigrationToolsOptions<TfsChangeSetMappingToolOptions>(configuration);
             context.AddSingleton<TfsWorkItemTypeValidatorTool>().AddMigrationToolsOptions<TfsWorkItemTypeValidatorToolOptions, TfsWorkItemTypeValidatorToolOptionsValidator>(configuration);
+            context.PostConfigure<TfsWorkItemTypeValidatorToolOptions>(options => options.Normalize());
         }
 
         public static void AddMigrationToolServicesForClientTfs_Processors(this IServiceCollection context)
