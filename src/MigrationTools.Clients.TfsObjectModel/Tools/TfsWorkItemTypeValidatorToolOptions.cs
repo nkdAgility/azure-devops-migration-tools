@@ -24,21 +24,7 @@ namespace MigrationTools.Tools
         /// <summary>
         /// List of work item types which will be excluded from validation.
         /// </summary>
-        public List<string> ExcludeWorkItemtypes { get; set; } = [
-            "Code Review Request",
-            "Code Review Response",
-            "Feedback Request",
-            "Feedback Response",
-            "Impediment",
-            "Quality of Service Requirement",
-            "Release",
-            "Risk",
-            "Shared Parameter",
-            "Shared Steps",
-            "Test Case",
-            "Test Plan",
-            "Test Suite",
-        ];
+        public List<string> ExcludeWorkItemtypes { get; set; } = [];
 
         /// <summary>
         /// Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
