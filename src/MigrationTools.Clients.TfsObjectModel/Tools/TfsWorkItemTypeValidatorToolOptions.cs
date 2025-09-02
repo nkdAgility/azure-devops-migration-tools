@@ -22,6 +22,25 @@ namespace MigrationTools.Tools
         public List<string> IncludeWorkItemtypes { get; set; } = [];
 
         /// <summary>
+        /// List of work item types which will be excluded from validation.
+        /// </summary>
+        public List<string> ExcludeWorkItemtypes { get; set; } = [
+            "Code Review Request",
+            "Code Review Response",
+            "Feedback Request",
+            "Feedback Response",
+            "Impediment",
+            "Quality of Service Requirement",
+            "Release",
+            "Risk",
+            "Shared Parameter",
+            "Shared Steps",
+            "Test Case",
+            "Test Plan",
+            "Test Suite",
+        ];
+
+        /// <summary>
         /// Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
         /// target field name. Target field name can be empty string to indicate that this field will not be validated in target.
         /// As work item type name, you can use <c>*</c> to define mappings which will be applied to all work item types.
@@ -31,17 +50,17 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// <para>
-        /// List of target fields that are considered as <c>fixed</c>.  
-        /// A field marked as fixed will not stop the migration if differences are found.  
-        /// Instead of a warning, only an informational message will be logged.  
+        /// List of target fields that are considered as <c>fixed</c>.
+        /// A field marked as fixed will not stop the migration if differences are found.
+        /// Instead of a warning, only an informational message will be logged.
         /// </para>
         /// <para>
-        /// Use this list when you already know about the differences and have resolved them,  
-        /// for example by using <see cref="FieldMappingTool"/>.  
+        /// Use this list when you already know about the differences and have resolved them,
+        /// for example by using <see cref="FieldMappingTool"/>.
         /// </para>
         /// <para>
-        /// The key is the target work item type name.  
-        /// You can also use <c>*</c> to define fixed fields that apply to all work item types.  
+        /// The key is the target work item type name.
+        /// You can also use <c>*</c> to define fixed fields that apply to all work item types.
         /// </para>
         /// </summary>
         /// <default>null</default>
@@ -84,6 +103,7 @@ namespace MigrationTools.Tools
             }
 
             IncludeWorkItemtypes ??= [];
+            ExcludeWorkItemtypes ??= [];
             FixedTargetFields = newFixedFields;
             SourceFieldMappings = newMappings;
             _isNormalized = true;

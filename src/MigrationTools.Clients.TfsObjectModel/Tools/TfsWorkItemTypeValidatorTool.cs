@@ -254,6 +254,14 @@ namespace MigrationTools.Tools
                     workItemTypeName);
                 return false;
             }
+            else if ((Options.ExcludeWorkItemtypes.Count > 0)
+                && Options.ExcludeWorkItemtypes.Contains(workItemTypeName, StringComparer.OrdinalIgnoreCase))
+            {
+                Log.LogInformation(
+                    "Skipping validation of work item type '{sourceWit}' because it is excluded from validation list.",
+                    workItemTypeName);
+                return false;
+            }
             return true;
         }
 
