@@ -27,7 +27,6 @@ namespace MigrationTools.Tools
             : base(options, services, logger, telemetry)
         {
             _witMappingTool = witMappingTool ?? throw new ArgumentNullException(nameof(witMappingTool));
-            Options.Normalize();
         }
 
         public bool ValidateReflectedWorkItemIdField(
