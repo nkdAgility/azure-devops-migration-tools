@@ -10,7 +10,17 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemTypeValidatorTool": {
-            "Enabled": "True"
+            "Enabled": "True",
+            "ExcludeWorkItemtypes": [
+              "Code Review Request",
+              "Code Review Response",
+              "Feedback Request",
+              "Feedback Response",
+              "Shared Parameter",
+              "Shared Steps"
+            ],
+            "FixedTargetFields": null,
+            "SourceFieldMappings": null
           }
         }
       }
@@ -26,20 +36,12 @@ configurationSamples:
         "CommonTools": {
           "TfsWorkItemTypeValidatorTool": {
             "Enabled": "True",
+            "ExcludeWorkItemtypes": null,
             "FixedTargetFields": {
               "User Story": [
                 "Custom.Prirucka"
               ]
             },
-            "IncludeWorkItemtypes": [
-              "Bug",
-              "Task",
-              "User Story",
-              "Product Backlog Item",
-              "Feature",
-              "Epic",
-              "Risk"
-            ],
             "SourceFieldMappings": {
               "User Story": {
                 "Microsoft.VSTS.Common.Prirucka": "Custom.Prirucka"
@@ -57,14 +59,14 @@ configurationSamples:
     {
       "$type": "TfsWorkItemTypeValidatorToolOptions",
       "Enabled": true,
-      "IncludeWorkItemtypes": [
-        "Bug",
-        "Task",
-        "User Story",
-        "Product Backlog Item",
-        "Feature",
-        "Epic",
-        "Risk"
+      "IncludeWorkItemtypes": [],
+      "ExcludeWorkItemtypes": [
+        "Code Review Request",
+        "Code Review Response",
+        "Feedback Request",
+        "Feedback Response",
+        "Shared Parameter",
+        "Shared Steps"
       ],
       "SourceFieldMappings": {
         "User Story": {
@@ -90,17 +92,23 @@ options:
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: ExcludeWorkItemtypes
+  type: List
+  description: List of work item types which will be excluded from validation.
+  defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FixedTargetFields
   type: Dictionary
   description: >-
-    List of target fields that are considered as `fixed`. 
-     A field marked as fixed will not stop the migration if differences are found. 
-     Instead of a warning, only an informational message will be logged. 
+    List of target fields that are considered as `fixed`.
+     A field marked as fixed will not stop the migration if differences are found.
+     Instead of a warning, only an informational message will be logged.
 
-     Use this list when you already know about the differences and have resolved them, 
-     for example by using `FieldMappingTool`. 
+     Use this list when you already know about the differences and have resolved them,
+     for example by using `FieldMappingTool`.
 
-     The key is the target work item type name. 
+     The key is the target work item type name.
      You can also use `*` to define fixed fields that apply to all work item types.
   defaultValue: null
   isRequired: false
