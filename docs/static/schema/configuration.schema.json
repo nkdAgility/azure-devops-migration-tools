@@ -2468,8 +2468,17 @@
                   "type": "boolean",
                   "default": "true"
                 },
+                "ExcludeWorkItemtypes": {
+                  "description": "List of work item types which will be excluded from validation.",
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
                 "FixedTargetFields": {
-                  "description": "List of target fields that are considered as `fixed`. \r\n A field marked as fixed will not stop the migration if differences are found. \r\n Instead of a warning, only an informational message will be logged. \r\n\n Use this list when you already know about the differences and have resolved them, \r\n for example by using `FieldMappingTool`. \r\n\n The key is the target work item type name. \r\n You can also use `*` to define fixed fields that apply to all work item types.",
+                  "description": "List of target fields that are considered as `fixed`.\r\n A field marked as fixed will not stop the migration if differences are found.\r\n Instead of a warning, only an informational message will be logged.\r\n\n Use this list when you already know about the differences and have resolved them,\r\n for example by using `FieldMappingTool`.\r\n\n The key is the target work item type name.\r\n You can also use `*` to define fixed fields that apply to all work item types.",
                   "type": "object",
                   "default": "null",
                   "additionalProperties": {
