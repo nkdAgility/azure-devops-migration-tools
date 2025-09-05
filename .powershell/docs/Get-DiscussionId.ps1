@@ -418,6 +418,28 @@ function Get-ClassNameFromDataFile {
     }
 }
 
+# Function to get class name from data file
+function Get-ClassTypeNameFromDataFile {
+    param(
+        [string]$DataFilePath
+    )
+    
+    if (-not (Test-Path $DataFilePath)) {
+        Write-WarningLog "Data file not found: $DataFilePath"
+        return $null
+    }
+    
+    try {
+        $yamlContent = Get-Content -Path $DataFilePath -Raw
+        $data = ConvertFrom-Yaml -Yaml $yamlContent
+        return $data.typeName
+    }
+    catch {
+        Write-WarningLog "Failed to parse data file $DataFilePath : $($_.Exception.Message)"
+        return $null
+    }
+}
+
 # Function to convert class name to friendly name
 function Convert-ClassNameToFriendlyName {
     param(
@@ -457,9 +479,11 @@ function Find-OrCreateDiscussion {
     
     # Get class name from data file if available
     $className = $null
+    $classTypeName = "unknown"
     if ($dataFile) {
-        $dataFilePath = Join-Path ".\docs\" $dataFile
+        $dataFilePath = Join-Path ".\docs\data\classes\" $dataFile
         $className = Get-ClassNameFromDataFile -DataFilePath $dataFilePath
+        $classTypeName = Get-ClassTypeNameFromDataFile -DataFilePath $dataFilePath
     }
     
     # Convert class name to friendly name
@@ -490,7 +514,7 @@ function Find-OrCreateDiscussion {
                 # Generate updated discussion body to ensure consistency
                 $docUrl = ""
                 if ($hugoMarkdown.FrontMatter.slug) {
-                    $docUrl = "https://devopsmigration.io/docs/reference/$($hugoMarkdown.FrontMatter.slug)/"
+                    $docUrl = "https://devopsmigration.io/docs/reference/$classTypeName/$($hugoMarkdown.FrontMatter.slug)/"
                 }
                 elseif ($hugoMarkdown.ReferencePath) {
                     $relativePath = $hugoMarkdown.ReferencePath.Replace('docs/', '').Replace('\', '/')
@@ -535,7 +559,7 @@ function Find-OrCreateDiscussion {
         # Generate documentation URL
         $docUrl = ""
         if ($hugoMarkdown.FrontMatter.slug) {
-            $docUrl = "https://devopsmigration.io/docs/reference/$($hugoMarkdown.FrontMatter.slug)/"
+            $docUrl = "https://devopsmigration.io/docs/reference/$classTypeName/$($hugoMarkdown.FrontMatter.slug)/"
         }
         elseif ($hugoMarkdown.ReferencePath) {
             $relativePath = $hugoMarkdown.ReferencePath.Replace('docs/', '').Replace('\', '/')
@@ -740,10 +764,12 @@ foreach ($hugoMarkdown in $hugoMarkdownObjects) {
             if ($existingDiscussion) {
                 # Get class name from data file if available
                 $className = $null
+                $classTypeName = "unknown"
                 $dataFile = $hugoMarkdown.FrontMatter.dataFile
                 if ($dataFile) {
-                    $dataFilePath = Join-Path ".\docs\" $dataFile
+                    $dataFilePath = Join-Path ".\docs\data\classes\" $dataFile
                     $className = Get-ClassNameFromDataFile -DataFilePath $dataFilePath
+                    $classTypeName = (Get-ClassTypeNameFromDataFile -DataFilePath $dataFilePath).ToLower()
                 }
                 
                 # Convert class name to friendly name
@@ -752,7 +778,7 @@ foreach ($hugoMarkdown in $hugoMarkdownObjects) {
                 # Generate documentation URL
                 $docUrl = ""
                 if ($hugoMarkdown.FrontMatter.slug) {
-                    $docUrl = "https://devopsmigration.io/docs/reference/$($hugoMarkdown.FrontMatter.slug)/"
+                    $docUrl = "https://devopsmigration.io/docs/reference/$classTypeName/$($hugoMarkdown.FrontMatter.slug)/"
                 }
                 elseif ($hugoMarkdown.ReferencePath) {
                     $relativePath = $hugoMarkdown.ReferencePath.Replace('\', '/')
