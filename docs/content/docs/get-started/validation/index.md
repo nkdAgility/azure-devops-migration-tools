@@ -1,14 +1,14 @@
 ---
-title: "Validating your Azure DevOps Migration Tools migration"
+title: Validating your Azure DevOps Migration Tools migration
 description: This tutorial covers the steps to validate and verify your migration using the Azure DevOps Migration Tools.
 short_title: Get Validated
 weight: 10
 aliases:
-  - /validation/
+- /validation/
 date: 2025-09-01T09:00:00Z
+discussionId: 2978
 
 ---
-
 The Azure DevOps Migration Tools use a two-step validation process to ensure a smooth and successful migration. This process helps catch configuration or data issues early, saving time and preventing unnecessary data loading when migration cannot proceed.
 
 ## 1. Pre-Data-Load Validation
