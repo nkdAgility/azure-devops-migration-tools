@@ -178,8 +178,8 @@ namespace MigrationTools.Processors
             catch (Exception ex)
             {
                 _totalQueryFailed++;
-                Log.LogDebug("Source Query: '{query}'");
-                Log.LogDebug("Target Query: '{fixedQueryText}'");
+                Log.LogDebug("Source Query: '{query}'", query);
+                Log.LogDebug("Target Query: '{fixedQueryText}'", fixedQueryText);
                 Log.LogError(ex, "Error saving query '{queryName}', probably due to invalid area or iteration paths", query.Name);
                 targetHierarchy.Refresh(); // get the tree without the last edit
             }
