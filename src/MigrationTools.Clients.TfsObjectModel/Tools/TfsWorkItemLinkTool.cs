@@ -425,10 +425,15 @@ namespace MigrationTools.Tools
 
         private void CreateHyperlink(Hyperlink sourceLink, WorkItemData target)
         {
-            var sourceLinkAbsoluteUri = GetAbsoluteUri(sourceLink);
+            string sourceLinkAbsoluteUri = GetAbsoluteUri(sourceLink);
             if (string.IsNullOrEmpty(sourceLinkAbsoluteUri))
             {
                 Log.LogWarning("  [SKIP] Unable to create a hyperlink to [{0}]", sourceLink.Location);
+                return;
+            }
+            if (!IsValidHyperlink(sourceLinkAbsoluteUri))
+            {
+                Log.LogWarning("  [SKIP] Unable to create a hyperlink to [{0}] <-- protocall no longer allowed or url format is invalid", sourceLink.Location);
                 return;
             }
 
@@ -457,6 +462,8 @@ namespace MigrationTools.Tools
                 target.SaveToAzureDevOps();
             }
         }
+
+
 
         private string GetAbsoluteUri(Hyperlink hyperlink)
         {
@@ -489,5 +496,28 @@ namespace MigrationTools.Tools
             return item is Hyperlink;
         }
 
+        private bool IsValidHyperlink(string sourceLinkAbsoluteUri)
+        {
+            if (string.IsNullOrEmpty(sourceLinkAbsoluteUri))
+            {
+                return false;
+            }
+
+            try
+            {
+                var uri = new Uri(sourceLinkAbsoluteUri);
+                var allowedSchemes = new[]
+                {
+                    "http", "https", "ftp", "gopher", "mailto", "news", "telnet", "wais",
+                    "vstfs", "tfs", "alm", "mtm", "mtms", "mtr", "mtrs", "mfbclient", "mfbclients",
+                    "test-runner", "x-mvwit", "onenote", "codeflow", "file", "tel", "skype"
+                };
+                return allowedSchemes.Contains(uri.Scheme.ToLowerInvariant());
+            }
+            catch (UriFormatException)
+            {
+                return false;
+            }
+        }
     }
 }
