@@ -874,6 +874,7 @@ namespace MigrationTools.Processors
                         targetWorkItem.ToWorkItem().History = history.ToString();
                     }
                     targetWorkItem.SaveToAzureDevOps();
+                    PatchClosedDate(sourceWorkItem, targetWorkItem);
 
                     CommonTools.Attachment.CleanUpAfterSave();
                     TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
@@ -956,6 +957,65 @@ namespace MigrationTools.Processors
                 {
                     Log.LogWarning("Target ClosedDate Field: ", "System.ClosedDate");
                 }
+            }
+        }
+
+        private void PatchClosedDate(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            var targetItem = targetWorkItem.ToWorkItem();
+            var state = targetItem.Fields["System.State"].Value?.ToString();
+            if (!(state == "Closed" || state == "Done"))
+            {
+                return;
+            }
+
+            object srcClosedDate = null;
+            if (sourceWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate"))
+            {
+                srcClosedDate = sourceWorkItem.ToWorkItem().Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
+            }
+            if (srcClosedDate == null && sourceWorkItem.ToWorkItem().Fields.Contains("System.ClosedDate"))
+            {
+                srcClosedDate = sourceWorkItem.ToWorkItem().Fields["System.ClosedDate"].Value;
+            }
+            if (srcClosedDate == null)
+            {
+                return;
+            }
+
+            try
+            {
+                ValidatePatTokenRequirement();
+                Uri collectionUri = Target.Options.Collection;
+                string token = Target.Options.Authentication.AccessToken;
+                VssConnection connection = new(collectionUri, new VssBasicCredential(string.Empty, token));
+                WorkItemTrackingHttpClient workItemTrackingClient = connection.GetClient<WorkItemTrackingHttpClient>();
+                JsonPatchDocument patchDocument = [];
+
+                var closedDateFieldRef = targetItem.Fields.Contains("Microsoft.VSTS.Common.ClosedDate")
+                    ? "Microsoft.VSTS.Common.ClosedDate"
+                    : (targetItem.Fields.Contains("System.ClosedDate") ? "System.ClosedDate" : null);
+
+                if (closedDateFieldRef == null)
+                {
+                    Log.LogWarning("Cannot patch ClosedDate: no appropriate field on target.");
+                    return;
+                }
+
+                patchDocument.Add(new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = $"/fields/{closedDateFieldRef}",
+                    Value = srcClosedDate
+                });
+
+                int id = int.Parse(targetWorkItem.Id);
+                var result = workItemTrackingClient.UpdateWorkItemAsync(patchDocument, id, bypassRules: true).Result;
+                Log.LogInformation("Patched ClosedDate for work item {id}.", id);
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning(ex, "Failed to patch ClosedDate for {id}.", targetWorkItem.Id);
             }
         }
 
