@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Windows.Forms;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Infrastructure;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+using static Microsoft.TeamFoundation.Client.CommandLine.Options;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 
@@ -37,10 +41,13 @@ public class FieldToFieldMap : FieldMapBase
 
     internal override void InternalExecute(WorkItem source, WorkItem target)
     {
-        if (!source.Fields.Contains(Config.sourceField) || !target.Fields.Contains(Config.targetField))
+        if (!IsValid(source, target))
         {
+            Log.LogWarning("FieldToFieldMap: [SKIPPED] Field mapping from '{SourceField}' to '{TargetField}' was skipped due to validation failures | Source WorkItem: {SourceId} -> Target WorkItem: {TargetId} | Mode: {FieldMapMode}",
+                Config.sourceField, Config.targetField, source.Id, target.Id, Config.fieldMapMode);
             return;
         }
+
         string value;
         switch (Config.fieldMapMode)
         {
@@ -53,11 +60,51 @@ public class FieldToFieldMap : FieldMapBase
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
         if (string.IsNullOrEmpty(value) && Config.defaultValue is not null)
         {
             value = Config.defaultValue;
         }
+
         target.Fields[Config.targetField].Value = value;
-        Log.LogDebug("FieldToFieldMap: [UPDATE] field mapped {0}:{1} to {2}:{3} as {4}", source.Id, Config.sourceField, target.Id, Config.targetField, Config.fieldMapMode.ToString());
+        Log.LogDebug("FieldToFieldMap: [UPDATE] Successfully mapped field {SourceField} to {TargetField} with value '{Value}' using mode {FieldMapMode} | Source WorkItem: {SourceId} -> Target WorkItem: {TargetId}", 
+            Config.sourceField, Config.targetField, value, Config.fieldMapMode, source.Id, target.Id);
+    }
+
+    private bool IsValid(WorkItem source, WorkItem target)
+    {
+        bool valid = true;
+        switch (Config.fieldMapMode)
+        {
+            case FieldMapMode.SourceToTarget:
+                if (!source.Fields.Contains(Config.sourceField))
+                {
+                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Source field '{SourceField}' does not exist on source WorkItem {SourceId}. Please verify the field name is correct and exists in the source work item type. Available fields can be checked in Azure DevOps work item customization.", 
+                        Config.sourceField, source.Id);
+                    valid = false;
+                }
+                if (!target.Fields.Contains(Config.targetField))
+                {
+                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Target field '{TargetField}' does not exist on target WorkItem {TargetId}. Please verify the field name is correct and exists in the target work item type. You may need to add this field to the target work item type or update your field mapping configuration.", 
+                        Config.targetField, target.Id);
+                    valid = false;
+                }
+                break;
+            case FieldMapMode.TargetToTarget:
+                if (!target.Fields.Contains(Config.sourceField))
+                {
+                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Source field '{SourceField}' does not exist on target WorkItem {TargetId}. In TargetToTarget mode, both source and target fields must exist on the target work item. Please verify the source field name is correct.", 
+                        Config.sourceField, target.Id);
+                    valid = false;
+                }
+                if (!target.Fields.Contains(Config.targetField))
+                {
+                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Target field '{TargetField}' does not exist on target WorkItem {TargetId}. In TargetToTarget mode, both source and target fields must exist on the target work item. Please verify the target field name is correct.", 
+                        Config.targetField, target.Id);
+                    valid = false;
+                }
+                break;
+        }
+        return valid;
     }
 }
