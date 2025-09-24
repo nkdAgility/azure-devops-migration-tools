@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using Antlr.Runtime;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
@@ -45,15 +46,23 @@ namespace MigrationTools.Tools
             _targetProject = processor.Target.WorkItems.Project.ToProject();
 
             string? accessToken = null;
-            if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.AccessToken)
-            {
-                accessToken = GenerateAuthToken(string.Empty, processor.Source.Options.Authentication.AccessToken);
-            }
-            else if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.Windows)
+
+            if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.Windows)
             {
                 NetworkCredentials credentials = processor.Source.Options.Authentication.NetworkCredentials;
                 accessToken = GenerateAuthToken($"{credentials.Domain}\\{credentials.UserName}", credentials.Password);
+            } else
+            {
+                Log.LogDebug("EmbededImagesRepairEnricher: Generating auth with {AccessToken}", MaskExceptFirst5(processor.Source.Options.Authentication.AccessToken));
+                accessToken = GenerateAuthToken(string.Empty, processor.Source.Options.Authentication.AccessToken);
+
             }
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                Log.LogError("EmbededImagesRepairEnricher: No access token was provided.");
+                throw new Exception();
+            }
+
 
             FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, accessToken);
         }
@@ -289,5 +298,20 @@ namespace MigrationTools.Tools
             _DummyWorkItemCount++;
             return _targetDummyWorkItem;
         }
+
+        public static string MaskExceptFirst5(string input)
+        {
+            if (string.IsNullOrEmpty(input) || input.Length <= 5)
+            {
+                return input;
+            }
+
+            string first5 = input.Substring(0, 5);
+            string masked = new string('*', input.Length - 5);
+            return first5 + masked;
+        }
+
     }
+
+
 }
