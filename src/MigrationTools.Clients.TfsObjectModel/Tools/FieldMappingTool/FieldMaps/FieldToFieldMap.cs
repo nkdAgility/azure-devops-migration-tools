@@ -66,9 +66,17 @@ public class FieldToFieldMap : FieldMapBase
             value = Config.defaultValue;
         }
 
-        target.Fields[Config.targetField].Value = value;
-        Log.LogDebug("FieldToFieldMap: [UPDATE] Successfully mapped field {SourceField} to {TargetField} with value '{Value}' using mode {FieldMapMode} | Source WorkItem: {SourceId} -> Target WorkItem: {TargetId}", 
-            Config.sourceField, Config.targetField, value, Config.fieldMapMode, source.Id, target.Id);
+        if (!string.IsNullOrEmpty(value))
+        {
+            target.Fields[Config.targetField].Value = value;
+            Log.LogDebug("FieldToFieldMap: [UPDATE] Successfully mapped field {SourceField} to {TargetField} with value '{Value}' using mode {FieldMapMode} | Source WorkItem: {SourceId} -> Target WorkItem: {TargetId}",
+               Config.sourceField, Config.targetField, value, Config.fieldMapMode, source.Id, target.Id);
+        }
+        else
+        {
+            Log.LogDebug("FieldToFieldMap: [SKIPPED] Proposed value is empty {SourceField} to {TargetField} with value '{Value}' using mode {FieldMapMode} | Source WorkItem: {SourceId} -> Target WorkItem: {TargetId}",
+               Config.sourceField, Config.targetField, value, Config.fieldMapMode, source.Id, target.Id);
+        }
     }
 
     private bool IsValid(WorkItem source, WorkItem target)

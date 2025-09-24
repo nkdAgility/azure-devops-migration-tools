@@ -18,7 +18,7 @@ namespace MigrationTools.Tools.Infrastructure
 
         protected EmbededImagesRepairToolBase(IOptions<ToolOptions> options, IServiceProvider services, ILogger<ITool> logger, ITelemetryLogger telemetry) : base(options, services, logger, telemetry)
         {
-            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = false, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+            _httpClientHandler = new HttpClientHandler { AllowAutoRedirect = true, UseDefaultCredentials = true, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
         }
 
         /**
@@ -40,6 +40,13 @@ namespace MigrationTools.Tools.Infrastructure
                         stream.CopyTo(fileWriter);
                     }
                 }
+            }
+            else
+            {
+                // Log details about non-success responses for debugging
+                var logger = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("EmbededImagesRepairEnricher");
+                logger.LogDebug("DownloadFile failed for URL {Url}. Status: {StatusCode} ({ReasonPhrase}). Location header: {LocationHeader}",
+                    url, (int)response.StatusCode, response.ReasonPhrase, response.Headers.Location?.ToString() ?? "None");
             }
 
             return response;
