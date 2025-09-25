@@ -12,11 +12,11 @@ discussionId: 2825
 ---
 The Azure DevOps migrations Tools has no internal state, and uses a field on the work item to track the migration of work items. This field is always referred to in the docs as `ReflectedWorkItemId` and is used to track the work item in the target. It enables the ability to resume migrations as well as to be able to scope the work items based on a query and have multiple runs overlap.
 
-Se below how to add the `ReflectedWorkItemId` to your target project as its different for Azure DevOps, TFS, and if you imported your Collection from TFS to Azure DevOps.
+See below how to add the `ReflectedWorkItemId` to your target project as its different for Azure DevOps, TFS, and if you imported your Collection from TFS to Azure DevOps.
 
 ## How to use the ReflectedWorkItemId
 
-In your configuration file under `MigrationTools:Endpoints` there will be both a `Source` and a `Target` endpoint. On the `Target` endpoint there should be a property called `ReflectedWorkItemID*` (depending on the specific endpoint implmnetation) that will have a property value like `Custom.ReflectedWorkItemId`. This is the field that the tool will use to track the work items in the target.
+In your configuration file under `MigrationTools:Endpoints` there will be both a `Source` and a `Target` endpoint. On the `Target` endpoint there should be a property called `ReflectedWorkItemID*` (depending on the specific endpoint implementation) that will have a property value like `Custom.ReflectedWorkItemId`. This is the field that the tool will use to track the work items in the target.
 
 ```json
 {
@@ -48,11 +48,11 @@ In your configuration file under `MigrationTools:Endpoints` there will be both a
 }
 ```
 
-When you create the field you will be able to see the`RefName` (different from the display name) in the field settings. This is the value that you will use in the configuration file. It will always have at least one `.` in the name. On the inherited processes it will be `Custom.ReflectedWorkItemId` (unless you created your process and added the field many moons ago, in which case it will be `processName.ReflectedWorkItemId`). On the XML process it will be whatever you want to call it But I recommend something like `TfsMigrationTool.ReflectedWorkItemId` or just `ReflectedWorkItemId`.
+When you create the field you will be able to see the`RefName` (different from the display name) in the field settings. This is the value that you will use in the configuration file. It will always have at least one `.` in the name. On the inherited processes it will be `Custom.ReflectedWorkItemId` (unless you created your process and added the field many moons ago, in which case it will be `processName.ReflectedWorkItemId`). On the XML process it will be whatever you want to call it, but I recommend something like `TfsMigrationTool.ReflectedWorkItemId` or just `ReflectedWorkItemId`.
 
 ## Work Items you can't customise!
 
-If you need to migrate work items that you cant customise, then you will need to use one of the built in fields and I recommend `Microsoft.VSTS.Build.IntegrationBuild`. This field is only used by builds, and is relatively safe to use.
+If you need to migrate work items that you can't customise, then you will need to use one of the built in fields and I recommend `Microsoft.VSTS.Build.IntegrationBuild`. This field is only used by builds, and is relatively safe to use.
 
 This is primarily of concern for [How-to: Migrating Plans and Suits](_howto/migrating-plans-and-suites.md).
 
@@ -70,7 +70,7 @@ With the advent of the [data migration tool for Azure DevOps](https://learn.micr
 
 If you created the Team Project via the web based Azure DevOps UI. You need to [add a custom field through the VSTS UI](https://blogs.msdn.microsoft.com/visualstudioalm/2015/12/10/adding-a-custom-field-to-a-work-item/) to be able to use the tool.
 
-The name you should use for the custom field on a VSTS instance is not `TfsMigrationTool.ReflectedWorkItemId` as .(period) are not valid characters for field name. Instead just use `ReflectedWorkItemId` but note that in the `configuration.json` file the name you need to enter is `NameOfYourCustomisedTemplate.ReflectedWorkItemId`. Where`NameOfYourCustomisedTemplate` is the name of your customised template, any spaces in the name will be replaced by \_ (underscore).
+The name you should use for the custom field on a VSTS instance is not `TfsMigrationTool.ReflectedWorkItemId` as .(period) are not valid characters for field name. Instead just use `ReflectedWorkItemId` but note that in the `configuration.json` file the name you need to enter is `NameOfYourCustomisedTemplate.ReflectedWorkItemId`. Where `NameOfYourCustomisedTemplate` is the name of your customised template, any spaces in the name will be replaced by \_ (underscore).
 
 #### XML Process
 
