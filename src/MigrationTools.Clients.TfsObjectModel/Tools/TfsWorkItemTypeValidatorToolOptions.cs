@@ -14,7 +14,7 @@ namespace MigrationTools.Tools
 
         private static readonly StringComparer _normalizedComparer = StringComparer.OrdinalIgnoreCase;
         private bool _isNormalized = false;
-        private static string[] _defaultExcludedWorkItemTypes = [
+        private static readonly string[] _defaultExcludedWorkItemTypes = [
             "Code Review Request",
             "Code Review Response",
             "Feedback Request",

@@ -17,15 +17,18 @@ namespace MigrationTools.Tools
     public class TfsWorkItemTypeValidatorTool : Tool<TfsWorkItemTypeValidatorToolOptions>
     {
         private readonly IWorkItemTypeMappingTool _witMappingTool;
+        private readonly CommonTools _commonTools;
 
         public TfsWorkItemTypeValidatorTool(
             IOptions<TfsWorkItemTypeValidatorToolOptions> options,
             IWorkItemTypeMappingTool witMappingTool,
+            CommonTools commonTools,
             IServiceProvider services,
             ILogger<TfsWorkItemTypeValidatorTool> logger,
             ITelemetryLogger telemetry)
             : base(options, services, logger, telemetry)
         {
+            _commonTools = commonTools ?? throw new ArgumentNullException(nameof(commonTools));
             _witMappingTool = witMappingTool ?? throw new ArgumentNullException(nameof(witMappingTool));
         }
 
@@ -172,7 +175,7 @@ namespace MigrationTools.Tools
                 ? LogLevel.Information
                 : LogLevel.Warning;
             bool isValid = ValidateFieldType(sourceField, targetField, logLevel);
-            isValid &= ValidateFieldAllowedValues(sourceField, targetField, logLevel);
+            isValid &= ValidateFieldAllowedValues(targetWitName, sourceField, targetField, logLevel);
             if (isValid)
             {
                 Log.LogDebug("  Target field '{targetFieldName}' exists in '{targetWit}' and is valid.",
@@ -200,7 +203,11 @@ namespace MigrationTools.Tools
             return true;
         }
 
-        private bool ValidateFieldAllowedValues(FieldDefinition sourceField, FieldDefinition targetField, LogLevel logLevel)
+        private bool ValidateFieldAllowedValues(
+            string targetWitName,
+            FieldDefinition sourceField,
+            FieldDefinition targetField,
+            LogLevel logLevel)
         {
             bool isValid = true;
             (string sourceValueType, List<string> sourceAllowedValues) = GetAllowedValues(sourceField);
@@ -213,23 +220,68 @@ namespace MigrationTools.Tools
                     + " source = '{sourceFieldAllowedValueType}', target = '{targetFieldAllowedValueType}'.",
                     sourceField.ReferenceName, targetField.ReferenceName, sourceValueType, targetValueType);
             }
-            if (!DoesTargetContainsAllSourceValues(sourceAllowedValues, targetAllowedValues))
+            if (!ValidateAllowedValues(targetWitName, sourceField.ReferenceName, sourceAllowedValues,
+                targetField.ReferenceName, targetAllowedValues, out List<string> missingValues))
             {
                 isValid = false;
                 Log.Log(logLevel,
                     "  Source field '{sourceField}' and target field '{targetField}' have different allowed values.",
                     sourceField.ReferenceName, targetField.ReferenceName);
-                Log.LogInformation("    Source allowed values: {sourceAllowedValues}",
-                    string.Join(", ", sourceAllowedValues.Select(val => $"'{val}'")));
-                Log.LogInformation("    Target allowed values: {targetAllowedValues}",
-                    string.Join(", ", targetAllowedValues.Select(val => $"'{val}'")));
+                LogAllowedValues("    Source allowed values: {sourceAllowedValues}", sourceAllowedValues);
+                LogAllowedValues("    Target allowed values: {targetAllowedValues}", targetAllowedValues);
+                LogAllowedValues("    Missing values in target are: {missingValues}", missingValues);
+                Log.LogInformation($"    You can configure value mapping using '{nameof(FieldValueMap)}' in '{nameof(FieldMappingTool)}',"
+                    + " or change the process of target system to contain all missing allowed values.");
             }
 
             return isValid;
+
+            void LogAllowedValues(string message, List<string> values)
+                => Log.LogInformation(message, string.Join(", ", values.Select(value => $"'{value}'")));
         }
 
-        private bool DoesTargetContainsAllSourceValues(List<string> sourceAllowedValues, List<string> targetAllowedValues) =>
-            sourceAllowedValues.Except(targetAllowedValues, StringComparer.OrdinalIgnoreCase).Count() == 0;
+        private bool ValidateAllowedValues(
+            string targetWitName,
+            string sourceFieldReferenceName,
+            List<string> sourceAllowedValues,
+            string targetFieldReferenceName,
+            List<string> targetAllowedValues,
+            out List<string> missingValues)
+        {
+            missingValues = sourceAllowedValues
+                .Except(targetAllowedValues, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (missingValues.Count > 0)
+            {
+                Log.LogDebug("  Allowed values in target do not match allowed values in source. Checking field value maps.");
+                Log.LogInformation("  Missing values are: {missingValues}", string.Join(", ", missingValues.Select(val => $"'{val}'")));
+                List<string> mappedValues = [];
+                Dictionary<string, string> valueMaps = _commonTools.FieldMappingTool
+                    .GetFieldValueMappings(targetWitName, sourceFieldReferenceName, targetFieldReferenceName);
+                foreach (string missingValue in missingValues)
+                {
+                    if (valueMaps.TryGetValue(missingValue, out string mappedValue))
+                    {
+                        if (targetAllowedValues.Contains(mappedValue, StringComparer.OrdinalIgnoreCase))
+                        {
+                            mappedValues.Add(missingValue);
+                            Log.LogDebug("    Value '{missingValue}' is mapped to '{mappedValue}', which exists in target.",
+                                missingValue, mappedValue);
+                        }
+                        else
+                        {
+                            Log.LogWarning("    Value '{missingValue}' is mapped to '{mappedValue}', which does not exists in target."
+                                + $" This is probably invalid '{nameof(FieldValueMap)}' configuration.",
+                                missingValue, mappedValue);
+                        }
+                    }
+                }
+                missingValues = missingValues
+                    .Except(mappedValues, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+            }
+            return missingValues.Count == 0;
+        }
 
 
         private (string valueType, List<string> allowedValues) GetAllowedValues(FieldDefinition field)
