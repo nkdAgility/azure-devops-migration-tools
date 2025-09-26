@@ -82,6 +82,7 @@ namespace MigrationTools
             context.AddTransient<RegexFieldMap>();
             context.AddTransient<TreeToTagFieldMap>();
             context.AddTransient<FieldCalculationMap>();
+            context.AddTransient<FieldClearMap>();
 
             // Core
             context.AddTransient<IMigrationClient, TfsTeamProjectEndpoint>();
