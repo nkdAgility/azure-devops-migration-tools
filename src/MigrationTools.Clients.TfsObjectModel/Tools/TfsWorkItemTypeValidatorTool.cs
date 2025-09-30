@@ -64,6 +64,11 @@ namespace MigrationTools.Tools
                 {
                     continue;
                 }
+                if (witPair.IsMapped)
+                {
+                    Log.LogInformation("Work item type '{sourceWit}' is mapped to '{targetWit}'.",
+                        witPair.SourceWit.Name, witPair.ExpectedTargetWitName);
+                }
                 if (targetWit.FieldDefinitions.Contains(reflectedWorkItemIdField))
                 {
                     Log.LogDebug("'{targetWit}' contains reflected work item ID field '{fieldName}'.",
