@@ -16,6 +16,22 @@ namespace MigrationTools.Tools
     /// </summary>
     public class TfsWorkItemTypeValidatorTool : Tool<TfsWorkItemTypeValidatorToolOptions>
     {
+        private class WitMapping
+        {
+            public WitMapping(WorkItemType sourceWit, string expectedTargetWitName, WorkItemType? targetWit, bool isMapped)
+            {
+                SourceWit = sourceWit;
+                ExpectedTargetWitName = expectedTargetWitName;
+                TargetWit = targetWit;
+                IsMapped = isMapped;
+            }
+
+            public WorkItemType SourceWit { get; }
+            public string ExpectedTargetWitName { get; }
+            public WorkItemType? TargetWit { get; }
+            public bool IsMapped { get; }
+        }
+
         private readonly IWorkItemTypeMappingTool _witMappingTool;
         private readonly CommonTools _commonTools;
 
@@ -40,17 +56,22 @@ namespace MigrationTools.Tools
             Log.LogInformation("Validating presence of reflected work item ID field '{reflectedWorkItemIdField}'"
                 + " in target work item types.", reflectedWorkItemIdField);
             bool isValid = true;
-            List<WorkItemType> wits = GetTargetWitsToValidate(sourceWits, targetWits);
-            foreach (WorkItemType targetWit in wits)
+            List<WitMapping> witPairs = GetWitsToValidate(sourceWits, targetWits);
+            foreach (WitMapping witPair in witPairs)
             {
+                WorkItemType? targetWit = witPair.TargetWit;
+                if (targetWit is null)
+                {
+                    continue;
+                }
                 if (targetWit.FieldDefinitions.Contains(reflectedWorkItemIdField))
                 {
-                    Log.LogDebug("  '{targetWit}' contains reflected work item ID field '{fieldName}'.",
+                    Log.LogDebug("'{targetWit}' contains reflected work item ID field '{fieldName}'.",
                         targetWit.Name, reflectedWorkItemIdField);
                 }
                 else
                 {
-                    Log.LogError("  '{targetWit}' does not contain reflected work item ID field '{fieldName}'.",
+                    Log.LogError("'{targetWit}' does not contain reflected work item ID field '{fieldName}'.",
                         targetWit.Name, reflectedWorkItemIdField);
                     isValid = false;
                 }
@@ -59,25 +80,29 @@ namespace MigrationTools.Tools
             return isValid;
         }
 
-        private List<WorkItemType> GetTargetWitsToValidate(List<WorkItemType> sourceWits, List<WorkItemType> targetWits)
+        // Returns list of target work item types with respect to work item type mapping.
+        private List<WitMapping> GetWitsToValidate(List<WorkItemType> sourceWits, List<WorkItemType> targetWits)
         {
-            List<WorkItemType> targetWitsToValidate = [];
+            List<WitMapping> witMappings = [];
             foreach (WorkItemType sourceWit in sourceWits)
             {
-                string sourceWitName = sourceWit.Name;
-                if (!ShouldValidateWorkItemType(sourceWitName))
+                if (ShouldValidateWorkItemType(sourceWit.Name))
                 {
-                    continue;
-                }
-                string targetWitName = GetTargetWorkItemType(sourceWitName);
-                WorkItemType targetWit = targetWits
-                    .FirstOrDefault(wit => wit.Name.Equals(targetWitName, StringComparison.OrdinalIgnoreCase));
-                if (targetWit is not null)
-                {
-                    targetWitsToValidate.Add(targetWit);
+                    bool isMapped = false;
+                    if (_witMappingTool.Mappings.TryGetValue(sourceWit.Name, out string targetWitName))
+                    {
+                        isMapped = true;
+                    }
+                    else
+                    {
+                        targetWitName = sourceWit.Name;
+                    }
+                    WorkItemType? targetWit = targetWits
+                        .FirstOrDefault(wit => wit.Name.Equals(targetWitName, StringComparison.OrdinalIgnoreCase));
+                    witMappings.Add(new WitMapping(sourceWit, targetWitName, targetWit, isMapped));
                 }
             }
-            return targetWitsToValidate;
+            return witMappings;
         }
 
         public bool ValidateWorkItemTypes(List<WorkItemType> sourceWits, List<WorkItemType> targetWits)
@@ -86,20 +111,19 @@ namespace MigrationTools.Tools
 
             List<string> targetWitNames = targetWits.Select(wit => wit.Name).ToList();
             bool isValid = true;
-            foreach (WorkItemType sourceWit in sourceWits)
+            List<WitMapping> witPairs = GetWitsToValidate(sourceWits, targetWits);
+            foreach (WitMapping witPair in witPairs)
             {
-                string sourceWitName = sourceWit.Name;
-                if (!ShouldValidateWorkItemType(sourceWitName))
+                string sourceWitName = witPair.SourceWit.Name;
+                Log.LogInformation("Validating work item type '{sourceWit}'.", sourceWitName);
+                if (witPair.IsMapped)
                 {
-                    continue;
+                    Log.LogInformation("  Work item type '{sourceWit}' is mapped to '{targetWit}'.",
+                        sourceWitName, witPair.ExpectedTargetWitName);
                 }
-                Log.LogInformation("Validating work item type '{sourceWit}'", sourceWitName);
-                string targetWitName = GetTargetWorkItemType(sourceWitName);
-                WorkItemType targetWit = targetWits
-                    .FirstOrDefault(wit => wit.Name.Equals(targetWitName, StringComparison.OrdinalIgnoreCase));
-                if (targetWit is null)
+                if (witPair.TargetWit is null)
                 {
-                    Log.LogWarning("Work item type '{targetWit}' does not exist in target system.", targetWitName);
+                    Log.LogWarning("Work item type '{targetWit}' does not exist in target system.", witPair.ExpectedTargetWitName);
                     if (TryFindSimilarWorkItemType(sourceWitName, targetWitNames, out string suggestedName))
                     {
                         Log.LogInformation(" Suggested mapping: '{0}' – '{1}'", sourceWitName, suggestedName);
@@ -108,7 +132,7 @@ namespace MigrationTools.Tools
                 }
                 else
                 {
-                    if (!ValidateWorkItemTypeFields(sourceWit, targetWit))
+                    if (!ValidateWorkItemTypeFields(witPair.SourceWit, witPair.TargetWit))
                     {
                         isValid = false;
                     }
@@ -325,19 +349,6 @@ namespace MigrationTools.Tools
                 Log.LogInformation("  This work item type is mapped to '{targetWit}' in target.", targetWit);
             }
             return targetWit;
-        }
-
-        private string GetTargetFieldName(string targetWitName, string sourceFieldName)
-        {
-            string targetFieldName = Options.GetTargetFieldName(targetWitName, sourceFieldName, out bool isMapped);
-            if (isMapped)
-            {
-                string message = string.IsNullOrEmpty(targetFieldName)
-                    ? "  Source field '{sourceFieldName}' is mapped as empty string, so it is not validated in target."
-                    : "  Source field '{sourceFieldName}' is mapped as '{targetFieldName}' in target.";
-                Log.LogInformation(message, sourceFieldName, targetFieldName);
-            }
-            return targetFieldName;
         }
 
         private void LogWorkItemTypes(ICollection<WorkItemType> sourceWits, ICollection<WorkItemType> targetWits)
