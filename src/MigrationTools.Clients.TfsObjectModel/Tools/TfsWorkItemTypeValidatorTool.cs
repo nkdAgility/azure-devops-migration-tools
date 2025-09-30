@@ -18,7 +18,11 @@ namespace MigrationTools.Tools
     {
         private class WitMapping
         {
-            public WitMapping(WorkItemType sourceWit, string expectedTargetWitName, WorkItemType? targetWit, bool isMapped)
+            public WitMapping(
+                WorkItemType sourceWit,
+                string expectedTargetWitName,
+                WorkItemType? targetWit,
+                bool isMapped)
             {
                 SourceWit = sourceWit;
                 ExpectedTargetWitName = expectedTargetWitName;
@@ -29,6 +33,28 @@ namespace MigrationTools.Tools
             public WorkItemType SourceWit { get; }
             public string ExpectedTargetWitName { get; }
             public WorkItemType? TargetWit { get; }
+            public bool HasTargetWit => TargetWit is not null;
+            public bool IsMapped { get; }
+        }
+
+        private class FieldMapping
+        {
+            public FieldMapping(
+                FieldDefinition sourceField,
+                string expectedTargetFieldName,
+                FieldDefinition? targetField,
+                bool isMapped)
+            {
+                SourceField = sourceField;
+                ExpectedTargetFieldName = expectedTargetFieldName;
+                TargetField = targetField;
+                IsMapped = isMapped;
+            }
+
+            public FieldDefinition SourceField { get; }
+            public string ExpectedTargetFieldName { get; }
+            public FieldDefinition? TargetField { get; }
+            public bool HasTargetField => TargetField is not null;
             public bool IsMapped { get; }
         }
 
@@ -59,11 +85,11 @@ namespace MigrationTools.Tools
             List<WitMapping> witPairs = GetWitsToValidate(sourceWits, targetWits);
             foreach (WitMapping witPair in witPairs)
             {
-                WorkItemType? targetWit = witPair.TargetWit;
-                if (targetWit is null)
+                if (!witPair.HasTargetWit)
                 {
                     continue;
                 }
+                WorkItemType targetWit = witPair.TargetWit;
                 if (witPair.IsMapped)
                 {
                     Log.LogInformation("Work item type '{sourceWit}' is mapped to '{targetWit}'.",
@@ -126,7 +152,7 @@ namespace MigrationTools.Tools
                     Log.LogInformation("  Work item type '{sourceWit}' is mapped to '{targetWit}'.",
                         sourceWitName, witPair.ExpectedTargetWitName);
                 }
-                if (witPair.TargetWit is null)
+                if (!witPair.HasTargetWit)
                 {
                     Log.LogWarning("Work item type '{targetWit}' does not exist in target system.", witPair.ExpectedTargetWitName);
                     if (TryFindSimilarWorkItemType(sourceWitName, targetWitNames, out string suggestedName))
@@ -155,44 +181,75 @@ namespace MigrationTools.Tools
                 .ToDictionary(f => f.ReferenceName, f => f, StringComparer.OrdinalIgnoreCase);
             foreach (FieldDefinition sourceField in sourceFields)
             {
-                string sourceFieldName = sourceField.ReferenceName;
-                string targetFieldName = GetTargetFieldName(targetWit.Name, sourceFieldName);
-                if (string.IsNullOrEmpty(targetFieldName))
+                List<FieldMapping> fieldsToValidate = GetTargetFieldsToValidate(targetWit.Name, sourceField, targetFields);
+                foreach (FieldMapping fieldPair in fieldsToValidate)
                 {
-                    continue;
-                }
-
-                if (targetFields.ContainsKey(targetFieldName))
-                {
-                    if (sourceField.IsIdentity)
+                    if (fieldPair.IsMapped)
                     {
-                        const string message = "  Source field '{sourceFieldName}' is identity field."
-                            + " Validation is not performed on identity fields, because they usually differ in allowed values.";
-                        Log.LogDebug(message, sourceFieldName);
+                        Log.LogInformation("  Source field '{sourceFieldName}' is mapped to '{targetFieldName}'.",
+                            fieldPair.SourceField.ReferenceName, fieldPair.ExpectedTargetFieldName);
+                    }
+                    if (fieldPair.HasTargetField)
+                    {
+                        if (sourceField.IsIdentity)
+                        {
+                            const string message = "  Source field '{sourceFieldName}' is identity field."
+                                + " Validation is not performed on identity fields, because they usually differ in allowed values.";
+                            Log.LogDebug(message, fieldPair.SourceField.ReferenceName);
+                        }
+                        else
+                        {
+                            result &= ValidateField(sourceField, fieldPair.TargetField, targetWit.Name);
+                        }
                     }
                     else
                     {
-                        result &= ValidateField(sourceField, targetFields[targetFieldName], targetWit.Name);
+                        LogMissingField(targetWit, sourceField, fieldPair.ExpectedTargetFieldName);
+                        result = false;
                     }
-                }
-                else
-                {
-                    Log.LogWarning("  Missing field '{targetFieldName}' in '{targetWit}'.", targetFieldName, targetWit.Name);
-                    Log.LogInformation("    Source field reference name: {sourceFieldReferenceName}", sourceFieldName);
-                    Log.LogInformation("    Source field name: {sourceFieldName}", sourceField.Name);
-                    Log.LogInformation("    Field type: {fieldType}", sourceField.FieldType);
-                    (string valueType, List<string> allowedValues) = GetAllowedValues(sourceField);
-                    Log.LogInformation("    Allowed values: {allowedValues}", string.Join(", ", allowedValues.Select(v => $"'{v}'")));
-                    Log.LogInformation("    Allowed values type: {allowedValuesType}", valueType);
-                    result = false;
                 }
             }
 
             if (result)
             {
-                Log.LogInformation("  All fields are either present or mapped.");
+                Log.LogInformation("  All fields are either present or mapped for '{targetWit}'.", targetWit.Name);
             }
             return result;
+        }
+
+        private List<FieldMapping> GetTargetFieldsToValidate(
+            string targetWitName,
+            FieldDefinition sourceField,
+            Dictionary<string, FieldDefinition> targetFields)
+        {
+            List<FieldMapping> result = [];
+
+            foreach (FieldToFieldMap fieldToFieldMap in _commonTools.FieldMappingTool
+                .GetFieldToFieldMaps(targetWitName, sourceField.ReferenceName, FieldMapMode.SourceToTarget))
+            {
+                targetFields.TryGetValue(fieldToFieldMap.Config.targetField, out FieldDefinition targetField);
+                result.Add(new FieldMapping(sourceField, fieldToFieldMap.Config.targetField, targetField, true));
+            }
+
+            if (result.Count == 0)
+            {
+                // If no field to field mapping is configured, just use the same field in target.
+                targetFields.TryGetValue(sourceField.ReferenceName, out FieldDefinition targetField);
+                result.Add(new FieldMapping(sourceField, sourceField.ReferenceName, targetField, false));
+            }
+
+            return result;
+        }
+
+        private void LogMissingField(WorkItemType targetWit, FieldDefinition sourceField, string targetFieldName)
+        {
+            Log.LogWarning("  Missing field '{targetFieldName}' in '{targetWit}'.", targetFieldName, targetWit.Name);
+            Log.LogInformation("    Source field reference name: {sourceFieldReferenceName}", sourceField.ReferenceName);
+            Log.LogInformation("    Source field name: {sourceFieldName}", sourceField.Name);
+            Log.LogInformation("    Field type: {fieldType}", sourceField.FieldType);
+            (string valueType, List<string> allowedValues) = GetAllowedValues(sourceField);
+            Log.LogInformation("    Allowed values: {allowedValues}", string.Join(", ", allowedValues.Select(v => $"'{v}'")));
+            Log.LogInformation("    Allowed values type: {allowedValuesType}", valueType);
         }
 
         private bool ValidateField(FieldDefinition sourceField, FieldDefinition targetField, string targetWitName)
@@ -343,17 +400,6 @@ namespace MigrationTools.Tools
                 return false;
             }
             return true;
-        }
-
-        private string GetTargetWorkItemType(string sourceWit)
-        {
-            string targetWit = sourceWit;
-            if (_witMappingTool.Mappings.ContainsKey(sourceWit))
-            {
-                targetWit = _witMappingTool.Mappings[sourceWit];
-                Log.LogInformation("  This work item type is mapped to '{targetWit}' in target.", targetWit);
-            }
-            return targetWit;
         }
 
         private void LogWorkItemTypes(ICollection<WorkItemType> sourceWits, ICollection<WorkItemType> targetWits)

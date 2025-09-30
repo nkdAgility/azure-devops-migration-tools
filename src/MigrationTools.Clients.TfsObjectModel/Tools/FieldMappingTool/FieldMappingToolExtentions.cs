@@ -27,6 +27,20 @@ namespace MigrationTools.Tools
                 .Cast<TFieldMap>();
         }
 
+        public static IEnumerable<FieldToFieldMap> GetFieldToFieldMaps(
+            this IFieldMappingTool fieldMappingTool,
+            string witName,
+            string sourceFieldReferenceName,
+            FieldMapMode? mapMode)
+        {
+            IEnumerable<FieldToFieldMap> allMaps = fieldMappingTool.GetFieldMaps<FieldToFieldMap>(witName)
+                .Where(fvm => sourceFieldReferenceName.Equals(fvm.Config.sourceField, StringComparison.OrdinalIgnoreCase));
+
+            return mapMode.HasValue
+                ? allMaps.Where(fvm => fvm.Config.fieldMapMode == mapMode.Value)
+                : allMaps;
+        }
+
         /// <summary>
         /// Returns defined field maps of type <see cref="FieldValueMap"/> for work item type <paramref name="witName"/>,
         /// which are defined between fields <paramref name="sourceFieldReferenceName"/> and <paramref name="targetFieldReferenceName"/>.
