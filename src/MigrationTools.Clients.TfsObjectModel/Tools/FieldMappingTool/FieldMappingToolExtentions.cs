@@ -21,13 +21,10 @@ namespace MigrationTools.Tools
             string witName)
             where TFieldMap : IFieldMap
         {
-            if (fieldMappingTool.Items.TryGetValue(witName, out List<IFieldMap>? fieldMaps))
-            {
-                return fieldMaps
-                    .Where(fm => fm is TFieldMap)
-                    .Cast<TFieldMap>();
-            }
-            return [];
+            List<IFieldMap> allMaps = fieldMappingTool.GetFieldMappings(witName);
+            return allMaps
+                .Where(fm => fm is TFieldMap)
+                .Cast<TFieldMap>();
         }
 
         /// <summary>

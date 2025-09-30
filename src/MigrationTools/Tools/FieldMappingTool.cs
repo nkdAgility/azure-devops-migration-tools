@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MigrationTools._EngineV1.Configuration;
-using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
-using MigrationTools.Enrichers;
-using MigrationTools.Processors;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -22,7 +16,7 @@ namespace MigrationTools.Tools
     public class FieldMappingTool : Tool<FieldMappingToolOptions>, IFieldMappingTool
     {
 
-        private Dictionary<string, List<IFieldMap>> fieldMapps = new Dictionary<string, List<IFieldMap>>();
+        private readonly Dictionary<string, List<IFieldMap>> _fieldMaps = new Dictionary<string, List<IFieldMap>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Initializes a new instance of the FieldMappingTool class.
@@ -37,7 +31,7 @@ namespace MigrationTools.Tools
             {
                 foreach (IFieldMapOptions fieldmapConfig in Options.FieldMaps)
                 {
-                    Log.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.ConfigurationMetadata.OptionFor, fieldmapConfig.ApplyTo.Count == 0?  "*ApplyTo is missing*" : string.Join(", ", fieldmapConfig.ApplyTo));
+                    Log.LogInformation("FieldMappingTool: Adding FieldMap {FieldMapName} for {WorkItemTypeName}", fieldmapConfig.ConfigurationMetadata.OptionFor, fieldmapConfig.ApplyTo.Count == 0 ? "*ApplyTo is missing*" : string.Join(", ", fieldmapConfig.ApplyTo));
                     string typePattern = $"MigrationTools.Sinks.*.FieldMaps.{fieldmapConfig.ConfigurationMetadata.OptionFor}";
 
                     Type type = AppDomain.CurrentDomain.GetAssemblies()
@@ -60,13 +54,9 @@ namespace MigrationTools.Tools
             }
         }
 
-        public int Count { get { return fieldMapps.Count; } }
+        public int Count => _fieldMaps.Count;
 
-        public Dictionary<string, List<IFieldMap>> Items
-        {
-            get { return fieldMapps; }
-        }
-
+        public Dictionary<string, List<IFieldMap>> Items => _fieldMaps;
 
         public void AddFieldMap(string workItemTypeName, IFieldMap fieldToTagFieldMap)
         {
@@ -74,36 +64,31 @@ namespace MigrationTools.Tools
             {
                 throw new IndexOutOfRangeException("workItemTypeName on all fieldmaps must be set to at least '*'.");
             }
-            if (!fieldMapps.ContainsKey(workItemTypeName))
+            if (!_fieldMaps.ContainsKey(workItemTypeName))
             {
-                fieldMapps.Add(workItemTypeName, new List<IFieldMap>());
+                _fieldMaps.Add(workItemTypeName, new List<IFieldMap>());
             }
-            fieldMapps[workItemTypeName].Add(fieldToTagFieldMap);
+            _fieldMaps[workItemTypeName].Add(fieldToTagFieldMap);
+        }
+
+        public List<IFieldMap> GetFieldMappings(string witName)
+        {
+            if (_fieldMaps.TryGetValue("*", out List<IFieldMap> fieldMaps))
+            {
+                return fieldMaps;
+            }
+            else if (_fieldMaps.TryGetValue(witName, out fieldMaps))
+            {
+                return fieldMaps;
+            }
+            return [];
         }
 
         public void ApplyFieldMappings(WorkItemData source, WorkItemData target)
-        {
-            if (fieldMapps.ContainsKey("*"))
-            {
-                ProcessFieldMapList(source, target, fieldMapps["*"]);
-            }
-            if (fieldMapps.ContainsKey(source.Fields["System.WorkItemType"].Value.ToString()))
-            {
-                ProcessFieldMapList(source, target, fieldMapps[source.Fields["System.WorkItemType"].Value.ToString()]);
-            }
-        }
+            => ProcessFieldMapList(source, target, GetFieldMappings(source.Fields["System.WorkItemType"].Value.ToString()));
 
         public void ApplyFieldMappings(WorkItemData target)
-        {
-            if (fieldMapps.ContainsKey("*"))
-            {
-                ProcessFieldMapList(target, target, fieldMapps["*"]);
-            }
-            if (fieldMapps.ContainsKey(target.Fields["System.WorkItemType"].Value.ToString()))
-            {
-                ProcessFieldMapList(target, target, fieldMapps[target.Fields["System.WorkItemType"].Value.ToString()]);
-            }
-        }
+            => ApplyFieldMappings(target, target);
 
         private void ProcessFieldMapList(WorkItemData source, WorkItemData target, List<IFieldMap> list)
         {

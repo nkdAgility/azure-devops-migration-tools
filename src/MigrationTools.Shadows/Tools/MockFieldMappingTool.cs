@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MigrationTools.DataContracts;
+﻿using MigrationTools.DataContracts;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -14,6 +9,11 @@ namespace MigrationTools.Tools.Shadows
         public Dictionary<string, List<IFieldMap>> Items => throw new NotImplementedException();
 
         public void AddFieldMap(string workItemTypeName, IFieldMap fieldToTagFieldMap)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<IFieldMap> GetFieldMappings(string witName)
         {
             throw new NotImplementedException();
         }
