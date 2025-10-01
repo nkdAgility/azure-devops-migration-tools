@@ -9,7 +9,7 @@
     },
     "execute": {
       "commandName": "Project",
-      "commandLineArgs": "execute -c configuration-default.json --disableTelemetry"
+      "commandLineArgs": "execute -c \"C:\\Users\\MartinHinshelwoodNKD\\source\\repos\\azure-devops-automation-tools\\output\\NCSBN-AppDev\\projects\\FITS\\workitems.json\""
     },
     "execute --help": {
       "commandName": "Project",
