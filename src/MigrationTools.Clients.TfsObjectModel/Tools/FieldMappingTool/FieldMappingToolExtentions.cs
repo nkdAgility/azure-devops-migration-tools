@@ -41,6 +41,29 @@ namespace MigrationTools.Tools
                 : allMaps;
         }
 
+        public static IEnumerable<(string sourceFieldName, string targetFieldName)> GetFieldToFieldMultiMaps(
+            this IFieldMappingTool fieldMappingTool,
+            string witName,
+            string sourceFieldReferenceName)
+        {
+            List<(string, string)> fieldMaps = [];
+
+            foreach (FieldToFieldMultiMap multiMap in fieldMappingTool.GetFieldMaps<FieldToFieldMultiMap>(witName))
+            {
+                // Iterating through dictionary to be able to ignore casing of field names.
+                foreach (KeyValuePair<string, string> mapping in multiMap.Config.SourceToTargetMappings)
+                {
+                    if (sourceFieldReferenceName.Equals(mapping.Key, StringComparison.OrdinalIgnoreCase))
+                    {
+                        fieldMaps.Add((mapping.Key, mapping.Value));
+                        break;
+                    }
+                }
+            }
+
+            return fieldMaps;
+        }
+
         /// <summary>
         /// Returns defined field maps of type <see cref="FieldValueMap"/> for work item type <paramref name="witName"/>,
         /// which are defined between fields <paramref name="sourceFieldReferenceName"/> and <paramref name="targetFieldReferenceName"/>.
@@ -88,8 +111,9 @@ namespace MigrationTools.Tools
                     if (result.TryGetValue(sourceValue, out string existingTargetValue)
                         && !existingTargetValue.Equals(targetValue, StringComparison.OrdinalIgnoreCase))
                     {
-                        string msg = $"Conflict in field value mapping for '{sourceFieldReferenceName}' to '{targetFieldReferenceName}' in '{witName}': "
-                            + $"Value '{sourceValue}' maps to both '{existingTargetValue}' and '{targetValue}'.";
+                        string msg = $"Conflict in field value mapping for field '{sourceFieldReferenceName}'"
+                            + $" to field '{targetFieldReferenceName}' in work item type '{witName}':"
+                            + $" Value '{sourceValue}' maps to both '{existingTargetValue}' and '{targetValue}'.";
                         throw new InvalidOperationException(msg);
                     }
                     result[sourceValue] = targetValue;
