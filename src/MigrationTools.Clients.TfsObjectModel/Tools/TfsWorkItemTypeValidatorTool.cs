@@ -395,16 +395,16 @@ namespace MigrationTools.Tools
 
         private bool ShouldValidateWorkItemType(string workItemTypeName)
         {
-            if ((Options.IncludeWorkItemtypes.Count > 0)
-                && !Options.IncludeWorkItemtypes.Contains(workItemTypeName, StringComparer.OrdinalIgnoreCase))
+            if ((Options.IncludeWorkItemTypes.Count > 0)
+                && !Options.IncludeWorkItemTypes.Contains(workItemTypeName, StringComparer.OrdinalIgnoreCase))
             {
                 Log.LogInformation(
                     "Skipping validation of work item type '{sourceWit}' because it is not included in validation list.",
                     workItemTypeName);
                 return false;
             }
-            else if ((Options.ExcludeWorkItemtypes.Count > 0)
-                && Options.ExcludeWorkItemtypes.Contains(workItemTypeName, StringComparer.OrdinalIgnoreCase))
+            else if ((Options.ExcludeWorkItemTypes.Count > 0)
+                && Options.ExcludeWorkItemTypes.Contains(workItemTypeName, StringComparer.OrdinalIgnoreCase))
             {
                 Log.LogInformation(
                     "Skipping validation of work item type '{sourceWit}' because it is excluded from validation list.",
@@ -457,8 +457,8 @@ namespace MigrationTools.Tools
             Log.LogInformation("  - Configure mapping to another work item type which exists in target using"
                 + $" '{nameof(WorkItemTypeMappingTool)}' configuration.");
             Log.LogInformation("  - Exclude it from validation. To configure which work item types are validated, use either"
-                + $" '{nameof(TfsWorkItemTypeValidatorToolOptions.IncludeWorkItemtypes)}' or"
-                + $" '{nameof(TfsWorkItemTypeValidatorToolOptions.ExcludeWorkItemtypes)}'"
+                + $" '{nameof(TfsWorkItemTypeValidatorToolOptions.IncludeWorkItemTypes)}' or"
+                + $" '{nameof(TfsWorkItemTypeValidatorToolOptions.ExcludeWorkItemTypes)}'"
                 + $" of '{nameof(TfsWorkItemTypeValidatorTool)}' configuration (but not both at the same time).");
 
             Log.LogInformation("If field is missing in target, you can:");

@@ -27,15 +27,15 @@ namespace MigrationTools.Tools
         /// List of work item types which will be validated. If this list is empty, all work item types will be validated.
         /// </summary>
         /// <default>null</default>
-        public List<string> IncludeWorkItemtypes { get; set; } = [];
+        public List<string> IncludeWorkItemTypes { get; set; } = [];
 
         /// <summary>
         /// List of work item types which will be excluded from validation.
         /// </summary>
-        public List<string> ExcludeWorkItemtypes { get; set; } = [];
+        public List<string> ExcludeWorkItemTypes { get; set; } = [];
 
         /// <summary>
-        /// If <see langword="true"/>, some work item types will be automatically added to <see cref="ExcludeWorkItemtypes"/> list.
+        /// If <see langword="true"/>, some work item types will be automatically added to <see cref="ExcludeWorkItemTypes"/> list.
         /// Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,
         /// Feedback Response, Shared Parameter, Shared Steps.
         /// </summary>
@@ -105,13 +105,15 @@ namespace MigrationTools.Tools
 
             IncludeWorkItemtypes ??= [];
             ExcludeWorkItemtypes ??= [];
+            IncludeWorkItemTypes ??= [];
+            ExcludeWorkItemTypes ??= [];
             if (ExcludeDefaultWorkItemTypes)
             {
                 foreach (string defaultExcludedWit in _defaultExcludedWorkItemTypes)
                 {
-                    if (!ExcludeWorkItemtypes.Contains(defaultExcludedWit, _normalizedComparer))
+                    if (!ExcludeWorkItemTypes.Contains(defaultExcludedWit, _normalizedComparer))
                     {
-                        ExcludeWorkItemtypes.Add(defaultExcludedWit);
+                        ExcludeWorkItemTypes.Add(defaultExcludedWit);
                     }
                 }
             }
