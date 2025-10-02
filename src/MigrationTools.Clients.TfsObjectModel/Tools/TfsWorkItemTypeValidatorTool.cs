@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -287,10 +286,10 @@ namespace MigrationTools.Tools
             FieldDefinition sourceField,
             FieldDefinition targetField,
             string targetWitName,
-            LogLevel validationLogLevel)
+            LogLevel logLevel)
         {
-            bool isValid = ValidateFieldType(sourceField, targetField, validationLogLevel);
-            isValid &= ValidateFieldAllowedValues(targetWitName, sourceField, targetField, validationLogLevel);
+            bool isValid = ValidateFieldType(sourceField, targetField, logLevel);
+            isValid &= ValidateFieldAllowedValues(targetWitName, sourceField, targetField, logLevel);
             if (isValid)
             {
                 Log.LogDebug("    Target field '{targetFieldReferenceName}' ({targetFieldName}) exists in '{targetWit}' and is valid.",
