@@ -53,19 +53,10 @@ configurationSamples:
     {
       "$type": "TfsWorkItemTypeValidatorToolOptions",
       "Enabled": true,
-      "IncludeWorkItemtypes": [],
-      "ExcludeWorkItemtypes": [],
+      "IncludeWorkItemTypes": [],
+      "ExcludeWorkItemTypes": [],
       "ExcludeDefaultWorkItemTypes": true,
-      "SourceFieldMappings": {
-        "User Story": {
-          "Microsoft.VSTS.Common.Prirucka": "Custom.Prirucka"
-        }
-      },
-      "FixedTargetFields": {
-        "User Story": [
-          "Custom.Prirucka"
-        ]
-      }
+      "ExcludeSourceFields": {}
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemTypeValidatorToolOptions
 description: >-
@@ -83,48 +74,36 @@ options:
 - parameterName: ExcludeDefaultWorkItemTypes
   type: Boolean
   description: >-
-    If `true`, some work item types will be automatically added to `ExcludeWorkItemtypes` list.
+    If `true`, some work item types will be automatically added to `ExcludeWorkItemTypes` list.
      Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,
      Feedback Response, Shared Parameter, Shared Steps.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
-- parameterName: ExcludeWorkItemtypes
+- parameterName: ExcludeSourceFields
+  type: Dictionary
+  description: >-
+    List of fields in source work itemt types, that are excluded from validation.
+     Fields excluded from validation are still validated and all found issues are logged.
+     But the result of the validation is 'valid' and the issues are logged as information instead of warning.
+
+     The key is the source work item type name.
+     You can also use `*` to exclude fields from all source work item types.
+  defaultValue: null
+  isRequired: false
+  dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: ExcludeWorkItemTypes
   type: List
   description: List of work item types which will be excluded from validation.
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
-- parameterName: FixedTargetFields
-  type: Dictionary
-  description: >-
-    List of target fields that are considered as `fixed`.
-     A field marked as fixed will not stop the migration if differences are found.
-     Instead of a warning, only an informational message will be logged.
-
-     Use this list when you already know about the differences and have resolved them,
-     for example by using `FieldMappingTool`.
-
-     The key is the target work item type name.
-     You can also use `*` to define fixed fields that apply to all work item types.
-  defaultValue: null
-  isRequired: false
-  dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
-- parameterName: IncludeWorkItemtypes
+- parameterName: IncludeWorkItemTypes
   type: List
   description: List of work item types which will be validated. If this list is empty, all work item types will be validated.
   defaultValue: null
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
-- parameterName: SourceFieldMappings
-  type: Dictionary
-  description: >-
-    Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
-     target field name. Target field name can be empty string to indicate that this field will not be validated in target.
-     As work item type name, you can use `*` to define mappings which will be applied to all work item types.
-  defaultValue: null
-  isRequired: false
-  dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemTypeValidatorTool.cs
