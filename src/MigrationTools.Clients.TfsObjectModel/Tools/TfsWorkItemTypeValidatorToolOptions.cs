@@ -42,30 +42,18 @@ namespace MigrationTools.Tools
         public bool ExcludeDefaultWorkItemTypes { get; set; } = true;
 
         /// <summary>
-        /// Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to
-        /// target field name. Target field name can be empty string to indicate that this field will not be validated in target.
-        /// As work item type name, you can use <c>*</c> to define mappings which will be applied to all work item types.
-        /// </summary>
-        /// <default>null</default>
-        public Dictionary<string, Dictionary<string, string>> SourceFieldMappings { get; set; } = [];
-
-        /// <summary>
         /// <para>
-        /// List of target fields that are considered as <c>fixed</c>.
-        /// A field marked as fixed will not stop the migration if differences are found.
-        /// Instead of a warning, only an informational message will be logged.
+        /// List of fields in source work itemt types, that are excluded from validation.
+        /// Fields excluded from validation are still validated and all found issues are logged.
+        /// But the result of the validation is 'valid' and the issues are logged as information instead of warning.
         /// </para>
         /// <para>
-        /// Use this list when you already know about the differences and have resolved them,
-        /// for example by using <see cref="FieldMappingTool"/>.
-        /// </para>
-        /// <para>
-        /// The key is the target work item type name.
-        /// You can also use <c>*</c> to define fixed fields that apply to all work item types.
+        /// The key is the source work item type name.
+        /// You can also use <c>*</c> to exclude fields from all source work item types.
         /// </para>
         /// </summary>
         /// <default>null</default>
-        public Dictionary<string, List<string>> FixedTargetFields { get; set; } = [];
+        public Dictionary<string, List<string>> ExcludeSourceFields { get; set; } = [];
 
         /// <summary>
         /// Normalizes properties, that all of them are set (not <see langword="null"/>) and all dictionaries uses
@@ -78,33 +66,16 @@ namespace MigrationTools.Tools
                 return;
             }
 
-            Dictionary<string, Dictionary<string, string>> oldMappings = SourceFieldMappings;
-            Dictionary<string, Dictionary<string, string>> newMappings = new(_normalizedComparer);
-            if (oldMappings is not null)
+            Dictionary<string, List<string>> oldExcludedFields = ExcludeSourceFields;
+            Dictionary<string, List<string>> newExcludedFields = new(_normalizedComparer);
+            if (oldExcludedFields is not null)
             {
-                foreach (KeyValuePair<string, Dictionary<string, string>> mapping in oldMappings)
+                foreach (KeyValuePair<string, List<string>> mapping in oldExcludedFields)
                 {
-                    Dictionary<string, string> normalizedValues = new(_normalizedComparer);
-                    foreach (KeyValuePair<string, string> fieldMapping in mapping.Value)
-                    {
-                        normalizedValues[fieldMapping.Key.Trim()] = fieldMapping.Value.Trim();
-                    }
-                    newMappings[mapping.Key.Trim()] = normalizedValues;
+                    newExcludedFields[mapping.Key.Trim()] = mapping.Value;
                 }
             }
 
-            Dictionary<string, List<string>> oldFixedFields = FixedTargetFields;
-            Dictionary<string, List<string>> newFixedFields = new(_normalizedComparer);
-            if (oldFixedFields is not null)
-            {
-                foreach (KeyValuePair<string, List<string>> mapping in oldFixedFields)
-                {
-                    newFixedFields[mapping.Key.Trim()] = mapping.Value;
-                }
-            }
-
-            IncludeWorkItemtypes ??= [];
-            ExcludeWorkItemtypes ??= [];
             IncludeWorkItemTypes ??= [];
             ExcludeWorkItemTypes ??= [];
             if (ExcludeDefaultWorkItemTypes)
@@ -118,72 +89,26 @@ namespace MigrationTools.Tools
                 }
             }
 
-            FixedTargetFields = newFixedFields;
-            SourceFieldMappings = newMappings;
+            ExcludeSourceFields = newExcludedFields;
             _isNormalized = true;
         }
 
         /// <summary>
-        /// Returns true, if field <paramref name="targetFieldName"/> from work item type <paramref name="workItemType"/>
+        /// Returns true, if field <paramref name="fieldReferenceName"/> from work item type <paramref name="workItemType"/>
         /// is in list of fixed target fields. Handles also fields defined for all work item types (<c>*</c>).
         /// </summary>
         /// <param name="workItemType">Work item type name.</param>
-        /// <param name="targetFieldName">Target field reference name.</param>
-        public bool IsFieldFixed(string workItemType, string targetFieldName)
+        /// <param name="fieldReferenceName">Target field reference name.</param>
+        public bool IsSourceFieldExcluded(string workItemType, string fieldReferenceName)
         {
-            if (FixedTargetFields.TryGetValue(workItemType, out List<string> fixedFields))
+            if (ExcludeSourceFields.TryGetValue(workItemType, out List<string> excludedFields))
             {
-                return fixedFields.Contains(targetFieldName, _normalizedComparer);
+                return excludedFields.Contains(fieldReferenceName, _normalizedComparer);
             }
-            if (FixedTargetFields.TryGetValue(AllWorkItemTypes, out fixedFields))
+            if (ExcludeSourceFields.TryGetValue(AllWorkItemTypes, out excludedFields))
             {
-                return fixedFields.Contains(targetFieldName, _normalizedComparer);
+                return excludedFields.Contains(fieldReferenceName, _normalizedComparer);
             }
-            return false;
-        }
-
-        /// <summary>
-        /// Search for mapped target field name for given <paramref name="sourceFieldName"/>. If there is no mapping for source
-        /// field name, its value is returned as target field name.
-        /// Handles also mappings defined for all work item types (<c>*</c>).
-        /// </summary>
-        /// <param name="workItemType">Work item type name.</param>
-        /// <param name="sourceFieldName">Source field reference name.</param>
-        /// <param name="isMapped">Flag if returned value was mapped, or just returned the original.</param>
-        /// <returns>
-        /// Returns:
-        /// <list type="bullet">
-        /// <item>Target field name if it is foung in mappings. This can be empty string, which means that the source
-        /// field is not mapped.</item>
-        /// <item>Source filed name <paramref name="sourceFieldName"/> if there is no mapping defined for this field.</item>
-        /// </list>
-        /// </returns>
-        public string GetTargetFieldName(string workItemType, string sourceFieldName, out bool isMapped)
-        {
-            if (TryGetTargetFieldName(workItemType, sourceFieldName, out string targetFieldName))
-            {
-                isMapped = true;
-                return targetFieldName;
-            }
-            if (TryGetTargetFieldName(AllWorkItemTypes, sourceFieldName, out targetFieldName))
-            {
-                isMapped = true;
-                return targetFieldName;
-            }
-            isMapped = false;
-            return sourceFieldName;
-        }
-
-        private bool TryGetTargetFieldName(string workItemType, string sourceFieldName, out string targetFieldName)
-        {
-            if (SourceFieldMappings.TryGetValue(workItemType, out Dictionary<string, string> mappings))
-            {
-                if (mappings.TryGetValue(sourceFieldName, out targetFieldName))
-                {
-                    return true;
-                }
-            }
-            targetFieldName = string.Empty;
             return false;
         }
     }

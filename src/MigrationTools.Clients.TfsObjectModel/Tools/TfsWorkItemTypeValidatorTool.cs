@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -187,6 +188,9 @@ namespace MigrationTools.Tools
                 {
                     Log.LogInformation("  Validating source field '{sourceFieldReferenceName}' ({sourceFieldName}).",
                         sourceField.ReferenceName, sourceField.Name);
+                    bool fieldResult = true;
+                    bool fieldIsExcluded = Options.IsSourceFieldExcluded(sourceWit.Name, sourceField.ReferenceName);
+                    LogLevel logLevel = fieldIsExcluded ? LogLevel.Information : LogLevel.Warning;
                     if (fieldPair.IsMapped)
                     {
                         Log.LogInformation("    Source field '{sourceFieldName}' is mapped to '{targetFieldName}'.",
@@ -202,13 +206,26 @@ namespace MigrationTools.Tools
                         }
                         else
                         {
-                            result &= ValidateField(sourceField, fieldPair.TargetField, targetWit.Name);
+                            fieldResult = ValidateField(sourceField, fieldPair.TargetField, targetWit.Name, logLevel);
                         }
                     }
                     else
                     {
-                        LogMissingField(targetWit, sourceField, fieldPair.ExpectedTargetFieldName);
-                        result = false;
+                        LogMissingField(targetWit, sourceField, fieldPair.ExpectedTargetFieldName, logLevel);
+                        fieldResult = false;
+                    }
+
+                    if (!fieldResult)
+                    {
+                        if (fieldIsExcluded)
+                        {
+                            Log.LogInformation("    Field '{sourceFieldName}' is excluded from validation, so it is considered valid.",
+                                fieldPair.SourceField.ReferenceName);
+                        }
+                        else
+                        {
+                            result = false;
+                        }
                     }
                 }
             }
@@ -251,9 +268,13 @@ namespace MigrationTools.Tools
             return result;
         }
 
-        private void LogMissingField(WorkItemType targetWit, FieldDefinition sourceField, string targetFieldName)
+        private void LogMissingField(
+            WorkItemType targetWit,
+            FieldDefinition sourceField,
+            string targetFieldName,
+            LogLevel logLevel)
         {
-            Log.LogWarning("    Missing field '{targetFieldName}' in '{targetWit}'.", targetFieldName, targetWit.Name);
+            Log.Log(logLevel, "    Missing field '{targetFieldName}' in '{targetWit}'.", targetFieldName, targetWit.Name);
             Log.LogInformation("      Source field reference name: {sourceFieldReferenceName}", sourceField.ReferenceName);
             Log.LogInformation("      Source field name: {sourceFieldName}", sourceField.Name);
             Log.LogInformation("      Field type: {fieldType}", sourceField.FieldType);
@@ -262,30 +283,20 @@ namespace MigrationTools.Tools
             Log.LogInformation("      Allowed values type: {allowedValuesType}", valueType);
         }
 
-        private bool ValidateField(FieldDefinition sourceField, FieldDefinition? targetField, string targetWitName)
+        private bool ValidateField(
+            FieldDefinition sourceField,
+            FieldDefinition targetField,
+            string targetWitName,
+            LogLevel validationLogLevel)
         {
-            //// If target field is in 'FixedTargetFields' list, it means, that user resolved this filed somehow.
-            //// For example by value mapping. So any discrepancies found will be logged just as information.
-            //// Otherwise, discrepancies are logged as warning.
-            //LogLevel logLevel = Options.IsFieldFixed(targetWitName, targetField.ReferenceName)
-            //    ? LogLevel.Information
-            //    : LogLevel.Warning;
-            LogLevel logLevel = LogLevel.Warning;
-
-            bool isValid = ValidateFieldType(sourceField, targetField, logLevel);
-            isValid &= ValidateFieldAllowedValues(targetWitName, sourceField, targetField, logLevel);
+            bool isValid = ValidateFieldType(sourceField, targetField, validationLogLevel);
+            isValid &= ValidateFieldAllowedValues(targetWitName, sourceField, targetField, validationLogLevel);
             if (isValid)
             {
                 Log.LogDebug("    Target field '{targetFieldReferenceName}' ({targetFieldName}) exists in '{targetWit}' and is valid.",
                     targetField.ReferenceName, targetField.Name, targetWitName);
             }
-            else if (logLevel == LogLevel.Information)
-            {
-                //Log.LogInformation("  Target field '{targetFieldName}' in '{targetWit}' is considered valid,"
-                //    + $" because it is listed in '{nameof(Options.FixedTargetFields)}'.",
-                //    targetField.ReferenceName, targetWitName, sourceField.ReferenceName);
-            }
-            return (logLevel == LogLevel.Information) || isValid;
+            return isValid;
         }
 
         private bool ValidateFieldType(FieldDefinition sourceField, FieldDefinition targetField, LogLevel logLevel)
@@ -319,7 +330,7 @@ namespace MigrationTools.Tools
                     sourceField.ReferenceName, targetField.ReferenceName, sourceValueType, targetValueType);
             }
             if (!ValidateAllowedValues(targetWitName, sourceField.ReferenceName, sourceAllowedValues,
-                targetField.ReferenceName, targetAllowedValues, out List<string> missingValues))
+                targetField.ReferenceName, targetAllowedValues, out List<string> missingValues, logLevel))
             {
                 isValid = false;
                 Log.Log(logLevel,
@@ -343,7 +354,8 @@ namespace MigrationTools.Tools
             List<string> sourceAllowedValues,
             string targetFieldReferenceName,
             List<string> targetAllowedValues,
-            out List<string> missingValues)
+            out List<string> missingValues,
+            LogLevel logLevel)
         {
             missingValues = sourceAllowedValues
                 .Except(targetAllowedValues, StringComparer.OrdinalIgnoreCase)
@@ -367,7 +379,7 @@ namespace MigrationTools.Tools
                         }
                         else
                         {
-                            Log.LogWarning("      Value '{missingValue}' is mapped to '{mappedValue}', which does not exists in target."
+                            Log.Log(logLevel, "      Value '{missingValue}' is mapped to '{mappedValue}', which does not exists in target."
                                 + $" This is probably invalid '{nameof(FieldValueMap)}' configuration.",
                                 missingValue, mappedValue);
                         }
@@ -447,9 +459,6 @@ namespace MigrationTools.Tools
                 return;
             }
 
-            //const string msg1 = "Some work item types or their fields are not valid in the target system (see previous logs)."
-            //    + " Either add these fields into target work items, or map source fields to other target fields"
-            //    + $" in options ({nameof(TfsWorkItemTypeValidatorToolOptions.SourceFieldMappings)}).";
             Log.LogError("Some work item types or their fields are not valid in the target system (see previous logs).");
 
             Log.LogInformation("If the work item type does not exist in target system, you can:");
@@ -475,15 +484,10 @@ namespace MigrationTools.Tools
             Log.LogInformation($"  - Configure value mapping. Add field maps of type '{nameof(FieldValueMap)}'"
                 + $" to '{nameof(FieldMappingTool)}' configuration.");
 
-            //const string message2 = "If you have some field mappings defined for validation, do not forget also to configure"
-            //    + $" proper field mapping in {nameof(FieldMappingTool)} so data will preserved during migration.";
-            //Log.LogInformation(message2);
-            //const string message3 = "If you have different allowed values in some field, either update target field to match"
-            //    + $" allowed values from source, or configure {nameof(FieldValueMap)} in {nameof(FieldMappingTool)}.";
-            //Log.LogInformation(message3);
-
-            //Log.LogInformation($"    You can configure value mapping using '{nameof(FieldValueMap)}' in '{nameof(FieldMappingTool)}',"
-            //    + " or change the process of target system to contain all missing allowed values.");
+            Log.LogInformation("To exclude field from validation, just configure it in"
+                + $" '{nameof(TfsWorkItemTypeValidatorToolOptions.ExcludeSourceFields)}'"
+                + $" of '{nameof(TfsWorkItemTypeValidatorTool)}' configuration."
+                + " If field is excluded from validation, all the issues are still logged, just the result of validation is 'valid'.");
         }
 
         private static bool TryFindSimilarWorkItemType(
