@@ -27,6 +27,15 @@ namespace MigrationTools.Tools
                 .Cast<TFieldMap>();
         }
 
+        /// <summary>
+        /// Return defined field maps of type <see cref="FieldToFieldMap"/> for work item type <paramref name="witName"/>,
+        /// which are defined for source field <paramref name="sourceFieldReferenceName"/>. If <paramref name="mapMode"/>
+        /// is set, only field maps with given mode are returned.
+        /// </summary>
+        /// <param name="fieldMappingTool">Field mapping tool.</param>
+        /// <param name="witName">Work item type name.</param>
+        /// <param name="sourceFieldReferenceName">Source field reference name.</param>
+        /// <param name="mapMode">Field map mode.</param>
         public static IEnumerable<FieldToFieldMap> GetFieldToFieldMaps(
             this IFieldMappingTool fieldMappingTool,
             string witName,
@@ -41,6 +50,12 @@ namespace MigrationTools.Tools
                 : allMaps;
         }
 
+        /// <summary>
+        /// Returns all all defined field maps in <see cref="FieldToFieldMultiMap"/> for source field <paramref name="sourceFieldReferenceName"/>.
+        /// </summary>
+        /// <param name="fieldMappingTool">Field mapping tool.</param>
+        /// <param name="witName">Work item type name.</param>
+        /// <param name="sourceFieldReferenceName">Source field reference name.</param>
         public static IEnumerable<(string sourceFieldName, string targetFieldName)> GetFieldToFieldMultiMaps(
             this IFieldMappingTool fieldMappingTool,
             string witName,
