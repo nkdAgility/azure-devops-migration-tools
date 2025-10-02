@@ -13,10 +13,7 @@ namespace MigrationTools.Tools.Shadows
             throw new NotImplementedException();
         }
 
-        public List<IFieldMap> GetFieldMappings(string witName)
-        {
-            throw new NotImplementedException();
-        }
+        public List<IFieldMap> GetFieldMappings(string witName) => [];
 
         public void ApplyFieldMappings(WorkItemData source, WorkItemData target)
         {
