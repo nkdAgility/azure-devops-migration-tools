@@ -1,8 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools.Tools.Infrastructure;
-using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Tools;
 
@@ -22,7 +20,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         {
         }
 
-        private FieldValueMapOptions Config { get { return (FieldValueMapOptions)_Config; } }
+        internal FieldValueMapOptions Config { get { return (FieldValueMapOptions)_Config; } }
 
         public override string MappingDisplayName => $"{Config.sourceField} {Config.targetField}";
 

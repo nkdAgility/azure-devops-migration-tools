@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MigrationTools.DataContracts;
+﻿using MigrationTools.DataContracts;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -17,6 +12,8 @@ namespace MigrationTools.Tools.Shadows
         {
             throw new NotImplementedException();
         }
+
+        public List<IFieldMap> GetFieldMappings(string witName) => [];
 
         public void ApplyFieldMappings(WorkItemData source, WorkItemData target)
         {
