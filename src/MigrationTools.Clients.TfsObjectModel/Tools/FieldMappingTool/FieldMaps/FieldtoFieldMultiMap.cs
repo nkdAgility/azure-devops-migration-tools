@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Infrastructure;
 
@@ -14,7 +13,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
         }
 
         public override string MappingDisplayName => string.Empty;
-        private FieldToFieldMultiMapOptions Config { get { return (FieldToFieldMultiMapOptions)_Config; } }
+        internal FieldToFieldMultiMapOptions Config { get { return (FieldToFieldMultiMapOptions)_Config; } }
 
         public override void Configure(IFieldMapOptions config)
         {

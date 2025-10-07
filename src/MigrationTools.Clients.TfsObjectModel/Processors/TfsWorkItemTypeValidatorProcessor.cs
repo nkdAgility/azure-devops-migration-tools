@@ -41,11 +41,13 @@ namespace MigrationTools.Processors
                 .ToProject()
                 .WorkItemTypes
                 .Cast<WorkItemType>()
+                .OrderBy(wit => wit.Name)
                 .ToList();
             List<WorkItemType> targetWits = Target.WorkItems.Project
                 .ToProject()
                 .WorkItemTypes
                 .Cast<WorkItemType>()
+                .OrderBy(wit => wit.Name)
                 .ToList();
             bool containsReflectedWorkItemId = CommonTools.WorkItemTypeValidatorTool
                 .ValidateReflectedWorkItemIdField(sourceWits, targetWits, Target.Options.ReflectedWorkItemIdField);

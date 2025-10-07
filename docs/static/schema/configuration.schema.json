@@ -2182,22 +2182,6 @@
                 }
               }
             },
-            "TfsChangeSetMappingTool": {
-              "title": "TfsChangeSetMappingTool",
-              "description": "missing XML code comments",
-              "type": "object",
-              "properties": {
-                "ChangeSetMappingFile": {
-                  "description": "missing XML code comments",
-                  "type": "string"
-                },
-                "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean",
-                  "default": "true"
-                }
-              }
-            },
             "TfsEmbededImagesTool": {
               "title": "TfsEmbededImagesTool",
               "description": "missing XML code comments",
@@ -2231,6 +2215,22 @@
                 "ShouldDropChangedSetLinks": {
                   "description": "When set to true, changeset links in work items will be removed during migration to prevent broken links when repositories are not migrated.",
                   "type": "boolean"
+                }
+              }
+            },
+            "TfsChangeSetMappingTool": {
+              "title": "TfsChangeSetMappingTool",
+              "description": "missing XML code comments",
+              "type": "object",
+              "properties": {
+                "Enabled": {
+                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "type": "boolean",
+                  "default": "true"
+                },
+                "ChangeSetMappingFile": {
+                  "description": "missing XML code comments",
+                  "type": "string"
                 }
               }
             },
@@ -2469,20 +2469,11 @@
                   "default": "true"
                 },
                 "ExcludeDefaultWorkItemTypes": {
-                  "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemtypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.",
+                  "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemTypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.",
                   "type": "boolean"
                 },
-                "ExcludeWorkItemtypes": {
-                  "description": "List of work item types which will be excluded from validation.",
-                  "type": "array",
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    }
-                  ]
-                },
-                "FixedTargetFields": {
-                  "description": "List of target fields that are considered as `fixed`.\r\n A field marked as fixed will not stop the migration if differences are found.\r\n Instead of a warning, only an informational message will be logged.\r\n\n Use this list when you already know about the differences and have resolved them,\r\n for example by using `FieldMappingTool`.\r\n\n The key is the target work item type name.\r\n You can also use `*` to define fixed fields that apply to all work item types.",
+                "ExcludeSourceFields": {
+                  "description": "List of fields in source work itemt types, that are excluded from validation.\r\n Fields excluded from validation are still validated and all found issues are logged.\r\n But the result of the validation is 'valid' and the issues are logged as information instead of warning.\r\n\n The key is the source work item type name.\r\n You can also use `*` to exclude fields from all source work item types.",
                   "type": "object",
                   "default": "null",
                   "additionalProperties": {
@@ -2494,7 +2485,16 @@
                     ]
                   }
                 },
-                "IncludeWorkItemtypes": {
+                "ExcludeWorkItemTypes": {
+                  "description": "List of work item types which will be excluded from validation.",
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "IncludeWorkItemTypes": {
                   "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
                   "type": "array",
                   "default": "null",
@@ -2503,17 +2503,6 @@
                       "type": "string"
                     }
                   ]
-                },
-                "SourceFieldMappings": {
-                  "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to\r\n target field name. Target field name can be empty string to indicate that this field will not be validated in target.\r\n As work item type name, you can use `*` to define mappings which will be applied to all work item types.",
-                  "type": "object",
-                  "default": "null",
-                  "additionalProperties": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    }
-                  }
                 }
               }
             },

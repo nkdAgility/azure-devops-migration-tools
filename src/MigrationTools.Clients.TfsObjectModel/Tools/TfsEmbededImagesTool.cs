@@ -150,6 +150,10 @@ namespace MigrationTools.Tools
                         }
                         else
                         {
+                            // Provide more detailed error information for non-404 failures
+                            Log.LogWarning("EmbededImagesRepairEnricher: Failed to download image {MatchValue} from WorkItem {WorkItemId}, Field {FieldName}. Status: {StatusCode} ({ReasonPhrase})",
+                                matchedSourceUri, targetWorkItem.Id, sourceFieldName, (int)result.StatusCode, result.ReasonPhrase);
+                            
                             result.EnsureSuccessStatusCode();
                         }
                     }

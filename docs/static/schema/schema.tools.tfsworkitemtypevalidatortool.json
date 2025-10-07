@@ -11,26 +11,21 @@
       "default": "true"
     },
     "ExcludeDefaultWorkItemTypes": {
-      "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemtypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.",
+      "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemTypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.",
       "type": "boolean"
     },
-    "ExcludeWorkItemtypes": {
+    "ExcludeSourceFields": {
+      "description": "List of fields in source work itemt types, that are excluded from validation.\r\n Fields excluded from validation are still validated and all found issues are logged.\r\n But the result of the validation is 'valid' and the issues are logged as information instead of warning.\r\n\n The key is the source work item type name.\r\n You can also use `*` to exclude fields from all source work item types.",
+      "type": "object",
+      "default": "null"
+    },
+    "ExcludeWorkItemTypes": {
       "description": "List of work item types which will be excluded from validation.",
       "type": "array"
     },
-    "FixedTargetFields": {
-      "description": "List of target fields that are considered as `fixed`.\r\n A field marked as fixed will not stop the migration if differences are found.\r\n Instead of a warning, only an informational message will be logged.\r\n\n Use this list when you already know about the differences and have resolved them,\r\n for example by using `FieldMappingTool`.\r\n\n The key is the target work item type name.\r\n You can also use `*` to define fixed fields that apply to all work item types.",
-      "type": "object",
-      "default": "null"
-    },
-    "IncludeWorkItemtypes": {
+    "IncludeWorkItemTypes": {
       "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
       "type": "array",
-      "default": "null"
-    },
-    "SourceFieldMappings": {
-      "description": "Field reference name mappings. Key is work item type name, value is dictionary of mapping source filed name to\r\n target field name. Target field name can be empty string to indicate that this field will not be validated in target.\r\n As work item type name, you can use `*` to define mappings which will be applied to all work item types.",
-      "type": "object",
       "default": "null"
     }
   }
