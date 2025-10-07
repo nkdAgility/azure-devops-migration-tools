@@ -259,11 +259,13 @@ namespace MigrationTools.Processors
                 .ToProject()
                 .WorkItemTypes
                 .Cast<WorkItemType>()
+                .OrderBy(wit => wit.Name)
                 .ToList();
             var targetWits = Target.WorkItems.Project
                 .ToProject()
                 .WorkItemTypes
                 .Cast<WorkItemType>()
+                .OrderBy(wit => wit.Name)
                 .ToList();
 
             // Reflected work item ID field is mandatory for migration, so it is validated even if the validator tool is disabled.
