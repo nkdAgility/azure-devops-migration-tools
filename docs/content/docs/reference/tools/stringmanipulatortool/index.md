@@ -35,7 +35,7 @@ The tool is automatically invoked by migration processors and applies transforma
 
 Common scenarios where the String Manipulator Tool is essential:
 
-- **Data Cleanup**: Removing invalid Unicode characters, control characters, or formatting artifacts
+- **Data Cleanup**: Removing control characters or formatting artifacts while preserving Unicode content
 - **Format Standardization**: Converting text patterns to consistent formats
 - **Length Compliance**: Ensuring field values don't exceed target system limits
 - **Character Encoding**: Fixing encoding issues from legacy systems
@@ -99,12 +99,24 @@ Each manipulator supports these properties:
 
 ### Removing Invalid Characters
 
-Remove non-printable characters that may cause issues in the target system:
+Remove control characters that may cause issues while preserving Unicode content:
 
 ```json
 {
   "$type": "RegexStringManipulator",
-  "Description": "Remove invalid characters from the end of the string",
+  "Description": "Remove control characters but preserve Unicode letters and symbols",
+  "Enabled": true,
+  "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]+",
+  "Replacement": ""
+}
+```
+
+For legacy ASCII-only environments, you can use the more restrictive pattern:
+
+```json
+{
+  "$type": "RegexStringManipulator",
+  "Description": "Remove all non-ASCII characters (legacy behavior)",
   "Enabled": true,
   "Pattern": "[^( -~)\n\r\t]+",
   "Replacement": ""
