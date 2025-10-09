@@ -221,6 +221,30 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
+        [DataTestMethod(), TestCategory("L1")]
+        [DataRow("Hello 😀 World", "Hello  World")]           // Basic emoticons should be stripped (surrogate pairs)
+        [DataRow("Test 🔥 Fire", "Test  Fire")]              // Fire emoji should be stripped (surrogate pairs)
+        [DataRow("Code 💻 Work", "Code  Work")]              // Laptop emoji should be stripped (surrogate pairs)  
+        [DataRow("Heart ❤️ Love", "Heart ❤ Love")]           // Variation selector stripped, heart symbol preserved
+        [DataRow("Flag 🇺🇸 Country", "Flag  Country")]        // Regional indicators stripped (surrogate pairs)
+        [DataRow("Math ∑ Symbol", "Math ∑ Symbol")]           // Mathematical symbols preserved (not surrogate pairs)
+        [DataRow("Arrow → Direction", "Arrow → Direction")]    // Arrows preserved (not surrogate pairs)
+        [DataRow("Check ✓ Mark", "Check ✓ Mark")]             // Useful dingbats preserved (not surrogate pairs)
+        [DataRow("Star ★ Rating", "Star ★ Rating")]           // Miscellaneous symbols preserved (not surrogate pairs)
+        [DataRow("Café résumé", "Café résumé")]              // Regular Unicode letters preserved
+        [DataRow("Test\u0001\u0002", "Test")]                // Control chars should be removed
+        public void StringManipulatorTool_DefaultManipulator_EmojiStripping(string value, string expected)
+        {
+            var options = new StringManipulatorToolOptions();
+            options.Enabled = true;
+            options.MaxStringLength = 1000;
+            // No manipulators set - should use default (which should strip emojis)
+            var x = GetStringManipulatorTool(options);
+
+            string? newValue = x.ProcessString(value);
+            Assert.AreEqual(expected, newValue);
+        }
+
         private static StringManipulatorTool GetStringManipulatorTool(StringManipulatorToolOptions options)
         {
             var services = new ServiceCollection();

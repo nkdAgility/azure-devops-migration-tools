@@ -99,14 +99,14 @@ Each manipulator supports these properties:
 
 ### Removing Invalid Characters
 
-Remove control characters that may cause issues while preserving Unicode content:
+Remove control characters and emojis while preserving Unicode content:
 
 ```json
 {
   "$type": "RegexStringManipulator",
-  "Description": "Remove control characters but preserve Unicode letters and symbols",
+  "Description": "Remove control characters and emojis but preserve Unicode letters and symbols",
   "Enabled": true,
-  "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]+",
+  "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
   "Replacement": ""
 }
 ```
@@ -150,6 +150,25 @@ Remove or clean HTML tags from text fields:
   "Replacement": ""
 }
 ```
+
+### Removing Emojis for SOAP Compatibility
+
+Remove emojis that can cause issues with SOAP interfaces while preserving other Unicode symbols:
+
+```json
+{
+  "$type": "RegexStringManipulator",
+  "Description": "Remove emojis but preserve Unicode letters and symbols",
+  "Enabled": true,
+  "Pattern": "[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
+  "Replacement": ""
+}
+```
+
+This pattern removes:
+- Emoji surrogate pairs (😀🔥💻🇺🇸)
+- Variation selectors that control emoji presentation
+- But preserves mathematical symbols (∑), arrows (→), checkmarks (✓), stars (★), and accented letters (café)
 
 ### Fixing Encoding Issues
 
