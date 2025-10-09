@@ -370,7 +370,14 @@ namespace MigrationTools.Tools
                 {
                     if (valueMaps.TryGetValue(missingValue, out string mappedValue))
                     {
-                        if (targetAllowedValues.Contains(mappedValue, StringComparer.OrdinalIgnoreCase))
+                        if (string.IsNullOrWhiteSpace(mappedValue))
+                        {
+                            mappedValues.Add(missingValue);
+                            Log.LogInformation("      Value '{missingValue}' is mapped to empty string ('{mappedValue}')."
+                                + " This is not checked in target and considered valid.",
+                                missingValue, mappedValue);
+                        }
+                        else if (targetAllowedValues.Contains(mappedValue, StringComparer.OrdinalIgnoreCase))
                         {
                             mappedValues.Add(missingValue);
                             Log.LogDebug("      Value '{missingValue}' is mapped to '{mappedValue}', which exists in target.",
