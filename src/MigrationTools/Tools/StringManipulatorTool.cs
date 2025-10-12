@@ -73,8 +73,8 @@ namespace MigrationTools.Tools
             Options.Manipulators.Add(new RegexStringManipulator()
             {
                 Enabled = true,
-                Description = "Default: Removes invalid chars!",
-                Pattern = "[^( -~)\n\r\t]+",
+                Description = "Default: Removes control characters and emojis but preserves Unicode letters and symbols",
+                Pattern = @"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]|[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F",
                 Replacement = ""
             });
         }
