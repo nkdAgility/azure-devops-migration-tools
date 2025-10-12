@@ -79,7 +79,6 @@ namespace MigrationTools.Processors
             }
             if (Options.MigrateTaskGroups)
             {
-                taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
                 taskGroupMappings = await CreateTaskGroupDefinitionsAsync(serviceConnectionMappings);
             }
             if (Options.MigrateBuildPipelines)
