@@ -321,7 +321,6 @@ namespace MigrationTools.Processors
                     {
                         foreach (var step in phase.Steps)
                         {
-                            if (step.Task.DefinitionType.ToLower() != "metaTask".ToLower())
                             if (step.Task.DefinitionType?.ToLower() != "metaTask".ToLower())
                             {
                                 continue;
