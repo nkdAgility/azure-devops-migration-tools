@@ -202,7 +202,7 @@ namespace MigrationTools.Processors
         /// <param name="availableTasks"></param>
         /// <returns>List of filtered Definitions</returns>
         private IEnumerable<TaskGroup> FilterOutIncompatibleTaskGroups(IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<TaskDefinition> availableTasks)
-        private IEnumerable<TaskGroup> FilterOutIncompatibleTaskGroups(IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<TaskDefinition> availableTasks, IEnumerable<Mapping> taskGroupMappings)
+        private IEnumerable<TaskGroup> FilterOutIncompatibleTaskGroupsWithMappings(IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<TaskDefinition> availableTasks, IEnumerable<Mapping> taskGroupMappings)
         {
             var objectsToMigrate = filteredTaskGroups.Where(g =>
             {
