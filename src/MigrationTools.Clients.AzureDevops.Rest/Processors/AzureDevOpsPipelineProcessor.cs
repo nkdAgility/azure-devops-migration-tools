@@ -626,7 +626,6 @@ namespace MigrationTools.Processors
             return mappings;
         }
 
-        private async Task<IEnumerable<Mapping>> CreateTaskGroupDefinitionsAsync()
         private async Task<IEnumerable<Mapping>> CreateTaskGroupDefinitionsAsync(IEnumerable<Mapping> serviceConnectionMappings)
         {
             Log.LogInformation($"Processing Taskgroups..");
