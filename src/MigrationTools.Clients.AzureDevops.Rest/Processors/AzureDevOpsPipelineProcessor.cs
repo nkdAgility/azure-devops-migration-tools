@@ -200,8 +200,8 @@ namespace MigrationTools.Processors
         /// </summary>
         /// <param name="filteredTaskGroups"></param>
         /// <param name="availableTasks"></param>
+        /// <param name="taskGroupMappings"></param>
         /// <returns>List of filtered Definitions</returns>
-        private IEnumerable<TaskGroup> FilterOutIncompatibleTaskGroups(IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<TaskDefinition> availableTasks)
         private IEnumerable<TaskGroup> FilterOutIncompatibleTaskGroupsWithMappings(IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<TaskDefinition> availableTasks, IEnumerable<Mapping> taskGroupMappings)
         {
             var objectsToMigrate = filteredTaskGroups.Where(g =>
@@ -287,6 +287,11 @@ namespace MigrationTools.Processors
                 .ToList();
         }
 
+        private static bool IsMetaTask(string definitionType)
+        {
+            return string.Equals(definitionType, "metaTask", StringComparison.OrdinalIgnoreCase);
+        }
+
         private async Task<IEnumerable<Mapping>> CreateBuildPipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null, IEnumerable<Mapping> serviceConnectionMappings = null)
         {
             Log.LogInformation("Processing Build Pipelines..");
@@ -321,7 +326,7 @@ namespace MigrationTools.Processors
                     {
                         foreach (var step in phase.Steps)
                         {
-                            if (step.Task.DefinitionType?.ToLower() != "metaTask".ToLower())
+                            if (!IsMetaTask(step.Task.DefinitionType))
                             {
                                 continue;
                             }
@@ -537,8 +542,7 @@ namespace MigrationTools.Processors
                 {
                     foreach (var WorkflowTask in deployPhase.WorkflowTasks)
                     {
-                        if (WorkflowTask.DefinitionType != null && WorkflowTask.DefinitionType.ToLower() != "metaTask".ToLower())
-                        if (WorkflowTask.DefinitionType?.ToLower() != "metaTask".ToLower())
+                        if (!IsMetaTask(WorkflowTask.DefinitionType))
                         {
                             continue;
                         }
@@ -634,16 +638,16 @@ namespace MigrationTools.Processors
             var targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             var availableTasks = await Target.GetApiDefinitionsAsync<TaskDefinition>(queryForDetails: false);
             var filteredTaskGroups = FilterOutExistingTaskGroups(sourceDefinitions, targetDefinitions);
-            filteredTaskGroups = FilterOutIncompatibleTaskGroups(filteredTaskGroups, availableTasks).ToList();
+            filteredTaskGroups = FilterOutIncompatibleTaskGroupsWithMappings(filteredTaskGroups, availableTasks, null).ToList();
 
             var existingMappings = FindExistingMappings(sourceDefinitions, targetDefinitions, new List<Mapping>());
 
             Log.LogInformation($"Phase 1 - Unnested Taskgroups");
-            var unnestedTaskGroups = filteredTaskGroups.Where(g => g.Tasks.All(t => t.Task.DefinitionType.ToLower() != "metaTask".ToLower()));
+            var unnestedTaskGroups = filteredTaskGroups.Where(g => g.Tasks.All(t => !IsMetaTask(t.Task.DefinitionType)));
             existingMappings = await CreateTaskGroupsAsync(serviceConnectionMappings, targetDefinitions, availableTasks, unnestedTaskGroups, existingMappings);
 
             Log.LogInformation($"Phase 2 - Nested Taskgroups");
-            var nestedTaskGroups = filteredTaskGroups.Where(g => g.Tasks.Any(t => t.Task.DefinitionType.ToLower() == "metaTask".ToLower())).ToList();
+            var nestedTaskGroups = filteredTaskGroups.Where(g => g.Tasks.Any(t => IsMetaTask(t.Task.DefinitionType))).ToList();
             var taskGroupsToMigrate = new List<TaskGroup>();
 
             do 
@@ -652,7 +656,7 @@ namespace MigrationTools.Processors
                 taskGroupsToMigrate.Clear();
                 foreach (var taskGroup in nestedTaskGroups)
                 {
-                    var nestedTaskGroup = taskGroup.Tasks.Where(t => t.Task.DefinitionType.ToLower() == "metaTask".ToLower()).Select(t => t.Task).ToList();
+                    var nestedTaskGroup = taskGroup.Tasks.Where(t => IsMetaTask(t.Task.DefinitionType)).Select(t => t.Task).ToList();
                     if (nestedTaskGroup.All(t => existingMappings.Any(m => t.Id == m.SourceId)))
                     {
                         taskGroupsToMigrate.Add(taskGroup);
@@ -668,7 +672,7 @@ namespace MigrationTools.Processors
 
         private async Task<IEnumerable<Mapping>> CreateTaskGroupsAsync(IEnumerable<Mapping> serviceConnectionMappings, IEnumerable<TaskGroup> targetDefinitions, IEnumerable<TaskDefinition> availableTasks, IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<Mapping> existingMappings)
         {
-            filteredTaskGroups = FilterOutIncompatibleTaskGroups(filteredTaskGroups, availableTasks, existingMappings).ToList();
+            filteredTaskGroups = FilterOutIncompatibleTaskGroupsWithMappings(filteredTaskGroups, availableTasks, existingMappings).ToList();
 
             var rootSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).First();
             var updatedSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).Last();
@@ -701,7 +705,7 @@ namespace MigrationTools.Processors
                 {
                     foreach (var task in definitionToBeMigrated.Tasks)
                     {
-                        if (task.Task.DefinitionType.ToLower() != "metaTask".ToLower())
+                        if (!IsMetaTask(task.Task.DefinitionType))
                         {
                             continue;
                         }
@@ -725,7 +729,7 @@ namespace MigrationTools.Processors
             await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, updatedSourceDefinitions);
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
-            mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions.Where(d => d.Name != null), mappings));
+            mappings.AddRange(FindExistingMappings(rootSourceDefinitions, targetDefinitions.Where(d => d.Name != null), mappings));
             mappings.AddRange(existingMappings);
             return mappings;
         }
