@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -21,7 +22,7 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
         WriteIndented = true,
     };
 
-    private readonly Dictionary<string, string> _mappings = [];
+    private readonly ConcurrentDictionary<string, string> _mappings = [];
 
     public ExportWorkItemMappingTool(
         IOptions<ExportWorkItemMappingToolOptions> options,
@@ -39,10 +40,10 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
         {
             return;
         }
-
-        if (_mappings.TryGetValue(sourceId, out var existingTargetId))
+        if (!_mappings.TryAdd(sourceId, targetId))
         {
-            if (!existingTargetId.Equals(targetId, StringComparison.OrdinalIgnoreCase))
+            if (_mappings.TryGetValue(sourceId, out string existingTargetId)
+                && !existingTargetId.Equals(targetId, StringComparison.OrdinalIgnoreCase))
             {
                 Log.LogError("Attempt to map source work item ID '{sourceId}' to target ID '{targetId}'."
                     + " This source work item ID is already mapped to different target ID '{existingTargetId}'."
@@ -72,7 +73,7 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
         else
         {
             Log.LogInformation("Saving work item mappings to file '{targetFile}'.", Options.TargetFile);
-            Dictionary<string, string> allMappings = _mappings;
+            Dictionary<string, string> allMappings = new(_mappings);
             if (Options.PreserveExisting)
             {
                 Log.LogInformation($"'{nameof(Options.PreserveExisting)}' is set to 'true'."
@@ -80,8 +81,25 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
                 Dictionary<string, string> existingMappings = LoadExistingMappings();
                 allMappings = MergeWithExistingMappings(_mappings, existingMappings);
             }
-            using FileStream target = File.OpenWrite(Options.TargetFile);
-            JsonSerializer.Serialize(target, allMappings, _jsonOptions);
+            SaveMappingsCore(allMappings);
+        }
+    }
+
+    private void SaveMappingsCore(Dictionary<string, string> mappings)
+    {
+        try
+        {
+            string tempFile = Options.TargetFile + ".tmp";
+            using (FileStream target = File.Create(tempFile))
+            {
+                JsonSerializer.Serialize(target, mappings, _jsonOptions);
+            }
+            File.Copy(tempFile, Options.TargetFile, overwrite: true);
+            File.Delete(tempFile);
+        }
+        catch (Exception ex)
+        {
+            Log.LogError(ex, "Failed to save work item mappings to '{targetFile}'.", Options.TargetFile);
         }
     }
 
@@ -103,8 +121,8 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
     }
 
     private Dictionary<string, string> MergeWithExistingMappings(
-        Dictionary<string, string> mappings,
-        Dictionary<string, string> existingMappings)
+        IDictionary<string, string> mappings,
+        IDictionary<string, string> existingMappings)
     {
         Dictionary<string, string> result = new(mappings);
 

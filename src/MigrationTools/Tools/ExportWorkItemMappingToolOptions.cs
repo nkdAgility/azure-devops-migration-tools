@@ -13,7 +13,7 @@ public class ExportWorkItemMappingToolOptions : ToolOptions
     }
 
     /// <summary>
-    /// Path to file, wher work item mapping will be saved.
+    /// Path to file, where work item mapping will be saved.
     /// </summary>
     public string TargetFile { get; set; }
 
