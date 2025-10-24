@@ -10,11 +10,11 @@ using MigrationTools.Tools.Interfaces;
 namespace MigrationTools.Tools;
 
 /// <summary>
-/// Tool for saving mappings from of work item IDs from source to target.
+/// Tool for exporting mappings of work item IDs from source to target.
 /// Work item migration processor uses this tool to record work item ID mappings.
 /// The mappings will be saved to file defined in options at the end of the migration.
 /// </summary>
-public class WorkItemMappingTool : Tool<WorkItemMappingToolOptions>, IWorkItemMappingTool
+public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>, IExportWorkItemMappingTool
 {
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -23,8 +23,8 @@ public class WorkItemMappingTool : Tool<WorkItemMappingToolOptions>, IWorkItemMa
 
     private readonly Dictionary<string, string> _mappings = [];
 
-    public WorkItemMappingTool(
-        IOptions<WorkItemMappingToolOptions> options,
+    public ExportWorkItemMappingTool(
+        IOptions<ExportWorkItemMappingToolOptions> options,
         IServiceProvider services,
         ILogger<ITool> logger,
         ITelemetryLogger telemetry)

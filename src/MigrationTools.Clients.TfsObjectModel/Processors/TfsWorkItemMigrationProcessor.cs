@@ -233,7 +233,7 @@ namespace MigrationTools.Processors
             }
             finally
             {
-                CommonTools.WorkItemMapping.SaveMappings();
+                CommonTools.ExportWorkItemMapping.SaveMappings();
                 if (Options.FixHtmlAttachmentLinks)
                 {
                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
@@ -602,7 +602,7 @@ namespace MigrationTools.Processors
                         }
                         if (targetWorkItem != null)
                         {
-                            CommonTools.WorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
+                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
                             targetWorkItem.ToWorkItem().Close();
                         }
                         if (sourceWorkItem != null)
