@@ -18,6 +18,11 @@ namespace MigrationTools.Tools
         public IWorkItemTypeMappingTool WorkItemTypeMapping { get; private set; }
 
         /// <summary>
+        /// Gets the work item mapping tool for exporting workt item mapping.
+        /// </summary>
+        public IWorkItemMappingTool WorkItemMapping { get; private set; }
+
+        /// <summary>
         /// Gets the field mapping tool for applying field transformations.
         /// </summary>
         public IFieldMappingTool FieldMappingTool { get; private set; }
@@ -27,14 +32,17 @@ namespace MigrationTools.Tools
         /// </summary>
         /// <param name="StringManipulatorTool">Tool for string field manipulation.</param>
         /// <param name="workItemTypeMapping">Tool for work item type mapping.</param>
+        /// <param name="workItemMapping">Tool for work item mapping.</param>
         /// <param name="fieldMappingTool">Tool for field mapping operations.</param>
         public CommonTools(
             IStringManipulatorTool StringManipulatorTool,
             IWorkItemTypeMappingTool workItemTypeMapping,
+            IWorkItemMappingTool workItemMapping,
             IFieldMappingTool fieldMappingTool)
         {
             StringManipulator = StringManipulatorTool;
             WorkItemTypeMapping = workItemTypeMapping;
+            WorkItemMapping = workItemMapping;
             FieldMappingTool = fieldMappingTool;
         }
     }
