@@ -25,6 +25,7 @@ namespace MigrationTools.Processors.Tests
             services.AddSingleton<CommonTools>();
             services.AddSingleton<IFieldMappingTool, MockFieldMappingTool>();
             services.AddSingleton<IWorkItemTypeMappingTool, MockWorkItemTypeMappingTool>();
+            services.AddSingleton<IExportWorkItemMappingTool, MockExportWorkItemMappingTool>();
             services.AddSingleton<IStringManipulatorTool, StringManipulatorTool>();
 
             services.AddSingleton<AzureDevOpsPipelineProcessor>();
