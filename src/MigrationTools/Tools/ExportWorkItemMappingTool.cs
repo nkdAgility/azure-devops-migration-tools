@@ -22,7 +22,7 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
         WriteIndented = true,
     };
 
-    private readonly ConcurrentDictionary<string, string> _mappings = [];
+    private readonly ConcurrentDictionary<string, string> _mappings = new(StringComparer.OrdinalIgnoreCase);
 
     public ExportWorkItemMappingTool(
         IOptions<ExportWorkItemMappingToolOptions> options,
@@ -53,7 +53,6 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
             return;
         }
         Log.LogDebug("Source work item ID '{sourceId}' is mapped to target work item ID '{targetId}'.", sourceId, targetId);
-        _mappings[sourceId] = targetId;
     }
 
     /// <summary>
@@ -125,7 +124,7 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
         IDictionary<string, string> mappings,
         IDictionary<string, string> existingMappings)
     {
-        Dictionary<string, string> result = new(mappings);
+        Dictionary<string, string> result = new(mappings, StringComparer.OrdinalIgnoreCase);
 
         foreach (KeyValuePair<string, string> existingMapping in existingMappings)
         {
