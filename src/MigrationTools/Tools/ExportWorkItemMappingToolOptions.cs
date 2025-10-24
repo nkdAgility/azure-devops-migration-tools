@@ -3,11 +3,11 @@
 namespace MigrationTools.Tools;
 
 /// <summary>
-/// Options for <see cref="WorkItemMappingTool"/>.
+/// Options for <see cref="ExportWorkItemMappingTool"/>.
 /// </summary>
-public class WorkItemMappingToolOptions : ToolOptions
+public class ExportWorkItemMappingToolOptions : ToolOptions
 {
-    public WorkItemMappingToolOptions()
+    public ExportWorkItemMappingToolOptions()
     {
         Enabled = false;
     }

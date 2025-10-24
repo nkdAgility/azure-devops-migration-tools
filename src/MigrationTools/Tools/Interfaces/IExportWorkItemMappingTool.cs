@@ -1,9 +1,9 @@
 ﻿namespace MigrationTools.Tools.Interfaces;
 
 /// <summary>
-/// Tool for saving mappings from of work item IDs from source to target.
+/// Tool for exporting mappings of work item IDs from source to target.
 /// </summary>
-public interface IWorkItemMappingTool
+public interface IExportWorkItemMappingTool
 {
     /// <summary>
     /// Add new work item mapping.

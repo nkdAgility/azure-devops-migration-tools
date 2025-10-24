@@ -2,9 +2,9 @@
 
 namespace MigrationTools.Tools
 {
-    internal class WorkItemMappingToolOptionsValidator : IValidateOptions<WorkItemMappingToolOptions>
+    internal class ExportWorkItemMappingToolOptionsValidator : IValidateOptions<ExportWorkItemMappingToolOptions>
     {
-        public ValidateOptionsResult Validate(string name, WorkItemMappingToolOptions options)
+        public ValidateOptionsResult Validate(string name, ExportWorkItemMappingToolOptions options)
         {
             if (options.Enabled && string.IsNullOrWhiteSpace(options.TargetFile))
             {
