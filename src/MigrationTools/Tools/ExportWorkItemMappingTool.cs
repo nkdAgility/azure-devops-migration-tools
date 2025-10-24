@@ -110,7 +110,8 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
             if (File.Exists(Options.TargetFile))
             {
                 using Stream source = File.OpenRead(Options.TargetFile);
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(source);
+                Dictionary<string, string>? existing = JsonSerializer.Deserialize<Dictionary<string, string>>(source);
+                return existing ?? [];
             }
         }
         catch (Exception ex)
