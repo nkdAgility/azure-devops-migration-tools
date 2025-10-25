@@ -2251,8 +2251,9 @@
                   "default": "true"
                 },
                 "ChangeSetMappingFile": {
-                  "description": "missing XML code comments",
-                  "type": "string"
+                  "description": "Path to changeset mapping file.",
+                  "type": "string",
+                  "default": "null"
                 }
               }
             },
