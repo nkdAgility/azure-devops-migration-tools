@@ -7,11 +7,6 @@ namespace MigrationTools.Tools;
 /// </summary>
 public class ExportWorkItemMappingToolOptions : ToolOptions
 {
-    public ExportWorkItemMappingToolOptions()
-    {
-        Enabled = false;
-    }
-
     /// <summary>
     /// Path to file, where work item mapping will be saved.
     /// </summary>
