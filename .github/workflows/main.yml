@@ -291,7 +291,7 @@ jobs:
 
           Write-Output "-------------------------------------------"
           Write-Output "::endgroup::"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Scripts
           path: ./build/**
@@ -441,11 +441,11 @@ jobs:
         if: ${{ steps.Build.outcome == 'success' }}
         run: |
           Get-ChildItem -Path ./staging/ -Recurse | ForEach-Object { $_.FullName }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Packages
           path: ./staging/**
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Generated
           path: ./docs/Reference/Generated/**
@@ -487,7 +487,7 @@ jobs:
           $configFiles = "hugo.yaml,hugo.$environment.yaml"
           Write-Host "Using config files: $configFiles"
           hugo --source docs --config $configFiles --logLevel debug;
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: AzureDevOpsMigrationTools-Site2
           path: ./public/**/*
