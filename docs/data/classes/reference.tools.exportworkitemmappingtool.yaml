@@ -1,0 +1,55 @@
+optionsClassName: ExportWorkItemMappingToolOptions
+optionsClassFullName: MigrationTools.Tools.ExportWorkItemMappingToolOptions
+configurationSamples:
+- name: defaults
+  order: 2
+  description: 
+  code: There are no defaults! Check the sample for options!
+  sampleFor: MigrationTools.Tools.ExportWorkItemMappingToolOptions
+- name: sample
+  order: 1
+  description: 
+  code: There is no sample, but you can check the classic below for a general feel.
+  sampleFor: MigrationTools.Tools.ExportWorkItemMappingToolOptions
+- name: classic
+  order: 3
+  description: 
+  code: >-
+    {
+      "$type": "ExportWorkItemMappingToolOptions",
+      "Enabled": false,
+      "TargetFile": "",
+      "PreserveExisting": true
+    }
+  sampleFor: MigrationTools.Tools.ExportWorkItemMappingToolOptions
+description: >-
+  Tool for exporting mappings of work item IDs from source to target.
+   Work item migration processor uses this tool to record work item ID mappings.
+   The mappings will be saved to file defined in options at the end of the migration.
+className: ExportWorkItemMappingTool
+typeName: Tools
+options:
+- parameterName: Enabled
+  type: Boolean
+  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  defaultValue: true
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: PreserveExisting
+  type: Boolean
+  description: >-
+    Indicates whether existing mappings in the target file should be preserved when saving new mappings.
+     Default value is `true`.
+  defaultValue: true
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: TargetFile
+  type: String
+  description: Path to file, where work item mapping will be saved.
+  defaultValue: String.Empty
+  isRequired: false
+  dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+status: missing XML code comments
+processingTarget: missing XML code comments
+classFile: src/MigrationTools/Tools/ExportWorkItemMappingTool.cs
+optionsClassFile: src/MigrationTools/Tools/ExportWorkItemMappingToolOptions.cs

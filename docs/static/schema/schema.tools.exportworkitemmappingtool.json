@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.tools.exportworkitemmappingtool.json",
+  "title": "ExportWorkItemMappingTool",
+  "description": "Tool for exporting mappings of work item IDs from source to target.\r\n Work item migration processor uses this tool to record work item ID mappings.\r\n The mappings will be saved to file defined in options at the end of the migration.",
+  "type": "object",
+  "properties": {
+    "Enabled": {
+      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "type": "boolean",
+      "default": "true"
+    },
+    "PreserveExisting": {
+      "description": "Indicates whether existing mappings in the target file should be preserved when saving new mappings.\r\n Default value is `true`.",
+      "type": "boolean",
+      "default": "true"
+    },
+    "TargetFile": {
+      "description": "Path to file, where work item mapping will be saved.",
+      "type": "string",
+      "default": "String.Empty"
+    }
+  }
+}

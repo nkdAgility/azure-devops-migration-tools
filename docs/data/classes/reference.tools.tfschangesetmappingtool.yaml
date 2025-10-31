@@ -49,8 +49,8 @@ typeName: Tools
 options:
 - parameterName: ChangeSetMappingFile
   type: String
-  description: missing XML code comments
-  defaultValue: missing XML code comments
+  description: Path to changeset mapping file.
+  defaultValue: null
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enabled
