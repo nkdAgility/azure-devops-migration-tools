@@ -73,13 +73,8 @@ namespace MigrationTools.Tests.Tools.Infrastructure
         [TestMethod]
         public void ShouldDetectSVG()
         {
-            // Arrange: SVG header (first few bytes of an SVG file)
             byte[] svgHeader = Encoding.ASCII.GetBytes("<svg");
-
-            // Act
             var format = TestableEmbededImagesRepairTool.CallGetImageFormat(svgHeader);
-
-            // Assert
             Assert.AreEqual("svg", format);
         }
 

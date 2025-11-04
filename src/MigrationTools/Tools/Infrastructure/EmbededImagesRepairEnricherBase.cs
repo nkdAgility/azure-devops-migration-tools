@@ -56,7 +56,6 @@ namespace MigrationTools.Tools.Infrastructure
         /// Retrieve Image Format for a given byte array
         /// </summary>
         /// <param name="bytes">Image to check</param>
-        /// <remarks>From https://stackoverflow.com/a/9446045/1317161</remarks>
         /// <returns>Image format</returns>
         protected static ImageFormat GetImageFormat(byte[] bytes)
         {
