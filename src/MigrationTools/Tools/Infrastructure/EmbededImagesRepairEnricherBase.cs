@@ -56,51 +56,60 @@ namespace MigrationTools.Tools.Infrastructure
         /// Retrieve Image Format for a given byte array
         /// </summary>
         /// <param name="bytes">Image to check</param>
-        /// <remarks>From https://stackoverflow.com/a/9446045/1317161</remarks>
         /// <returns>Image format</returns>
         protected static ImageFormat GetImageFormat(byte[] bytes)
         {
-            // see http://www.mikekunz.com/image_file_header.html
-            var bmp = Encoding.ASCII.GetBytes("BM");     // BMP
-            var gif = Encoding.ASCII.GetBytes("GIF");    // GIF
-            var png = new byte[] { 137, 80, 78, 71 };    // PNG
-            var tiff = new byte[] { 73, 73, 42 };         // TIFF
-            var tiff2 = new byte[] { 77, 77, 42 };         // TIFF
-            var jpeg = new byte[] { 255, 216, 255, 224 }; // jpeg
-            var jpeg2 = new byte[] { 255, 216, 255, 225 }; // jpeg canon
-            var jpeg3 = new byte[] { 255, 216, 255, 237 }; // jpeg
-            var jpeg4 = new byte[] { 255, 216, 255, 232 }; // jpeg still picture interchange file format (SPIFF)
-            var jpeg5 = new byte[] { 255, 216, 255, 226 }; // jpeg canon
+            if (bytes != null && bytes.Length > 1)
+            {
+                // BMP: 42 4D
+                var bmp = new byte[] { 0x42, 0x4D };
+                if (bmp.SequenceEqual(bytes.Take(bmp.Length)))
+                    return ImageFormat.bmp;
+            }
 
-            if (bmp.SequenceEqual(bytes.Take(bmp.Length)))
-                return ImageFormat.bmp;
+            if (bytes == null || bytes.Length < 4)
+                return ImageFormat.unknown;
 
-            if (gif.SequenceEqual(bytes.Take(gif.Length)))
+            // GIF: GIF87a or GIF89a
+            var gif87a = System.Text.Encoding.ASCII.GetBytes("GIF87a");
+            var gif89a = System.Text.Encoding.ASCII.GetBytes("GIF89a");
+
+            // PNG: 89 50 4E 47 0D 0A 1A 0A
+            var png = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+
+            // TIFF: II* or MM*
+            var tiffLE = new byte[] { 0x49, 0x49, 0x2A, 0x00 };
+            var tiffBE = new byte[] { 0x4D, 0x4D, 0x00, 0x2A };
+
+            // JPEG: FF D8
+            var jpegSOI = new byte[] { 0xFF, 0xD8 };
+
+            // Check GIF
+            if (gif87a.SequenceEqual(bytes.Take(gif87a.Length)) ||
+                gif89a.SequenceEqual(bytes.Take(gif89a.Length)))
                 return ImageFormat.gif;
 
+            // Check PNG
             if (png.SequenceEqual(bytes.Take(png.Length)))
                 return ImageFormat.png;
 
-            if (tiff.SequenceEqual(bytes.Take(tiff.Length)))
+            // Check TIFF
+            if (tiffLE.SequenceEqual(bytes.Take(tiffLE.Length)) ||
+                tiffBE.SequenceEqual(bytes.Take(tiffBE.Length)))
                 return ImageFormat.tiff;
 
-            if (tiff2.SequenceEqual(bytes.Take(tiff2.Length)))
-                return ImageFormat.tiff;
-
-            if (jpeg.SequenceEqual(bytes.Take(jpeg.Length)))
+            // Check JPEG
+            if (jpegSOI.SequenceEqual(bytes.Take(jpegSOI.Length)))
                 return ImageFormat.jpeg;
 
-            if (jpeg2.SequenceEqual(bytes.Take(jpeg2.Length)))
-                return ImageFormat.jpeg;
+            var text = Encoding.UTF8.GetString(bytes);
+            text = text.TrimStart();
 
-            if (jpeg3.SequenceEqual(bytes.Take(jpeg3.Length)))
-                return ImageFormat.jpeg;
-
-            if (jpeg4.SequenceEqual(bytes.Take(jpeg4.Length)))
-                return ImageFormat.jpeg;
-
-            if (jpeg5.SequenceEqual(bytes.Take(jpeg5.Length)))
-                return ImageFormat.jpeg;
+            if (text.StartsWith("<svg", StringComparison.OrdinalIgnoreCase) ||
+                (text.StartsWith("<?xml", StringComparison.OrdinalIgnoreCase) && text.Contains("<svg")))
+            {
+                return ImageFormat.svg;
+            }
 
             return ImageFormat.unknown;
         }
@@ -130,7 +139,8 @@ namespace MigrationTools.Tools.Infrastructure
             gif,
             png,
             tiff,
-            jpeg
+            jpeg,
+            svg
         }
     }
 }
