@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Tools;
@@ -117,7 +117,7 @@ namespace MigrationTools.Tests.Tools.FieldMaps
             var expression = new Expression("[x] + [");  // Invalid syntax
 
             // Act & Assert - NCalc throws EvaluationException for invalid syntax
-            Assert.ThrowsException<NCalc.EvaluationException>(() => expression.Evaluate());
+            Assert.Throws<NCalc.EvaluationException>(() => expression.Evaluate());
         }
 
         [TestMethod]
@@ -127,7 +127,7 @@ namespace MigrationTools.Tests.Tools.FieldMaps
             var expression = new Expression("[undefined] * 2");
 
             // Act & Assert
-            Assert.ThrowsException<ArgumentException>(() => expression.Evaluate());
+            Assert.Throws<ArgumentException>(() => expression.Evaluate());
         }
     }
 }
