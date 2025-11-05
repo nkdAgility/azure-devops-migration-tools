@@ -66,9 +66,9 @@ namespace MigrationTools.Tools.Infrastructure
                 if (bmp.SequenceEqual(bytes.Take(bmp.Length)))
                     return ImageFormat.bmp;
             }
-   
+
             if (bytes == null || bytes.Length < 4)
-                throw new ArgumentException("Byte array too short to determine image format.");
+                return ImageFormat.unknown;
 
             // GIF: GIF87a or GIF89a
             var gif87a = System.Text.Encoding.ASCII.GetBytes("GIF87a");
@@ -81,11 +81,8 @@ namespace MigrationTools.Tools.Infrastructure
             var tiffLE = new byte[] { 0x49, 0x49, 0x2A, 0x00 };
             var tiffBE = new byte[] { 0x4D, 0x4D, 0x00, 0x2A };
 
-            // JPEG: FF D8 (simplified for all variants)
+            // JPEG: FF D8
             var jpegSOI = new byte[] { 0xFF, 0xD8 };
-
-            // SVG: starts with "<svg" (text-based)
-            var svgTag = System.Text.Encoding.ASCII.GetBytes("<svg");
 
             // Check GIF
             if (gif87a.SequenceEqual(bytes.Take(gif87a.Length)) ||
@@ -105,9 +102,14 @@ namespace MigrationTools.Tools.Infrastructure
             if (jpegSOI.SequenceEqual(bytes.Take(jpegSOI.Length)))
                 return ImageFormat.jpeg;
 
-            // Check SVG (text-based)
-            if (bytes.Length >= 4 && svgTag.SequenceEqual(bytes.Take(svgTag.Length)))
+            var text = Encoding.UTF8.GetString(bytes);
+            text = text.TrimStart();
+
+            if (text.StartsWith("<svg", StringComparison.OrdinalIgnoreCase) ||
+                (text.StartsWith("<?xml", StringComparison.OrdinalIgnoreCase) && text.Contains("<svg")))
+            {
                 return ImageFormat.svg;
+            }
 
             return ImageFormat.unknown;
         }
