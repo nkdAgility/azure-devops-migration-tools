@@ -1,14 +1,6 @@
-<svg version="1.1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    width="1600" height="1000" viewBox="0 0 1600 1000">
-<!-- Colors -->
-<!-- Sweden flag: blue #005293, yellow #FECB00 -->
-
-<!-- Swedish flag (10:16; fields 5:2:9 and 4:2:4) -->
-<rect x="0" y="0" width="1600" height="1000" fill="#005293"/>
-<rect x="500" y="0" width="200" height="1000" fill="#FECB00"/>
-<rect x="0" y="400" width="1600" height="200" fill="#FECB00"/>
-
-
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="50" fill="lightblue" stroke="black" stroke-width="2"/>
+  <text x="100" y="180" font-family="Arial" font-size="16" text-anchor="middle" fill="black">
+    Sample Image
+  </text>
 </svg>
