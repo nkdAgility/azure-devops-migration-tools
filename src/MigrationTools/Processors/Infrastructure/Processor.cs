@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Endpoints;
-using MigrationTools.Endpoints.Infrastructure;
 using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 using MigrationTools.Services;
@@ -139,6 +136,7 @@ namespace MigrationTools.Processors.Infrastructure
                 }
                 finally
                 {
+                    ProcessorActivity.Stop();
                     Log.LogInformation("{ProcessorName} completed in {ProcessorDuration} ", Name, ProcessorActivity.Duration.ToString("c"));
                 }
 

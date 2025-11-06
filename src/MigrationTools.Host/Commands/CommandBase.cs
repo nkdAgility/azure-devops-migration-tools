@@ -65,7 +65,6 @@ namespace MigrationTools.Host.Commands
                 {
                     Log.Debug("Disabling Telemetry {CommandName}", this.GetType().Name);
                     CommandActivity.AddTag("DisableTelemetry", settings.DisableTelemetry);
-                    CommandActivity.Stop();
                     ActivitySourceProvider.DisableActivitySource();
                 }
                 //Enable Debug Trace
@@ -105,7 +104,7 @@ namespace MigrationTools.Host.Commands
 
         internal virtual Task<int> ExecuteInternalAsync(CommandContext context, TSettings settings)
         {
-            return Task.FromResult( 0);
+            return Task.FromResult(0);
         }
 
         public void RunStartupLogic(TSettings settings)

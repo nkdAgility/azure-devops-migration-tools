@@ -22,6 +22,27 @@
     <ProjectReference Include="..\MigrationTools.Clients.FileSystem\MigrationTools.Clients.FileSystem.csproj" />
     <ProjectReference Include="..\MigrationTools.Shadows\MigrationTools.Shadows.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
+  </ItemGroup> 
+
+  <ItemGroup>     
+    <Content Include="..\MigrationTools.Tests\Tools\Infrastructure\Assets\bmpsample.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MigrationTools.Tests\Tools\Infrastructure\Assets\gifsample.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MigrationTools.Tests\Tools\Infrastructure\Assets\jpgsample.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MigrationTools.Tests\Tools\Infrastructure\Assets\tiffsample.tiff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MigrationTools.Tests\Tools\Infrastructure\Assets\pngsample.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\MigrationTools.Tests\Tools\Infrastructure\Assets\svgsample.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
