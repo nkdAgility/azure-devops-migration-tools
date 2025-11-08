@@ -28,8 +28,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="YamlDotNet" />
-    <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="Newtonsoft.Json.Schema" />
   </ItemGroup>
 
   <ItemGroup>
