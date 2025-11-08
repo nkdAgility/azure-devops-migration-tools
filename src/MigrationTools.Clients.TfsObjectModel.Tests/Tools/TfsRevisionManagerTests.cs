@@ -65,7 +65,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(1, revs.Count);
+            Assert.HasCount(1, revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -79,7 +79,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(10, revs.Count);
+            Assert.HasCount(10, revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -98,7 +98,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(1, revs.Count);
+            Assert.HasCount(1, revs);
         }
 
 
@@ -137,7 +137,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(5, revs.Count);
+            Assert.HasCount(5, revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -155,7 +155,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, null);
 
-            Assert.AreEqual(5, revs.Count);
+            Assert.HasCount(5, revs);
         }
 
         [TestMethod(), TestCategory("L0")]

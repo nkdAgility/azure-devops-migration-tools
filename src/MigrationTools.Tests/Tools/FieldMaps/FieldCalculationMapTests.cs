@@ -31,7 +31,7 @@ namespace MigrationTools.Tests.Tools.FieldMaps
             // Assert
             Assert.AreEqual("[x]*2", options.expression);
             Assert.AreEqual("Custom.FieldC", options.targetField);
-            Assert.AreEqual(1, options.parameters.Count);
+            Assert.HasCount(1, options.parameters);
             Assert.AreEqual("Custom.FieldB", options.parameters["x"]);
             CollectionAssert.Contains(options.ApplyTo, "SomeWorkItemType");
         }

@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -66,8 +65,8 @@ namespace MigrationTools.Tests.Options
                 var areasChildren = areasMappingsSection.GetChildren().ToList();
                 var iterationsChildren = iterationsMappingsSection.GetChildren().ToList();
 
-                Assert.AreEqual(2, areasChildren.Count, "Should have 2 areas mappings");
-                Assert.AreEqual(1, iterationsChildren.Count, "Should have 1 iterations mapping");
+                Assert.HasCount(2, areasChildren, "Should have 2 areas mappings");
+                Assert.HasCount(1, iterationsChildren, "Should have 1 iterations mapping");
 
                 // Verify the dictionary format detection logic
                 var firstAreaChild = areasChildren.FirstOrDefault();
@@ -131,11 +130,11 @@ namespace MigrationTools.Tests.Options
                 Assert.IsTrue(areasMappingsSection.Exists(), "Areas.Mappings section should exist");
 
                 var areasChildren = areasMappingsSection.GetChildren().ToList();
-                Assert.AreEqual(1, areasChildren.Count, "Should have 1 areas mapping");
+                Assert.HasCount(1, areasChildren, "Should have 1 areas mapping");
 
                 var firstChild = areasChildren.FirstOrDefault();
                 Assert.IsNotNull(firstChild, "Should have first mapping");
-                
+
                 // In array format, keys should be numeric indices
                 Assert.IsTrue(int.TryParse(firstChild.Key, out _), "Key should be numeric (array format)");
             }
