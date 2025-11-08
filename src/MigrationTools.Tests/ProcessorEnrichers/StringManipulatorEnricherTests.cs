@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.DataContracts;
 using MigrationTools.Shadows;
 using MigrationTools.Tools;
 
@@ -86,7 +85,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(10, newValue.Length);
         }
 
-        [DataTestMethod(), TestCategory("L1")]
+        [TestMethod(), TestCategory("L1")]
         [DataRow(null, null)]
         [DataRow("", "")]
         [DataRow("lorem", "lorem")]
@@ -111,7 +110,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
-        [DataTestMethod(), TestCategory("L1")]
+        [TestMethod(), TestCategory("L1")]
         [DataRow(null, null)]
         [DataRow("", " ")]
         [DataRow("lorem", "lorem lorem")]
@@ -137,7 +136,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
-        [DataTestMethod(), TestCategory("L1")]
+        [TestMethod(), TestCategory("L1")]
         [DataRow(null, null)]
         [DataRow("", " 1 2")]
         [DataRow("lorem", "lorem 1 2")]
@@ -169,7 +168,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
-        [DataTestMethod(), TestCategory("L1")]
+        [TestMethod(), TestCategory("L1")]
         [DataRow("Hello", "Hello")]
         [DataRow("Héllo", "Héllo")]    // New behavior: accented chars preserved
         [DataRow("Привет", "Привет")]    // New behavior: Cyrillic chars preserved
@@ -190,7 +189,7 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
-        [DataTestMethod(), TestCategory("L1")]
+        [TestMethod(), TestCategory("L1")]
         [DataRow("Hello", "Hello")]
         [DataRow("Héllo", "Héllo")]    // Expected behavior: accented chars preserved
         [DataRow("Привет", "Привет")]    // Expected behavior: Cyrillic chars preserved
@@ -221,10 +220,10 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
-        [DataTestMethod(), TestCategory("L1")]
+        [TestMethod(), TestCategory("L1")]
         [DataRow("Hello 😀 World", "Hello  World")]           // Basic emoticons should be stripped (surrogate pairs)
         [DataRow("Test 🔥 Fire", "Test  Fire")]              // Fire emoji should be stripped (surrogate pairs)
-        [DataRow("Code 💻 Work", "Code  Work")]              // Laptop emoji should be stripped (surrogate pairs)  
+        [DataRow("Code 💻 Work", "Code  Work")]              // Laptop emoji should be stripped (surrogate pairs)
         [DataRow("Heart ❤️ Love", "Heart ❤ Love")]           // Variation selector stripped, heart symbol preserved
         [DataRow("Flag 🇺🇸 Country", "Flag  Country")]        // Regional indicators stripped (surrogate pairs)
         [DataRow("Math ∑ Symbol", "Math ∑ Symbol")]           // Mathematical symbols preserved (not surrogate pairs)
