@@ -43,16 +43,16 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// <para>
-        /// List of fields in source work itemt types, that are excluded from validation.
+        /// List of fields in source work item types, that are excluded from validation.
         /// Fields excluded from validation are still validated and all found issues are logged.
         /// But the result of the validation is 'valid' and the issues are logged as information instead of warning.
         /// </para>
         /// <para>
-        /// The key is the source work item type name.
-        /// You can also use <c>*</c> to exclude fields from all source work item types.
+        /// The key is the source work item type name. The value is list of fields' reference names which are excluded.
+        /// You can also use <c>*</c> as key to exclude fields from all source work item types.
         /// </para>
         /// </summary>
-        /// <default>null</default>
+        /// <default>Empty dictionary</default>
         public Dictionary<string, List<string>> ExcludeSourceFields { get; set; } = [];
 
         /// <summary>
