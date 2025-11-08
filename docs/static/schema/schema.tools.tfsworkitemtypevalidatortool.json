@@ -15,9 +15,9 @@
       "type": "boolean"
     },
     "ExcludeSourceFields": {
-      "description": "List of fields in source work itemt types, that are excluded from validation.\r\n Fields excluded from validation are still validated and all found issues are logged.\r\n But the result of the validation is 'valid' and the issues are logged as information instead of warning.\r\n\n The key is the source work item type name.\r\n You can also use `*` to exclude fields from all source work item types.",
+      "description": "List of fields in source work item types, that are excluded from validation.\r\n Fields excluded from validation are still validated and all found issues are logged.\r\n But the result of the validation is 'valid' and the issues are logged as information instead of warning.\r\n\n The key is the source work item type name. The value is list of fields' reference names which are excluded.\r\n You can also use `*` as key to exclude fields from all source work item types.",
       "type": "object",
-      "default": "null"
+      "default": "Empty dictionary"
     },
     "ExcludeWorkItemTypes": {
       "description": "List of work item types which will be excluded from validation.",

@@ -12,9 +12,8 @@ configurationSamples:
           "TfsWorkItemTypeValidatorTool": {
             "Enabled": "True",
             "ExcludeDefaultWorkItemTypes": "True",
-            "ExcludeWorkItemtypes": null,
-            "FixedTargetFields": null,
-            "SourceFieldMappings": null
+            "ExcludeSourceFields": null,
+            "ExcludeWorkItemTypes": null
           }
         }
       }
@@ -30,17 +29,14 @@ configurationSamples:
         "CommonTools": {
           "TfsWorkItemTypeValidatorTool": {
             "Enabled": "True",
-            "ExcludeWorkItemtypes": null,
-            "FixedTargetFields": {
-              "User Story": [
-                "Custom.Prirucka"
+            "ExcludeDefaultWorkItemTypes": "True",
+            "ExcludeSourceFields": {
+              "Bug": [
+                "Microsoft.VSTS.Common.AcceptanceCriteria",
+                "Microsoft.VSTS.Scheduling.Effort"
               ]
             },
-            "SourceFieldMappings": {
-              "User Story": {
-                "Microsoft.VSTS.Common.Prirucka": "Custom.Prirucka"
-              }
-            }
+            "ExcludeWorkItemTypes": null
           }
         }
       }
@@ -56,7 +52,12 @@ configurationSamples:
       "IncludeWorkItemTypes": [],
       "ExcludeWorkItemTypes": [],
       "ExcludeDefaultWorkItemTypes": true,
-      "ExcludeSourceFields": {}
+      "ExcludeSourceFields": {
+        "Bug": [
+          "Microsoft.VSTS.Common.AcceptanceCriteria",
+          "Microsoft.VSTS.Scheduling.Effort"
+        ]
+      }
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemTypeValidatorToolOptions
 description: >-
@@ -83,13 +84,13 @@ options:
 - parameterName: ExcludeSourceFields
   type: Dictionary
   description: >-
-    List of fields in source work itemt types, that are excluded from validation.
+    List of fields in source work item types, that are excluded from validation.
      Fields excluded from validation are still validated and all found issues are logged.
      But the result of the validation is 'valid' and the issues are logged as information instead of warning.
 
-     The key is the source work item type name.
-     You can also use `*` to exclude fields from all source work item types.
-  defaultValue: null
+     The key is the source work item type name. The value is list of fields' reference names which are excluded.
+     You can also use `*` as key to exclude fields from all source work item types.
+  defaultValue: Empty dictionary
   isRequired: false
   dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: ExcludeWorkItemTypes

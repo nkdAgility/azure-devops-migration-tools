@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MigrationTools.Processors.Tests
@@ -12,7 +7,7 @@ namespace MigrationTools.Processors.Tests
     public class TfsWorkItemMigrationProcessorTests
     {
 
-        [TestMethod("TfsWorkItemMigrationProcessorTests_OptionsValidator_Empty"), TestCategory("L0")]
+        [TestMethod(DisplayName = "TfsWorkItemMigrationProcessorTests_OptionsValidator_Empty"), TestCategory("L0")]
         public void OptionsValidator_Empty()
         {
             var validator = new TfsWorkItemMigrationProcessorOptionsValidator();
@@ -20,7 +15,7 @@ namespace MigrationTools.Processors.Tests
             Assert.IsTrue(validator.Validate(null, x).Failed);
         }
 
-        [TestMethod("TfsWorkItemMigrationProcessorTests_OptionsValidator_Valid"), TestCategory("L0")]
+        [TestMethod(DisplayName = "TfsWorkItemMigrationProcessorTests_OptionsValidator_Valid"), TestCategory("L0")]
         public void OptionsValidator_Valid()
         {
             var validator = new TfsWorkItemMigrationProcessorOptionsValidator();
