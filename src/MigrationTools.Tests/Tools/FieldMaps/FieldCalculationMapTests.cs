@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Tools;
 using NCalc;
@@ -17,7 +16,7 @@ namespace MigrationTools.Tests.Tools.FieldMaps
 
             // Assert
             Assert.IsNotNull(options.parameters);
-            Assert.AreEqual(0, options.parameters.Count);
+            Assert.IsEmpty(options.parameters);
         }
 
         [TestMethod]
@@ -57,7 +56,7 @@ namespace MigrationTools.Tests.Tools.FieldMaps
             // Arrange
             var expression = new Expression("([a] + [b]) * [c]");
             expression.Parameters["a"] = 10;
-            expression.Parameters["b"] = 5; 
+            expression.Parameters["b"] = 5;
             expression.Parameters["c"] = 2;
 
             // Act
