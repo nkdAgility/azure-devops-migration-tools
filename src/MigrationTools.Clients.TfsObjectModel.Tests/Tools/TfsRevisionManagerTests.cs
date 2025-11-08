@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
-using MigrationTools.Tests;
 using MigrationTools.Tools;
 
 
@@ -38,8 +37,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(revs.Count, 0);
-
+            Assert.AreEqual(0, revs.Count);
         }
 
         [TestMethod(), TestCategory("L0")]
