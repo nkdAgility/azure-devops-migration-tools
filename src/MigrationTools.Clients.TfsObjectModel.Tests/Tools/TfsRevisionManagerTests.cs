@@ -167,7 +167,7 @@ namespace MigrationTools.Tests.Tools
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10, false);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, null);
-            Assert.AreEqual(true, CheckDateIncreasing(revs));
+            Assert.IsTrue(CheckDateIncreasing(revs));
         }
 
         private static bool CheckDateIncreasing(List<RevisionItem> revs)
