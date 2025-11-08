@@ -1,23 +1,18 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MigrationTools.Endpoints;
-using MigrationTools.Tests;
-using MigrationTools.Processors.Infrastructure;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MigrationTools.Processors.Tests
 {
     [TestClass()]
     public class TfsSharedQueryProcessorTests : TfsProcessorTests
     {
-        [TestMethod("TfsSharedQueryProcessorTests_Incantate"), TestCategory("L0")]
+        [TestMethod(DisplayName = "TfsSharedQueryProcessorTests_Incantate"), TestCategory("L0")]
         public void Incantate()
         {
             var x = GetTfsSharedQueryProcessor();
             Assert.IsNotNull(x);
         }
 
-        [TestMethod("TfsSharedQueryProcessorTests_BasicConfigure"), TestCategory("L0")]
+        [TestMethod(DisplayName = "TfsSharedQueryProcessorTests_BasicConfigure"), TestCategory("L0")]
         public void BasicConfigure()
         {
             var y = new TfsSharedQueryProcessorOptions
@@ -33,7 +28,7 @@ namespace MigrationTools.Processors.Tests
             Assert.AreEqual("fortyTwo", x.Options.RefName);
         }
 
-        [TestMethod("TfsSharedQueryProcessorTests_BasicRun"), TestCategory("L0")]
+        [TestMethod(DisplayName = "TfsSharedQueryProcessorTests_BasicRun"), TestCategory("L0")]
         public void BasicRun()
         {
             var y = new TfsSharedQueryProcessorOptions

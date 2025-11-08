@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors.Tests
@@ -28,7 +27,7 @@ namespace MigrationTools.Processors.Tests
             };
             var x = GetTfsTeamSettingsProcessor(y);
             Assert.IsNotNull(x);
-            Assert.AreEqual(x.Options.SourceName, "TfsTeamSettingsSource");
+            Assert.AreEqual("TfsTeamSettingsSource", x.Options.SourceName);
             Assert.IsNotNull(x.Source);
         }
 

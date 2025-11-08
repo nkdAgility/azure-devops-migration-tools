@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
-using MigrationTools.Tests;
 using MigrationTools.Tools;
 
 
@@ -38,8 +37,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(revs.Count, 0);
-
+            Assert.IsEmpty(revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -53,8 +51,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(0, revs.Count);
-
+            Assert.IsEmpty(revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -68,7 +65,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(1, revs.Count);
+            Assert.HasCount(1, revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -82,7 +79,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(10, revs.Count);
+            Assert.HasCount(10, revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -101,7 +98,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(1, revs.Count);
+            Assert.HasCount(1, revs);
         }
 
 
@@ -121,7 +118,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(0, revs.Count);
+            Assert.IsEmpty(revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -140,7 +137,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, target);
 
-            Assert.AreEqual(5, revs.Count);
+            Assert.HasCount(5, revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -158,7 +155,7 @@ namespace MigrationTools.Tests.Tools
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, null);
 
-            Assert.AreEqual(5, revs.Count);
+            Assert.HasCount(5, revs);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -170,7 +167,7 @@ namespace MigrationTools.Tests.Tools
             List<RevisionItem> source = GetWorkItemWithRevisions(currentDateTime, 1, 10, false);
 
             var revs = processorEnricher.GetRevisionsToMigrate(source, null);
-            Assert.AreEqual(true, CheckDateIncreasing(revs));
+            Assert.IsTrue(CheckDateIncreasing(revs));
         }
 
         private static bool CheckDateIncreasing(List<RevisionItem> revs)

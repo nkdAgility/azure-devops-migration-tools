@@ -439,7 +439,7 @@ namespace MigrationTools.Processors
                     newWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value = oldWorkItem.Fields["Microsoft.VSTS.Common.ClosedDate"].Value;
                 }
             }
-            catch (FieldDefinitionNotExistException ex)
+            catch (FieldDefinitionNotExistException)
             {
                 // Eat exception coz the TFS API Sucks
             }
