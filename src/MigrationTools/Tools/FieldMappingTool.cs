@@ -73,15 +73,16 @@ namespace MigrationTools.Tools
 
         public List<IFieldMap> GetFieldMappings(string witName)
         {
-            if (_fieldMaps.TryGetValue("*", out List<IFieldMap> fieldMaps))
+            var result = new List<IFieldMap>();
+            if (_fieldMaps.TryGetValue("*", out var globalMaps))
             {
-                return fieldMaps;
+                result.AddRange(globalMaps);
             }
-            else if (_fieldMaps.TryGetValue(witName, out fieldMaps))
+            if (_fieldMaps.TryGetValue(witName, out var specificMaps))
             {
-                return fieldMaps;
+                result.AddRange(specificMaps);
             }
-            return [];
+            return result;
         }
 
         public void ApplyFieldMappings(WorkItemData source, WorkItemData target)
