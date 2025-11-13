@@ -27,7 +27,7 @@ public class ExportWorkItemMappingTool : Tool<ExportWorkItemMappingToolOptions>,
     public ExportWorkItemMappingTool(
         IOptions<ExportWorkItemMappingToolOptions> options,
         IServiceProvider services,
-        ILogger<ITool> logger,
+        ILogger<ExportWorkItemMappingTool> logger,
         ITelemetryLogger telemetry)
         : base(options, services, logger, telemetry)
     {
