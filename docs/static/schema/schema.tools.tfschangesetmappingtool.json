@@ -6,8 +6,9 @@
   "type": "object",
   "properties": {
     "ChangeSetMappingFile": {
-      "description": "missing XML code comments",
-      "type": "string"
+      "description": "Path to changeset mapping file.",
+      "type": "string",
+      "default": "null"
     },
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
