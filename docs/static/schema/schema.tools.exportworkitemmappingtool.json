@@ -17,8 +17,7 @@
     },
     "TargetFile": {
       "description": "Path to file, where work item mapping will be saved.",
-      "type": "string",
-      "default": "String.Empty"
+      "type": "string"
     }
   }
 }

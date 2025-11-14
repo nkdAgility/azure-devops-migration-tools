@@ -10,7 +10,7 @@ public class ExportWorkItemMappingToolOptions : ToolOptions
     /// <summary>
     /// Path to file, where work item mapping will be saved.
     /// </summary>
-    /// <default>String.Empty</default>
+    /// <default></default>
     public string TargetFile { get; set; } = string.Empty;
 
     /// <summary>

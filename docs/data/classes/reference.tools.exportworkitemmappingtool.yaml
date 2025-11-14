@@ -46,7 +46,7 @@ options:
 - parameterName: TargetFile
   type: String
   description: Path to file, where work item mapping will be saved.
-  defaultValue: String.Empty
+  defaultValue: ''
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
