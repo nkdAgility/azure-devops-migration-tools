@@ -96,24 +96,18 @@ namespace MigrationTools.Tools
             string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
             
             // Validate that we have at least 3 parts (projectId, repoId, commitId)
+            // This ensures bits[0], bits[1], and bits[2] are all accessible
             if (bits.Length < 3)
             {
                 Log.Warning("GitRepositoryInfo: Invalid Git external link format. Expected at least 3 parts separated by %2f, but got {count} parts. Link: {link}", bits.Length, gitExternalLink.LinkedArtifactUri);
                 return null;
             }
             
-            repoID = bits[1];
-            if (bits.Count() >= 3)
+            repoID = bits[1]; // Safe to access after length validation
+            commitID = $"{bits[2]}"; // Safe to access after length validation
+            for (int i = 3; i < bits.Count(); i++)
             {
-                commitID = $"{bits[2]}";
-                for (int i = 3; i < bits.Count(); i++)
-                {
-                    commitID += $"%2f{bits[i]}";
-                }
-            }
-            else
-            {
-                commitID = bits[2];
+                commitID += $"%2f{bits[i]}";
             }
             gitRepo =
                 (from g in possibleRepos where string.Equals(g.Id.ToString(), repoID, StringComparison.OrdinalIgnoreCase) select g)
