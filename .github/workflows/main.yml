@@ -55,7 +55,7 @@ jobs:
       nkdAgility_AzureSitesEnvironment: ${{ steps.nkdagility.outputs.AzureSitesEnvironment }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: "Fix contibutions if main"
@@ -372,7 +372,7 @@ jobs:
           java-version: 17
           distribution: "zulu"
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/StaticVariables.cs"]'
@@ -461,7 +461,7 @@ jobs:
       GitVersion_AssemblySemVer: ${{ needs.Setup.outputs.GitVersion_AssemblySemVer }}
       GitVersion_InformationalVersion: ${{ needs.Setup.outputs.GitVersion_InformationalVersion }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: cschleiden/replace-tokens@v1
         with:
           files: '["**/*.html", "**/*.yaml", "**/*.yml", "**/*.json"]'
@@ -591,7 +591,7 @@ jobs:
     if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' && needs.Setup.outputs.nkdAgility_Ring == 'Production' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: actions/download-artifact@v6
       - name: "Find files"
         shell: pwsh
@@ -644,7 +644,7 @@ jobs:
     if: ${{ success() && needs.Setup.outputs.nkdAgility_RunRelease == 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: actions/download-artifact@v6
       - name: "Find files"
         shell: pwsh
