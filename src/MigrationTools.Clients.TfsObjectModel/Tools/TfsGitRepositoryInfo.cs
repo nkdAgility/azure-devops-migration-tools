@@ -91,40 +91,73 @@ namespace MigrationTools.Tools
             string commitID;
             string repoID;
             GitRepository gitRepo;
-            //Old format: vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
-            //New format: vstfs:///Git/Commit/50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
-            string guidbits = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
-            string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
+            //Legacy format: vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
+            //New format: vstfs:///Git/Commit/projectName/repoName/commitId
             
-            // Validate that we have at least 2 parts (repoId, commitId) for new format
-            // or 3 parts (projectId, repoId, commitId) for old format
-            if (bits.Length < 2)
+            // Determine which format we're dealing with
+            if (gitExternalLink.LinkedArtifactUri.Contains("%2f", StringComparison.OrdinalIgnoreCase))
             {
-                Log.Warning("GitRepositoryInfo: Invalid Git external link format. Expected at least 2 parts separated by %2f, but got {count} parts. Link: {link}", bits.Length, gitExternalLink.LinkedArtifactUri);
-                return null;
-            }
-            
-            // Support both old format (3+ parts) and new format (2 parts)
-            if (bits.Length >= 3)
-            {
-                // Old format: projectId%2frepoId%2fcommitId
+                // Legacy format with %2f encoding
+                string guidbits = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
+                string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
+                
+                // Validate that we have at least 3 parts (projectId, repoId, commitId) for legacy format
+                if (bits.Length < 3)
+                {
+                    Log.Warning("GitRepositoryInfo: Invalid Git external link format (legacy). Expected at least 3 parts separated by %2f, but got {count} parts. Link: {link}", bits.Length, gitExternalLink.LinkedArtifactUri);
+                    return null;
+                }
+                
+                // Legacy format: projectId%2frepoId%2fcommitId
                 repoID = bits[1];
                 commitID = $"{bits[2]}";
                 for (int i = 3; i < bits.Count(); i++)
                 {
                     commitID += $"%2f{bits[i]}";
                 }
+                
+                gitRepo = (from g in possibleRepos 
+                          where string.Equals(g.Id.ToString(), repoID, StringComparison.OrdinalIgnoreCase) 
+                          select g).SingleOrDefault();
             }
             else
             {
-                // New format: repoId%2fcommitId
-                repoID = bits[0];
-                commitID = bits[1];
+                // New format with forward slashes: vstfs:///Git/Commit/projectName/repoName/commitId
+                const string prefix = "vstfs:///Git/Commit/";
+                if (!gitExternalLink.LinkedArtifactUri.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    Log.Warning("GitRepositoryInfo: Invalid Git external link format (new). Link does not start with expected prefix. Link: {link}", gitExternalLink.LinkedArtifactUri);
+                    return null;
+                }
+                
+                string remainder = gitExternalLink.LinkedArtifactUri.Substring(prefix.Length);
+                string[] parts = remainder.Split('/');
+                
+                // Validate that we have at least 3 parts (projectName, repoName, commitId)
+                if (parts.Length < 3)
+                {
+                    Log.Warning("GitRepositoryInfo: Invalid Git external link format (new). Expected at least 3 parts separated by /, but got {count} parts. Link: {link}", parts.Length, gitExternalLink.LinkedArtifactUri);
+                    return null;
+                }
+                
+                // New format: projectName/repoName/commitId
+                string repoName = parts[1];
+                commitID = parts[2];
+                
+                // Handle commit IDs that may contain additional slashes
+                for (int i = 3; i < parts.Length; i++)
+                {
+                    commitID += $"/{parts[i]}";
+                }
+                
+                // Look up repo by name instead of ID
+                gitRepo = (from g in possibleRepos 
+                          where string.Equals(g.Name, repoName, StringComparison.OrdinalIgnoreCase) 
+                          select g).SingleOrDefault();
+                
+                repoID = gitRepo?.Id.ToString();
             }
             
-            gitRepo =
-                (from g in possibleRepos where string.Equals(g.Id.ToString(), repoID, StringComparison.OrdinalIgnoreCase) select g)
-                .SingleOrDefault();
             return new TfsGitRepositoryInfo(commitID, repoID, gitRepo);
         }
 

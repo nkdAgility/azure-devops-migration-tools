@@ -30,9 +30,9 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void CreateFromGit_ValidLinkWithThreeParts_ShouldSucceed()
+        public void CreateFromGit_ValidLinkWithThreeParts_LegacyFormat_ShouldSucceed()
         {
-            // Arrange
+            // Arrange - Legacy format with %2f encoding
             var validLink = "vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535";
             var externalLink = CreateMockExternalLink(validLink);
             var possibleRepos = new List<GitRepository>
@@ -50,9 +50,9 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void CreateFromGit_ValidLinkWithMultipleCommitParts_ShouldSucceed()
+        public void CreateFromGit_ValidLinkWithMultipleCommitParts_LegacyFormat_ShouldSucceed()
         {
-            // Arrange
+            // Arrange - Legacy format with extended commit ID
             var validLink = "vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535%2fextra%2fparts";
             var externalLink = CreateMockExternalLink(validLink);
             var possibleRepos = new List<GitRepository>
@@ -70,14 +70,18 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void CreateFromGit_ValidLinkWithTwoParts_NewFormat_ShouldSucceed()
+        public void CreateFromGit_ValidLinkWithSlashes_NewFormat_ShouldSucceed()
         {
-            // Arrange - New format without projectId
-            var newFormatLink = "vstfs:///Git/Commit/50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535";
+            // Arrange - New Azure DevOps format with forward slashes
+            var newFormatLink = "vstfs:///Git/Commit/MyProject/MyRepo/41dd2754058348d72a6417c0615c2543b9b55535";
             var externalLink = CreateMockExternalLink(newFormatLink);
             var possibleRepos = new List<GitRepository>
             {
-                new GitRepository { Id = Guid.Parse("50477259-3058-4dff-ba4c-e8c179ec5327") }
+                new GitRepository 
+                { 
+                    Id = Guid.Parse("50477259-3058-4dff-ba4c-e8c179ec5327"),
+                    Name = "MyRepo"
+                }
             };
 
             // Act
@@ -87,13 +91,45 @@ namespace MigrationTools.Tests.Tools
             Assert.IsNotNull(result);
             Assert.AreEqual("50477259-3058-4dff-ba4c-e8c179ec5327", result.RepoID);
             Assert.AreEqual("41dd2754058348d72a6417c0615c2543b9b55535", result.CommitID);
+            Assert.IsNotNull(result.GitRepo);
+            Assert.AreEqual("MyRepo", result.GitRepo.Name);
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void CreateFromGit_InvalidLinkWithOnePart_ShouldReturnNull()
+        public void CreateFromGit_InvalidLinkWithOnePart_LegacyFormat_ShouldReturnNull()
         {
-            // Arrange
+            // Arrange - Legacy format with insufficient parts
             var invalidLink = "vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a";
+            var externalLink = CreateMockExternalLink(invalidLink);
+            var possibleRepos = new List<GitRepository>();
+
+            // Act
+            var result = TfsGitRepositoryInfo.CreateFromGit(externalLink, possibleRepos);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_InvalidLinkWithTwoParts_LegacyFormat_ShouldReturnNull()
+        {
+            // Arrange - Legacy format with only 2 parts (missing commitId)
+            var invalidLink = "vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327";
+            var externalLink = CreateMockExternalLink(invalidLink);
+            var possibleRepos = new List<GitRepository>();
+
+            // Act
+            var result = TfsGitRepositoryInfo.CreateFromGit(externalLink, possibleRepos);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_InvalidLinkWithTwoParts_NewFormat_ShouldReturnNull()
+        {
+            // Arrange - New format with insufficient parts
+            var invalidLink = "vstfs:///Git/Commit/MyProject/MyRepo";
             var externalLink = CreateMockExternalLink(invalidLink);
             var possibleRepos = new List<GitRepository>();
 
