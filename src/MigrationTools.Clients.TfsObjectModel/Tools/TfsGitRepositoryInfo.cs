@@ -91,24 +91,37 @@ namespace MigrationTools.Tools
             string commitID;
             string repoID;
             GitRepository gitRepo;
-            //vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
+            //Old format: vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
+            //New format: vstfs:///Git/Commit/50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535
             string guidbits = gitExternalLink.LinkedArtifactUri.Substring(gitExternalLink.LinkedArtifactUri.LastIndexOf('/') + 1);
             string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
             
-            // Validate that we have at least 3 parts (projectId, repoId, commitId)
-            // This ensures bits[0], bits[1], and bits[2] are all accessible
-            if (bits.Length < 3)
+            // Validate that we have at least 2 parts (repoId, commitId) for new format
+            // or 3 parts (projectId, repoId, commitId) for old format
+            if (bits.Length < 2)
             {
-                Log.Warning("GitRepositoryInfo: Invalid Git external link format. Expected at least 3 parts separated by %2f, but got {count} parts. Link: {link}", bits.Length, gitExternalLink.LinkedArtifactUri);
+                Log.Warning("GitRepositoryInfo: Invalid Git external link format. Expected at least 2 parts separated by %2f, but got {count} parts. Link: {link}", bits.Length, gitExternalLink.LinkedArtifactUri);
                 return null;
             }
             
-            repoID = bits[1]; // Safe to access after length validation
-            commitID = $"{bits[2]}"; // Safe to access after length validation
-            for (int i = 3; i < bits.Count(); i++)
+            // Support both old format (3+ parts) and new format (2 parts)
+            if (bits.Length >= 3)
             {
-                commitID += $"%2f{bits[i]}";
+                // Old format: projectId%2frepoId%2fcommitId
+                repoID = bits[1];
+                commitID = $"{bits[2]}";
+                for (int i = 3; i < bits.Count(); i++)
+                {
+                    commitID += $"%2f{bits[i]}";
+                }
             }
+            else
+            {
+                // New format: repoId%2fcommitId
+                repoID = bits[0];
+                commitID = bits[1];
+            }
+            
             gitRepo =
                 (from g in possibleRepos where string.Equals(g.Id.ToString(), repoID, StringComparison.OrdinalIgnoreCase) select g)
                 .SingleOrDefault();

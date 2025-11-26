@@ -70,25 +70,30 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void CreateFromGit_InvalidLinkWithOnePart_ShouldReturnNull()
+        public void CreateFromGit_ValidLinkWithTwoParts_NewFormat_ShouldSucceed()
         {
-            // Arrange
-            var invalidLink = "vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a";
-            var externalLink = CreateMockExternalLink(invalidLink);
-            var possibleRepos = new List<GitRepository>();
+            // Arrange - New format without projectId
+            var newFormatLink = "vstfs:///Git/Commit/50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535";
+            var externalLink = CreateMockExternalLink(newFormatLink);
+            var possibleRepos = new List<GitRepository>
+            {
+                new GitRepository { Id = Guid.Parse("50477259-3058-4dff-ba4c-e8c179ec5327") }
+            };
 
             // Act
             var result = TfsGitRepositoryInfo.CreateFromGit(externalLink, possibleRepos);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.IsNotNull(result);
+            Assert.AreEqual("50477259-3058-4dff-ba4c-e8c179ec5327", result.RepoID);
+            Assert.AreEqual("41dd2754058348d72a6417c0615c2543b9b55535", result.CommitID);
         }
 
         [TestMethod(), TestCategory("L0")]
-        public void CreateFromGit_InvalidLinkWithTwoParts_ShouldReturnNull()
+        public void CreateFromGit_InvalidLinkWithOnePart_ShouldReturnNull()
         {
             // Arrange
-            var invalidLink = "vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327";
+            var invalidLink = "vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a";
             var externalLink = CreateMockExternalLink(invalidLink);
             var possibleRepos = new List<GitRepository>();
 
