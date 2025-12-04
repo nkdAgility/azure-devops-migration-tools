@@ -123,6 +123,8 @@ namespace MigrationTools.Processors
 
             ValidateWorkItemTypes();
 
+            ValidateProject();
+
             CommonTools.NodeStructure.ProcessorExecutionBegin(this);
             if (CommonTools.TeamSettings.Enabled)
             {
@@ -246,6 +248,45 @@ namespace MigrationTools.Processors
                 }
 
             }
+        }
+
+        private void ValidateProject()
+        {
+            Log.LogInformation("[ValidateProject]");
+            Log.LogInformation("------------------------------------");
+            Log.LogInformation("Source Project Check");
+            Log.LogInformation("------------------------------------");
+            var sourceProjectName = Source.Options.Project;
+            var sourceProjects = Source.WorkItems.GetProjects();
+            var foundSourceProject = sourceProjects.FirstOrDefault(p => p.Name.Equals(sourceProjectName, StringComparison.OrdinalIgnoreCase));
+            if (foundSourceProject == null)
+            {
+                Log.LogError("Source project '{ProjectName}' not found!", sourceProjectName);
+                Log.LogInformation("Available projects are: {@sourceProjects}", string.Join(", ", sourceProjects.Select(p => p.Name)));
+                Environment.Exit(-1);
+            }
+            else
+            {
+                Log.LogInformation("Found source project as {@sourceProject}", foundSourceProject.Name);
+            }
+            Log.LogInformation("------------------------------------");
+            Log.LogInformation("Target Project Check");
+            Log.LogInformation("------------------------------------");
+            var targetProjectName = Target.Options.Project;
+            var targetProjects = Target.WorkItems.GetProjects();
+            var foundTargetProject = targetProjects.FirstOrDefault(p => p.Name.Equals(targetProjectName, StringComparison.OrdinalIgnoreCase));
+            if (foundTargetProject == null)
+            {
+                Log.LogError("Target project '{ProjectName}' not found!", targetProjectName);
+                Log.LogInformation("Available projects are: {@targetProjects}", string.Join(", ", targetProjects.Select(p => p.Name)));
+                Environment.Exit(-1);
+            }
+            else
+            {
+                Log.LogInformation("Found target project as {@targetProject}", foundTargetProject.Name);
+            }
+
+            Log.LogInformation("[/ValidateProject]");
         }
 
         private void ValidateWorkItemTypes()

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
+using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
@@ -343,6 +344,16 @@ namespace MigrationTools.Clients
                 }
                 return store;
             }
+        }
+
+        public override List<ProjectData> GetProjects()
+        {
+            List<ProjectData> projects = new List<ProjectData>();
+            foreach (Project p in Store.Projects)
+            {
+                projects.Add(p?.ToProjectData());
+            }
+            return projects;
         }
     }
 }
