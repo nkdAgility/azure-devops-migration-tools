@@ -235,6 +235,7 @@ namespace MigrationTools.Processors
             }
             finally
             {
+                CommonTools.ExportWorkItemMapping.SaveMappings();
                 if (Options.FixHtmlAttachmentLinks)
                 {
                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
@@ -642,6 +643,7 @@ namespace MigrationTools.Processors
                         }
                         if (targetWorkItem != null)
                         {
+                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
                             targetWorkItem.ToWorkItem().Close();
                         }
                         if (sourceWorkItem != null)

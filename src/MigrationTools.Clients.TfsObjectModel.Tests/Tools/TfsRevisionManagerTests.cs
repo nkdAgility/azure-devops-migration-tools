@@ -19,7 +19,7 @@ namespace MigrationTools.Tests.Tools
             for (int i = startHours; i < endHours + startHours; i++)
             {
                 DateTime dateTime = dateIncreasing ? currentDateTime.AddHours(i) : currentDateTime;
-                revisions.Add(i, new RevisionItem() { Index = i, Number = i, ChangedDate = dateTime, OriginalChangedDate = dateTime });
+                revisions.Add(i, new RevisionItem() { Index = i, Number = i, ChangedDate = dateTime, OriginalChangedDate = dateTime, CreatedDate = dateTime, OriginalCreatedDate = dateTime });
             }
 
             return revisions.Values.ToList();
