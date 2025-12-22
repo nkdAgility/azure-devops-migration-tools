@@ -14,6 +14,8 @@ namespace MigrationTools.Clients
 
         ProjectData GetProject();
 
+        List<ProjectData> GetProjects();
+
         List<WorkItemData> GetWorkItems();
 
         WorkItemData GetWorkItem(string id, bool stopOnError = true);

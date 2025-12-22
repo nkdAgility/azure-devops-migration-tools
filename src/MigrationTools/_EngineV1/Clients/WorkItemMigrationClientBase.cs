@@ -79,5 +79,10 @@ namespace MigrationTools.Clients
             }
             return null;
         }
+
+        public abstract List<ProjectData> GetProjects();
+
+
+
     }
 }

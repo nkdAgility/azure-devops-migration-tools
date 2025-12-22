@@ -165,5 +165,10 @@ namespace MigrationTools.Clients.Tests
         {
             throw new System.NotImplementedException();
         }
+
+        public List<ProjectData> GetProjects()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

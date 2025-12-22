@@ -77,15 +77,23 @@ namespace MigrationTools.Tools
         public void EnforceDatesMustBeIncreasing(List<RevisionItem> sortedRevisions)
         {
             Log.LogDebug("TfsRevisionManagerTool::EnforceDatesMustBeIncreasing");
-            DateTime lastDateTime = DateTime.MinValue;
+            DateTime lastChangedDateTime = DateTime.MinValue;
+            DateTime lastCreatedDateTime = DateTime.MinValue;
             foreach (var revision in sortedRevisions)
             {
-                if (revision.ChangedDate == lastDateTime || revision.OriginalChangedDate < lastDateTime)
+                if (revision.ChangedDate == lastChangedDateTime || revision.OriginalChangedDate < lastChangedDateTime)
                 {
-                    revision.ChangedDate = lastDateTime.AddSeconds(1);
-                    Log.LogDebug("TfsRevisionManagerTool::EnforceDatesMustBeIncreasing[{revision}]::Fix", revision.Number);
+                    revision.ChangedDate = lastChangedDateTime.AddSeconds(1);
+                    Log.LogDebug($"TfsRevisionManagerTool::EnforceDatesMustBeIncreasing[{revision.Number}]::Fix ChangedDate");
                 }
-                lastDateTime = revision.ChangedDate;
+                lastChangedDateTime = revision.ChangedDate;
+
+                if (revision.CreatedDate == lastCreatedDateTime || revision.OriginalCreatedDate < lastCreatedDateTime)
+                {
+                    revision.CreatedDate = lastCreatedDateTime.AddSeconds(1);
+                    Log.LogDebug($"TfsRevisionManagerTool::EnforceDatesMustBeIncreasing[{revision.Number}]::Fix CreatedDate");
+                }
+                lastCreatedDateTime = revision.CreatedDate;
             }
         }
 
