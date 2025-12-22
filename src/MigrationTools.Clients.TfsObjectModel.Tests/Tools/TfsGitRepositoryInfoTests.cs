@@ -16,14 +16,58 @@ namespace MigrationTools.Tests.Tools
         /// </summary>
         private ExternalLink CreateMockExternalLink(string uri)
         {
-            // Create a mock RegisteredLinkType using reflection
+            // Try to create a mock RegisteredLinkType using reflection
+            // First try the two-parameter constructor
             var linkTypeConstructor = typeof(RegisteredLinkType).GetConstructor(
                 BindingFlags.NonPublic | BindingFlags.Instance,
                 null,
                 new Type[] { typeof(string), typeof(string) },
                 null);
 
-            var linkType = (RegisteredLinkType)linkTypeConstructor.Invoke(new object[] { "MockLinkType", "Mock Link Type" });
+            RegisteredLinkType linkType = null;
+            
+            if (linkTypeConstructor != null)
+            {
+                linkType = (RegisteredLinkType)linkTypeConstructor.Invoke(new object[] { "MockLinkType", "Mock Link Type" });
+            }
+            else
+            {
+                // Try alternative constructors if the two-parameter one doesn't exist
+                var constructors = typeof(RegisteredLinkType).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+                
+                foreach (var ctor in constructors)
+                {
+                    var parameters = ctor.GetParameters();
+                    if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string))
+                    {
+                        linkType = (RegisteredLinkType)ctor.Invoke(new object[] { "MockLinkType" });
+                        break;
+                    }
+                    else if (parameters.Length == 0)
+                    {
+                        linkType = (RegisteredLinkType)ctor.Invoke(new object[] { });
+                        break;
+                    }
+                }
+                
+                // If still null, try to find any constructor with minimal parameters
+                if (linkType == null && constructors.Length > 0)
+                {
+                    var simplestCtor = constructors[0];
+                    var ctorParams = simplestCtor.GetParameters();
+                    var args = new object[ctorParams.Length];
+                    for (int i = 0; i < ctorParams.Length; i++)
+                    {
+                        args[i] = ctorParams[i].ParameterType.IsValueType ? Activator.CreateInstance(ctorParams[i].ParameterType) : null;
+                    }
+                    linkType = (RegisteredLinkType)simplestCtor.Invoke(args);
+                }
+            }
+
+            if (linkType == null)
+            {
+                throw new InvalidOperationException("Could not create RegisteredLinkType instance via reflection. Available constructors may have changed.");
+            }
 
             // Create ExternalLink using the mock link type
             return new ExternalLink(linkType, uri);
