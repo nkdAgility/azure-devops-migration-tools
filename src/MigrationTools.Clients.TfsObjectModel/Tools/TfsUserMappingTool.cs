@@ -196,7 +196,7 @@ namespace MigrationTools.Tools
                     }
                     catch (InvalidOperationException)
                     {
-                        Log.LogError("TfsUserMappingTool::GetUsersInSourceMappedToTarget:: Multiple target users found with the same display name '{displayName}'. "
+                        Log.LogError("TfsUserMappingTool::GetUsersInSourceMappedToTarget:: Multiple target users found with the same display name '{displayName}' (account: {accountName}). "
                             + "Consider enabling MatchUsersByEmail option to avoid this issue. ", 
                             sourceUser.DisplayName, sourceUser.AccountName);
                         var matchingUsers = targetUsers.Where(x => x.DisplayName == sourceUser.DisplayName).ToList();
