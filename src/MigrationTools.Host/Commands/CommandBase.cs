@@ -120,7 +120,7 @@ namespace MigrationTools.Host.Commands
                 Log.Debug("     IsRunningInDebug: {IsRunningInDebug}", _detectVersionService.IsRunningInDebug);
                 Log.Verbose("Full version data: ${_detectVersionService}", _detectVersionService);
 
-                Log.Information("Verion Info:");
+                Log.Information("Version Info:");
                 Log.Information("     Running: {RunningVersion}", _detectVersionService.RunningVersion);
                 Log.Information("     Installed: {InstalledVersion}", _detectVersionService.InstalledVersion);
                 Log.Information("     Available: {AvailableVersion}", _detectVersionService.AvailableVersion);
