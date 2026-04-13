@@ -531,7 +531,7 @@ jobs:
              echo "discussion_category_name=Releases" >> $env:GITHUB_OUTPUT
           }
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             MigrationTools-*.zip
