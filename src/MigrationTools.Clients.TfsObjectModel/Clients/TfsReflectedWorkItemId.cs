@@ -46,7 +46,7 @@ namespace MigrationTools.Clients
             var match = ReflectedIdRegex.Match(ReflectedWorkItemId);
             if (match.Success)
             {
-                Log.Verbose("TfsReflectedWorkItemId: Match Sucess from {ReflectedWorkItemId}: {@ReflectedWorkItemIdObject}", ReflectedWorkItemId, this);
+                Log.Verbose("TfsReflectedWorkItemId: Match Success from {ReflectedWorkItemId}: {@ReflectedWorkItemIdObject}", ReflectedWorkItemId, this);
                 _Connection = new Uri(match.Groups[1].Value);
                 _ProjectName = match.Groups[2].Value;
                 _WorkItemId = match.Groups[3].Value;

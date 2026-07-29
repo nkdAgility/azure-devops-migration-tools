@@ -190,7 +190,21 @@ namespace MigrationTools.Tools
                             targetUser = candidates[0];
                         }
                     }
-                    targetUser ??= targetUsers.SingleOrDefault(x => x.DisplayName == sourceUser.DisplayName);
+                    try
+                    {
+                        targetUser ??= targetUsers.SingleOrDefault(x => x.DisplayName == sourceUser.DisplayName);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        Log.LogError("TfsUserMappingTool::GetUsersInSourceMappedToTarget:: Multiple target users found with the same display name '{displayName}'. "
+                            + "Consider enabling MatchUsersByEmail option to avoid this issue. ", 
+                            sourceUser.DisplayName, sourceUser.AccountName);
+                        var matchingUsers = targetUsers.Where(x => x.DisplayName == sourceUser.DisplayName).ToList();
+                        Log.LogWarning("TfsUserMappingTool::GetUsersInSourceMappedToTarget:: The list of matching users is {matchingUsers}",
+                            string.Join(", ", matchingUsers.Select(x => $"{x.DisplayName} [{x.MailAddress}]")));
+                        throw;
+                    }
+                    
                     identityMap.Add(new IdentityMapData { Source = sourceUser, Target = targetUser });
                 }
                 return new()

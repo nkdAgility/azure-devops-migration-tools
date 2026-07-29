@@ -34,4 +34,4 @@ The tools will be installed to `C:\Tools\MigrationTools\` which should be added 
 
 You can download the [latest release](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) and unzip it to a folder of your choice.
 
-_NOTE: You may need to 'unlock' the downloaded archive before you unzop and run. Go to the file properties (click `show more options` on Win11) and click `Unblock`._
+_NOTE: You may need to 'unlock' the downloaded archive before you unzip and run. Go to the file properties (click `show more options` on Win11) and click `Unblock`._

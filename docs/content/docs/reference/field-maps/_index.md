@@ -9,4 +9,4 @@ aliases:
 - /learn/azure-devops-migration-tools/Reference/FieldMaps/
 
 ---
-These fieldmaps are usied by the [Field Mapping Tool]({{< ref "docs/reference/tools/fieldmappingtool" >}}) to map fields from the source to the target system. The field maps are defined in the `fieldMaps` section of the configuration file.`
+These field maps are used by the [Field Mapping Tool]({{< ref "docs/reference/tools/fieldmappingtool" >}}) to map fields from the source to the target system. The field maps are defined in the `fieldMaps` section of the configuration file.

@@ -695,7 +695,7 @@ namespace MigrationTools.Processors
                 activity?.Stop();
                 progressTimer.AddProcessedItem(activity.Duration, retries > 0);
                 TraceWriteLine(LogEventLevel.Information,
-                    "Average time of {average:%s}.{average:%fff} per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s} seconds estimated to completion.",
+                    "Average time of {average:%s}.{average:%fff} seconds per work item and {remaining:%h} hours {remaining:%m} minutes {remaining:%s} seconds estimated to completion.",
                     new Dictionary<string, object>() {
                         { "average", progressTimer.AverageTime },
                         { "remaining", progressTimer.RemainingTime }

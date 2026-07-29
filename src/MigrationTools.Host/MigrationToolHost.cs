@@ -125,6 +125,10 @@ namespace MigrationTools.Host
                            .WithDescription("Creates or edits a configuration file")
                           .WithExample("builder --config \"configuration.json\"").IsHidden();
 
+                config.AddCommand<Commands.VersionCommand>("version")
+                           .WithDescription("Displays the version of the tool")
+                           .WithExample("version");
+
                 extraCommands?.Invoke(config);
                 config.PropagateExceptions();
             });

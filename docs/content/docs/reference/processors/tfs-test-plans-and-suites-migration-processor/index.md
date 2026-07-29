@@ -1,6 +1,6 @@
 ---
 title: Tfs Test Plans And Suites Migration Processor
-description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+description: Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration
 dataFile: reference.processors.tfstestplansandsuitesmigrationprocessor.yaml
 slug: tfs-test-plans-and-suites-migration-processor
 aliases:

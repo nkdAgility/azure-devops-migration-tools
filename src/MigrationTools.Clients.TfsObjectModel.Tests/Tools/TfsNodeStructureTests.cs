@@ -44,6 +44,38 @@ namespace MigrationTools.Tests.Tools
 
         }
 
+        [TestMethod(), TestCategory("L0")]
+        public void GetNewNodeName_WithCaseDifferenceInSourcePath_AppliesMappingConsistently()
+        {
+            var options = new TfsNodeStructureToolOptions();
+            options.Enabled = true;
+            options.Areas = new NodeOptions()
+            {
+                Mappings = [
+                    new() { Match = @"^SourceProject\\PUL", Replacement = "TargetProject\\test\\PUL" }
+                ]
+            };
+            var nodeStructure = GetTfsNodeStructureTool(options);
+
+            nodeStructure.ApplySettings(new TfsNodeStructureToolSettings
+            {
+                SourceProjectName = "SourceProject",
+                TargetProjectName = "TargetProject",
+                FoundNodes = new Dictionary<string, bool>
+                {
+                    { @"TargetProject\Area\test\PUL", true }
+                }
+            });
+
+            // Source path uses different casing than the Match pattern — must still apply replacement
+            const string sourceNodeName = @"sourceproject\pul";
+            const TfsNodeStructureType nodeStructureType = TfsNodeStructureType.Area;
+
+            var newNodeName = nodeStructure.GetNewNodeName(sourceNodeName, nodeStructureType);
+
+            Assert.AreEqual(@"TargetProject\test\PUL", newNodeName);
+        }
+
         [TestMethod, TestCategory("L0")]
         public void TestFixAreaPath_WhenNoAreaPathOrIterationPath_DoesntChangeQuery()
         {

@@ -185,7 +185,7 @@ in the replacement string.
 
 ### PrefixProjectToNodes
 
-The `PrefixProjectToNodes` was an option that was used to prepend the source project name to the target set of nodes. This was super valuable when the target Project already has nodes and you dont want to merge them all together. This is now replaced by the `Areas.Mappings` and `Iterations.Mappings` options.
+The `PrefixProjectToNodes` was an option that was used to prepend the source project name to the target set of nodes. This was super valuable when the target Project already has nodes and you don't want to merge them all together. This is now replaced by the `Areas.Mappings` and `Iterations.Mappings` options.
 
 ```
 "Iterations": {

@@ -101,13 +101,15 @@ namespace MigrationTools.Tools
         /// <param name="fieldReferenceName">Target field reference name.</param>
         public bool IsSourceFieldExcluded(string workItemType, string fieldReferenceName)
         {
-            if (ExcludeSourceFields.TryGetValue(workItemType, out List<string> excludedFields))
+            if (ExcludeSourceFields.TryGetValue(workItemType, out List<string> excludedFields)
+                && excludedFields.Contains(fieldReferenceName, _normalizedComparer))
             {
-                return excludedFields.Contains(fieldReferenceName, _normalizedComparer);
+                return true;
             }
-            if (ExcludeSourceFields.TryGetValue(AllWorkItemTypes, out excludedFields))
+            if (ExcludeSourceFields.TryGetValue(AllWorkItemTypes, out excludedFields)
+                && excludedFields.Contains(fieldReferenceName, _normalizedComparer))
             {
-                return excludedFields.Contains(fieldReferenceName, _normalizedComparer);
+                return true;
             }
             return false;
         }

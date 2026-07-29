@@ -1,6 +1,6 @@
 ---
 title: "Tutorial: Get started with the Azure DevOps Migration Tools"
-description: Performs mathematical calculations on numeric fields using NCalc expressions during migration.
+description: Learn how to get started with the Azure DevOps Migration Tools with step-by-step instructions and configuration guidance.
 short_title: Get Started
 weight: 1
 aliases:
@@ -13,9 +13,9 @@ If you want to perform a bulk edit or a migration then you need to start here. T
 
 Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 minutes. This tool is complicated and it's not always easy to discover what you need to do.
 
-## Prerequisits
+## Prerequisites
 
-1. [Install]({{< ref "docs/setup/installation" >}}) the tools using your prefered method.
+1. [Install]({{< ref "docs/setup/installation" >}}) the tools using your preferred method.
 2. Check that you have the required [Permissions]({{< ref "docs/setup/permissions" >}}) to run the tools.
 3. Get to grips with the [Configuration]({{< ref "docs/reference" >}}) to understand how to configure the tool. (you can skip this for now and come back to it later)
 

@@ -32,7 +32,7 @@ These tools run on Windows and support connecting to Team Foundation Server 2013
 
 ## What do you get?
 
-- *Move* Work Items, Test Plans & Suits, and Pipelines between projects, collections, and even organizations.
+- *Move* Work Items, Test Plans & Suites, and Pipelines between projects, collections, and even organizations.
 - *Merge* multiple projects into a single project even from different organizations.
 - *Split* one project into several projects even between projects, collections, and even organizations.
 - *Change* Process process from Agile to Scrum or any other template.
@@ -89,11 +89,11 @@ These metrics come directly from Custo Metrics in Application Insights and are u
 ![Work Items in last 30 days](https://migrationtoolstelemetery.azurewebsites.net/api/GetGraphWorkItemMetrics_WorkItems?code=github)
 
 
-This tool uses OpenTelemetery to collect metrics and logs, and Application Insights to store and analyse them. Exceptions are also sent to [Elmah.io](https://elmah.io) for analysis and improvement.
+This tool uses OpenTelemetry to collect metrics and logs, and Application Insights to store and analyze them. Exceptions are also sent to [Elmah.io](https://elmah.io) for analysis and improvement.
 
 ## Advanced tools
 
-There are additional advanced tooling available on [Azure DevOps Automation Tools](https://github.com/nkdAgility/azure-devops-automation-tools). These are a collection of Powershell scripts that can be used to;
+There are additional advanced tooling available on [Azure DevOps Automation Tools](https://github.com/nkdAgility/azure-devops-automation-tools). These are a collection of Powershell scripts that can be used to:
 
 - Generate Migration Tools configurations across many projects on many organisations
 - Export Stats on many projects on many organisations

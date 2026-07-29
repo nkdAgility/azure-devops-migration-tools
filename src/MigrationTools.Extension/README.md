@@ -18,8 +18,8 @@ The Azure DevOps Migration Tools allow you to bulk edit and migrate data between
 
 ## What can you do with this tool?
 
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Team Project` to another
-- Migrate `Work Items`, `TestPlans & Suits`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Organisation` to another
+- Migrate `Work Items`, `TestPlans & Suites`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Team Project` to another
+- Migrate `Work Items`, `TestPlans & Suites`, `Teams`, `Shared Queries`, `Pipelines`, & `Processes` from one `Organisation` to another
 - Bulk edit of `Work Items` accross an entire `Project`.
 
 **WARNING: This tool is not designed for a novice. This tool was developed to support the scenarios below, and the edge cases that have been encountered by the 30+ contributors from around the Azure DevOps community. You should be comfortable with the TFS/Azure DevOps object model, as well as debugging code in Visual Studio.**

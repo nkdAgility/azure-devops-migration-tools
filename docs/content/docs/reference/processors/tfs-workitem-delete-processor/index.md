@@ -1,6 +1,6 @@
 ---
 title: Tfs WorkItem Delete Processor
-description: The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be use with extream caution.
+description: The `WorkItemDelete` processor allows you to delete any amount of work items that meet the query. **DANGER:** This is not a recoverable action and should be used with extreme caution.
 dataFile: reference.processors.tfsworkitemdeleteprocessor.yaml
 slug: tfs-workitem-delete-processor
 aliases:

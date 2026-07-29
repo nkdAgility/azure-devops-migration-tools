@@ -114,7 +114,7 @@ namespace MigrationTools.Tools
                     if (Regex.IsMatch(sourceNodePath, mapper.Match, RegexOptions.IgnoreCase))
                     {
                         Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::Match", mapper.Match);
-                        string replacement = Regex.Replace(sourceNodePath, mapper.Match, mapper.Replacement);
+                        string replacement = Regex.Replace(sourceNodePath, mapper.Match, mapper.Replacement, RegexOptions.IgnoreCase);
                         Log.LogDebug("NodeStructureEnricher.GetNewNodeName::Mappers::{key}::replaceWith({replace})", mapper.Match, replacement);
                         return replacement;
                     }
@@ -130,7 +130,7 @@ namespace MigrationTools.Tools
                 throw new NodePathNotAnchoredException($"This path is not anchored in the source project name: {sourceNodePath}");
             }
 
-            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value);
+            return Regex.Replace(sourceNodePath, lastResortRule.Key, lastResortRule.Value, RegexOptions.IgnoreCase);
         }
 
         private KeyValuePair<string, string> GetLastResortRemappingRule()

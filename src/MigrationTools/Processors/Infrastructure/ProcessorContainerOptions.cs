@@ -43,7 +43,7 @@ namespace MigrationTools.Processors.Infrastructure
                     var processorTypeString = processorSection.GetValue<string>(objectTypePropertyName);
                     if (processorTypeString == null)
                     {
-                        Log.Fatal("Your processor at `{path}` in the config does not have a property called {objectTypePropertyName} that is required to sucessfully detect the type and load it.", processorSection.Path, objectTypePropertyName);
+                        Log.Fatal("Your processor at `{path}` in the config does not have a property called {objectTypePropertyName} that is required to successfully detect the type and load it.", processorSection.Path, objectTypePropertyName);
                         throw new InvalidProcessorException($"`{objectTypePropertyName}` missing");
                     }
 

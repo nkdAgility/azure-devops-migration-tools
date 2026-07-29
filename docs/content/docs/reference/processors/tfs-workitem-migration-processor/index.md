@@ -60,7 +60,7 @@ Overall, the `WorkItemMigrationContext` processor is a comprehensive tool for tr
 
 ## WIQL Query
 
-The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax). We only support flat quereis that have `FROM WorkItems` in the query.
+The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax). We only support flat queries that have `FROM WorkItems` in the query.
 
 > Note: A useful Azure DevOps Extension to explore WIQL is the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor)
 
@@ -100,7 +100,8 @@ The above options allow you to bring over a sub-set of the WIs (using the `WIQLQ
 
 Using the above sample structure, if you wanted to map the source project `Team 1` to target project `Team A` etc. you could add the field map as follows
 
-A complete list of [FieldMaps](../FieldMaps/index.md) are available.
+
+A complete list of [FieldMaps]({{< ref "docs/reference/field-maps" >}}) is available.
 
 ```
  "FieldMaps": [

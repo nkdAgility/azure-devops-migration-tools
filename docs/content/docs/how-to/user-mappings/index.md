@@ -41,16 +41,16 @@ There was a request to have the ability to map users to try and maintain integri
 ]
 ```
 
-##How it works
+## How it works
 
 1. Run `TfsExportUsersForMappingProcessor` which will export all of the Users in Source mapped or not to target.
 2. Run `TfsWorkItemMigrationProcessor` which will run a validator by detail to warn you of missing users. If it finds a mapping it will convert the field...
 
-##Notes
+## Notes
 
 - Applies to all identity fields specified in the list
 - It really sucks that we have to match on Display name! Email is included for internal matching
-- On `TfsExportUsersForMappingProcessor` you can set `OnlyListUsersInWorkItems` to filter the mapping based on the scope of the query. This is greater if you have many users.
+- On `TfsExportUsersForMappingProcessor` you can set `OnlyListUsersInWorkItems` to filter the mapping based on the scope of the query. This is better if you have many users.
 - Both use the `TfsUserMappingTool` setting in `CommonTools` to know what to do.
 
 ```json

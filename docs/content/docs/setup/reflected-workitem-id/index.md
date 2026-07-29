@@ -54,7 +54,7 @@ When you create the field you will be able to see the`RefName` (different from t
 
 If you need to migrate work items that you can't customise, then you will need to use one of the built in fields and I recommend `Microsoft.VSTS.Build.IntegrationBuild`. This field is only used by builds, and is relatively safe to use.
 
-This is primarily of concern for [How-to: Migrating Plans and Suits](_howto/migrating-plans-and-suites.md).
+This is primarily of concern for [How-to: Migrating Plans and Suites]({{< ref "docs/how-to/migrating-plans-and-suites" >}}).
 
 ## How to add the ReflectedWorkItemId
 
