@@ -64,6 +64,30 @@ namespace MigrationTools.Processors
 
             List<IdentityMapData> usersToMap = data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName).ToList();
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
+
+            // Export in the configured format only
+            if (CommonTools.UserMapping.Options.UseIdentityMapDataFormat)
+            {
+                Log.LogInformation("Exporting user mappings in detailed IdentityMapData format");
+                TfsUserMappingTool.SerializeIdentityMapData(CommonTools.UserMapping.Options.UserMappingFile, usersToMap, Log);
+            }
+            else
+            {
+                Log.LogInformation("Exporting user mappings in simple dictionary format");
+                ExportSimpleDictionaryFormat(usersToMap);
+            }
+
+            if (Options.ExportAllUsers)
+            {
+                ExportAllUsers(data);
+            }
+
+            stopwatch.Stop();
+            Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed);
+        }
+
+        private void ExportSimpleDictionaryFormat(List<IdentityMapData> usersToMap)
+        {
             Dictionary<string, string> usermappings = new(StringComparer.CurrentCultureIgnoreCase);
             foreach (IdentityMapData userMapping in usersToMap)
             {
@@ -72,13 +96,6 @@ namespace MigrationTools.Processors
                 usermappings[userMapping.Source.DisplayName] = userMapping.Target?.DisplayName;
             }
             TfsUserMappingTool.SerializeUserMap(CommonTools.UserMapping.Options.UserMappingFile, usermappings, Log);
-            if (Options.ExportAllUsers)
-            {
-                ExportAllUsers(data);
-            }
-
-            stopwatch.Stop();
-            Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed);
         }
 
         private void ExportAllUsers(IdentityMapResult data)
@@ -99,6 +116,7 @@ namespace MigrationTools.Processors
                 Log.LogError("UserMappingFile is not set");
                 throw new ArgumentNullException("UserMappingFile must be set on the TfsUserMappingToolOptions in CommonTools.");
             }
+
             if (Options.ExportAllUsers && string.IsNullOrEmpty(Options.UserExportFile))
             {
                 Log.LogError($"Flag ExportAllUsers is set but export file UserExportFile is not set.");

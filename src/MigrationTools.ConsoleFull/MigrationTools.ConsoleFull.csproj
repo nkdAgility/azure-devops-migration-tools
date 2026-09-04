@@ -65,4 +65,10 @@
     <ProjectReference Include="..\MigrationTools.Clients.TfsObjectModel\MigrationTools.Clients.TfsObjectModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="userExportMap.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
