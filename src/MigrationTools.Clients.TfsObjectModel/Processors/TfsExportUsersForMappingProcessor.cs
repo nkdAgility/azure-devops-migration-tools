@@ -65,7 +65,7 @@ namespace MigrationTools.Processors
             List<IdentityMapData> usersToMap = data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName).ToList();
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
 
-            // Export in the configured format only
+            // Export in the selected format
             if (CommonTools.UserMapping.Options.UseIdentityMapDataFormat)
             {
                 Log.LogInformation("Exporting user mappings in detailed IdentityMapData format");

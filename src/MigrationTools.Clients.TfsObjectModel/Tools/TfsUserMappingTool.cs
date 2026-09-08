@@ -31,6 +31,7 @@ namespace MigrationTools.Tools
         {
             UserMappings = new Lazy<Dictionary<string, string>>(GetMappingFileData);
             IdentityMappings = new Lazy<List<IdentityMapData>>(GetIdentityMapDataFromFile);
+            DetectedFormatIsIdentityMapData = new Lazy<bool>(DetectFormatFromFile);
         }
 
         private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
@@ -165,7 +166,7 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// Maps a user identity field value using the configured user mappings if the field is configured for mapping.
-        /// The format (dictionary or IdentityMapData) is automatically determined based on the loaded data.
+        /// The file format is automatically detected based on the file content when UseIdentityMapDataFormat is enabled.
         /// </summary>
         /// <param name="field">The work item field containing a user identity to be mapped</param>
         public void MapUserIdentityField(Field field)
@@ -174,9 +175,18 @@ namespace MigrationTools.Tools
             {
                 Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField [ReferenceName|{field.ReferenceName}]");
 
+                // When UseIdentityMapDataFormat is true, detect the actual format from the file
+                // This allows flexibility - the file can be either format and it will be handled correctly
                 if (Options.UseIdentityMapDataFormat)
                 {
-                    MapUserIdentityFieldByIdentityMap(field, IdentityMappings.Value);
+                    if (DetectedFormatIsIdentityMapData.Value)
+                    {
+                        MapUserIdentityFieldByIdentityMap(field, IdentityMappings.Value);
+                    }
+                    else
+                    {
+                        MapUserIdentityFieldByDictionary(field);
+                    }
                 }
                 else
                 {
@@ -228,6 +238,8 @@ namespace MigrationTools.Tools
 
         public Lazy<List<IdentityMapData>> IdentityMappings { get; }
 
+        public Lazy<bool> DetectedFormatIsIdentityMapData { get; }
+
         private Dictionary<string, string> GetMappingFileData()
         {
             if (!File.Exists(Options.UserMappingFile))
@@ -253,6 +265,19 @@ namespace MigrationTools.Tools
             }
 
             return DeserializeIdentityMapData(Options.UserMappingFile, Log);
+        }
+
+        private bool DetectFormatFromFile()
+        {
+            if (!Options.UseIdentityMapDataFormat)
+            {
+                Log.LogDebug("TfsUserMappingTool::DetectFormatFromFile:: UseIdentityMapDataFormat is disabled, format detection skipped");
+                return false;
+            }
+
+            bool isIdentityMapDataFormat = IsIdentityMapDataFormat(Options.UserMappingFile, Log);
+            Log.LogInformation("TfsUserMappingTool::DetectFormatFromFile:: Detected format is {Format}", isIdentityMapDataFormat ? "IdentityMapData" : "Dictionary");
+            return isIdentityMapDataFormat;
         }
 
         private List<IdentityItemData> GetUsersListFromServer(IGroupSecurityService gss)
