@@ -1,5 +1,6 @@
 
 Environment: "production"
-minifyOutput: true
+minify:
+  minifyOutput: true
 
 
