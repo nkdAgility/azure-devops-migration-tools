@@ -1,6 +1,7 @@
 baseURL: "https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net/"
 Environment: "preview"
-minifyOutput: true
+minify:
+  minifyOutput: true
 
 buildDrafts: true
 buildFuture: true
