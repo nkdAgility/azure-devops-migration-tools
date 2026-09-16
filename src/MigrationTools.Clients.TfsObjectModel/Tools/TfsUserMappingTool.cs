@@ -10,6 +10,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Riok.Mapperly.Abstractions;
 
 namespace MigrationTools.Tools
@@ -29,6 +30,8 @@ namespace MigrationTools.Tools
             : base(options, services, logger, telemetryLogger)
         {
             UserMappings = new Lazy<Dictionary<string, string>>(GetMappingFileData);
+            IdentityMappings = new Lazy<List<IdentityMapData>>(GetIdentityMapDataFromFile);
+            DetectedFormatIsIdentityMapData = new Lazy<bool>(DetectFormatFromFile);
         }
 
         private readonly CaseInsensitiveStringComparer _workItemNameComparer = new();
@@ -67,6 +70,78 @@ namespace MigrationTools.Tools
             return [];
         }
 
+        /// <summary>
+        /// Serializes a list of identity mappings to a JSON file for use in user mapping operations.
+        /// </summary>
+        /// <param name="fileName">The file path where the user identity mapping will be saved</param>
+        /// <param name="identityMappings">The list of identity mappings to serialize</param>
+        /// <param name="logger">Logger for the operation</param>
+        public static void SerializeIdentityMapData(string fileName, List<IdentityMapData> identityMappings, ILogger logger)
+        {
+            File.WriteAllText(fileName, JsonConvert.SerializeObject(identityMappings, Formatting.Indented));
+            logger.LogInformation("Identity mappings written to: {fileName}", fileName);
+        }
+
+        /// <summary>
+        /// Deserializes a list of user identity mappings from a JSON file structured as IdentityMapData objects.
+        /// </summary>
+        /// <param name="fileName">The file path where the user identity mappings are stored</param>
+        /// <param name="logger">Logger for the operation</param>
+        /// <returns>A list of IdentityMapData containing source and target user mappings, or an empty list if the file doesn't exist</returns>
+        public static List<IdentityMapData> DeserializeIdentityMapData(string fileName, ILogger logger)
+        {
+            try
+            {
+                string fileData = File.ReadAllText(fileName);
+                var mapping = JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
+                return mapping ?? [];
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("TfsUserMappingTool::DeserializeIdentityMapData User identity mapping could not be deserialized from file '{fileName}'. Error: {error}", fileName, ex.Message);
+            }
+            return [];
+        }
+
+        /// <summary>
+        /// Detects the format of a user mapping file (dictionary or IdentityMapData list).
+        /// </summary>
+        /// <param name="fileName">The file path to analyze</param>
+        /// <param name="logger">Logger for the operation</param>
+        /// <returns>True if the file contains IdentityMapData format (list with Source/Target), false if dictionary format</returns>
+        public static bool IsIdentityMapDataFormat(string fileName, ILogger logger)
+        {
+            try
+            {
+                if (!File.Exists(fileName))
+                {
+                    return false;
+                }
+
+                string fileData = File.ReadAllText(fileName);
+                var jToken = JToken.Parse(fileData);
+
+                // Check if it's an array (IdentityMapData format)
+                if (jToken.Type == JTokenType.Array)
+                {
+                    return true;
+                }
+
+                // Check if it's an object with dictionary structure (simple format)
+                if (jToken.Type == JTokenType.Object)
+                {
+                    return false;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning("TfsUserMappingTool::IsIdentityMapDataFormat Error detecting file format for '{fileName}': {error}. Defaulting to dictionary format.", fileName, ex.Message);
+                return false;
+            }
+        }
+
         private HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
         {
             HashSet<string> foundUsers = new(StringComparer.CurrentCultureIgnoreCase);
@@ -91,6 +166,7 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// Maps a user identity field value using the configured user mappings if the field is configured for mapping.
+        /// The file format is automatically detected based on the file content when UseIdentityMapDataFormat is enabled.
         /// </summary>
         /// <param name="field">The work item field containing a user identity to be mapped</param>
         public void MapUserIdentityField(Field field)
@@ -98,16 +174,71 @@ namespace MigrationTools.Tools
             if (Options.Enabled && Options.IdentityFieldsToCheck.Contains(field.ReferenceName))
             {
                 Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField [ReferenceName|{field.ReferenceName}]");
-                if (UserMappings.Value.ContainsKey(field.Value.ToString()))
+
+                // When UseIdentityMapDataFormat is true, detect the actual format from the file
+                // This allows flexibility - the file can be either format and it will be handled correctly
+                if (Options.UseIdentityMapDataFormat)
                 {
-                    var original = field.Value;
-                    field.Value = UserMappings.Value[field.Value.ToString()];
-                    Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField::Map:[original|{original}][new|{field.Value}]");
+                    if (DetectedFormatIsIdentityMapData.Value)
+                    {
+                        MapUserIdentityFieldByIdentityMap(field, IdentityMappings.Value);
+                    }
+                    else
+                    {
+                        MapUserIdentityFieldByDictionary(field);
+                    }
+                }
+                else
+                {
+                    MapUserIdentityFieldByDictionary(field);
                 }
             }
         }
 
+        /// <summary>
+        /// Maps a user identity field value using a dictionary of simple display name mappings.
+        /// </summary>
+        /// <param name="field">The work item field containing a user identity to be mapped</param>
+        private void MapUserIdentityFieldByDictionary(Field field)
+        {
+            if (UserMappings.Value.ContainsKey(field.Value.ToString()))
+            {
+                var original = field.Value;
+                field.Value = UserMappings.Value[field.Value.ToString()];
+                Log.LogDebug($"TfsUserMappingTool::MapUserIdentityFieldByDictionary::Map:[original|{original}][new|{field.Value}]");
+            }
+        }
+
+        /// <summary>
+        /// Maps a user identity field value using detailed identity mapping data.
+        /// </summary>
+        /// <param name="field">The work item field containing a user identity to be mapped</param>
+        /// <param name="identityMapData">The list of identity map data to use for mapping</param>
+        private void MapUserIdentityFieldByIdentityMap(Field field, List<IdentityMapData> identityMapData)
+        {
+            var sourceValue = field.Value?.ToString();
+            if (string.IsNullOrEmpty(sourceValue))
+            {
+                return;
+            }
+
+            var mapping = identityMapData.FirstOrDefault(x =>
+                x.Source?.DisplayName == sourceValue ||
+                x.Source?.AccountName == sourceValue);
+
+            if (mapping?.Target != null)
+            {
+                var original = field.Value;
+                field.Value = mapping.Target.DisplayName ?? mapping.Target.AccountName;
+                Log.LogDebug($"TfsUserMappingTool::MapUserIdentityFieldByIdentityMap::Map:[original|{original}][new|{field.Value}]");
+            }
+        }
+
         public Lazy<Dictionary<string, string>> UserMappings { get; }
+
+        public Lazy<List<IdentityMapData>> IdentityMappings { get; }
+
+        public Lazy<bool> DetectedFormatIsIdentityMapData { get; }
 
         private Dictionary<string, string> GetMappingFileData()
         {
@@ -117,6 +248,36 @@ namespace MigrationTools.Tools
                 return [];
             }
             return DeserializeUserMap(Options.UserMappingFile, Log);
+        }
+
+        private List<IdentityMapData> GetIdentityMapDataFromFile()
+        {
+            if (!Options.UseIdentityMapDataFormat)
+            {
+                Log.LogDebug("TfsUserMappingTool::GetIdentityMapDataFromFile:: UseIdentityMapDataFormat is disabled, skipping IdentityMapData loading");
+                return [];
+            }
+
+            if (!File.Exists(Options.UserMappingFile))
+            {
+                Log.LogError("TfsUserMappingTool::GetIdentityMapDataFromFile:: The UserMappingFile '{UserMappingFile}' cant be found!", Options.UserMappingFile);
+                return [];
+            }
+
+            return DeserializeIdentityMapData(Options.UserMappingFile, Log);
+        }
+
+        private bool DetectFormatFromFile()
+        {
+            if (!Options.UseIdentityMapDataFormat)
+            {
+                Log.LogDebug("TfsUserMappingTool::DetectFormatFromFile:: UseIdentityMapDataFormat is disabled, format detection skipped");
+                return false;
+            }
+
+            bool isIdentityMapDataFormat = IsIdentityMapDataFormat(Options.UserMappingFile, Log);
+            Log.LogInformation("TfsUserMappingTool::DetectFormatFromFile:: Detected format is {Format}", isIdentityMapDataFormat ? "IdentityMapData" : "Dictionary");
+            return isIdentityMapDataFormat;
         }
 
         private List<IdentityItemData> GetUsersListFromServer(IGroupSecurityService gss)
@@ -197,14 +358,14 @@ namespace MigrationTools.Tools
                     catch (InvalidOperationException)
                     {
                         Log.LogError("TfsUserMappingTool::GetUsersInSourceMappedToTarget:: Multiple target users found with the same display name '{displayName}'. "
-                            + "Consider enabling MatchUsersByEmail option to avoid this issue. ", 
+                            + "Consider enabling MatchUsersByEmail option to avoid this issue. ",
                             sourceUser.DisplayName, sourceUser.AccountName);
                         var matchingUsers = targetUsers.Where(x => x.DisplayName == sourceUser.DisplayName).ToList();
                         Log.LogWarning("TfsUserMappingTool::GetUsersInSourceMappedToTarget:: The list of matching users is {matchingUsers}",
                             string.Join(", ", matchingUsers.Select(x => $"{x.DisplayName} [{x.MailAddress}]")));
                         throw;
                     }
-                    
+
                     identityMap.Add(new IdentityMapData { Source = sourceUser, Target = targetUser });
                 }
                 return new()

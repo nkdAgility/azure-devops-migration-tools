@@ -16,7 +16,9 @@ namespace MigrationTools.Tools
         public List<string> IdentityFieldsToCheck { get; set; }
 
         /// <summary>
-        /// This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
+        /// This is the file that will be used to export or import the user mappings. The file format is automatically detected based on its content:
+        /// - If the file contains a JSON object with "Source" and "Target" properties, it uses the IdentityMapData format (detailed identity information).
+        /// - If the file contains a simple JSON dictionary of key-value pairs, it uses the simple dictionary format (display name mappings).
         /// </summary>
         public string UserMappingFile { get; set; }
 
@@ -37,6 +39,13 @@ namespace MigrationTools.Tools
         /// </summary>
         public string ProjectCollectionValidUsersGroupName { get; set; } = "Project Collection Valid Users";
 
+        /// <summary>
+        /// When set to true, user mappings will be exported in the detailed IdentityMapData format with full identity information (Source and Target) instead of simple display name mappings.
+        /// <default>false</default>
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool UseIdentityMapDataFormat { get; set; } = false;
+
     }
 
     public interface ITfsUserMappingToolOptions
@@ -45,5 +54,6 @@ namespace MigrationTools.Tools
         string UserMappingFile { get; set; }
         bool MatchUsersByEmail { get; set; }
         bool SkipValidateAllUsersExistOrAreMapped { get; set; }
-    }
+        bool UseIdentityMapDataFormat { get; set; }
+    }   
 }
