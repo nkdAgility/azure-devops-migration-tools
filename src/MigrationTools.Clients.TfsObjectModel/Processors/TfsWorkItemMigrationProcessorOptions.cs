@@ -71,12 +71,21 @@ namespace MigrationTools.Processors
         public IList<int> WorkItemIDs { get; set; }
 
         /// <summary>
-        /// The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
-        /// continue until the number of failed items reaches the configured value, after which the migration fails.
+        /// The maximum number of failed work items to tolerate before the run is aborted. When set to zero (the default) there is no limit: every failed
+        /// work item is logged and recorded, the remaining items are still migrated, and the processor is reported as failed at the end with a list of the
+        /// failed IDs. When set above zero, the run aborts once more than this number of items have failed. Use `StopOnFirstError` to stop on the first failure.
         /// </summary>
         /// <default>0</default>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int MaxGracefulFailures { get; set; } = 0;
+
+        /// <summary>
+        /// When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),
+        /// the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.
+        /// </summary>
+        /// <default>false</default>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool StopOnFirstError { get; set; } = false;
 
         /// <summary>
         /// This will skip a revision if the source iteration has not been migrated i.e. it was deleted

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using MigrationTools.Host.Commands;
 using MigrationTools.Host.Services;
 using MigrationTools.Options;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Services;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -57,8 +58,12 @@ namespace MigrationTools.Host.Commands
                 }
 
                 var migrationEngine = _services.GetRequiredService<IMigrationEngine>();
-                migrationEngine.Run();
-                _exitCode = 0;
+                var status = migrationEngine.Run();
+                _exitCode = status == ProcessingStatus.Failed ? 1 : 0;
+                if (_exitCode != 0)
+                {
+                    _logger.LogError("The migration run failed: one or more processors failed, were stopped by validation, or could not migrate every item. Exiting with code {ExitCode}.", _exitCode);
+                }
             }
             catch (OptionsValidationException ex)
             {
