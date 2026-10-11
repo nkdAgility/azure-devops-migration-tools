@@ -1,9 +1,11 @@
+using MigrationTools.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -217,18 +219,26 @@ namespace MigrationTools.Processors
                         }
                         catch (Exception e)
                         {
+                            // .Wait() wraps failures in AggregateException; a stop request must end the run, not count as an item failure.
+                            var stop = e as MigrationRunStoppedException
+                                ?? (e as AggregateException)?.Flatten().InnerExceptions.OfType<MigrationRunStoppedException>().FirstOrDefault();
+                            if (stop != null)
+                            {
+                                ExceptionDispatchInfo.Capture(stop).Throw();
+                            }
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
                             workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
 
-                            if (Options.MaxGracefulFailures == 0)
+                            if (Options.StopOnFirstError)
                             {
                                 throw;
                             }
 
-                            if (_itemsInError.Count > Options.MaxGracefulFailures)
+                            if (ShouldAbortAfterFailure(Options.StopOnFirstError, Options.MaxGracefulFailures, _itemsInError.Count))
                             {
-                                throw new Exception($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
+                                throw new MigrationRunStoppedException($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
                             }
+                            workItemLog.Warning("Continuing with the remaining work items ({FailedCount} failed so far). Set StopOnFirstError to stop on the first failure.", _itemsInError.Count);
                         }
                     }
                 }
@@ -244,10 +254,20 @@ namespace MigrationTools.Processors
 
                 if (_itemsInError.Count > 0)
                 {
-                    contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
+                    CompletedWithErrors = true;
+                    contextLog.Error("{FailedCount} work item(s) could not be migrated: {ItemIds}", _itemsInError.Count, string.Join(", ", _itemsInError));
                 }
 
             }
+        }
+
+        public static bool ShouldAbortAfterFailure(bool stopOnFirstError, int maxGracefulFailures, int failureCount)
+        {
+            if (stopOnFirstError)
+            {
+                return failureCount > 0;
+            }
+            return maxGracefulFailures > 0 && failureCount > maxGracefulFailures;
         }
 
         private void ValidateProject()
@@ -263,7 +283,7 @@ namespace MigrationTools.Processors
             {
                 Log.LogError("Source project '{ProjectName}' not found!", sourceProjectName);
                 Log.LogInformation("Available projects are: {@sourceProjects}", string.Join(", ", sourceProjects.Select(p => p.Name)));
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Source project not found.");
             }
             else
             {
@@ -279,7 +299,7 @@ namespace MigrationTools.Processors
             {
                 Log.LogError("Target project '{ProjectName}' not found!", targetProjectName);
                 Log.LogInformation("Available projects are: {@targetProjects}", string.Join(", ", targetProjects.Select(p => p.Name)));
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Target project not found.");
             }
             else
             {
@@ -329,7 +349,7 @@ namespace MigrationTools.Processors
             if (!containsReflectedWorkItemId || !validationResult)
             {
                 Log.LogError("Validation of work item types failed.");
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Validation of work item types failed.");
             }
             Log.LogInformation("------------------------------------");
             Log.LogInformation("[/ValidateWorkItemTypes]");
@@ -387,7 +407,7 @@ namespace MigrationTools.Processors
                 {
                     var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
                     Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Missing PersonalAccessToken from Target.");
                 }
             }
         }
@@ -681,6 +701,7 @@ namespace MigrationTools.Processors
                     else
                     {
                         TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                        throw;
                     }
                 }
                 catch (Exception ex)
@@ -950,10 +971,7 @@ namespace MigrationTools.Processors
                 Log.LogInformation("===============================================================");
                 Log.LogError(ex.ToString(), ex);
                 Log.LogInformation("===============================================================");
-                if (ex is ClosedDateFixUpException)
-                {
-                    throw;
-                }
+                throw;
             }
 
             return targetWorkItem;

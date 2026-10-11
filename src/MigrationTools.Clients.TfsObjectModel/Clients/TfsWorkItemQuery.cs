@@ -1,4 +1,5 @@
-﻿using System;
+using MigrationTools.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -96,7 +97,7 @@ namespace MigrationTools.Clients
                 {
                     activity?.SetTag("http.response.status_code", "500");
                     Log.Error(ex, " Error running query");
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Error running work item query.");
                 }
                 catch (Exception ex)
                 {
