@@ -122,16 +122,15 @@ namespace MigrationTools.Tools
             }
             else
             {
-                // New format with forward slashes: vstfs:///Git/Commit/projectName/repoName/commitId
-                const string prefix = "vstfs:///Git/Commit/";
-                if (!gitExternalLink.LinkedArtifactUri.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                // New format with forward slashes: vstfs:///Git/{Commit|Ref|PullRequestId}/projectName/repoName/id
+                var match = Regex.Match(gitExternalLink.LinkedArtifactUri, "^vstfs:///Git/[^/]+/(.*)$", RegexOptions.IgnoreCase);
+                if (!match.Success)
                 {
                     Log.Warning("GitRepositoryInfo: Invalid Git external link format (new). Link does not start with expected prefix. Link: {link}", gitExternalLink.LinkedArtifactUri);
                     return null;
                 }
-                
-                string remainder = gitExternalLink.LinkedArtifactUri.Substring(prefix.Length);
-                string[] parts = remainder.Split('/');
+
+                string[] parts = match.Groups[1].Value.Split('/');
                 
                 // Validate that we have at least 3 parts (projectName, repoName, commitId)
                 if (parts.Length < 3)
@@ -141,20 +140,27 @@ namespace MigrationTools.Tools
                 }
                 
                 // New format: projectName/repoName/commitId
-                string repoName = parts[1];
-                commitID = parts[2];
-                
-                // Handle commit IDs that may contain additional slashes
-                for (int i = 3; i < parts.Length; i++)
+                string projectName = Uri.UnescapeDataString(parts[0]);
+                string repoName = Uri.UnescapeDataString(parts[1]);
+
+                // Re-join any remaining parts with %2f so links rebuilt from CommitID stay in the legacy format
+                commitID = string.Join("%2f", parts.Skip(2));
+
+                // Repo names are only unique within a project, so match on project and repo name
+                var namedRepos = possibleRepos
+                    .Where(g => string.Equals(g.Name, repoName, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                var projectRepos = namedRepos
+                    .Where(g => string.Equals(g.ProjectReference?.Name, projectName, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                gitRepo = projectRepos.Count == 1 ? projectRepos[0]
+                    : projectRepos.Count == 0 && namedRepos.Count == 1 ? namedRepos[0]
+                    : null;
+                if (projectRepos.Count > 1 || (projectRepos.Count == 0 && namedRepos.Count > 1))
                 {
-                    commitID += $"/{parts[i]}";
+                    Log.Warning("GitRepositoryInfo: Ambiguous Git repository {project}/{repo} in external link. Link: {link}", projectName, repoName, gitExternalLink.LinkedArtifactUri);
                 }
-                
-                // Look up repo by name instead of ID
-                gitRepo = (from g in possibleRepos 
-                          where string.Equals(g.Name, repoName, StringComparison.OrdinalIgnoreCase) 
-                          select g).SingleOrDefault();
-                
+
                 repoID = gitRepo?.Id.ToString();
             }
             

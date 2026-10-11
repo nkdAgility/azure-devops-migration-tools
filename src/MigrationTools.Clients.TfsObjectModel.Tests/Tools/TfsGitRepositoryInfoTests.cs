@@ -184,6 +184,95 @@ namespace MigrationTools.Tests.Tools
             Assert.IsNull(result);
         }
 
+        private static GitRepository Repo(string project, string name, string id)
+        {
+            return new GitRepository
+            {
+                Id = Guid.Parse(id),
+                Name = name,
+                ProjectReference = new Microsoft.TeamFoundation.Core.WebApi.TeamProjectReference { Name = project }
+            };
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_NewFormat_SameRepoNameInTwoProjects_ShouldPickRepoFromLinkProject()
+        {
+            var link = CreateMockExternalLink("vstfs:///Git/Commit/ProjectB/Shared/41dd2754058348d72a6417c0615c2543b9b55535");
+            var repos = new List<GitRepository>
+            {
+                Repo("ProjectA", "Shared", "11111111-1111-1111-1111-111111111111"),
+                Repo("ProjectB", "Shared", "22222222-2222-2222-2222-222222222222"),
+            };
+
+            var result = TfsGitRepositoryInfo.CreateFromGit(link, repos);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("22222222-2222-2222-2222-222222222222", result.RepoID);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_NewFormat_AmbiguousRepoName_ShouldNotThrowAndReturnNoRepo()
+        {
+            var link = CreateMockExternalLink("vstfs:///Git/Commit/OtherProject/Shared/41dd2754058348d72a6417c0615c2543b9b55535");
+            var repos = new List<GitRepository>
+            {
+                Repo("ProjectA", "Shared", "11111111-1111-1111-1111-111111111111"),
+                Repo("ProjectB", "Shared", "22222222-2222-2222-2222-222222222222"),
+            };
+
+            var result = TfsGitRepositoryInfo.CreateFromGit(link, repos);
+
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.GitRepo);
+            Assert.IsNull(result.RepoID);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_NewFormat_EncodedNames_ShouldMatch()
+        {
+            var link = CreateMockExternalLink("vstfs:///Git/Commit/My%20Project/My%20Repo/41dd2754058348d72a6417c0615c2543b9b55535");
+            var repos = new List<GitRepository> { Repo("My Project", "My Repo", "33333333-3333-3333-3333-333333333333") };
+
+            var result = TfsGitRepositoryInfo.CreateFromGit(link, repos);
+
+            Assert.AreEqual("33333333-3333-3333-3333-333333333333", result.RepoID);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_NewFormat_RefLink_ShouldKeepLegacyEncodingInId()
+        {
+            var link = CreateMockExternalLink("vstfs:///Git/Ref/Proj/Repo/GBfeature/x");
+            var repos = new List<GitRepository> { Repo("Proj", "Repo", "44444444-4444-4444-4444-444444444444") };
+
+            var result = TfsGitRepositoryInfo.CreateFromGit(link, repos);
+
+            Assert.AreEqual("44444444-4444-4444-4444-444444444444", result.RepoID);
+            Assert.AreEqual("GBfeature%2fx", result.CommitID);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_LegacyFormat_UpperCaseEncoding_ShouldSucceed()
+        {
+            var link = CreateMockExternalLink("vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2F50477259-3058-4dff-ba4c-e8c179ec5327%2F41dd2754058348d72a6417c0615c2543b9b55535");
+            var repos = new List<GitRepository> { Repo("P", "R", "50477259-3058-4dff-ba4c-e8c179ec5327") };
+
+            var result = TfsGitRepositoryInfo.CreateFromGit(link, repos);
+
+            Assert.IsNotNull(result.GitRepo);
+            Assert.AreEqual("41dd2754058348d72a6417c0615c2543b9b55535", result.CommitID);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void Create_GitLinkInNewFormat_ShouldRouteToGitParser()
+        {
+            var link = CreateMockExternalLink("vstfs:///Git/Commit/Proj/Repo/41dd2754058348d72a6417c0615c2543b9b55535");
+            var repos = new List<GitRepository> { Repo("Proj", "Repo", "55555555-5555-5555-5555-555555555555") };
+
+            var result = TfsGitRepositoryInfo.Create(link, repos, null, "Proj");
+
+            Assert.AreEqual("55555555-5555-5555-5555-555555555555", result.RepoID);
+        }
+
         [TestMethod(), TestCategory("L0")]
         public void CreateFromGit_EmptyLink_ShouldReturnNull()
         {
