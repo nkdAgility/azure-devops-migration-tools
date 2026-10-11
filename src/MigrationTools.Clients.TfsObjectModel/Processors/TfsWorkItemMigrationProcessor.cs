@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -881,12 +881,14 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    CheckClosedDateIsValid(sourceWorkItem, targetWorkItem);
+                    ApplySourceClosedDate(currentRevisionWorkItem, targetWorkItem);
+                    CheckClosedDateIsValid(currentRevisionWorkItem, targetWorkItem);
 
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
-
+                        var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
                         targetWorkItem.SaveToAzureDevOps();
+                        EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
@@ -948,9 +950,93 @@ namespace MigrationTools.Processors
                 Log.LogInformation("===============================================================");
                 Log.LogError(ex.ToString(), ex);
                 Log.LogInformation("===============================================================");
+                if (ex is ClosedDateFixUpException)
+                {
+                    throw;
+                }
             }
 
             return targetWorkItem;
+        }
+
+        private static string GetClosedDateField(WorkItem workItem)
+        {
+            return ClosedDateHelper.ResolveField(
+                workItem.Fields.Contains(ClosedDateHelper.CommonClosedDate),
+                workItem.Fields.Contains(ClosedDateHelper.SystemClosedDate));
+        }
+
+        /// <summary>
+        /// Sets the target ClosedDate to the source revision's value when the source revision has one.
+        /// Runs after State/Reason, field copying and field maps. With a BypassRules store the field is
+        /// writable even when the object model reports it as not editable (it is rule-controlled).
+        /// Items whose source revision has no ClosedDate (i.e. not closed) are left untouched.
+        /// </summary>
+        private void ApplySourceClosedDate(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        {
+            var source = sourceRevision.ToWorkItem();
+            var target = targetWorkItem.ToWorkItem();
+            var targetField = GetClosedDateField(target);
+            if (targetField == null) return;
+            var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
+            if (sourceField == null) return;
+
+            var sourceValue = source.Fields[sourceField].Value;
+            var targetValue = target.Fields[targetField].Value;
+            if (!ClosedDateHelper.NeedsUpdate(sourceValue, targetValue)) return;
+            try
+            {
+                target.Fields[targetField].Value = sourceValue;
+                Log.LogDebug("ApplySourceClosedDate: {field} set to source value {value} (was {old})", targetField, sourceValue, targetValue);
+            }
+            catch (Exception ex)
+            {
+                Log.LogDebug(ex, "ApplySourceClosedDate: could not set {field} before save; a fix-up save will be attempted.", targetField);
+            }
+        }
+
+        private sealed class ClosedDateFixUpException : Exception
+        {
+            public ClosedDateFixUpException(string message, Exception inner) : base(message, inner) { }
+        }
+
+        /// <summary>
+        /// The server can still apply the current date to ClosedDate on save, even with BypassRules,
+        /// so a mismatch after save is corrected with a fix-up revision.
+        /// </summary>
+        private void EnsureClosedDateAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
+        {
+            try
+            {
+                var target = targetWorkItem.ToWorkItem();
+                var source = sourceRevision.ToWorkItem();
+                var targetField = GetClosedDateField(target);
+                if (targetField == null) return;
+                var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
+                if (sourceField == null) return;
+                var sourceValue = source.Fields[sourceField].Value;
+                if (!ClosedDateHelper.NeedsUpdate(sourceValue, target.Fields[targetField].Value)) return;
+
+                Log.LogWarning("ClosedDate on target #{targetId} is {targetValue} after save but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
+                    target.Id, target.Fields[targetField].Value, source.Id, source.Rev, sourceValue);
+                target.Fields[targetField].Value = sourceValue;
+                var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
+                target.Fields["System.ChangedDate"].Value = fixUpDate;
+                target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
+                targetWorkItem.SaveToAzureDevOps();
+                var floor = fixUpDate;
+                for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
+                {
+                    revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
+                    floor = revisionsToMigrate[i].ChangedDate;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
+                targetWorkItem.ToWorkItem().Reset();
+                throw new ClosedDateFixUpException($"Unable to apply fix-up save for ClosedDate on target #{targetWorkItem.Id}", ex);
+            }
         }
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
