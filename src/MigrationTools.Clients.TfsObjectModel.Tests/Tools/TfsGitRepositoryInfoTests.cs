@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -12,65 +13,19 @@ namespace MigrationTools.Tests.Tools
     public class TfsGitRepositoryInfoTests
     {
         /// <summary>
-        /// Helper method to create a mock ExternalLink using reflection to avoid complex TFS object model setup
+        /// Creates an ExternalLink without needing a live work item store
         /// </summary>
         private ExternalLink CreateMockExternalLink(string uri)
         {
-            // Try to create a mock RegisteredLinkType using reflection
-            // First try the two-parameter constructor
-            var linkTypeConstructor = typeof(RegisteredLinkType).GetConstructor(
-                BindingFlags.NonPublic | BindingFlags.Instance,
-                null,
-                new Type[] { typeof(string), typeof(string) },
-                null);
-
-            RegisteredLinkType linkType = null;
-            
-            if (linkTypeConstructor != null)
-            {
-                linkType = (RegisteredLinkType)linkTypeConstructor.Invoke(new object[] { "MockLinkType", "Mock Link Type" });
-            }
-            else
-            {
-                // Try alternative constructors if the two-parameter one doesn't exist
-                var constructors = typeof(RegisteredLinkType).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-                
-                foreach (var ctor in constructors)
-                {
-                    var parameters = ctor.GetParameters();
-                    if (parameters.Length == 1 && parameters[0].ParameterType == typeof(string))
-                    {
-                        linkType = (RegisteredLinkType)ctor.Invoke(new object[] { "MockLinkType" });
-                        break;
-                    }
-                    else if (parameters.Length == 0)
-                    {
-                        linkType = (RegisteredLinkType)ctor.Invoke(new object[] { });
-                        break;
-                    }
-                }
-                
-                // If still null, try to find any constructor with minimal parameters
-                if (linkType == null && constructors.Length > 0)
-                {
-                    var simplestCtor = constructors[0];
-                    var ctorParams = simplestCtor.GetParameters();
-                    var args = new object[ctorParams.Length];
-                    for (int i = 0; i < ctorParams.Length; i++)
-                    {
-                        args[i] = ctorParams[i].ParameterType.IsValueType ? Activator.CreateInstance(ctorParams[i].ParameterType) : null;
-                    }
-                    linkType = (RegisteredLinkType)simplestCtor.Invoke(args);
-                }
-            }
-
-            if (linkType == null)
-            {
-                throw new InvalidOperationException("Could not create RegisteredLinkType instance via reflection. Available constructors may have changed.");
-            }
-
-            // Create ExternalLink using the mock link type
-            return new ExternalLink(linkType, uri);
+            // RegisteredLinkType has no public constructor; pick the smallest all-string one deterministically
+            var ctor = typeof(RegisteredLinkType)
+                .GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)
+                .Where(c => c.GetParameters().All(p => p.ParameterType == typeof(string)))
+                .OrderBy(c => c.GetParameters().Length)
+                .FirstOrDefault()
+                ?? throw new InvalidOperationException("No string-only RegisteredLinkType constructor found; the TFS object model may have changed.");
+            var args = ctor.GetParameters().Select(_ => (object)"MockLinkType").ToArray();
+            return new ExternalLink((RegisteredLinkType)ctor.Invoke(args), uri);
         }
 
         [TestMethod(), TestCategory("L0")]
@@ -274,6 +229,15 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod(), TestCategory("L0")]
+        public void CreateFromGit_NewFormat_EmptyCommitSegment_ShouldReturnNull()
+        {
+            var link = CreateMockExternalLink("vstfs:///Git/Commit/Proj/Repo/");
+            var repos = new List<GitRepository> { Repo("Proj", "Repo", "66666666-6666-6666-6666-666666666666") };
+
+            Assert.IsNull(TfsGitRepositoryInfo.CreateFromGit(link, repos));
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void CreateFromGit_EmptyLink_ShouldReturnNull()
         {
             // Arrange
@@ -289,3 +253,4 @@ namespace MigrationTools.Tests.Tools
         }
     }
 }
+

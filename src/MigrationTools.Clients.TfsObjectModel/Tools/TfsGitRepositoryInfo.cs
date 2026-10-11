@@ -133,7 +133,7 @@ namespace MigrationTools.Tools
                 string[] parts = match.Groups[1].Value.Split('/');
                 
                 // Validate that we have at least 3 parts (projectName, repoName, commitId)
-                if (parts.Length < 3)
+                if (parts.Length < 3 || parts.Any(string.IsNullOrWhiteSpace))
                 {
                     Log.Warning("GitRepositoryInfo: Invalid Git external link format (new). Expected at least 3 parts separated by /, but got {count} parts. Link: {link}", parts.Length, gitExternalLink.LinkedArtifactUri);
                     return null;
