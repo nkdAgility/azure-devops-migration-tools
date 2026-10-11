@@ -399,6 +399,39 @@ namespace MigrationTools.Processors
                 CultureInfo.CurrentCulture, out result);
         }
 
+        private readonly Dictionary<string, bool> _targetTypeUsableCache = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// True when the type exists in the target project and is not disabled. Disabled state is read over REST
+        /// (the object model does not expose it); if that lookup fails the type is assumed to be enabled.
+        /// </summary>
+        private bool IsWorkItemTypeUsableInTarget(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName)) return false;
+            if (_targetTypeUsableCache.TryGetValue(typeName, out var cached)) return cached;
+            bool usable = Target.WorkItems.Project.ToProject().WorkItemTypes.Contains(typeName);
+            if (usable)
+            {
+                try
+                {
+                    string token = Target.Options.Authentication?.AccessToken;
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token));
+                        var client = connection.GetClient<WorkItemTrackingHttpClient>();
+                        var wit = client.GetWorkItemTypeAsync(Target.Options.Project, typeName).GetAwaiter().GetResult();
+                        if (wit?.IsDisabled == true) usable = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.LogDebug(ex, "Unable to determine whether work item type '{TypeName}' is disabled in the target; assuming it is enabled.", typeName);
+                }
+            }
+            _targetTypeUsableCache[typeName] = usable;
+            return usable;
+        }
+
         private WorkItemData CreateWorkItem_Shell(ProjectData destProject, WorkItemData currentRevisionWorkItem, string destType)
         {
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("CreateWorkItem_Shell", ActivityKind.Client))
@@ -743,19 +776,21 @@ namespace MigrationTools.Processors
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
-                    var finalDestType = revisionsToMigrate.Last().Type;
-                    var targetType = revisionsToMigrate.First().Type;
+                    var firstSourceType = revisionsToMigrate.First().Type;
+                    var finalSourceType = revisionsToMigrate.Last().Type;
 
-                    if (targetType != finalDestType)
+                    if (firstSourceType != finalSourceType)
                     {
-                        TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
+                        TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {firstSourceType} to {finalSourceType}");
                     }
 
-                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(targetType))
+                    var selection = WorkItemShellTypeSelector.Select(firstSourceType, finalSourceType, CommonTools.WorkItemTypeMapping.Mappings, IsWorkItemTypeUsableInTarget);
+                    if (selection.FellBackToFinalType)
                     {
-                        targetType = CommonTools.WorkItemTypeMapping.Mappings[targetType];
+                        Log.LogWarning("Source work item {SourceId} changed type from '{FirstType}' to '{FinalType}'. Target type '{FirstTargetType}' does not exist or is disabled in the target project, so the work item will be created as '{ShellType}' instead.",
+                            sourceWorkItem.Id, firstSourceType, finalSourceType, selection.FirstType, selection.ShellType);
                     }
-                    targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, targetType);
+                    targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, selection.ShellType);
                 }
 
                 if (Options.AttachRevisionHistory)
