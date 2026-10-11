@@ -21,6 +21,7 @@ configurationSamples:
             "SkipRevisionWithInvalidAreaPath": "False",
             "SkipRevisionWithInvalidIterationPath": "False",
             "SourceName": "Source",
+            "StopOnFirstError": "False",
             "TargetName": "Target",
             "UpdateCreatedBy": "True",
             "UpdateCreatedDate": "True",

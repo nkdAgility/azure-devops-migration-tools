@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -218,6 +219,13 @@ namespace MigrationTools.Processors
                         }
                         catch (Exception e)
                         {
+                            // .Wait() wraps failures in AggregateException; a stop request must end the run, not count as an item failure.
+                            var stop = e as MigrationRunStoppedException
+                                ?? (e as AggregateException)?.Flatten().InnerExceptions.OfType<MigrationRunStoppedException>().FirstOrDefault();
+                            if (stop != null)
+                            {
+                                ExceptionDispatchInfo.Capture(stop).Throw();
+                            }
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
                             workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
 
@@ -228,7 +236,7 @@ namespace MigrationTools.Processors
 
                             if (ShouldAbortAfterFailure(Options.StopOnFirstError, Options.MaxGracefulFailures, _itemsInError.Count))
                             {
-                                throw new Exception($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
+                                throw new MigrationRunStoppedException($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
                             }
                             workItemLog.Warning("Continuing with the remaining work items ({FailedCount} failed so far). Set StopOnFirstError to stop on the first failure.", _itemsInError.Count);
                         }
@@ -253,9 +261,6 @@ namespace MigrationTools.Processors
             }
         }
 
-        /// <summary>
-        /// Decides whether a work item failure should abort the whole run.
-        /// </summary>
         public static bool ShouldAbortAfterFailure(bool stopOnFirstError, int maxGracefulFailures, int failureCount)
         {
             if (stopOnFirstError)
@@ -696,6 +701,7 @@ namespace MigrationTools.Processors
                     else
                     {
                         TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                        throw;
                     }
                 }
                 catch (Exception ex)
@@ -963,6 +969,7 @@ namespace MigrationTools.Processors
                 Log.LogInformation("===============================================================");
                 Log.LogError(ex.ToString(), ex);
                 Log.LogInformation("===============================================================");
+                throw;
             }
 
             return targetWorkItem;

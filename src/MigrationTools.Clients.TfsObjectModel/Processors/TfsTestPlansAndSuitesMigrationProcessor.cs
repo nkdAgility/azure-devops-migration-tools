@@ -976,6 +976,10 @@ namespace MigrationTools.Processors
                                 break;
                             }
                         }
+                        catch (MigrationRunStoppedException)
+                        {
+                            throw;
+                        }
                         catch (Exception)
                         {
                             InnerLog(sourceSuite, "            Source work item cannot be loaded", 5);

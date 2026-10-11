@@ -27,6 +27,18 @@ namespace MigrationTools.Processors.Tests
             Assert.IsTrue(result.Succeeded);
         }
 
+        [TestMethod(DisplayName = "TfsWorkItemMigrationProcessorTests_OptionsValidator_NegativeMaxGracefulFailures"), TestCategory("L0")]
+        public void OptionsValidator_NegativeMaxGracefulFailures()
+        {
+            var validator = new TfsWorkItemMigrationProcessorOptionsValidator();
+            var x = new TfsWorkItemMigrationProcessorOptions();
+            x.WIQLQuery = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject";
+            x.SourceName = "source";
+            x.TargetName = "target";
+            x.MaxGracefulFailures = -1;
+            Assert.IsTrue(validator.Validate(null, x).Failed);
+        }
+
         [TestMethod(DisplayName = "TfsWorkItemMigrationProcessorTests_StopOnFirstError_DefaultsToFalse"), TestCategory("L0")]
         public void StopOnFirstError_DefaultsToFalse()
         {

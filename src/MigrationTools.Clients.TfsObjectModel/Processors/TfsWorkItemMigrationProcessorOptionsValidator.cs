@@ -38,6 +38,10 @@ namespace MigrationTools.Processors
                     errors.Add("The WIQLQuery on {name} must use 'WorkItems' after the 'FROM' clause and not 'WorkItemLinks'.");
                 }
             }
+            if (options.MaxGracefulFailures < 0)
+            {
+                errors.Add($"The MaxGracefulFailures on {name} must be zero (no limit) or greater.");
+            }
             if (errors.Count > 0)
             {
                 Log.Debug("TfsWorkItemMigrationProcessorOptionsValidator::Validate::Fail");
