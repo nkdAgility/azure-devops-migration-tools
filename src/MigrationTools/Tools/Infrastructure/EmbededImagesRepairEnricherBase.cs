@@ -114,6 +114,51 @@ namespace MigrationTools.Tools.Infrastructure
             return ImageFormat.unknown;
         }
 
+        /// <summary>
+        /// Returns true when <paramref name="imageUrl"/> is an address under one of the supplied
+        /// collection URLs, i.e. the collection URL is a proper prefix ending on a path or query
+        /// boundary.
+        /// </summary>
+        /// <remarks>
+        /// A substring check is not enough here: the URL comes from work item content, which is
+        /// untrusted, and the caller sends the source credentials with the download request. A
+        /// crafted value such as <c>https://attacker.example/?next=https://collection/...</c>
+        /// contains the collection URL but does not point to it, and must not receive the
+        /// credentials. Requiring a boundary character after the prefix also stops
+        /// <c>https://host/CollectionEvil/...</c> from matching <c>https://host/Collection</c>.
+        /// </remarks>
+        protected static bool IsAttachmentFromSourceCollection(string imageUrl, params string[] collectionUrls)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+                return false;
+
+            // urls taken from HTML fields still carry their entities (&amp;); decode so the
+            // comparison sees the address the request would actually be made to.
+            string decodedUrl = WebUtility.HtmlDecode(imageUrl).TrimStart();
+
+            foreach (string collectionUrl in collectionUrls)
+            {
+                if (string.IsNullOrWhiteSpace(collectionUrl))
+                    continue;
+
+                string prefix = collectionUrl.TrimEnd('/');
+
+                // the bare collection root is not an attachment, with or without its trailing slash.
+                if (decodedUrl.Length <= prefix.Length ||
+                    decodedUrl.Equals(prefix + "/", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                if (!decodedUrl.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                char boundary = decodedUrl[prefix.Length];
+                if (boundary == '/' || boundary == '?')
+                    return true;
+            }
+
+            return false;
+        }
+
         protected string GetUrlWithOppositeSchema(string url)
         {
             string oppositeUrl;

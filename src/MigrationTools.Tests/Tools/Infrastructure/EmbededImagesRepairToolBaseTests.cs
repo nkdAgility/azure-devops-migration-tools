@@ -190,6 +190,73 @@ namespace MigrationTools.Tests.Tools.Infrastructure
             Assert.AreEqual("jpeg", format);
         }
 
+        private const string CollectionUrl = "https://old.example/tfs/Collection/";
+        private const string CollectionUrlOppositeSchema = "http://old.example/tfs/Collection";
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldAcceptAttachmentUrlUnderTheCollection()
+        {
+            Assert.IsTrue(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                "https://old.example/tfs/Collection/_apis/wit/attachments/1234?FileName=a.png",
+                CollectionUrl, CollectionUrlOppositeSchema));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldAcceptAttachmentUrlOnTheOppositeSchema()
+        {
+            Assert.IsTrue(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                "http://old.example/tfs/Collection/WorkItemTracking/v1.0/AttachFileHandler.ashx?FileID=1&FileName=a.png",
+                CollectionUrl, CollectionUrlOppositeSchema));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldAcceptHtmlEncodedAttachmentUrl()
+        {
+            Assert.IsTrue(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                "https://old.example/tfs/Collection/AttachFileHandler.ashx?FileID=1&amp;FileName=a.png",
+                CollectionUrl, CollectionUrlOppositeSchema));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldRejectAttackerUrlThatEmbedsTheCollectionUrlInItsQuery()
+        {
+            Assert.IsFalse(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                "https://attacker.example/?FileName=evil.png&next=https://old.example/tfs/Collection/_apis/wit/attachments/1",
+                CollectionUrl, CollectionUrlOppositeSchema));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldRejectHostThatMerelyStartsWithTheCollectionUrl()
+        {
+            Assert.IsFalse(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                "https://old.example/tfs/CollectionEvil/_apis/wit/attachments/1?FileName=a.png",
+                CollectionUrl, CollectionUrlOppositeSchema));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldRejectTheBareCollectionUrlWithNothingAfterIt()
+        {
+            Assert.IsFalse(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                "https://old.example/tfs/Collection",
+                CollectionUrl, CollectionUrlOppositeSchema));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldRejectTheBareCollectionUrlWithATrailingSlash()
+        {
+            Assert.IsFalse(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                "https://old.example/tfs/Collection/",
+                CollectionUrl, CollectionUrlOppositeSchema));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldRejectNullOrEmptyUrl()
+        {
+            Assert.IsFalse(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                null, CollectionUrl, CollectionUrlOppositeSchema));
+            Assert.IsFalse(TestableEmbededImagesRepairTool.CallIsAttachmentFromSourceCollection(
+                string.Empty, CollectionUrl, CollectionUrlOppositeSchema));
+        }
     }
 
     /// <summary>
@@ -204,6 +271,11 @@ namespace MigrationTools.Tests.Tools.Infrastructure
         public static string CallGetImageFormat(byte[] bytes)
         {
             return GetImageFormat(bytes).ToString();
+        }
+
+        public static bool CallIsAttachmentFromSourceCollection(string imageUrl, params string[] collectionUrls)
+        {
+            return IsAttachmentFromSourceCollection(imageUrl, collectionUrls);
         }
 
         protected override void FixEmbededImages(WorkItemData wi, string oldTfsurl, string newTfsurl, string sourcePersonalAccessToken = "")

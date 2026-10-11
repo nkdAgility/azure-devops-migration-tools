@@ -1,6 +1,6 @@
 ---
 title: TFS Embedded Images Tool
-description: Processes and migrates embedded images within work item descriptions, comments, and HTML content, ensuring images are properly transferred and referenced in the target system.
+description: Processes and migrates embedded images within work item descriptions, comments, and rich text content in both HTML and Markdown format, ensuring images are properly transferred and referenced in the target system.
 dataFile: reference.tools.tfsembededimagestool.yaml
 schemaFile: schema.tools.tfsembededimagestool.json
 slug: tfs-embeded-images-tool
@@ -15,7 +15,9 @@ discussionId: 2808
 
 ## Overview
 
-The TFS Embedded Images Tool handles the migration of embedded images within work item content during the migration process. This tool processes HTML content in work item descriptions, comments, and other rich text fields to identify, extract, and migrate embedded images to the target system.
+The TFS Embedded Images Tool handles the migration of embedded images within work item content during the migration process. This tool processes rich text content in work item descriptions, comments, and other rich text fields to identify, extract, and migrate embedded images to the target system.
+
+Both content formats are supported: HTML (`<img src="...">`) and Markdown (`![alt](url)`). Azure DevOps keeps the field type as HTML even when a project stores its rich text as Markdown, so the tool inspects the same set of fields for both formats and no configuration is needed to switch between them. When an image is migrated, every occurrence of its source URL in the field is updated to the new target URL — including plain links to the same attachment — so no references are left pointing to the source collection. Surrounding content such as HTML attributes, Markdown alt text, and titles is preserved.
 
 The tool ensures that images embedded in work item content are properly preserved and accessible in the target environment, maintaining the visual context and documentation integrity of work items.
 
@@ -23,10 +25,10 @@ The tool ensures that images embedded in work item content are properly preserve
 
 The TFS Embedded Images Tool operates during work item migration to handle embedded images:
 
-1. **Content Scanning**: Analyzes HTML content in work item fields for embedded image references
+1. **Content Scanning**: Analyzes rich text content in work item fields for embedded HTML and Markdown image references
 2. **Image Extraction**: Downloads embedded images from the source system
 3. **Image Processing**: Processes images and prepares them for target system upload
-4. **Reference Updates**: Updates HTML content to reference images in the target system
+4. **Reference Updates**: Updates the HTML or Markdown content to reference images in the target system
 5. **Upload Management**: Uploads images to the target system and maintains proper linking
 
 The tool integrates seamlessly with work item migration processors to ensure embedded images are handled transparently.
@@ -125,7 +127,7 @@ Use with other content migration tools for comprehensive work item migration:
 ### Quality Assurance
 
 - **Image Integrity**: Verify images are properly migrated and accessible
-- **Reference Validation**: Ensure HTML references are correctly updated
+- **Reference Validation**: Ensure HTML and Markdown references are correctly updated
 - **Visual Testing**: Test migrated work items to confirm image display
 - **Content Review**: Review migrated content for any missing or broken images
 
@@ -142,7 +144,7 @@ Use with other content migration tools for comprehensive work item migration:
 
 **Broken Image References:**
 
-- Verify HTML content is properly processed
+- Verify HTML and Markdown content is properly processed
 - Check that images were successfully uploaded to target
 - Ensure image references are correctly updated
 - Review target system image storage configuration
