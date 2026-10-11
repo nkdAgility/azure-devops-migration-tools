@@ -122,13 +122,20 @@ namespace MigrationTools.Clients
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Ok);
                 }
+                catch (MigrationRunStoppedException)
+                {
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    ActivitySourceProvider.FlushTelemetery();
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     Log.Error(ex, "The project `{ConfiguredProjectName}` does not exist in the collection. Please fix to continue.", Options.Project);
                     ActivitySourceProvider.FlushTelemetery();
-                    throw new MigrationRunStoppedException("The configured project does not exist in the collection.");
+                    throw new MigrationRunStoppedException("The configured project does not exist in the collection.", ex);
                 }
                 return y?.ToProjectData();
             }
