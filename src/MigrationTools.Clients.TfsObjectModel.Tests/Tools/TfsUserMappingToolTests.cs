@@ -310,6 +310,75 @@ namespace MigrationTools.Tests.Tools
             Assert.AreEqual("New Name", TfsUserMappingTool.FindIdentityMapTarget(result, "old name"));
         }
 
+        private TfsUserMappingTool CreateTool(string userMappingFile, bool useIdentityMapDataFormat)
+        {
+            var options = new TfsUserMappingToolOptions
+            {
+                Enabled = true,
+                UserMappingFile = userMappingFile,
+                UseIdentityMapDataFormat = useIdentityMapDataFormat
+            };
+            return new TfsUserMappingTool(
+                Microsoft.Extensions.Options.Options.Create(options),
+                new Mock<IServiceProvider>().Object,
+                _logger,
+                new Mock<ITelemetryLogger>().Object);
+        }
+
+        private string WriteExportedIdentityMapFile()
+        {
+            var filePath = Path.Combine(_testDirectory, "exported.json");
+            var exported = CreateMappingList();
+            exported.Add(new IdentityMapData { Source = new IdentityItemData { DisplayName = "Unmapped User" }, Target = null });
+            TfsUserMappingTool.SerializeIdentityMapData(filePath, exported, _logger);
+            return filePath;
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void UserMappings_FlagOnWithExportedArrayFile_LoadsDetailedMappings()
+        {
+            var tool = CreateTool(WriteExportedIdentityMapFile(), useIdentityMapDataFormat: true);
+
+            Assert.IsTrue(tool.DetectedFormatIsIdentityMapData.Value);
+            Assert.AreEqual("New Name", tool.UserMappings.Value["old name"]);
+            Assert.AreEqual("New Name", tool.UserMappings.Value["DOMAIN\\olduser"]);
+            Assert.IsFalse(tool.UserMappings.Value.ContainsKey("Unmapped User"));
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void UserMappings_FlagOnWithDictionaryFile_LoadsDictionary()
+        {
+            var filePath = Path.Combine(_testDirectory, "dictionary.json");
+            TfsUserMappingTool.SerializeUserMap(filePath, new Dictionary<string, string> { ["Old Name"] = "New Name" }, _logger);
+
+            var tool = CreateTool(filePath, useIdentityMapDataFormat: true);
+
+            Assert.IsFalse(tool.DetectedFormatIsIdentityMapData.Value);
+            Assert.AreEqual("New Name", tool.UserMappings.Value["old name"]);
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void UserMappings_FlagOffWithDictionaryFile_KeepsLegacyBehaviour()
+        {
+            var filePath = Path.Combine(_testDirectory, "dictionary.json");
+            TfsUserMappingTool.SerializeUserMap(filePath, new Dictionary<string, string> { ["Old Name"] = "New Name" }, _logger);
+
+            var tool = CreateTool(filePath, useIdentityMapDataFormat: false);
+
+            Assert.IsFalse(tool.DetectedFormatIsIdentityMapData.Value);
+            Assert.IsEmpty(tool.IdentityMappings.Value);
+            Assert.AreEqual("New Name", tool.UserMappings.Value["Old Name"]);
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void UserMappings_FlagOffWithArrayFile_DoesNotLoadDetailedMappings()
+        {
+            var tool = CreateTool(WriteExportedIdentityMapFile(), useIdentityMapDataFormat: false);
+
+            Assert.IsFalse(tool.DetectedFormatIsIdentityMapData.Value);
+            Assert.IsEmpty(tool.UserMappings.Value);
+        }
+
         [TestMethod, TestCategory("L0")]
         public void IsIdentityMapDataFormat_DetectsArrayAndDictionaryFiles()
         {
