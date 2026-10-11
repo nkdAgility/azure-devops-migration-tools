@@ -586,8 +586,12 @@ namespace MigrationTools.Processors
                     {
                         Log.LogWarning($"Microsoft.VSTS.TCM.Steps does not exist on Source Work Item. This field will be skipped, but the all other fields on the revision will be populated. Exception details: {ex.Message}");
                     }
-                    newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
-                        oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
+                    // The source revision may be an earlier, different type (shell fell back to the final type).
+                    if (oldWorkItem.Fields.Contains("Microsoft.VSTS.Common.Priority"))
+                    {
+                        newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
+                            oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
+                    }
                     break;
             }
 
