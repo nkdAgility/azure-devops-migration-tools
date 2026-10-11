@@ -91,18 +91,34 @@ namespace MigrationTools.Tools
         /// <returns>A list of IdentityMapData containing source and target user mappings, or an empty list if the file doesn't exist</returns>
         public static List<IdentityMapData> DeserializeIdentityMapData(string fileName, ILogger logger)
         {
+            JArray entries;
             try
             {
-                var entries = JArray.Parse(File.ReadAllText(fileName));
-                return entries.Select(entry => entry is JObject item
-                    ? new IdentityMapData { Source = ToIdentityItemData(item["Source"]), Target = ToIdentityItemData(item["Target"]) }
-                    : null).ToList();
+                entries = JArray.Parse(File.ReadAllText(fileName));
             }
             catch (Exception ex)
             {
                 logger.LogError("TfsUserMappingTool::DeserializeIdentityMapData User identity mapping could not be deserialized from file '{fileName}'. Error: {error}", fileName, ex.Message);
+                return [];
             }
-            return [];
+
+            List<IdentityMapData> result = [];
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i] is not JObject item)
+                {
+                    continue;
+                }
+                try
+                {
+                    result.Add(new IdentityMapData { Source = ToIdentityItemData(item["Source"]), Target = ToIdentityItemData(item["Target"]) });
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning("TfsUserMappingTool::DeserializeIdentityMapData Skipping invalid entry {index} in '{fileName}'. Error: {error}", i, fileName, ex.Message);
+                }
+            }
+            return result;
         }
 
         private static IdentityItemData ToIdentityItemData(JToken token) => token?.Type switch

@@ -380,6 +380,18 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void DeserializeIdentityMapData_InvalidEntry_KeepsValidEntries()
+        {
+            var filePath = Path.Combine(_testDirectory, "partly-invalid.json");
+            File.WriteAllText(filePath, "[{\"Source\":{\"DisplayName\":\"Bad\",\"Sid\":{}},\"Target\":\"X\"},{\"Source\":\"Old Name\",\"Target\":\"New Name\"}]");
+
+            var result = TfsUserMappingTool.DeserializeIdentityMapData(filePath, _logger);
+
+            Assert.HasCount(1, result);
+            Assert.AreEqual("New Name", TfsUserMappingTool.FindIdentityMapTarget(result, "Old Name"));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void IsIdentityMapDataFormat_DetectsArrayAndDictionaryFiles()
         {
             var arrayFile = Path.Combine(_testDirectory, "array.json");
