@@ -240,5 +240,58 @@ namespace MigrationTools.Tests.Tools
             Assert.IsNotNull(result);
             Assert.IsEmpty(result);
         }
+
+        private static List<IdentityMapData> CreateMappingList() =>
+        [
+            null,
+            new IdentityMapData { Source = new IdentityItemData { DisplayName = "No Target" }, Target = null },
+            new IdentityMapData
+            {
+                Source = new IdentityItemData { DisplayName = "Old Name", AccountName = "DOMAIN\\olduser" },
+                Target = new IdentityItemData { DisplayName = "New Name", AccountName = "newuser@example.com" }
+            }
+        ];
+
+        [TestMethod, TestCategory("L0")]
+        [DataRow("Old Name")]
+        [DataRow("old name")]
+        [DataRow("DOMAIN\\olduser")]
+        [DataRow("domain\\OLDUSER")]
+        public void FindIdentityMapTarget_MatchesDisplayOrAccountNameIgnoringCase(string sourceValue)
+        {
+            Assert.AreEqual("New Name", TfsUserMappingTool.FindIdentityMapTarget(CreateMappingList(), sourceValue));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        [DataRow("Unknown User")]
+        [DataRow("No Target")]
+        [DataRow("")]
+        [DataRow(null)]
+        public void FindIdentityMapTarget_NoUsableMapping_ReturnsNull(string sourceValue)
+        {
+            Assert.IsNull(TfsUserMappingTool.FindIdentityMapTarget(CreateMappingList(), sourceValue));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ToUserMapDictionary_MapsDisplayAndAccountNamesIgnoringCase()
+        {
+            var result = TfsUserMappingTool.ToUserMapDictionary(CreateMappingList());
+
+            Assert.HasCount(2, result);
+            Assert.AreEqual("New Name", result["old name"]);
+            Assert.AreEqual("New Name", result["domain\\olduser"]);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsIdentityMapDataFormat_DetectsArrayAndDictionaryFiles()
+        {
+            var arrayFile = Path.Combine(_testDirectory, "array.json");
+            var dictionaryFile = Path.Combine(_testDirectory, "dictionary.json");
+            TfsUserMappingTool.SerializeIdentityMapData(arrayFile, CreateMappingList(), _logger);
+            TfsUserMappingTool.SerializeUserMap(dictionaryFile, new Dictionary<string, string> { ["Old Name"] = "New Name" }, _logger);
+
+            Assert.IsTrue(TfsUserMappingTool.IsIdentityMapDataFormat(arrayFile, _logger));
+            Assert.IsFalse(TfsUserMappingTool.IsIdentityMapDataFormat(dictionaryFile, _logger));
+        }
     }
 }

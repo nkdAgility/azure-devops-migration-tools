@@ -119,21 +119,7 @@ namespace MigrationTools.Tools
                 }
 
                 string fileData = File.ReadAllText(fileName);
-                var jToken = JToken.Parse(fileData);
-
-                // Check if it's an array (IdentityMapData format)
-                if (jToken.Type == JTokenType.Array)
-                {
-                    return true;
-                }
-
-                // Check if it's an object with dictionary structure (simple format)
-                if (jToken.Type == JTokenType.Object)
-                {
-                    return false;
-                }
-
-                return false;
+                return JToken.Parse(fileData).Type == JTokenType.Array;
             }
             catch (Exception ex)
             {
@@ -175,18 +161,9 @@ namespace MigrationTools.Tools
             {
                 Log.LogDebug($"TfsUserMappingTool::MapUserIdentityField [ReferenceName|{field.ReferenceName}]");
 
-                // When UseIdentityMapDataFormat is true, detect the actual format from the file
-                // This allows flexibility - the file can be either format and it will be handled correctly
-                if (Options.UseIdentityMapDataFormat)
+                if (DetectedFormatIsIdentityMapData.Value)
                 {
-                    if (DetectedFormatIsIdentityMapData.Value)
-                    {
-                        MapUserIdentityFieldByIdentityMap(field, IdentityMappings.Value);
-                    }
-                    else
-                    {
-                        MapUserIdentityFieldByDictionary(field);
-                    }
+                    MapUserIdentityFieldByIdentityMap(field, IdentityMappings.Value);
                 }
                 else
                 {
@@ -222,16 +199,61 @@ namespace MigrationTools.Tools
                 return;
             }
 
-            var mapping = identityMapData.FirstOrDefault(x =>
-                x.Source?.DisplayName == sourceValue ||
-                x.Source?.AccountName == sourceValue);
-
-            if (mapping?.Target != null)
+            var target = FindIdentityMapTarget(identityMapData, sourceValue);
+            if (target != null)
             {
                 var original = field.Value;
-                field.Value = mapping.Target.DisplayName ?? mapping.Target.AccountName;
+                field.Value = target;
                 Log.LogDebug($"TfsUserMappingTool::MapUserIdentityFieldByIdentityMap::Map:[original|{original}][new|{field.Value}]");
             }
+        }
+
+        /// <summary>
+        /// Finds the target identity for a source display name or account name, ignoring case.
+        /// </summary>
+        /// <param name="identityMapData">The list of identity map data to search</param>
+        /// <param name="sourceValue">The source display name or account name</param>
+        /// <returns>The target display name (or account name when no display name exists), or null if no mapping is found</returns>
+        public static string FindIdentityMapTarget(IEnumerable<IdentityMapData> identityMapData, string sourceValue)
+        {
+            if (identityMapData == null || string.IsNullOrEmpty(sourceValue))
+            {
+                return null;
+            }
+
+            var mapping = identityMapData.FirstOrDefault(x =>
+                x?.Source != null && x.Target != null &&
+                (string.Equals(x.Source.DisplayName, sourceValue, StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(x.Source.AccountName, sourceValue, StringComparison.OrdinalIgnoreCase)));
+
+            return mapping == null ? null : mapping.Target.DisplayName ?? mapping.Target.AccountName;
+        }
+
+        /// <summary>
+        /// Converts detailed identity mappings to the simple dictionary used by existing consumers such as
+        /// team capacity migration. Both the source display name and account name are added as keys.
+        /// </summary>
+        /// <param name="identityMapData">The list of identity map data to convert</param>
+        /// <returns>A case-insensitive dictionary of source names to target names</returns>
+        public static Dictionary<string, string> ToUserMapDictionary(IEnumerable<IdentityMapData> identityMapData)
+        {
+            Dictionary<string, string> result = new(StringComparer.CurrentCultureIgnoreCase);
+            foreach (var mapping in identityMapData ?? [])
+            {
+                var target = mapping?.Target?.DisplayName ?? mapping?.Target?.AccountName;
+                if (mapping?.Source == null || target == null)
+                {
+                    continue;
+                }
+                foreach (var key in new[] { mapping.Source.DisplayName, mapping.Source.AccountName })
+                {
+                    if (!string.IsNullOrEmpty(key) && !result.ContainsKey(key))
+                    {
+                        result[key] = target;
+                    }
+                }
+            }
+            return result;
         }
 
         public Lazy<Dictionary<string, string>> UserMappings { get; }
@@ -246,6 +268,10 @@ namespace MigrationTools.Tools
             {
                 Log.LogError("TfsUserMappingTool::GetMappingFileData:: The UserMappingFile '{UserMappingFile}' cant be found! Provide a valid file or disable TfsUserMappingTool!", Options.UserMappingFile);
                 return [];
+            }
+            if (DetectedFormatIsIdentityMapData.Value)
+            {
+                return ToUserMapDictionary(IdentityMappings.Value);
             }
             return DeserializeUserMap(Options.UserMappingFile, Log);
         }

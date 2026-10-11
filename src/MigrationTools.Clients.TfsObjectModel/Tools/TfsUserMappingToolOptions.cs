@@ -16,9 +16,11 @@ namespace MigrationTools.Tools
         public List<string> IdentityFieldsToCheck { get; set; }
 
         /// <summary>
-        /// This is the file that will be used to export or import the user mappings. The file format is automatically detected based on its content:
-        /// - If the file contains a JSON object with "Source" and "Target" properties, it uses the IdentityMapData format (detailed identity information).
-        /// - If the file contains a simple JSON dictionary of key-value pairs, it uses the simple dictionary format (display name mappings).
+        /// This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
+        /// By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is
+        /// enabled, the format is detected from the content: a JSON array of objects with "Source" and "Target" identities is read as
+        /// detailed IdentityMapData, and a JSON object is read as the simple dictionary format.
+        /// <default>none</default>
         /// </summary>
         public string UserMappingFile { get; set; }
 
@@ -40,7 +42,9 @@ namespace MigrationTools.Tools
         public string ProjectCollectionValidUsersGroupName { get; set; } = "Project Collection Valid Users";
 
         /// <summary>
-        /// When set to true, user mappings will be exported in the detailed IdentityMapData format with full identity information (Source and Target) instead of simple display name mappings.
+        /// When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)
+        /// instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.
+        /// Detailed entries match work item values against the source display name or account name, ignoring case.
         /// <default>false</default>
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
