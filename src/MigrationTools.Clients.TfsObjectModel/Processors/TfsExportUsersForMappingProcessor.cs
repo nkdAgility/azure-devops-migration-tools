@@ -62,10 +62,12 @@ namespace MigrationTools.Processors
                 Log.LogInformation("Found {usersToMap} total mapped", data.IdentityMap.Count);
             }
 
-            List<IdentityMapData> usersToMap = data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName).ToList();
+            bool detailed = CommonTools.UserMapping.Options.UseIdentityMapDataFormat;
+            List<IdentityMapData> usersToMap = data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName
+                || (detailed && !string.Equals(x.Source.AccountName, x.Target?.AccountName, StringComparison.OrdinalIgnoreCase))).ToList();
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
 
-            if (CommonTools.UserMapping.Options.UseIdentityMapDataFormat)
+            if (detailed)
             {
                 Log.LogInformation("Exporting user mappings in detailed IdentityMapData format");
                 TfsUserMappingTool.SerializeIdentityMapData(CommonTools.UserMapping.Options.UserMappingFile, usersToMap, Log);

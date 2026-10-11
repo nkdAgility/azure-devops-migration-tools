@@ -111,7 +111,11 @@ namespace MigrationTools.Tools
                 }
                 try
                 {
-                    result.Add(new IdentityMapData { Source = ToIdentityItemData(item["Source"]), Target = ToIdentityItemData(item["Target"]) });
+                    result.Add(new IdentityMapData
+                    {
+                        Source = ToIdentityItemData(item.GetValue("Source", StringComparison.OrdinalIgnoreCase)),
+                        Target = ToIdentityItemData(item.GetValue("Target", StringComparison.OrdinalIgnoreCase))
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -121,12 +125,24 @@ namespace MigrationTools.Tools
             return result;
         }
 
-        private static IdentityItemData ToIdentityItemData(JToken token) => token?.Type switch
+        private static IdentityItemData ToIdentityItemData(JToken token)
         {
-            JTokenType.String => new IdentityItemData { DisplayName = token.Value<string>() },
-            JTokenType.Object => token.ToObject<IdentityItemData>(),
-            _ => null
-        };
+            switch (token?.Type)
+            {
+                case JTokenType.String:
+                    return new IdentityItemData { DisplayName = token.Value<string>() };
+                case JTokenType.Object:
+                    var identity = token.ToObject<IdentityItemData>();
+                    // Older guidance and exports use FriendlyName for the display name.
+                    if (string.IsNullOrEmpty(identity.DisplayName))
+                    {
+                        identity.DisplayName = ((JObject)token).GetValue("FriendlyName", StringComparison.OrdinalIgnoreCase)?.Value<string>();
+                    }
+                    return identity;
+                default:
+                    return null;
+            }
+        }
 
         private static string GetTargetName(IdentityItemData target) =>
             !string.IsNullOrEmpty(target?.DisplayName) ? target.DisplayName
@@ -202,10 +218,6 @@ namespace MigrationTools.Tools
             }
         }
 
-        /// <summary>
-        /// Maps a user identity field value using a dictionary of simple display name mappings.
-        /// </summary>
-        /// <param name="field">The work item field containing a user identity to be mapped</param>
         private void MapUserIdentityFieldByDictionary(Field field)
         {
             if (UserMappings.Value.ContainsKey(field.Value.ToString()))
@@ -216,11 +228,6 @@ namespace MigrationTools.Tools
             }
         }
 
-        /// <summary>
-        /// Maps a user identity field value using detailed identity mapping data.
-        /// </summary>
-        /// <param name="field">The work item field containing a user identity to be mapped</param>
-        /// <param name="identityMapData">The list of identity map data to use for mapping</param>
         private void MapUserIdentityFieldByIdentityMap(Field field, List<IdentityMapData> identityMapData)
         {
             var sourceValue = field.Value?.ToString();
@@ -447,7 +454,8 @@ namespace MigrationTools.Tools
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
                 IdentityMapResult mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.IdentityMap.Count}]");
-                mappedUsers.IdentityMap = mappedUsers.IdentityMap.Where(x => workItemUsers.Contains(x.Source.DisplayName)).ToList();
+                mappedUsers.IdentityMap = mappedUsers.IdentityMap.Where(x => workItemUsers.Contains(x.Source.DisplayName)
+                    || (!string.IsNullOrEmpty(x.Source.AccountName) && workItemUsers.Contains(x.Source.AccountName))).ToList();
                 return mappedUsers;
             }
             else

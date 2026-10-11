@@ -392,6 +392,19 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void DeserializeIdentityMapData_GuideFormatWithFriendlyNameAndLowercaseTarget_Maps()
+        {
+            var filePath = Path.Combine(_testDirectory, "guide.json");
+            File.WriteAllText(filePath, "[{\"Source\":{\"FriendlyName\":\"Martin Hinshelwood nkdAgility.com\",\"AccountName\":\"martin@nkdagility.com\"},"
+                + "\"target\":{\"FriendlyName\":\"Hinshelwood, Martin\",\"AccountName\":\"martin@othercompany.com\"}}]");
+
+            var result = TfsUserMappingTool.DeserializeIdentityMapData(filePath, _logger);
+
+            Assert.AreEqual("Hinshelwood, Martin", TfsUserMappingTool.FindIdentityMapTarget(result, "Martin Hinshelwood nkdAgility.com"));
+            Assert.AreEqual("Hinshelwood, Martin", TfsUserMappingTool.FindIdentityMapTarget(result, "martin@nkdagility.com"));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void IsIdentityMapDataFormat_DetectsArrayAndDictionaryFiles()
         {
             var arrayFile = Path.Combine(_testDirectory, "array.json");
