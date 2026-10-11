@@ -819,7 +819,6 @@ namespace MigrationTools.Processors
                         });
 
                     // Decide on WIT
-                    // A revision type that is missing or disabled in the target (e.g. the shell fell back to the final type) keeps the current type rather than patching to an unusable one.
                     var revisionType = WorkItemShellTypeSelector.MapType(currentRevisionWorkItem.Type, CommonTools.WorkItemTypeMapping.Mappings);
                     var destType = WorkItemShellTypeSelector.SelectRevisionType(currentRevisionWorkItem.Type, targetWorkItem.Type, CommonTools.WorkItemTypeMapping.Mappings, IsWorkItemTypeUsableInTarget);
                     if (destType != revisionType)
