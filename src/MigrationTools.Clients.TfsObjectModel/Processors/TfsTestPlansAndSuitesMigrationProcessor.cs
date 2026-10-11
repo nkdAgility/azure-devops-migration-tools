@@ -995,6 +995,10 @@ namespace MigrationTools.Processors
                                 break;
                             }
                         }
+                        catch (MigrationRunStoppedException)
+                        {
+                            throw;
+                        }
                         catch (Exception ex)
                         {
                             InnerLog(sourceSuite, "            Source work item not migrated to target, cannot be found", 5);
