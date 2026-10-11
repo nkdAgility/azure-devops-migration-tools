@@ -83,7 +83,8 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
-        /// Deserializes a list of user identity mappings from a JSON file structured as IdentityMapData objects.
+        /// Deserializes a list of user identity mappings from a JSON array. Each entry's Source and Target can be either an
+        /// identity object or a plain string, which is treated as the display name.
         /// </summary>
         /// <param name="fileName">The file path where the user identity mappings are stored</param>
         /// <param name="logger">Logger for the operation</param>
@@ -92,9 +93,10 @@ namespace MigrationTools.Tools
         {
             try
             {
-                string fileData = File.ReadAllText(fileName);
-                var mapping = JsonConvert.DeserializeObject<List<IdentityMapData>>(fileData);
-                return mapping ?? [];
+                var entries = JArray.Parse(File.ReadAllText(fileName));
+                return entries.Select(entry => entry is JObject item
+                    ? new IdentityMapData { Source = ToIdentityItemData(item["Source"]), Target = ToIdentityItemData(item["Target"]) }
+                    : null).ToList();
             }
             catch (Exception ex)
             {
@@ -102,6 +104,18 @@ namespace MigrationTools.Tools
             }
             return [];
         }
+
+        private static IdentityItemData ToIdentityItemData(JToken token) => token?.Type switch
+        {
+            JTokenType.String => new IdentityItemData { DisplayName = token.Value<string>() },
+            JTokenType.Object => token.ToObject<IdentityItemData>(),
+            _ => null
+        };
+
+        private static string GetTargetName(IdentityItemData target) =>
+            !string.IsNullOrEmpty(target?.DisplayName) ? target.DisplayName
+            : !string.IsNullOrEmpty(target?.AccountName) ? target.AccountName
+            : null;
 
         /// <summary>
         /// Detects the format of a user mapping file (dictionary or IdentityMapData list).
@@ -221,12 +235,12 @@ namespace MigrationTools.Tools
                 return null;
             }
 
-            var mapping = identityMapData.FirstOrDefault(x =>
-                x?.Source != null && x.Target != null &&
-                (string.Equals(x.Source.DisplayName, sourceValue, StringComparison.OrdinalIgnoreCase) ||
-                 string.Equals(x.Source.AccountName, sourceValue, StringComparison.OrdinalIgnoreCase)));
-
-            return mapping == null ? null : mapping.Target.DisplayName ?? mapping.Target.AccountName;
+            return identityMapData
+                .Where(x => x?.Source != null &&
+                    (string.Equals(x.Source.DisplayName, sourceValue, StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(x.Source.AccountName, sourceValue, StringComparison.OrdinalIgnoreCase)))
+                .Select(x => GetTargetName(x.Target))
+                .FirstOrDefault(x => x != null);
         }
 
         /// <summary>
@@ -240,7 +254,7 @@ namespace MigrationTools.Tools
             Dictionary<string, string> result = new(StringComparer.CurrentCultureIgnoreCase);
             foreach (var mapping in identityMapData ?? [])
             {
-                var target = mapping?.Target?.DisplayName ?? mapping?.Target?.AccountName;
+                var target = GetTargetName(mapping?.Target);
                 if (mapping?.Source == null || target == null)
                 {
                     continue;

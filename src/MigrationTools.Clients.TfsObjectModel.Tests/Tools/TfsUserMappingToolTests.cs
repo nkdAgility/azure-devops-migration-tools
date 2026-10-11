@@ -283,6 +283,34 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void FindIdentityMapTarget_EmptyTargetDisplayName_UsesAccountName()
+        {
+            var mappings = new List<IdentityMapData>
+            {
+                new IdentityMapData
+                {
+                    Source = new IdentityItemData { DisplayName = "Old Name" },
+                    Target = new IdentityItemData { DisplayName = "", AccountName = "newuser@example.com" }
+                }
+            };
+
+            Assert.AreEqual("newuser@example.com", TfsUserMappingTool.FindIdentityMapTarget(mappings, "Old Name"));
+            Assert.AreEqual("newuser@example.com", TfsUserMappingTool.ToUserMapDictionary(mappings)["Old Name"]);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void DeserializeIdentityMapData_StringSourceAndTarget_ReadsAsDisplayNames()
+        {
+            var filePath = Path.Combine(_testDirectory, "strings.json");
+            File.WriteAllText(filePath, "[{\"Source\":\"Old Name\",\"Target\":\"New Name\"}]");
+
+            var result = TfsUserMappingTool.DeserializeIdentityMapData(filePath, _logger);
+
+            Assert.HasCount(1, result);
+            Assert.AreEqual("New Name", TfsUserMappingTool.FindIdentityMapTarget(result, "old name"));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void IsIdentityMapDataFormat_DetectsArrayAndDictionaryFiles()
         {
             var arrayFile = Path.Combine(_testDirectory, "array.json");
