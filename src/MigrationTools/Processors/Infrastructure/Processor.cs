@@ -111,7 +111,7 @@ namespace MigrationTools.Processors.Infrastructure
                 {
                     Status = ProcessingStatus.Failed;
                     ProcessorActivity.SetStatus(ActivityStatusCode.Error);
-                    Log.LogCritical("{MigrationContextname} stopped: {Reason}", Name, ex.Message);
+                    Log.LogCritical(ex, "{MigrationContextname} stopped: {Reason}", Name, ex.Message);
                 }
                 catch (OptionsValidationException ex)
                 {
