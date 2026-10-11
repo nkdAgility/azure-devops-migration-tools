@@ -438,10 +438,12 @@ namespace MigrationTools.Processors
                     string token = Target.Options.Authentication?.AccessToken;
                     if (!string.IsNullOrEmpty(token))
                     {
-                        var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token));
-                        var client = connection.GetClient<WorkItemTrackingHttpClient>();
-                        var wit = client.GetWorkItemTypeAsync(Target.Options.Project, typeName).GetAwaiter().GetResult();
-                        if (wit?.IsDisabled == true) usable = false;
+                        using (var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token)))
+                        using (var client = connection.GetClient<WorkItemTrackingHttpClient>())
+                        {
+                            var wit = client.GetWorkItemTypeAsync(Target.Options.Project, typeName).GetAwaiter().GetResult();
+                            if (wit?.IsDisabled == true) usable = false;
+                        }
                     }
                 }
                 catch (Exception ex)
