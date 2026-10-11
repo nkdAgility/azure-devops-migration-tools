@@ -54,5 +54,21 @@ namespace MigrationTools.Processors
             }
             return selection;
         }
+
+        /// <summary>
+        /// Selects the target type for a replayed revision. The revision's (mapped) type is used, unless it differs from
+        /// the current target type and is not usable in the target, in which case the current type is kept.
+        /// </summary>
+        public static string SelectRevisionType(string revisionSourceType, string currentTargetType, IDictionary<string, string> mappings, Func<string, bool> isUsableInTarget)
+        {
+            var mapped = MapType(revisionSourceType, mappings);
+            if (isUsableInTarget != null
+                && !string.Equals(mapped, currentTargetType, StringComparison.OrdinalIgnoreCase)
+                && !isUsableInTarget(mapped))
+            {
+                return currentTargetType;
+            }
+            return mapped;
+        }
     }
 }

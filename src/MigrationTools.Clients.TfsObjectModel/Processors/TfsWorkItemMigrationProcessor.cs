@@ -819,17 +819,13 @@ namespace MigrationTools.Processors
                         });
 
                     // Decide on WIT
-                    var destType = currentRevisionWorkItem.Type;
-                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(destType))
+                    // A revision type that is missing or disabled in the target (e.g. the shell fell back to the final type) keeps the current type rather than patching to an unusable one.
+                    var revisionType = WorkItemShellTypeSelector.MapType(currentRevisionWorkItem.Type, CommonTools.WorkItemTypeMapping.Mappings);
+                    var destType = WorkItemShellTypeSelector.SelectRevisionType(currentRevisionWorkItem.Type, targetWorkItem.Type, CommonTools.WorkItemTypeMapping.Mappings, IsWorkItemTypeUsableInTarget);
+                    if (destType != revisionType)
                     {
-                        destType = CommonTools.WorkItemTypeMapping.Mappings[destType];
-                    }
-                    if (destType != targetWorkItem.Type && !IsWorkItemTypeUsableInTarget(destType))
-                    {
-                        // The revision's type is missing or disabled in the target (e.g. the shell fell back to the final type); keep the current type rather than patching to an unusable one.
                         Log.LogWarning("Source work item {SourceId} revision {RevisionNumber} has type '{RevisionType}', which does not exist or is disabled in the target; keeping '{CurrentType}'.",
-                            sourceWorkItem.Id, revision.Number, destType, targetWorkItem.Type);
-                        destType = targetWorkItem.Type;
+                            sourceWorkItem.Id, revision.Number, revisionType, targetWorkItem.Type);
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 
