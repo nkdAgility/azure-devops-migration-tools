@@ -90,14 +90,28 @@ namespace MigrationTools.Processors.Infrastructure
                     if (string.IsNullOrEmpty(Options.SourceName) || string.IsNullOrEmpty(Options.TargetName))
                     {
                         Log.LogCritical("Processor::Execute: Processer base has not been configured. Source or Target is null! You need to set both 'SourceName' and 'TargetName' on the processer to a valid 'Endpoint' entry.");
-                        Environment.Exit(-200);
+                        throw new MigrationRunStoppedException("Source or Target is not configured on the processor.");
                     }
+                    CompletedWithErrors = false;
                     Status = ProcessingStatus.Running;
                     InternalExecute();
-                    Status = ProcessingStatus.Complete;
-
-
-                    Log.LogInformation(" Migration Processor Complete {MigrationContextname} ", Name);
+                    if (CompletedWithErrors)
+                    {
+                        Status = ProcessingStatus.Failed;
+                        ProcessorActivity.SetStatus(ActivityStatusCode.Error);
+                        Log.LogError(" Migration Processor {MigrationContextname} completed with errors; marking the run as failed.", Name);
+                    }
+                    else
+                    {
+                        Status = ProcessingStatus.Complete;
+                        Log.LogInformation(" Migration Processor Complete {MigrationContextname} ", Name);
+                    }
+                }
+                catch (MigrationRunStoppedException ex)
+                {
+                    Status = ProcessingStatus.Failed;
+                    ProcessorActivity.SetStatus(ActivityStatusCode.Error);
+                    Log.LogCritical("{MigrationContextname} stopped: {Reason}", Name, ex.Message);
                 }
                 catch (OptionsValidationException ex)
                 {
@@ -144,6 +158,12 @@ namespace MigrationTools.Processors.Infrastructure
         }
 
         protected abstract void InternalExecute();
+
+        /// <summary>
+        /// Set by a processor that finished its run but could not process every item.
+        /// The processor is then reported as <see cref="ProcessingStatus.Failed"/> so the run exits non-zero.
+        /// </summary>
+        protected bool CompletedWithErrors { get; set; }
 
         protected Type GetTypeFromName(string name)
         {

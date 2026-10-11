@@ -1,4 +1,5 @@
-﻿using System;
+using MigrationTools.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -637,7 +638,7 @@ namespace MigrationTools.Processors
                 if (!targetWI.Fields.ContainsKey(Target.Options.ReflectedWorkItemIdField))
                 {
                     Log.LogError("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId} does not have ReflectedWorkItemId field {ReflectedWorkItemIdField}", targetWI.Id, Target.Options.ReflectedWorkItemIdField);
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Target test plan work item does not have the ReflectedWorkItemId field.");
                 }
                 string workItemReflectedId = (string)targetWI.Fields[Target.Options.ReflectedWorkItemIdField].Value;
                 Log.LogDebug("TestPlansAndSuitesMigrationContext::FindTestPlan::TargetWorkItem[{workItemId] [{ReflectedWorkItemId]", targetWI.Id, workItemReflectedId);

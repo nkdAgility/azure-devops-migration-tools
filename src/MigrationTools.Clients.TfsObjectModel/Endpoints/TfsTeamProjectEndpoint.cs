@@ -1,4 +1,5 @@
-﻿using System;
+using MigrationTools.Exceptions;
+using System;
 using System.Diagnostics;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,7 +93,7 @@ namespace MigrationTools.Clients
                             if (string.IsNullOrEmpty(Options.Authentication.AccessToken))
                             {
                                 Log.LogCritical("You must provide a PAT to use 'AccessToken' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://devopsmigration.io/Reference/Endpoints/TfsTeamProjectEndpoint/");
-                                Environment.Exit(-1);
+                                throw new MigrationRunStoppedException("An AccessToken is required for AccessToken authentication.");
                             }
                             var pat = Options.Authentication.AccessToken;
                             _vssCredentials = new VssBasicCredential(string.Empty, pat);
@@ -103,7 +104,7 @@ namespace MigrationTools.Clients
                             if (Options.Authentication.NetworkCredentials == null)
                             {
                                 Log.LogCritical("You must set NetworkCredential to use 'Windows' as the authentication mode. You can set this through the config at 'MigrationTools:Endpoints:{name}:Authentication:AccessToken', or you can set an environemnt variable of 'MigrationTools__Endpoints__{name}__Authentication__AccessToken'. Check the docs on https://devopsmigration.io/Reference/Endpoints/TfsTeamProjectEndpoint/");
-                                Environment.Exit(-1);
+                                throw new MigrationRunStoppedException("NetworkCredentials are required for Windows authentication.");
                             }
                             var cred = new NetworkCredential(Options.Authentication.NetworkCredentials.UserName, Options.Authentication.NetworkCredentials.Password, Options.Authentication.NetworkCredentials.Domain);
                             _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(cred));
@@ -129,13 +130,19 @@ namespace MigrationTools.Clients
                     activity?.SetTag("http.response.status_code", "200");
                     Log.LogInformation("Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
                 }
+                catch (MigrationRunStoppedException)
+                {
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    throw;
+                }
                 catch (TeamFoundationServerUnauthorizedException ex)
                 {
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     activity?.SetTag("http.response.status_code", "401");
                     Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.Authentication.AuthenticationMode);
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Unable to configure store: check permissions and credentials.");
                 }
                 catch (Exception ex)
                 {
@@ -152,7 +159,7 @@ namespace MigrationTools.Clients
                         default:
                             break;
                     }
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Unable to configure store: check permissions and credentials.");
                 }
                 return y;
             }

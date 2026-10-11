@@ -1,4 +1,5 @@
-﻿using System;
+using MigrationTools.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -116,7 +117,7 @@ namespace MigrationTools.Clients
                     {
                         Log.Fatal("The project `{ConfiguredProjectName}` does not exist in the collection. Please fix to continue.", Options.Project);
                         Log.Error("Valid options are: @{projects}", Store.Projects.Cast<Project>().Select(x => x.Name).ToList());
-                        Environment.Exit(-1);
+                        throw new MigrationRunStoppedException("The configured project does not exist in the collection.");
                     }
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Ok);
@@ -127,7 +128,7 @@ namespace MigrationTools.Clients
                     activity?.SetStatus(ActivityStatusCode.Error);
                     Log.Error(ex, "The project `{ConfiguredProjectName}` does not exist in the collection. Please fix to continue.", Options.Project);
                     ActivitySourceProvider.FlushTelemetery();
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("The configured project does not exist in the collection.");
                 }
                 return y?.ToProjectData();
             }
@@ -198,7 +199,7 @@ namespace MigrationTools.Clients
                     if (stopOnError)
                     {
                         ActivitySourceProvider.FlushTelemetery();
-                        Environment.Exit(-1);
+                        throw new MigrationRunStoppedException("Unable to get work item.");
                     }
                 }
                 return y?.AsWorkItemData();
@@ -340,7 +341,7 @@ namespace MigrationTools.Clients
                     Telemetry.TrackException(ex, activity.Tags);
                     Log.Fatal(ex, "Unable to configure store");
                     ActivitySourceProvider.FlushTelemetery();
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Unable to configure work item store.");
                 }
                 return store;
             }
