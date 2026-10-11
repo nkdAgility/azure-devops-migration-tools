@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -77,7 +77,7 @@ namespace MigrationTools.Tools
             if (!Options.Enabled && targetProject != sourceProject)
             {
                 Log.LogError("Source and Target projects have different names, but  NodeStructureEnricher is not enabled. Cant continue... please enable nodeStructureEnricher in the config and restart.");
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Source and Target projects have different names, but the node structure tool is not enabled.");
             }
             if (Options.Enabled)
             {
@@ -85,7 +85,7 @@ namespace MigrationTools.Tools
                 if (ValidateTargetNodesExist(nodeStructureMissingItems))
                 {
                     Log.LogError("Missing Iterations in Target preventing progress, check log for list. To continue you MUST configure IterationMaps or AreaMaps that matches the missing paths..");
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Missing Iterations in Target preventing progress. Configure IterationMaps or AreaMaps that match the missing paths.");
                 }
             }
             else
@@ -203,7 +203,7 @@ namespace MigrationTools.Tools
             if (parentNode == null)
             {
                 Log.LogCritical($"Path {nodePath} is not anchored in the target project, it cannot be created.");
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Path is not anchored in the target project and cannot be created.");
             }
 
             // Now that we have a parent, we can start creating nodes down the tree from that point

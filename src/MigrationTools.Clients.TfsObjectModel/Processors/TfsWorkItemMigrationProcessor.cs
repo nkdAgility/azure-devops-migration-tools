@@ -1,9 +1,11 @@
-﻿using System;
+using MigrationTools.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -217,18 +219,26 @@ namespace MigrationTools.Processors
                         }
                         catch (Exception e)
                         {
+                            // .Wait() wraps failures in AggregateException; a stop request must end the run, not count as an item failure.
+                            var stop = e as MigrationRunStoppedException
+                                ?? (e as AggregateException)?.Flatten().InnerExceptions.OfType<MigrationRunStoppedException>().FirstOrDefault();
+                            if (stop != null)
+                            {
+                                ExceptionDispatchInfo.Capture(stop).Throw();
+                            }
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
                             workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
 
-                            if (Options.MaxGracefulFailures == 0)
+                            if (Options.StopOnFirstError)
                             {
                                 throw;
                             }
 
-                            if (_itemsInError.Count > Options.MaxGracefulFailures)
+                            if (ShouldAbortAfterFailure(Options.StopOnFirstError, Options.MaxGracefulFailures, _itemsInError.Count))
                             {
-                                throw new Exception($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
+                                throw new MigrationRunStoppedException($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
                             }
+                            workItemLog.Warning("Continuing with the remaining work items ({FailedCount} failed so far). Set StopOnFirstError to stop on the first failure.", _itemsInError.Count);
                         }
                     }
                 }
@@ -244,10 +254,20 @@ namespace MigrationTools.Processors
 
                 if (_itemsInError.Count > 0)
                 {
-                    contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
+                    CompletedWithErrors = true;
+                    contextLog.Error("{FailedCount} work item(s) could not be migrated: {ItemIds}", _itemsInError.Count, string.Join(", ", _itemsInError));
                 }
 
             }
+        }
+
+        public static bool ShouldAbortAfterFailure(bool stopOnFirstError, int maxGracefulFailures, int failureCount)
+        {
+            if (stopOnFirstError)
+            {
+                return failureCount > 0;
+            }
+            return maxGracefulFailures > 0 && failureCount > maxGracefulFailures;
         }
 
         private void ValidateProject()
@@ -263,7 +283,7 @@ namespace MigrationTools.Processors
             {
                 Log.LogError("Source project '{ProjectName}' not found!", sourceProjectName);
                 Log.LogInformation("Available projects are: {@sourceProjects}", string.Join(", ", sourceProjects.Select(p => p.Name)));
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Source project not found.");
             }
             else
             {
@@ -279,7 +299,7 @@ namespace MigrationTools.Processors
             {
                 Log.LogError("Target project '{ProjectName}' not found!", targetProjectName);
                 Log.LogInformation("Available projects are: {@targetProjects}", string.Join(", ", targetProjects.Select(p => p.Name)));
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Target project not found.");
             }
             else
             {
@@ -329,7 +349,7 @@ namespace MigrationTools.Processors
             if (!containsReflectedWorkItemId || !validationResult)
             {
                 Log.LogError("Validation of work item types failed.");
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Validation of work item types failed.");
             }
             Log.LogInformation("------------------------------------");
             Log.LogInformation("[/ValidateWorkItemTypes]");
@@ -387,7 +407,7 @@ namespace MigrationTools.Processors
                 {
                     var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
                     Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Missing PersonalAccessToken from Target.");
                 }
             }
         }
@@ -681,6 +701,7 @@ namespace MigrationTools.Processors
                     else
                     {
                         TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                        throw;
                     }
                 }
                 catch (Exception ex)
@@ -881,12 +902,14 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    CheckClosedDateIsValid(sourceWorkItem, targetWorkItem);
+                    ApplySourceClosedDate(currentRevisionWorkItem, targetWorkItem);
+                    CheckClosedDateIsValid(currentRevisionWorkItem, targetWorkItem);
 
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
-
+                        var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
                         targetWorkItem.SaveToAzureDevOps();
+                        EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
@@ -948,9 +971,90 @@ namespace MigrationTools.Processors
                 Log.LogInformation("===============================================================");
                 Log.LogError(ex.ToString(), ex);
                 Log.LogInformation("===============================================================");
+                throw;
             }
 
             return targetWorkItem;
+        }
+
+        private static string GetClosedDateField(WorkItem workItem)
+        {
+            return ClosedDateHelper.ResolveField(
+                workItem.Fields.Contains(ClosedDateHelper.CommonClosedDate),
+                workItem.Fields.Contains(ClosedDateHelper.SystemClosedDate));
+        }
+
+        /// <summary>
+        /// Sets the target ClosedDate to the source revision's value when the source revision has one.
+        /// Runs after State/Reason, field copying and field maps. With a BypassRules store the field is
+        /// writable even when the object model reports it as not editable (it is rule-controlled).
+        /// Items whose source revision has no ClosedDate (i.e. not closed) are left untouched.
+        /// </summary>
+        private void ApplySourceClosedDate(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        {
+            var source = sourceRevision.ToWorkItem();
+            var target = targetWorkItem.ToWorkItem();
+            var targetField = GetClosedDateField(target);
+            if (targetField == null) return;
+            var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
+            if (sourceField == null) return;
+
+            var sourceValue = source.Fields[sourceField].Value;
+            var targetValue = target.Fields[targetField].Value;
+            if (!ClosedDateHelper.NeedsUpdate(sourceValue, targetValue)) return;
+            try
+            {
+                target.Fields[targetField].Value = sourceValue;
+                Log.LogDebug("ApplySourceClosedDate: {field} set to source value {value} (was {old})", targetField, sourceValue, targetValue);
+            }
+            catch (Exception ex)
+            {
+                Log.LogDebug(ex, "ApplySourceClosedDate: could not set {field} before save; a fix-up save will be attempted.", targetField);
+            }
+        }
+
+        private sealed class ClosedDateFixUpException : Exception
+        {
+            public ClosedDateFixUpException(string message, Exception inner) : base(message, inner) { }
+        }
+
+        /// <summary>
+        /// The server can still apply the current date to ClosedDate on save, even with BypassRules,
+        /// so a mismatch after save is corrected with a fix-up revision.
+        /// </summary>
+        private void EnsureClosedDateAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
+        {
+            try
+            {
+                var target = targetWorkItem.ToWorkItem();
+                var source = sourceRevision.ToWorkItem();
+                var targetField = GetClosedDateField(target);
+                if (targetField == null) return;
+                var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
+                if (sourceField == null) return;
+                var sourceValue = source.Fields[sourceField].Value;
+                if (!ClosedDateHelper.NeedsUpdate(sourceValue, target.Fields[targetField].Value)) return;
+
+                Log.LogWarning("ClosedDate on target #{targetId} is {targetValue} after save but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
+                    target.Id, target.Fields[targetField].Value, source.Id, source.Rev, sourceValue);
+                target.Fields[targetField].Value = sourceValue;
+                var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
+                target.Fields["System.ChangedDate"].Value = fixUpDate;
+                target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
+                targetWorkItem.SaveToAzureDevOps();
+                var floor = fixUpDate;
+                for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
+                {
+                    revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
+                    floor = revisionsToMigrate[i].ChangedDate;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
+                targetWorkItem.ToWorkItem().Reset();
+                throw new ClosedDateFixUpException($"Unable to apply fix-up save for ClosedDate on target #{targetWorkItem.Id}", ex);
+            }
         }
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
