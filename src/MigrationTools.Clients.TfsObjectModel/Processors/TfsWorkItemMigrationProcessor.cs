@@ -410,6 +410,7 @@ namespace MigrationTools.Processors
             if (string.IsNullOrEmpty(typeName)) return false;
             if (_targetTypeUsableCache.TryGetValue(typeName, out var cached)) return cached;
             bool usable = Target.WorkItems.Project.ToProject().WorkItemTypes.Contains(typeName);
+            bool lookupSucceeded = true;
             if (usable)
             {
                 try
@@ -425,10 +426,15 @@ namespace MigrationTools.Processors
                 }
                 catch (Exception ex)
                 {
-                    Log.LogDebug(ex, "Unable to determine whether work item type '{TypeName}' is disabled in the target; assuming it is enabled.", typeName);
+                    // Do not cache: a later work item can retry once REST recovers.
+                    lookupSucceeded = false;
+                    Log.LogWarning(ex, "Unable to determine whether work item type '{TypeName}' is disabled in the target; assuming it is enabled.", typeName);
                 }
             }
-            _targetTypeUsableCache[typeName] = usable;
+            if (lookupSucceeded)
+            {
+                _targetTypeUsableCache[typeName] = usable;
+            }
             return usable;
         }
 
@@ -813,6 +819,13 @@ namespace MigrationTools.Processors
                     if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(destType))
                     {
                         destType = CommonTools.WorkItemTypeMapping.Mappings[destType];
+                    }
+                    if (destType != targetWorkItem.Type && !IsWorkItemTypeUsableInTarget(destType))
+                    {
+                        // The revision's type is missing or disabled in the target (e.g. the shell fell back to the final type); keep the current type rather than patching to an unusable one.
+                        Log.LogWarning("Source work item {SourceId} revision {RevisionNumber} has type '{RevisionType}', which does not exist or is disabled in the target; keeping '{CurrentType}'.",
+                            sourceWorkItem.Id, revision.Number, destType, targetWorkItem.Type);
+                        destType = targetWorkItem.Type;
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 
