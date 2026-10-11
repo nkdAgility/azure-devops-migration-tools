@@ -881,16 +881,16 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    // #3171: State/Reason changes and field maps run before this point and can clear or
-                    // reset ClosedDate. Re-apply the source revision's value last, so it wins.
                     ApplySourceClosedDate(currentRevisionWorkItem, targetWorkItem);
                     CheckClosedDateIsValid(currentRevisionWorkItem, targetWorkItem);
 
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
-
+                        var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
                         targetWorkItem.SaveToAzureDevOps();
-                        EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revision);
+                        var nextIndex = revisionsToMigrate.IndexOf(revision) + 1;
+                        var nextRevision = nextIndex < revisionsToMigrate.Count ? revisionsToMigrate[nextIndex] : null;
+                        EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revision, nextRevision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
@@ -996,9 +996,11 @@ namespace MigrationTools.Processors
         /// <summary>
         /// After a revision is saved, if the stored ClosedDate does not match the source revision
         /// (for example the server applied the current date), write the source value in a fix-up save
-        /// impersonating the same revision author.
+        /// impersonating the author used for that save (after field maps). The fix-up is dated 1ms after
+        /// the revision; if the next revision would not be strictly later, it is pushed forward.
+        /// Failures are rethrown so the revision is not reported as saved.
         /// </summary>
-        private void EnsureClosedDateAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, RevisionItem revision)
+        private void EnsureClosedDateAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, RevisionItem revision, RevisionItem nextRevision, string savedChangedBy)
         {
             try
             {
@@ -1014,13 +1016,19 @@ namespace MigrationTools.Processors
                 Log.LogWarning("ClosedDate on target #{targetId} is {targetValue} after save but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
                     target.Id, target.Fields[targetField].Value, source.Id, source.Rev, sourceValue);
                 target.Fields[targetField].Value = sourceValue;
-                target.Fields["System.ChangedDate"].Value = revision.ChangedDate.AddMilliseconds(1);
-                target.Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value.ToString();
+                var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
+                target.Fields["System.ChangedDate"].Value = fixUpDate;
+                target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
                 targetWorkItem.SaveToAzureDevOps();
+                if (nextRevision != null && nextRevision.ChangedDate <= fixUpDate)
+                {
+                    nextRevision.ChangedDate = fixUpDate.AddMilliseconds(1);
+                }
             }
             catch (Exception ex)
             {
-                Log.LogWarning(ex, "Unable to apply fix-up save for ClosedDate on target #{targetId}", targetWorkItem.Id);
+                Log.LogError(ex, "Unable to apply fix-up save for ClosedDate on target #{targetId}", targetWorkItem.Id);
+                throw;
             }
         }
 
