@@ -1178,7 +1178,11 @@ namespace MigrationTools.Processors
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
 
                     // Attachments and links are saved with the revision where they changed in the source (#3192).
-                    ApplyRevisionAttachmentsAndLinks(previousSourceRevision, currentRevisionWorkItem, targetWorkItem, revision == lastRevision);
+                    // The last replayed revision is the source's latest, so use the work item's current attachments and
+                    // links for it. The per-revision view can miss removals when the source history is back-dated (for
+                    // example a source that was itself migrated), and this keeps the final state matching the source.
+                    var artifactSource = revision == lastRevision ? sourceWorkItem : currentRevisionWorkItem;
+                    ApplyRevisionAttachmentsAndLinks(previousSourceRevision, artifactSource, targetWorkItem, revision == lastRevision);
                     previousSourceRevision = currentRevisionWorkItem;
 
                     if (revision == lastRevision && Options.GenerateMigrationComment)
