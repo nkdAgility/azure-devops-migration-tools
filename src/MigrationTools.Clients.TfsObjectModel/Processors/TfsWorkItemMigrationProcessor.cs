@@ -1,4 +1,4 @@
-﻿using MigrationTools.Exceptions;
+using MigrationTools.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -152,6 +152,7 @@ namespace MigrationTools.Processors
                 //////////////////////////////////////////////////
                 CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
+                ValidateRevisionHistoryFields(sourceWorkItems);
                 //////////////////////////////////////////////////
 
                 contextLog.Information("Found target project as {@destProject}", Target.WorkItems.Project.Name);
@@ -354,6 +355,28 @@ namespace MigrationTools.Processors
             }
             Log.LogInformation("------------------------------------");
             Log.LogInformation("[/ValidateWorkItemTypes]");
+        }
+
+        // Opt-in pre-flight check for fields that exist only in revision history (#3194); the run-time
+        // MissingTargetFieldTracker summary still reports them when this is off.
+        private void ValidateRevisionHistoryFields(List<WorkItemData> sourceWorkItems)
+        {
+            var validator = CommonTools.WorkItemTypeValidatorTool;
+            if (!validator.Enabled || !validator.ScanRevisionHistoryForFields)
+            {
+                return;
+            }
+            Log.LogInformation("[ValidateRevisionHistoryFields]");
+            var sourceWits = Source.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().ToList();
+            var targetWits = Target.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().ToList();
+            bool isValid = validator.ValidateRevisionHistoryFields(sourceWorkItems, sourceWits, targetWits);
+            if (!isValid && validator.StopIfHistoryOnlyFieldsFound)
+            {
+                Log.LogError("History-only fields were found and '{option}' is true, so the migration will stop now.",
+                    nameof(TfsWorkItemTypeValidatorToolOptions.StopIfHistoryOnlyFieldsFound));
+                throw new MigrationRunStoppedException("Validation of revision history fields failed.");
+            }
+            Log.LogInformation("[/ValidateRevisionHistoryFields]");
         }
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)

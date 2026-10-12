@@ -161,6 +161,24 @@ When validation fails, the migration process stops immediately with exit code -1
 
 The tool provides comprehensive logging including field types, allowed values, and suggested mappings to help troubleshoot validation issues.
 
+### History-only fields
+
+Type validation compares only the current work item type definitions. A field can still have values in older revisions after an item was moved from another project or process, or after the field was removed from the type. Those values are dropped during migration, and field maps cannot read them, because maps validate against the current source type.
+
+Set `ScanRevisionHistoryForFields` to `true` to scan every revision of the items returned by the `TfsWorkItemMigrationProcessor` query before migration starts. The scan uses revisions already loaded by the query, so it makes no extra server calls, but it adds time on large projects. It is off by default. Each history-only field is reported once per source and target type pair, with revision and work item counts and sample IDs.
+
+By default the findings are warnings and the migration continues. Set `StopIfHistoryOnlyFieldsFound` to `true` to stop instead. To keep the data, add the field to the target work item type. To accept the loss, list the field in `ExcludeSourceFields`; excluded fields are still logged, as information.
+
+```json
+"TfsWorkItemTypeValidatorTool": {
+  "Enabled": true,
+  "ScanRevisionHistoryForFields": true,
+  "StopIfHistoryOnlyFieldsFound": true
+}
+```
+
+When the scan is off, the same fields are still reported during the run and in the summary at the end of it.
+
 {{< class-metadata >}}
 
 ## Schema

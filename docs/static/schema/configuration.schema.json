@@ -2539,6 +2539,16 @@
                       "type": "string"
                     }
                   ]
+                },
+                "ScanRevisionHistoryForFields": {
+                  "description": "If `true`, before migration starts every revision of the work items returned by the\r\n processor's query is scanned for fields that have a value but exist only in revision history (they are on\r\n neither the current source work item type nor the target type, for example because the item was moved from\r\n another project or process). These values cannot be migrated, and field maps cannot read them.\r\n The scan uses revisions already loaded by the query, but it adds time on large projects, so it is off by default.",
+                  "type": "boolean",
+                  "default": "false"
+                },
+                "StopIfHistoryOnlyFieldsFound": {
+                  "description": "If `true` and `ScanRevisionHistoryForFields` finds history-only fields that are\r\n not excluded by `ExcludeSourceFields`, the migration stops before any work item is migrated.\r\n If `false`, the fields are logged as warnings and the migration continues.",
+                  "type": "boolean",
+                  "default": "false"
                 }
               }
             },

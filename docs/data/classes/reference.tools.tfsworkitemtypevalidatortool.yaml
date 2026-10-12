@@ -57,7 +57,9 @@ configurationSamples:
           "Microsoft.VSTS.Common.AcceptanceCriteria",
           "Microsoft.VSTS.Scheduling.Effort"
         ]
-      }
+      },
+      "ScanRevisionHistoryForFields": false,
+      "StopIfHistoryOnlyFieldsFound": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemTypeValidatorToolOptions
 description: >-
@@ -105,6 +107,26 @@ options:
   defaultValue: null
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: ScanRevisionHistoryForFields
+  type: Boolean
+  description: >-
+    If `true`, before migration starts every revision of the work items returned by the
+     processor's query is scanned for fields that have a value but exist only in revision history (they are on
+     neither the current source work item type nor the target type, for example because the item was moved from
+     another project or process). These values cannot be migrated, and field maps cannot read them.
+     The scan uses revisions already loaded by the query, but it adds time on large projects, so it is off by default.
+  defaultValue: false
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: StopIfHistoryOnlyFieldsFound
+  type: Boolean
+  description: >-
+    If `true` and `ScanRevisionHistoryForFields` finds history-only fields that are
+     not excluded by `ExcludeSourceFields`, the migration stops before any work item is migrated.
+     If `false`, the fields are logged as warnings and the migration continues.
+  defaultValue: false
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemTypeValidatorTool.cs
