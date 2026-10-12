@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,16 @@ namespace MigrationTools.Tools
     /// </summary>
     public class TfsWorkItemLinkTool : Tool<TfsWorkItemLinkToolOptions>
     {
+        private bool _inline;
+
+        private bool SaveAfterEachLink => Options.SaveAfterEachLinkIsAdded && !_inline;
+
+        /// <summary>
+        /// True when the last inline <see cref="Enrich"/> skipped a child link because the target was not saved yet and the
+        /// child already has another parent. Call <see cref="Enrich"/> again (not inline) after saving the target (#3192).
+        /// </summary>
+        public bool HasDeferredLinks { get; private set; }
+
         /// <summary>
         /// Initializes a new instance of the TfsWorkItemLinkTool class.
         /// </summary>
@@ -38,9 +49,14 @@ namespace MigrationTools.Tools
         /// <param name="processor">The TFS processor performing the migration</param>
         /// <param name="sourceWorkItemLinkStart">The source work item containing links to migrate</param>
         /// <param name="targetWorkItemLinkStart">The target work item to receive the links</param>
+        /// <param name="inline">
+        /// True when called during revision replay (#3192): the links are saved as part of the revision being replayed,
+        /// so nothing is saved here (SaveAfterEachLinkIsAdded is ignored), the target may not have been saved yet,
+        /// and a child link is added on the target itself rather than by saving the child.
+        /// </param>
         /// <returns>The number of links processed</returns>
         /// <exception cref="ArgumentNullException">Thrown when source or target work items are null</exception>
-        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart, bool inline = false)
         {
             if (sourceWorkItemLinkStart is null)
             {
@@ -50,7 +66,9 @@ namespace MigrationTools.Tools
             {
                 throw new ArgumentNullException(nameof(targetWorkItemLinkStart));
             }
-            if (targetWorkItemLinkStart.Id == "0")
+            _inline = inline;
+            HasDeferredLinks = false;
+            if (targetWorkItemLinkStart.Id == "0" && !inline)
             {
                 Log.LogWarning("TfsWorkItemLinkTool::Enrich: Target work item must be saved before you can add a link: exiting Link Migration");
                 return 0;
@@ -91,19 +109,19 @@ namespace MigrationTools.Tools
                     catch (WorkItemLinkValidationException ex)
                     {
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
-                        targetWorkItemLinkStart.ToWorkItem().Reset();
+                        if (!_inline) targetWorkItemLinkStart.ToWorkItem().Reset(); // inline: keep the revision's pending changes
                         Log.LogError(ex, "[WorkItemLinkValidationException] Adding link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                     catch (FormatException ex)
                     {
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
-                        targetWorkItemLinkStart.ToWorkItem().Reset();
+                        if (!_inline) targetWorkItemLinkStart.ToWorkItem().Reset(); // inline: keep the revision's pending changes
                         Log.LogError(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                     catch (UnexpectedErrorException ex)
                     {
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
-                        targetWorkItemLinkStart.ToWorkItem().Reset();
+                        if (!_inline) targetWorkItemLinkStart.ToWorkItem().Reset(); // inline: keep the revision's pending changes
                         Log.LogError(ex, "[UnexpectedErrorException] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
                     }
                 }
@@ -150,7 +168,7 @@ namespace MigrationTools.Tools
                 }
             }
 
-            if (wiTargetL.ToWorkItem().IsDirty && Options.SaveAfterEachLinkIsAdded)
+            if (wiTargetL.ToWorkItem().IsDirty && SaveAfterEachLink)
             {
                 wiTargetL.SaveToAzureDevOps();
             }
@@ -188,7 +206,7 @@ namespace MigrationTools.Tools
                 }
             }
 
-            if (wiTargetL.ToWorkItem().IsDirty && Options.SaveAfterEachLinkIsAdded)
+            if (wiTargetL.ToWorkItem().IsDirty && SaveAfterEachLink)
             {
                 wiTargetL.SaveToAzureDevOps();
             }
@@ -211,7 +229,7 @@ namespace MigrationTools.Tools
                 // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                 // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                 // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-                if (Options.SaveAfterEachLinkIsAdded)
+                if (SaveAfterEachLink)
                 {
                     try
                     {
@@ -327,13 +345,26 @@ namespace MigrationTools.Tools
 
                         WorkItemLinkTypeEnd linkTypeEnd = client.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetR.Id));
+                        RelatedLink childParentLink = null;
                         if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
                         {
-                            var potentialParentConflictLink = ( // TF201036: You cannot add a Child link between work items xxx and xxx because a work item can have only one Parent link.
+                            childParentLink = ( // TF201036: You cannot add a Child link between work items xxx and xxx because a work item can have only one Parent link.
                                     from Link l in wiTargetR.ToWorkItem().Links
                                     where l is RelatedLink
                                         && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
                                     select (RelatedLink)l).SingleOrDefault();
+                            if (_inline && childParentLink != null && wiTargetL.Id == "0")
+                            {
+                                Log.LogWarning("  [DEFER] Child {wiTargetR} already has another parent and {wiSourceL} is not saved yet; the link will be added after this revision is saved.", wiTargetR.Id, wiSourceL.Id);
+                                HasDeferredLinks = true;
+                                return;
+                            }
+                        }
+                        if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward" && (!_inline || childParentLink != null))
+                        {
+                            // Saving the child creates a revision on it dated now, so during replay this is only
+                            // done when the child already has another parent that must be removed first.
+                            var potentialParentConflictLink = childParentLink;
                             if (potentialParentConflictLink != null)
                             {
                                 wiTargetR.ToWorkItem().Links.Remove(potentialParentConflictLink);
@@ -366,7 +397,7 @@ namespace MigrationTools.Tools
                             // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                             // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                             // wiTargetL.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-                            if (Options.SaveAfterEachLinkIsAdded)
+                            if (SaveAfterEachLink)
                             {
                                 wiTargetL.SaveToAzureDevOps();
                             }
@@ -397,6 +428,74 @@ namespace MigrationTools.Tools
             else
             {
                 Log.LogWarning("[SKIP] [LINK_CAPTURE_RELATED] [{RegisteredLinkType}] target not found. wiSourceL={wiSourceL}, wiSourceR={wiSourceR}, wiTargetL={wiTargetL}", rl.ArtifactLinkType.GetType().Name, wiSourceL == null ? "null" : wiSourceL.Id, wiSourceR == null ? "null" : wiSourceR.Id, wiTargetL == null ? "null" : wiTargetL.Id);
+            }
+        }
+
+        /// <summary>
+        /// Removes from the target the links that correspond to the given source links.
+        /// Used during revision replay (#3192) to remove a link at the revision where it was removed in the source.
+        /// Does not save the target. Git links rewritten by the git repository tool are matched by their rewritten URI.
+        /// </summary>
+        public void RemoveLinks(TfsProcessor processor, WorkItemData sourceWorkItem, IEnumerable<Link> removedSourceLinks, WorkItemData target)
+        {
+            if (target is null) throw new ArgumentNullException(nameof(target));
+            var targetLinks = target.ToWorkItem().Links;
+            foreach (Link sourceLink in removedSourceLinks)
+            {
+                Link match = null;
+                try
+                {
+                    if (sourceLink is Hyperlink hl)
+                    {
+                        var key = RevisionArtifactDiff.HyperlinkKey(GetAbsoluteUri(hl) ?? hl.Location);
+                        match = targetLinks.OfType<Hyperlink>().FirstOrDefault(t => RevisionArtifactDiff.HyperlinkKey(GetAbsoluteUri(t) ?? t.Location) == key);
+                    }
+                    else if (sourceLink is ExternalLink el)
+                    {
+                        var key = RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri);
+                        match = targetLinks.OfType<ExternalLink>().FirstOrDefault(t => RevisionArtifactDiff.ExternalLinkKey(t.LinkedArtifactUri) == key);
+                        if (match == null)
+                        {
+                            // Git links are rewritten to the target repository, so look for the rewritten URI.
+                            var targetUri = Services.GetRequiredService<TfsGitRepositoryTool>().GetTargetUri(processor, sourceWorkItem, el);
+                            if (targetUri != null)
+                            {
+                                var mappedKey = RevisionArtifactDiff.ExternalLinkKey(targetUri);
+                                match = targetLinks.OfType<ExternalLink>().FirstOrDefault(t => RevisionArtifactDiff.ExternalLinkKey(t.LinkedArtifactUri) == mappedKey);
+                            }
+                        }
+                    }
+                    else if (sourceLink is RelatedLink rl && rl.LinkTypeEnd != null)
+                    {
+                        var wiSourceR = processor.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                        var wiTargetR = wiSourceR == null ? null : GetRightHandSideTargetWi(processor, wiSourceR, target);
+                        if (wiTargetR != null)
+                        {
+                            match = targetLinks.OfType<RelatedLink>().FirstOrDefault(t =>
+                                t.RelatedWorkItemId.ToString() == wiTargetR.Id
+                                && t.LinkTypeEnd != null
+                                && t.LinkTypeEnd.ImmutableName == rl.LinkTypeEnd.ImmutableName);
+                        }
+                    }
+                }
+                catch (MigrationRunStoppedException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Log.LogWarning(ex, "  [SKIP] Unable to find the target link to remove for {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
+                    continue;
+                }
+                if (match != null)
+                {
+                    Log.LogInformation("  [REMOVE] Removing {SourceLinkType} from {TargetId} as it was removed in the source", sourceLink.GetType().Name, target.Id);
+                    targetLinks.Remove(match);
+                }
+                else
+                {
+                    Log.LogDebug("  [REMOVE-SKIP] {SourceLinkType} removed in the source was not found on {TargetId}", sourceLink.GetType().Name, target.Id);
+                }
             }
         }
 
@@ -465,7 +564,7 @@ namespace MigrationTools.Tools
             // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
             // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
             // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-            if (Options.SaveAfterEachLinkIsAdded)
+            if (SaveAfterEachLink)
             {
                 target.SaveToAzureDevOps();
             }
