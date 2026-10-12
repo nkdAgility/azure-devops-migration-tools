@@ -2231,7 +2231,7 @@
                   "default": "true"
                 },
                 "Mappings": {
-                  "description": "Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration.",
+                  "description": "Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration. Keys may be a repository name (\"Repo\") or a project-qualified name (\"Project/Repo\"); the qualified form takes precedence. Repositories referenced from other (or renamed) projects are resolved by repository ID and rewritten when mapped here or when the target project contains a repository with the same name.",
                   "type": "object",
                   "default": "{}",
                   "additionalProperties": {

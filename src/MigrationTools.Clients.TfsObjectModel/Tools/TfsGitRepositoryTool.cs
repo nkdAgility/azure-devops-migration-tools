@@ -201,7 +201,7 @@ namespace MigrationTools.Tools
                             }
                             else
                             {
-                                Log.LogWarning("GitRepositoryEnricher: Target Repo not found. Cannot map {SourceRepoUrl} to ???", sourceRepoInfo.GitRepo.RemoteUrl);
+                                ReportUnresolved(sourceRepoInfo, $"target repo \"{targetRepoName}\" not found");
                             }
                         }
                     }
@@ -250,20 +250,35 @@ namespace MigrationTools.Tools
         /// <summary>Repositories that could not be resolved, with the number of links referencing each.</summary>
         public IReadOnlyDictionary<string, int> UnresolvedRepos => _unresolvedRepos;
 
-        private void ReportUnresolved(TfsGitRepositoryInfo info)
+        private void ReportUnresolved(TfsGitRepositoryInfo info, string reason = "source repo not resolved")
         {
             string key = info?.GitRepo != null
                 ? $"{info.GitRepo.ProjectReference?.Name}/{info.GitRepo.Name}"
                 : $"unknown repo id {info?.RepoID ?? "(none)"}";
+            key = $"{key} ({reason})";
             _unresolvedRepos.TryGetValue(key, out int seen);
             _unresolvedRepos[key] = seen + 1;
             if (seen == 0)
             {
-                Log.LogWarning("GitRepositoryEnricher: Could not find source git repo - repo referenced: {RepoReference}. Add a Mapping for the repo name (or \"Project/Repo\") to rewrite these links. Further links to this repo are logged at Debug.", key);
+                Log.LogWarning("GitRepositoryEnricher: Could not rewrite git links - {RepoReference}. Add a Mapping for the repo name (or \"Project/Repo\") to rewrite these links. Further links to this repo are logged at Debug.", key);
             }
             else
             {
-                Log.LogDebug("GitRepositoryEnricher: Could not find source git repo - repo referenced: {RepoReference} ({Count} links so far)", key, seen + 1);
+                Log.LogDebug("GitRepositoryEnricher: Could not rewrite git links - {RepoReference} ({Count} links so far)", key, seen + 1);
+            }
+        }
+
+        /// <summary>Logs one line per unresolved repository with its link count. Call once at the end of a run.</summary>
+        public void LogUnresolvedSummary()
+        {
+            if (_unresolvedRepos.Count == 0)
+            {
+                return;
+            }
+            Log.LogWarning("GitRepositoryEnricher: {RepoCount} git repo reference(s) could not be resolved; their links were left unchanged:", _unresolvedRepos.Count);
+            foreach (var kv in _unresolvedRepos.OrderByDescending(kv => kv.Value))
+            {
+                Log.LogWarning("  {RepoReference}: {LinkCount} link(s)", kv.Key, kv.Value);
             }
         }
 

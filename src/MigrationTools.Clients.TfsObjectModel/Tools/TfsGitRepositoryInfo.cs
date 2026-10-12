@@ -115,10 +115,12 @@ namespace MigrationTools.Tools
 
         internal static TfsGitRepositoryInfo Create(string targetRepoName, TfsGitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos)
         {
-            var gitRepo = (from g in targetRepos
+            // Names are unique within a project but not across a collection; treat an ambiguous name as not found.
+            var matches = (from g in targetRepos
                            where
                                g.Name == targetRepoName
-                           select g).SingleOrDefault();
+                           select g).Take(2).ToList();
+            var gitRepo = matches.Count == 1 ? matches[0] : null;
             return new TfsGitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo?.Id.ToString(), gitRepo);
         }
     }
