@@ -56,6 +56,21 @@ The `WorkItemMigrationContext` processor is used for migrating work items from o
 
 Overall, the `WorkItemMigrationContext` processor is a comprehensive tool for transferring work items and their associated data and metadata between Azure DevOps instances. It should be used whenever there is a need to move work items between instances while preserving as much information as possible.
 
+## How revisions, attachments and links are saved
+
+Each source revision is replayed as one target revision, with the source revision's `ChangedBy` and `ChangedDate`. Attachments and links are saved as part of the revision where they were added or removed in the source, so the migration does not add revisions dated after the source history:
+
+- **Attachments** and **links** (hyperlinks, external and Git links, work item links) are added and removed at the matching revision.
+- **Links to work items that are not migrated yet** are added later, from the other work item, when that one is migrated.
+- **The migration comment** (`GenerateMigrationComment`) is added to the History of the last replayed revision.
+- **Re-running** against work items that are already migrated adds no revisions unless something is missing. If something is, it is saved as the last author, one second after the last revision.
+
+### Known limitations
+
+- **Azure DevOps shows back-dated additions at revision 1.** When a revision's `ChangedDate` is set in the past, the work item history (and the `updates`/`revisions` REST APIs) list every *added* attachment and link under the first revision. The data itself is correct: each relation keeps the date of the revision it was added in. Removals are shown at the right revision. This is a service behaviour and cannot be changed by the tool.
+- **A source that was itself migrated with back-dated history** has the same problem in its revision view, so attachment and link changes for it may not be placed at the right revision.
+- **"Copy current user" rules overwrite identity fields.** Azure DevOps applies inherited process rules such as *"When State is Done, copy the current user to Assigned To"* on every save, even with `BypassRules` and even when the field value is sent. The migrated revision then shows the account running the migration. Disable these rules in the target process while you migrate, and turn them back on afterwards. The processor logs a warning at start-up for each rule of this kind it finds on the target work item types.
+
 ---
 
 ## WIQL Query

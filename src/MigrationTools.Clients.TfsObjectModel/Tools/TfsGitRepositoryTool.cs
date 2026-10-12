@@ -199,6 +199,15 @@ namespace MigrationTools.Tools
             dropLink = false;
             linkTypeId = null;
             var changeSetMappings = Services.GetRequiredService<TfsChangeSetMappingTool>();
+
+            // During revision replay (#3192) this runs on every revision that adds links, so links already rewritten to
+            // a target repository (and not also a source repository) are left alone instead of being re-mapped.
+            var targetRepoOfLink = TfsGitRepositoryInfo.Create(el, targetRepos, changeSetMappings, _processor.Target.Options.Project);
+            if (targetRepoOfLink?.GitRepo != null && !sourceRepos.Any(r => r.Id == targetRepoOfLink.GitRepo.Id))
+            {
+                return null;
+            }
+
             TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, changeSetMappings, sourceProjectName);
 
             // if sourceRepo is null ignore this link and keep processing further links

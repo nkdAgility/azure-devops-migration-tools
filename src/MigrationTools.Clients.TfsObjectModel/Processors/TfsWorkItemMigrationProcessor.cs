@@ -125,6 +125,8 @@ namespace MigrationTools.Processors
 
             ValidateWorkItemTypes();
 
+            WarnOnCurrentUserRules();
+
             ValidateProject();
 
             CommonTools.NodeStructure.ProcessorExecutionBegin(this);
@@ -354,6 +356,66 @@ namespace MigrationTools.Processors
             }
             Log.LogInformation("------------------------------------");
             Log.LogInformation("[/ValidateWorkItemTypes]");
+        }
+
+        /// <summary>
+        /// Warns about target process rules that copy the current user into an identity field. Azure DevOps applies them
+        /// on every save, even with BypassRules, so replayed revisions would show the migration account (#2869).
+        /// Only inherited processes are checked; any failure is logged and the migration continues.
+        /// </summary>
+        private void WarnOnCurrentUserRules()
+        {
+            var token = Target.Options.Authentication?.AccessToken;
+            if (string.IsNullOrEmpty(token))
+            {
+                Log.LogDebug("WarnOnCurrentUserRules: no target PAT, skipping the process rule check.");
+                return;
+            }
+            try
+            {
+                var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token));
+                var project = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
+                    .GetProject(Target.Options.Project).Result;
+                var properties = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
+                    .GetProjectPropertiesAsync(project.Id, new[] { "System.ProcessTemplateType" }).Result;
+                var processIdValue = properties.FirstOrDefault()?.Value?.ToString();
+                if (!Guid.TryParse(processIdValue, out var processId))
+                {
+                    Log.LogDebug("WarnOnCurrentUserRules: could not read the target process id, skipping.");
+                    return;
+                }
+                var processClient = connection.GetClient<Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.WorkItemTrackingProcessHttpClient>();
+                var rules = new List<ProcessRuleInfo>();
+                foreach (var wit in processClient.GetProcessWorkItemTypesAsync(processId).Result)
+                {
+                    foreach (var rule in processClient.GetProcessWorkItemTypeRulesAsync(processId, wit.ReferenceName).Result)
+                    {
+                        rules.Add(new ProcessRuleInfo
+                        {
+                            WorkItemType = wit.Name,
+                            RuleName = rule.Name,
+                            IsDisabled = rule.IsDisabled,
+                            IsCustom = rule.CustomizationType != Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.Models.CustomizationType.System,
+                            Actions = (rule.Actions ?? Enumerable.Empty<Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.Models.RuleAction>())
+                                .Select(a => new ProcessRuleActionInfo { ActionType = a.ActionType.ToString(), TargetField = a.TargetField })
+                                .ToList()
+                        });
+                    }
+                }
+                var fieldDefinitions = ((TfsWorkItemMigrationClient)Target.WorkItems).Store.FieldDefinitions;
+                var findings = CurrentUserRuleCheck.Find(rules,
+                    field => fieldDefinitions.Contains(field) && fieldDefinitions[field].IsIdentity);
+                Log.LogDebug("WarnOnCurrentUserRules: checked {RuleCount} rules in process {ProcessId}; {FindingCount} copy the current user into an identity field.", rules.Count, processId, findings.Count);
+                foreach (var f in findings)
+                {
+                    Log.LogWarning("Target process rule '{RuleName}' on '{WorkItemType}' copies the current user into {Field}. Azure DevOps applies it on every save, even with BypassRules, so migrated revisions will show the migration account in that field. Disable the rule in the target process while migrating, then re-enable it.",
+                        f.RuleName, f.WorkItemType, f.Field);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogDebug(ex, "WarnOnCurrentUserRules: unable to read the target process rules; skipping the check.");
+            }
         }
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
