@@ -560,7 +560,10 @@ namespace MigrationTools.Processors
                     continue;
                 }
                 // Fields pre-populated on the shell (e.g. System.CreatedBy) may be read-only below, so map them here.
-                CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
+                if (!_ignore.Contains(f.ReferenceName))
+                {
+                    CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
+                }
                 var sourceFieldValue = CommonTools.UserMapping.MapUserIdentityValue(f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value);
                 if (!_ignore.Contains(f.ReferenceName) &&
                     (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable)
