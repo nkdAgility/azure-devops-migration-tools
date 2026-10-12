@@ -60,7 +60,7 @@ options:
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Mappings
   type: Dictionary
-  description: Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration.
+  description: Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration. Keys may be a repository name ("Repo") or a project-qualified name ("Project/Repo"); the qualified form takes precedence. Repositories referenced from other (or renamed) projects are resolved by repository ID and rewritten when mapped here or when the target project contains a repository with the same name.
   defaultValue: '{}'
   isRequired: false
   dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

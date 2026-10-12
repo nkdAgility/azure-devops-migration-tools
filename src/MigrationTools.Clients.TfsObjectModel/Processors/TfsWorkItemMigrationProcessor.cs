@@ -253,7 +253,7 @@ namespace MigrationTools.Processors
                 {
                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
                 }
-
+                CommonTools.GitRepository?.LogUnresolvedSummary();
 
                 if (_itemsInError.Count > 0)
                 {

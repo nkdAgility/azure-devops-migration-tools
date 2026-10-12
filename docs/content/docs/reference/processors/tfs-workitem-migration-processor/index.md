@@ -138,6 +138,12 @@ A complete list of [FieldMaps]({{< ref "docs/reference/field-maps" >}}) is avail
 
 > Note: These mappings could also be achieved with other forms of Field mapper e.g. `RegexFieldMapConfig`, but the value mapper as an example is easy to understand
 
+## Identity Fields
+
+Earlier versions saved each work item again as `Migration` after the replay, to add attachments, links and the migration comment, and process rules could then overwrite identity fields such as `System.AssignedTo`, `Microsoft.VSTS.Common.ResolvedBy` and `Microsoft.VSTS.Common.ClosedBy` with the account running the migration. Those saves no longer happen (see [How revisions, attachments and links are saved](#how-revisions-attachments-and-links-are-saved)), so every target revision keeps the source revision's author.
+
+Process rules that *copy the current user* into an identity field still apply on every save, even with `BypassRules`, so the migration account can appear in that field on the revisions where the rule's condition holds. The processor warns about each such rule at start-up; disable them in the target process while migrating. If you still see identity fields set to the migration account, also check the [TfsUserMappingTool]({{< ref "docs/reference/tools/tfsusermappingtool" >}}) configuration.
+
 ## Removed Properties
 
 - PrefixProjectToNodes - This option was removed in favour of the Area and Iteration Maps on [TfsNodeStructure]({{< ref "docs/reference/tools/tfsnodestructuretool" >}})

@@ -30,6 +30,20 @@ class Program
 
         string dir = AppDomain.CurrentDomain.BaseDirectory;
         Console.WriteLine(dir);
+
+        // MigrationTools.Clients.TfsObjectModel targets net472 and references the .NET Framework builds of
+        // Microsoft.Extensions.* (assembly version 9.0.0.x), while this net8.0 host ships 9.0.0.0. The runtime
+        // refuses to bind a request for a higher version, so resolve by simple name from the output folder.
+        System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += (context, name) =>
+        {
+            var loaded = context.Assemblies.FirstOrDefault(a => a.GetName().Name == name.Name);
+            if (loaded != null)
+            {
+                return loaded;
+            }
+            string candidate = System.IO.Path.Combine(dir, name.Name + ".dll");
+            return File.Exists(candidate) ? context.LoadFromAssemblyPath(candidate) : null;
+        };
         AppDomain currentDomain = AppDomain.CurrentDomain;
         currentDomain.Load("MigrationTools");
         currentDomain.Load("MigrationTools.Clients.TfsObjectModel");
