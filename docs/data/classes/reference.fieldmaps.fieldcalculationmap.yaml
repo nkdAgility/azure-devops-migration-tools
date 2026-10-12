@@ -59,7 +59,7 @@ configurationSamples:
     {
       "$type": "FieldCalculationMapOptions",
       "expression": "[effort] * [rate]",
-      "parsingFallback": 0,
+      "parsingFallback": "RaiseError",
       "parameters": {
         "effort": "Custom.EstimatedHours",
         "rate": "Custom.HourlyRate"

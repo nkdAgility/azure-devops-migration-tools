@@ -31,12 +31,17 @@ class Program
         string dir = AppDomain.CurrentDomain.BaseDirectory;
         Console.WriteLine(dir);
 
-        // MigrationTools.Clients.TfsObjectModel is built for net472, where Microsoft.Extensions.* 9.0.x
-        // assemblies carry the patch in their version (e.g. 9.0.0.10), while the net8.0 copies are 9.0.0.0.
-        // .NET does not bind a higher requested version to a lower one, so fall back to the local copy by name.
+        // MigrationTools.Clients.TfsObjectModel targets net472 and references the .NET Framework builds of
+        // Microsoft.Extensions.* (assembly version 9.0.0.x), while this net8.0 host ships 9.0.0.0. The runtime
+        // refuses to bind a request for a higher version, so resolve by simple name from the output folder.
         System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += (context, name) =>
         {
-            string candidate = Path.Combine(dir, name.Name + ".dll");
+            var loaded = context.Assemblies.FirstOrDefault(a => a.GetName().Name == name.Name);
+            if (loaded != null)
+            {
+                return loaded;
+            }
+            string candidate = System.IO.Path.Combine(dir, name.Name + ".dll");
             return File.Exists(candidate) ? context.LoadFromAssemblyPath(candidate) : null;
         };
         AppDomain currentDomain = AppDomain.CurrentDomain;
@@ -44,6 +49,10 @@ class Program
         currentDomain.Load("MigrationTools.Clients.TfsObjectModel");
         currentDomain.Load("MigrationTools.Clients.AzureDevops.Rest");
         currentDomain.Load("MigrationTools.Clients.FileSystem");
+        //currentDomain.Load("Microsoft.Extensions.Options");
+
+        Assembly assembly = Assembly.LoadFrom(System.IO.Path.Combine(dir, "Microsoft.Extensions.Options.dll"));
+
 
         Console.WriteLine("Assemblies");
 

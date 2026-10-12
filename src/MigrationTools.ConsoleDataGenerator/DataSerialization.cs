@@ -630,6 +630,7 @@ namespace MigrationTools.ConsoleDataGenerator
     public class ConditionalTypeConverter : JsonConverter
     {
         private readonly Type _typeToInclude;
+        private static readonly JsonSerializer EnumAsStringSerializer = JsonSerializer.Create(new JsonSerializerSettings { Converters = { new Newtonsoft.Json.Converters.StringEnumConverter() } });
 
         public ConditionalTypeConverter(Type typeToInclude)
         {
@@ -643,7 +644,8 @@ namespace MigrationTools.ConsoleDataGenerator
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            JObject jo = JObject.FromObject(value);
+            // A separate serializer (not the outer one, which would re-enter this converter) that writes enum names.
+            JObject jo = JObject.FromObject(value, EnumAsStringSerializer);
 
             // Include $type only if the object is of the specified type
             if (value.GetType() == _typeToInclude)
