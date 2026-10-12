@@ -260,6 +260,21 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod(), TestCategory("L0")]
+        // null and "" are rejected by the ExternalLink constructor itself, so whitespace is the blank value that can reach Create
+        [DataRow(" ")]
+        [DataRow("   ")]
+        public void Create_BlankArtifactUri_ShouldReturnNullWithoutThrowing(string uri)
+        {
+            Assert.IsNull(TfsGitRepositoryInfo.Create(CreateMockExternalLink(uri), new List<GitRepository>(), null, "Proj"));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void Create_NullExternalLink_ShouldReturnNullWithoutThrowing()
+        {
+            Assert.IsNull(TfsGitRepositoryInfo.Create(null, new List<GitRepository>(), null, "Proj"));
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void CreateFromGit_EmptyLink_ShouldReturnNull()
         {
             // Arrange
