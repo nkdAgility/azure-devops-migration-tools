@@ -530,21 +530,40 @@ namespace MigrationTools.Processors
         /// in historical revisions (e.g. items moved from another project or process) are not caught up front (#3173).
         /// The first occurrence is logged prominently and a summary is produced at the end of the run.
         /// </summary>
-        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision)
+        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision, bool fieldOnSourceType)
         {
-            // Field maps are applied later in the revision replay; a field they consume is not dropped.
-            if (IsSourceFieldHandledByFieldMap(sourceType, fieldReferenceName))
+            // Field maps are applied later in the revision replay; a field they consume is not dropped. Maps validate
+            // the source field against the current source type, so a history-only field is never handled by a map.
+            if (fieldOnSourceType && IsSourceFieldHandledByFieldMap(sourceType, fieldReferenceName))
             {
                 return;
             }
             if (_missingTargetFields.Record(sourceType, targetType, fieldReferenceName, sourceWorkItemId, sourceRevision))
             {
                 Log.LogWarning("Field '{MissingField}' has data in source revisions of type '{SourceType}' but does not exist on target type '{TargetType}'. "
-                    + "The value will NOT be migrated unless a field map handles it. This field may only exist in work item history "
-                    + "(e.g. the item was moved from another project/process), so it is not reported by TfsWorkItemTypeValidatorTool. "
-                    + "Add the field to the target type or configure a field map. A summary is logged at the end of the run.",
+                    + "The value will NOT be migrated. If the field is not on the current source type it only exists in work item history "
+                    + "(e.g. the item was moved from another project/process), so it is not reported by TfsWorkItemTypeValidatorTool "
+                    + "and field maps cannot read it. Add the field to the target type, or for a field on the source type configure a "
+                    + "field map for the source type. A summary is logged at the end of the run.",
                     fieldReferenceName, sourceType, targetType);
             }
+        }
+
+        private readonly Dictionary<string, HashSet<string>> _sourceTypeFields = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        // Revisions of an item moved between projects report the old project's type, so check the field against the
+        // type in the current source project, which is what field maps validate against.
+        private bool IsFieldOnCurrentSourceType(string sourceType, string fieldReferenceName)
+        {
+            if (!_sourceTypeFields.TryGetValue(sourceType, out var fields))
+            {
+                var witTypes = Source.WorkItems.Project.ToProject().WorkItemTypes;
+                fields = witTypes.Contains(sourceType)
+                    ? new HashSet<string>(witTypes[sourceType].FieldDefinitions.Cast<FieldDefinition>().Select(fd => fd.ReferenceName), StringComparer.OrdinalIgnoreCase)
+                    : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                _sourceTypeFields[sourceType] = fields;
+            }
+            return fields.Contains(fieldReferenceName);
         }
 
         private bool IsSourceFieldHandledByFieldMap(string sourceType, string fieldReferenceName)
@@ -560,7 +579,7 @@ namespace MigrationTools.Processors
                 return;
             }
             Log.LogWarning("{Count} source field(s) had values that were not migrated because the field does not exist on the target work item type "
-                + "(unless handled by a field map). These are not detected by work item type validation, which only checks current "
+                + "and no applicable field map handles them. These are not detected by work item type validation, which only checks current "
                 + "type definitions and not fields present in revision history:", _missingTargetFields.Count);
             foreach (var line in _missingTargetFields.GetSummary())
             {
@@ -608,7 +627,8 @@ namespace MigrationTools.Processors
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
-                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id, oldWorkItem.Revision);
+                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id, oldWorkItem.Revision,
+                            IsFieldOnCurrentSourceType(oldWorkItem.Type.Name, f.ReferenceName));
                         Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWorkItemData.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;
