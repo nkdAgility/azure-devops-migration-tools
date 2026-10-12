@@ -59,6 +59,8 @@ The important bits:
     "Processors": [
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "SourceName": "Source",
+        "TargetName": "Target",
         "Enabled": true,
         "UpdateCreatedDate": false,
         "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Case', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
@@ -92,6 +94,7 @@ The important bits:
 - Target ReflectedWorkItemIdField is a common field that is available on the non-customisable work items
 - Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only
 - The query includes only the Test items that we can migrate as work items (No Suites or Plans)
+- The work item type validator checks only those types, because the other types in the target may not have `Microsoft.VSTS.Build.IntegrationBuild`
 
 ```JSON
 {
@@ -124,11 +127,18 @@ The important bits:
     "Processors": [
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "SourceName": "Source",
+        "TargetName": "Target",
         "Enabled": true,
         "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Test Case','Shared Steps','Shared Parameter') ORDER BY [System.ChangedDate] desc"
       }
     ],
     "CommonTools": {
+      "TfsWorkItemTypeValidatorTool": {
+        "Enabled": true,
+        "ExcludeDefaultWorkItemTypes": false,
+        "IncludeWorkItemTypes": ["Test Case", "Shared Steps", "Shared Parameter"]
+      },
       "FieldMappingTool": {
         "Enabled": true,
         "FieldMaps": [
@@ -186,11 +196,14 @@ The important bits:
     "Processors": [
       {
         "ProcessorType": "TfsTestVariablesMigrationProcessor",
-        "Enabled": true,
-        "Processor": "TestVariablesMigrationContext"
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "Enabled": true
       },
       {
         "ProcessorType": "TfsTestConfigurationsMigrationProcessor",
+        "SourceName": "Source",
+        "TargetName": "Target",
         "Enabled": true
       }
     ]
@@ -240,8 +253,9 @@ The important bits:
       {
         "ProcessorType": "TfsTestPlansAndSuitesMigrationProcessor",
         "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
         "OnlyElementsWithTag": "",
-        "TestPlanQuery": null,
         "RemoveAllLinks": false,
         "MigrationDelay": 0,
         "RemoveInvalidTestSuiteLinks": false,
