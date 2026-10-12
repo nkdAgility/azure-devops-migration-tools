@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools {
