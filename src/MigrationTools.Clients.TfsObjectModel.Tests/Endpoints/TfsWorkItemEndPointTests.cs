@@ -6,6 +6,10 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Clients;
 using MigrationTools.DataContracts;
@@ -45,16 +49,25 @@ namespace MigrationTools.Endpoints.Tests
         {
             var endpoint = GetTfsWorkItemEndPoint();
             var result = endpoint.GetWorkItems().ToList();
-            AssertSourceProjectWorkItems(result);
+            AssertMatchesServer(result);
         }
 
-        // migrationSource1 is shared by e2e runs, so assert what the query guarantees rather than a fixed count
-        private static void AssertSourceProjectWorkItems(IList<WorkItemData> result)
+        private const string SourceProjectQuery = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = 'migrationSource1' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')";
+
+        // migrationSource1 is shared and its contents change, so the expected set comes from the server at test time
+        private static void AssertMatchesServer(IList<WorkItemData> result)
         {
-            Assert.IsTrue(result.Count > 0, "Expected work items in migrationSource1");
+            List<string> expectedIds;
+            using (var connection = new VssConnection(new Uri("https://dev.azure.com/nkdagility-preview/"), new VssBasicCredential(string.Empty, TestingConstants.AccessToken)))
+            using (var client = connection.GetClient<WorkItemTrackingHttpClient>())
+            {
+                expectedIds = client.QueryByWiqlAsync(new Wiql { Query = SourceProjectQuery }).Result.WorkItems.Select(r => r.Id.ToString()).ToList();
+            }
+
+            Assert.IsTrue(expectedIds.Count > 0, "Expected work items in migrationSource1");
+            CollectionAssert.AreEquivalent(expectedIds, result.Select(wi => wi.Id).ToList(), "Endpoint should return exactly the work items the server returns for the same query");
             Assert.IsTrue(result.All(wi => wi.ProjectName == "migrationSource1"), "Every work item should come from migrationSource1");
             Assert.IsFalse(result.Any(wi => wi.Type == "Test Suite" || wi.Type == "Test Plan"), "Test Suites and Test Plans should be excluded");
-            Assert.AreEqual(result.Count, result.Select(wi => wi.Id).Distinct().Count(), "Work item ids should be unique");
         }
 
         [TestMethod(), TestCategory("L3")]
@@ -67,8 +80,7 @@ namespace MigrationTools.Endpoints.Tests
                 Parameters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
             };
             var result = endpoint.GetWorkItems(qo).ToList();
-            AssertSourceProjectWorkItems(result);
-            CollectionAssert.AreEquivalent(endpoint.GetWorkItems().Select(wi => wi.Id).ToList(), result.Select(wi => wi.Id).ToList());
+            AssertMatchesServer(result);
         }
 
         protected TfsWorkItemEndpoint GetTfsWorkItemEndPoint(string key = "Source", TfsWorkItemEndpointOptions options = null)
