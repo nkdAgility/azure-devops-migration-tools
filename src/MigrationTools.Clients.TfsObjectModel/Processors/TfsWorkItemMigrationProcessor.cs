@@ -819,6 +819,8 @@ namespace MigrationTools.Processors
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                // Retries a fix-up that failed after its revision was saved on an earlier run.
+                                SetStateStampedDatesFromSource(sourceWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), "on the migrated item");
                                 StampCatchUpSave(targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
@@ -1303,31 +1305,8 @@ namespace MigrationTools.Processors
             try
             {
                 var target = targetWorkItem.ToWorkItem();
-                var source = sourceRevision.ToWorkItem();
-                var candidates = new List<(string Field, object SourceValue, object TargetValue)>();
-                var closedTargetField = GetClosedDateField(target);
-                var closedSourceField = closedTargetField == null ? null
-                    : source.Fields.Contains(closedTargetField) ? closedTargetField : GetClosedDateField(source);
-                if (closedSourceField != null)
-                {
-                    candidates.Add((closedTargetField, source.Fields[closedSourceField].Value, target.Fields[closedTargetField].Value));
-                }
-                foreach (var field in ClosedDateHelper.StateStampedDateFields)
-                {
-                    if (target.Fields.Contains(field) && source.Fields.Contains(field))
-                    {
-                        candidates.Add((field, source.Fields[field].Value, target.Fields[field].Value));
-                    }
-                }
-                var fixUps = ClosedDateHelper.FieldsNeedingFixUp(candidates);
-                if (fixUps.Count == 0) return;
+                if (!SetStateStampedDatesFromSource(sourceRevision.ToWorkItem(), target, "after save")) return;
 
-                foreach (var (field, sourceValue, targetValue) in candidates.Where(c => fixUps.Contains(c.Field)))
-                {
-                    Log.LogWarning("{field} on target #{targetId} is {targetValue} after save but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
-                        field, target.Id, targetValue, source.Id, source.Rev, sourceValue);
-                    target.Fields[field].Value = sourceValue;
-                }
                 var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
                 target.Fields["System.ChangedDate"].Value = fixUpDate;
                 target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
@@ -1345,6 +1324,37 @@ namespace MigrationTools.Processors
                 targetWorkItem.ToWorkItem().Reset();
                 throw new StateStampedDateFixUpException($"Unable to apply fix-up save for state-stamped dates on target #{targetWorkItem.Id}", ex);
             }
+        }
+
+        /// <summary>
+        /// Sets each state-stamped date (ClosedDate, ActivatedDate, ResolvedDate) on the target to the source value
+        /// where they differ, without saving. Returns true when any field was set.
+        /// </summary>
+        private bool SetStateStampedDatesFromSource(WorkItem source, WorkItem target, string when)
+        {
+            var candidates = new List<(string Field, object SourceValue, object TargetValue)>();
+            var closedTargetField = GetClosedDateField(target);
+            var closedSourceField = closedTargetField == null ? null
+                : source.Fields.Contains(closedTargetField) ? closedTargetField : GetClosedDateField(source);
+            if (closedSourceField != null)
+            {
+                candidates.Add((closedTargetField, source.Fields[closedSourceField].Value, target.Fields[closedTargetField].Value));
+            }
+            foreach (var field in ClosedDateHelper.StateStampedDateFields)
+            {
+                if (target.Fields.Contains(field) && source.Fields.Contains(field))
+                {
+                    candidates.Add((field, source.Fields[field].Value, target.Fields[field].Value));
+                }
+            }
+            var fixUps = ClosedDateHelper.FieldsNeedingFixUp(candidates);
+            foreach (var (field, sourceValue, targetValue) in candidates.Where(c => fixUps.Contains(c.Field)))
+            {
+                Log.LogWarning("{field} on target #{targetId} is {targetValue} {when} but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
+                    field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
+                target.Fields[field].Value = sourceValue;
+            }
+            return fixUps.Count > 0;
         }
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
