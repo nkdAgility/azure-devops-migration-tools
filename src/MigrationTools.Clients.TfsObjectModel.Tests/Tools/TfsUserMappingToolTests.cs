@@ -338,6 +338,39 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L1")]
+        public void ExportedDictionary_WithDuplicateDisplayNames_RoundTripsThroughMappingFile()
+        {
+            var jsOld = new IdentityItemData { DisplayName = "John Smith", AccountName = "john.smith@old.com" };
+            var js2Old = new IdentityItemData { DisplayName = "John Smith", AccountName = "jsmith@old.com" };
+            var janeOld = new IdentityItemData { DisplayName = "Jane Doe", AccountName = "jane.doe@old.com" };
+            var jsNew = new IdentityItemData { DisplayName = "John Smith", AccountName = "john.smith@new.com" };
+            var js2New = new IdentityItemData { DisplayName = "John Smith", AccountName = "jsmith@new.com" };
+            var janeNew = new IdentityItemData { DisplayName = "Jane D", AccountName = "jane.doe@new.com" };
+            var usersToMap = new List<IdentityMapData>
+            {
+                new() { Source = jsOld, Target = jsNew },
+                new() { Source = js2Old, Target = js2New },
+                new() { Source = janeOld, Target = janeNew },
+            };
+            var filePath = Path.Combine(_testDirectory, "exported-dictionary.json");
+            TfsUserMappingTool.SerializeUserMap(filePath,
+                MigrationTools.Processors.TfsExportUsersForMappingProcessor.BuildSimpleDictionary(
+                    MigrationTools.Processors.TfsExportUsersForMappingProcessor.SelectUsersToMap(
+                        new IdentityMapResult { IdentityMap = usersToMap, SourceUsers = [jsOld, js2Old, janeOld], TargetUsers = [jsNew, js2New, janeNew] }, detailed: false),
+                    [jsOld, js2Old, janeOld], [jsNew, js2New, janeNew]), _logger);
+
+            var map = CreateTool(filePath, useIdentityMapDataFormat: false).UserMappings.Value;
+
+            // The client object model returns "Display Name <unique name>" only for display names that are not unique.
+            Assert.AreEqual("John Smith <john.smith@new.com>", TfsUserIdentityReference.FindMappedTarget(map, "John Smith <john.smith@old.com>"));
+            Assert.AreEqual("John Smith <jsmith@new.com>", TfsUserIdentityReference.FindMappedTarget(map, "John Smith <JSmith@old.com>"));
+            Assert.AreEqual("Jane D", TfsUserIdentityReference.FindMappedTarget(map, "Jane Doe"));
+            Assert.IsNull(TfsUserIdentityReference.FindMappedTarget(map, "John Smith"));
+            Assert.IsTrue(TfsUserIdentityReference.IsAmbiguous(map, "John Smith"));
+            Assert.IsFalse(TfsUserIdentityReference.IsAmbiguous(map, "Jane Doe"));
+        }
+
+        [TestMethod, TestCategory("L1")]
         public void UserMappings_FlagOnWithExportedArrayFile_LoadsDetailedMappings()
         {
             var tool = CreateTool(WriteExportedIdentityMapFile(), useIdentityMapDataFormat: true);
@@ -529,6 +562,18 @@ namespace MigrationTools.Tests.Tools
             var result = TfsUserMappingTool.MatchSourceUsersToTarget(source, target, true, _logger);
 
             Assert.AreEqual("bob", result.Single().Target.AccountName);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void MatchSourceUsersToTarget_EmailDomainMapping_ResolvesDuplicateDisplayNamesAcrossDomainChange()
+        {
+            var source = new List<IdentityItemData> { User("Alice", "a2@old.com") };
+            var target = new List<IdentityItemData> { User("Alice", "a1@new.com", "a1"), User("Alice", "a2@new.com", "a2") };
+            var domains = new Dictionary<string, string> { { "old.com", "new.com" } };
+
+            var result = TfsUserMappingTool.MatchSourceUsersToTarget(source, target, true, _logger, domains);
+
+            Assert.AreEqual("a2", result.Single().Target.AccountName);
         }
 
         [TestMethod, TestCategory("L0")]
