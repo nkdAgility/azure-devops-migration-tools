@@ -90,6 +90,18 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
+        /// Returns true when a plain display name matches more than one <c>Display Name &lt;upn&gt;</c> key and no other key.
+        /// </summary>
+        public static bool IsAmbiguous(IDictionary<string, string> userMap, string sourceValue)
+        {
+            if (userMap == null || string.IsNullOrEmpty(sourceValue) || TryParse(sourceValue, out _, out _) || userMap.ContainsKey(sourceValue))
+            {
+                return false;
+            }
+            return userMap.Keys.Count(k => TryParse(k, out var name, out _) && string.Equals(name, sourceValue, StringComparison.OrdinalIgnoreCase)) > 1;
+        }
+
+        /// <summary>
         /// Returns the display names that occur more than once in <paramref name="users"/>, ignoring case.
         /// </summary>
         public static HashSet<string> DuplicateDisplayNames(IEnumerable<IdentityItemData> users)

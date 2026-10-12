@@ -93,6 +93,7 @@ The TFS User Mapping Tool supports several configuration options for flexible us
 - **MatchUsersByEmail**: Attempt automatic matching based on email addresses
 - **EmailDomainMappings**: Source-to-target email domain rewrites (e.g. `{ "old.com": "new.com" }`) used by MatchUsersByEmail for domain changes
 - **MatchUsersByEmailLocalPart**: With MatchUsersByEmail, fall back to matching the email local part (before `@`) when unique
+- **UseIdentityMapDataFormat**: Export and read the detailed Source/Target identity format instead of the display name dictionary
 - **SkipValidateAllUsersExistOrAreMapped**: Skip validation that all users are properly mapped
 - **ProjectCollectionValidUsersGroupName**: Group name for validating user membership
 
@@ -249,6 +250,11 @@ When `UseIdentityMapDataFormat` is enabled, the file can instead be a JSON array
 - Check file paths and accessibility
 - Ensure proper encoding for special characters in usernames
 - Verify source and target user format consistency
+
+**Users Sharing a Display Name:**
+
+- Write the mapping entries as `Display Name <upn>`; the ExportUsersForMapping processor does this for duplicated display names
+- A warning that a value `matches more than one 'Display Name <upn>' entry` means the work item value was a plain display name that fits several entries; add an entry for the plain display name or correct the duplicates
 
 **Performance Problems:**
 

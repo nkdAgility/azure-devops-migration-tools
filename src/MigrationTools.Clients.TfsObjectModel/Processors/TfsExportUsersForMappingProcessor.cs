@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -16,7 +16,8 @@ namespace MigrationTools.Processors
 {
     /// <summary>
     /// ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
-    /// Use `ExportUsersForMappingConfig` to configure.
+    /// Use `ExportUsersForMappingConfig` to configure. The file is written to the TfsUserMappingTool UserMappingFile; display names
+    /// shared by more than one user are written as the display name followed by the UPN in angle brackets so that each entry identifies one user.
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Items</processingtarget>

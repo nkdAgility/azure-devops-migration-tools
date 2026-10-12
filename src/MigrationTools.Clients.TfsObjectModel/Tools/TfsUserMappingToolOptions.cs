@@ -20,6 +20,7 @@ namespace MigrationTools.Tools
         /// By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is
         /// enabled, the format is detected from the content: a JSON array of objects with "Source" and "Target" identities is read as
         /// detailed IdentityMapData, and a JSON object is read as the simple dictionary format.
+        /// In the dictionary format a key or value may be written as the display name followed by the UPN in angle brackets to identify one of several users that share a display name.
         /// </summary>
         /// <default>none</default>
         public string UserMappingFile { get; set; }

@@ -220,12 +220,17 @@ namespace MigrationTools.Tools
 
         private void MapUserIdentityFieldByDictionary(Field field)
         {
-            var target = TfsUserIdentityReference.FindMappedTarget(UserMappings.Value, field.Value?.ToString());
+            var sourceValue = field.Value?.ToString();
+            var target = TfsUserIdentityReference.FindMappedTarget(UserMappings.Value, sourceValue);
             if (target != null)
             {
                 var original = field.Value;
                 field.Value = target;
                 Log.LogDebug($"TfsUserMappingTool::MapUserIdentityFieldByDictionary::Map:[original|{original}][new|{field.Value}]");
+            }
+            else if (TfsUserIdentityReference.IsAmbiguous(UserMappings.Value, sourceValue))
+            {
+                Log.LogWarning("TfsUserMappingTool::MapUserIdentityFieldByDictionary '{sourceValue}' matches more than one 'Display Name <upn>' entry in the mapping file and was not mapped.", sourceValue);
             }
         }
 

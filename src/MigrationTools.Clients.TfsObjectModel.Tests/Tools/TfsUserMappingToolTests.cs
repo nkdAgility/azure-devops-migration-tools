@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
@@ -332,6 +332,36 @@ namespace MigrationTools.Tests.Tools
             exported.Add(new IdentityMapData { Source = new IdentityItemData { DisplayName = "Unmapped User" }, Target = null });
             TfsUserMappingTool.SerializeIdentityMapData(filePath, exported, _logger);
             return filePath;
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void ExportedDictionary_WithDuplicateDisplayNames_RoundTripsThroughMappingFile()
+        {
+            var jsOld = new IdentityItemData { DisplayName = "John Smith", AccountName = "john.smith@old.com" };
+            var js2Old = new IdentityItemData { DisplayName = "John Smith", AccountName = "jsmith@old.com" };
+            var janeOld = new IdentityItemData { DisplayName = "Jane Doe", AccountName = "jane.doe@old.com" };
+            var jsNew = new IdentityItemData { DisplayName = "John Smith", AccountName = "john.smith@new.com" };
+            var js2New = new IdentityItemData { DisplayName = "John Smith", AccountName = "jsmith@new.com" };
+            var janeNew = new IdentityItemData { DisplayName = "Jane D", AccountName = "jane.doe@new.com" };
+            var usersToMap = new List<IdentityMapData>
+            {
+                new() { Source = jsOld, Target = jsNew },
+                new() { Source = js2Old, Target = js2New },
+                new() { Source = janeOld, Target = janeNew },
+            };
+            var filePath = Path.Combine(_testDirectory, "exported-dictionary.json");
+            TfsUserMappingTool.SerializeUserMap(filePath,
+                MigrationTools.Processors.TfsExportUsersForMappingProcessor.BuildSimpleDictionary(usersToMap, [jsOld, js2Old, janeOld], [jsNew, js2New, janeNew]), _logger);
+
+            var map = CreateTool(filePath, useIdentityMapDataFormat: false).UserMappings.Value;
+
+            // The client object model returns "Display Name <unique name>" only for display names that are not unique.
+            Assert.AreEqual("John Smith <john.smith@new.com>", TfsUserIdentityReference.FindMappedTarget(map, "John Smith <john.smith@old.com>"));
+            Assert.AreEqual("John Smith <jsmith@new.com>", TfsUserIdentityReference.FindMappedTarget(map, "John Smith <JSmith@old.com>"));
+            Assert.AreEqual("Jane D", TfsUserIdentityReference.FindMappedTarget(map, "Jane Doe"));
+            Assert.IsNull(TfsUserIdentityReference.FindMappedTarget(map, "John Smith"));
+            Assert.IsTrue(TfsUserIdentityReference.IsAmbiguous(map, "John Smith"));
+            Assert.IsFalse(TfsUserIdentityReference.IsAmbiguous(map, "Jane Doe"));
         }
 
         [TestMethod, TestCategory("L1")]
