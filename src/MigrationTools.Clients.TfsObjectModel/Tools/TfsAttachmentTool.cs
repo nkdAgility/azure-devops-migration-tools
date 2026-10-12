@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using MigrationTools.DataContracts;
+using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 
@@ -76,6 +78,11 @@ namespace MigrationTools.Tools
 
                 try
                 {
+                    if (FindExistingAttachment(target.ToWorkItem(), wia) != null)
+                    {
+                        Log.LogDebug(" [SKIP] WorkItem {0} already contains attachment {1}", target.Id, wia.Name);
+                        continue;
+                    }
                     string filepath = null;
                     Directory.CreateDirectory(Path.Combine(_exportWiPath, wia.Id.ToString()));
                     filepath = ExportAttachment(wia, _exportWiPath);
@@ -153,15 +160,8 @@ namespace MigrationTools.Tools
             FileInfo fi = new FileInfo(filepath);
             if (Options.MaxAttachmentSize > fi.Length)
             {
-                string originalId = "[originalId:" + wia.Id + "]";
-                var attachments = targetWorkItem.Attachments.Cast<Attachment>();
-                var attachment = attachments.Where(a => a.Name == wia.Name && a.Length == wia.Length && a.Comment.Contains(originalId)).FirstOrDefault();
-                if (attachment is null)
-                {
-                    attachment = attachments.Where(a => a.Name.Equals(wia.Name, StringComparison.OrdinalIgnoreCase)
-                        && a.Comment.Equals(wia.Comment, StringComparison.OrdinalIgnoreCase))
-                        .FirstOrDefault();
-                }
+                string originalId = RevisionArtifactDiff.AttachmentOriginalIdMarker(wia.Id);
+                var attachment = FindExistingAttachment(targetWorkItem, wia);
                 if (attachment == null)
                 {
                     Attachment a = new Attachment(filepath);
@@ -189,6 +189,43 @@ namespace MigrationTools.Tools
             else
             {
                 Log.LogWarning(" [SKIP] Attachment {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, Options.MaxAttachmentSize);
+            }
+        }
+
+        private static Attachment FindExistingAttachment(WorkItem targetWorkItem, Attachment wia)
+        {
+            string originalId = RevisionArtifactDiff.AttachmentOriginalIdMarker(wia.Id);
+            var attachments = targetWorkItem.Attachments.Cast<Attachment>();
+            var attachment = attachments.Where(a => a.Name == wia.Name && a.Length == wia.Length && a.Comment.Contains(originalId)).FirstOrDefault();
+            if (attachment is null)
+            {
+                attachment = attachments.Where(a => a.Name.Equals(wia.Name, StringComparison.OrdinalIgnoreCase)
+                    && a.Comment.Equals(wia.Comment, StringComparison.OrdinalIgnoreCase))
+                    .FirstOrDefault();
+            }
+            return attachment;
+        }
+
+        /// <summary>
+        /// Removes from the target the attachments that were migrated from the given source attachments.
+        /// Used during revision replay to remove an attachment at the revision where it was removed in the source.
+        /// Does not save the target.
+        /// </summary>
+        public void RemoveAttachments(IEnumerable<Attachment> removedSourceAttachments, WorkItemData target)
+        {
+            if (target is null) throw new ArgumentNullException(nameof(target));
+            foreach (var wia in removedSourceAttachments)
+            {
+                var existing = FindExistingAttachment(target.ToWorkItem(), wia);
+                if (existing != null)
+                {
+                    Log.LogInformation("AttachmentMigrationEnricher: Removing attachment {AttachmentName} from {TargetWorkItemID} as it was removed in the source", wia.Name, target.Id);
+                    target.ToWorkItem().Attachments.Remove(existing);
+                }
+                else
+                {
+                    Log.LogDebug("AttachmentMigrationEnricher: Attachment {AttachmentName} removed in the source was not found on {TargetWorkItemID}", wia.Name, target.Id);
+                }
             }
         }
 

@@ -685,10 +685,11 @@ namespace MigrationTools.Processors
                             if (revisionsToMigrate.Count == 0)
                             {
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                                ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
+                                ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                StampCatchUpSave(targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
                             }
@@ -785,14 +786,98 @@ namespace MigrationTools.Processors
             }
         }
 
-        private void ProcessWorkItemLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        /// <summary>
+        /// Applies the attachment and link changes made in one source revision to the target before that revision is saved (#3192),
+        /// so they are saved with the revision's ChangedBy/ChangedDate instead of in a later "Migration" save.
+        /// </summary>
+        /// <param name="previousSourceRevision">The source revision replayed before this one, or null if none has been replayed.</param>
+        /// <param name="sourceRevision">The source work item opened at the revision being replayed.</param>
+        /// <param name="isLastRevision">On the last revision all links are re-checked, to catch any skipped earlier.</param>
+        private void ApplyRevisionAttachmentsAndLinks(WorkItemData previousSourceRevision, WorkItemData sourceRevision, WorkItemData targetWorkItem, bool isLastRevision)
+        {
+            var previousWi = previousSourceRevision?.ToWorkItem();
+            var currentWi = sourceRevision.ToWorkItem();
+
+            if (CommonTools.Attachment.Enabled)
+            {
+                var attachments = RevisionArtifactDiff.Compare(
+                    previousWi?.Attachments.Cast<Attachment>(),
+                    currentWi.Attachments.Cast<Attachment>(),
+                    a => RevisionArtifactDiff.AttachmentKey(a.Id));
+                if (attachments.Removed.Count > 0)
+                {
+                    CommonTools.Attachment.RemoveAttachments(attachments.Removed, targetWorkItem);
+                }
+                if (attachments.Added.Count > 0)
+                {
+                    ProcessWorkItemAttachments(sourceRevision, targetWorkItem, false);
+                }
+            }
+
+            var links = RevisionArtifactDiff.Compare(
+                previousWi?.Links.Cast<Link>(),
+                currentWi.Links.Cast<Link>(),
+                LinkKey);
+            if (CommonTools.WorkItemLink.Enabled && links.Removed.Count > 0)
+            {
+                CommonTools.WorkItemLink.RemoveLinks(this, links.Removed, targetWorkItem);
+            }
+            if (links.Added.Count > 0 || (isLastRevision && currentWi.Links.Count > 0))
+            {
+                ProcessWorkItemLinks(sourceRevision, targetWorkItem, true);
+            }
+        }
+
+        /// <summary>
+        /// When an already migrated item with no new source revisions still needs a save (e.g. a missing link),
+        /// keep the last revision's author and date it just after it, instead of "Migration" now (#3192).
+        /// </summary>
+        private static void StampCatchUpSave(WorkItemData targetWorkItem)
+        {
+            var wi = targetWorkItem.ToWorkItem();
+            if (!wi.IsDirty)
+            {
+                return;
+            }
+            var lastChangedBy = wi.Fields["System.ChangedBy"].OriginalValue?.ToString();
+            var lastChangedDate = (DateTime)wi.Fields["System.ChangedDate"].OriginalValue;
+            if (!string.IsNullOrEmpty(lastChangedBy))
+            {
+                wi.Fields["System.ChangedBy"].Value = lastChangedBy;
+            }
+            wi.Fields["System.ChangedDate"].Value = lastChangedDate.AddSeconds(1);
+        }
+
+        private void AppendMigrationComment(WorkItemData targetWorkItem)
+        {
+            var wi = targetWorkItem.ToWorkItem();
+            var reflectedUri = wi.Fields[Target.Options.ReflectedWorkItemIdField].Value;
+            wi.History = MigrationCommentHelper.AppendTo(wi.History, reflectedUri);
+        }
+
+        private static string LinkKey(Link link)
+        {
+            switch (link)
+            {
+                case Hyperlink hl:
+                    return RevisionArtifactDiff.HyperlinkKey(hl.Location);
+                case ExternalLink el:
+                    return RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri);
+                case RelatedLink rl:
+                    return RevisionArtifactDiff.RelatedLinkKey(rl.LinkTypeEnd?.ImmutableName ?? rl.ArtifactLinkType?.Name, rl.RelatedWorkItemId);
+                default:
+                    return link.GetType().Name + "|" + link.ArtifactLinkType?.Name;
+            }
+        }
+
+        private void ProcessWorkItemLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool inline = false)
         {
             if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", CommonTools.WorkItemLink.Enabled } });
-                CommonTools.WorkItemLink.Enrich(this, sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemLink.Enrich(this, sourceWorkItem, targetWorkItem, inline);
                 //AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
-                int fixedLinkCount = CommonTools.GitRepository.Enrich(this, sourceWorkItem, targetWorkItem);
+                int fixedLinkCount = CommonTools.GitRepository.Enrich(this, sourceWorkItem, targetWorkItem, !inline);
                 // AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
             else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case")
@@ -830,6 +915,16 @@ namespace MigrationTools.Processors
                 {
                     CommonTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
+
+                // Baseline for attachment/link changes: the source revision before the first one we replay (when resuming).
+                WorkItemData previousSourceRevision = null;
+                var firstRevisionNumber = revisionsToMigrate.First().Number;
+                var previousRevisionNumbers = sourceWorkItem.Revisions.Keys.Where(n => n < firstRevisionNumber).ToList();
+                if (previousRevisionNumbers.Count > 0)
+                {
+                    previousSourceRevision = sourceWorkItem.GetRevision(previousRevisionNumbers.Max());
+                }
+                var lastRevision = revisionsToMigrate.Last();
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -948,6 +1043,15 @@ namespace MigrationTools.Processors
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
 
+                    // Attachments and links are saved with the revision where they changed in the source (#3192).
+                    ApplyRevisionAttachmentsAndLinks(previousSourceRevision, currentRevisionWorkItem, targetWorkItem, revision == lastRevision);
+                    previousSourceRevision = currentRevisionWorkItem;
+
+                    if (revision == lastRevision && Options.GenerateMigrationComment)
+                    {
+                        AppendMigrationComment(targetWorkItem);
+                    }
+
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
@@ -958,6 +1062,7 @@ namespace MigrationTools.Processors
                     {
                         var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
                         targetWorkItem.SaveToAzureDevOps();
+                        CommonTools.Attachment.CleanUpAfterSave();
                         EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
@@ -969,32 +1074,10 @@ namespace MigrationTools.Processors
                            });
                 }
 
-                // Until here we impersonate the maker of the revisions. From here we act as ourselves to push the attachments and add the comment
-                targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-
-                if (targetWorkItem != null)
-                {
-                    ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                    if (!string.IsNullOrEmpty(targetWorkItem.Id))
-                    {
-                        ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
-                        // The TFS client seems to plainly ignore the ChangedBy field when saving a link, so we need to put this back in place
-                        targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                    }
-
-                    if (Options.GenerateMigrationComment)
-                    {
-                        var reflectedUri = targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value;
-                        var history = new StringBuilder();
-                        history.Append(
-                            $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
-                        targetWorkItem.ToWorkItem().History = history.ToString();
-                    }
-                    targetWorkItem.SaveToAzureDevOps();
-
-                    CommonTools.Attachment.CleanUpAfterSave();
-                    TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
-                }
+                // Attachments, links and the migration comment were saved with the replayed revisions (#3192),
+                // so there is no extra save here with a ChangedBy/ChangedDate later than the source history.
+                CommonTools.Attachment.CleanUpAfterSave();
+                TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
             }
             catch (Exception ex)
             {

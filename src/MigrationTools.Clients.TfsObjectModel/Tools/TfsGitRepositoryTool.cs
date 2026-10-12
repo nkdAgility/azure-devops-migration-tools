@@ -65,7 +65,8 @@ namespace MigrationTools.Tools
         }
 
 
-        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        /// <param name="save">False during revision replay (#3192): the rewritten links are saved with the revision being replayed.</param>
+        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {
             _processor = processor;
             if (sourceWorkItem is null)
@@ -235,7 +236,7 @@ namespace MigrationTools.Tools
                 }
             }
 
-            if (targetWorkItem.ToWorkItem().IsDirty && _save)
+            if (targetWorkItem.ToWorkItem().IsDirty && _save && save)
             {
                 Log.LogDebug("GitRepositoryEnricher: Saving {TargetWorkItemId}", targetWorkItem.Id);
                 targetWorkItem.SaveToAzureDevOps();
