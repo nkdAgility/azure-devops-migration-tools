@@ -75,7 +75,7 @@ namespace MigrationTools.Processors
             else
             {
                 Log.LogInformation("Exporting user mappings in simple dictionary format");
-                ExportSimpleDictionaryFormat(usersToMap);
+                ExportSimpleDictionaryFormat(usersToMap, data.SourceUsers, data.TargetUsers);
             }
 
             if (Options.ExportAllUsers)
@@ -87,16 +87,32 @@ namespace MigrationTools.Processors
             Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed);
         }
 
-        private void ExportSimpleDictionaryFormat(List<IdentityMapData> usersToMap)
+        private void ExportSimpleDictionaryFormat(List<IdentityMapData> usersToMap, List<IdentityItemData> sourceUsers, List<IdentityItemData> targetUsers)
         {
+            TfsUserMappingTool.SerializeUserMap(CommonTools.UserMapping.Options.UserMappingFile,
+                BuildSimpleDictionary(usersToMap, sourceUsers, targetUsers), Log);
+        }
+
+        /// <summary>
+        /// Builds the simple mapping dictionary. Display names shared by more than one user are written as
+        /// <c>Display Name &lt;upn&gt;</c> so each entry identifies a single user.
+        /// </summary>
+        public static Dictionary<string, string> BuildSimpleDictionary(List<IdentityMapData> usersToMap, List<IdentityItemData> sourceUsers, List<IdentityItemData> targetUsers)
+        {
+            var duplicateSource = TfsUserIdentityReference.DuplicateDisplayNames(sourceUsers);
+            var duplicateTarget = TfsUserIdentityReference.DuplicateDisplayNames(targetUsers);
             Dictionary<string, string> usermappings = new(StringComparer.CurrentCultureIgnoreCase);
             foreach (IdentityMapData userMapping in usersToMap)
             {
-                // We cannot use ToDictionary(), because there can be multiple users with the same display name and so
-                // it would throw with duplicate key. This way we just overwrite the value – last item in source wins.
-                usermappings[userMapping.Source.DisplayName] = userMapping.Target?.DisplayName;
+                var key = duplicateSource.Contains(userMapping.Source.DisplayName)
+                    ? TfsUserIdentityReference.Format(userMapping.Source)
+                    : userMapping.Source.DisplayName;
+                var target = userMapping.Target;
+                usermappings[key] = target != null && duplicateTarget.Contains(target.DisplayName)
+                    ? TfsUserIdentityReference.Format(target)
+                    : target?.DisplayName;
             }
-            TfsUserMappingTool.SerializeUserMap(CommonTools.UserMapping.Options.UserMappingFile, usermappings, Log);
+            return usermappings;
         }
 
         private void ExportAllUsers(IdentityMapResult data)

@@ -220,10 +220,11 @@ namespace MigrationTools.Tools
 
         private void MapUserIdentityFieldByDictionary(Field field)
         {
-            if (UserMappings.Value.ContainsKey(field.Value.ToString()))
+            var target = TfsUserIdentityReference.FindMappedTarget(UserMappings.Value, field.Value?.ToString());
+            if (target != null)
             {
                 var original = field.Value;
-                field.Value = UserMappings.Value[field.Value.ToString()];
+                field.Value = target;
                 Log.LogDebug($"TfsUserMappingTool::MapUserIdentityFieldByDictionary::Map:[original|{original}][new|{field.Value}]");
             }
         }
@@ -447,7 +448,8 @@ namespace MigrationTools.Tools
                 IdentityMapResult mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.IdentityMap.Count}]");
                 mappedUsers.IdentityMap = mappedUsers.IdentityMap.Where(x => workItemUsers.Contains(x.Source.DisplayName)
-                    || (!string.IsNullOrEmpty(x.Source.AccountName) && workItemUsers.Contains(x.Source.AccountName))).ToList();
+                    || (!string.IsNullOrEmpty(x.Source.AccountName) && workItemUsers.Contains(x.Source.AccountName))
+                    || workItemUsers.Contains(TfsUserIdentityReference.Format(x.Source))).ToList();
                 return mappedUsers;
             }
             else

@@ -180,24 +180,21 @@ Skip user validation for scenarios where not all users need to exist in target:
 
 ## User Mapping File Format
 
-When using a manual user mapping file, the format should be a JSON array of mapping objects:
+By default the mapping file is a JSON object that maps source display names to target display names. Users whose display name is the same in source and target need no entry.
+
+Where several users share a display name, write the entry as `Display Name <upn>`. Azure DevOps accepts this form for identity fields, so a value written this way assigns the work item to that exact user:
 
 ```json
-[
-  {
-    "Source": "domain\\sourceuser",
-    "Target": "targetdomain\\targetuser"
-  },
-  {
-    "Source": "olddomain\\john.doe",
-    "Target": "newdomain\\john.doe"
-  },
-  {
-    "Source": "contractor@external.com",
-    "Target": "employee@company.com"
-  }
-]
+{
+  "Jane Doe": "Jane Doe (Contoso)",
+  "John Smith <john.smith@old.com>": "John Smith <john.smith@new.com>",
+  "John Smith <jsmith@old.com>": "John Smith <jsmith@new.com>"
+}
 ```
+
+A work item value is matched to a key in this order: the exact key, a `Display Name <upn>` key with the same UPN, then a `Display Name <upn>` key with the same display name when only one such key exists. The ExportUsersForMapping processor writes the `Display Name <upn>` form only for display names that occur more than once.
+
+When `UseIdentityMapDataFormat` is enabled, the file can instead be a JSON array of `Source` and `Target` identity objects, as written by the ExportUsersForMapping processor.
 
 ## Good Practices
 

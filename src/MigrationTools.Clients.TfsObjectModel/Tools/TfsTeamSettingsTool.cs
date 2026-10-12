@@ -400,7 +400,14 @@ namespace MigrationTools.Tools
             targetIdentity = MatchIdentity(sourceName, identityCache);
             if ((targetIdentity is null) && (userMapping is not null))
             {
-                if (userMapping.TryGetValue(sourceName, out var mappedName) && !string.IsNullOrEmpty(mappedName))
+                var mappedName = TfsUserIdentityReference.FindMappedTarget(userMapping, sourceCapacity.TeamMember.DisplayName)
+                    ?? TfsUserIdentityReference.FindMappedTarget(userMapping, sourceName);
+                if (TfsUserIdentityReference.TryParse(mappedName, out var mappedDisplayName, out var mappedUniqueName))
+                {
+                    targetIdentity = identityCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, mappedUniqueName, StringComparison.OrdinalIgnoreCase))
+                        ?? MatchIdentity(mappedDisplayName, identityCache);
+                }
+                else if (!string.IsNullOrEmpty(mappedName))
                 {
                     targetIdentity = MatchIdentity(mappedName, identityCache);
                 }
