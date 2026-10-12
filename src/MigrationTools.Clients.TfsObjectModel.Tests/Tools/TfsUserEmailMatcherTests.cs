@@ -62,6 +62,33 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void ExactAmbiguous_DoesNotFallThroughToDomainMapping()
+        {
+            var targets = new List<IdentityItemData>
+            {
+                U("Dup A", "dup@old.com"),
+                U("Dup B", "dup@old.com"),
+                U("Other", "dup@new.com"),
+            };
+            var map = new Dictionary<string, string> { { "old.com", "new.com" } };
+            Assert.IsNull(TfsUserEmailMatcher.FindTarget(U("Dup", "dup@old.com"), targets, map, true));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void RewriteDomain_ConflictingCaseInsensitiveKeys_ReturnsNull()
+        {
+            var map = new Dictionary<string, string> { { "old.com", "new.com" }, { "OLD.COM", "other.com" } };
+            Assert.IsNull(TfsUserEmailMatcher.RewriteDomain("jane.doe@old.com", map));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void RewriteDomain_DuplicateKeysSameTarget_Rewrites()
+        {
+            var map = new Dictionary<string, string> { { "old.com", "new.com" }, { "OLD.COM", "@NEW.com" } };
+            Assert.AreEqual("jane.doe@new.com", TfsUserEmailMatcher.RewriteDomain("jane.doe@old.com", map));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void NoSourceEmail_ReturnsNull()
         {
             Assert.IsNull(TfsUserEmailMatcher.FindTarget(U("X", ""), Targets, null, true));

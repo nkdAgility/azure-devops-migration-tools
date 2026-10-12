@@ -403,8 +403,6 @@ namespace MigrationTools.Tools
                     IdentityItemData targetUser = null;
                     if (Options.MatchUsersByEmail && !string.IsNullOrEmpty(sourceUser.MailAddress))
                     {
-                        // Ambiguous email matches return null, so mapping falls back to display name or is
-                        // exported for manual mapping. Domain rewrite / local-part matching handle domain changes (#3178).
                         targetUser = TfsUserEmailMatcher.FindTarget(sourceUser, targetUsers,
                             Options.EmailDomainMappings, Options.MatchUsersByEmailLocalPart);
                     }

@@ -114,7 +114,7 @@ Enable automatic user matching based on email addresses:
 
 ### Email Domain or Tenant Change
 
-When users move from `first.last@old.com` to `first.last@new.com`, exact email matching fails. Use `EmailDomainMappings` to rewrite source domains to target domains, and optionally `MatchUsersByEmailLocalPart` to match on the part before `@` when no domain mapping applies. Both only take effect with `MatchUsersByEmail`, are tried after an exact email match, and only use a single unambiguous match; otherwise matching falls back to display name. Users whose display names are identical in source and target need no mapping entry.
+When users move from `first.last@old.com` to `first.last@new.com`, exact email matching fails. Use `EmailDomainMappings` to rewrite source domains to target domains, and optionally `MatchUsersByEmailLocalPart` to match on the part before `@` when the exact and domain-mapped stages find no unique match. Both only take effect with `MatchUsersByEmail`, are tried after an exact email match, and only use a single unambiguous match; otherwise matching falls back to display name. Users whose display names are identical in source and target need no mapping entry.
 
 ```json
 {

@@ -29,11 +29,13 @@ namespace MigrationTools.Tools
             }
             var targets = targetUsers.Where(t => !string.IsNullOrWhiteSpace(t?.MailAddress)).ToList();
 
-            var match = Single(targets, t => t.MailAddress.Equals(sourceMail, StringComparison.OrdinalIgnoreCase));
-            if (match != null)
+            var exact = targets.Where(t => t.MailAddress.Equals(sourceMail, StringComparison.OrdinalIgnoreCase)).Take(2).ToList();
+            if (exact.Count > 0)
             {
-                return match;
+                return exact.Count == 1 ? exact[0] : null;
             }
+
+            IdentityItemData match;
 
             var rewritten = RewriteDomain(sourceMail, domainMappings);
             if (rewritten != null)
@@ -58,7 +60,7 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// Rewrites the domain of <paramref name="email"/> using <paramref name="domainMappings"/> (source domain to target domain,
-        /// case-insensitive). Returns null when no mapping applies.
+        /// case-insensitive). Returns null when no mapping applies, or when keys differing only by case map to different domains.
         /// </summary>
         public static string RewriteDomain(string email, IDictionary<string, string> domainMappings)
         {
@@ -72,18 +74,14 @@ namespace MigrationTools.Tools
                 return null;
             }
             var domain = email.Substring(at + 1);
-            foreach (var kvp in domainMappings)
-            {
-                if (string.IsNullOrWhiteSpace(kvp.Key) || string.IsNullOrWhiteSpace(kvp.Value))
-                {
-                    continue;
-                }
-                if (domain.Equals(kvp.Key.Trim().TrimStart('@'), StringComparison.OrdinalIgnoreCase))
-                {
-                    return email.Substring(0, at + 1) + kvp.Value.Trim().TrimStart('@');
-                }
-            }
-            return null;
+            var targetDomains = domainMappings
+                .Where(kvp => !string.IsNullOrWhiteSpace(kvp.Key) && !string.IsNullOrWhiteSpace(kvp.Value)
+                    && domain.Equals(kvp.Key.Trim().TrimStart('@'), StringComparison.OrdinalIgnoreCase))
+                .Select(kvp => kvp.Value.Trim().TrimStart('@'))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(2)
+                .ToList();
+            return targetDomains.Count == 1 ? email.Substring(0, at + 1) + targetDomains[0] : null;
         }
 
         private static string LocalPart(string email)
