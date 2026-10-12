@@ -28,6 +28,20 @@ class Program
         };
 
 
+        // net472 builds of referenced projects bind Microsoft.Extensions.* by file version (e.g. 9.0.0.10), but the
+        // net8.0 packages ship 9.0.0.0. Bind by simple name; this tool only reflects over option types.
+        AppDomain.CurrentDomain.AssemblyResolve += (sender, resolveArgs) =>
+        {
+            var name = new AssemblyName(resolveArgs.Name).Name;
+            var loaded = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == name);
+            if (loaded != null)
+            {
+                return loaded;
+            }
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, name + ".dll");
+            return File.Exists(path) ? Assembly.LoadFrom(path) : null;
+        };
+
         string dir = AppDomain.CurrentDomain.BaseDirectory;
         Console.WriteLine(dir);
         AppDomain currentDomain = AppDomain.CurrentDomain;

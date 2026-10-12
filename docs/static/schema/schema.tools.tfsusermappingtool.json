@@ -5,6 +5,11 @@
   "description": "The TfsUserMappingTool is used to map users from the source to the target system. Run it with the ExportUsersForMappingContext to create a mapping file then with WorkItemMigrationContext to use the mapping file to update the users in the target system as you migrate the work items.",
   "type": "object",
   "properties": {
+    "EmailDomainMappings": {
+      "description": "Used with MatchUsersByEmail to handle a tenant or domain change. Maps source email domains to target email domains,\r\n for example { \"old.com\": \"new.com\" } matches first.last@old.com to first.last@new.com. Applied when no exact email match is found.",
+      "type": "object",
+      "default": "none"
+    },
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean",
@@ -18,13 +23,8 @@
       "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the\r\n users will be mapped by their email address first. If no match is found, then the display name will be used.",
       "type": "boolean"
     },
-    "EmailDomainMappings": {
-      "description": "Used with MatchUsersByEmail to handle a tenant or domain change. Maps source email domains to target email domains, for example { \"old.com\": \"new.com\" } matches first.last@old.com to first.last@new.com. Applied when no exact email match is found.",
-      "type": "object",
-      "default": "none"
-    },
     "MatchUsersByEmailLocalPart": {
-      "description": "Used with MatchUsersByEmail. When true and neither the exact email nor EmailDomainMappings produce a match, users are matched on the email local part (the part before @), ignoring the domain. Only a single unambiguous match is used.",
+      "description": "Used with MatchUsersByEmail. When true and neither the exact email nor EmailDomainMappings produce a match, users are matched\r\n on the email local part (the part before @), ignoring the domain. Only a single unambiguous match is used.",
       "type": "boolean",
       "default": "false"
     },
@@ -36,9 +36,15 @@
       "description": "When set to true, this setting will skip a validation that all users exists or mapped",
       "type": "boolean"
     },
+    "UseIdentityMapDataFormat": {
+      "description": "When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)\r\n instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.\r\n Detailed entries match work item values against the source display name or account name, ignoring case.",
+      "type": "boolean",
+      "default": "false"
+    },
     "UserMappingFile": {
-      "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.",
-      "type": "string"
+      "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.\r\n By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is\r\n enabled, the format is detected from the content: a JSON array of objects with \"Source\" and \"Target\" identities is read as\r\n detailed IdentityMapData, and a JSON object is read as the simple dictionary format.",
+      "type": "string",
+      "default": "none"
     }
   }
 }

@@ -79,6 +79,14 @@ description: The TfsUserMappingTool is used to map users from the source to the 
 className: TfsUserMappingTool
 typeName: Tools
 options:
+- parameterName: EmailDomainMappings
+  type: Dictionary
+  description: >-
+    Used with MatchUsersByEmail to handle a tenant or domain change. Maps source email domains to target email domains,
+     for example { "old.com": "new.com" } matches first.last@old.com to first.last@new.com. Applied when no exact email match is found.
+  defaultValue: none
+  isRequired: false
+  dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
@@ -99,6 +107,14 @@ options:
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: MatchUsersByEmailLocalPart
+  type: Boolean
+  description: >-
+    Used with MatchUsersByEmail. When true and neither the exact email nor EmailDomainMappings produce a match, users are matched
+     on the email local part (the part before @), ignoring the domain. Only a single unambiguous match is used.
+  defaultValue: false
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: ProjectCollectionValidUsersGroupName
   type: String
   description: This is the regionalized "Project Collection Valid Users" group name. Default is "Project Collection Valid Users".
@@ -111,10 +127,23 @@ options:
   defaultValue: missing XML code comments
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: UseIdentityMapDataFormat
+  type: Boolean
+  description: >-
+    When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)
+     instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.
+     Detailed entries match work item values against the source display name or account name, ignoring case.
+  defaultValue: false
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: UserMappingFile
   type: String
-  description: This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
-  defaultValue: missing XML code comments
+  description: >-
+    This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.
+     By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is
+     enabled, the format is detected from the content: a JSON array of objects with "Source" and "Target" identities is read as
+     detailed IdentityMapData, and a JSON object is read as the simple dictionary format.
+  defaultValue: none
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
