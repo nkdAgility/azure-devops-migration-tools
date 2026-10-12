@@ -24,7 +24,7 @@ namespace MigrationTools
             {
                 foreach (var loaderException in ex.LoaderExceptions.Where(e => e != null).Select(e => e.Message).Distinct())
                 {
-                    Console.Error.WriteLine($"Warning: could not load some types from {assembly.GetName().Name}: {loaderException}");
+                    Serilog.Log.Warning("Could not load some types from {AssemblyName}: {LoaderException}", assembly.GetName().Name, loaderException);
                 }
                 return ex.Types.Where(t => t != null);
             }
