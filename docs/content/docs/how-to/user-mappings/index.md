@@ -48,7 +48,9 @@ There was a request to have the ability to map users to try and maintain integri
 
 ## Notes
 
-- Applies to all identity fields specified in the list
+- Applies to all identity fields specified in the list. Use full field reference names (for example `System.AssignedTo`); matching is exact and ignores case, and partial names are not matched
+- Mappings are applied to the target work item only; the source is not changed. Empty and unmapped values are passed through unchanged
+- Identity fields replayed from the source are kept through the final `Migration` saves (attachments, links and the migration comment), so process rules that set a field to the current user do not replace it with the migration account
 - It really sucks that we have to match on Display name! Email is included for internal matching
 - On `TfsExportUsersForMappingProcessor` you can set `OnlyListUsersInWorkItems` to filter the mapping based on the scope of the query. This is better if you have many users.
 - Both use the `TfsUserMappingTool` setting in `CommonTools` to know what to do.
