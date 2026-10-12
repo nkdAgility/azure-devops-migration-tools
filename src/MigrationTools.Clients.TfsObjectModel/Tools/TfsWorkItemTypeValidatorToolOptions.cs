@@ -56,6 +56,25 @@ namespace MigrationTools.Tools
         public Dictionary<string, List<string>> ExcludeSourceFields { get; set; } = [];
 
         /// <summary>
+        /// If <see langword="true"/>, before migration starts the work items to be migrated are scanned for fields that
+        /// have a value only in revision history: the revision was saved under another team project or work item type
+        /// (the item was moved or its type changed), and the field is on neither the source type in the current project
+        /// nor the target type the revision is replayed to. These values cannot be migrated, and field maps cannot read
+        /// them. Only moved or retyped revisions are checked, but each one is loaded with a separate server request,
+        /// so the scan can add significant time when many items were moved. It is off by default.
+        /// </summary>
+        /// <default>false</default>
+        public bool ScanRevisionHistoryForFields { get; set; } = false;
+
+        /// <summary>
+        /// If <see langword="true"/> and <see cref="ScanRevisionHistoryForFields"/> finds history-only fields that are
+        /// not excluded by <see cref="ExcludeSourceFields"/>, the migration stops before any work item is migrated.
+        /// If <see langword="false"/>, the fields are logged as warnings and the migration continues.
+        /// </summary>
+        /// <default>false</default>
+        public bool StopIfHistoryOnlyFieldsFound { get; set; } = false;
+
+        /// <summary>
         /// Normalizes properties, that all of them are set (not <see langword="null"/>) and all dictionaries uses
         /// case-insensitive keys.
         /// </summary>

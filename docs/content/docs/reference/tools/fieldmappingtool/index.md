@@ -53,7 +53,7 @@ Key categories include:
 Field mappings are configured in the `FieldMaps` array within the `FieldMappingTool` section. Each field map includes:
 
 - **FieldMapType**: Specifies which field map implementation to use
-- **ApplyTo**: Array of work item types the mapping applies to (use `["*"]` for all types)
+- **ApplyTo**: Array of **source** work item type names the mapping applies to (use `["*"]` for all types). Maps are selected by the type of the source work item, even when `WorkItemTypeMappingTool` maps it to a different target type.
 - **Additional Properties**: Configuration specific to each field map type
 
 ### Common Configuration Pattern
@@ -101,6 +101,21 @@ Field maps are processed in the order they appear in the configuration. Consider
 ### Work Item Type Targeting
 
 Use specific work item types in `ApplyTo` rather than `["*"]` when possible to avoid unintended side effects.
+
+### Upgrading: ApplyTo names the source type
+
+`ApplyTo` has always been matched against the source work item type at migration time. Before [#3151](https://github.com/nkdAgility/azure-devops-migration-tools/issues/3151), `TfsWorkItemTypeValidatorTool` looked field maps up by the target type instead, so a common workaround was to put only the target type in `ApplyTo` to get past validation. The validator now uses the source type, like the migration does, so it reports those configurations, and those maps were never applied during migration anyway.
+
+If you map work item types (for example `"User Story": "Product Backlog Item"`) and your field maps list only the target type, change `ApplyTo` to the source type:
+
+```json
+{
+  "FieldMapType": "FieldToFieldMap",
+  "ApplyTo": ["User Story"],
+  "sourceField": "Custom.StoryField",
+  "targetField": "Custom.PbiField"
+}
+```
 
 ### Testing Field Maps
 

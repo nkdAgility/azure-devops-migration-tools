@@ -33,17 +33,15 @@ TfsWorkItemTypeValidatorTool validates work item types and fields between the so
   * Field type compatibility between source and target fields
   * Allowed values compatibility for fields with restricted values
   * Special handling for identity fields (validation skipped due to typically different allowed values)
-* **Failure behaviour**: If validation fails, migration is stopped immediately with `Environment.Exit(-1)`.
+* **Failure behaviour**: If validation fails, the migration stops before any work item is migrated and the tool exits with code 1.
 * **Scope control**:
-  * Users can configure which work item types to validate via `IncludeWorkItemtypes`. If none are specified, all work item types are validated.
-  * Users can configure field mappings per work item type via `SourceFieldMappings` to:
-    * Map a source field to a different target field
-    * Exclude a field from validation (by mapping it to an empty string)
-  * Users can mark fields as "fixed" via `FixedTargetFields` to reduce validation warnings to informational messages when differences are known and resolved
+  * `IncludeWorkItemTypes` or `ExcludeWorkItemTypes` (not both) choose which source work item types are validated. If neither is set, all types are validated. `ExcludeDefaultWorkItemTypes` (on by default) also excludes Code Review Request/Response, Feedback Request/Response, Shared Parameter and Shared Steps; set it to `false` when you use `IncludeWorkItemTypes`.
+  * `ExcludeSourceFields` lists source fields, per source type or for all types with `*`, whose issues are still logged but as information, and do not fail validation. Use it for differences you have resolved or accept.
+* **Field maps are honoured**: a source field read by a `FieldToFieldMap` (mode `SourceToTarget`) or `FieldToFieldMultiMap` in `FieldMappingTool` is validated against the mapped target field, and `FieldValueMap` mappings are taken into account when allowed values differ. Maps are matched by the **source** work item type in their `ApplyTo`, as they are during migration (see [Upgrading: ApplyTo names the source type]({{< ref "docs/reference/tools/fieldmappingtool" >}}#upgrading-applyto-names-the-source-type)).
 * **Advanced features**:
-  * Supports wildcard mappings using `*` for field mappings and fixed fields that apply to all work item types
   * Provides suggestions for similar work item type names when exact matches are not found
   * Detailed logging of field information including types and allowed values for troubleshooting
+  * Optional scan of revision history for fields that only exist there (see [History-only fields](#history-only-fields))
 
 ## Samples
 
@@ -54,41 +52,50 @@ TfsWorkItemTypeValidatorTool validates work item types and fields between the so
 This sample configuration demonstrates:
 
 * **Enabled**: Set to `true` to run the validation tool
-* **IncludeWorkItemtypes**: Limits validation to specific work item types (Bug, Task, User Story, Product Backlog Item, Feature, Epic, Risk)
-* **SourceFieldMappings**: Maps source field `Microsoft.VSTS.Common.Prirucka` to target field `Custom.Prirucka` for User Story work items
-* **FixedTargetFields**: Marks `Custom.Prirucka` as a fixed field for User Story, meaning validation differences will be logged as information rather than warnings
+* **ExcludeDefaultWorkItemTypes**: Skips the default excluded types (code review, feedback, shared steps and parameters)
+* **ExcludeSourceFields**: Issues with `Microsoft.VSTS.Common.AcceptanceCriteria` and `Microsoft.VSTS.Scheduling.Effort` on Bug are logged as information and do not fail validation
+* **ScanRevisionHistoryForFields**: Scans moved or retyped revisions for history-only fields before migration; with `StopIfHistoryOnlyFieldsFound` set to `false`, findings are warnings and the migration continues
 
 ### Advanced Configuration Example
 
-For more complex scenarios, you might use wildcard mappings and multiple work item types:
+Field mappings for validation are configured once, in `FieldMappingTool`, and the validator uses the same maps the migration applies:
 
 ```json
 {
   "MigrationTools": {
     "Version": "16.0",
     "CommonTools": {
+      "WorkItemTypeMappingTool": {
+        "Enabled": true,
+        "Mappings": {
+          "User Story": "Product Backlog Item"
+        }
+      },
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldToFieldMap",
+            "ApplyTo": [ "User Story" ],
+            "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
+            "targetField": "Custom.Priority"
+          },
+          {
+            "FieldMapType": "FieldToFieldMultiMap",
+            "ApplyTo": [ "*" ],
+            "SourceToTargetMappings": {
+              "Custom.Field2": "Custom.NewField2"
+            }
+          }
+        ]
+      },
       "TfsWorkItemTypeValidatorTool": {
         "Enabled": true,
-        "IncludeWorkItemtypes": [
-          "Bug", "Task", "User Story", "Feature", "Epic"
-        ],
-        "SourceFieldMappings": {
-          "*": {
-            "Microsoft.VSTS.Common.CustomField1": "",
-            "Microsoft.VSTS.Common.CustomField2": "Custom.NewField2"
-          },
-          "User Story": {
-            "Microsoft.VSTS.Common.BacklogPriority": "Custom.Priority"
-          }
+        "ExcludeSourceFields": {
+          "*": [ "Custom.Field1" ]
         },
-        "FixedTargetFields": {
-          "*": [
-            "Custom.NewField2"
-          ],
-          "User Story": [
-            "Custom.Priority"
-          ]
-        }
+        "ScanRevisionHistoryForFields": true,
+        "StopIfHistoryOnlyFieldsFound": true
       }
     }
   }
@@ -97,11 +104,11 @@ For more complex scenarios, you might use wildcard mappings and multiple work it
 
 This configuration:
 
-* Uses `*` wildcard to apply field mappings to all work item types
-* Excludes `CustomField1` from validation by mapping to empty string
-* Maps `CustomField2` to `Custom.NewField2` for all work item types
-* Maps `BacklogPriority` to `Custom.Priority` specifically for User Story
-* Marks mapped fields as fixed to suppress validation warnings
+* Maps User Story to Product Backlog Item, and validates User Story fields against Product Backlog Item
+* Validates `BacklogPriority` against `Custom.Priority` for User Story; `ApplyTo` names the source type, User Story, not the target type
+* Validates `Custom.Field2` against `Custom.NewField2` for all work item types
+* Logs issues with `Custom.Field1` as information instead of failing validation
+* Stops the migration if any revision holds a value for a field that exists only in history
 
 ### Defaults
 
@@ -126,40 +133,60 @@ If you see warnings like "Work item type 'Risk' does not exist in target system"
 When fields are missing in the target, you can:
 
 1. Add the field to the target work item type
-2. Map the source field to an existing target field using `SourceFieldMappings`
-3. Exclude the field from validation by mapping it to an empty string
-4. Mark the field as "fixed" in `FixedTargetFields` if you have a field mapping configured
+2. Map the source field to an existing target field with a `FieldToFieldMap` (mode `SourceToTarget`) or `FieldToFieldMultiMap` in `FieldMappingTool`, with the **source** type in `ApplyTo`
+3. List the field in `ExcludeSourceFields` to accept the difference; it is then logged as information
+
+**Field maps that list only the target type in `ApplyTo`:**
+Since [#3151](https://github.com/nkdAgility/azure-devops-migration-tools/issues/3151) the validator selects field maps by the source work item type, as the migration always has. Configurations that put only the target type in `ApplyTo`, a workaround for the earlier validator, are now reported as missing fields. Those maps were not applied during migration either. Change `ApplyTo` to the source type; see [Upgrading: ApplyTo names the source type]({{< ref "docs/reference/tools/fieldmappingtool" >}}#upgrading-applyto-names-the-source-type).
 
 **Field Type Mismatches:**
 If source and target fields have different types (e.g., Boolean vs String), consider:
 
 1. Updating the target field type to match the source
 2. Using `FieldValueMap` in `FieldMappingTool` to convert values during migration
-3. Marking the field as fixed if you have proper value mapping configured
+3. Listing the field in `ExcludeSourceFields` if you have proper value mapping configured
 
 **Different Allowed Values:**
 When fields have different allowed values, you can:
 
 1. Update the target field's allowed values to include all source values
-2. Configure `FieldValueMap` to translate values during migration
-3. Mark the field as fixed if value mapping is properly configured
+2. Configure `FieldValueMap` to translate values during migration; the validator treats mapped values as valid
+3. List the field in `ExcludeSourceFields` if the remaining differences are acceptable
 
 ### Configuration Tips
 
-* Use the `*` wildcard in `SourceFieldMappings` and `FixedTargetFields` for mappings that apply to all work item types
-* Always configure corresponding field mappings in `FieldMappingTool` when you use `SourceFieldMappings` for validation
-* Use `FixedTargetFields` to reduce noise in validation logs when you've already resolved field differences
+* Use the `*` key in `ExcludeSourceFields` for fields that apply to all work item types
+* Configure field mappings once, in `FieldMappingTool`; the validator reads the same maps the migration applies
+* Use `ExcludeSourceFields` to reduce noise in validation logs when you've already resolved field differences
 * Identity fields are automatically skipped during validation due to their typically different allowed values
 
 ### Validation Failure Handling
 
-When validation fails, the migration process stops immediately with exit code -1. Review the detailed logs to:
+When validation fails, the migration stops before any work item is migrated and the tool exits with code 1. Review the detailed logs to:
 
 1. Identify specific missing types, fields, or mismatches
 2. Configure appropriate mappings or exclusions
 3. Re-run the migration after making configuration changes
 
 The tool provides comprehensive logging including field types, allowed values, and suggested mappings to help troubleshoot validation issues.
+
+### History-only fields
+
+Type validation compares only the current work item type definitions. When an item was moved from another project or process, or its type was changed, its older revisions can hold values for fields that the current type does not have. Those values are dropped during migration, and field maps cannot read them, because maps validate against the current source type.
+
+Set `ScanRevisionHistoryForFields` to `true` to check the items that `TfsWorkItemMigrationProcessor` will migrate (after `FilterWorkItemsThatAlreadyExistInTarget`) before migration starts. The scan checks each revision that was saved under a different team project or work item type than the item has now, against the target type that revision will be replayed to. Other revisions only carry fields of the current type, which type validation already covers. Each checked revision is loaded with one server request, so the cost grows with the number of moved or retyped revisions; the log reports how many were loaded and how long the scan took. It is off by default. Each history-only field is reported once per source and target type pair, with revision and work item counts and sample IDs.
+
+By default the findings are warnings and the migration continues. Set `StopIfHistoryOnlyFieldsFound` to `true` to stop instead. To keep the data, add the field to the target work item type. To accept the loss, list the field in `ExcludeSourceFields`; excluded fields are still logged, as information.
+
+```json
+"TfsWorkItemTypeValidatorTool": {
+  "Enabled": true,
+  "ScanRevisionHistoryForFields": true,
+  "StopIfHistoryOnlyFieldsFound": true
+}
+```
+
+When the scan is off, the same fields are still reported during the run and in the summary at the end of it.
 
 {{< class-metadata >}}
 
@@ -169,6 +196,8 @@ The tool provides comprehensive logging including field types, allowed values, a
 
 
 ## Log output example
+
+This output is from an earlier version, before `SourceFieldMappings` and `FixedTargetFields` were replaced by field maps in `FieldMappingTool` and `ExcludeSourceFields`. The messages that mention them are worded differently now.
 
 ```text
 [10:54:09 INF] [ValidateWorkItemTypes]

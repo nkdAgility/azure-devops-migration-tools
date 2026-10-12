@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.DataContracts;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
+using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -110,6 +113,101 @@ namespace MigrationTools.Tools
             LogReflectedWorkItemIdValidationResult(isValid, reflectedWorkItemIdField);
             return isValid;
         }
+
+        public bool ScanRevisionHistoryForFields => Options.ScanRevisionHistoryForFields;
+
+        public bool StopIfHistoryOnlyFieldsFound => Options.StopIfHistoryOnlyFieldsFound;
+
+        /// <summary>
+        /// Scans the revisions of <paramref name="sourceWorkItems"/> that were saved under another team project or work
+        /// item type for fields with values that exist neither on the source type nor on the target type the revision is
+        /// replayed to (#3194). Each such revision is loaded from the server. Returns <see langword="false"/> if any such
+        /// field is found that is not excluded by <see cref="TfsWorkItemTypeValidatorToolOptions.ExcludeSourceFields"/>.
+        /// </summary>
+        /// <param name="isUsableInTarget">
+        /// The target type check used by revision replay. Defaults to the type existing in <paramref name="targetWits"/>.
+        /// </param>
+        public bool ValidateRevisionHistoryFields(
+            List<WorkItemData> sourceWorkItems,
+            List<WorkItemType> sourceWits,
+            List<WorkItemType> targetWits,
+            Func<string, bool>? isUsableInTarget = null)
+        {
+            Options.Normalize();
+            Log.LogInformation("Scanning revisions of {count} work item(s) for fields that exist only in revision history.",
+                sourceWorkItems.Count);
+            var stopwatch = Stopwatch.StartNew();
+            Dictionary<string, ISet<string>> sourceFields = sourceWits
+                .ToDictionary(wit => wit.Name, GetFieldNames, StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, ISet<string>> targetFields = targetWits
+                .ToDictionary(wit => wit.Name, GetFieldNames, StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, bool> validatedTypes = new(StringComparer.OrdinalIgnoreCase);
+            ISet<string>? GetSourceFields(string sourceWit)
+            {
+                if (!validatedTypes.TryGetValue(sourceWit, out bool validate))
+                {
+                    validate = ShouldValidateWorkItemType(sourceWit);
+                    validatedTypes[sourceWit] = validate;
+                }
+                if (!validate)
+                {
+                    return null;
+                }
+                // A type that is not in the current source project has no fields that field maps could read.
+                return sourceFields.TryGetValue(sourceWit, out ISet<string> fields)
+                    ? fields
+                    : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
+            var scanner = new HistoryOnlyFieldScanner(
+                _witMappingTool.Mappings,
+                isUsableInTarget ?? (targetWit => targetFields.ContainsKey(targetWit)),
+                GetSourceFields,
+                targetWit => targetFields.TryGetValue(targetWit, out ISet<string> fields) ? fields : null,
+                LoadRevisionFields,
+                Options.IsSourceFieldExcluded);
+            MissingTargetFieldTracker found = scanner.Scan(sourceWorkItems);
+            stopwatch.Stop();
+            Log.LogInformation("Loaded {revisions} revision(s) saved under another team project or work item type.",
+                scanner.RevisionsLoaded);
+
+            foreach (string line in scanner.Excluded.GetSummary())
+            {
+                Log.LogInformation("  History-only field (excluded from validation): {MissingFieldSummary}", line);
+            }
+            if (found.Count == 0)
+            {
+                Log.LogInformation("No history-only fields found that are missing in the target ({elapsed:N0} ms).",
+                    stopwatch.Elapsed.TotalMilliseconds);
+                return true;
+            }
+            Log.LogWarning("{Count} field(s) have values in source revision history but exist neither on the current source"
+                + " work item type nor on the target type. These values will NOT be migrated ({elapsed:N0} ms):",
+                found.Count, stopwatch.Elapsed.TotalMilliseconds);
+            foreach (string line in found.GetSummary())
+            {
+                Log.LogWarning("  Missing target field: {MissingFieldSummary}", line);
+            }
+            Log.LogInformation("Field maps cannot rescue history-only fields, because they validate against the current source type."
+                + " To keep the data, add the field to the target work item type. To accept the loss, add the field to"
+                + $" '{nameof(TfsWorkItemTypeValidatorToolOptions.ExcludeSourceFields)}' or set"
+                + $" '{nameof(TfsWorkItemTypeValidatorToolOptions.StopIfHistoryOnlyFieldsFound)}' to false.");
+            return false;
+        }
+
+        // Revision.Fields of the current item only exposes the current type's fields; loading the item at that
+        // revision exposes the fields of the type it was saved under, as the revision replay does.
+        private static IEnumerable<FieldItem> LoadRevisionFields(WorkItemData workItem, RevisionItem revision)
+        {
+            var current = (WorkItem)workItem.internalObject;
+            WorkItem atRevision = current.Store.GetWorkItem(current.Id, revision.Number);
+            return atRevision.Fields.Cast<Field>()
+                .Select(f => new FieldItem { ReferenceName = f.ReferenceName, Name = f.Name, Value = f.Value })
+                .ToList();
+        }
+
+        private static ISet<string> GetFieldNames(WorkItemType wit)
+            => new HashSet<string>(wit.FieldDefinitions.Cast<FieldDefinition>().Select(f => f.ReferenceName),
+                StringComparer.OrdinalIgnoreCase);
 
         // Returns list of target work item types with respect to work item type mapping.
         private List<WitMapping> GetWitsToValidate(List<WorkItemType> sourceWits, List<WorkItemType> targetWits)

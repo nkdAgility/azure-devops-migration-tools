@@ -2563,6 +2563,16 @@
                       "type": "string"
                     }
                   ]
+                },
+                "ScanRevisionHistoryForFields": {
+                  "description": "If `true`, before migration starts the work items to be migrated are scanned for fields that\r\n have a value only in revision history: the revision was saved under another team project or work item type\r\n (the item was moved or its type changed), and the field is on neither the source type in the current project\r\n nor the target type the revision is replayed to. These values cannot be migrated, and field maps cannot read\r\n them. Only moved or retyped revisions are checked, but each one is loaded with a separate server request,\r\n so the scan can add significant time when many items were moved. It is off by default.",
+                  "type": "boolean",
+                  "default": "false"
+                },
+                "StopIfHistoryOnlyFieldsFound": {
+                  "description": "If `true` and `ScanRevisionHistoryForFields` finds history-only fields that are\r\n not excluded by `ExcludeSourceFields`, the migration stops before any work item is migrated.\r\n If `false`, the fields are logged as warnings and the migration continues.",
+                  "type": "boolean",
+                  "default": "false"
                 }
               }
             },
