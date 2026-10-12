@@ -1,9 +1,11 @@
-﻿using System;
+﻿using MigrationTools.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -217,37 +219,56 @@ namespace MigrationTools.Processors
                         }
                         catch (Exception e)
                         {
+                            // .Wait() wraps failures in AggregateException; a stop request must end the run, not count as an item failure.
+                            var stop = e as MigrationRunStoppedException
+                                ?? (e as AggregateException)?.Flatten().InnerExceptions.OfType<MigrationRunStoppedException>().FirstOrDefault();
+                            if (stop != null)
+                            {
+                                ExceptionDispatchInfo.Capture(stop).Throw();
+                            }
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
                             workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
 
-                            if (Options.MaxGracefulFailures == 0)
+                            if (Options.StopOnFirstError)
                             {
                                 throw;
                             }
 
-                            if (_itemsInError.Count > Options.MaxGracefulFailures)
+                            if (ShouldAbortAfterFailure(Options.StopOnFirstError, Options.MaxGracefulFailures, _itemsInError.Count))
                             {
-                                throw new Exception($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
+                                throw new MigrationRunStoppedException($"Too many errors: more than {Options.MaxGracefulFailures} errors occurred, aborting migration.");
                             }
+                            workItemLog.Warning("Continuing with the remaining work items ({FailedCount} failed so far). Set StopOnFirstError to stop on the first failure.", _itemsInError.Count);
                         }
                     }
                 }
             }
             finally
             {
+                LogMissingTargetFieldSummary();
                 CommonTools.ExportWorkItemMapping.SaveMappings();
                 if (Options.FixHtmlAttachmentLinks)
                 {
                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
                 }
-
+                CommonTools.GitRepository?.LogUnresolvedSummary();
 
                 if (_itemsInError.Count > 0)
                 {
-                    contextLog.Warning("The following items could not be migrated: {ItemIds}", string.Join(", ", _itemsInError));
+                    CompletedWithErrors = true;
+                    contextLog.Error("{FailedCount} work item(s) could not be migrated: {ItemIds}", _itemsInError.Count, string.Join(", ", _itemsInError));
                 }
 
             }
+        }
+
+        public static bool ShouldAbortAfterFailure(bool stopOnFirstError, int maxGracefulFailures, int failureCount)
+        {
+            if (stopOnFirstError)
+            {
+                return failureCount > 0;
+            }
+            return maxGracefulFailures > 0 && failureCount > maxGracefulFailures;
         }
 
         private void ValidateProject()
@@ -263,7 +284,7 @@ namespace MigrationTools.Processors
             {
                 Log.LogError("Source project '{ProjectName}' not found!", sourceProjectName);
                 Log.LogInformation("Available projects are: {@sourceProjects}", string.Join(", ", sourceProjects.Select(p => p.Name)));
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Source project not found.");
             }
             else
             {
@@ -279,7 +300,7 @@ namespace MigrationTools.Processors
             {
                 Log.LogError("Target project '{ProjectName}' not found!", targetProjectName);
                 Log.LogInformation("Available projects are: {@targetProjects}", string.Join(", ", targetProjects.Select(p => p.Name)));
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Target project not found.");
             }
             else
             {
@@ -329,7 +350,7 @@ namespace MigrationTools.Processors
             if (!containsReflectedWorkItemId || !validationResult)
             {
                 Log.LogError("Validation of work item types failed.");
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Validation of work item types failed.");
             }
             Log.LogInformation("------------------------------------");
             Log.LogInformation("[/ValidateWorkItemTypes]");
@@ -387,7 +408,7 @@ namespace MigrationTools.Processors
                 {
                     var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
                     Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
-                    Environment.Exit(-1);
+                    throw new MigrationRunStoppedException("Missing PersonalAccessToken from Target.");
                 }
             }
         }
@@ -397,6 +418,47 @@ namespace MigrationTools.Processors
             double result;
             return double.TryParse(val, numberStyle,
                 CultureInfo.CurrentCulture, out result);
+        }
+
+        private readonly Dictionary<string, bool> _targetTypeUsableCache = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// True when the type exists in the target project and is not disabled. Disabled state is read over REST
+        /// (the object model does not expose it); if that lookup fails the type is assumed to be enabled.
+        /// </summary>
+        private bool IsWorkItemTypeUsableInTarget(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName)) return false;
+            if (_targetTypeUsableCache.TryGetValue(typeName, out var cached)) return cached;
+            bool usable = Target.WorkItems.Project.ToProject().WorkItemTypes.Contains(typeName);
+            bool lookupSucceeded = true;
+            if (usable)
+            {
+                try
+                {
+                    string token = Target.Options.Authentication?.AccessToken;
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        using (var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token)))
+                        using (var client = connection.GetClient<WorkItemTrackingHttpClient>())
+                        {
+                            var wit = client.GetWorkItemTypeAsync(Target.Options.Project, typeName).GetAwaiter().GetResult();
+                            if (wit?.IsDisabled == true) usable = false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Do not cache: a later work item can retry once REST recovers.
+                    lookupSucceeded = false;
+                    Log.LogWarning(ex, "Unable to determine whether work item type '{TypeName}' is disabled in the target; assuming it is enabled.", typeName);
+                }
+            }
+            if (lookupSucceeded)
+            {
+                _targetTypeUsableCache[typeName] = usable;
+            }
+            return usable;
         }
 
         private WorkItemData CreateWorkItem_Shell(ProjectData destProject, WorkItemData currentRevisionWorkItem, string destType)
@@ -460,6 +522,71 @@ namespace MigrationTools.Processors
             };
         }
 
+        private readonly MissingTargetFieldTracker _missingTargetFields = new MissingTargetFieldTracker();
+
+        /// <summary>
+        /// Records that a source revision carried a value for a field that does not exist on the target work item type.
+        /// The work item type validator only inspects the current source type definitions, so fields that only appear
+        /// in historical revisions (e.g. items moved from another project or process) are not caught up front (#3173).
+        /// The first occurrence is logged prominently and a summary is produced at the end of the run.
+        /// </summary>
+        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision, bool fieldOnSourceType)
+        {
+            // Field maps are applied later in the revision replay; a field they consume is not dropped. Maps validate
+            // the source field against the current source type, so a history-only field is never handled by a map.
+            if (fieldOnSourceType && IsSourceFieldHandledByFieldMap(sourceType, fieldReferenceName))
+            {
+                return;
+            }
+            if (_missingTargetFields.Record(sourceType, targetType, fieldReferenceName, sourceWorkItemId, sourceRevision))
+            {
+                Log.LogWarning("Field '{MissingField}' has data in source revisions of type '{SourceType}' but does not exist on target type '{TargetType}'. "
+                    + "The value will NOT be migrated. If the field is not on the current source type it only exists in work item history "
+                    + "(e.g. the item was moved from another project/process), so it is not reported by TfsWorkItemTypeValidatorTool "
+                    + "and field maps cannot read it. Add the field to the target type, or for a field on the source type configure a "
+                    + "field map for the source type. A summary is logged at the end of the run.",
+                    fieldReferenceName, sourceType, targetType);
+            }
+        }
+
+        private readonly Dictionary<string, HashSet<string>> _sourceTypeFields = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        // Revisions of an item moved between projects report the old project's type, so check the field against the
+        // type in the current source project, which is what field maps validate against.
+        private bool IsFieldOnCurrentSourceType(string sourceType, string fieldReferenceName)
+        {
+            if (!_sourceTypeFields.TryGetValue(sourceType, out var fields))
+            {
+                var witTypes = Source.WorkItems.Project.ToProject().WorkItemTypes;
+                fields = witTypes.Contains(sourceType)
+                    ? new HashSet<string>(witTypes[sourceType].FieldDefinitions.Cast<FieldDefinition>().Select(fd => fd.ReferenceName), StringComparer.OrdinalIgnoreCase)
+                    : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                _sourceTypeFields[sourceType] = fields;
+            }
+            return fields.Contains(fieldReferenceName);
+        }
+
+        private bool IsSourceFieldHandledByFieldMap(string sourceType, string fieldReferenceName)
+        {
+            return CommonTools.FieldMappingTool.GetFieldToFieldMaps(sourceType, fieldReferenceName, FieldMapMode.SourceToTarget).Any()
+                || CommonTools.FieldMappingTool.GetFieldToFieldMultiMaps(sourceType, fieldReferenceName).Any();
+        }
+
+        private void LogMissingTargetFieldSummary()
+        {
+            if (_missingTargetFields.Count == 0)
+            {
+                return;
+            }
+            Log.LogWarning("{Count} source field(s) had values that were not migrated because the field does not exist on the target work item type "
+                + "and no applicable field map handles them. These are not detected by work item type validation, which only checks current "
+                + "type definitions and not fields present in revision history:", _missingTargetFields.Count);
+            foreach (var line in _missingTargetFields.GetSummary())
+            {
+                Log.LogWarning("  Missing target field: {MissingFieldSummary}", line);
+            }
+        }
+
         // TODO : Make this into the Work Item mapping tool
         private void PopulateWorkItem(WorkItemData oldWorkItemData, WorkItemData newWorkItemData, string destType)
         {
@@ -489,36 +616,38 @@ namespace MigrationTools.Processors
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                CommonTools.UserMapping.MapUserIdentityField(f);
-                if (newWorkItem.Fields.Contains(f.ReferenceName))
-                {
-                    CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
-                }
-
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
+                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id, oldWorkItem.Revision,
+                            IsFieldOnCurrentSourceType(oldWorkItem.Type.Name, f.ReferenceName));
                         Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWorkItemData.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;
                 }
+                // Fields pre-populated on the shell (e.g. System.CreatedBy) may be read-only below, so map them here.
+                if (!_ignore.Contains(f.ReferenceName))
+                {
+                    CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
+                }
+                var sourceFieldValue = CommonTools.UserMapping.MapUserIdentityValue(f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value);
                 if (!_ignore.Contains(f.ReferenceName) &&
                     (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable)
-                    && oldWorkItem.Fields[f.ReferenceName].Value != newWorkItem.Fields[f.ReferenceName].Value)
+                    && sourceFieldValue != newWorkItem.Fields[f.ReferenceName].Value)
                 {
-                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
+                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, sourceFieldValue, newWorkItem.Fields[f.ReferenceName].Value);
 
                     switch (f.FieldDefinition.FieldType)
                     {
                         case FieldType.String:
-                            string oldValue = oldWorkItem.Fields[f.ReferenceName].Value.ToString();
+                            string oldValue = sourceFieldValue?.ToString();
                             string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
                             newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
                         default:
-                            newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
+                            newWorkItem.Fields[f.ReferenceName].Value = sourceFieldValue;
                             break;
                     }
 
@@ -547,8 +676,12 @@ namespace MigrationTools.Processors
                     {
                         Log.LogWarning($"Microsoft.VSTS.TCM.Steps does not exist on Source Work Item. This field will be skipped, but the all other fields on the revision will be populated. Exception details: {ex.Message}");
                     }
-                    newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
-                        oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
+                    // The source revision may be an earlier, different type (shell fell back to the final type).
+                    if (oldWorkItem.Fields.Contains("Microsoft.VSTS.Common.Priority"))
+                    {
+                        newWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value =
+                            oldWorkItem.Fields["Microsoft.VSTS.Common.Priority"].Value;
+                    }
                     break;
             }
 
@@ -681,6 +814,7 @@ namespace MigrationTools.Processors
                     else
                     {
                         TraceWriteLine(LogEventLevel.Error, "ERROR: Failed to create work item. Retry Limit reached ");
+                        throw;
                     }
                 }
                 catch (Exception ex)
@@ -743,25 +877,29 @@ namespace MigrationTools.Processors
                 //If work item hasn't been created yet, create a shell
                 if (targetWorkItem == null)
                 {
-                    var finalDestType = revisionsToMigrate.Last().Type;
-                    var targetType = revisionsToMigrate.First().Type;
+                    var firstSourceType = revisionsToMigrate.First().Type;
+                    var finalSourceType = revisionsToMigrate.Last().Type;
 
-                    if (targetType != finalDestType)
+                    if (firstSourceType != finalSourceType)
                     {
-                        TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {targetType} to {finalDestType}");
+                        TraceWriteLine(LogEventLevel.Information, $"WorkItem has changed type at one of the revisions, from {firstSourceType} to {finalSourceType}");
                     }
 
-                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(targetType))
+                    var selection = WorkItemShellTypeSelector.Select(firstSourceType, finalSourceType, CommonTools.WorkItemTypeMapping.Mappings, IsWorkItemTypeUsableInTarget);
+                    if (selection.FellBackToFinalType)
                     {
-                        targetType = CommonTools.WorkItemTypeMapping.Mappings[targetType];
+                        Log.LogWarning("Source work item {SourceId} changed type from '{FirstType}' to '{FinalType}'. Target type '{FirstTargetType}' does not exist or is disabled in the target project, so the work item will be created as '{ShellType}' instead.",
+                            sourceWorkItem.Id, firstSourceType, finalSourceType, selection.FirstType, selection.ShellType);
                     }
-                    targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, targetType);
+                    targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, selection.ShellType);
                 }
 
                 if (Options.AttachRevisionHistory)
                 {
                     CommonTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
+
+                Dictionary<string, object> replayedIdentityValues = null;
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -774,10 +912,12 @@ namespace MigrationTools.Processors
                         });
 
                     // Decide on WIT
-                    var destType = currentRevisionWorkItem.Type;
-                    if (CommonTools.WorkItemTypeMapping.Mappings.ContainsKey(destType))
+                    var revisionType = WorkItemShellTypeSelector.MapType(currentRevisionWorkItem.Type, CommonTools.WorkItemTypeMapping.Mappings);
+                    var destType = WorkItemShellTypeSelector.SelectRevisionType(currentRevisionWorkItem.Type, targetWorkItem.Type, CommonTools.WorkItemTypeMapping.Mappings, IsWorkItemTypeUsableInTarget);
+                    if (destType != revisionType)
                     {
-                        destType = CommonTools.WorkItemTypeMapping.Mappings[destType];
+                        Log.LogWarning("Source work item {SourceId} revision {RevisionNumber} has type '{RevisionType}', which does not exist or is disabled in the target; keeping '{CurrentType}'.",
+                            sourceWorkItem.Id, revision.Number, revisionType, targetWorkItem.Type);
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 
@@ -881,12 +1021,15 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    CheckClosedDateIsValid(sourceWorkItem, targetWorkItem);
+                    ApplySourceClosedDate(currentRevisionWorkItem, targetWorkItem);
+                    CheckClosedDateIsValid(currentRevisionWorkItem, targetWorkItem);
 
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
-
+                        var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
+                        replayedIdentityValues = SnapshotIdentityFields(targetWorkItem);
                         targetWorkItem.SaveToAzureDevOps();
+                        EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
@@ -899,8 +1042,12 @@ namespace MigrationTools.Processors
 
                 // Until here we impersonate the maker of the revisions. From here we act as ourselves to push the attachments and add the comment
                 targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-
+                // Once ChangedBy is no longer an impersonated user, the object model re-runs the process rules and
+                // "copy from current user" rules stamp the migration account into AssignedTo/ResolvedBy/ClosedBy.
+                // Put back the values written by the last replayed revision before every save from here on, including
+                // the per-link and attachment saves made inside the tools (#2869).
                 if (targetWorkItem != null)
+                using (targetWorkItem.RegisterBeforeSave(wi => RestoreIdentityFields(wi, replayedIdentityValues)))
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     if (!string.IsNullOrEmpty(targetWorkItem.Id))
@@ -948,9 +1095,138 @@ namespace MigrationTools.Processors
                 Log.LogInformation("===============================================================");
                 Log.LogError(ex.ToString(), ex);
                 Log.LogInformation("===============================================================");
+                throw;
             }
 
             return targetWorkItem;
+        }
+
+        private static readonly HashSet<string> _identityFieldsNotRestored = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "System.ChangedBy",
+            "System.AuthorizedAs",
+            "System.CreatedBy",
+        };
+
+        private static Dictionary<string, object> SnapshotIdentityFields(WorkItemData targetWorkItem)
+        {
+            var snapshot = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            if (targetWorkItem == null) return snapshot;
+            foreach (Field f in targetWorkItem.ToWorkItem().Fields)
+            {
+                if (f.FieldDefinition.IsIdentity && !_identityFieldsNotRestored.Contains(f.ReferenceName))
+                {
+                    snapshot[f.ReferenceName] = f.Value;
+                }
+            }
+            return snapshot;
+        }
+
+        /// <summary>
+        /// Puts back identity field values that process rules (e.g. "copy from current user") changed after the
+        /// replay finished, so the migration account is not written into AssignedTo/ResolvedBy/ClosedBy (#2869).
+        /// </summary>
+        private void RestoreIdentityFields(WorkItemData targetWorkItem, Dictionary<string, object> snapshot)
+        {
+            if (targetWorkItem == null || snapshot == null || snapshot.Count == 0) return;
+            var target = targetWorkItem.ToWorkItem();
+            foreach (var kvp in snapshot)
+            {
+                if (!target.Fields.Contains(kvp.Key)) continue;
+                var field = target.Fields[kvp.Key];
+                var current = field.Value as string ?? field.Value?.ToString() ?? string.Empty;
+                var expected = kvp.Value as string ?? kvp.Value?.ToString() ?? string.Empty;
+                if (string.Equals(current, expected, StringComparison.Ordinal)) continue;
+                try
+                {
+                    field.Value = kvp.Value;
+                    Log.LogDebug("RestoreIdentityFields: {field} reset to replayed value '{expected}' (rules had set '{current}')", kvp.Key, expected, current);
+                }
+                catch (Exception ex)
+                {
+                    Log.LogWarning(ex, "RestoreIdentityFields: could not reset {field} to '{expected}'; it stays '{current}'.", kvp.Key, expected, current);
+                }
+            }
+        }
+
+        private static string GetClosedDateField(WorkItem workItem)
+        {
+            return ClosedDateHelper.ResolveField(
+                workItem.Fields.Contains(ClosedDateHelper.CommonClosedDate),
+                workItem.Fields.Contains(ClosedDateHelper.SystemClosedDate));
+        }
+
+        /// <summary>
+        /// Sets the target ClosedDate to the source revision's value when the source revision has one.
+        /// Runs after State/Reason, field copying and field maps. With a BypassRules store the field is
+        /// writable even when the object model reports it as not editable (it is rule-controlled).
+        /// Items whose source revision has no ClosedDate (i.e. not closed) are left untouched.
+        /// </summary>
+        private void ApplySourceClosedDate(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        {
+            var source = sourceRevision.ToWorkItem();
+            var target = targetWorkItem.ToWorkItem();
+            var targetField = GetClosedDateField(target);
+            if (targetField == null) return;
+            var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
+            if (sourceField == null) return;
+
+            var sourceValue = source.Fields[sourceField].Value;
+            var targetValue = target.Fields[targetField].Value;
+            if (!ClosedDateHelper.NeedsUpdate(sourceValue, targetValue)) return;
+            try
+            {
+                target.Fields[targetField].Value = sourceValue;
+                Log.LogDebug("ApplySourceClosedDate: {field} set to source value {value} (was {old})", targetField, sourceValue, targetValue);
+            }
+            catch (Exception ex)
+            {
+                Log.LogDebug(ex, "ApplySourceClosedDate: could not set {field} before save; a fix-up save will be attempted.", targetField);
+            }
+        }
+
+        private sealed class ClosedDateFixUpException : Exception
+        {
+            public ClosedDateFixUpException(string message, Exception inner) : base(message, inner) { }
+        }
+
+        /// <summary>
+        /// The server can still apply the current date to ClosedDate on save, even with BypassRules,
+        /// so a mismatch after save is corrected with a fix-up revision.
+        /// </summary>
+        private void EnsureClosedDateAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
+        {
+            try
+            {
+                var target = targetWorkItem.ToWorkItem();
+                var source = sourceRevision.ToWorkItem();
+                var targetField = GetClosedDateField(target);
+                if (targetField == null) return;
+                var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
+                if (sourceField == null) return;
+                var sourceValue = source.Fields[sourceField].Value;
+                if (!ClosedDateHelper.NeedsUpdate(sourceValue, target.Fields[targetField].Value)) return;
+
+                Log.LogWarning("ClosedDate on target #{targetId} is {targetValue} after save but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
+                    target.Id, target.Fields[targetField].Value, source.Id, source.Rev, sourceValue);
+                target.Fields[targetField].Value = sourceValue;
+                var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
+                target.Fields["System.ChangedDate"].Value = fixUpDate;
+                target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
+                targetWorkItem.SaveToAzureDevOps();
+                var floor = fixUpDate;
+                for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
+                {
+                    revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
+                    floor = revisionsToMigrate[i].ChangedDate;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
+                targetWorkItem.ToWorkItem().Reset();
+                throw new ClosedDateFixUpException($"Unable to apply fix-up save for ClosedDate on target #{targetWorkItem.Id}", ex);
+            }
         }
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)

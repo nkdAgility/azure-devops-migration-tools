@@ -34,7 +34,7 @@
       "default": "true"
     },
     "MaxGracefulFailures": {
-      "description": "The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will\r\n continue until the number of failed items reaches the configured value, after which the migration fails.",
+      "description": "The maximum number of failed work items to tolerate before the run is aborted. When set to zero (the default) there is no limit: every failed\r\n work item is logged and recorded, the remaining items are still migrated, and the processor is reported as failed at the end with a list of the\r\n failed IDs. When set above zero, the run aborts once more than this number of items have failed. Use `StopOnFirstError` to stop on the first failure.",
       "type": "integer",
       "default": "0"
     },
@@ -58,6 +58,11 @@
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
+    },
+    "StopOnFirstError": {
+      "description": "When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),\r\n the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.",
+      "type": "boolean",
+      "default": "false"
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",

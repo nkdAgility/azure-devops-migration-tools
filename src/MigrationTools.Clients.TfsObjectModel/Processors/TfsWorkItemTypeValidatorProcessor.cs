@@ -1,4 +1,5 @@
-﻿using System;
+using MigrationTools.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -59,7 +60,7 @@ namespace MigrationTools.Processors
                     "Either the reflected work item type ID field '{ReflectedWorkItemIdField}' is missing in some of the target work item types"
                     + $" or '{nameof(Options.StopIfValidationFails)}' is set to 'true', so migration process will stop now.";
                 Log.LogInformation(message, Target.Options.ReflectedWorkItemIdField);
-                Environment.Exit(-1);
+                throw new MigrationRunStoppedException("Work item type validation failed.");
             }
         }
     }

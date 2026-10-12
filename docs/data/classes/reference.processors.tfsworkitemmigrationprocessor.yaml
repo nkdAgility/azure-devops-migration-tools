@@ -21,6 +21,7 @@ configurationSamples:
             "SkipRevisionWithInvalidAreaPath": "False",
             "SkipRevisionWithInvalidIterationPath": "False",
             "SourceName": "Source",
+            "StopOnFirstError": "False",
             "TargetName": "Target",
             "UpdateCreatedBy": "True",
             "UpdateCreatedDate": "True",
@@ -118,8 +119,9 @@ options:
 - parameterName: MaxGracefulFailures
   type: Int32
   description: >-
-    The maximum number of failures to tolerate before the migration fails. When set above zero, a work item migration error is logged but the migration will
-     continue until the number of failed items reaches the configured value, after which the migration fails.
+    The maximum number of failed work items to tolerate before the run is aborted. When set to zero (the default) there is no limit: every failed
+     work item is logged and recorded, the remaining items are still migrated, and the processor is reported as failed at the end with a list of the
+     failed IDs. When set above zero, the run aborts once more than this number of items have failed. Use `StopOnFirstError` to stop on the first failure.
   defaultValue: 0
   isRequired: false
   dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
@@ -153,6 +155,14 @@ options:
   defaultValue: missing XML code comments
   isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: StopOnFirstError
+  type: Boolean
+  description: >-
+    When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),
+     the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.
+  defaultValue: false
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.

@@ -268,6 +268,10 @@ namespace MigrationTools.Tools
                 {
                     wiSourceR = processor.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
                 }
+                catch (MigrationRunStoppedException)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     Telemetry.TrackException(ex, null);
@@ -277,6 +281,10 @@ namespace MigrationTools.Tools
                 try
                 {
                     wiTargetR = GetRightHandSideTargetWi(processor, wiSourceR, wiTargetL);
+                }
+                catch (MigrationRunStoppedException)
+                {
+                    throw;
                 }
                 catch (Exception ex)
                 {
