@@ -64,7 +64,10 @@ options:
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SaveAfterEachLinkIsAdded
   type: Boolean
-  description: Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
+  description: >-
+    Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
+     Ignored while TfsWorkItemMigrationProcessor replays revisions, because links are then saved with the revision
+     where they were added or removed in the source.
   defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
