@@ -112,7 +112,9 @@ options:
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: GenerateMigrationComment
   type: Boolean
-  description: If enabled, adds a comment recording the migration
+  description: >-
+    If enabled, adds a comment recording the migration. The comment is added to the History of the last replayed
+     revision, after that revision's own comment, rather than in a separate revision.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

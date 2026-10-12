@@ -65,7 +65,12 @@ namespace MigrationTools.Tools
         }
 
 
-        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        /// <summary>Rewrites the target's Git links (commit, branch, changeset) to the mapped target repositories.</summary>
+        /// <param name="processor">The processor running the migration.</param>
+        /// <param name="sourceWorkItem">The source work item, used for its project name.</param>
+        /// <param name="targetWorkItem">The target work item whose links are rewritten.</param>
+        /// <param name="save">False during revision replay (#3192): the rewritten links are saved with the revision being replayed.</param>
+        public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {
             _processor = processor;
             if (sourceWorkItem is null)
@@ -84,7 +89,6 @@ namespace MigrationTools.Tools
             }
 
             Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
-            var changeSetMappings = Services.GetRequiredService<TfsChangeSetMappingTool>();
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
             int count = 0;
@@ -106,108 +110,33 @@ namespace MigrationTools.Tools
                     }
                     else
                     {
-                        TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, changeSetMappings, sourceWorkItem?.ProjectName);
-
-                        // if sourceRepo is null ignore this link and keep processing further links
-                        if (sourceRepoInfo == null)
+                        string targetUri = MapGitLinkToTargetUri(el, sourceWorkItem?.ProjectName, out bool dropLink, out string linkTypeId);
+                        if (dropLink)
+                        {
+                            removeEL.Add(el);
+                            continue;
+                        }
+                        if (targetUri == null)
                         {
                             continue;
                         }
-
-                        // if repo was not found in source project, try to find it by repoId in the whole project collection
-                        if (sourceRepoInfo.GitRepo == null)
+                        ExternalLink newLink = new ExternalLink(((TfsWorkItemMigrationClient)_processor.Target.WorkItems).Store.RegisteredLinkTypes[linkTypeId], targetUri);
+                        if (linkTypeId == ArtifactLinkIds.Commit)
                         {
-                            var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, sourceWorkItem?.ProjectName);
-                            // Legacy links carry the repo GUID, so a hit there is exact even when the repo lives in (or was referenced
-                            // under) another / former project name. Newer "Project/Repo/id" links match on project and repo name, falling
-                            // back to a repo name that is unique in the collection (needed when the project was renamed). Accept the repo
-                            // when it is mapped (by "Repo" or "Project/Repo") or when the target project has a repo of the same name.
-                            if (ShouldUseCrossProjectRepo(anyProjectSourceRepoInfo?.GitRepo, Options.Mappings, targetRepos))
-                            {
-                                sourceRepoInfo = anyProjectSourceRepoInfo;
-                            }
-                            else
-                            {
-                                ReportUnresolved(anyProjectSourceRepoInfo ?? sourceRepoInfo);
-                            }
+                            newLink.Comment = el.Comment;
                         }
-
-                        if (sourceRepoInfo.GitRepo != null)
+                        var elinks = from Link lq in targetWorkItem.ToWorkItem().Links
+                                     where gitWits.Contains(lq.ArtifactLinkType.Name)
+                                     select (ExternalLink)lq;
+                        var found =
+                        (from Link lq in elinks
+                         where ((ExternalLink)lq).LinkedArtifactUri.ToLower() == newLink.LinkedArtifactUri.ToLower()
+                         select lq).SingleOrDefault();
+                        if (found == null)
                         {
-                            string targetRepoName = GetTargetRepoName(Options.Mappings, sourceRepoInfo);
-                            string sourceProjectName = sourceRepoInfo?.GitRepo?.ProjectReference?.Name ?? _processor.Target.Options.Project;
-                            string targetProjectName = _processor.Target.Options.Project;
-
-                            TfsGitRepositoryInfo targetRepoInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
-                            // if repo was not found in the target project, try to find it in the whole target project collection
-                            if (targetRepoInfo.GitRepo == null)
-                            {
-                                if (Options.Mappings.Values.Contains(targetRepoName))
-                                {
-                                    var anyTargetRepoInCollectionInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
-                                    if (anyTargetRepoInCollectionInfo.GitRepo != null)
-                                    {
-                                        targetRepoInfo = anyTargetRepoInCollectionInfo;
-                                    }
-                                }
-                            }
-
-                            // Fix commit links if target repo has been found
-                            if (targetRepoInfo.GitRepo != null)
-                            {
-                                Log.LogDebug("GitRepositoryEnricher: Fixing {SourceRepoUrl} to {TargetRepoUrl}?", sourceRepoInfo.GitRepo.RemoteUrl, targetRepoInfo.GitRepo.RemoteUrl);
-
-                                // Create External Link object
-                                ExternalLink newLink = null;
-                                switch (l.ArtifactLinkType.Name)
-                                {
-                                    case "Branch":
-                                        newLink = new ExternalLink(((TfsWorkItemMigrationClient)_processor.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Branch],
-                                            $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
-                                        break;
-
-                                    case "Fixed in Changeset":  // TFVC
-                                    case "Fixed in Commit":
-                                        newLink = new ExternalLink(((TfsWorkItemMigrationClient)_processor.Target.WorkItems).Store.RegisteredLinkTypes[ArtifactLinkIds.Commit],
-                                            $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
-                                        newLink.Comment = el.Comment;
-                                        break;
-
-                                    case "Pull Request":
-                                        //newLink = new ExternalLink(targetStore.Store.RegisteredLinkTypes[ArtifactLinkIds.PullRequest],
-                                        //    $"vstfs:///Git/PullRequestId/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}");
-                                        removeEL.Add(el);
-                                        break;
-
-                                    default:
-                                        Log.LogWarning("Skipping unsupported link type {0}", l.ArtifactLinkType.Name);
-                                        break;
-                                }
-
-                                if (newLink != null)
-                                {
-                                    var elinks = from Link lq in targetWorkItem.ToWorkItem().Links
-                                                where gitWits.Contains(lq.ArtifactLinkType.Name)
-                                                select (ExternalLink)lq;
-                                    var found =
-                                    (from Link lq in elinks
-                                    where ((ExternalLink)lq).LinkedArtifactUri.ToLower() == newLink.LinkedArtifactUri.ToLower()
-                                    select lq).SingleOrDefault();
-                                    if (found == null)
-                                    {
-                                        newEL.Add(newLink);
-                                    }
-                                    removeEL.Add(el);
-                                }
-                            }
-                            else
-                            {
-                                ReportUnresolved(sourceRepoInfo, $"target repo \"{targetRepoName}\" not found",
-                                    TryGetMapping(Options.Mappings, sourceRepoInfo.GitRepo, out _)
-                                        ? $"Create \"{targetRepoName}\" in the target or fix the Mapping"
-                                        : null);
-                            }
+                            newEL.Add(newLink);
                         }
+                        removeEL.Add(el);
                     }
                 }
             }
@@ -241,12 +170,122 @@ namespace MigrationTools.Tools
                 }
             }
 
-            if (targetWorkItem.ToWorkItem().IsDirty && _save)
+            if (targetWorkItem.ToWorkItem().IsDirty && _save && save)
             {
                 Log.LogDebug("GitRepositoryEnricher: Saving {TargetWorkItemId}", targetWorkItem.Id);
                 targetWorkItem.SaveToAzureDevOps();
             }
             return count;
+        }
+
+        /// <summary>
+        /// Returns the URI that <see cref="Enrich"/> writes on the target for a source Git link, or null when the link
+        /// is not rewritten (tool disabled, links dropped, repo not mapped). Used during revision replay (#3192) to find
+        /// the target link to remove when the source removes a Git link.
+        /// </summary>
+        public string GetTargetUri(TfsProcessor processor, WorkItemData sourceWorkItem, ExternalLink sourceLink)
+        {
+            if (!Options.Enabled || Options.ShouldDropChangedSetLinks || sourceLink?.ArtifactLinkType == null || !gitWits.Contains(sourceLink.ArtifactLinkType.Name))
+            {
+                return null;
+            }
+            _processor = processor;
+            SetupRepoBits();
+            if (sourceRepoService == null)
+            {
+                return null;
+            }
+            return MapGitLinkToTargetUri(sourceLink, sourceWorkItem?.ProjectName, out _, out _, report: false);
+        }
+
+        private string MapGitLinkToTargetUri(ExternalLink el, string sourceProjectName, out bool dropLink, out string linkTypeId, bool report = true)
+        {
+            dropLink = false;
+            linkTypeId = null;
+            var changeSetMappings = Services.GetRequiredService<TfsChangeSetMappingTool>();
+
+            // During revision replay (#3192) this runs on every revision that adds links, so links already rewritten to
+            // a target repository (and not also a source repository) are left alone instead of being re-mapped.
+            var targetRepoOfLink = TfsGitRepositoryInfo.Create(el, targetRepos, changeSetMappings, _processor.Target.Options.Project);
+            if (targetRepoOfLink?.GitRepo != null && !sourceRepos.Any(r => r.Id == targetRepoOfLink.GitRepo.Id))
+            {
+                return null;
+            }
+
+            TfsGitRepositoryInfo sourceRepoInfo = TfsGitRepositoryInfo.Create(el, sourceRepos, changeSetMappings, sourceProjectName);
+
+            // if sourceRepo is null ignore this link and keep processing further links
+            if (sourceRepoInfo == null)
+            {
+                return null;
+            }
+
+            // if repo was not found in source project, try to find it by repoId in the whole project collection
+            if (sourceRepoInfo.GitRepo == null)
+            {
+                var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, sourceProjectName);
+                // Legacy links carry the repo GUID, so a hit there is exact even when the repo lives in (or was referenced
+                // under) another / former project name. Newer "Project/Repo/id" links match on project and repo name, falling
+                // back to a repo name that is unique in the collection (needed when the project was renamed). Accept the repo
+                // when it is mapped (by "Repo" or "Project/Repo") or when the target project has a repo of the same name.
+                if (ShouldUseCrossProjectRepo(anyProjectSourceRepoInfo?.GitRepo, Options.Mappings, targetRepos))
+                {
+                    sourceRepoInfo = anyProjectSourceRepoInfo;
+                }
+                else
+                {
+                    if (report)
+                    {
+                        ReportUnresolved(anyProjectSourceRepoInfo ?? sourceRepoInfo);
+                    }
+                    return null;
+                }
+            }
+
+            string targetRepoName = GetTargetRepoName(Options.Mappings, sourceRepoInfo);
+            TfsGitRepositoryInfo targetRepoInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
+            // if repo was not found in the target project, try to find it in the whole target project collection
+            if (targetRepoInfo.GitRepo == null && Options.Mappings.Values.Contains(targetRepoName))
+            {
+                var anyTargetRepoInCollectionInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
+                if (anyTargetRepoInCollectionInfo.GitRepo != null)
+                {
+                    targetRepoInfo = anyTargetRepoInCollectionInfo;
+                }
+            }
+
+            if (targetRepoInfo.GitRepo == null)
+            {
+                if (report)
+                {
+                    ReportUnresolved(sourceRepoInfo, $"target repo \"{targetRepoName}\" not found",
+                        TryGetMapping(Options.Mappings, sourceRepoInfo.GitRepo, out _)
+                            ? $"Create \"{targetRepoName}\" in the target or fix the Mapping"
+                            : null);
+                }
+                return null;
+            }
+
+            Log.LogDebug("GitRepositoryEnricher: Fixing {SourceRepoUrl} to {TargetRepoUrl}?", sourceRepoInfo.GitRepo.RemoteUrl, targetRepoInfo.GitRepo.RemoteUrl);
+            switch (el.ArtifactLinkType.Name)
+            {
+                case "Branch":
+                    linkTypeId = ArtifactLinkIds.Branch;
+                    return $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}";
+
+                case "Fixed in Changeset":  // TFVC
+                case "Fixed in Commit":
+                    linkTypeId = ArtifactLinkIds.Commit;
+                    return $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}";
+
+                case "Pull Request":
+                    dropLink = true;
+                    return null;
+
+                default:
+                    Log.LogWarning("Skipping unsupported link type {0}", el.ArtifactLinkType.Name);
+                    return null;
+            }
         }
 
         private readonly Dictionary<string, int> _unresolvedRepos = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);

@@ -15,7 +15,7 @@
       "type": "boolean"
     },
     "SaveAfterEachLinkIsAdded": {
-      "description": "Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.",
+      "description": "Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.\r\n Ignored while TfsWorkItemMigrationProcessor replays revisions, because links are then saved with the revision\r\n where they were added or removed in the source.",
       "type": "boolean",
       "default": "false"
     }
