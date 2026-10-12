@@ -56,6 +56,21 @@ The `WorkItemMigrationContext` processor is used for migrating work items from o
 
 Overall, the `WorkItemMigrationContext` processor is a comprehensive tool for transferring work items and their associated data and metadata between Azure DevOps instances. It should be used whenever there is a need to move work items between instances while preserving as much information as possible.
 
+## How revisions, attachments and links are saved
+
+Each source revision is replayed as one target revision, with the source revision's `ChangedBy` and `ChangedDate`. Attachments and links are saved as part of the revision where they were added or removed in the source, so the migration does not add revisions dated after the source history:
+
+- **Attachments** and **links** (hyperlinks, external and Git links, work item links) are added and removed at the matching revision.
+- **Links to work items that are not migrated yet** are added later, from the other work item, when that one is migrated.
+- **The migration comment** (`GenerateMigrationComment`) is added to the History of the last replayed revision.
+- **Re-running** against work items that are already migrated adds no revisions unless something is missing. If something is, it is saved as the last author, one second after the last revision.
+
+### Known limitations
+
+- **Azure DevOps shows back-dated additions at revision 1.** When a revision's `ChangedDate` is set in the past, the work item history (and the `updates`/`revisions` REST APIs) list every *added* attachment and link under the first revision. The data itself is correct: each relation keeps the date of the revision it was added in. Removals are shown at the right revision. This is a service behaviour and cannot be changed by the tool.
+- **A source that was itself migrated with back-dated history** has the same problem in its revision view: removals are not visible at the revision where they happened. The last replayed revision is compared with the source work item's current attachments and links, so the final state always matches the source, but such removals are shown at the last revision.
+- **"Copy current user" rules overwrite identity fields.** Azure DevOps applies inherited process rules such as *"When State is Done, copy the current user to Assigned To"* on every save, even with `BypassRules` and even when the field value is sent. The migrated revision then shows the account running the migration. Disable these rules in the target process while you migrate, and turn them back on afterwards. The processor logs a warning at start-up for each rule of this kind it finds on the target work item types.
+
 ---
 
 ## WIQL Query
@@ -123,13 +138,11 @@ A complete list of [FieldMaps]({{< ref "docs/reference/field-maps" >}}) is avail
 
 > Note: These mappings could also be achieved with other forms of Field mapper e.g. `RegexFieldMapConfig`, but the value mapper as an example is easy to understand
 
-## Identity Fields and the "Migration" Revisions
+## Identity Fields
 
-After the last source revision is replayed, the processor saves the target work item again as `Migration` to add attachments, links and the migration comment. Changing `System.ChangedBy` causes the target process rules to run again, so rules such as "copy the current user to Resolved By" would previously overwrite identity fields with the account running the migration.
+Earlier versions saved each work item again as `Migration` after the replay, to add attachments, links and the migration comment, and process rules could then overwrite identity fields such as `System.AssignedTo`, `Microsoft.VSTS.Common.ResolvedBy` and `Microsoft.VSTS.Common.ClosedBy` with the account running the migration. Those saves no longer happen (see [How revisions, attachments and links are saved](#how-revisions-attachments-and-links-are-saved)), so every target revision keeps the source revision's author.
 
-The processor now records the replayed values of identity fields (for example `System.AssignedTo`, `Microsoft.VSTS.Common.ResolvedBy` and `Microsoft.VSTS.Common.ClosedBy`) and restores them before each of these saves. The values from the source, including empty values, are kept in every target revision. `System.ChangedBy`, `System.AuthorizedAs` and `System.CreatedBy` are not restored by this step.
-
-If you still see identity fields set to the migration account, check the target process for rules that set those fields, and check the [TfsUserMappingTool]({{< ref "docs/reference/tools/tfsusermappingtool" >}}) configuration.
+Process rules that *copy the current user* into an identity field still apply on every save, even with `BypassRules`, so the migration account can appear in that field on the revisions where the rule's condition holds. The processor warns about each such rule at start-up; disable them in the target process while migrating. If you still see identity fields set to the migration account, also check the [TfsUserMappingTool]({{< ref "docs/reference/tools/tfsusermappingtool" >}}) configuration.
 
 ## Removed Properties
 

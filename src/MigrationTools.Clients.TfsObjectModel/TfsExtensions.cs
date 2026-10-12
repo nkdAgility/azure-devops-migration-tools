@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Runtime.CompilerServices;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.DataContracts;
@@ -54,46 +53,12 @@ namespace MigrationTools
             tfswic.MapWorkItemtoWorkItemData(context, workItem, fieldsOfRevision);
         }
 
-        private static readonly ConditionalWeakTable<WorkItem, Action<WorkItemData>> _beforeSaveActions = new ConditionalWeakTable<WorkItem, Action<WorkItemData>>();
-
-        /// <summary>
-        /// Runs <paramref name="beforeSave"/> before every <see cref="SaveToAzureDevOps"/> of this work item, including
-        /// saves made by tools (links, attachments), until the returned handle is disposed.
-        /// </summary>
-        public static IDisposable RegisterBeforeSave(this WorkItemData context, Action<WorkItemData> beforeSave)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            var workItem = (WorkItem)context.internalObject;
-            _beforeSaveActions.Remove(workItem);
-            _beforeSaveActions.Add(workItem, beforeSave);
-            return new BeforeSaveRegistration(workItem, beforeSave);
-        }
-
-        private sealed class BeforeSaveRegistration : IDisposable
-        {
-            private readonly WorkItem _workItem;
-            private readonly Action<WorkItemData> _beforeSave;
-            public BeforeSaveRegistration(WorkItem workItem, Action<WorkItemData> beforeSave) { _workItem = workItem; _beforeSave = beforeSave; }
-            public void Dispose()
-            {
-                // Only remove our own callback; a later registration for the same work item replaces it.
-                if (_beforeSaveActions.TryGetValue(_workItem, out var current) && ReferenceEquals(current, _beforeSave))
-                {
-                    _beforeSaveActions.Remove(_workItem);
-                }
-            }
-        }
-
         public static void SaveToAzureDevOps(this WorkItemData context)
         {
             Log.Debug("TfsExtensions::SaveToAzureDevOps");
 
             if (context == null) throw new ArgumentNullException(nameof(context));
             var workItem = (WorkItem)context.internalObject;
-            if (_beforeSaveActions.TryGetValue(workItem, out var beforeSave))
-            {
-                beforeSave(context);
-            }
             if ((string)workItem.Fields["System.ChangedBy"].Value == string.Empty)
             {
                 workItem.Fields["System.ChangedBy"].Value = "Migration";
