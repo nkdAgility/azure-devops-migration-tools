@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -121,7 +121,7 @@ namespace MigrationTools.Endpoints
             //}
 
             string unformatted = (apiPathAttribute.IncludeProject ? "/" + Options.Project : "") + "/_apis/" + pathSplit[0] + (apiPathAttribute.IncludeTrailingSlash ? "/" : "");
-            builder.Path += Regex.IsMatch(unformatted, @"{\d}") ? string.Format(unformatted, routeParameters) : unformatted;
+            builder.Path += Regex.IsMatch(unformatted, @"{\d}") ? RestUrlHelper.FormatRoute(unformatted, routeParameters) : unformatted;
 
             if (apiNameAttribute.Name == "Release Piplines")
             {
@@ -188,7 +188,7 @@ namespace MigrationTools.Endpoints
                     foreach (RestApiDefinition definition in definitions.Value)
                     {
                         // Nessecary because getting all Pipelines doesn't include all of their properties
-                        var response = await client2.GetAsync(client2.BaseAddress + "/" + definition.Id + "?" + singleDefinitionQueryString);
+                        var response = await client2.GetAsync(RestUrlHelper.AppendSegment(client2.BaseAddress.ToString(), definition.Id) + "?" + singleDefinitionQueryString);
                         if (response.StatusCode == HttpStatusCode.OK)
                         {
                             var fullDefinition = await response.Content.ReadAsAsync<DefinitionType>();
@@ -196,7 +196,7 @@ namespace MigrationTools.Endpoints
                         }
                         else
                         {
-                            Log.LogError("Failed on call to get single [{definitionName}] with Id [{definitionId}].\r\nUrl: GET {requestUri}\r\nResponse Code:{statusCode}", typeof(DefinitionType).Name, definition.Id, response.RequestMessage.RequestUri.ToString(), httpResponse.StatusCode);
+                            Log.LogError("Failed on call to get single [{definitionName}] with Id [{definitionId}].\r\nUrl: GET {requestUri}\r\nResponse Code:{statusCode}", typeof(DefinitionType).Name, definition.Id, response.RequestMessage.RequestUri.ToString(), response.StatusCode);
                             throw new Exception(await response.Content.ReadAsStringAsync());
                         }
                     }
@@ -323,7 +323,7 @@ namespace MigrationTools.Endpoints
                         body = JsonConvert.SerializeObject(tempTaskGroup, jsonSettings);
 
                         content = new StringContent(body, Encoding.UTF8, "application/json");
-                        result = await client.PatchAsync(client.BaseAddress + $"/{taskGroupId}?disablePriorVersions=false", content);
+                        result = await client.PatchAsync(client.BaseAddress + $"/{RestUrlHelper.EscapeSegment(taskGroupId)}?disablePriorVersions=false", content);
 
                         responseContent = await result.Content.ReadAsStringAsync();
                         if (result.StatusCode != HttpStatusCode.OK)
@@ -434,7 +434,7 @@ namespace MigrationTools.Endpoints
                 string suffix = "";
                 if (apiPathAttribute == null || apiPathAttribute.IncludeIdOnUpdate)
                 {
-                    suffix = "/" + definitionToBeMigrated.Id;
+                    suffix = "/" + RestUrlHelper.EscapeSegment(definitionToBeMigrated.Id);
                 }
                 HttpResponseMessage result = null;
                 switch (apiPathAttribute.UpdateVerb)
@@ -450,7 +450,7 @@ namespace MigrationTools.Endpoints
                 var responseContent = await result.Content.ReadAsStringAsync();
                 if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.NotModified)
                 {
-                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. \r\nUrl: {Verb} {Url}\r\n{ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, Enum.GetName(typeof(HttpMethod), result.RequestMessage.Method), result.RequestMessage.RequestUri.ToString(), responseContent);
+                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName}. Please migrate it manually. \r\nUrl: {Verb} {Url}\r\n{ErrorText}", typeof(DefinitionType).Name, definitionToBeMigrated.Name, result.RequestMessage.Method.Method, result.RequestMessage.RequestUri.ToString(), responseContent);
                     continue;
                 }
                 else if (result.StatusCode == HttpStatusCode.NotModified)
@@ -552,9 +552,9 @@ namespace MigrationTools.Endpoints
         {
             var client = GetHttpClient(
                 $"{new UriBuilder(Options.Organisation)}/_apis/work/processes" +
-                $"/{processId}/workItemTypes/{witRefName}/layout/pages/{pageId}/sections/{sectionId}/groups/{group.Id}?" +
-                $"removeFromSectionId={oldSectionId}" +
-                (!string.IsNullOrEmpty(oldPageId) ? $"&removeFromPageId={oldPageId}" : ""),
+                $"/{RestUrlHelper.EscapeSegment(processId)}/workItemTypes/{RestUrlHelper.EscapeSegment(witRefName)}/layout/pages/{RestUrlHelper.EscapeSegment(pageId)}/sections/{RestUrlHelper.EscapeSegment(sectionId)}/groups/{RestUrlHelper.EscapeSegment(group.Id)}?" +
+                $"removeFromSectionId={RestUrlHelper.EscapeSegment(oldSectionId)}" +
+                (!string.IsNullOrEmpty(oldPageId) ? $"&removeFromPageId={RestUrlHelper.EscapeSegment(oldPageId)}" : ""),
                 "api-version=6.1-preview.1");
 
             DefaultContractResolver contractResolver = new DefaultContractResolver
@@ -618,8 +618,8 @@ namespace MigrationTools.Endpoints
         {
             var client = GetHttpClient(
                 $"{new UriBuilder(Options.Organisation)}/_apis/work/processes" +
-                $"/{processId}/workItemTypes/{witRefName}/layout/groups/{groupId}/Controls/{fieldName}?" +
-                (!string.IsNullOrEmpty(oldGroupId) ? $"&removeFromGroupId={oldGroupId}" : ""),
+                $"/{RestUrlHelper.EscapeSegment(processId)}/workItemTypes/{RestUrlHelper.EscapeSegment(witRefName)}/layout/groups/{RestUrlHelper.EscapeSegment(groupId)}/Controls/{RestUrlHelper.EscapeSegment(fieldName)}?" +
+                (!string.IsNullOrEmpty(oldGroupId) ? $"&removeFromGroupId={RestUrlHelper.EscapeSegment(oldGroupId)}" : ""),
                 "api-version=6.1-preview.1");
 
             DefaultContractResolver contractResolver = new DefaultContractResolver
