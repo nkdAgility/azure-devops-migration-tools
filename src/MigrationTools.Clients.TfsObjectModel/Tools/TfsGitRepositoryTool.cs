@@ -201,7 +201,10 @@ namespace MigrationTools.Tools
                             }
                             else
                             {
-                                ReportUnresolved(sourceRepoInfo, $"target repo \"{targetRepoName}\" not found");
+                                ReportUnresolved(sourceRepoInfo, $"target repo \"{targetRepoName}\" not found",
+                                    TryGetMapping(Options.Mappings, sourceRepoInfo.GitRepo, out _)
+                                        ? $"Create \"{targetRepoName}\" in the target or fix the Mapping"
+                                        : null);
                             }
                         }
                     }
@@ -250,8 +253,9 @@ namespace MigrationTools.Tools
         /// <summary>Repositories that could not be resolved, with the number of links referencing each.</summary>
         public IReadOnlyDictionary<string, int> UnresolvedRepos => _unresolvedRepos;
 
-        private void ReportUnresolved(TfsGitRepositoryInfo info, string reason = "source repo not resolved")
+        private void ReportUnresolved(TfsGitRepositoryInfo info, string reason = "source repo not resolved", string advice = null)
         {
+            advice ??= "Add a Mapping for the repo name (or \"Project/Repo\")";
             string key = info?.GitRepo != null
                 ? $"{info.GitRepo.ProjectReference?.Name}/{info.GitRepo.Name}"
                 : $"unknown repo id {info?.RepoID ?? "(none)"}";
@@ -260,7 +264,7 @@ namespace MigrationTools.Tools
             _unresolvedRepos[key] = seen + 1;
             if (seen == 0)
             {
-                Log.LogWarning("GitRepositoryEnricher: Could not rewrite git links - {RepoReference}. Add a Mapping for the repo name (or \"Project/Repo\") to rewrite these links. Further links to this repo are logged at Debug.", key);
+                Log.LogWarning("GitRepositoryEnricher: Could not rewrite git links - {RepoReference}. {Advice} to rewrite these links. Further links to this repo are logged at Debug.", key, advice);
             }
             else
             {
