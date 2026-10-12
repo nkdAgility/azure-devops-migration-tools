@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
@@ -316,7 +318,8 @@ namespace MigrationTools.Tests.Tools
             {
                 Enabled = true,
                 UserMappingFile = userMappingFile,
-                UseIdentityMapDataFormat = useIdentityMapDataFormat
+                UseIdentityMapDataFormat = useIdentityMapDataFormat,
+                IdentityFieldsToCheck = new List<string> { AssignedTo, "System.ChangedBy" }
             };
             return new TfsUserMappingTool(
                 Microsoft.Extensions.Options.Options.Create(options),
@@ -414,6 +417,151 @@ namespace MigrationTools.Tests.Tools
 
             Assert.IsTrue(TfsUserMappingTool.IsIdentityMapDataFormat(arrayFile, _logger));
             Assert.IsFalse(TfsUserMappingTool.IsIdentityMapDataFormat(dictionaryFile, _logger));
+        }
+
+        private const string AssignedTo = "System.AssignedTo";
+
+        private string WriteDictionaryFile()
+        {
+            var filePath = Path.Combine(_testDirectory, "dict-map.json");
+            TfsUserMappingTool.SerializeUserMap(filePath, new Dictionary<string, string> { ["Old Name"] = "New Name" }, _logger);
+            return filePath;
+        }
+
+        [TestMethod, TestCategory("L1")]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void MapUserIdentityValue_MappingHit_ReturnsTarget(bool identityFormat)
+        {
+            var file = identityFormat ? WriteExportedIdentityMapFile() : WriteDictionaryFile();
+            var tool = CreateTool(file, useIdentityMapDataFormat: identityFormat);
+
+            Assert.AreEqual("New Name", tool.MapUserIdentityValue(AssignedTo, "Old Name"));
+            Assert.AreEqual("New Name", tool.MapUserIdentityValue(AssignedTo, "old name"));
+            Assert.AreEqual("New Name", tool.MapUserIdentityValue(AssignedTo.ToLowerInvariant(), "Old Name"));
+        }
+
+        [TestMethod, TestCategory("L1")]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void MapUserIdentityValue_MappingMiss_ReturnsOriginal(bool identityFormat)
+        {
+            var file = identityFormat ? WriteExportedIdentityMapFile() : WriteDictionaryFile();
+            var tool = CreateTool(file, useIdentityMapDataFormat: identityFormat);
+
+            Assert.AreEqual("Someone Else", tool.MapUserIdentityValue(AssignedTo, "Someone Else"));
+            // Unmapped entry (null target) in the exported file must not blank the value.
+            Assert.AreEqual("Unmapped User", tool.MapUserIdentityValue(AssignedTo, "Unmapped User"));
+        }
+
+        [TestMethod, TestCategory("L1")]
+        [DataRow(false, null)]
+        [DataRow(false, "")]
+        [DataRow(true, null)]
+        [DataRow(true, "")]
+        public void MapUserIdentityValue_NullOrEmptyValue_ReturnsOriginalWithoutThrowing(bool identityFormat, string value)
+        {
+            var file = identityFormat ? WriteExportedIdentityMapFile() : WriteDictionaryFile();
+            var tool = CreateTool(file, useIdentityMapDataFormat: identityFormat);
+
+            Assert.AreEqual(value, tool.MapUserIdentityValue(AssignedTo, value));
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void MapUserIdentityValue_FieldNotConfigured_ReturnsOriginal()
+        {
+            var tool = CreateTool(WriteDictionaryFile(), useIdentityMapDataFormat: false);
+
+            Assert.AreEqual("Old Name", tool.MapUserIdentityValue("System.Title", "Old Name"));
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void MapUserIdentityValue_ToolDisabled_ReturnsOriginal()
+        {
+            var tool = CreateTool(WriteDictionaryFile(), useIdentityMapDataFormat: false);
+            tool.Options.Enabled = false;
+
+            Assert.AreEqual("Old Name", tool.MapUserIdentityValue(AssignedTo, "Old Name"));
+        }
+
+        private static IdentityItemData User(string displayName, string mail = null, string account = null) =>
+            new IdentityItemData { DisplayName = displayName, MailAddress = mail, AccountName = account ?? displayName };
+
+        [TestMethod, TestCategory("L0")]
+        public void MatchSourceUsersToTarget_ByDisplayName_MatchesAndLeavesMissesUnmapped()
+        {
+            var source = new List<IdentityItemData> { User("Alice"), User("Bob") };
+            var target = new List<IdentityItemData> { User("Alice", account: "alice@new") };
+
+            var result = TfsUserMappingTool.MatchSourceUsersToTarget(source, target, false, _logger);
+
+            Assert.HasCount(2, result);
+            Assert.AreEqual("alice@new", result[0].Target.AccountName);
+            Assert.IsNull(result[1].Target);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void MatchSourceUsersToTarget_DuplicateTargetDisplayNames_Throws()
+        {
+            var source = new List<IdentityItemData> { User("Alice", "alice@old") };
+            var target = new List<IdentityItemData> { User("Alice", "a1@new", "a1"), User("Alice", "a2@new", "a2") };
+
+            Assert.ThrowsExactly<InvalidOperationException>(() => TfsUserMappingTool.MatchSourceUsersToTarget(source, target, false, _logger));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void MatchSourceUsersToTarget_MatchByEmail_ResolvesDuplicateDisplayNames()
+        {
+            var source = new List<IdentityItemData> { User("Alice", "A2@NEW") };
+            var target = new List<IdentityItemData> { User("Alice", "a1@new", "a1"), User("Alice", "a2@new", "a2"), User("NoMail", null, "nm") };
+
+            var result = TfsUserMappingTool.MatchSourceUsersToTarget(source, target, true, _logger);
+
+            Assert.AreEqual("a2", result.Single().Target.AccountName);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void MatchSourceUsersToTarget_MatchByEmail_FallsBackToDisplayName()
+        {
+            var source = new List<IdentityItemData> { User("Bob", "bob@old") };
+            var target = new List<IdentityItemData> { User("Bob", "bob@new", "bob") };
+
+            var result = TfsUserMappingTool.MatchSourceUsersToTarget(source, target, true, _logger);
+
+            Assert.AreEqual("bob", result.Single().Target.AccountName);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void GetUsersFromWorkItems_UsesExactCaseInsensitiveFieldNames()
+        {
+            var revision = new RevisionItem
+            {
+                Fields = new Dictionary<string, FieldItem>
+                {
+                    ["a"] = new FieldItem { ReferenceName = "system.assignedto", Value = "Alice" },
+                    ["b"] = new FieldItem { ReferenceName = "System.AssignedToExtra", Value = "Substring Match" },
+                    ["c"] = new FieldItem { ReferenceName = AssignedTo, Value = null },
+                    ["d"] = new FieldItem { ReferenceName = AssignedTo, Value = "ALICE" },
+                }
+            };
+            var workItem = new WorkItemData { Revisions = new SortedDictionary<int, RevisionItem> { [0] = revision } };
+
+            var users = TfsUserMappingTool.GetUsersFromWorkItems(new List<WorkItemData> { workItem }, new List<string> { AssignedTo });
+
+            Assert.HasCount(1, users);
+            Assert.Contains("Alice", users);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void SkipValidateAllUsersExistOrAreMapped_DefaultsFalseAndBinds()
+        {
+            Assert.IsFalse(new TfsUserMappingToolOptions().SkipValidateAllUsersExistOrAreMapped);
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string> { ["SkipValidateAllUsersExistOrAreMapped"] = "true" })
+                .Build();
+            var options = new TfsUserMappingToolOptions();
+            config.Bind(options);
+            Assert.IsTrue(options.SkipValidateAllUsersExistOrAreMapped);
         }
     }
 }
