@@ -42,7 +42,9 @@ A match is used only when it identifies a single target user. Otherwise the disp
 
 ## Notes
 
-- Applies to all identity fields specified in `IdentityFieldsToCheck`.
+- Applies to all identity fields specified in `IdentityFieldsToCheck`. Use full field reference names (for example `System.AssignedTo`); matching is exact and ignores case, and partial names are not matched.
+- Mappings are applied to the target work item only; the source is not changed. Empty and unmapped values are passed through unchanged.
+- Identity fields replayed from the source are kept through the final `Migration` saves (attachments, links and the migration comment), so process rules that set a field to the current user do not replace it with the migration account.
 - On `TfsExportUsersForMappingProcessor` you can set `OnlyListUsersInWorkItems` to export only the users found in the work items selected by `WIQLQuery`. This is better if you have many users.
 - Both processors use the `TfsUserMappingTool` settings in `CommonTools`. See the [TfsUserMappingTool reference]({{< ref "docs/reference/tools/tfsusermappingtool" >}}) for all options.
 
