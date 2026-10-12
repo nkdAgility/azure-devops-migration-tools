@@ -19,6 +19,11 @@ namespace MigrationTools.Tools.Infrastructure
     /// </remarks>
     public static class EmbededImageUrlReplacer
     {
+        private const string UrlChar = "[\\w/?=%~+#-]";
+
+        private const string UrlContinuesLookahead =
+            "(?!" + UrlChar + "|[.,;:!@$*]" + UrlChar + "|&amp;|&(?![A-Za-z][A-Za-z0-9]*;|#[0-9]+;|#x[0-9A-Fa-f]+;))";
+
         /// <summary>
         /// Replaces every occurrence of each key in <paramref name="replacements"/> with its value.
         /// Entries whose value is null or whitespace are left unchanged.
@@ -36,9 +41,10 @@ namespace MigrationTools.Tools.Infrastructure
                 return fieldValue;
 
             // a URL must not continue past the match, otherwise .../{guid} would match the start
-            // of .../{guid}?fileName=a.png or .../{guid}0. the characters that end a URL in the
-            // field are quotes, whitespace, angle brackets, parentheses or the end of the text.
-            string pattern = "(?:" + string.Join("|", active.Select(r => Regex.Escape(r.Key))) + ")(?![^\"'\\s<>()])";
+            // of .../{guid}?fileName=a.png or .../{guid}0. prose punctuation only continues a URL
+            // when more URL characters follow it (".png" does, ". See" does not), and an ampersand
+            // only does as &amp; or a bare &, not as an entity that ends the URL such as &nbsp;.
+            string pattern = "(?:" + string.Join("|", active.Select(r => Regex.Escape(r.Key))) + ")" + UrlContinuesLookahead;
             var lookup = active.ToDictionary(r => r.Key, r => r.Value, StringComparer.Ordinal);
 
             return Regex.Replace(fieldValue, pattern, m => lookup[m.Value]);

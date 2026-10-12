@@ -74,6 +74,35 @@ namespace MigrationTools.Tests.Tools.Infrastructure
             Assert.AreEqual($"![a]({TargetWithName}) see {TargetWithName} <a href=\"{TargetWithName}\">x</a>", result);
         }
 
+        [DataTestMethod, TestCategory("L0")]
+        [DataRow(".")]
+        [DataRow(",")]
+        [DataRow(";")]
+        [DataRow(":")]
+        [DataRow("!")]
+        [DataRow("]")]
+        [DataRow("&nbsp;")]
+        [DataRow("&#160;")]
+        public void ShouldReplacePlainUrlFollowedByPunctuation(string terminator)
+        {
+            string result = EmbededImageUrlReplacer.ReplaceUrls($"See {SourceWithName}{terminator} next", new Dictionary<string, string> { [SourceWithName] = TargetWithName });
+
+            Assert.AreEqual($"See {TargetWithName}{terminator} next", result);
+        }
+
+        [DataTestMethod, TestCategory("L0")]
+        [DataRow("0")]
+        [DataRow(".png")]
+        [DataRow("&amp;download=false")]
+        [DataRow("&download=false")]
+        [DataRow("/more")]
+        public void ShouldNotReplaceUrlThatContinues(string continuation)
+        {
+            string field = $"<img src=\"{SourceBare}{continuation}\">";
+
+            Assert.AreEqual(field, EmbededImageUrlReplacer.ReplaceUrls(field, new Dictionary<string, string> { [SourceBare] = TargetWithName }));
+        }
+
         [TestMethod, TestCategory("L0")]
         public void ShouldReplaceHtmlEncodedUrl()
         {
