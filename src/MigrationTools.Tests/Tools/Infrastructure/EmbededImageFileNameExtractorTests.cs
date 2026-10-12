@@ -15,6 +15,15 @@ namespace MigrationTools.Tests.Tools.Infrastructure
             Assert.AreEqual("screenshot.png", fileName);
         }
 
+        [DataTestMethod, TestCategory("L0")]
+        [DataRow("https://dev.azure.com/org/_apis/wit/attachments/1234?fileName=a.png?fileName=a.png")]
+        [DataRow("https://dev.azure.com/org/_apis/wit/attachments/1234?fileName=a.png?download=true")]
+        [DataRow("https://dev.azure.com/org/_apis/wit/attachments/1234?fileName=a.png?fileName=a.png&amp;download=true")]
+        public void ShouldStopFileNameAtARepeatedQuery(string url)
+        {
+            Assert.AreEqual("a.png", EmbededImageFileNameExtractor.GetFileNameFromUrl(url));
+        }
+
         [TestMethod, TestCategory("L0")]
         public void ShouldMatchTheParameterNameCaseInsensitively()
         {

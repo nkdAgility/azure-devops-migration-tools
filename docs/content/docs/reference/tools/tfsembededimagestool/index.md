@@ -19,6 +19,8 @@ The TFS Embedded Images Tool handles the migration of embedded images within wor
 
 Both content formats are supported: HTML (`<img src="...">`) and Markdown (`![alt](url)`). Azure DevOps keeps the field type as HTML even when a project stores its rich text as Markdown, so the tool inspects the same set of fields for both formats and no configuration is needed to switch between them. When an image is migrated, every occurrence of its source URL in the field is updated to the new target URL — including plain links to the same attachment — so no references are left pointing to the source collection. Surrounding content such as HTML attributes, Markdown alt text, and titles is preserved.
 
+The uploaded image keeps the name from the source URL's `fileName` parameter. If the source URL has its query repeated (`?fileName=a.png?fileName=a.png`), which Azure DevOps still renders, only the first name (`a.png`) is used. URLs without a `fileName` parameter are left unchanged.
+
 The tool ensures that images embedded in work item content are properly preserved and accessible in the target environment, maintaining the visual context and documentation integrity of work items.
 
 ### How It Works

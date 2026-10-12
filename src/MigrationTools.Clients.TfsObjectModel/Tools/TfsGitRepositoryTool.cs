@@ -110,7 +110,7 @@ namespace MigrationTools.Tools
                     }
                     else
                     {
-                        string targetUri = MapGitLinkToTargetUri(el, sourceWorkItem?.ProjectName, out bool dropLink, out string linkTypeId);
+                        string targetUri = MapGitLinkToTargetUri(el, sourceWorkItem?.ProjectName, out bool dropLink, out string linkTypeId, sourceWorkItemId: sourceWorkItem.Id);
                         if (dropLink)
                         {
                             removeEL.Add(el);
@@ -198,8 +198,46 @@ namespace MigrationTools.Tools
             return MapGitLinkToTargetUri(sourceLink, sourceWorkItem?.ProjectName, out _, out _, report: false);
         }
 
-        private string MapGitLinkToTargetUri(ExternalLink el, string sourceProjectName, out bool dropLink, out string linkTypeId, bool report = true)
+        private TfsGitTargetArtifactCache _targetArtifacts;
+
+        /// <summary>Replaces the target existence lookups; for tests.</summary>
+        public TfsGitTargetArtifactCache TargetArtifacts
         {
+            get => _targetArtifacts ??= TfsGitTargetArtifactCache.ForClient(_processor.Target.GetClient<GitHttpClient>());
+            set => _targetArtifacts = value;
+        }
+
+        private readonly Dictionary<string, int> _linksLeftOnSource = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _reportedLeftOnSource = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Target repositories missing linked commits or branches, with the number of links left pointing at the source.</summary>
+        public IReadOnlyDictionary<string, int> LinksLeftOnSource => _linksLeftOnSource;
+
+        /// <summary>
+        /// Checks the target repo has the linked commit or branch. When it does not, logs a warning and records it: the
+        /// caller then leaves the source link in place rather than creating a link to something that does not exist.
+        /// </summary>
+        public bool TargetHasArtifact(bool isBranch, GitRepository targetRepo, string commitOrRefId, string sourceLinkUri, string sourceWorkItemId)
+        {
+            bool exists = isBranch
+                ? TargetArtifacts.BranchExists(targetRepo.Id, commitOrRefId)
+                : TargetArtifacts.CommitExists(targetRepo.Id, commitOrRefId);
+            // Revision replay enriches every revision, so each missing link is reported once per work item.
+            if (!exists && _reportedLeftOnSource.Add($"{sourceWorkItemId}|{sourceLinkUri}"))
+            {
+                string repoName = $"{targetRepo.ProjectReference?.Name}/{targetRepo.Name}";
+                string artifact = isBranch ? $"branch {TfsGitTargetArtifactCache.BranchNameFromRefId(commitOrRefId) ?? commitOrRefId}" : $"commit {commitOrRefId}";
+                Log.LogWarning("GitRepositoryEnricher: Source work item {SourceWorkItemId}: {Artifact} not found in target repo {TargetRepo}; leaving link {SourceLink} pointing at the source.",
+                    sourceWorkItemId, artifact, repoName, sourceLinkUri);
+                _linksLeftOnSource.TryGetValue(repoName, out int seen);
+                _linksLeftOnSource[repoName] = seen + 1;
+            }
+            return exists;
+        }
+
+        private string MapGitLinkToTargetUri(ExternalLink el, string sourceProjectName, out bool dropLink, out string linkTypeId, bool report = true, string sourceWorkItemId = null)
+        {
+            bool verifyTarget = report && Options.VerifyTargetExists;
             dropLink = false;
             linkTypeId = null;
             var changeSetMappings = Services.GetRequiredService<TfsChangeSetMappingTool>();
@@ -270,14 +308,24 @@ namespace MigrationTools.Tools
             switch (el.ArtifactLinkType.Name)
             {
                 case "Branch":
+                    if (verifyTarget && !TargetHasArtifact(isBranch: true, targetRepoInfo.GitRepo, sourceRepoInfo.CommitID, el.LinkedArtifactUri, sourceWorkItemId))
+                    {
+                        return null;
+                    }
                     linkTypeId = ArtifactLinkIds.Branch;
                     return $"vstfs:///git/ref/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}";
 
                 case "Fixed in Changeset":  // TFVC
                 case "Fixed in Commit":
+                    if (verifyTarget && !TargetHasArtifact(isBranch: false, targetRepoInfo.GitRepo, sourceRepoInfo.CommitID, el.LinkedArtifactUri, sourceWorkItemId))
+                    {
+                        return null;
+                    }
                     linkTypeId = ArtifactLinkIds.Commit;
                     return $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}";
 
+                // Pull request ids are not preserved by a git push, so there is no target equivalent to check; the
+                // link is dropped as before.
                 case "Pull Request":
                     dropLink = true;
                     return null;
@@ -315,6 +363,14 @@ namespace MigrationTools.Tools
         /// <summary>Logs one line per unresolved repository with its link count. Call once at the end of a run.</summary>
         public void LogUnresolvedSummary()
         {
+            if (_linksLeftOnSource.Count > 0)
+            {
+                Log.LogWarning("GitRepositoryEnricher: {RepoCount} target repo(s) are missing linked commits or branches; those links were left pointing at the source:", _linksLeftOnSource.Count);
+                foreach (var kv in _linksLeftOnSource.OrderByDescending(kv => kv.Value))
+                {
+                    Log.LogWarning("  {TargetRepo}: {LinkCount} link(s)", kv.Key, kv.Value);
+                }
+            }
             if (_unresolvedRepos.Count == 0)
             {
                 return;
