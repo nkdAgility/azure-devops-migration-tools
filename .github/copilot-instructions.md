@@ -284,8 +284,8 @@ Available templates for `init` command:
 
 Unit tests are not enough for changes to migration behaviour, exit codes, validation or error handling. Prove the change by running the built tool against the test organisation.
 
-- **Test environment:** `https://dev.azure.com/nkdagility-preview`. The test PAT in `src/MigrationTools/Tests/TestingConstants.cs` (`AccessTokenRaw` with `fake` removed) is approved for this. Never print, log or commit the token anywhere else.
-- **Harness:** build `MigrationTools.ConsoleFull`, then run `tools/e2e/Invoke-MigrationE2E.ps1 -Config <scenario.json>`. It passes the PAT through the endpoint environment-variable overrides, masks it in output, and reports `EXIT CODE`.
+- **Test environment:** `https://dev.azure.com/nkdagility-preview`. The test PAT is approved for this. The harness reads it from the `AMT_TEST_PAT` environment variable, falling back to `src/MigrationTools/Tests/TestingConstants.cs` while the token still lives there. Never print, log or commit the token anywhere else.
+- **Harness:** build `MigrationTools.ConsoleFull`, then run `tools/e2e/Invoke-MigrationE2E.ps1 -Config <scenario.json>`. It refuses any config whose endpoints are outside the test organisation, passes the PAT through the endpoint environment-variable overrides (TFS and REST, any endpoint name), masks it in output, restores any existing values afterwards, prints `EXIT CODE` and exits with it.
 - **Projects:** create your own scratch source/target projects for the change (for example `amt<PR>-src` / `amt<PR>-tgt`) and seed only the work items the scenario needs. Do not modify projects used by the automated tests.
 - **Before and after:** run each scenario on `main` and on the change, and report both results, including the exit code.
 - **Failure scenarios:** cover the failure path as well as the happy path. A reliable way to force a real server-side item failure is to map a work item type to one that is disabled or missing in the target.
