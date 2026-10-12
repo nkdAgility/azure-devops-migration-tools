@@ -93,7 +93,12 @@ namespace MigrationTools.Tools.Infrastructure
                 if (!string.Equals(pair.Substring(0, separator), parameterName, StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                return pair.Substring(separator + 1);
+                // a url that had its query appended twice (?FileName=a.png?FileName=a.png) still
+                // renders in Azure DevOps, but everything after the second "?" is not part of the
+                // name. sanitising would only strip the "?", uploading as "a.pngFileName=a.png".
+                string value = pair.Substring(separator + 1);
+                int nextQuery = value.IndexOf('?');
+                return nextQuery >= 0 ? value.Substring(0, nextQuery) : value;
             }
 
             return null;
