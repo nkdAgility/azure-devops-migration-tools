@@ -25,6 +25,12 @@ namespace MigrationTools.Tools
         private bool SaveAfterEachLink => Options.SaveAfterEachLinkIsAdded && !_inline;
 
         /// <summary>
+        /// True when the last inline <see cref="Enrich"/> skipped a child link because the target was not saved yet and the
+        /// child already has another parent. Call <see cref="Enrich"/> again (not inline) after saving the target (#3192).
+        /// </summary>
+        public bool HasDeferredLinks { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the TfsWorkItemLinkTool class.
         /// </summary>
         /// <param name="options">Configuration options for the work item link tool</param>
@@ -61,6 +67,7 @@ namespace MigrationTools.Tools
                 throw new ArgumentNullException(nameof(targetWorkItemLinkStart));
             }
             _inline = inline;
+            HasDeferredLinks = false;
             if (targetWorkItemLinkStart.Id == "0" && !inline)
             {
                 Log.LogWarning("TfsWorkItemLinkTool::Enrich: Target work item must be saved before you can add a link: exiting Link Migration");
@@ -348,7 +355,8 @@ namespace MigrationTools.Tools
                                     select (RelatedLink)l).SingleOrDefault();
                             if (_inline && childParentLink != null && wiTargetL.Id == "0")
                             {
-                                Log.LogWarning("  [SKIP] Child {wiTargetR} already has another parent and {wiSourceL} is not saved yet; the link will be added at a later revision.", wiTargetR.Id, wiSourceL.Id);
+                                Log.LogWarning("  [DEFER] Child {wiTargetR} already has another parent and {wiSourceL} is not saved yet; the link will be added after this revision is saved.", wiTargetR.Id, wiSourceL.Id);
+                                HasDeferredLinks = true;
                                 return;
                             }
                         }

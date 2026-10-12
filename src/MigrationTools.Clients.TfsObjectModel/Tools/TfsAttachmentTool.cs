@@ -216,7 +216,11 @@ namespace MigrationTools.Tools
             if (target is null) throw new ArgumentNullException(nameof(target));
             foreach (var wia in removedSourceAttachments)
             {
-                var existing = FindExistingAttachment(target.ToWorkItem(), wia);
+                // Only remove an attachment we can tie to this source file by its [originalId:N] marker; the
+                // name/comment fallback used for de-duplication could pick a different file.
+                string originalId = RevisionArtifactDiff.AttachmentOriginalIdMarker(wia.Id);
+                var existing = target.ToWorkItem().Attachments.Cast<Attachment>()
+                    .FirstOrDefault(a => a.Comment != null && a.Comment.Contains(originalId));
                 if (existing != null)
                 {
                     Log.LogInformation("AttachmentMigrationEnricher: Removing attachment {AttachmentName} from {TargetWorkItemID} as it was removed in the source", wia.Name, target.Id);

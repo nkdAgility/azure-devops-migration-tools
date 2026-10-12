@@ -775,6 +775,7 @@ namespace MigrationTools.Processors
                         {
                             targetWorkItem.SaveToAzureDevOps();
                         }
+                        CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
                         {
                             CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
@@ -1134,6 +1135,12 @@ namespace MigrationTools.Processors
                         var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
                         targetWorkItem.SaveToAzureDevOps();
                         CommonTools.Attachment.CleanUpAfterSave();
+                        if (CommonTools.WorkItemLink.Enabled && CommonTools.WorkItemLink.HasDeferredLinks)
+                        {
+                            // A child link skipped because this item was not saved yet; now it has an id, add it.
+                            // The child's conflicting parent is removed by saving the child, as before this change.
+                            ProcessWorkItemLinks(currentRevisionWorkItem, targetWorkItem, false);
+                        }
                         EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
