@@ -24,6 +24,12 @@ namespace MigrationTools.Tools
         /// </summary>
         /// <default>{}</default>
         public Dictionary<string, string> Mappings { get; set; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// When true, a commit or branch link is only rewritten to the target repository if that commit or branch exists there; otherwise the source link is kept and a warning names the work item, repository and commit. Set to false to rewrite every link without checking (the behaviour before this option existed). Pull request links are dropped either way.
+        /// </summary>
+        /// <default>true</default>
+        public bool VerifyTargetExists { get; set; } = true;
     }
 
 }
