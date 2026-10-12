@@ -426,10 +426,9 @@ namespace MigrationTools.Tools
         /// <summary>
         /// Removes from the target the links that correspond to the given source links.
         /// Used during revision replay (#3192) to remove a link at the revision where it was removed in the source.
-        /// Does not save the target. Git links rewritten by the git repository tool have a different URI on the
-        /// target and are not matched.
+        /// Does not save the target. Git links rewritten by the git repository tool are matched by their rewritten URI.
         /// </summary>
-        public void RemoveLinks(TfsProcessor processor, IEnumerable<Link> removedSourceLinks, WorkItemData target)
+        public void RemoveLinks(TfsProcessor processor, WorkItemData sourceWorkItem, IEnumerable<Link> removedSourceLinks, WorkItemData target)
         {
             if (target is null) throw new ArgumentNullException(nameof(target));
             var targetLinks = target.ToWorkItem().Links;
@@ -447,6 +446,16 @@ namespace MigrationTools.Tools
                     {
                         var key = RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri);
                         match = targetLinks.OfType<ExternalLink>().FirstOrDefault(t => RevisionArtifactDiff.ExternalLinkKey(t.LinkedArtifactUri) == key);
+                        if (match == null)
+                        {
+                            // Git links are rewritten to the target repository, so look for the rewritten URI.
+                            var targetUri = Services.GetRequiredService<TfsGitRepositoryTool>().GetTargetUri(processor, sourceWorkItem, el);
+                            if (targetUri != null)
+                            {
+                                var mappedKey = RevisionArtifactDiff.ExternalLinkKey(targetUri);
+                                match = targetLinks.OfType<ExternalLink>().FirstOrDefault(t => RevisionArtifactDiff.ExternalLinkKey(t.LinkedArtifactUri) == mappedKey);
+                            }
+                        }
                     }
                     else if (sourceLink is RelatedLink rl && rl.LinkTypeEnd != null)
                     {

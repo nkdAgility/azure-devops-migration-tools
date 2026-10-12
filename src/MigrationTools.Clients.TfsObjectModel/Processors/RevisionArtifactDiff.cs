@@ -28,6 +28,17 @@ namespace MigrationTools.Processors
             return (added, removed);
         }
 
+        /// <summary>
+        /// The source revision to compare the first replayed revision with: the latest source revision before it when
+        /// resuming an existing target, or null for a new target (so all its first revision's items are added).
+        /// </summary>
+        public static int? BaselineRevisionNumber(bool targetExists, int firstReplayedRevision, IEnumerable<int> sourceRevisionNumbers)
+        {
+            if (!targetExists || sourceRevisionNumbers == null) return null;
+            var earlier = sourceRevisionNumbers.Where(n => n < firstReplayedRevision).ToList();
+            return earlier.Count > 0 ? earlier.Max() : (int?)null;
+        }
+
         /// <summary>Key for a hyperlink, compared case-insensitively.</summary>
         public static string HyperlinkKey(string location) => "H|" + (location ?? string.Empty).Trim('"').ToLowerInvariant();
 

@@ -100,6 +100,25 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void BaselineRevisionNumber_NewTarget_NoBaselineEvenIfReplayStartsLater()
+        {
+            // ReplayRevisions=false / MaxRevisions: a new target starts at rev 5, but rev 5's items must all be added.
+            Assert.IsNull(RevisionArtifactDiff.BaselineRevisionNumber(false, 5, new[] { 1, 2, 3, 4, 5 }));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void BaselineRevisionNumber_ExistingTarget_UsesLatestEarlierRevision()
+        {
+            Assert.AreEqual(4, RevisionArtifactDiff.BaselineRevisionNumber(true, 5, new[] { 1, 2, 4, 5, 6 }));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void BaselineRevisionNumber_ExistingTarget_StartingAtFirst_NoBaseline()
+        {
+            Assert.IsNull(RevisionArtifactDiff.BaselineRevisionNumber(true, 1, new[] { 1, 2 }));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void HyperlinkKey_IgnoresCaseAndQuotes()
         {
             Assert.AreEqual(RevisionArtifactDiff.HyperlinkKey("https://Example.com/A"), RevisionArtifactDiff.HyperlinkKey("\"https://example.com/a\""));

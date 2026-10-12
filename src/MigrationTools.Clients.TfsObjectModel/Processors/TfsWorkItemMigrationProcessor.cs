@@ -876,7 +876,8 @@ namespace MigrationTools.Processors
                 {
                     CommonTools.Attachment.RemoveAttachments(attachments.Removed, targetWorkItem);
                 }
-                if (attachments.Added.Count > 0)
+                // On the last revision re-check all attachments (duplicate-safe), to catch any missing on a resumed target.
+                if (attachments.Added.Count > 0 || (isLastRevision && currentWi.Attachments.Count > 0))
                 {
                     ProcessWorkItemAttachments(sourceRevision, targetWorkItem, false);
                 }
@@ -888,7 +889,7 @@ namespace MigrationTools.Processors
                 LinkKey);
             if (CommonTools.WorkItemLink.Enabled && links.Removed.Count > 0)
             {
-                CommonTools.WorkItemLink.RemoveLinks(this, links.Removed, targetWorkItem);
+                CommonTools.WorkItemLink.RemoveLinks(this, sourceRevision, links.Removed, targetWorkItem);
             }
             if (links.Added.Count > 0 || (isLastRevision && currentWi.Links.Count > 0))
             {
@@ -984,13 +985,15 @@ namespace MigrationTools.Processors
                     CommonTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
-                // Baseline for attachment/link changes: the source revision before the first one we replay (when resuming).
+                // Baseline for attachment/link changes: when resuming an existing target, the source revision before
+                // the first one we replay. A new target has no baseline, so everything in its first replayed revision
+                // is added, even when revisions were skipped (ReplayRevisions=false or MaxRevisions).
                 WorkItemData previousSourceRevision = null;
-                var firstRevisionNumber = revisionsToMigrate.First().Number;
-                var previousRevisionNumbers = sourceWorkItem.Revisions.Keys.Where(n => n < firstRevisionNumber).ToList();
-                if (previousRevisionNumbers.Count > 0)
+                var previousRevisionNumber = RevisionArtifactDiff.BaselineRevisionNumber(
+                    targetWorkItem.Id != "0", revisionsToMigrate.First().Number, sourceWorkItem.Revisions.Keys);
+                if (previousRevisionNumber.HasValue)
                 {
-                    previousSourceRevision = sourceWorkItem.GetRevision(previousRevisionNumbers.Max());
+                    previousSourceRevision = sourceWorkItem.GetRevision(previousRevisionNumber.Value);
                 }
                 var lastRevision = revisionsToMigrate.Last();
 
