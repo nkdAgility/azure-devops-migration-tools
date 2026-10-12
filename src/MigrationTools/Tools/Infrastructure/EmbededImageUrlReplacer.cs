@@ -47,7 +47,7 @@ namespace MigrationTools.Tools.Infrastructure
             string pattern = "(?:" + string.Join("|", active.Select(r => Regex.Escape(r.Key))) + ")" + UrlContinuesLookahead;
             var lookup = active.ToDictionary(r => r.Key, r => r.Value, StringComparer.Ordinal);
 
-            return Regex.Replace(fieldValue, pattern, m => lookup[m.Value]);
+            return Regex.Replace(fieldValue, pattern, m => lookup[m.Value], RegexOptions.CultureInvariant, TimeSpan.FromSeconds(10));
         }
     }
 }
