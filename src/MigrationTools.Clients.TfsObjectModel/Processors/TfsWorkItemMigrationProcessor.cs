@@ -1,4 +1,4 @@
-using MigrationTools.Exceptions;
+﻿using MigrationTools.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -246,6 +246,7 @@ namespace MigrationTools.Processors
             finally
             {
                 CommonTools.ExportWorkItemMapping.SaveMappings();
+                LogMissingTargetFieldSummary();
                 if (Options.FixHtmlAttachmentLinks)
                 {
                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
@@ -521,6 +522,41 @@ namespace MigrationTools.Processors
             };
         }
 
+        private readonly MissingTargetFieldTracker _missingTargetFields = new MissingTargetFieldTracker();
+
+        /// <summary>
+        /// Records that a source revision carried a value for a field that does not exist on the target work item type.
+        /// The work item type validator only inspects the current source type definitions, so fields that only appear
+        /// in historical revisions (e.g. items moved from another project or process) are not caught up front (#3173).
+        /// The first occurrence is logged prominently and a summary is produced at the end of the run.
+        /// </summary>
+        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId)
+        {
+            if (_missingTargetFields.Record(sourceType, targetType, fieldReferenceName, sourceWorkItemId))
+            {
+                Log.LogWarning("Field '{MissingField}' has data in source revisions of type '{SourceType}' but does not exist on target type '{TargetType}'. "
+                    + "The value will NOT be migrated unless a field map handles it. This field may only exist in work item history "
+                    + "(e.g. the item was moved from another project/process), so it is not reported by TfsWorkItemTypeValidatorTool. "
+                    + "Add the field to the target type or configure a field map. A summary is logged at the end of the run.",
+                    fieldReferenceName, sourceType, targetType);
+            }
+        }
+
+        private void LogMissingTargetFieldSummary()
+        {
+            if (_missingTargetFields.Count == 0)
+            {
+                return;
+            }
+            Log.LogWarning("{Count} source field(s) had values that were not migrated because the field does not exist on the target work item type "
+                + "(unless handled by a field map). These are not detected by work item type validation, which only checks current "
+                + "type definitions and not fields present in revision history:", _missingTargetFields.Count);
+            foreach (var line in _missingTargetFields.GetSummary())
+            {
+                Log.LogWarning("  Missing target field: {MissingFieldSummary}", line);
+            }
+        }
+
         // TODO : Make this into the Work Item mapping tool
         private void PopulateWorkItem(WorkItemData oldWorkItemData, WorkItemData newWorkItemData, string destType)
         {
@@ -561,6 +597,7 @@ namespace MigrationTools.Processors
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
+                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id);
                         Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWorkItemData.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;
