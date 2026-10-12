@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -123,7 +123,13 @@ namespace MigrationTools.Tools
                         {
                             var displayName = value.Substring(1);
                             Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName);
+                            var targetName = MapMentionUserName(displayName, GetUserMappings());
+                            if (!string.Equals(targetName, displayName, StringComparison.Ordinal))
+                            {
+                                Log.LogDebug("{LogTypeName}: User identity {displayName} mention mapped to {targetName} using TfsUserMappingTool.", LogTypeName, displayName, targetName);
+                            }
+                            var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.DisplayName, targetName, StringComparison.OrdinalIgnoreCase))
+                                ?? _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, targetName, StringComparison.OrdinalIgnoreCase));
                             if (identity != null)
                             {
                                 var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
@@ -145,6 +151,35 @@ namespace MigrationTools.Tools
             }
 
             return 0;
+        }
+
+        private IDictionary<string, string> GetUserMappings()
+        {
+            // Resolved lazily: TfsCommonTools depends on this tool, so it cannot be injected through the constructor.
+            var userMappingTool = Services.GetService<TfsUserMappingTool>();
+            if (userMappingTool == null || !userMappingTool.Options.Enabled)
+            {
+                return null;
+            }
+            return userMappingTool.UserMappings.Value;
+        }
+
+        /// <summary>
+        /// Maps the display name of a mentioned user to the target name using the TfsUserMappingTool mappings.
+        /// Returns the original name when there are no mappings or no mapping exists for the user.
+        /// </summary>
+        public static string MapMentionUserName(string displayName, IDictionary<string, string> userMappings)
+        {
+            if (string.IsNullOrEmpty(displayName) || userMappings == null)
+            {
+                return displayName;
+            }
+            if (userMappings.TryGetValue(displayName, out var mapped) && !string.IsNullOrEmpty(mapped))
+            {
+                return mapped;
+            }
+            var match = userMappings.FirstOrDefault(m => string.Equals(m.Key, displayName, StringComparison.OrdinalIgnoreCase));
+            return string.IsNullOrEmpty(match.Value) ? displayName : match.Value;
         }
 
 
