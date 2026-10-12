@@ -50,49 +50,56 @@ namespace MigrationTools.Processors
             int current = sourceWIS.Count;
             int count = 0;
             long elapsedms = 0;
-            foreach (WorkItemData sourceWI in sourceWIS)
+            try
             {
-                Stopwatch witstopwatch = Stopwatch.StartNew();
-                WorkItemData targetFound;
-                targetFound = Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
-                Log.LogInformation("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type);
-                if (targetFound == null)
+                foreach (WorkItemData sourceWI in sourceWIS)
                 {
-                    Log.LogWarning("{0} - WARNING: does not exist {1}-{2}", current, sourceWI.Id, sourceWI.Type);
-                }
-                else
-                {
-                    Log.LogInformation("...Exists");
-                    TfsExtensions.ToWorkItem(targetFound).Open();
-                    CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
-                    CommonTools.WorkItemEmbededLink.Enrich(this, null, targetFound);
-                    CommonTools.EmbededImages.FixEmbededImages(this, targetFound);
-                    if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
+                    Stopwatch witstopwatch = Stopwatch.StartNew();
+                    WorkItemData targetFound;
+                    targetFound = Target.WorkItems.FindReflectedWorkItem(sourceWI, false);
+                    Log.LogInformation("{0} - Updating: {1}-{2}", current, sourceWI.Id, sourceWI.Type);
+                    if (targetFound == null)
                     {
-                        try
-                        {
-                            targetFound.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                            TfsExtensions.SaveToAzureDevOps(targetFound);
-                            Log.LogInformation("          Updated");
-                        }
-                        catch (ValidationException ve)
-                        {
-                            Log.LogError(ve, "          [FAILED] {0}", ve.ToString());
-                        }
+                        Log.LogWarning("{0} - WARNING: does not exist {1}-{2}", current, sourceWI.Id, sourceWI.Type);
                     }
                     else
                     {
-                        Log.LogInformation("          No changes");
+                        Log.LogInformation("...Exists");
+                        TfsExtensions.ToWorkItem(targetFound).Open();
+                        CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWI, targetFound);
+                        CommonTools.WorkItemEmbededLink.Enrich(this, null, targetFound);
+                        CommonTools.EmbededImages.FixEmbededImages(this, targetFound);
+                        if (TfsExtensions.ToWorkItem(targetFound).IsDirty)
+                        {
+                            try
+                            {
+                                targetFound.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
+                                TfsExtensions.SaveToAzureDevOps(targetFound);
+                                Log.LogInformation("          Updated");
+                            }
+                            catch (ValidationException ve)
+                            {
+                                Log.LogError(ve, "          [FAILED] {0}", ve.ToString());
+                            }
+                        }
+                        else
+                        {
+                            Log.LogInformation("          No changes");
+                        }
+                        TfsExtensions.ToWorkItem(sourceWI).Close();
                     }
-                    TfsExtensions.ToWorkItem(sourceWI).Close();
+                    witstopwatch.Stop();
+                    elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
+                    current--;
+                    count++;
+                    TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
+                    TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
+                    Log.LogInformation("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining));
                 }
-                witstopwatch.Stop();
-                elapsedms = elapsedms + witstopwatch.ElapsedMilliseconds;
-                current--;
-                count++;
-                TimeSpan average = new TimeSpan(0, 0, 0, 0, (int)(elapsedms / count));
-                TimeSpan remaining = new TimeSpan(0, 0, 0, 0, (int)(average.TotalMilliseconds * current));
-                Log.LogInformation("Average time of {0} per work item and {1} estimated to completion", string.Format(@"{0:s\:fff} seconds", average), string.Format(@"{0:%h} hours {0:%m} minutes {0:s\:fff} seconds", remaining));
+            }
+            finally
+            {
+                CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
             }
             //////////////////////////////////////////////////
             stopwatch.Stop();

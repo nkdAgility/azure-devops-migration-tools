@@ -31,6 +31,7 @@ namespace MigrationTools.Tools
         public TfsEmbededImagesTool(IOptions<TfsEmbededImagesToolOptions> options, IServiceProvider services, ILogger<TfsEmbededImagesTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
             _cachedUploadedUrisBySourceValue = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            _placeholders = new EmbededImagesPlaceholderTracker(PlaceholderImageCapacity, DestroyWorkItem, Log);
         }
 
         public void FixEmbededImages(TfsProcessor processor, WorkItemData targetWorkItem)
@@ -55,15 +56,36 @@ namespace MigrationTools.Tools
             FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, accessToken);
         }
 
+        /// <summary>
+        /// Removes every placeholder work item created during the run. Called from the processor's
+        /// finally block, so it must never throw: a failure here would mask the run's own exception.
+        /// </summary>
         public void ProcessorExecutionEnd(TfsProcessor processor)
         {
             _processor = processor;
-            if (_targetDummyWorkItem != null)
+            _targetDummyWorkItem?.Close();
+            _targetDummyWorkItem = null;
+
+            var remaining = _placeholders.DestroyAll();
+            if (remaining.Count > 0)
             {
-                _targetDummyWorkItem.Close();
-                _targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
+                Log.LogWarning("TfsEmbededImagesTool: {Count} placeholder work item(s) titled '{Title}' could not be destroyed and must be removed manually from the target: {Ids}. Destroying work items requires the 'Permanently delete work items' permission.",
+                    remaining.Count, TargetDummyWorkItemTitle, string.Join(", ", remaining));
             }
         }
+
+        private void DestroyWorkItem(int id)
+        {
+            var errors = _targetProject.Store.DestroyWorkItems(new List<int> { id });
+            foreach (var error in errors)
+            {
+                throw error.Exception ?? new Exception($"DestroyWorkItems failed for {id}.");
+            }
+        }
+
+        private const int PlaceholderImageCapacity = 900;
+
+        private readonly EmbededImagesPlaceholderTracker _placeholders;
 
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
@@ -244,16 +266,16 @@ namespace MigrationTools.Tools
         }
 
 
-        private int _DummyWorkItemCount = 0;
         private TfsProcessor _processor;
 
         private WorkItem GetDummyWorkItem(WorkItemType type = null)
         {
-            if (_DummyWorkItemCount > 900)
+            if (_placeholders.IsAtCapacity)
             {
-                Log.LogDebug("EmbededImagesRepairEnricher: Dummy workitem {id} is neering capacity. Creating a new one!", _targetDummyWorkItem.Id);
+                Log.LogDebug("EmbededImagesRepairEnricher: Dummy workitem {id} is nearing capacity. Replacing it with a new one.", _targetDummyWorkItem.Id);
+                _targetDummyWorkItem.Close();
                 _targetDummyWorkItem = null;
-                _DummyWorkItemCount = 0;
+                _placeholders.Retire();
             }
             if (_targetDummyWorkItem == null)
             {
@@ -295,11 +317,11 @@ namespace MigrationTools.Tools
                 }
                 else
                 {
-                    Log.LogDebug("TfsEmbededImagesTool: Dummy workitem {id} created on the target collection.", _targetDummyWorkItem.Id);
-                    //_targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
+                    _placeholders.Created(_targetDummyWorkItem.Id);
+                    Log.LogInformation("TfsEmbededImagesTool: Placeholder work item {id} created on the target collection; it is destroyed at the end of the run.", _targetDummyWorkItem.Id);
                 }
             }
-            _DummyWorkItemCount++;
+            _placeholders.Used();
             return _targetDummyWorkItem;
         }
     }

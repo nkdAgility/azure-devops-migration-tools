@@ -249,10 +249,7 @@ namespace MigrationTools.Processors
             {
                 LogMissingTargetFieldSummary();
                 CommonTools.ExportWorkItemMapping.SaveMappings();
-                if (Options.FixHtmlAttachmentLinks)
-                {
-                    CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
-                }
+                CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
                 CommonTools.GitRepository?.LogUnresolvedSummary();
 
                 if (_itemsInError.Count > 0)
