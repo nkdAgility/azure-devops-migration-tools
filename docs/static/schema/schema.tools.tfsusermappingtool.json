@@ -18,6 +18,16 @@
       "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the\r\n users will be mapped by their email address first. If no match is found, then the display name will be used.",
       "type": "boolean"
     },
+    "EmailDomainMappings": {
+      "description": "Used with MatchUsersByEmail to handle a tenant or domain change. Maps source email domains to target email domains, for example { \"old.com\": \"new.com\" } matches first.last@old.com to first.last@new.com. Applied when no exact email match is found.",
+      "type": "object",
+      "default": "none"
+    },
+    "MatchUsersByEmailLocalPart": {
+      "description": "Used with MatchUsersByEmail. When true and neither the exact email nor EmailDomainMappings produce a match, users are matched on the email local part (the part before @), ignoring the domain. Only a single unambiguous match is used.",
+      "type": "boolean",
+      "default": "false"
+    },
     "ProjectCollectionValidUsersGroupName": {
       "description": "This is the regionalized \"Project Collection Valid Users\" group name. Default is \"Project Collection Valid Users\".",
       "type": "string"

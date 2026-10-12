@@ -91,6 +91,8 @@ The TFS User Mapping Tool supports several configuration options for flexible us
 - **IdentityFieldsToCheck**: Array of field reference names that contain user identities
 - **UserMappingFile**: Path to JSON file containing manual user mappings
 - **MatchUsersByEmail**: Attempt automatic matching based on email addresses
+- **EmailDomainMappings**: Source-to-target email domain rewrites (e.g. `{ "old.com": "new.com" }`) used by MatchUsersByEmail for domain changes
+- **MatchUsersByEmailLocalPart**: With MatchUsersByEmail, fall back to matching the email local part (before `@`) when unique
 - **SkipValidateAllUsersExistOrAreMapped**: Skip validation that all users are properly mapped
 - **ProjectCollectionValidUsersGroupName**: Group name for validating user membership
 
@@ -106,6 +108,23 @@ Enable automatic user matching based on email addresses:
     "Enabled": true,
     "MatchUsersByEmail": true,
     "SkipValidateAllUsersExistOrAreMapped": false
+  }
+}
+```
+
+### Email Domain or Tenant Change
+
+When users move from `first.last@old.com` to `first.last@new.com`, exact email matching fails. Use `EmailDomainMappings` to rewrite source domains to target domains, and optionally `MatchUsersByEmailLocalPart` to match on the part before `@` when no domain mapping applies. Both only take effect with `MatchUsersByEmail`, are tried after an exact email match, and only use a single unambiguous match; otherwise matching falls back to display name. Users whose display names are identical in source and target need no mapping entry.
+
+```json
+{
+  "TfsUserMappingTool": {
+    "Enabled": true,
+    "MatchUsersByEmail": true,
+    "EmailDomainMappings": {
+      "old.com": "new.com"
+    },
+    "MatchUsersByEmailLocalPart": false
   }
 }
 ```

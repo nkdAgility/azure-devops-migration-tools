@@ -403,16 +403,10 @@ namespace MigrationTools.Tools
                     IdentityItemData targetUser = null;
                     if (Options.MatchUsersByEmail && !string.IsNullOrEmpty(sourceUser.MailAddress))
                     {
-                        var candidates = targetUsers
-                            .Where(tu => tu.MailAddress.Equals(sourceUser.MailAddress, StringComparison.OrdinalIgnoreCase))
-                            .ToList();
-                        if (candidates.Count == 1)
-                        {
-                            // If there are more than one user with the same email address, we can't be sure which one is
-                            // the correct one, so mapping will match either by display name, or will be skipped and
-                            // exported for manual mapping.
-                            targetUser = candidates[0];
-                        }
+                        // Ambiguous email matches return null, so mapping falls back to display name or is
+                        // exported for manual mapping. Domain rewrite / local-part matching handle domain changes (#3178).
+                        targetUser = TfsUserEmailMatcher.FindTarget(sourceUser, targetUsers,
+                            Options.EmailDomainMappings, Options.MatchUsersByEmailLocalPart);
                     }
                     try
                     {

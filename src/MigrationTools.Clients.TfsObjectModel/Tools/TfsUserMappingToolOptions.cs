@@ -31,6 +31,22 @@ namespace MigrationTools.Tools
         public bool MatchUsersByEmail { get; set; }
 
         /// <summary>
+        /// Used with MatchUsersByEmail to handle a tenant or domain change. Maps source email domains to target email domains,
+        /// for example { "old.com": "new.com" } matches first.last@old.com to first.last@new.com. Applied when no exact email match is found.
+        /// <default>none</default>
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public Dictionary<string, string> EmailDomainMappings { get; set; }
+
+        /// <summary>
+        /// Used with MatchUsersByEmail. When true and neither the exact email nor EmailDomainMappings produce a match, users are matched
+        /// on the email local part (the part before @), ignoring the domain. Only a single unambiguous match is used.
+        /// <default>false</default>
+        /// </summary>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool MatchUsersByEmailLocalPart { get; set; } = false;
+
+        /// <summary>
         /// When set to true, this setting will skip a validation that all users exists or mapped
         /// </summary>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
