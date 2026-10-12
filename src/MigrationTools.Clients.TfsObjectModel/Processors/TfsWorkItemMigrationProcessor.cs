@@ -181,6 +181,8 @@ namespace MigrationTools.Processors
 
                 //////////////////////////////////////////////////
 
+                sourceWorkItems = SharedItemsFirst(sourceWorkItems);
+
                 // After filtering, so the scan only covers (and only stops for) items that will be migrated.
                 ValidateRevisionHistoryFields(sourceWorkItems);
 
@@ -574,6 +576,17 @@ namespace MigrationTools.Processors
             }
         }
 
+        private static readonly string[] SharedItemTypes = { "Shared Steps", "Shared Parameter" };
+
+        // Test Case steps reference Shared Steps and Shared Parameters by id, and those references are only remapped
+        // when the target item already exists, so migrate them first; otherwise keep the query's order.
+        internal static List<WorkItemData> SharedItemsFirst(List<WorkItemData> workItems)
+        {
+            return workItems
+                .OrderBy(wi => SharedItemTypes.Contains(wi.Type, StringComparer.OrdinalIgnoreCase) ? 0 : 1)
+                .ToList();
+        }
+
         private void PopulateIgnoreList()
         {
             _ignore = new List<string>
@@ -827,6 +840,8 @@ namespace MigrationTools.Processors
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                // A field map must not change the reflected id, or the next run cannot find this item (#2998).
+                                targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString();
                                 // Retries a fix-up that failed after its revision was saved on an earlier run.
                                 SetStateStampedDatesFromSource(sourceWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), "on the migrated item");
                                 StampCatchUpSave(targetWorkItem);
@@ -1168,11 +1183,6 @@ namespace MigrationTools.Processors
                     targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value.ToString();
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
-                    // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
-                    CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
-
-                    // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
-
                     var reflectedUri = (TfsReflectedWorkItemId)Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
                     if (!targetWorkItem.ToWorkItem().Fields.Contains(Target.Options.ReflectedWorkItemIdField))
                     {
@@ -1183,6 +1193,15 @@ namespace MigrationTools.Processors
                             Target.Options.ReflectedWorkItemIdField);
                         throw ex;
                     }
+                    // Set the reflected id before the field maps so a TargetToTarget map can copy it to another
+                    // field on the first revision (#2998), and again after so no map can overwrite it.
+                    targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri.ToString();
+
+                    // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
+                    CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
+
+                    // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
+
                     targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri.ToString();
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
