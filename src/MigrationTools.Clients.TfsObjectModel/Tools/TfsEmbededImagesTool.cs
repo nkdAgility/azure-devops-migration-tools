@@ -84,6 +84,7 @@ namespace MigrationTools.Tools
 
                 try
                 {
+                    var replacements = new Dictionary<string, string>(StringComparer.Ordinal);
                     foreach (string sourceImageUrl in EmbededImageUrlExtractor.ExtractImageUrls(field.Value as string))
                     {
                         // prefix match with a boundary, not a substring check: the url is untrusted
@@ -107,14 +108,18 @@ namespace MigrationTools.Tools
                             _cachedUploadedUrisBySourceValue[sourceImageUrl] = newImageLink;
                         }
 
-                        if (!string.IsNullOrWhiteSpace(newImageLink))
-                        {
-                            // every occurrence of the source url in the field is rewritten, not just the image
-                            // reference it was extracted from. the source url is dead after migration, so plain
-                            // links to the same attachment need updating too. surrounding <img> attributes and
-                            // Markdown alt text are untouched because only the url text itself is swapped.
-                            field.Value = field.Value.ToString().Replace(sourceImageUrl, newImageLink);
-                        }
+                        replacements[sourceImageUrl] = newImageLink;
+                    }
+
+                    // every occurrence of the source url in the field is rewritten, not just the image
+                    // reference it was extracted from. the source url is dead after migration, so plain
+                    // links to the same attachment need updating too. surrounding <img> attributes and
+                    // Markdown alt text are untouched because only the url text itself is swapped.
+                    // all urls are swapped in one pass so a url that is a prefix of another cannot
+                    // rewrite part of the longer one (which appended its ?fileName= a second time).
+                    if (replacements.Count > 0)
+                    {
+                        field.Value = EmbededImageUrlReplacer.ReplaceUrls(field.Value.ToString(), replacements);
                     }
                 }
                 catch (Exception ex)

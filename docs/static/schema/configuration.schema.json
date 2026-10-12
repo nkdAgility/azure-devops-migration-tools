@@ -1807,7 +1807,7 @@
                             "parsingFallback": {
                               "description": "Gets or sets the parsing fallback.",
                               "type": "string",
-                              "default": "null"
+                              "default": "RaiseError"
                             },
                             "targetField": {
                               "description": "Gets or sets the target field reference name where the calculated result will be stored.",
@@ -2263,6 +2263,11 @@
                 "ShouldDropChangedSetLinks": {
                   "description": "When set to true, changeset links in work items will be removed during migration to prevent broken links when repositories are not migrated.",
                   "type": "boolean"
+                },
+                "VerifyTargetExists": {
+                  "description": "When true, a commit or branch link is only rewritten to the target repository if that commit or branch exists there; otherwise the source link is kept and a warning names the work item, repository and commit. Set to false to rewrite every link without checking (the behaviour before this option existed). Pull request links are dropped either way.",
+                  "type": "boolean",
+                  "default": "true"
                 }
               }
             },

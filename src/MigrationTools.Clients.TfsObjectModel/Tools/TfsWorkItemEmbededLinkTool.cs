@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -123,7 +123,11 @@ namespace MigrationTools.Tools
                         {
                             var displayName = value.Substring(1);
                             Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName);
+                            var identity = FindMentionIdentity(displayName, GetUserMappings(), _targetTeamFoundationIdentitiesLazyCache.Value, i => i.DisplayName, i => i.UniqueName, out var mappedName);
+                            if (mappedName != null)
+                            {
+                                Log.LogDebug("{LogTypeName}: User identity {displayName} mention mapped to {mappedName} using TfsUserMappingTool.", LogTypeName, displayName, mappedName);
+                            }
                             if (identity != null)
                             {
                                 var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
@@ -147,6 +151,40 @@ namespace MigrationTools.Tools
             return 0;
         }
 
+        private IDictionary<string, string> GetUserMappings()
+        {
+            // Resolved lazily: TfsCommonTools depends on this tool, so it cannot be injected through the constructor.
+            var userMappingTool = Services.GetService<TfsUserMappingTool>();
+            if (userMappingTool == null || !userMappingTool.Options.Enabled)
+            {
+                return null;
+            }
+            return userMappingTool.UserMappings.Value;
+        }
 
+        /// <summary>
+        /// Finds the target identity for a mentioned user. The mention is first mapped with the TfsUserMappingTool mappings.
+        /// A <c>Display Name &lt;upn&gt;</c> target is resolved by unique name only; a plain target by display name and then
+        /// unique name. An unmapped mention is resolved by its exact display name.
+        /// </summary>
+        /// <param name="mappedName">The mapped target name, or null when no mapping applied.</param>
+        internal static T FindMentionIdentity<T>(string displayName, IDictionary<string, string> userMappings, IEnumerable<T> targetIdentities,
+            Func<T, string> getDisplayName, Func<T, string> getUniqueName, out string mappedName) where T : class
+        {
+            mappedName = TfsUserIdentityReference.FindMappedTarget(userMappings, displayName);
+            if (string.IsNullOrEmpty(mappedName))
+            {
+                mappedName = null;
+                return targetIdentities.FirstOrDefault(i => getDisplayName(i) == displayName);
+            }
+            var target = mappedName;
+            if (TfsUserIdentityReference.TryParse(target, out _, out var uniqueName))
+            {
+                // A "Display Name <upn>" mapping names one user, so a shared display name never selects a different user.
+                return targetIdentities.FirstOrDefault(i => string.Equals(getUniqueName(i), uniqueName, StringComparison.OrdinalIgnoreCase));
+            }
+            return targetIdentities.FirstOrDefault(i => string.Equals(getDisplayName(i), target, StringComparison.OrdinalIgnoreCase))
+                ?? targetIdentities.FirstOrDefault(i => string.Equals(getUniqueName(i), target, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }

@@ -25,9 +25,10 @@ The TFS Git Repository Tool operates during work item migration to handle Git re
 
 1. **Repository Discovery**: Identifies Git repository references within work items being migrated
 2. **Mapping Application**: Maps source repository names to target repository names
-3. **Link Updates**: Updates work item links to reference target system repositories
-4. **Changeset Handling**: Coordinates with changeset mapping for complete traceability
-5. **Validation**: Ensures mapped repositories exist in the target system
+3. **Target Check**: With `VerifyTargetExists` (the default), checks that each linked commit or branch exists in the target repository. Answers are cached, so each commit or branch is checked once per run
+4. **Link Updates**: Repoints commit and branch links to the target repository. A link whose commit or branch is missing from the target is left pointing at the source and logged as a warning. Pull request links are dropped, because pull request ids don't carry over to the target
+5. **Changeset Handling**: Coordinates with changeset mapping for complete traceability
+6. **Validation**: Ensures mapped repositories exist in the target system
 
 The tool integrates with work item migration processors to maintain proper Git repository relationships.
 
@@ -79,8 +80,27 @@ The TFS Git Repository Tool is configured with repository mappings and changeset
 - **Enabled**: Controls whether the Git repository tool is active during migration
 - **Mappings**: Dictionary mapping source repository names to target repository names
 - **ShouldDropChangedSetLinks**: Whether to remove changeset links during migration
+- **VerifyTargetExists**: Whether to check that a commit or branch exists in the target repository before repointing its link (default `true`)
 
 ## Common Scenarios
+
+### Partially Migrated Repositories
+
+When only some commits or branches reach the target (for example after a squash-merge, deleted pull request branches or a trimmed history), keep the default `VerifyTargetExists: true`. Links to commits and branches that exist in the target are repointed, and the rest stay on the source instead of becoming broken links:
+
+```json
+{
+  "TfsGitRepositoryTool": {
+    "Enabled": true,
+    "Mappings": {
+      "SourceRepo1": "TargetRepo1"
+    },
+    "VerifyTargetExists": true
+  }
+}
+```
+
+Set `VerifyTargetExists` to `false` only to restore the earlier behaviour of repointing every link without checking.
 
 ### Repository Name Mapping
 
@@ -203,6 +223,19 @@ Remove changeset links when repository migration is not needed:
 - Check for typos in source and target repository names
 - Ensure mapping keys match source repository names exactly
 - Review case sensitivity in repository names
+
+**"Invalid Git external link format" Warnings:**
+
+- The source work item has a Git link whose artifact URI can't be parsed: it has missing or empty `projectId%2frepoId%2fcommitId` parts, a repo id that isn't a GUID, or an empty URI
+- That one link is skipped and left unchanged; the work item's other links are still processed and the migration continues
+- The warning includes the raw `LinkedArtifactUri`, so you can find the bad link on the source work item and fix or remove it there if you need it migrated
+
+**"not found in target repo ... pointing at the source" Warnings:**
+
+- The linked commit or branch is not in the mapped target repository, so the link was left on the source rather than replaced with a broken one
+- The warning names the source work item, the commit or branch, the target repository and the original link
+- At the end of the run, a summary lists each target repository with the number of links left on the source
+- If those links should point at the target, push the missing commits or branches to the target repository before migrating work items
 
 **Performance Issues:**
 

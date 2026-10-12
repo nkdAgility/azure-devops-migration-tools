@@ -50,7 +50,7 @@
                 "parsingFallback": {
                   "description": "Gets or sets the parsing fallback.",
                   "type": "string",
-                  "default": "null"
+                  "default": "RaiseError"
                 },
                 "targetField": {
                   "description": "Gets or sets the target field reference name where the calculated result will be stored.",
