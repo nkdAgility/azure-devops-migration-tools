@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
@@ -437,6 +438,7 @@ namespace MigrationTools.Tests.Tools
 
             Assert.AreEqual("New Name", tool.MapUserIdentityValue(AssignedTo, "Old Name"));
             Assert.AreEqual("New Name", tool.MapUserIdentityValue(AssignedTo, "old name"));
+            Assert.AreEqual("New Name", tool.MapUserIdentityValue(AssignedTo.ToLowerInvariant(), "Old Name"));
         }
 
         [TestMethod, TestCategory("L1")]
@@ -554,9 +556,12 @@ namespace MigrationTools.Tests.Tools
         public void SkipValidateAllUsersExistOrAreMapped_DefaultsFalseAndBinds()
         {
             Assert.IsFalse(new TfsUserMappingToolOptions().SkipValidateAllUsersExistOrAreMapped);
-            var tool = CreateTool(WriteDictionaryFile(), false);
-            tool.Options.SkipValidateAllUsersExistOrAreMapped = true;
-            Assert.IsTrue(tool.Options.SkipValidateAllUsersExistOrAreMapped);
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string> { ["SkipValidateAllUsersExistOrAreMapped"] = "true" })
+                .Build();
+            var options = new TfsUserMappingToolOptions();
+            config.Bind(options);
+            Assert.IsTrue(options.SkipValidateAllUsersExistOrAreMapped);
         }
     }
 }

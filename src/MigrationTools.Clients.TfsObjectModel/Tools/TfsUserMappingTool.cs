@@ -223,7 +223,7 @@ namespace MigrationTools.Tools
         public object MapUserIdentityValue(string referenceName, object value)
         {
             if (!Options.Enabled || referenceName == null || Options.IdentityFieldsToCheck == null
-                || !Options.IdentityFieldsToCheck.Contains(referenceName))
+                || !Options.IdentityFieldsToCheck.Contains(referenceName, StringComparer.OrdinalIgnoreCase))
             {
                 return value;
             }
