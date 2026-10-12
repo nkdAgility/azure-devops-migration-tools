@@ -360,8 +360,7 @@ namespace MigrationTools.Processors
             Log.LogInformation("[/ValidateWorkItemTypes]");
         }
 
-        // Opt-in pre-flight check for fields that exist only in revision history (#3194); the run-time
-        // MissingTargetFieldTracker summary still reports them when this is off.
+        // When the scan is off, the run-time MissingTargetFieldTracker summary still reports these fields (#3194).
         private void ValidateRevisionHistoryFields(List<WorkItemData> sourceWorkItems)
         {
             var validator = CommonTools.WorkItemTypeValidatorTool;

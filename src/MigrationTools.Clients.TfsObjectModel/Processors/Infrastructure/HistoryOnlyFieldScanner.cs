@@ -28,7 +28,6 @@ namespace MigrationTools.Processors.Infrastructure
         private readonly Func<WorkItemData, RevisionItem, IEnumerable<FieldItem>> _getRevisionFields;
         private readonly Func<string, string, bool> _isExcluded;
 
-        /// <param name="typeMappings">Work item type mappings (source type to target type).</param>
         /// <param name="isUsableInTarget">Whether a target type exists and is enabled, as used by revision replay.</param>
         /// <param name="getSourceTypeFields">
         /// Fields of a source type in the current project: null if the type is not validated, empty if it does not exist.
