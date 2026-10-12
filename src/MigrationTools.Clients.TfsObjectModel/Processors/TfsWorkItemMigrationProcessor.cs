@@ -831,7 +831,6 @@ namespace MigrationTools.Processors
                     CommonTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
-                // Identity field values (AssignedTo, ResolvedBy, ClosedBy, ...) as written by the last replayed revision.
                 Dictionary<string, object> replayedIdentityValues = null;
 
                 foreach (var revision in revisionsToMigrate)
@@ -977,15 +976,14 @@ namespace MigrationTools.Processors
                 targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
                 // Once ChangedBy is no longer an impersonated user, the object model re-runs the process rules and
                 // "copy from current user" rules stamp the migration account into AssignedTo/ResolvedBy/ClosedBy.
-                // Put back the values written by the last replayed revision before every save from here on (#2869).
-                RestoreIdentityFields(targetWorkItem, replayedIdentityValues);
-
+                // Put back the values written by the last replayed revision before every save from here on, including
+                // the per-link and attachment saves made inside the tools (#2869).
                 if (targetWorkItem != null)
+                using (targetWorkItem.RegisterBeforeSave(wi => RestoreIdentityFields(wi, replayedIdentityValues)))
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     if (!string.IsNullOrEmpty(targetWorkItem.Id))
                     {
-                        RestoreIdentityFields(targetWorkItem, replayedIdentityValues);
                         ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
                         // The TFS client seems to plainly ignore the ChangedBy field when saving a link, so we need to put this back in place
                         targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
@@ -999,7 +997,6 @@ namespace MigrationTools.Processors
                             $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
                         targetWorkItem.ToWorkItem().History = history.ToString();
                     }
-                    RestoreIdentityFields(targetWorkItem, replayedIdentityValues);
                     targetWorkItem.SaveToAzureDevOps();
 
                     CommonTools.Attachment.CleanUpAfterSave();
