@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,7 +45,7 @@ namespace MigrationTools.Endpoints.Tests
         {
             var endpoint = GetTfsWorkItemEndPoint();
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
-            Assert.AreEqual(13, result.Count());
+            Assert.AreEqual(14, result.Count());
         }
 
         [TestMethod(), TestCategory("L3")]
@@ -58,7 +58,7 @@ namespace MigrationTools.Endpoints.Tests
                 Parameters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
             };
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
-            Assert.AreEqual(13, result.Count());
+            Assert.AreEqual(14, result.Count());
         }
 
         protected TfsWorkItemEndpoint GetTfsWorkItemEndPoint(string key = "Source", TfsWorkItemEndpointOptions options = null)
