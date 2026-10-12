@@ -103,7 +103,7 @@ options:
 - parameterName: parsingFallback
   type: FieldCalculationMapParsingFallback
   description: Gets or sets the parsing fallback.
-  defaultValue: null
+  defaultValue: RaiseError
   isRequired: false
   dotNetType: MigrationTools.Tools.FieldCalculationMapParsingFallback, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 - parameterName: targetField

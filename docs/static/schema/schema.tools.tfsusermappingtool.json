@@ -27,12 +27,14 @@
       "type": "boolean"
     },
     "UseIdentityMapDataFormat": {
-      "description": "When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)\r\n instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.\r\n Detailed entries match work item values against the source display name or account name, ignoring case.\r\n false",
-      "type": "boolean"
+      "description": "When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)\r\n instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.\r\n Detailed entries match work item values against the source display name or account name, ignoring case.",
+      "type": "boolean",
+      "default": "false"
     },
     "UserMappingFile": {
-      "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.\r\n By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is\r\n enabled, the format is detected from the content: a JSON array of objects with \"Source\" and \"Target\" identities is read as\r\n detailed IdentityMapData, and a JSON object is read as the simple dictionary format.\r\n none",
-      "type": "string"
+      "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.\r\n By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is\r\n enabled, the format is detected from the content: a JSON array of objects with \"Source\" and \"Target\" identities is read as\r\n detailed IdentityMapData, and a JSON object is read as the simple dictionary format.",
+      "type": "string",
+      "default": "none"
     }
   }
 }

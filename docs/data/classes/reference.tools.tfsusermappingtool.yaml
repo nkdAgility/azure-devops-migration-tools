@@ -117,8 +117,7 @@ options:
     When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)
      instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.
      Detailed entries match work item values against the source display name or account name, ignoring case.
-     false
-  defaultValue: missing XML code comments
+  defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: UserMappingFile
@@ -128,8 +127,7 @@ options:
      By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is
      enabled, the format is detected from the content: a JSON array of objects with "Source" and "Target" identities is read as
      detailed IdentityMapData, and a JSON object is read as the simple dictionary format.
-     none
-  defaultValue: missing XML code comments
+  defaultValue: none
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments

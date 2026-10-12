@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools {
@@ -22,7 +22,7 @@ namespace MigrationTools.Tools {
         /// <summary>
         /// Gets or sets the parsing fallback.
         /// </summary>
-        /// <default>null</default>
+        /// <default>RaiseError</default>
         public FieldCalculationMapParsingFallback parsingFallback { get; set; } =
             FieldCalculationMapParsingFallback.RaiseError;
 
