@@ -168,7 +168,7 @@ namespace MigrationTools.Tools
         /// unique name. An unmapped mention is resolved by its exact display name.
         /// </summary>
         /// <param name="mappedName">The mapped target name, or null when no mapping applied.</param>
-        public static T FindMentionIdentity<T>(string displayName, IDictionary<string, string> userMappings, IEnumerable<T> targetIdentities,
+        internal static T FindMentionIdentity<T>(string displayName, IDictionary<string, string> userMappings, IEnumerable<T> targetIdentities,
             Func<T, string> getDisplayName, Func<T, string> getUniqueName, out string mappedName) where T : class
         {
             mappedName = TfsUserIdentityReference.FindMappedTarget(userMappings, displayName);
