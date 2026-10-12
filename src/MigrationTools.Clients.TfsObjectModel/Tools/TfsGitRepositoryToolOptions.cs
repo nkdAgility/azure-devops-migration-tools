@@ -20,7 +20,7 @@ namespace MigrationTools.Tools
         public bool ShouldDropChangedSetLinks { get; set; }
 
         /// <summary>
-        /// Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration.
+        /// Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration. Keys may be a repository name ("Repo") or a project-qualified name ("Project/Repo"); the qualified form takes precedence. Repositories referenced from other (or renamed) projects are resolved by repository ID and rewritten when mapped here or when the target project contains a repository with the same name.
         /// </summary>
         /// <default>{}</default>
         public Dictionary<string, string> Mappings { get; set; } = new Dictionary<string, string>();

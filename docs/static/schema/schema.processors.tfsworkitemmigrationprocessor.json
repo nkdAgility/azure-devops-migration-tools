@@ -38,11 +38,6 @@
       "type": "integer",
       "default": "0"
     },
-    "StopOnFirstError": {
-      "description": "When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),\r\n the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.",
-      "type": "boolean",
-      "default": "false"
-    },
     "PauseAfterEachWorkItem": {
       "description": "Pause after each work item is migrated",
       "type": "boolean",
@@ -63,6 +58,11 @@
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
       "type": "string"
+    },
+    "StopOnFirstError": {
+      "description": "When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),\r\n the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.",
+      "type": "boolean",
+      "default": "false"
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
