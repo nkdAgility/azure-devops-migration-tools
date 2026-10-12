@@ -45,7 +45,8 @@ configurationSamples:
       "ShouldDropChangedSetLinks": false,
       "Mappings": {
         "RepoInSource": "RepoInTarget"
-      }
+      },
+      "VerifyTargetExists": true
     }
   sampleFor: MigrationTools.Tools.TfsGitRepositoryToolOptions
 description: missing XML code comments
@@ -68,6 +69,12 @@ options:
   type: Boolean
   description: When set to true, changeset links in work items will be removed during migration to prevent broken links when repositories are not migrated.
   defaultValue: missing XML code comments
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: VerifyTargetExists
+  type: Boolean
+  description: When true, a commit or branch link is only rewritten to the target repository if that commit or branch exists there; otherwise the source link is kept and a warning names the work item, repository and commit. Set to false to rewrite every link without checking (the behaviour before this option existed). Pull request links are dropped either way.
+  defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments
