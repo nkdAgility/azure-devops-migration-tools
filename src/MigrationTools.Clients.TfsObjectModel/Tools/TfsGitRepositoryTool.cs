@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -110,7 +110,7 @@ namespace MigrationTools.Tools
                     }
                     else
                     {
-                        string targetUri = MapGitLinkToTargetUri(el, sourceWorkItem?.ProjectName, out bool dropLink, out string linkTypeId, workItemId: targetWorkItem.ToWorkItem().Id);
+                        string targetUri = MapGitLinkToTargetUri(el, sourceWorkItem?.ProjectName, out bool dropLink, out string linkTypeId, sourceWorkItemId: sourceWorkItem.Id);
                         if (dropLink)
                         {
                             removeEL.Add(el);
@@ -208,6 +208,7 @@ namespace MigrationTools.Tools
         }
 
         private readonly Dictionary<string, int> _linksLeftOnSource = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _reportedLeftOnSource = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>Target repositories missing linked commits or branches, with the number of links left pointing at the source.</summary>
         public IReadOnlyDictionary<string, int> LinksLeftOnSource => _linksLeftOnSource;
@@ -216,24 +217,25 @@ namespace MigrationTools.Tools
         /// Checks the target repo has the linked commit or branch. When it does not, logs a warning and records it: the
         /// caller then leaves the source link in place rather than creating a link to something that does not exist.
         /// </summary>
-        public bool TargetHasArtifact(bool isBranch, GitRepository targetRepo, string commitOrRefId, string sourceLinkUri, int workItemId)
+        public bool TargetHasArtifact(bool isBranch, GitRepository targetRepo, string commitOrRefId, string sourceLinkUri, string sourceWorkItemId)
         {
             bool exists = isBranch
                 ? TargetArtifacts.BranchExists(targetRepo.Id, commitOrRefId)
                 : TargetArtifacts.CommitExists(targetRepo.Id, commitOrRefId);
-            if (!exists)
+            // Revision replay enriches every revision, so each missing link is reported once per work item.
+            if (!exists && _reportedLeftOnSource.Add($"{sourceWorkItemId}|{sourceLinkUri}"))
             {
                 string repoName = $"{targetRepo.ProjectReference?.Name}/{targetRepo.Name}";
                 string artifact = isBranch ? $"branch {TfsGitTargetArtifactCache.BranchNameFromRefId(commitOrRefId) ?? commitOrRefId}" : $"commit {commitOrRefId}";
-                Log.LogWarning("GitRepositoryEnricher: Work item {WorkItemId}: {Artifact} not found in target repo {TargetRepo}; leaving link {SourceLink} pointing at the source.",
-                    workItemId, artifact, repoName, sourceLinkUri);
+                Log.LogWarning("GitRepositoryEnricher: Source work item {SourceWorkItemId}: {Artifact} not found in target repo {TargetRepo}; leaving link {SourceLink} pointing at the source.",
+                    sourceWorkItemId, artifact, repoName, sourceLinkUri);
                 _linksLeftOnSource.TryGetValue(repoName, out int seen);
                 _linksLeftOnSource[repoName] = seen + 1;
             }
             return exists;
         }
 
-        private string MapGitLinkToTargetUri(ExternalLink el, string sourceProjectName, out bool dropLink, out string linkTypeId, bool report = true, int workItemId = 0)
+        private string MapGitLinkToTargetUri(ExternalLink el, string sourceProjectName, out bool dropLink, out string linkTypeId, bool report = true, string sourceWorkItemId = null)
         {
             bool verifyTarget = report && Options.VerifyTargetExists;
             dropLink = false;
@@ -306,7 +308,7 @@ namespace MigrationTools.Tools
             switch (el.ArtifactLinkType.Name)
             {
                 case "Branch":
-                    if (verifyTarget && !TargetHasArtifact(isBranch: true, targetRepoInfo.GitRepo, sourceRepoInfo.CommitID, el.LinkedArtifactUri, workItemId))
+                    if (verifyTarget && !TargetHasArtifact(isBranch: true, targetRepoInfo.GitRepo, sourceRepoInfo.CommitID, el.LinkedArtifactUri, sourceWorkItemId))
                     {
                         return null;
                     }
@@ -315,7 +317,7 @@ namespace MigrationTools.Tools
 
                 case "Fixed in Changeset":  // TFVC
                 case "Fixed in Commit":
-                    if (verifyTarget && !TargetHasArtifact(isBranch: false, targetRepoInfo.GitRepo, sourceRepoInfo.CommitID, el.LinkedArtifactUri, workItemId))
+                    if (verifyTarget && !TargetHasArtifact(isBranch: false, targetRepoInfo.GitRepo, sourceRepoInfo.CommitID, el.LinkedArtifactUri, sourceWorkItemId))
                     {
                         return null;
                     }

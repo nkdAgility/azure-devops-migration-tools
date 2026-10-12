@@ -140,7 +140,7 @@ namespace MigrationTools.Tests.Tools
         {
             var repo = Repo("Target", "MyRepo");
             var tool = Tool(new TfsGitTargetArtifactCache((r, c) => r == repo.Id && c == "abc", (r, b) => false));
-            Assert.IsTrue(tool.TargetHasArtifact(false, repo, "abc", "vstfs:///Git/Commit/x", 1));
+            Assert.IsTrue(tool.TargetHasArtifact(false, repo, "abc", "vstfs:///Git/Commit/x", "1"));
             Assert.IsEmpty(tool.LinksLeftOnSource);
         }
 
@@ -149,9 +149,19 @@ namespace MigrationTools.Tests.Tools
         {
             var repo = Repo("Target", "MyRepo");
             var tool = Tool(new TfsGitTargetArtifactCache((r, c) => false, (r, b) => false));
-            Assert.IsFalse(tool.TargetHasArtifact(false, repo, "abc", "vstfs:///Git/Commit/x", 1));
-            Assert.IsFalse(tool.TargetHasArtifact(false, repo, "def", "vstfs:///Git/Commit/y", 2));
+            Assert.IsFalse(tool.TargetHasArtifact(false, repo, "abc", "vstfs:///Git/Commit/x", "1"));
+            Assert.IsFalse(tool.TargetHasArtifact(false, repo, "def", "vstfs:///Git/Commit/y", "2"));
             Assert.AreEqual(2, tool.LinksLeftOnSource["Target/MyRepo"]);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void TargetHasArtifact_SameMissingLinkOnLaterRevision_CountedOnce()
+        {
+            var repo = Repo("Target", "MyRepo");
+            var tool = Tool(new TfsGitTargetArtifactCache((r, c) => false, (r, b) => false));
+            Assert.IsFalse(tool.TargetHasArtifact(false, repo, "abc", "vstfs:///Git/Commit/x", "1"));
+            Assert.IsFalse(tool.TargetHasArtifact(false, repo, "abc", "vstfs:///Git/Commit/x", "1"));
+            Assert.AreEqual(1, tool.LinksLeftOnSource["Target/MyRepo"]);
         }
 
         [TestMethod, TestCategory("L0")]
@@ -160,7 +170,7 @@ namespace MigrationTools.Tests.Tools
             var repo = Repo("Target", "MyRepo");
             string asked = null;
             var tool = Tool(new TfsGitTargetArtifactCache((r, c) => false, (r, b) => { asked = b; return true; }));
-            Assert.IsTrue(tool.TargetHasArtifact(true, repo, "GBfeature%2Fx", "vstfs:///Git/Ref/x", 1));
+            Assert.IsTrue(tool.TargetHasArtifact(true, repo, "GBfeature%2Fx", "vstfs:///Git/Ref/x", "1"));
             Assert.AreEqual("feature/x", asked);
         }
 
@@ -169,7 +179,7 @@ namespace MigrationTools.Tests.Tools
         {
             var repo = Repo("Target", "MyRepo");
             var tool = Tool(new TfsGitTargetArtifactCache((r, c) => true, (r, b) => false));
-            Assert.IsFalse(tool.TargetHasArtifact(true, repo, "GBdeleted", "vstfs:///Git/Ref/x", 1));
+            Assert.IsFalse(tool.TargetHasArtifact(true, repo, "GBdeleted", "vstfs:///Git/Ref/x", "1"));
         }
 
         [TestMethod, TestCategory("L0")]
