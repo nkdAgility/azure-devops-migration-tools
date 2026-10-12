@@ -245,8 +245,8 @@ namespace MigrationTools.Processors
             }
             finally
             {
-                CommonTools.ExportWorkItemMapping.SaveMappings();
                 LogMissingTargetFieldSummary();
+                CommonTools.ExportWorkItemMapping.SaveMappings();
                 if (Options.FixHtmlAttachmentLinks)
                 {
                     CommonTools.EmbededImages?.ProcessorExecutionEnd(null);
@@ -530,9 +530,14 @@ namespace MigrationTools.Processors
         /// in historical revisions (e.g. items moved from another project or process) are not caught up front (#3173).
         /// The first occurrence is logged prominently and a summary is produced at the end of the run.
         /// </summary>
-        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId)
+        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision)
         {
-            if (_missingTargetFields.Record(sourceType, targetType, fieldReferenceName, sourceWorkItemId))
+            // Field maps are applied later in the revision replay; a field they consume is not dropped.
+            if (IsSourceFieldHandledByFieldMap(sourceType, fieldReferenceName))
+            {
+                return;
+            }
+            if (_missingTargetFields.Record(sourceType, targetType, fieldReferenceName, sourceWorkItemId, sourceRevision))
             {
                 Log.LogWarning("Field '{MissingField}' has data in source revisions of type '{SourceType}' but does not exist on target type '{TargetType}'. "
                     + "The value will NOT be migrated unless a field map handles it. This field may only exist in work item history "
@@ -540,6 +545,12 @@ namespace MigrationTools.Processors
                     + "Add the field to the target type or configure a field map. A summary is logged at the end of the run.",
                     fieldReferenceName, sourceType, targetType);
             }
+        }
+
+        private bool IsSourceFieldHandledByFieldMap(string sourceType, string fieldReferenceName)
+        {
+            return CommonTools.FieldMappingTool.GetFieldToFieldMaps(sourceType, fieldReferenceName, FieldMapMode.SourceToTarget).Any()
+                || CommonTools.FieldMappingTool.GetFieldToFieldMultiMaps(sourceType, fieldReferenceName).Any();
         }
 
         private void LogMissingTargetFieldSummary()
@@ -597,7 +608,7 @@ namespace MigrationTools.Processors
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
-                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id);
+                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id, oldWorkItem.Revision);
                         Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWorkItemData.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;
