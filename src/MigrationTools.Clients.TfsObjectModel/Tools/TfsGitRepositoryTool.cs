@@ -118,9 +118,10 @@ namespace MigrationTools.Tools
                         if (sourceRepoInfo.GitRepo == null)
                         {
                             var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, sourceWorkItem?.ProjectName);
-                            // The link carries the repo GUID, so a repo found anywhere in the collection is an exact match even when
-                            // it lives in (or was referenced under) another / former project name. Accept it when it is mapped
-                            // (by "Repo" or "Project/Repo") or when the target project has a repo of the same name.
+                            // Legacy links carry the repo GUID, so a hit there is exact even when the repo lives in (or was referenced
+                            // under) another / former project name. Newer "Project/Repo/id" links match on project and repo name, falling
+                            // back to a repo name that is unique in the collection (needed when the project was renamed). Accept the repo
+                            // when it is mapped (by "Repo" or "Project/Repo") or when the target project has a repo of the same name.
                             if (ShouldUseCrossProjectRepo(anyProjectSourceRepoInfo?.GitRepo, Options.Mappings, targetRepos))
                             {
                                 sourceRepoInfo = anyProjectSourceRepoInfo;
@@ -327,7 +328,7 @@ namespace MigrationTools.Tools
             {
                 return true;
             }
-            return targetProjectRepos != null && targetProjectRepos.Any(r => string.Equals(r.Name, repo.Name, StringComparison.Ordinal));
+            return targetProjectRepos != null && targetProjectRepos.Any(r => string.Equals(r.Name, repo.Name, StringComparison.OrdinalIgnoreCase));
         }
 
         public static string GetTargetRepoName(Dictionary<string, string> gitRepoMappings, TfsGitRepositoryInfo repoInfo)

@@ -101,6 +101,23 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void ShouldUseCrossProjectRepo_TargetNameDiffersOnlyByCase_ReturnsTrue()
+        {
+            var source = Repo("OldProject", "MyRepo");
+            var targets = new List<GitRepository> { Repo("Target", "myrepo") };
+            Assert.IsTrue(TfsGitRepositoryTool.ShouldUseCrossProjectRepo(source, new Dictionary<string, string>(), targets));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CreateByName_NameDiffersOnlyByCase_ReturnsRepo()
+        {
+            var source = new TfsGitRepositoryInfo("abc", null, Repo("OldProject", "MyRepo"));
+            var target = Repo("Target", "myrepo");
+            var result = TfsGitRepositoryInfo.Create("MyRepo", source, new List<GitRepository> { target });
+            Assert.AreSame(target, result.GitRepo);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void CreateByName_NoMatch_ReturnsNoRepo()
         {
             var source = new TfsGitRepositoryInfo("abc", null, Repo("OldProject", "MyRepo"));
