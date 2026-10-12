@@ -1345,10 +1345,6 @@ namespace MigrationTools.Processors
             }
         }
 
-        /// <summary>
-        /// Sets each state-stamped date (ClosedDate, ActivatedDate, ResolvedDate) on the target to the source value
-        /// where they differ, without saving. Returns true when any field was set.
-        /// </summary>
         private bool SetStateStampedDatesFromSource(WorkItem source, WorkItem target, string when)
         {
             var candidates = new List<(string Field, object SourceValue, object TargetValue)>();
