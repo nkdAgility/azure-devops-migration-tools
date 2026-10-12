@@ -550,12 +550,6 @@ namespace MigrationTools.Processors
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                CommonTools.UserMapping.MapUserIdentityField(f);
-                if (newWorkItem.Fields.Contains(f.ReferenceName))
-                {
-                    CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
-                }
-
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
@@ -565,21 +559,23 @@ namespace MigrationTools.Processors
                     }
                     continue;
                 }
+                // Map user identities on the value being written to the target; never mutate the source work item.
+                var sourceFieldValue = CommonTools.UserMapping.MapUserIdentityValue(f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value);
                 if (!_ignore.Contains(f.ReferenceName) &&
                     (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable)
-                    && oldWorkItem.Fields[f.ReferenceName].Value != newWorkItem.Fields[f.ReferenceName].Value)
+                    && sourceFieldValue != newWorkItem.Fields[f.ReferenceName].Value)
                 {
-                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
+                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, sourceFieldValue, newWorkItem.Fields[f.ReferenceName].Value);
 
                     switch (f.FieldDefinition.FieldType)
                     {
                         case FieldType.String:
-                            string oldValue = oldWorkItem.Fields[f.ReferenceName].Value.ToString();
+                            string oldValue = sourceFieldValue?.ToString();
                             string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
                             newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
                         default:
-                            newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
+                            newWorkItem.Fields[f.ReferenceName].Value = sourceFieldValue;
                             break;
                     }
 
