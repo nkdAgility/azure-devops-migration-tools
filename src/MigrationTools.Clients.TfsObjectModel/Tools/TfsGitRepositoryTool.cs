@@ -118,14 +118,16 @@ namespace MigrationTools.Tools
                         if (sourceRepoInfo.GitRepo == null)
                         {
                             var anyProjectSourceRepoInfo = TfsGitRepositoryInfo.Create(el, allSourceRepos, changeSetMappings, sourceWorkItem?.ProjectName);
-                            // if repo is found in a different project and the repo Name is listed in repo mappings, use it
-                            if (anyProjectSourceRepoInfo.GitRepo != null && Options.Mappings.ContainsKey(anyProjectSourceRepoInfo.GitRepo.Name))
+                            // The link carries the repo GUID, so a repo found anywhere in the collection is an exact match even when
+                            // it lives in (or was referenced under) another / former project name. Accept it when it is mapped
+                            // (by "Repo" or "Project/Repo") or when the target project has a repo of the same name.
+                            if (ShouldUseCrossProjectRepo(anyProjectSourceRepoInfo?.GitRepo, Options.Mappings, targetRepos))
                             {
                                 sourceRepoInfo = anyProjectSourceRepoInfo;
                             }
                             else
                             {
-                                Log.LogWarning("GitRepositoryEnricher: Could not find source git repo - repo referenced: {SourceRepoName}/{TargetRepoName}", anyProjectSourceRepoInfo?.GitRepo?.ProjectReference?.Name, anyProjectSourceRepoInfo?.GitRepo?.Name);
+                                ReportUnresolved(anyProjectSourceRepoInfo ?? sourceRepoInfo);
                             }
                         }
 
@@ -243,16 +245,75 @@ namespace MigrationTools.Tools
             return count;
         }
 
-        private string GetTargetRepoName(Dictionary<string, string> gitRepoMappings, TfsGitRepositoryInfo repoInfo)
+        private readonly Dictionary<string, int> _unresolvedRepos = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Repositories that could not be resolved, with the number of links referencing each.</summary>
+        public IReadOnlyDictionary<string, int> UnresolvedRepos => _unresolvedRepos;
+
+        private void ReportUnresolved(TfsGitRepositoryInfo info)
         {
-            if (gitRepoMappings.ContainsKey(repoInfo.GitRepo.Name))
+            string key = info?.GitRepo != null
+                ? $"{info.GitRepo.ProjectReference?.Name}/{info.GitRepo.Name}"
+                : $"unknown repo id {info?.RepoID ?? "(none)"}";
+            _unresolvedRepos.TryGetValue(key, out int seen);
+            _unresolvedRepos[key] = seen + 1;
+            if (seen == 0)
             {
-                return gitRepoMappings[repoInfo.GitRepo.Name];
+                Log.LogWarning("GitRepositoryEnricher: Could not find source git repo - repo referenced: {RepoReference}. Add a Mapping for the repo name (or \"Project/Repo\") to rewrite these links. Further links to this repo are logged at Debug.", key);
             }
             else
             {
-                return repoInfo.GitRepo.Name;
+                Log.LogDebug("GitRepositoryEnricher: Could not find source git repo - repo referenced: {RepoReference} ({Count} links so far)", key, seen + 1);
             }
+        }
+
+        /// <summary>
+        /// Looks up a mapping for a repo by "Project/Repo" first, then by repo name alone.
+        /// </summary>
+        public static bool TryGetMapping(Dictionary<string, string> gitRepoMappings, GitRepository repo, out string targetName)
+        {
+            targetName = null;
+            if (gitRepoMappings == null || repo?.Name == null)
+            {
+                return false;
+            }
+            var projectName = repo.ProjectReference?.Name;
+            if (!string.IsNullOrEmpty(projectName))
+            {
+                var qualified = $"{projectName}/{repo.Name}";
+                var hit = gitRepoMappings.FirstOrDefault(kv => string.Equals(kv.Key, qualified, StringComparison.OrdinalIgnoreCase));
+                if (hit.Key != null)
+                {
+                    targetName = hit.Value;
+                    return true;
+                }
+            }
+            if (gitRepoMappings.TryGetValue(repo.Name, out targetName))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Decides whether a repo found by GUID outside the source project should be used to rewrite a link.
+        /// </summary>
+        public static bool ShouldUseCrossProjectRepo(GitRepository repo, Dictionary<string, string> gitRepoMappings, IList<GitRepository> targetProjectRepos)
+        {
+            if (repo == null)
+            {
+                return false;
+            }
+            if (TryGetMapping(gitRepoMappings, repo, out _))
+            {
+                return true;
+            }
+            return targetProjectRepos != null && targetProjectRepos.Any(r => string.Equals(r.Name, repo.Name, StringComparison.Ordinal));
+        }
+
+        public static string GetTargetRepoName(Dictionary<string, string> gitRepoMappings, TfsGitRepositoryInfo repoInfo)
+        {
+            return TryGetMapping(gitRepoMappings, repoInfo.GitRepo, out var mapped) ? mapped : repoInfo.GitRepo.Name;
         }
 
     }
