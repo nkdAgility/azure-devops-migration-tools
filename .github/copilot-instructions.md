@@ -251,6 +251,22 @@ Discovers and documents:
 
 **Copilot Agent Notes:** This script should be used instead of manually navigating to the ConsoleDataGenerator directory. When documentation updates are needed, recommend using this script for consistency. The script follows PowerShell best practices with proper parameter validation, error handling, and user feedback.
 
+### tools/e2e/Invoke-MigrationE2E.ps1
+
+**Path:** `tools/e2e/Invoke-MigrationE2E.ps1`
+
+**Purpose:** Runs a built `MigrationTools.ConsoleFull` against the test organisation with the test PAT, for end-to-end validation of a change. See [Validating Changes End to End](#validating-changes-end-to-end).
+
+**Usage:**
+```powershell
+.\tools\e2e\Invoke-MigrationE2E.ps1 -Config .\my-scenario.json
+.\tools\e2e\Invoke-MigrationE2E.ps1 -Config .\my-scenario.json -Filter '.'   # full output
+```
+
+**Parameters:** `-Config` (required), `-RepoRoot`, `-BuildOutput` (default `src\MigrationTools.ConsoleFull\bin\Debug\net472`), `-Filter` (regex for the output lines to show).
+
+**Requirements:** Windows PowerShell 5.1 or PowerShell 7+, a Debug build of `MigrationTools.ConsoleFull`, and `AMT_TEST_PAT` (or the token still in `TestingConstants.cs`).
+
 ---
 
 ## Architecture Patterns
@@ -279,6 +295,17 @@ Available templates for `init` command:
 - `Reference` - Complete feature set with all options
 
 **Copilot Agent Notes:** When suggesting code modifications, consider whether TFS Object Model or REST API patterns are more appropriate. REST API patterns are preferred for new development and cross-platform scenarios, while TFS Object Model may be necessary for specific legacy TFS compatibility requirements.
+
+## Validating Changes End to End
+
+Unit tests are not enough for changes to migration behaviour, exit codes, validation or error handling. Prove the change by running the built tool against the test organisation.
+
+- **Test environment:** `https://dev.azure.com/nkdagility-preview`. The test PAT is approved for this. The harness reads it from the `AMT_TEST_PAT` environment variable, falling back to `src/MigrationTools/Tests/TestingConstants.cs` while the token still lives there. Never print, log or commit the token anywhere else.
+- **Harness:** build `MigrationTools.ConsoleFull`, then run `tools/e2e/Invoke-MigrationE2E.ps1 -Config <scenario.json>`. It refuses any config whose endpoints are outside the test organisation, passes the PAT through the endpoint environment-variable overrides (TFS and REST, any endpoint name), masks it in output, restores any existing values afterwards, prints `EXIT CODE` and exits with it. Never put the real token in a scenario file. TFS endpoints can omit it, but the schema requires `AccessToken` on REST (`AzureDevOpsEndpoint`) endpoints, so put a placeholder such as `"set-by-harness"` there; the harness override replaces it at run time.
+- **Projects:** create your own scratch source/target projects for the change (for example `amt<PR>-src` / `amt<PR>-tgt`) and seed only the work items the scenario needs. Do not modify projects used by the automated tests.
+- **Before and after:** run each scenario on `main` and on the change, and report both results, including the exit code.
+- **Failure scenarios:** cover the failure path as well as the happy path. A reliable way to force a real server-side item failure is to map a work item type to one that is disabled or missing in the target.
+- **Report** the scenarios, the observed output lines and the exit codes in the pull request.
 
 ## Documentation Synchronization Requirements
 
