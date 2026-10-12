@@ -34,11 +34,14 @@ public class FieldToFieldMap : FieldMapBase
         base.Configure(config);
     }
 
+    private readonly OncePerWorkItem _reported = new();
+
     internal override void InternalExecute(WorkItem source, WorkItem target)
     {
         if (!IsValid(source, target))
         {
-            Log.LogWarning("FieldToFieldMap: [SKIPPED] Field mapping from '{SourceField}' to '{TargetField}' was skipped due to validation failures | Source WorkItem: {SourceId} -> Target WorkItem: {TargetId} | Mode: {FieldMapMode}",
+            // The validation failure that caused this has already been logged.
+            Log.LogDebug("FieldToFieldMap: [SKIPPED] Field mapping from '{SourceField}' to '{TargetField}' was skipped due to validation failures | Source WorkItem: {SourceId} -> Target WorkItem: {TargetId} | Mode: {FieldMapMode}",
                 Config.sourceField, Config.targetField, source.Id, target.Id, Config.fieldMapMode);
             return;
         }
@@ -74,6 +77,7 @@ public class FieldToFieldMap : FieldMapBase
         }
     }
 
+    // Each check runs for every replayed revision, so a problem is logged once per work item; repeats go to Debug.
     private bool IsValid(WorkItem source, WorkItem target)
     {
         bool valid = true;
@@ -82,13 +86,17 @@ public class FieldToFieldMap : FieldMapBase
             case FieldMapMode.SourceToTarget:
                 if (!source.Fields.Contains(Config.sourceField))
                 {
-                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Source field '{SourceField}' does not exist on source WorkItem {SourceId}. Please verify the field name is correct and exists in the source work item type. Available fields can be checked in Azure DevOps work item customization.",
+                    // Not a warning: a field missing from the current source type is already reported by the work item
+                    // type validator before migration starts, so this is a gap in revision history.
+                    Log.Log(LevelForFirst(source.Id, "source:" + Config.sourceField, LogLevel.Information),
+                        "FieldToFieldMap: [VALIDATION FAILED] Source field '{SourceField}' does not exist on source WorkItem {SourceId} in this revision, so it is not mapped for this revision. This is expected for revisions saved before the field existed on the work item (for example before it was moved from another project or process). Logged once per work item.",
                         Config.sourceField, source.Id);
                     valid = false;
                 }
                 if (!target.Fields.Contains(Config.targetField))
                 {
-                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Target field '{TargetField}' does not exist on target WorkItem {TargetId}. Please verify the field name is correct and exists in the target work item type. You may need to add this field to the target work item type or update your field mapping configuration.",
+                    Log.Log(LevelForFirst(source.Id, "target:" + Config.targetField, LogLevel.Warning),
+                        "FieldToFieldMap: [VALIDATION FAILED] Target field '{TargetField}' does not exist on target WorkItem {TargetId}. Please verify the field name is correct and exists in the target work item type. You may need to add this field to the target work item type or update your field mapping configuration. Logged once per work item.",
                         Config.targetField, target.Id);
                     valid = false;
                 }
@@ -96,13 +104,15 @@ public class FieldToFieldMap : FieldMapBase
             case FieldMapMode.TargetToTarget:
                 if (!target.Fields.Contains(Config.sourceField))
                 {
-                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Source field '{SourceField}' does not exist on target WorkItem {TargetId}. In TargetToTarget mode, both source and target fields must exist on the target work item. Please verify the source field name is correct.",
+                    Log.Log(LevelForFirst(source.Id, "target-source:" + Config.sourceField, LogLevel.Warning),
+                        "FieldToFieldMap: [VALIDATION FAILED] Source field '{SourceField}' does not exist on target WorkItem {TargetId}. In TargetToTarget mode, both source and target fields must exist on the target work item. Please verify the source field name is correct. Logged once per work item.",
                         Config.sourceField, target.Id);
                     valid = false;
                 }
                 if (!target.Fields.Contains(Config.targetField))
                 {
-                    Log.LogWarning("FieldToFieldMap: [VALIDATION FAILED] Target field '{TargetField}' does not exist on target WorkItem {TargetId}. In TargetToTarget mode, both source and target fields must exist on the target work item. Please verify the target field name is correct.",
+                    Log.Log(LevelForFirst(source.Id, "target:" + Config.targetField, LogLevel.Warning),
+                        "FieldToFieldMap: [VALIDATION FAILED] Target field '{TargetField}' does not exist on target WorkItem {TargetId}. In TargetToTarget mode, both source and target fields must exist on the target work item. Please verify the target field name is correct. Logged once per work item.",
                         Config.targetField, target.Id);
                     valid = false;
                 }
@@ -110,4 +120,7 @@ public class FieldToFieldMap : FieldMapBase
         }
         return valid;
     }
+
+    private LogLevel LevelForFirst(int sourceWorkItemId, string key, LogLevel firstLevel)
+        => _reported.IsFirst(sourceWorkItemId.ToString(), key) ? firstLevel : LogLevel.Debug;
 }

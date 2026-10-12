@@ -615,11 +615,10 @@ namespace MigrationTools.Processors
         /// in historical revisions (e.g. items moved from another project or process) are not caught up front (#3173).
         /// The first occurrence is logged prominently and a summary is produced at the end of the run.
         /// </summary>
-        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision, bool fieldOnSourceType)
+        private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision)
         {
-            // Field maps are applied later in the revision replay; a field they consume is not dropped. Maps validate
-            // the source field against the current source type, so a history-only field is never handled by a map.
-            if (fieldOnSourceType && IsSourceFieldHandledByFieldMap(sourceType, fieldReferenceName))
+            // Field maps are applied later in the revision replay; a field they consume is not dropped.
+            if (!MissingFieldPolicy.IsDropped(sourceType, fieldReferenceName))
             {
                 return;
             }
@@ -634,28 +633,18 @@ namespace MigrationTools.Processors
             }
         }
 
-        private readonly Dictionary<string, HashSet<string>> _sourceTypeFields = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        private MissingTargetFieldPolicy _missingFieldPolicy;
 
-        // Revisions of an item moved between projects report the old project's type, so check the field against the
-        // type in the current source project, which is what field maps validate against.
-        private bool IsFieldOnCurrentSourceType(string sourceType, string fieldReferenceName)
-        {
-            if (!_sourceTypeFields.TryGetValue(sourceType, out var fields))
+        // Created on first use, because the source endpoint is only connected once the processor runs.
+        private MissingTargetFieldPolicy MissingFieldPolicy => _missingFieldPolicy ??= new MissingTargetFieldPolicy(
+            sourceType =>
             {
                 var witTypes = Source.WorkItems.Project.ToProject().WorkItemTypes;
-                fields = witTypes.Contains(sourceType)
-                    ? new HashSet<string>(witTypes[sourceType].FieldDefinitions.Cast<FieldDefinition>().Select(fd => fd.ReferenceName), StringComparer.OrdinalIgnoreCase)
-                    : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                _sourceTypeFields[sourceType] = fields;
-            }
-            return fields.Contains(fieldReferenceName);
-        }
-
-        private bool IsSourceFieldHandledByFieldMap(string sourceType, string fieldReferenceName)
-        {
-            return CommonTools.FieldMappingTool.GetFieldToFieldMaps(sourceType, fieldReferenceName, FieldMapMode.SourceToTarget).Any()
-                || CommonTools.FieldMappingTool.GetFieldToFieldMultiMaps(sourceType, fieldReferenceName).Any();
-        }
+                return witTypes.Contains(sourceType)
+                    ? witTypes[sourceType].FieldDefinitions.Cast<FieldDefinition>().Select(fd => fd.ReferenceName)
+                    : Enumerable.Empty<string>();
+            },
+            CommonTools.FieldMappingTool);
 
         private void LogMissingTargetFieldSummary()
         {
@@ -706,8 +695,7 @@ namespace MigrationTools.Processors
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
                     if (missedMigratedValue != null && !string.Empty.Equals(missedMigratedValue))
                     {
-                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id, oldWorkItem.Revision,
-                            IsFieldOnCurrentSourceType(oldWorkItem.Type.Name, f.ReferenceName));
+                        RecordMissingTargetField(oldWorkItem.Type.Name, destType, f.ReferenceName, oldWorkItemData.Id, oldWorkItem.Revision);
                         Log.LogWarning("PopulateWorkItem:FieldUpdate: Missing field in target workitem, Source WorkItemId: {WorkitemId}, Field: {MissingField}, Value: {SourceValue}", oldWorkItemData.Id, f.ReferenceName, missedMigratedValue);
                     }
                     continue;

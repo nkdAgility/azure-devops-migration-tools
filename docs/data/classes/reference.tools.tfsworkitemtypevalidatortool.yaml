@@ -13,7 +13,9 @@ configurationSamples:
             "Enabled": "True",
             "ExcludeDefaultWorkItemTypes": "True",
             "ExcludeSourceFields": null,
-            "ExcludeWorkItemTypes": null
+            "ExcludeWorkItemTypes": null,
+            "ScanRevisionHistoryForFields": "False",
+            "StopIfHistoryOnlyFieldsFound": "False"
           }
         }
       }
@@ -36,7 +38,9 @@ configurationSamples:
                 "Microsoft.VSTS.Scheduling.Effort"
               ]
             },
-            "ExcludeWorkItemTypes": null
+            "ExcludeWorkItemTypes": null,
+            "ScanRevisionHistoryForFields": "True",
+            "StopIfHistoryOnlyFieldsFound": "False"
           }
         }
       }
@@ -58,7 +62,7 @@ configurationSamples:
           "Microsoft.VSTS.Scheduling.Effort"
         ]
       },
-      "ScanRevisionHistoryForFields": false,
+      "ScanRevisionHistoryForFields": true,
       "StopIfHistoryOnlyFieldsFound": false
     }
   sampleFor: MigrationTools.Tools.TfsWorkItemTypeValidatorToolOptions
