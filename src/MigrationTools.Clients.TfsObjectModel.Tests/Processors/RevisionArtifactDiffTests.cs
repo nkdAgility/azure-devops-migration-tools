@@ -16,15 +16,15 @@ namespace MigrationTools.Tests.Processors
         {
             var (added, removed) = Diff(null, new[] { "a", "b" });
             CollectionAssert.AreEqual(new[] { "a", "b" }, added);
-            Assert.AreEqual(0, removed.Count);
+            Assert.IsEmpty(removed);
         }
 
         [TestMethod, TestCategory("L0")]
         public void Compare_Unchanged_NothingAddedOrRemoved()
         {
             var (added, removed) = Diff(new[] { "a", "b" }, new[] { "b", "a" });
-            Assert.AreEqual(0, added.Count);
-            Assert.AreEqual(0, removed.Count);
+            Assert.IsEmpty(added);
+            Assert.IsEmpty(removed);
         }
 
         [TestMethod, TestCategory("L0")]
@@ -39,7 +39,7 @@ namespace MigrationTools.Tests.Processors
         public void Compare_RemovedToEmpty()
         {
             var (added, removed) = Diff(new[] { "a" }, new string[0]);
-            Assert.AreEqual(0, added.Count);
+            Assert.IsEmpty(added);
             CollectionAssert.AreEqual(new[] { "a" }, removed);
         }
 
@@ -47,7 +47,7 @@ namespace MigrationTools.Tests.Processors
         public void Compare_NullCurrent_RemovesAll()
         {
             var (added, removed) = Diff(new[] { "a" }, null);
-            Assert.AreEqual(0, added.Count);
+            Assert.IsEmpty(added);
             CollectionAssert.AreEqual(new[] { "a" }, removed);
         }
 
@@ -56,7 +56,7 @@ namespace MigrationTools.Tests.Processors
         {
             var (added, removed) = Diff(null, new[] { "a", "a" });
             CollectionAssert.AreEqual(new[] { "a" }, added);
-            Assert.AreEqual(0, removed.Count);
+            Assert.IsEmpty(removed);
         }
 
         [TestMethod, TestCategory("L0")]
@@ -95,7 +95,7 @@ namespace MigrationTools.Tests.Processors
             var r2 = new[] { RevisionArtifactDiff.HyperlinkKey("https://x/1") };
             var r3 = new string[0];
             var (added, removed) = Diff(r2, r3);
-            Assert.AreEqual(0, added.Count);
+            Assert.IsEmpty(added);
             CollectionAssert.AreEqual(new[] { "H|https://x/1" }, removed);
         }
 

@@ -65,6 +65,10 @@ namespace MigrationTools.Tools
         }
 
 
+        /// <summary>Rewrites the target's Git links (commit, branch, changeset) to the mapped target repositories.</summary>
+        /// <param name="processor">The processor running the migration.</param>
+        /// <param name="sourceWorkItem">The source work item, used for its project name.</param>
+        /// <param name="targetWorkItem">The target work item whose links are rewritten.</param>
         /// <param name="save">False during revision replay (#3192): the rewritten links are saved with the revision being replayed.</param>
         public  int Enrich(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {

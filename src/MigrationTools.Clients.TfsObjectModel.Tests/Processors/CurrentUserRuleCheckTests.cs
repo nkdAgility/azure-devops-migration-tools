@@ -23,7 +23,7 @@ namespace MigrationTools.Tests.Processors
         public void Find_CopyFromCurrentUserOnIdentityField_Reported()
         {
             var found = CurrentUserRuleCheck.Find(new[] { Rule("copyFromCurrentUser", "System.AssignedTo") }, Identity.Contains);
-            Assert.AreEqual(1, found.Count);
+            Assert.HasCount(1, found);
             Assert.AreEqual("System.AssignedTo", found[0].Field);
             Assert.AreEqual("Bug", found[0].WorkItemType);
         }
@@ -31,32 +31,32 @@ namespace MigrationTools.Tests.Processors
         [TestMethod, TestCategory("L0")]
         public void Find_ServerCurrentUser_Reported()
         {
-            Assert.AreEqual(1, CurrentUserRuleCheck.Find(new[] { Rule("copyFromServerCurrentUser", "Microsoft.VSTS.Common.ResolvedBy") }, Identity.Contains).Count);
+            Assert.HasCount(1, CurrentUserRuleCheck.Find(new[] { Rule("copyFromServerCurrentUser", "Microsoft.VSTS.Common.ResolvedBy") }, Identity.Contains));
         }
 
         [TestMethod, TestCategory("L0")]
         public void Find_DisabledRule_Ignored()
         {
-            Assert.AreEqual(0, CurrentUserRuleCheck.Find(new[] { Rule("copyFromCurrentUser", "System.AssignedTo", disabled: true) }, Identity.Contains).Count);
+            Assert.IsEmpty(CurrentUserRuleCheck.Find(new[] { Rule("copyFromCurrentUser", "System.AssignedTo", disabled: true) }, Identity.Contains));
         }
 
         [TestMethod, TestCategory("L0")]
         public void Find_SystemRule_Ignored()
         {
-            Assert.AreEqual(0, CurrentUserRuleCheck.Find(new[] { Rule("copyFromCurrentUser", "System.AssignedTo", custom: false) }, Identity.Contains).Count);
+            Assert.IsEmpty(CurrentUserRuleCheck.Find(new[] { Rule("copyFromCurrentUser", "System.AssignedTo", custom: false) }, Identity.Contains));
         }
 
         [TestMethod, TestCategory("L0")]
         public void Find_DefaultFromCurrentUser_Ignored()
         {
             // A default only applies to an empty field on create, which the replay sets explicitly.
-            Assert.AreEqual(0, CurrentUserRuleCheck.Find(new[] { Rule("setDefaultFromCurrentUser", "System.AssignedTo") }, Identity.Contains).Count);
+            Assert.IsEmpty(CurrentUserRuleCheck.Find(new[] { Rule("setDefaultFromCurrentUser", "System.AssignedTo") }, Identity.Contains));
         }
 
         [TestMethod, TestCategory("L0")]
         public void Find_NonIdentityField_Ignored()
         {
-            Assert.AreEqual(0, CurrentUserRuleCheck.Find(new[] { Rule("copyFromCurrentUser", "Custom.Text") }, Identity.Contains).Count);
+            Assert.IsEmpty(CurrentUserRuleCheck.Find(new[] { Rule("copyFromCurrentUser", "Custom.Text") }, Identity.Contains));
         }
 
         [TestMethod, TestCategory("L0")]
@@ -68,7 +68,7 @@ namespace MigrationTools.Tests.Processors
                 Rule("copyFromCurrentUser", "System.AssignedTo", wit: "Bug"),
                 Rule("copyFromCurrentUser", "System.AssignedTo", wit: "Bug"),
             }, Identity.Contains);
-            Assert.AreEqual(2, found.Count);
+            Assert.HasCount(2, found);
             Assert.AreEqual("Bug", found[0].WorkItemType);
             Assert.AreEqual("Task", found[1].WorkItemType);
         }
@@ -76,7 +76,7 @@ namespace MigrationTools.Tests.Processors
         [TestMethod, TestCategory("L0")]
         public void Find_NullRules_Empty()
         {
-            Assert.AreEqual(0, CurrentUserRuleCheck.Find(null, Identity.Contains).Count);
+            Assert.IsEmpty(CurrentUserRuleCheck.Find(null, Identity.Contains));
         }
     }
 }

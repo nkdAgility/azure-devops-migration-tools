@@ -19,8 +19,8 @@ namespace MigrationTools.Tests.Processors
         public void AppendTo_SourceComment_KeepsItFirst()
         {
             var result = MigrationCommentHelper.AppendTo("<p>source comment</p>", Uri);
-            Assert.IsTrue(result.StartsWith("<p>source comment</p>"));
-            Assert.IsTrue(result.EndsWith(MigrationCommentHelper.Comment(Uri)));
+            Assert.StartsWith("<p>source comment</p>", result);
+            Assert.EndsWith(MigrationCommentHelper.Comment(Uri), result);
         }
 
         [TestMethod, TestCategory("L0")]

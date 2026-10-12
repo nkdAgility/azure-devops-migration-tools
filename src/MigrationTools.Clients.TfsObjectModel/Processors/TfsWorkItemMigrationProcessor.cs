@@ -923,6 +923,7 @@ namespace MigrationTools.Processors
         /// </summary>
         /// <param name="previousSourceRevision">The source revision replayed before this one, or null if none has been replayed.</param>
         /// <param name="sourceRevision">The source work item opened at the revision being replayed.</param>
+        /// <param name="targetWorkItem">The target work item the revision is replayed onto; not saved here.</param>
         /// <param name="isLastRevision">On the last revision all links are re-checked, to catch any skipped earlier.</param>
         private void ApplyRevisionAttachmentsAndLinks(WorkItemData previousSourceRevision, WorkItemData sourceRevision, WorkItemData targetWorkItem, bool isLastRevision)
         {
