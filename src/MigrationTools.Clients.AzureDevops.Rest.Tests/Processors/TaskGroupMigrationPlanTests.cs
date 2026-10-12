@@ -75,6 +75,35 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
+        public void TaskMajorVersionMissingInTarget_IsIncompatible()
+        {
+            var group = Version("a", "A", 1, AvailableTask);
+            group.Tasks[0].Task.VersionSpec = "1.*";
+            var targetTasks = new List<TaskDefinition> { new TaskDefinition { Id = AvailableTask, Version = new Version { Major = 2 } } };
+
+            var plan = TaskGroupMigrationPlan.Create(new[] { group }, new TaskGroup[0], targetTasks);
+
+            Assert.IsEmpty(plan.RootVersions);
+            StringAssert.Contains(plan.Warnings.Single(), $"{AvailableTask} (1.*)");
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void TaskMajorVersionPresentInTarget_IsCompatible()
+        {
+            var group = Version("a", "A", 1, AvailableTask);
+            group.Tasks[0].Task.VersionSpec = "2.*";
+            var targetTasks = new List<TaskDefinition>
+            {
+                new TaskDefinition { Id = AvailableTask, Version = new Version { Major = 1 } },
+                new TaskDefinition { Id = AvailableTask, Version = new Version { Major = 2 } }
+            };
+
+            var plan = TaskGroupMigrationPlan.Create(new[] { group }, new TaskGroup[0], targetTasks);
+
+            Assert.HasCount(1, plan.RootVersions);
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void ExistingInTarget_IsSkippedAndCountedSeparately()
         {
             var source = new[] { Version("a", "A", 1, MissingTask), Version("a", "A", 2, AvailableTask), Version("b", "B", 1, AvailableTask) };

@@ -8,6 +8,8 @@ namespace MigrationTools.DataContracts.Pipelines
     [ApiName("Tasks")]
     public class TaskDefinition : RestApiDefinition
     {
+        public Version Version { get; set; }
+
         public override bool HasTaskGroups() => false;
 
         public override bool HasVariableGroups() => false;

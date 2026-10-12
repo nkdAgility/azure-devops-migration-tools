@@ -248,12 +248,15 @@ namespace MigrationTools.Endpoints
         /// <param name="rootDefinitions"></param>
         /// <param name="updatedDefinitions"></param>
         /// <returns>List of Mappings</returns>
-        public async Task<List<Mapping>> UpdateTaskGroupsAsync(IEnumerable<TaskGroup> rootDefinitions, IEnumerable<TaskGroup> updatedDefinitions)
+        public async Task<List<Mapping>> UpdateTaskGroupsAsync(IEnumerable<TaskGroup> rootDefinitions, IEnumerable<TaskGroup> updatedDefinitions, IEnumerable<Mapping> rootMappings = null)
         {
             var migratedDefinitions = new List<Mapping>();
             foreach (var definitionToBeMigrated in updatedDefinitions)
             {
-                var relatedRootDefinition = rootDefinitions.FirstOrDefault(d => definitionToBeMigrated.Name == d.Name);
+                // Matching by id first, because a higher version can have a different name from its root.
+                var rootMapping = rootMappings?.FirstOrDefault(m => m.SourceId == definitionToBeMigrated.Id);
+                var relatedRootDefinition = (rootMapping is null ? null : rootDefinitions.FirstOrDefault(d => d.Id == rootMapping.TargetId))
+                    ?? rootDefinitions.FirstOrDefault(d => definitionToBeMigrated.Name == d.Name);
                 if (relatedRootDefinition is null)
                 {
                     Log.LogError("Error migrating {DefinitionType}: {DefinitionName} version {Version}.*. The task group does not exist in the target, so this version cannot be added to it. Please migrate it manually.", typeof(TaskGroup).Name, definitionToBeMigrated.Name, definitionToBeMigrated.Version?.Major);

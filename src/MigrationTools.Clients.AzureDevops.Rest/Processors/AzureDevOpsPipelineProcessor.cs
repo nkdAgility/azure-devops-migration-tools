@@ -572,10 +572,10 @@ namespace MigrationTools.Processors
             {
                 targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
                 var rootTargetDefinitions = targetDefinitions
-                    .Where(d => d.Name != null)
-                    .GroupBy(d => d.Name)
+                    .Where(d => d.Id != null)
+                    .GroupBy(d => d.Id)
                     .Select(g => g.OrderBy(d => d.Version?.Major ?? 0).First());
-                await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, plan.UpdatedVersions);
+                await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, plan.UpdatedVersions, mappings);
             }
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);

@@ -39,7 +39,20 @@ namespace MigrationTools.Processors
         {
             var plan = new TaskGroupMigrationPlan();
             var targetNames = new HashSet<string>(targetDefinitions.Where(t => t.Name != null).Select(t => t.Name));
-            var availableTaskIds = new HashSet<string>(availableTasks.Select(a => a.Id), StringComparer.OrdinalIgnoreCase);
+            var availableMajorsByTaskId = availableTasks
+                .Where(a => a.Id != null)
+                .GroupBy(a => a.Id, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => new HashSet<long>(g.Where(a => a.Version != null).Select(a => a.Version.Major)), StringComparer.OrdinalIgnoreCase);
+            bool IsAvailable(TaskTask task)
+            {
+                if (task?.Id == null || !availableMajorsByTaskId.TryGetValue(task.Id, out var majors))
+                {
+                    return false;
+                }
+                // A spec without a fixed major ("*") or a target that doesn't report versions accepts any version.
+                var requiredMajor = RequiredMajor(task.VersionSpec);
+                return requiredMajor is null || majors.Count == 0 || majors.Contains(requiredMajor.Value);
+            }
 
             var taskGroups = sourceDefinitions.GroupBy(d => string.IsNullOrEmpty(d.Id) ? d.Name : d.Id).ToList();
             plan.TotalTaskGroups = taskGroups.Count;
@@ -58,8 +71,8 @@ namespace MigrationTools.Processors
                 foreach (var version in versions)
                 {
                     var missingTaskNames = (version.Tasks ?? Array.Empty<TaskElement>())
-                        .Where(t => t.Task == null || !availableTaskIds.Contains(t.Task.Id))
-                        .Select(t => t.DisplayName)
+                        .Where(t => !IsAvailable(t.Task))
+                        .Select(t => RequiredMajor(t.Task?.VersionSpec) is long major ? $"{t.DisplayName} ({major}.*)" : t.DisplayName)
                         .ToList();
                     if (missingTaskNames.Count == 0)
                     {
@@ -84,6 +97,12 @@ namespace MigrationTools.Processors
 
             plan.UpdatedVersions.Sort((a, b) => (a.Version?.Major ?? 0).CompareTo(b.Version?.Major ?? 0));
             return plan;
+        }
+
+        private static long? RequiredMajor(string versionSpec)
+        {
+            var major = versionSpec?.Split('.')[0];
+            return long.TryParse(major, out var value) ? value : null;
         }
     }
 }
