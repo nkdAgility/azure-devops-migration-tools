@@ -55,15 +55,61 @@ namespace MigrationTools.Tools
             FixEmbededImages(targetWorkItem, processor.Source.Options.Collection.AbsoluteUri, processor.Target.Options.Collection.AbsoluteUri, accessToken);
         }
 
+        /// <summary>
+        /// Removes every placeholder work item created during the run. Called from the processor's
+        /// finally block, so it must never throw: a failure here would mask the run's own exception.
+        /// </summary>
         public void ProcessorExecutionEnd(TfsProcessor processor)
         {
-            _processor = processor;
-            if (_targetDummyWorkItem != null)
+            if (processor != null)
             {
-                _targetDummyWorkItem.Close();
-                _targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
+                _processor = processor;
+            }
+            _targetDummyWorkItem?.Close();
+            _targetDummyWorkItem = null;
+            _DummyWorkItemCount = 0;
+
+            var remaining = DestroyPlaceholders(_placeholderIds, DestroyWorkItem, Log);
+            _placeholderIds.Clear();
+            if (remaining.Count > 0)
+            {
+                Log.LogWarning("TfsEmbededImagesTool: {Count} placeholder work item(s) titled '{Title}' could not be destroyed and must be removed manually from the target: {Ids}. Destroying work items requires the 'Permanently delete work items' permission.",
+                    remaining.Count, TargetDummyWorkItemTitle, string.Join(", ", remaining));
             }
         }
+
+        /// <summary>
+        /// Destroys each id, continuing past failures, and returns the ids that could not be destroyed.
+        /// </summary>
+        internal static List<int> DestroyPlaceholders(IEnumerable<int> ids, Action<int> destroy, ILogger log)
+        {
+            var remaining = new List<int>();
+            foreach (var id in ids)
+            {
+                try
+                {
+                    destroy(id);
+                    log.LogInformation("TfsEmbededImagesTool: Destroyed placeholder work item {Id} in the target.", id);
+                }
+                catch (Exception ex)
+                {
+                    log.LogWarning(ex, "TfsEmbededImagesTool: Unable to destroy placeholder work item {Id}.", id);
+                    remaining.Add(id);
+                }
+            }
+            return remaining;
+        }
+
+        private void DestroyWorkItem(int id)
+        {
+            var errors = _targetProject.Store.DestroyWorkItems(new List<int> { id });
+            foreach (var error in errors)
+            {
+                throw error.Exception ?? new Exception($"DestroyWorkItems failed for {id}.");
+            }
+        }
+
+        private readonly List<int> _placeholderIds = new List<int>();
 
         /**
       *  from https://gist.github.com/pietergheysens/792ed505f09557e77ddfc1b83531e4fb
@@ -246,8 +292,14 @@ namespace MigrationTools.Tools
         {
             if (_DummyWorkItemCount > 900)
             {
-                Log.LogDebug("EmbededImagesRepairEnricher: Dummy workitem {id} is neering capacity. Creating a new one!", _targetDummyWorkItem.Id);
+                Log.LogDebug("EmbededImagesRepairEnricher: Dummy workitem {id} is nearing capacity. Replacing it with a new one.", _targetDummyWorkItem.Id);
+                var full = _targetDummyWorkItem.Id;
+                _targetDummyWorkItem.Close();
                 _targetDummyWorkItem = null;
+                if (DestroyPlaceholders(new[] { full }, DestroyWorkItem, Log).Count == 0)
+                {
+                    _placeholderIds.Remove(full);
+                }
                 _DummyWorkItemCount = 0;
             }
             if (_targetDummyWorkItem == null)
@@ -290,8 +342,8 @@ namespace MigrationTools.Tools
                 }
                 else
                 {
-                    Log.LogDebug("TfsEmbededImagesTool: Dummy workitem {id} created on the target collection.", _targetDummyWorkItem.Id);
-                    //_targetProject.Store.DestroyWorkItems(new List<int> { _targetDummyWorkItem.Id });
+                    _placeholderIds.Add(_targetDummyWorkItem.Id);
+                    Log.LogInformation("TfsEmbededImagesTool: Placeholder work item {id} created on the target collection; it is destroyed at the end of the run.", _targetDummyWorkItem.Id);
                 }
             }
             _DummyWorkItemCount++;

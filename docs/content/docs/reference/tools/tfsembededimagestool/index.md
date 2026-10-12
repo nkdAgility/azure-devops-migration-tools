@@ -33,6 +33,12 @@ The TFS Embedded Images Tool operates during work item migration to handle embed
 
 The tool integrates seamlessly with work item migration processors to ensure embedded images are handled transparently.
 
+### Placeholder Work Item
+
+So that uploaded images are readable by every user in the target, each image is briefly attached to a placeholder work item titled `***** DELETE THIS - Migration Tool Generated Dummy Work Item For TfsEmbededImagesTool *****`. One placeholder is created per run, only when the first image is uploaded, and it is replaced after about 900 images. Each placeholder is destroyed when it is replaced and at the end of the run, including when the run fails or is stopped.
+
+Destroying work items needs the **Permanently delete work items** permission in the target project. If the account cannot destroy a placeholder, the run continues and logs a warning that lists the placeholder IDs so you can remove them manually. A placeholder can also be left behind if the process is killed before the end of the run; search the target for the title above to find it.
+
 ### Use Cases
 
 Common scenarios where the TFS Embedded Images Tool is essential:
@@ -155,6 +161,11 @@ Use with other content migration tools for comprehensive work item migration:
 - Consider network bandwidth for image transfers
 - Review image sizes and migration batch sizes
 - Optimize temporary storage location for performance
+
+**"DELETE THIS" Work Items Left in the Target:**
+
+- Check the end of the log for a warning listing placeholder IDs that could not be destroyed
+- Grant the migration account **Permanently delete work items** on the target project, or destroy the listed items manually
 
 **Permission Errors:**
 
