@@ -7,53 +7,46 @@ discussionId: 2266
 date: 2025-06-24T12:07:31Z
 
 ---
-There was a request to have the ability to map users to try and maintain integrity across different systems. We added a `TfsUserMappingTool` that allows you to map users from Source to Target... this is not free and takes some work. Running the `TfsExportUsersForMappingProcessor` to get the list of users will produce:
+The `TfsUserMappingTool` maps users in identity fields (such as Assigned To) from the source to the target. Users whose display name is the same in source and target need no mapping. Running the `TfsExportUsersForMappingProcessor` writes a starter mapping file of the users that differ.
 
+By default the file maps source display names to target display names:
+
+```json
+{
+  "Martin Hinshelwood nkdAgility.com": "Hinshelwood, Martin",
+  "Rollup Bot": "Service Account 4",
+  "John Smith <john.smith@old.com>": "John Smith <john.smith@new.com>",
+  "John Smith <jsmith@old.com>": "John Smith <jsmith@new.com>"
+}
 ```
-[
-  {
-    "Source": {
-      "FriendlyName": "Martin Hinshelwood nkdAgility.com",
-      "AccountName": "martin@nkdagility.com"
-    },
-    "target": {
-      "FriendlyName": "Hinshelwood, Martin",
-      "AccountName": "martin@othercompany.com"
-    }
-  },
-  {
-    "Source": {
-      "FriendlyName": "Rollup Bot",
-      "AccountName": "Bot@nkdagility.com"
-    },
-    "target": {
-      "FriendlyName": "Service Account 4",
-      "AccountName": "randoaccount@somecompany.com"
-    }
-  },
-  {
-    "Source": {
-      "FriendlyName": "Another non mapped Account",
-      "AccountName": "not-mapped@nkdagility.com"
-    },
-    "target": null
-  }
-]
-```
+
+Where several users share a display name, the export writes the entry as `Display Name <upn>`. Azure DevOps returns identity values in that form when a display name is not unique, and accepts it when saving, so each entry identifies one user. You can write entries in this form by hand as well.
+
+When `UseIdentityMapDataFormat` is enabled, the export instead writes a JSON array of `Source` and `Target` identities (display name, account name, email and SID), and source values are matched on either the display name or the account name.
 
 ## How it works
 
-1. Run `TfsExportUsersForMappingProcessor` which will export all of the Users in Source mapped or not to target.
-2. Run `TfsWorkItemMigrationProcessor` which will run a validator by detail to warn you of missing users. If it finds a mapping it will convert the field...
+1. Run `TfsExportUsersForMappingProcessor`. It loads the users from source and target, pairs them, and writes the users whose names differ to `UserMappingFile`. Review and edit the file.
+2. Run `TfsWorkItemMigrationProcessor`. It warns about source users that do not exist in the target and, for each identity field listed in `IdentityFieldsToCheck`, replaces the source value with the mapped target value.
+
+Users are paired by display name. With `MatchUsersByEmail` enabled they are paired by email address first, then by display name.
+
+## Email domain or tenant changes
+
+When users move from `first.last@old.com` to `first.last@new.com`, exact email matching finds nothing. With `MatchUsersByEmail` enabled:
+
+- `EmailDomainMappings` rewrites source domains to target domains, for example `{ "old.com": "new.com" }`.
+- `MatchUsersByEmailLocalPart` matches on the part before `@` when the exact and domain-mapped checks find no unique match.
+
+A match is used only when it identifies a single target user. Otherwise the display name is used, or the user is left for you to map in the file.
 
 ## Notes
 
-- Applies to all identity fields specified in the list. Use full field reference names (for example `System.AssignedTo`); matching is exact and ignores case, and partial names are not matched
-- Mappings are applied to the target work item only; the source is not changed. Empty and unmapped values are passed through unchanged
-- Identity fields replayed from the source are kept through the final `Migration` saves (attachments, links and the migration comment), so process rules that set a field to the current user do not replace it with the migration account
-- It really sucks that we have to match on Display name! Email is included for internal matching
-- On `TfsExportUsersForMappingProcessor` you can set `OnlyListUsersInWorkItems` to filter the mapping based on the scope of the query. This is better if you have many users.
-- Both use the `TfsUserMappingTool` setting in `CommonTools` to know what to do.
+- Applies to all identity fields specified in `IdentityFieldsToCheck`. Use full field reference names (for example `System.AssignedTo`); matching is exact and ignores case, and partial names are not matched.
+- Mappings are applied to the target work item only; the source is not changed. Empty and unmapped values are passed through unchanged.
+- Identity fields replayed from the source are kept through the final `Migration` saves (attachments, links and the migration comment), so process rules that set a field to the current user do not replace it with the migration account.
+- On `TfsExportUsersForMappingProcessor` you can set `OnlyListUsersInWorkItems` to export only the users found in the work items selected by `WIQLQuery`. This is better if you have many users.
+- Both processors use the `TfsUserMappingTool` settings in `CommonTools`. See the [TfsUserMappingTool reference]({{< ref "docs/reference/tools/tfsusermappingtool" >}}) for all options.
 
 ```json
 {
@@ -106,6 +99,10 @@ There was a request to have the ability to map users to try and maintain integri
       "TfsUserMappingTool": {
         "Enabled": true,
         "UserMappingFile": "C:\\temp\\userExport.json",
+        "MatchUsersByEmail": true,
+        "EmailDomainMappings": {
+          "old.com": "new.com"
+        },
         "IdentityFieldsToCheck": [
           "System.AssignedTo",
           "System.ChangedBy",

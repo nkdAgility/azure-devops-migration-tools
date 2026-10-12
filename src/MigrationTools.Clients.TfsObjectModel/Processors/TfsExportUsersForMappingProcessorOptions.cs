@@ -13,7 +13,8 @@ namespace MigrationTools.Processors
         public string WIQLQuery { get; set; }
 
         /// <summary>
-        /// `OnlyListUsersInWorkItems`
+        /// When true, only users that appear in the identity fields of the work items selected by WIQLQuery are exported.
+        /// When false, all users in the source are exported.
         /// </summary>
         /// <default>true</default>
         public bool OnlyListUsersInWorkItems { get; set; } = true;
