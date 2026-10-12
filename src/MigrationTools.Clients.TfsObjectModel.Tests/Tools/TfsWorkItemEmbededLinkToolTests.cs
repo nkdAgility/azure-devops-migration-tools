@@ -27,7 +27,9 @@ namespace MigrationTools.Tests.Tools
         public void MapMentionUserName_UnmappedUser_ReturnsOriginal()
         {
             var map = new Dictionary<string, string> { { "Tester", "Test" } };
-            Assert.AreEqual("Other", TfsWorkItemEmbededLinkTool.MapMentionUserName("Other", map));
+            var name = "Other";
+            // The tool relies on the same instance coming back to keep the exact display name lookup for unmapped users.
+            Assert.AreSame(name, TfsWorkItemEmbededLinkTool.MapMentionUserName(name, map));
         }
 
         [TestMethod, TestCategory("L0")]

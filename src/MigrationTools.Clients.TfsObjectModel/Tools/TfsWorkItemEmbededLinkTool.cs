@@ -128,8 +128,11 @@ namespace MigrationTools.Tools
                             {
                                 Log.LogDebug("{LogTypeName}: User identity {displayName} mention mapped to {targetName} using TfsUserMappingTool.", LogTypeName, displayName, targetName);
                             }
-                            var identity = _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.DisplayName, targetName, StringComparison.OrdinalIgnoreCase))
-                                ?? _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, targetName, StringComparison.OrdinalIgnoreCase));
+                            // Unmapped mentions keep the original exact display name match; mapped targets may be a display name or a unique name.
+                            var identity = ReferenceEquals(targetName, displayName)
+                                ? _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName)
+                                : _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.DisplayName, targetName, StringComparison.OrdinalIgnoreCase))
+                                    ?? _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, targetName, StringComparison.OrdinalIgnoreCase));
                             if (identity != null)
                             {
                                 var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
