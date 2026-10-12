@@ -34,7 +34,7 @@ The tool processes user identity fields in work items and applies configured map
 - **Target only**: The mapped value is written to the target work item. The source work item is not changed.
 - **Empty values**: Null or empty identity values are passed through unchanged.
 - **Unmapped values**: Values with no mapping are passed through unchanged.
-- **Email matching**: With `MatchUsersByEmail` enabled, target users with no email address are skipped instead of causing a failure. A user is matched by email only when exactly one target user has that address (ignoring case). Otherwise, or when the source user has no email, the tool falls back to display name matching. If several target users share the display name, an error is logged and the user is left for manual mapping.
+- **Email matching**: With `MatchUsersByEmail` enabled, target users with no email address are skipped instead of causing a failure. A user is matched by email only when exactly one target user has that address (ignoring case); when no target user has it, `EmailDomainMappings` and then `MatchUsersByEmailLocalPart` are tried, each also requiring a single match. Otherwise, or when the source user has no email, the tool falls back to display name matching. If several target users share the display name, an error is logged and the user is left for manual mapping.
 
 ### Key Features
 
@@ -99,6 +99,9 @@ The TFS User Mapping Tool supports several configuration options for flexible us
 - **IdentityFieldsToCheck**: Array of full field reference names that contain user identities (exact match, case-insensitive)
 - **UserMappingFile**: Path to JSON file containing manual user mappings
 - **MatchUsersByEmail**: Attempt automatic matching based on email addresses
+- **EmailDomainMappings**: Source-to-target email domain rewrites (e.g. `{ "old.com": "new.com" }`) used by MatchUsersByEmail for domain changes
+- **MatchUsersByEmailLocalPart**: With MatchUsersByEmail, fall back to matching the email local part (before `@`) when unique
+- **UseIdentityMapDataFormat**: Export and read the detailed Source/Target identity format instead of the display name dictionary
 - **SkipValidateAllUsersExistOrAreMapped**: Skip validation that all users are properly mapped
 - **ProjectCollectionValidUsersGroupName**: Group name for validating user membership
 
@@ -114,6 +117,23 @@ Enable automatic user matching based on email addresses:
     "Enabled": true,
     "MatchUsersByEmail": true,
     "SkipValidateAllUsersExistOrAreMapped": false
+  }
+}
+```
+
+### Email Domain or Tenant Change
+
+When users move from `first.last@old.com` to `first.last@new.com`, exact email matching fails. Use `EmailDomainMappings` to rewrite source domains to target domains, and optionally `MatchUsersByEmailLocalPart` to match on the part before `@` when the exact and domain-mapped stages find no unique match. Both only take effect with `MatchUsersByEmail`, are tried after an exact email match, and only use a single unambiguous match; otherwise matching falls back to display name. Users whose display names are identical in source and target need no mapping entry.
+
+```json
+{
+  "TfsUserMappingTool": {
+    "Enabled": true,
+    "MatchUsersByEmail": true,
+    "EmailDomainMappings": {
+      "old.com": "new.com"
+    },
+    "MatchUsersByEmailLocalPart": false
   }
 }
 ```
@@ -169,24 +189,21 @@ Skip user validation for scenarios where not all users need to exist in target:
 
 ## User Mapping File Format
 
-When using a manual user mapping file, the format should be a JSON array of mapping objects:
+By default the mapping file is a JSON object that maps source display names to target display names. Users whose display name is the same in source and target need no entry.
+
+Where several users share a display name, write the entry as `Display Name <upn>`. Azure DevOps accepts this form for identity fields, so a value written this way assigns the work item to that exact user:
 
 ```json
-[
-  {
-    "Source": "domain\\sourceuser",
-    "Target": "targetdomain\\targetuser"
-  },
-  {
-    "Source": "olddomain\\john.doe",
-    "Target": "newdomain\\john.doe"
-  },
-  {
-    "Source": "contractor@external.com",
-    "Target": "employee@company.com"
-  }
-]
+{
+  "Jane Doe": "Jane Doe (Contoso)",
+  "John Smith <john.smith@old.com>": "John Smith <john.smith@new.com>",
+  "John Smith <jsmith@old.com>": "John Smith <jsmith@new.com>"
+}
 ```
+
+A work item value is matched to a key in this order: the exact key, then, for a `Display Name <upn>` value, a key with the same UPN or a plain key with the same display name, and for a plain display name, a `Display Name <upn>` key with that display name when only one such key exists. A value is never mapped through a key that names a different UPN. The ExportUsersForMapping processor writes the `Display Name <upn>` form only for display names that occur more than once.
+
+When `UseIdentityMapDataFormat` is enabled, the file can instead be a JSON array of `Source` and `Target` identity objects, as written by the ExportUsersForMapping processor.
 
 ## Good Practices
 
@@ -250,6 +267,11 @@ When using a manual user mapping file, the format should be a JSON array of mapp
 - Check file paths and accessibility
 - Ensure proper encoding for special characters in usernames
 - Verify source and target user format consistency
+
+**Users Sharing a Display Name:**
+
+- Write the mapping entries as `Display Name <upn>`; the ExportUsersForMapping processor does this for duplicated display names
+- A warning that a value `matches more than one 'Display Name <upn>' entry` means the work item value was a plain display name that fits several entries; add an entry for the plain display name or correct the duplicates
 
 **Performance Problems:**
 

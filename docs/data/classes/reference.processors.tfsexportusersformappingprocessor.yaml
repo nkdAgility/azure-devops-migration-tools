@@ -28,7 +28,8 @@ configurationSamples:
   sampleFor: MigrationTools.Processors.TfsExportUsersForMappingProcessorOptions
 description: >-
   ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.
-   Use `ExportUsersForMappingConfig` to configure.
+   Use `ExportUsersForMappingConfig` to configure. The file is written to the TfsUserMappingTool UserMappingFile; display names
+   shared by more than one user are written as the display name followed by the UPN in angle brackets so that each entry identifies one user.
 className: TfsExportUsersForMappingProcessor
 typeName: Processors
 options:
@@ -55,7 +56,9 @@ options:
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: OnlyListUsersInWorkItems
   type: Boolean
-  description: '`OnlyListUsersInWorkItems`'
+  description: >-
+    When true, only users that appear in the identity fields of the work items selected by WIQLQuery are exported.
+     When false, all users in the source are exported.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
