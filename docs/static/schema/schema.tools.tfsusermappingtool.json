@@ -17,11 +17,13 @@
     },
     "IdentityFieldsToCheck": {
       "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.",
-      "type": "array"
+      "type": "array",
+      "default": "none"
     },
     "MatchUsersByEmail": {
       "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the\r\n users will be mapped by their email address first. If no match is found, then the display name will be used.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "false"
     },
     "MatchUsersByEmailLocalPart": {
       "description": "Used with MatchUsersByEmail. When true and neither the exact email nor EmailDomainMappings produce a match, users are matched\r\n on the email local part (the part before @), ignoring the domain. Only a single unambiguous match is used.",
@@ -30,11 +32,13 @@
     },
     "ProjectCollectionValidUsersGroupName": {
       "description": "This is the regionalized \"Project Collection Valid Users\" group name. Default is \"Project Collection Valid Users\".",
-      "type": "string"
+      "type": "string",
+      "default": "Project Collection Valid Users"
     },
     "SkipValidateAllUsersExistOrAreMapped": {
       "description": "When set to true, this setting will skip a validation that all users exists or mapped",
-      "type": "boolean"
+      "type": "boolean",
+      "default": "false"
     },
     "UseIdentityMapDataFormat": {
       "description": "When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)\r\n instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.\r\n Detailed entries match work item values against the source display name or account name, ignoring case.",

@@ -13,6 +13,7 @@ namespace MigrationTools.Tools
         /// <summary>
         /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.
         /// </summary>
+        /// <default>none</default>
         public List<string> IdentityFieldsToCheck { get; set; }
 
         /// <summary>
@@ -29,6 +30,7 @@ namespace MigrationTools.Tools
         /// By default, users in source are mapped to target users by their display name. If this is set to true, then the
         /// users will be mapped by their email address first. If no match is found, then the display name will be used.
         /// </summary>
+        /// <default>false</default>
         public bool MatchUsersByEmail { get; set; }
 
         /// <summary>
@@ -50,12 +52,14 @@ namespace MigrationTools.Tools
         /// <summary>
         /// When set to true, this setting will skip a validation that all users exists or mapped
         /// </summary>
+        /// <default>false</default>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool SkipValidateAllUsersExistOrAreMapped { get; set; } = false;
 
         /// <summary>
         /// This is the regionalized "Project Collection Valid Users" group name. Default is "Project Collection Valid Users".
         /// </summary>
+        /// <default>Project Collection Valid Users</default>
         public string ProjectCollectionValidUsersGroupName { get; set; } = "Project Collection Valid Users";
 
         /// <summary>
