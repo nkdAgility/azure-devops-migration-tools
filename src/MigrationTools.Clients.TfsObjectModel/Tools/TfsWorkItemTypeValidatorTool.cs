@@ -119,27 +119,49 @@ namespace MigrationTools.Tools
         public bool StopIfHistoryOnlyFieldsFound => Options.StopIfHistoryOnlyFieldsFound;
 
         /// <summary>
-        /// Scans all revisions of <paramref name="sourceWorkItems"/> for fields with values that exist only in revision
-        /// history and not on the target work item type (#3194). Returns <see langword="false"/> if any such field is
-        /// found that is not excluded by <see cref="TfsWorkItemTypeValidatorToolOptions.ExcludeSourceFields"/>.
+        /// Scans the revisions of <paramref name="sourceWorkItems"/> that were saved under another team project or work
+        /// item type for fields with values that exist neither on the source type nor on the target type the revision is
+        /// replayed to (#3194). Each such revision is loaded from the server. Returns <see langword="false"/> if any such
+        /// field is found that is not excluded by <see cref="TfsWorkItemTypeValidatorToolOptions.ExcludeSourceFields"/>.
         /// </summary>
+        /// <param name="isUsableInTarget">
+        /// The target type check used by revision replay. Defaults to the type existing in <paramref name="targetWits"/>.
+        /// </param>
         public bool ValidateRevisionHistoryFields(
             List<WorkItemData> sourceWorkItems,
             List<WorkItemType> sourceWits,
-            List<WorkItemType> targetWits)
+            List<WorkItemType> targetWits,
+            Func<string, bool>? isUsableInTarget = null)
         {
             Options.Normalize();
-            Log.LogInformation("Scanning all revisions of {count} work item(s) for fields that exist only in revision history.",
+            Log.LogInformation("Scanning revisions of {count} work item(s) for fields that exist only in revision history.",
                 sourceWorkItems.Count);
             var stopwatch = Stopwatch.StartNew();
             Dictionary<string, ISet<string>> sourceFields = sourceWits
-                .Where(wit => ShouldValidateWorkItemType(wit.Name))
                 .ToDictionary(wit => wit.Name, GetFieldNames, StringComparer.OrdinalIgnoreCase);
             Dictionary<string, ISet<string>> targetFields = targetWits
                 .ToDictionary(wit => wit.Name, GetFieldNames, StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, bool> validatedTypes = new(StringComparer.OrdinalIgnoreCase);
+            ISet<string>? GetSourceFields(string sourceWit)
+            {
+                if (!validatedTypes.TryGetValue(sourceWit, out bool validate))
+                {
+                    validate = ShouldValidateWorkItemType(sourceWit);
+                    validatedTypes[sourceWit] = validate;
+                }
+                if (!validate)
+                {
+                    return null;
+                }
+                // A type that is not in the current source project has no fields that field maps could read.
+                return sourceFields.TryGetValue(sourceWit, out ISet<string> fields)
+                    ? fields
+                    : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            }
             var scanner = new HistoryOnlyFieldScanner(
-                sourceWit => _witMappingTool.Mappings.TryGetValue(sourceWit, out string mapped) ? mapped : sourceWit,
-                sourceWit => sourceFields.TryGetValue(sourceWit, out ISet<string> fields) ? fields : null,
+                _witMappingTool.Mappings,
+                isUsableInTarget ?? (targetWit => targetFields.ContainsKey(targetWit)),
+                GetSourceFields,
                 targetWit => targetFields.TryGetValue(targetWit, out ISet<string> fields) ? fields : null,
                 LoadRevisionFields,
                 Options.IsSourceFieldExcluded);

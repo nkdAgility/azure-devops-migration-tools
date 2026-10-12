@@ -152,7 +152,6 @@ namespace MigrationTools.Processors
                 //////////////////////////////////////////////////
                 CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
-                ValidateRevisionHistoryFields(sourceWorkItems);
                 //////////////////////////////////////////////////
 
                 contextLog.Information("Found target project as {@destProject}", Target.WorkItems.Project.Name);
@@ -180,6 +179,8 @@ namespace MigrationTools.Processors
 
                 //////////////////////////////////////////////////
 
+                // After filtering, so the scan only covers (and only stops for) items that will be migrated.
+                ValidateRevisionHistoryFields(sourceWorkItems);
 
                 _current = 1;
                 _count = sourceWorkItems.Count;
@@ -369,7 +370,7 @@ namespace MigrationTools.Processors
             Log.LogInformation("[ValidateRevisionHistoryFields]");
             var sourceWits = Source.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().ToList();
             var targetWits = Target.WorkItems.Project.ToProject().WorkItemTypes.Cast<WorkItemType>().ToList();
-            bool isValid = validator.ValidateRevisionHistoryFields(sourceWorkItems, sourceWits, targetWits);
+            bool isValid = validator.ValidateRevisionHistoryFields(sourceWorkItems, sourceWits, targetWits, IsWorkItemTypeUsableInTarget);
             if (!isValid && validator.StopIfHistoryOnlyFieldsFound)
             {
                 Log.LogError("History-only fields were found and '{option}' is true, so the migration will stop now.",

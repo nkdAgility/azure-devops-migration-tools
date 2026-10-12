@@ -163,9 +163,9 @@ The tool provides comprehensive logging including field types, allowed values, a
 
 ### History-only fields
 
-Type validation compares only the current work item type definitions. A field can still have values in older revisions after an item was moved from another project or process, or after the field was removed from the type. Those values are dropped during migration, and field maps cannot read them, because maps validate against the current source type.
+Type validation compares only the current work item type definitions. When an item was moved from another project or process, or its type was changed, its older revisions can hold values for fields that the current type does not have. Those values are dropped during migration, and field maps cannot read them, because maps validate against the current source type.
 
-Set `ScanRevisionHistoryForFields` to `true` to scan every revision of the items returned by the `TfsWorkItemMigrationProcessor` query before migration starts. The scan uses revisions already loaded by the query, so it makes no extra server calls, but it adds time on large projects. It is off by default. Each history-only field is reported once per source and target type pair, with revision and work item counts and sample IDs.
+Set `ScanRevisionHistoryForFields` to `true` to check the items that `TfsWorkItemMigrationProcessor` will migrate (after `FilterWorkItemsThatAlreadyExistInTarget`) before migration starts. The scan checks each revision that was saved under a different team project or work item type than the item has now, against the target type that revision will be replayed to. Other revisions only carry fields of the current type, which type validation already covers. Each checked revision is loaded with one server request, so the cost grows with the number of moved or retyped revisions; the log reports how many were loaded and how long the scan took. It is off by default. Each history-only field is reported once per source and target type pair, with revision and work item counts and sample IDs.
 
 By default the findings are warnings and the migration continues. Set `StopIfHistoryOnlyFieldsFound` to `true` to stop instead. To keep the data, add the field to the target work item type. To accept the loss, list the field in `ExcludeSourceFields`; excluded fields are still logged, as information.
 
