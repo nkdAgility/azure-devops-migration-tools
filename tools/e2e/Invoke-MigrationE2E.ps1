@@ -10,6 +10,10 @@
     to run otherwise, so the test PAT is never sent anywhere else. The token is injected through the tool's
     endpoint environment-variable overrides for every endpoint in the config (any name, TFS or REST), is never
     written to disk, and is masked in the output. Any existing values of those variables are restored afterwards.
+    REST (AzureDevOpsEndpoint) endpoints must still carry a placeholder AccessToken in the config, because the
+    schema requires it; the override replaces it at run time.
+
+    Works with Windows PowerShell 5.1 and PowerShell 7+.
 
     Build MigrationTools.ConsoleFull first. Long worktree paths can stop the exe launching, so the build output
     is copied to a short temp folder before running.
@@ -19,11 +23,14 @@
 #>
 param(
     [Parameter(Mandatory)][string]$Config,
-    [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
-    [string]$BuildOutput = (Join-Path $RepoRoot "src\MigrationTools.ConsoleFull\bin\Debug\net472"),
+    [string]$RepoRoot,
+    [string]$BuildOutput,
     [string]$Filter = "Saved as|Could not save|could not be migrated|Continuing|Too many|stopped|failed|Exiting"
 )
 $ErrorActionPreference = "Stop"
+# Resolved here rather than as parameter defaults: Windows PowerShell 5.1 leaves $PSScriptRoot empty in the param block.
+if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "..\..")).Path }
+if (-not $BuildOutput) { $BuildOutput = Join-Path $RepoRoot "src\MigrationTools.ConsoleFull\bin\Debug\net472" }
 $AllowedOrganisation = "https://dev.azure.com/nkdagility-preview"
 
 # Validate everything before touching the environment or the disk.
