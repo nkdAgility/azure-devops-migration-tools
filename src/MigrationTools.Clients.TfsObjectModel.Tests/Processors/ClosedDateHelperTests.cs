@@ -39,9 +39,10 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
-        public void StateStampedDateFields_IncludesActivatedDate()
+        public void StateStampedDateFields_IncludesActivatedAndResolvedDate()
         {
             CollectionAssert.Contains(ClosedDateHelper.StateStampedDateFields.ToList(), ClosedDateHelper.CommonActivatedDate);
+            CollectionAssert.Contains(ClosedDateHelper.StateStampedDateFields.ToList(), ClosedDateHelper.CommonResolvedDate);
         }
 
         [TestMethod, TestCategory("L0")]

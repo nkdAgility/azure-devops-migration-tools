@@ -1294,7 +1294,7 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// The server can still apply the current date to ClosedDate and ActivatedDate on save, even with BypassRules,
+        /// The server can still apply the current date to ClosedDate, ActivatedDate and ResolvedDate on save, even with BypassRules,
         /// and they are read-only in the revision that changes state, so a mismatch after save is corrected with a
         /// single fix-up revision.
         /// </summary>
@@ -1343,7 +1343,7 @@ namespace MigrationTools.Processors
             {
                 // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
                 targetWorkItem.ToWorkItem().Reset();
-                throw new StateStampedDateFixUpException($"Unable to apply fix-up save for ClosedDate/ActivatedDate on target #{targetWorkItem.Id}", ex);
+                throw new StateStampedDateFixUpException($"Unable to apply fix-up save for state-stamped dates on target #{targetWorkItem.Id}", ex);
             }
         }
 

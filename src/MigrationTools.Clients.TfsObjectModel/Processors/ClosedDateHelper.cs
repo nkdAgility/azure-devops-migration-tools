@@ -12,12 +12,13 @@ namespace MigrationTools.Processors
         public const string CommonClosedDate = "Microsoft.VSTS.Common.ClosedDate";
         public const string SystemClosedDate = "System.ClosedDate";
         public const string CommonActivatedDate = "Microsoft.VSTS.Common.ActivatedDate";
+        public const string CommonResolvedDate = "Microsoft.VSTS.Common.ResolvedDate";
 
         /// <summary>
         /// Date fields, other than ClosedDate, that the server stamps with the save time when a revision changes
         /// state, even with BypassRules. They are read-only in that revision, so they are corrected after the save.
         /// </summary>
-        public static readonly IReadOnlyList<string> StateStampedDateFields = new[] { CommonActivatedDate };
+        public static readonly IReadOnlyList<string> StateStampedDateFields = new[] { CommonActivatedDate, CommonResolvedDate };
 
         /// <summary>
         /// Returns the target fields whose saved value differs from the source revision's value
