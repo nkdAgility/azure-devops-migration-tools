@@ -24,6 +24,11 @@ namespace MigrationTools.Tools
 
         public static TfsGitRepositoryInfo Create(ExternalLink gitExternalLink, IList<GitRepository> possibleRepos, TfsChangeSetMappingTool tfsChangeSetMappingTool, string workItemSourceProjectName)
         {
+            if (string.IsNullOrWhiteSpace(gitExternalLink?.LinkedArtifactUri))
+            {
+                Log.Warning("GitRepositoryInfo: Skipping external link with an empty artifact URI.");
+                return null;
+            }
             var repoType = DetermineFromLink(gitExternalLink.LinkedArtifactUri);
             switch (repoType)
             {
@@ -102,9 +107,9 @@ namespace MigrationTools.Tools
                 string[] bits = Regex.Split(guidbits, "%2f", RegexOptions.IgnoreCase);
                 
                 // Validate that we have at least 3 parts (projectId, repoId, commitId) for legacy format
-                if (bits.Length < 3)
+                if (bits.Length < 3 || bits.Any(string.IsNullOrWhiteSpace) || !Guid.TryParse(bits[1], out _))
                 {
-                    Log.Warning("GitRepositoryInfo: Invalid Git external link format (legacy). Expected at least 3 parts separated by %2f, but got {count} parts. Link: {link}", bits.Length, gitExternalLink.LinkedArtifactUri);
+                    Log.Warning("GitRepositoryInfo: Invalid Git external link format (legacy). Expected projectId%2frepoId%2fcommitId with a GUID repoId and no empty parts, but got {count} parts. The link will be skipped. Link: {link}", bits.Length, gitExternalLink.LinkedArtifactUri);
                     return null;
                 }
                 

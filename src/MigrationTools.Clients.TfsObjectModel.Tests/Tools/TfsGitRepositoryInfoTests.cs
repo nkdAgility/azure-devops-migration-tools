@@ -238,6 +238,28 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod(), TestCategory("L0")]
+        [DataRow("vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f%2f41dd2754058348d72a6417c0615c2543b9b55535")]
+        [DataRow("vstfs:///Git/Commit/25f94570-e3e7-4b79-ad19-4b434787fd5a%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f")]
+        [DataRow("vstfs:///Git/Commit/%2f50477259-3058-4dff-ba4c-e8c179ec5327%2f41dd2754058348d72a6417c0615c2543b9b55535")]
+        [DataRow("vstfs:///Git/Commit/%2f%2f")]
+        [DataRow("vstfs:///Git/Commit/proj%2fnot-a-guid%2f41dd2754058348d72a6417c0615c2543b9b55535")]
+        [DataRow("vstfs:///Git/Commit/Proj/25f94570%2f50477259-3058-4dff-ba4c-e8c179ec5327")]
+        public void CreateFromGit_MalformedLegacyLink_ShouldReturnNullWithoutThrowing(string uri)
+        {
+            Assert.IsNull(TfsGitRepositoryInfo.CreateFromGit(CreateMockExternalLink(uri), new List<GitRepository>()));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        [DataRow("vstfs:///Git/Commit//Repo/41dd2754")]
+        [DataRow("vstfs:///Git/Commit/Proj//41dd2754")]
+        [DataRow("vstfs:///Git/Commit/Proj")]
+        [DataRow("vstfs:///Git/Commit")]
+        public void Create_MalformedGitLink_ShouldReturnNullWithoutThrowing(string uri)
+        {
+            Assert.IsNull(TfsGitRepositoryInfo.Create(CreateMockExternalLink(uri), new List<GitRepository>(), null, "Proj"));
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void CreateFromGit_EmptyLink_ShouldReturnNull()
         {
             // Arrange
