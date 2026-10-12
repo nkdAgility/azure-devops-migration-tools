@@ -89,6 +89,36 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void FindMappedTarget_QualifiedSource_DifferentUpn_DoesNotMatchByDisplayName()
+        {
+            var map = Map(("John Smith <john@old.com>", "John Smith <john@new.com>"));
+            Assert.IsNull(TfsUserIdentityReference.FindMappedTarget(map, "John Smith <other@old.com>"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void SelectUsersToMap_KeepsSameNamePairsOnlyWhenNameIsSharedAndAccountChanged()
+        {
+            var jsOld = U("John Smith", "john@old.com");
+            var js2Old = U("John Smith", "jsmith@old.com");
+            var janeOld = U("Jane Doe", "jane@old.com");
+            var jsNew = U("John Smith", "john@new.com");
+            var js2New = U("John Smith", "jsmith@new.com");
+            var janeNew = U("Jane Doe", "jane@new.com");
+            var data = new IdentityMapResult
+            {
+                SourceUsers = [jsOld, js2Old, janeOld],
+                TargetUsers = [jsNew, js2New, janeNew],
+                IdentityMap = [new() { Source = jsOld, Target = jsNew }, new() { Source = js2Old, Target = js2New }, new() { Source = janeOld, Target = janeNew }],
+            };
+
+            var simple = TfsExportUsersForMappingProcessor.SelectUsersToMap(data, detailed: false);
+            var detailed = TfsExportUsersForMappingProcessor.SelectUsersToMap(data, detailed: true);
+
+            CollectionAssert.AreEquivalent(new[] { jsOld, js2Old }, simple.ConvertAll(x => x.Source));
+            Assert.HasCount(3, detailed);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void FindMappedTarget_NoMatch_ReturnsNull()
         {
             Assert.IsNull(TfsUserIdentityReference.FindMappedTarget(Map(("A", "B")), "C"));
@@ -113,7 +143,7 @@ namespace MigrationTools.Tests.Tools
 
             var result = TfsExportUsersForMappingProcessor.BuildSimpleDictionary(map, [jsOld, js2Old, janeOld], [jsNew, js2New, janeNew]);
 
-            Assert.AreEqual(3, result.Count);
+            Assert.HasCount(3, result);
             Assert.AreEqual("John Smith <john.smith@new.com>", result["John Smith <john.smith@old.com>"]);
             Assert.AreEqual("John Smith <jsmith@new.com>", result["John Smith <jsmith@old.com>"]);
             Assert.AreEqual("Jane D", result["Jane Doe"]);

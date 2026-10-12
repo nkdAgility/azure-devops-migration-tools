@@ -354,7 +354,10 @@ namespace MigrationTools.Tests.Tools
             };
             var filePath = Path.Combine(_testDirectory, "exported-dictionary.json");
             TfsUserMappingTool.SerializeUserMap(filePath,
-                MigrationTools.Processors.TfsExportUsersForMappingProcessor.BuildSimpleDictionary(usersToMap, [jsOld, js2Old, janeOld], [jsNew, js2New, janeNew]), _logger);
+                MigrationTools.Processors.TfsExportUsersForMappingProcessor.BuildSimpleDictionary(
+                    MigrationTools.Processors.TfsExportUsersForMappingProcessor.SelectUsersToMap(
+                        new IdentityMapResult { IdentityMap = usersToMap, SourceUsers = [jsOld, js2Old, janeOld], TargetUsers = [jsNew, js2New, janeNew] }, detailed: false),
+                    [jsOld, js2Old, janeOld], [jsNew, js2New, janeNew]), _logger);
 
             var map = CreateTool(filePath, useIdentityMapDataFormat: false).UserMappings.Value;
 

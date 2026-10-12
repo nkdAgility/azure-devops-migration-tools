@@ -50,8 +50,9 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
-        /// Finds the mapped target for a work item identity value. Tries the exact key, then keys written as
-        /// <c>Display Name &lt;upn&gt;</c> with the same unique name, then a single such key with the same display name.
+        /// Finds the mapped target for a work item identity value. Tries the exact key; for a qualified value, a key with the
+        /// same unique name and then a plain key with the same display name; for a plain value, a single qualified key with the
+        /// same display name.
         /// Returns null when there is no mapping or the display name matches more than one key.
         /// </summary>
         public static string FindMappedTarget(IDictionary<string, string> userMap, string sourceValue)
@@ -78,14 +79,11 @@ namespace MigrationTools.Tools
                 {
                     return byUnique[0].Value;
                 }
-                if (userMap.TryGetValue(sourceName, out var byPlainName))
-                {
-                    return byPlainName;
-                }
+                // A qualified source names one user, so a qualified key with another unique name must not match it.
+                return userMap.TryGetValue(sourceName, out var byPlainName) ? byPlainName : null;
             }
 
-            var name = sourceIsQualified ? sourceName : sourceValue;
-            var byName = qualifiedKeys.Where(k => string.Equals(k.Name, name, StringComparison.OrdinalIgnoreCase)).Take(2).ToList();
+            var byName = qualifiedKeys.Where(k => string.Equals(k.Name, sourceValue, StringComparison.OrdinalIgnoreCase)).Take(2).ToList();
             return byName.Count == 1 ? byName[0].Value : null;
         }
 

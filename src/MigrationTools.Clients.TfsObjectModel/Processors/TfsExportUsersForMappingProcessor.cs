@@ -64,8 +64,7 @@ namespace MigrationTools.Processors
             }
 
             bool detailed = CommonTools.UserMapping.Options.UseIdentityMapDataFormat;
-            List<IdentityMapData> usersToMap = data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName
-                || (detailed && !string.Equals(x.Source.AccountName, x.Target?.AccountName, StringComparison.OrdinalIgnoreCase))).ToList();
+            List<IdentityMapData> usersToMap = SelectUsersToMap(data, detailed);
             Log.LogInformation("Filtered to {usersToMap} total viable mappings", usersToMap.Count);
 
             if (detailed)
@@ -92,6 +91,19 @@ namespace MigrationTools.Processors
         {
             TfsUserMappingTool.SerializeUserMap(CommonTools.UserMapping.Options.UserMappingFile,
                 BuildSimpleDictionary(usersToMap, sourceUsers, targetUsers), Log);
+        }
+
+        /// <summary>
+        /// Selects the pairs that need a mapping entry: those whose display names differ, and those whose account changed
+        /// when the detailed format is used or the display name is shared by several users and so needs a qualified entry.
+        /// </summary>
+        public static List<IdentityMapData> SelectUsersToMap(IdentityMapResult data, bool detailed)
+        {
+            var duplicateSource = TfsUserIdentityReference.DuplicateDisplayNames(data.SourceUsers);
+            var duplicateTarget = TfsUserIdentityReference.DuplicateDisplayNames(data.TargetUsers);
+            return data.IdentityMap.Where(x => x.Source.DisplayName != x.Target?.DisplayName
+                || (!string.Equals(x.Source.AccountName, x.Target?.AccountName, StringComparison.OrdinalIgnoreCase)
+                    && (detailed || duplicateSource.Contains(x.Source.DisplayName) || duplicateTarget.Contains(x.Source.DisplayName)))).ToList();
         }
 
         /// <summary>

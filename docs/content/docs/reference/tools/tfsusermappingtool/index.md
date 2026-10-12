@@ -193,7 +193,7 @@ Where several users share a display name, write the entry as `Display Name <upn>
 }
 ```
 
-A work item value is matched to a key in this order: the exact key, a `Display Name <upn>` key with the same UPN, then a `Display Name <upn>` key with the same display name when only one such key exists. The ExportUsersForMapping processor writes the `Display Name <upn>` form only for display names that occur more than once.
+A work item value is matched to a key in this order: the exact key, then, for a `Display Name <upn>` value, a key with the same UPN or a plain key with the same display name, and for a plain display name, a `Display Name <upn>` key with that display name when only one such key exists. A value is never mapped through a key that names a different UPN. The ExportUsersForMapping processor writes the `Display Name <upn>` form only for display names that occur more than once.
 
 When `UseIdentityMapDataFormat` is enabled, the file can instead be a JSON array of `Source` and `Target` identity objects, as written by the ExportUsersForMapping processor.
 

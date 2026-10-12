@@ -397,20 +397,22 @@ namespace MigrationTools.Tools
                 sourceName = sourceName.Substring(0, index).Trim();
             }
 
-            targetIdentity = MatchIdentity(sourceName, identityCache);
-            if ((targetIdentity is null) && (userMapping is not null))
-            {
-                var mappedName = TfsUserIdentityReference.FindMappedTarget(userMapping, sourceCapacity.TeamMember.DisplayName)
+            var mappedName = userMapping is null ? null
+                : TfsUserIdentityReference.FindMappedTarget(userMapping, sourceCapacity.TeamMember.DisplayName)
                     ?? TfsUserIdentityReference.FindMappedTarget(userMapping, sourceName);
-                if (TfsUserIdentityReference.TryParse(mappedName, out var mappedDisplayName, out var mappedUniqueName))
-                {
-                    targetIdentity = identityCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, mappedUniqueName, StringComparison.OrdinalIgnoreCase))
-                        ?? MatchIdentity(mappedDisplayName, identityCache);
-                }
-                else if (!string.IsNullOrEmpty(mappedName))
-                {
-                    targetIdentity = MatchIdentity(mappedName, identityCache);
-                }
+
+            // A "Display Name <upn>" mapping names one user; resolve it by unique name only, so a missing or
+            // shared display name never selects a different user.
+            if (TfsUserIdentityReference.TryParse(mappedName, out _, out var mappedUniqueName))
+            {
+                targetIdentity = identityCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, mappedUniqueName, StringComparison.OrdinalIgnoreCase));
+                return targetIdentity is not null;
+            }
+
+            targetIdentity = MatchIdentity(sourceName, identityCache);
+            if ((targetIdentity is null) && !string.IsNullOrEmpty(mappedName))
+            {
+                targetIdentity = MatchIdentity(mappedName, identityCache);
             }
 
             // last attempt to match on unique name
