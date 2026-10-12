@@ -92,7 +92,7 @@ This will migrate Test Cases while fixing the links to the Shared bits that can'
 The important bits:
 
 - Target ReflectedWorkItemIdField is a common field that is available on the non-customisable work items
-- Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only
+- Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only. The target `Test Case` type must have your custom `ReflectedWorkItemId` field (here `Custom.ReflectedWorkItemId`); if it does not, the map logs a validation warning and copies nothing
 - The query includes only the Test items that we can migrate as work items (No Suites or Plans)
 - Shared Steps and Shared Parameters are migrated before the Test Cases whatever the query order, so the references in each Test Case's steps are pointed at the migrated copies
 - The work item type validator checks only those types, because the other types in the target may not have `Microsoft.VSTS.Build.IntegrationBuild`
