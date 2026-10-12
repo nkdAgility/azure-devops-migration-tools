@@ -77,5 +77,35 @@ namespace MigrationTools.Tests.Tools
             var map = new Dictionary<string, string> { { "Proj", "Mapped" } };
             Assert.AreEqual("Mapped", TfsGitRepositoryTool.GetTargetRepoName(map, info));
         }
+
+        [TestMethod, TestCategory("L0")]
+        public void CreateByName_DuplicateNameAcrossCollection_ReturnsNoRepo()
+        {
+            var source = new TfsGitRepositoryInfo("abc", null, Repo("OldProject", "MyRepo"));
+            var collection = new List<GitRepository> { Repo("ProjectA", "Shared"), Repo("ProjectB", "Shared") };
+            var result = TfsGitRepositoryInfo.Create("Shared", source, collection);
+            Assert.IsNull(result.GitRepo);
+            Assert.IsNull(result.RepoID);
+            Assert.AreEqual("abc", result.CommitID);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CreateByName_SingleMatch_ReturnsRepo()
+        {
+            var source = new TfsGitRepositoryInfo("abc", null, Repo("OldProject", "MyRepo"));
+            var only = Repo("ProjectA", "Shared");
+            var collection = new List<GitRepository> { only, Repo("ProjectB", "Other") };
+            var result = TfsGitRepositoryInfo.Create("Shared", source, collection);
+            Assert.AreSame(only, result.GitRepo);
+            Assert.AreEqual(only.Id.ToString(), result.RepoID);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CreateByName_NoMatch_ReturnsNoRepo()
+        {
+            var source = new TfsGitRepositoryInfo("abc", null, Repo("OldProject", "MyRepo"));
+            var result = TfsGitRepositoryInfo.Create("Missing", source, new List<GitRepository> { Repo("ProjectA", "Shared") });
+            Assert.IsNull(result.GitRepo);
+        }
     }
 }
