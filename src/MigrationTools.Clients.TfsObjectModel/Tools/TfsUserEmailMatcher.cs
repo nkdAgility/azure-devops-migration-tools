@@ -35,12 +35,10 @@ namespace MigrationTools.Tools
                 return exact.Count == 1 ? exact[0] : null;
             }
 
-            IdentityItemData match;
-
             var rewritten = RewriteDomain(sourceMail, domainMappings);
             if (rewritten != null)
             {
-                match = Single(targets, t => t.MailAddress.Equals(rewritten, StringComparison.OrdinalIgnoreCase));
+                var match = Single(targets, t => t.MailAddress.Equals(rewritten, StringComparison.OrdinalIgnoreCase));
                 if (match != null)
                 {
                     return match;
