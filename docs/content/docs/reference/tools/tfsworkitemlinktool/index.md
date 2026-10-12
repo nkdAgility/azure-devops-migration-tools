@@ -210,7 +210,7 @@ Handle links that span multiple projects:
 ### Performance Optimization
 
 - **Batch Processing**: Consider batch size for link processing performance
-- **Save Strategy**: Use `SaveAfterEachLinkIsAdded` judiciously for performance
+- **Save Strategy**: Use `SaveAfterEachLinkIsAdded` judiciously for performance. It is ignored while `TfsWorkItemMigrationProcessor` replays revisions, because links are then saved with the revision where they were added or removed in the source.
 - **Filter Work Items**: Use work item type filters to reduce processing scope
 - **Cross-Project Impact**: Consider performance impact of cross-project link processing
 

@@ -57,7 +57,8 @@ namespace MigrationTools.Processors
         public bool AttachRevisionHistory { get; set; } = false;
 
         /// <summary>
-        /// If enabled, adds a comment recording the migration
+        /// If enabled, adds a comment recording the migration. The comment is added to the History of the last replayed
+        /// revision, after that revision's own comment, rather than in a separate revision.
         /// </summary>
         /// <default>true</default>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
