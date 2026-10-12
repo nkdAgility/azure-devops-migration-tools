@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.processors.tfsexportusersformappingprocessor.json",
   "title": "TfsExportUsersForMappingProcessor",
-  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.\r\n Use `ExportUsersForMappingConfig` to configure.",
+  "description": "ExportUsersForMappingContext is a tool used to create a starter mapping file for users between the source and target systems.\r\n Use `ExportUsersForMappingConfig` to configure. The file is written to the TfsUserMappingTool UserMappingFile; display names\r\n shared by more than one user are written as the display name followed by the UPN in angle brackets so that each entry identifies one user.",
   "type": "object",
   "properties": {
     "Enabled": {
@@ -18,7 +18,7 @@
       "type": "boolean"
     },
     "OnlyListUsersInWorkItems": {
-      "description": "`OnlyListUsersInWorkItems`",
+      "description": "When true, only users that appear in the identity fields of the work items selected by WIQLQuery are exported.\r\n When false, all users in the source are exported.",
       "type": "boolean",
       "default": "true"
     },

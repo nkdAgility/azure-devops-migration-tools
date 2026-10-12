@@ -236,9 +236,13 @@ namespace MigrationTools.Tools
             Log.LogDebug($"TfsUserMappingTool::MapUserIdentityValue [ReferenceName|{referenceName}]");
             string target = DetectedFormatIsIdentityMapData.Value
                 ? FindIdentityMapTarget(IdentityMappings.Value, sourceValue)
-                : (UserMappings.Value.TryGetValue(sourceValue, out var mappedValue) ? mappedValue : null);
+                : TfsUserIdentityReference.FindMappedTarget(UserMappings.Value, sourceValue);
             if (target == null)
             {
+                if (!DetectedFormatIsIdentityMapData.Value && TfsUserIdentityReference.IsAmbiguous(UserMappings.Value, sourceValue))
+                {
+                    Log.LogWarning("TfsUserMappingTool::MapUserIdentityValue '{sourceValue}' matches more than one 'Display Name <upn>' entry in the mapping file and was not mapped.", sourceValue);
+                }
                 return value;
             }
             Log.LogDebug($"TfsUserMappingTool::MapUserIdentityValue::Map:[original|{sourceValue}][new|{target}]");
@@ -382,9 +386,11 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// Matches each source user to a target user, by unique email address first (when enabled) and then by display name.
+        /// Email matching tolerates a domain change through <paramref name="emailDomainMappings"/> and <paramref name="matchByEmailLocalPart"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException">Thrown when several target users share the source user's display name.</exception>
-        public static List<IdentityMapData> MatchSourceUsersToTarget(List<IdentityItemData> sourceUsers, List<IdentityItemData> targetUsers, bool matchUsersByEmail, ILogger log)
+        public static List<IdentityMapData> MatchSourceUsersToTarget(List<IdentityItemData> sourceUsers, List<IdentityItemData> targetUsers, bool matchUsersByEmail, ILogger log,
+            IDictionary<string, string> emailDomainMappings = null, bool matchByEmailLocalPart = false)
         {
             List<IdentityMapData> identityMap = [];
             foreach (var sourceUser in sourceUsers)
@@ -392,16 +398,7 @@ namespace MigrationTools.Tools
                 IdentityItemData targetUser = null;
                 if (matchUsersByEmail && !string.IsNullOrEmpty(sourceUser.MailAddress))
                 {
-                    var candidates = targetUsers
-                        .Where(tu => string.Equals(tu.MailAddress, sourceUser.MailAddress, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-                    if (candidates.Count == 1)
-                    {
-                        // If there are more than one user with the same email address, we can't be sure which one is
-                        // the correct one, so mapping will match either by display name, or will be skipped and
-                        // exported for manual mapping.
-                        targetUser = candidates[0];
-                    }
+                    targetUser = TfsUserEmailMatcher.FindTarget(sourceUser, targetUsers, emailDomainMappings, matchByEmailLocalPart);
                 }
                 try
                 {
@@ -440,7 +437,8 @@ namespace MigrationTools.Tools
                         + "matching by display name will be used.");
                 }
 
-                List<IdentityMapData> identityMap = MatchSourceUsersToTarget(sourceUsers, targetUsers, Options.MatchUsersByEmail, Log);
+                List<IdentityMapData> identityMap = MatchSourceUsersToTarget(sourceUsers, targetUsers, Options.MatchUsersByEmail, Log,
+                    Options.EmailDomainMappings, Options.MatchUsersByEmailLocalPart);
                 return new()
                 {
                     IdentityMap = identityMap,
@@ -465,7 +463,8 @@ namespace MigrationTools.Tools
                 IdentityMapResult mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.IdentityMap.Count}]");
                 mappedUsers.IdentityMap = mappedUsers.IdentityMap.Where(x => workItemUsers.Contains(x.Source.DisplayName)
-                    || (!string.IsNullOrEmpty(x.Source.AccountName) && workItemUsers.Contains(x.Source.AccountName))).ToList();
+                    || (!string.IsNullOrEmpty(x.Source.AccountName) && workItemUsers.Contains(x.Source.AccountName))
+                    || workItemUsers.Contains(TfsUserIdentityReference.Format(x.Source))).ToList();
                 return mappedUsers;
             }
             else
