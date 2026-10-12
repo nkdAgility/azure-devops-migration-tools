@@ -182,7 +182,7 @@ namespace MigrationTools.Tools
                 .ToDictionary(f => f.ReferenceName, f => f, StringComparer.OrdinalIgnoreCase);
             foreach (FieldDefinition sourceField in sourceFields)
             {
-                List<FieldMapping> fieldsToValidate = GetTargetFieldsToValidate(targetWit.Name, sourceField, targetFields);
+                List<FieldMapping> fieldsToValidate = GetTargetFieldsToValidate(sourceWit.Name, sourceField, targetFields);
                 foreach (FieldMapping fieldPair in fieldsToValidate)
                 {
                     Log.LogInformation("  Validating source field '{sourceFieldReferenceName}' ({sourceFieldName}).",
@@ -205,7 +205,7 @@ namespace MigrationTools.Tools
                         }
                         else
                         {
-                            fieldResult = ValidateField(sourceField, fieldPair.TargetField, targetWit.Name, logLevel);
+                            fieldResult = ValidateField(sourceField, fieldPair.TargetField, sourceWit.Name, targetWit.Name, logLevel);
                         }
                     }
                     else
@@ -236,22 +236,24 @@ namespace MigrationTools.Tools
             return result;
         }
 
+        // Field maps are looked up by the SOURCE work item type name, because that is how FieldMappingTool
+        // selects maps at migration time (see FieldMappingTool.ApplyFieldMappings). See #3151.
         private List<FieldMapping> GetTargetFieldsToValidate(
-            string targetWitName,
+            string sourceWitName,
             FieldDefinition sourceField,
             Dictionary<string, FieldDefinition> targetFields)
         {
             List<FieldMapping> result = [];
 
             foreach (FieldToFieldMap fieldToFieldMap in _commonTools.FieldMappingTool
-                .GetFieldToFieldMaps(targetWitName, sourceField.ReferenceName, FieldMapMode.SourceToTarget))
+                .GetFieldToFieldMaps(sourceWitName, sourceField.ReferenceName, FieldMapMode.SourceToTarget))
             {
                 targetFields.TryGetValue(fieldToFieldMap.Config.targetField, out FieldDefinition targetField);
                 result.Add(new FieldMapping(sourceField, fieldToFieldMap.Config.targetField, targetField, true));
             }
 
             foreach ((string _, string targetFieldName) in _commonTools.FieldMappingTool
-                .GetFieldToFieldMultiMaps(targetWitName, sourceField.ReferenceName))
+                .GetFieldToFieldMultiMaps(sourceWitName, sourceField.ReferenceName))
             {
                 targetFields.TryGetValue(targetFieldName, out FieldDefinition targetField);
                 result.Add(new FieldMapping(sourceField, targetFieldName, targetField, true));
@@ -285,11 +287,12 @@ namespace MigrationTools.Tools
         private bool ValidateField(
             FieldDefinition sourceField,
             FieldDefinition targetField,
+            string sourceWitName,
             string targetWitName,
             LogLevel logLevel)
         {
             bool isValid = ValidateFieldType(sourceField, targetField, logLevel);
-            isValid &= ValidateFieldAllowedValues(targetWitName, sourceField, targetField, logLevel);
+            isValid &= ValidateFieldAllowedValues(sourceWitName, sourceField, targetField, logLevel);
             if (isValid)
             {
                 Log.LogDebug("    Target field '{targetFieldReferenceName}' ({targetFieldName}) exists in '{targetWit}' and is valid.",
@@ -312,7 +315,7 @@ namespace MigrationTools.Tools
         }
 
         private bool ValidateFieldAllowedValues(
-            string targetWitName,
+            string sourceWitName,
             FieldDefinition sourceField,
             FieldDefinition targetField,
             LogLevel logLevel)
@@ -328,7 +331,7 @@ namespace MigrationTools.Tools
                     + " source = '{sourceFieldAllowedValueType}', target = '{targetFieldAllowedValueType}'.",
                     sourceField.ReferenceName, targetField.ReferenceName, sourceValueType, targetValueType);
             }
-            if (!ValidateAllowedValues(targetWitName, sourceField.ReferenceName, sourceAllowedValues,
+            if (!ValidateAllowedValues(sourceWitName, sourceField.ReferenceName, sourceAllowedValues,
                 targetField.ReferenceName, targetAllowedValues, out List<string> missingValues, logLevel))
             {
                 isValid = false;
@@ -348,7 +351,7 @@ namespace MigrationTools.Tools
             => Log.LogInformation(message, string.Join(", ", values.Select(value => $"'{value}'")));
 
         private bool ValidateAllowedValues(
-            string targetWitName,
+            string sourceWitName,
             string sourceFieldReferenceName,
             List<string> sourceAllowedValues,
             string targetFieldReferenceName,
@@ -365,7 +368,7 @@ namespace MigrationTools.Tools
                 LogAllowedValues("    Missing values are: {missingValues}", missingValues);
                 List<string> mappedValues = [];
                 Dictionary<string, string> valueMaps = _commonTools.FieldMappingTool
-                    .GetFieldValueMappings(targetWitName, sourceFieldReferenceName, targetFieldReferenceName);
+                    .GetFieldValueMappings(sourceWitName, sourceFieldReferenceName, targetFieldReferenceName);
                 foreach (string missingValue in missingValues)
                 {
                     if (valueMaps.TryGetValue(missingValue, out string mappedValue))
