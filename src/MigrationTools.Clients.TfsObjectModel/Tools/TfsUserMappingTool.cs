@@ -206,11 +206,26 @@ namespace MigrationTools.Tools
         /// <param name="field">The work item field containing a user identity to be mapped</param>
         public void MapUserIdentityField(Field field)
         {
-            var mapped = MapUserIdentityValue(field.ReferenceName, field.Value);
-            if (!ReferenceEquals(mapped, field.Value))
+            if (TryMapUserIdentityValue(field.ReferenceName, field.Value, out var mapped))
             {
                 field.Value = mapped;
             }
+        }
+
+        /// <summary>
+        /// Maps a user identity value and reports whether it changed. Only a changed value should be written back:
+        /// rewriting an unchanged value can fail on fields the target rules make read-only (for example
+        /// TF26194 on Activated Date when a revision reactivates a work item).
+        /// </summary>
+        /// <param name="referenceName">The field reference name</param>
+        /// <param name="value">The current field value</param>
+        /// <param name="mapped">The mapped value, or <paramref name="value"/> when no mapping applies</param>
+        /// <returns><see langword="true"/> when the mapped value differs from <paramref name="value"/></returns>
+        public bool TryMapUserIdentityValue(string referenceName, object value, out object mapped)
+        {
+            mapped = MapUserIdentityValue(referenceName, value);
+            // Compare by value: Field.Value boxes value types (dates, numbers) afresh on every read.
+            return !Equals(mapped, value);
         }
 
         /// <summary>
