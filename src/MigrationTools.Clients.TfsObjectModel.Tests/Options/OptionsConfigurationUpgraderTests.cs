@@ -91,6 +91,21 @@ namespace MigrationTools.Tests.Options
         }
 
         [TestMethod, TestCategory("L0")]
+        public void UpgradeConfiguration_V160_PreservesInheritedProcessorDefaultCollections()
+        {
+            Assert.IsNotNull(typeof(MigrationTools.Processors.TfsTeamSettingsProcessorOptions));
+            var json = V160Config
+                .Replace(@"""Processors"": []", @"""ProcessorDefaults"": { ""TfsTeamSettingsProcessor"": { ""Teams"": [ ""DefaultTeam"" ] } },
+    ""Processors"": [ { ""ProcessorType"": ""TfsTeamSettingsProcessor"", ""Enabled"": true, ""Teams"": [ ""InstanceTeam"" ] } ]");
+
+            var result = Upgrade(json);
+
+            var processor = result["MigrationTools"]["Processors"][0];
+            Assert.IsNotNull(processor, result.ToString());
+            CollectionAssert.AreEqual(new[] { "DefaultTeam", "InstanceTeam" }, processor["Teams"].Values<string>().ToArray());
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void UpgradeConfiguration_V150_MapsChangeSetMappingFile()
         {
             Assert.IsNotNull(typeof(TfsChangeSetMappingToolOptions));

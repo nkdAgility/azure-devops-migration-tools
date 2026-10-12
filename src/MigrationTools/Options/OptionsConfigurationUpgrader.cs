@@ -303,16 +303,20 @@ namespace MigrationTools.Options
 
         /// <summary>
         /// Binds the section onto an option that may already hold defaults. ConfigurationBinder appends to
-        /// existing collections rather than replacing them, so any collection that the section supplies is
-        /// cleared first to avoid duplicated entries.
+        /// existing collections rather than replacing them. When the defaults were bound from this same
+        /// section, the collections it supplies are cleared first to avoid duplicated entries. Defaults from a
+        /// distinct section (e.g. ProcessorDefaults) are kept so inherited values are preserved.
         /// </summary>
-        private static void BindReplacingCollections(IConfigurationSection section, object option)
+        private static void BindReplacingCollections(IConfigurationSection section, IOptions option)
         {
             if (option == null)
             {
                 return;
             }
-            ClearCollectionsPresentInSection(section, option);
+            if (string.Equals(section.Path, option.ConfigurationMetadata?.PathToDefault, StringComparison.OrdinalIgnoreCase))
+            {
+                ClearCollectionsPresentInSection(section, option);
+            }
             section.Bind(option);
         }
 
