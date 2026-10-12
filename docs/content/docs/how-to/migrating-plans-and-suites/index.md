@@ -14,6 +14,8 @@ Migrating Plans and Suites is quite convoluted since Shared Steps, which we need
 3. Migrate `Test Variables` & `Test Configurations`
 4. Rebuild `Test Plans` & `Test Suites`
 
+Both field maps use `TargetToTarget`, not `SourceToTarget`. The value being copied is the reflected work item id that the migration writes to the target work item; it does not exist on the source, so it has to be read from the target. In older versions the copy was missed for newly created work items with a single revision, because the field maps ran before the reflected id was written ([#2998](https://github.com/nkdAgility/azure-devops-migration-tools/issues/2998)).
+
 _WARNING: The configs below are for illustration and were correct as of the version number in the `Version` field._
 
 ## 1. Migrate Basic Work Items
@@ -57,7 +59,7 @@ The important bits:
     "Processors": [
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",
-        "Enabled": false,
+        "Enabled": true,
         "UpdateCreatedDate": false,
         "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Case', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
       }
@@ -125,7 +127,22 @@ The important bits:
         "Enabled": true,
         "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Test Case','Shared Steps','Shared Parameter') ORDER BY [System.ChangedDate] desc"
       }
-    ]
+    ],
+    "CommonTools": {
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldToFieldMap",
+            "fieldMapMode": "TargetToTarget",
+            "sourceField": "Microsoft.VSTS.Build.IntegrationBuild",
+            "targetField": "Custom.ReflectedWorkItemId",
+            "defaultValue": "",
+            "ApplyTo": ["Test Case"]
+          }
+        ]
+      }
+    }
   }
 }
 ```
@@ -189,7 +206,7 @@ _note: Runs are not migrated._
 
 The important bits:
 
-- Processors for `TestPlansAndSuitesMigrationConfig`
+- Processor `TfsTestPlansAndSuitesMigrationProcessor`
 
 ```JSON
 {
@@ -205,7 +222,7 @@ The important bits:
         "Project": "migrationSource1",
        "Authentication": {
           "AuthenticationMode": "AccessToken",
-          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+          "AccessToken": "** removed as a secret ***"
         }
       },
       "Target": {
@@ -221,7 +238,7 @@ The important bits:
     },
     "Processors": [
       {
-        "ProcessorType": "** removed as a secret ***",
+        "ProcessorType": "TfsTestPlansAndSuitesMigrationProcessor",
         "Enabled": true,
         "OnlyElementsWithTag": "",
         "TestPlanQuery": null,
