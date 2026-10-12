@@ -1177,8 +1177,6 @@ namespace MigrationTools.Processors
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
-
-                    // Attachments and links are saved with the revision where they changed in the source (#3192).
                     // The last replayed revision is the source's latest, so use the work item's current attachments and
                     // links for it. The per-revision view can miss removals when the source history is back-dated (for
                     // example a source that was itself migrated), and this keeps the final state matching the source.

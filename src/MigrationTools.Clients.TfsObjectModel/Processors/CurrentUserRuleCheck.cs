@@ -24,7 +24,7 @@ namespace MigrationTools.Processors
     /// <summary>
     /// Finds target process rules that copy the current user into an identity field. Azure DevOps applies these on
     /// every save while their condition holds, even with BypassRules, so replayed revisions get the migration account
-    /// (#2869). Pure logic, so it can be unit tested.
+    /// (#2869).
     /// </summary>
     public static class CurrentUserRuleCheck
     {

@@ -5,7 +5,7 @@ using System.Linq;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Pure logic for replaying attachments and links at the revision where they changed in the source (#3192).
+    /// Replays attachments and links at the revision where they changed in the source (#3192).
     /// Compares the source state of one revision with the state of the previous replayed revision.
     /// </summary>
     public static class RevisionArtifactDiff
@@ -45,10 +45,8 @@ namespace MigrationTools.Processors
         /// <summary>Key for an external (artifact) link, compared case-insensitively.</summary>
         public static string ExternalLinkKey(string linkedArtifactUri) => "E|" + (linkedArtifactUri ?? string.Empty).ToLowerInvariant();
 
-        /// <summary>Key for a work item link: link type end plus the related work item id.</summary>
         public static string RelatedLinkKey(string linkTypeEndImmutableName, int relatedWorkItemId) => "R|" + linkTypeEndImmutableName + "|" + relatedWorkItemId;
 
-        /// <summary>Key for an attachment: the source file id.</summary>
         public static string AttachmentKey(int fileId) => "A|" + fileId;
 
         /// <summary>The marker written to a migrated attachment's comment to identify its source file id.</summary>
