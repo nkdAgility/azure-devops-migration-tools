@@ -80,6 +80,8 @@ The Work Item queries are all built using Work Item [Query Language (WIQL)](http
 
 > Note: A useful Azure DevOps Extension to explore WIQL is the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor)
 
+Work items are migrated in the order the query returns them, except that `Shared Steps` and `Shared Parameter` items are migrated first. Test Case steps refer to them by id, and those references can only be pointed at the migrated copies once the copies exist.
+
 ### Examples
 
 You can use the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor) to craft a query in Azure DevOps.

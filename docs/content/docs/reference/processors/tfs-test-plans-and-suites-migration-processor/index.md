@@ -36,6 +36,12 @@ discussionId: 2613
 
 {{< class-metadata >}}
 
+## Troubleshooting
+
+### Test Cases missing from rebuilt suites
+
+The processor adds a Test Case to a suite only if it can find the migrated Test Case in the target by its reflected work item id. If it cannot, it logs an error naming the Test Case and suite, carries on with the rest of the plans, and the run exits with code 1. Migrate the Test Cases with `TfsWorkItemMigrationProcessor` first, check that their reflected work item id field is populated (see [Migrating Plans and Suites](/docs/how-to/migrating-plans-and-suites/)), then run this processor again.
+
 ## Schema
 
 {{< class-schema >}}
