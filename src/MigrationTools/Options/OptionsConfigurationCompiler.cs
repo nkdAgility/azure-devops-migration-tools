@@ -11,6 +11,8 @@ namespace MigrationTools.Options
 
 public static class OptionsConfigurationCompiler
     {
+    // Null values are omitted so that unset options (e.g. ChangeSetMappingFile) are not written as null, which fails schema validation.
+    private static readonly Newtonsoft.Json.JsonSerializer IgnoreNullsSerializer = Newtonsoft.Json.JsonSerializer.Create(new Newtonsoft.Json.JsonSerializerSettings { NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore });
 
     public static IOptions LoadConfiguration(string filePath, IOptions options, bool isCollection = false)
     {
@@ -198,7 +200,7 @@ public static class OptionsConfigurationCompiler
 
                     // Add the options object as part of the collection
                     var collectionArray = (JArray)currentSection[pathParts[i]];
-                    var optionsObject = JObject.FromObject(options);
+                    var optionsObject = JObject.FromObject(options, IgnoreNullsSerializer);
                     // Always add object name for collections
                     optionsObject.AddFirst(new JProperty(objectName, optionFor));
                     collectionArray.Add(optionsObject);
@@ -215,7 +217,7 @@ public static class OptionsConfigurationCompiler
                     }
 
                     // Add the other properties from the options object
-                    optionsObject.Merge(JObject.FromObject(options), new JsonMergeSettings
+                    optionsObject.Merge(JObject.FromObject(options, IgnoreNullsSerializer), new JsonMergeSettings
                     {
                         MergeArrayHandling = MergeArrayHandling.Concat
                     });

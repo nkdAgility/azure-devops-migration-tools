@@ -204,6 +204,12 @@ Remove changeset links when repository migration is not needed:
 - Ensure mapping keys match source repository names exactly
 - Review case sensitivity in repository names
 
+**"Invalid Git external link format" Warnings:**
+
+- The source work item has a Git link whose artifact URI can't be parsed: it has missing or empty `projectId%2frepoId%2fcommitId` parts, a repo id that isn't a GUID, or an empty URI
+- That one link is skipped and left unchanged; the work item's other links are still processed and the migration continues
+- The warning includes the raw `LinkedArtifactUri`, so you can find the bad link on the source work item and fix or remove it there if you need it migrated
+
 **Performance Issues:**
 
 - Repository mapping typically doesn't impact performance significantly

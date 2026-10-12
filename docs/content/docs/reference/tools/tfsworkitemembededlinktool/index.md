@@ -31,6 +31,12 @@ The TFS Work Item Embedded Link Tool operates during work item field processing:
 
 The tool integrates with work item migration processors to ensure content integrity during migration.
 
+### User Mentions and User Mapping
+
+User mentions (`@Display Name` links) in HTML and History fields are re-pointed at the matching identity in the target collection. When the [TFS User Mapping Tool](/docs/reference/tools/tfs-user-mapping-tool/) is enabled, the mentioned name is first looked up in its `UserMappingFile` (matching source display names or account names case-insensitively), using the same lookup as identity fields, including `Display Name <upn>` keys. A `Display Name <upn>` target is matched against target identities by unique name only, so users who share a display name are not confused; a plain target is matched by display name and then by unique name. The dictionary format works by default; an `IdentityMapData` array file is only read when `UseIdentityMapDataFormat` is also set to `true` on the User Mapping Tool. Mentions without a mapping are matched by their original display name exactly, as before, and mentions that cannot be matched are left unchanged.
+
+`IdentityFieldsToCheck` only restricts which identity *fields* the User Mapping Tool rewrites; it does not limit mention mapping.
+
 ### Use Cases
 
 Common scenarios where the TFS Work Item Embedded Link Tool is essential:
