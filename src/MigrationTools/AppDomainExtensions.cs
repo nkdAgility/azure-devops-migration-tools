@@ -11,7 +11,23 @@ namespace MigrationTools
         {
             var assemblies = appDomain.GetAssemblies().Where(ass => (ass.FullName.StartsWith("MigrationTools") || ass.FullName.StartsWith("VstsSyncMigrator")));
             return assemblies
-                        .SelectMany(assembly => assembly.GetTypes());
+                        .SelectMany(GetLoadableTypes);
+        }
+
+        private static IEnumerable<Type> GetLoadableTypes(System.Reflection.Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (System.Reflection.ReflectionTypeLoadException ex)
+            {
+                foreach (var loaderException in ex.LoaderExceptions.Where(e => e != null).Select(e => e.Message).Distinct())
+                {
+                    Serilog.Log.Warning("Could not load some types from {AssemblyName}: {LoaderException}", assembly.GetName().Name, loaderException);
+                }
+                return ex.Types.Where(t => t != null);
+            }
         }
     }
 }
