@@ -64,6 +64,7 @@ Each source revision is replayed as one target revision, with the source revisio
 - **Links to work items that are not migrated yet** are added later, from the other work item, when that one is migrated.
 - **The migration comment** (`GenerateMigrationComment`) is added to the History of the last replayed revision.
 - **Re-running** against work items that are already migrated adds no revisions unless something is missing. If something is, it is saved as the last author, one second after the last revision.
+- **Closed Date and Activated Date** are stamped with the time of the save by Azure DevOps when a revision changes state, even with `BypassRules`, and are read-only in that revision. When the saved value differs from the source revision, the processor saves one fix-up revision straight after it, with the same author, that sets the source value. The history then shows an extra revision after each closing or reactivation, and every revision carries the source dates.
 
 ### Known limitations
 

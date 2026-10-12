@@ -1,14 +1,32 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Pure decision logic for preserving ClosedDate during revision replay (#3171).
+    /// Pure decision logic for preserving rule-stamped dates (ClosedDate #3171, ActivatedDate) during revision replay.
     /// </summary>
     public static class ClosedDateHelper
     {
         public const string CommonClosedDate = "Microsoft.VSTS.Common.ClosedDate";
         public const string SystemClosedDate = "System.ClosedDate";
+        public const string CommonActivatedDate = "Microsoft.VSTS.Common.ActivatedDate";
+
+        /// <summary>
+        /// Date fields, other than ClosedDate, that the server stamps with the save time when a revision changes
+        /// state, even with BypassRules. They are read-only in that revision, so they are corrected after the save.
+        /// </summary>
+        public static readonly IReadOnlyList<string> StateStampedDateFields = new[] { CommonActivatedDate };
+
+        /// <summary>
+        /// Returns the target fields whose saved value differs from the source revision's value
+        /// (by <see cref="NeedsUpdate"/>), given (target field, source value, target value) triples.
+        /// </summary>
+        public static List<string> FieldsNeedingFixUp(IEnumerable<(string Field, object SourceValue, object TargetValue)> fields)
+        {
+            return fields.Where(f => NeedsUpdate(f.SourceValue, f.TargetValue)).Select(f => f.Field).ToList();
+        }
 
         /// <summary>Returns the ClosedDate field to use, preferring Microsoft.VSTS.Common.ClosedDate, or null if neither exists.</summary>
         public static string ResolveField(bool hasCommonClosedDate, bool hasSystemClosedDate)
