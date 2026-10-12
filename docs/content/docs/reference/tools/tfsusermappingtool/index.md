@@ -34,7 +34,7 @@ The tool processes user identity fields in work items and applies configured map
 - **Target only**: The mapped value is written to the target work item. The source work item is not changed.
 - **Empty values**: Null or empty identity values are passed through unchanged.
 - **Unmapped values**: Values with no mapping are passed through unchanged.
-- **Email matching**: With `MatchUsersByEmail` enabled, target users with no email address are skipped instead of causing a failure. Users who cannot be matched by email fall back to display name matching.
+- **Email matching**: With `MatchUsersByEmail` enabled, target users with no email address are skipped instead of causing a failure. A user is matched by email only when exactly one target user has that address (ignoring case). Otherwise, or when the source user has no email, the tool falls back to display name matching. If several target users share the display name, an error is logged and the user is left for manual mapping.
 
 ### Key Features
 
