@@ -76,12 +76,12 @@ namespace MigrationTools.Options
 
                 var schemaVersion = VersionOptions.ConfigureOptions.GetMigrationConfigVersion(configuration);
                 activity?.AddTag("SchemaVersion", schemaVersion.schema.ToString());
-                activity.AddEvent(new ActivityEvent($"UpgradeConfigCommand.{schemaVersion.schema.ToString()}"));
+                activity?.AddEvent(new ActivityEvent($"UpgradeConfigCommand.{schemaVersion.schema.ToString()}"));
                 switch (schemaVersion.schema)
                 {
                     case MigrationConfigSchema.v1:
                     case MigrationConfigSchema.v150:
-                        activity.AddEvent(new ActivityEvent("UpgradeConfigCommand.v150"));
+                        activity?.AddEvent(new ActivityEvent("UpgradeConfigCommand.v150"));
                         // ChangeSetMappingFile
                         optionsBuilder.AddOption(ParseV1TfsChangeSetMappingToolOptions(configuration));
                         optionsBuilder.AddOption(ParseV1TfsGitRepoMappingOptions(configuration));
@@ -157,7 +157,7 @@ namespace MigrationTools.Options
                 var option = GetOptionWithDefaults(configuration, newOptionTypeString);
                 if (option != null)
                 {
-                    childSection.Bind(option);
+                    BindReplacingCollections(childSection, option);
                     switch (optionTypeString)
                     {
                         case "TfsNodeStructureOptions":
@@ -297,8 +297,60 @@ namespace MigrationTools.Options
             _logger.LogDebug("Upgrading to {old} to {new}", optionTypeString, newOptionTypeString);
             IOptions sourceOptions;
             sourceOptions = GetOptionWithDefaults(configuration, newOptionTypeString);
-            optionsConfig.Bind(sourceOptions);
+            BindReplacingCollections(optionsConfig, sourceOptions);
             return sourceOptions;
+        }
+
+        /// <summary>
+        /// Binds the section onto an option that may already hold defaults. ConfigurationBinder appends to
+        /// existing collections rather than replacing them, so any collection that the section supplies is
+        /// cleared first to avoid duplicated entries.
+        /// </summary>
+        private static void BindReplacingCollections(IConfigurationSection section, object option)
+        {
+            if (option == null)
+            {
+                return;
+            }
+            ClearCollectionsPresentInSection(section, option);
+            section.Bind(option);
+        }
+
+        private static void ClearCollectionsPresentInSection(IConfigurationSection section, object target)
+        {
+            foreach (var property in target.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (!property.CanRead || property.GetIndexParameters().Length > 0 || property.PropertyType == typeof(string))
+                {
+                    continue;
+                }
+                var childSection = section.GetSection(property.Name);
+                if (!childSection.Exists())
+                {
+                    continue;
+                }
+                object value;
+                try
+                {
+                    value = property.GetValue(target);
+                }
+                catch
+                {
+                    continue;
+                }
+                if (value is System.Collections.IList list && !list.IsFixedSize && !list.IsReadOnly)
+                {
+                    list.Clear();
+                }
+                else if (value is System.Collections.IDictionary dictionary && !dictionary.IsReadOnly)
+                {
+                    dictionary.Clear();
+                }
+                else if (value != null && !property.PropertyType.IsValueType && !(value is System.Collections.IEnumerable) && property.PropertyType.Namespace?.StartsWith("MigrationTools") == true)
+                {
+                    ClearCollectionsPresentInSection(childSection, value);
+                }
+            }
         }
 
         private IOptions GetOptionWithDefaults(IConfiguration configuration, string optionTypeString)
