@@ -1040,9 +1040,6 @@ namespace MigrationTools.Processors
             "System.CreatedBy",
         };
 
-        /// <summary>
-        /// Captures the current values of the identity fields (other than ChangedBy/AuthorizedAs/CreatedBy) on the target.
-        /// </summary>
         private static Dictionary<string, object> SnapshotIdentityFields(WorkItemData targetWorkItem)
         {
             var snapshot = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);

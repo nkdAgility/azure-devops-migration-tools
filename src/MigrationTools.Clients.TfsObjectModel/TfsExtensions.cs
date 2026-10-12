@@ -66,14 +66,22 @@ namespace MigrationTools
             var workItem = (WorkItem)context.internalObject;
             _beforeSaveActions.Remove(workItem);
             _beforeSaveActions.Add(workItem, beforeSave);
-            return new BeforeSaveRegistration(workItem);
+            return new BeforeSaveRegistration(workItem, beforeSave);
         }
 
         private sealed class BeforeSaveRegistration : IDisposable
         {
             private readonly WorkItem _workItem;
-            public BeforeSaveRegistration(WorkItem workItem) { _workItem = workItem; }
-            public void Dispose() { _beforeSaveActions.Remove(_workItem); }
+            private readonly Action<WorkItemData> _beforeSave;
+            public BeforeSaveRegistration(WorkItem workItem, Action<WorkItemData> beforeSave) { _workItem = workItem; _beforeSave = beforeSave; }
+            public void Dispose()
+            {
+                // Only remove our own callback; a later registration for the same work item replaces it.
+                if (_beforeSaveActions.TryGetValue(_workItem, out var current) && ReferenceEquals(current, _beforeSave))
+                {
+                    _beforeSaveActions.Remove(_workItem);
+                }
+            }
         }
 
         public static void SaveToAzureDevOps(this WorkItemData context)
