@@ -40,7 +40,7 @@ namespace MigrationTools.Processors
         public bool MigrateReleasePipelines { get; set; }
 
         /// <summary>
-        /// Migrate Task Groups
+        /// Migrate Task Groups. The versions of a task group are migrated together, lowest first. A task group that already exists in the target (matched by name) is skipped. If a version uses a task that is not installed in the target, that version and every higher version are skipped, because a version can only be created on top of the versions below it.
         /// </summary>
         /// <default>true</default>
         public bool MigrateTaskGroups { get; set; }

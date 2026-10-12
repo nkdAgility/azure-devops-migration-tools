@@ -254,7 +254,12 @@ namespace MigrationTools.Endpoints
             foreach (var definitionToBeMigrated in updatedDefinitions)
             {
                 var relatedRootDefinition = rootDefinitions.FirstOrDefault(d => definitionToBeMigrated.Name == d.Name);
-                var taskGroupId = rootDefinitions.FirstOrDefault(d => definitionToBeMigrated.Name == d.Name).Id;
+                if (relatedRootDefinition is null)
+                {
+                    Log.LogError("Error migrating {DefinitionType}: {DefinitionName} version {Version}.*. The task group does not exist in the target, so this version cannot be added to it. Please migrate it manually.", typeof(TaskGroup).Name, definitionToBeMigrated.Name, definitionToBeMigrated.Version?.Major);
+                    continue;
+                }
+                var taskGroupId = relatedRootDefinition.Id;
                 definitionToBeMigrated.ParentDefinitionId = taskGroupId;
                 definitionToBeMigrated.Version.IsTest = true;
 
