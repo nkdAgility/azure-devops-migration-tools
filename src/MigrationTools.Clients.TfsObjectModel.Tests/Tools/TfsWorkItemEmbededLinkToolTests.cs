@@ -1,0 +1,102 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.DataContracts;
+using MigrationTools.Tools;
+
+namespace MigrationTools.Tests.Tools
+{
+    [TestClass]
+    public class TfsWorkItemEmbededLinkToolTests
+    {
+        private class TargetIdentity
+        {
+            public string DisplayName { get; set; }
+            public string UniqueName { get; set; }
+        }
+
+        private static readonly TargetIdentity Test = new() { DisplayName = "Test", UniqueName = "test@target.com" };
+        private static readonly TargetIdentity Tester = new() { DisplayName = "Tester", UniqueName = "tester@target.com" };
+        private static readonly TargetIdentity SharedA = new() { DisplayName = "Shared Name", UniqueName = "a@target.com" };
+        private static readonly TargetIdentity SharedB = new() { DisplayName = "Shared Name", UniqueName = "b@target.com" };
+        private static readonly List<TargetIdentity> Targets = [Test, Tester, SharedA, SharedB];
+
+        private static TargetIdentity Find(string mention, IDictionary<string, string> map, out string mappedName) =>
+            TfsWorkItemEmbededLinkTool.FindMentionIdentity(mention, map, Targets, i => i.DisplayName, i => i.UniqueName, out mappedName);
+
+        private static Dictionary<string, string> Map(params (string Key, string Value)[] entries)
+        {
+            var map = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+            foreach (var (key, value) in entries)
+            {
+                map[key] = value;
+            }
+            return map;
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_MappedToDisplayName_ReturnsMappedTarget()
+        {
+            // Issue #2866: "Tester" is mapped to "Test", so the mention must not resolve to the target user named "Tester".
+            Assert.AreSame(Test, Find("Tester", Map(("Tester", "Test")), out var mappedName));
+            Assert.AreEqual("Test", mappedName);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_MappedToUniqueName_ReturnsTarget()
+        {
+            Assert.AreSame(Test, Find("Old Name", Map(("Old Name", "test@target.com")), out _));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_MappedToQualifiedName_ResolvesByUniqueNameOnly()
+        {
+            Assert.AreSame(SharedB, Find("Old Name", Map(("Old Name", "Shared Name <b@target.com>")), out _));
+            Assert.IsNull(Find("Old Name", Map(("Old Name", "Shared Name <missing@target.com>")), out _));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_QualifiedSourceKey_MapsPlainMention()
+        {
+            Assert.AreSame(Test, Find("Old Name", Map(("Old Name <old@source.com>", "Test")), out _));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_MappingIgnoresCase()
+        {
+            Assert.AreSame(Test, Find("tester", Map(("Tester", "Test")), out _));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_Unmapped_UsesExactDisplayName()
+        {
+            Assert.AreSame(Tester, Find("Tester", Map(("Someone", "Test")), out var mappedName));
+            Assert.IsNull(mappedName);
+            // Unmapped mentions keep the previous exact, case-sensitive display name match.
+            Assert.IsNull(Find("tester", Map(), out _));
+            Assert.IsNull(Find("test@target.com", Map(), out _));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_MappingDisabled_UsesExactDisplayName()
+        {
+            Assert.AreSame(Tester, Find("Tester", null, out var mappedName));
+            Assert.IsNull(mappedName);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindMentionIdentity_IdentityMapDataFormat_MapsDisplayNameAndAccountName()
+        {
+            var map = TfsUserMappingTool.ToUserMapDictionary(new List<IdentityMapData>
+            {
+                new IdentityMapData
+                {
+                    Source = new IdentityItemData { DisplayName = "Old Name", AccountName = "DOMAIN\\old" },
+                    Target = new IdentityItemData { DisplayName = "Test" }
+                }
+            });
+            Assert.AreSame(Test, Find("Old Name", map, out _));
+            Assert.AreSame(Test, Find("DOMAIN\\old", map, out _));
+        }
+    }
+}
