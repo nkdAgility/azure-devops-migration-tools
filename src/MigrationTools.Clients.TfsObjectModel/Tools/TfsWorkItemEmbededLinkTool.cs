@@ -123,16 +123,11 @@ namespace MigrationTools.Tools
                         {
                             var displayName = value.Substring(1);
                             Log.LogDebug("{LogTypeName}: User identity {displayName} mention traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, displayName, field.Name, targetWorkItem.Id);
-                            var targetName = MapMentionUserName(displayName, GetUserMappings());
-                            if (!string.Equals(targetName, displayName, StringComparison.Ordinal))
+                            var identity = FindMentionIdentity(displayName, GetUserMappings(), _targetTeamFoundationIdentitiesLazyCache.Value, i => i.DisplayName, i => i.UniqueName, out var mappedName);
+                            if (mappedName != null)
                             {
-                                Log.LogDebug("{LogTypeName}: User identity {displayName} mention mapped to {targetName} using TfsUserMappingTool.", LogTypeName, displayName, targetName);
+                                Log.LogDebug("{LogTypeName}: User identity {displayName} mention mapped to {mappedName} using TfsUserMappingTool.", LogTypeName, displayName, mappedName);
                             }
-                            // Unmapped mentions keep the original exact display name match; mapped targets may be a display name or a unique name.
-                            var identity = ReferenceEquals(targetName, displayName)
-                                ? _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => i.DisplayName == displayName)
-                                : _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.DisplayName, targetName, StringComparison.OrdinalIgnoreCase))
-                                    ?? _targetTeamFoundationIdentitiesLazyCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, targetName, StringComparison.OrdinalIgnoreCase));
                             if (identity != null)
                             {
                                 var replaceValue = anchorTagMatch.Value.Replace(href, "#").Replace(version, $"data-vss-mention=\"version:2.0,{identity.TeamFoundationId}\"");
@@ -168,23 +163,28 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
-        /// Maps the display name of a mentioned user to the target name using the TfsUserMappingTool mappings.
-        /// Returns the original name when there are no mappings or no mapping exists for the user.
+        /// Finds the target identity for a mentioned user. The mention is first mapped with the TfsUserMappingTool mappings.
+        /// A <c>Display Name &lt;upn&gt;</c> target is resolved by unique name only; a plain target by display name and then
+        /// unique name. An unmapped mention is resolved by its exact display name.
         /// </summary>
-        public static string MapMentionUserName(string displayName, IDictionary<string, string> userMappings)
+        /// <param name="mappedName">The mapped target name, or null when no mapping applied.</param>
+        public static T FindMentionIdentity<T>(string displayName, IDictionary<string, string> userMappings, IEnumerable<T> targetIdentities,
+            Func<T, string> getDisplayName, Func<T, string> getUniqueName, out string mappedName) where T : class
         {
-            if (string.IsNullOrEmpty(displayName) || userMappings == null)
+            mappedName = TfsUserIdentityReference.FindMappedTarget(userMappings, displayName);
+            if (string.IsNullOrEmpty(mappedName))
             {
-                return displayName;
+                mappedName = null;
+                return targetIdentities.FirstOrDefault(i => getDisplayName(i) == displayName);
             }
-            if (userMappings.TryGetValue(displayName, out var mapped) && !string.IsNullOrEmpty(mapped))
+            var target = mappedName;
+            if (TfsUserIdentityReference.TryParse(target, out _, out var uniqueName))
             {
-                return mapped;
+                // A "Display Name <upn>" mapping names one user, so a shared display name never selects a different user.
+                return targetIdentities.FirstOrDefault(i => string.Equals(getUniqueName(i), uniqueName, StringComparison.OrdinalIgnoreCase));
             }
-            var match = userMappings.FirstOrDefault(m => string.Equals(m.Key, displayName, StringComparison.OrdinalIgnoreCase));
-            return string.IsNullOrEmpty(match.Value) ? displayName : match.Value;
+            return targetIdentities.FirstOrDefault(i => string.Equals(getDisplayName(i), target, StringComparison.OrdinalIgnoreCase))
+                ?? targetIdentities.FirstOrDefault(i => string.Equals(getUniqueName(i), target, StringComparison.OrdinalIgnoreCase));
         }
-
-
     }
 }
