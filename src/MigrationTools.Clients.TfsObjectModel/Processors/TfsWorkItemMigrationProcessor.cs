@@ -550,12 +550,6 @@ namespace MigrationTools.Processors
 
             foreach (Field f in oldWorkItem.Fields)
             {
-                CommonTools.UserMapping.MapUserIdentityField(f);
-                if (newWorkItem.Fields.Contains(f.ReferenceName))
-                {
-                    CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
-                }
-
                 if (newWorkItem.Fields.Contains(f.ReferenceName) == false)
                 {
                     var missedMigratedValue = oldWorkItem.Fields[f.ReferenceName].Value;
@@ -565,21 +559,27 @@ namespace MigrationTools.Processors
                     }
                     continue;
                 }
+                // Fields pre-populated on the shell (e.g. System.CreatedBy) may be read-only below, so map them here.
+                if (!_ignore.Contains(f.ReferenceName))
+                {
+                    CommonTools.UserMapping.MapUserIdentityField(newWorkItem.Fields[f.ReferenceName]);
+                }
+                var sourceFieldValue = CommonTools.UserMapping.MapUserIdentityValue(f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value);
                 if (!_ignore.Contains(f.ReferenceName) &&
                     (!newWorkItem.Fields[f.ReferenceName].IsChangedInRevision || newWorkItem.Fields[f.ReferenceName].IsEditable)
-                    && oldWorkItem.Fields[f.ReferenceName].Value != newWorkItem.Fields[f.ReferenceName].Value)
+                    && sourceFieldValue != newWorkItem.Fields[f.ReferenceName].Value)
                 {
-                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, oldWorkItem.Fields[f.ReferenceName].Value, newWorkItem.Fields[f.ReferenceName].Value);
+                    Log.LogDebug("PopulateWorkItem:FieldUpdate: {ReferenceName} | Source:{OldReferenceValue} Target:{NewReferenceValue}", f.ReferenceName, sourceFieldValue, newWorkItem.Fields[f.ReferenceName].Value);
 
                     switch (f.FieldDefinition.FieldType)
                     {
                         case FieldType.String:
-                            string oldValue = oldWorkItem.Fields[f.ReferenceName].Value.ToString();
+                            string oldValue = sourceFieldValue?.ToString();
                             string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
                             newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
                         default:
-                            newWorkItem.Fields[f.ReferenceName].Value = oldWorkItem.Fields[f.ReferenceName].Value;
+                            newWorkItem.Fields[f.ReferenceName].Value = sourceFieldValue;
                             break;
                     }
 
@@ -831,6 +831,8 @@ namespace MigrationTools.Processors
                     CommonTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
+                Dictionary<string, object> replayedIdentityValues = null;
+
                 foreach (var revision in revisionsToMigrate)
                 {
                     workItemMetrics.RevisionsProcessedCount.Add(1);
@@ -957,6 +959,7 @@ namespace MigrationTools.Processors
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
                         var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
+                        replayedIdentityValues = SnapshotIdentityFields(targetWorkItem);
                         targetWorkItem.SaveToAzureDevOps();
                         EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
@@ -971,8 +974,12 @@ namespace MigrationTools.Processors
 
                 // Until here we impersonate the maker of the revisions. From here we act as ourselves to push the attachments and add the comment
                 targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-
+                // Once ChangedBy is no longer an impersonated user, the object model re-runs the process rules and
+                // "copy from current user" rules stamp the migration account into AssignedTo/ResolvedBy/ClosedBy.
+                // Put back the values written by the last replayed revision before every save from here on, including
+                // the per-link and attachment saves made inside the tools (#2869).
                 if (targetWorkItem != null)
+                using (targetWorkItem.RegisterBeforeSave(wi => RestoreIdentityFields(wi, replayedIdentityValues)))
                 {
                     ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                     if (!string.IsNullOrEmpty(targetWorkItem.Id))
@@ -1024,6 +1031,54 @@ namespace MigrationTools.Processors
             }
 
             return targetWorkItem;
+        }
+
+        private static readonly HashSet<string> _identityFieldsNotRestored = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "System.ChangedBy",
+            "System.AuthorizedAs",
+            "System.CreatedBy",
+        };
+
+        private static Dictionary<string, object> SnapshotIdentityFields(WorkItemData targetWorkItem)
+        {
+            var snapshot = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            if (targetWorkItem == null) return snapshot;
+            foreach (Field f in targetWorkItem.ToWorkItem().Fields)
+            {
+                if (f.FieldDefinition.IsIdentity && !_identityFieldsNotRestored.Contains(f.ReferenceName))
+                {
+                    snapshot[f.ReferenceName] = f.Value;
+                }
+            }
+            return snapshot;
+        }
+
+        /// <summary>
+        /// Puts back identity field values that process rules (e.g. "copy from current user") changed after the
+        /// replay finished, so the migration account is not written into AssignedTo/ResolvedBy/ClosedBy (#2869).
+        /// </summary>
+        private void RestoreIdentityFields(WorkItemData targetWorkItem, Dictionary<string, object> snapshot)
+        {
+            if (targetWorkItem == null || snapshot == null || snapshot.Count == 0) return;
+            var target = targetWorkItem.ToWorkItem();
+            foreach (var kvp in snapshot)
+            {
+                if (!target.Fields.Contains(kvp.Key)) continue;
+                var field = target.Fields[kvp.Key];
+                var current = field.Value as string ?? field.Value?.ToString() ?? string.Empty;
+                var expected = kvp.Value as string ?? kvp.Value?.ToString() ?? string.Empty;
+                if (string.Equals(current, expected, StringComparison.Ordinal)) continue;
+                try
+                {
+                    field.Value = kvp.Value;
+                    Log.LogDebug("RestoreIdentityFields: {field} reset to replayed value '{expected}' (rules had set '{current}')", kvp.Key, expected, current);
+                }
+                catch (Exception ex)
+                {
+                    Log.LogWarning(ex, "RestoreIdentityFields: could not reset {field} to '{expected}'; it stays '{current}'.", kvp.Key, expected, current);
+                }
+            }
         }
 
         private static string GetClosedDateField(WorkItem workItem)
