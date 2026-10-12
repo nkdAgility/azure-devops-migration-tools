@@ -44,8 +44,17 @@ namespace MigrationTools.Endpoints.Tests
         public void TfsWorkItemEndPointGetWorkItemsTest()
         {
             var endpoint = GetTfsWorkItemEndPoint();
-            IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
-            Assert.AreEqual(13, result.Count());
+            var result = endpoint.GetWorkItems().ToList();
+            AssertSourceProjectWorkItems(result);
+        }
+
+        // migrationSource1 is shared by e2e runs, so assert what the query guarantees rather than a fixed count
+        private static void AssertSourceProjectWorkItems(IList<WorkItemData> result)
+        {
+            Assert.IsTrue(result.Count > 0, "Expected work items in migrationSource1");
+            Assert.IsTrue(result.All(wi => wi.ProjectName == "migrationSource1"), "Every work item should come from migrationSource1");
+            Assert.IsFalse(result.Any(wi => wi.Type == "Test Suite" || wi.Type == "Test Plan"), "Test Suites and Test Plans should be excluded");
+            Assert.AreEqual(result.Count, result.Select(wi => wi.Id).Distinct().Count(), "Work item ids should be unique");
         }
 
         [TestMethod(), TestCategory("L3")]
@@ -57,8 +66,9 @@ namespace MigrationTools.Endpoints.Tests
                 Query = "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')",
                 Parameters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
             };
-            IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
-            Assert.AreEqual(13, result.Count());
+            var result = endpoint.GetWorkItems(qo).ToList();
+            AssertSourceProjectWorkItems(result);
+            CollectionAssert.AreEquivalent(endpoint.GetWorkItems().Select(wi => wi.Id).ToList(), result.Select(wi => wi.Id).ToList());
         }
 
         protected TfsWorkItemEndpoint GetTfsWorkItemEndPoint(string key = "Source", TfsWorkItemEndpointOptions options = null)
