@@ -125,6 +125,8 @@ namespace MigrationTools.Processors
 
             ValidateWorkItemTypes();
 
+            WarnOnCurrentUserRules();
+
             ValidateProject();
 
             CommonTools.NodeStructure.ProcessorExecutionBegin(this);
@@ -378,6 +380,66 @@ namespace MigrationTools.Processors
                 throw new MigrationRunStoppedException("Validation of revision history fields failed.");
             }
             Log.LogInformation("[/ValidateRevisionHistoryFields]");
+        }
+
+        /// <summary>
+        /// Warns about target process rules that copy the current user into an identity field. Azure DevOps applies them
+        /// on every save, even with BypassRules, so replayed revisions would show the migration account (#2869).
+        /// Only inherited processes are checked; any failure is logged and the migration continues.
+        /// </summary>
+        private void WarnOnCurrentUserRules()
+        {
+            var token = Target.Options.Authentication?.AccessToken;
+            if (string.IsNullOrEmpty(token))
+            {
+                Log.LogDebug("WarnOnCurrentUserRules: no target PAT, skipping the process rule check.");
+                return;
+            }
+            try
+            {
+                var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token));
+                var project = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
+                    .GetProject(Target.Options.Project).Result;
+                var properties = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
+                    .GetProjectPropertiesAsync(project.Id, new[] { "System.ProcessTemplateType" }).Result;
+                var processIdValue = properties.FirstOrDefault()?.Value?.ToString();
+                if (!Guid.TryParse(processIdValue, out var processId))
+                {
+                    Log.LogDebug("WarnOnCurrentUserRules: could not read the target process id, skipping.");
+                    return;
+                }
+                var processClient = connection.GetClient<Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.WorkItemTrackingProcessHttpClient>();
+                var rules = new List<ProcessRuleInfo>();
+                foreach (var wit in processClient.GetProcessWorkItemTypesAsync(processId).Result)
+                {
+                    foreach (var rule in processClient.GetProcessWorkItemTypeRulesAsync(processId, wit.ReferenceName).Result)
+                    {
+                        rules.Add(new ProcessRuleInfo
+                        {
+                            WorkItemType = wit.Name,
+                            RuleName = rule.Name,
+                            IsDisabled = rule.IsDisabled,
+                            IsCustom = rule.CustomizationType != Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.Models.CustomizationType.System,
+                            Actions = (rule.Actions ?? Enumerable.Empty<Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.Models.RuleAction>())
+                                .Select(a => new ProcessRuleActionInfo { ActionType = a.ActionType.ToString(), TargetField = a.TargetField })
+                                .ToList()
+                        });
+                    }
+                }
+                var fieldDefinitions = ((TfsWorkItemMigrationClient)Target.WorkItems).Store.FieldDefinitions;
+                var findings = CurrentUserRuleCheck.Find(rules,
+                    field => fieldDefinitions.Contains(field) && fieldDefinitions[field].IsIdentity);
+                Log.LogDebug("WarnOnCurrentUserRules: checked {RuleCount} rules in process {ProcessId}; {FindingCount} copy the current user into an identity field.", rules.Count, processId, findings.Count);
+                foreach (var f in findings)
+                {
+                    Log.LogWarning("Target process rule '{RuleName}' on '{WorkItemType}' copies the current user into {Field}. Azure DevOps applies it on every save, even with BypassRules, so migrated revisions will show the migration account in that field. Disable the rule in the target process while migrating, then re-enable it.",
+                        f.RuleName, f.WorkItemType, f.Field);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogDebug(ex, "WarnOnCurrentUserRules: unable to read the target process rules; skipping the check.");
+            }
         }
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
@@ -777,10 +839,11 @@ namespace MigrationTools.Processors
                             if (revisionsToMigrate.Count == 0)
                             {
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                                ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
+                                ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                StampCatchUpSave(targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
                             }
@@ -798,6 +861,7 @@ namespace MigrationTools.Processors
                         {
                             targetWorkItem.SaveToAzureDevOps();
                         }
+                        CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
                         {
                             CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
@@ -877,14 +941,100 @@ namespace MigrationTools.Processors
             }
         }
 
-        private void ProcessWorkItemLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        /// <summary>
+        /// Applies the attachment and link changes made in one source revision to the target before that revision is saved (#3192),
+        /// so they are saved with the revision's ChangedBy/ChangedDate instead of in a later "Migration" save.
+        /// </summary>
+        /// <param name="previousSourceRevision">The source revision replayed before this one, or null if none has been replayed.</param>
+        /// <param name="sourceRevision">The source work item opened at the revision being replayed.</param>
+        /// <param name="targetWorkItem">The target work item the revision is replayed onto; not saved here.</param>
+        /// <param name="isLastRevision">On the last revision all links are re-checked, to catch any skipped earlier.</param>
+        private void ApplyRevisionAttachmentsAndLinks(WorkItemData previousSourceRevision, WorkItemData sourceRevision, WorkItemData targetWorkItem, bool isLastRevision)
+        {
+            var previousWi = previousSourceRevision?.ToWorkItem();
+            var currentWi = sourceRevision.ToWorkItem();
+
+            if (CommonTools.Attachment.Enabled)
+            {
+                var attachments = RevisionArtifactDiff.Compare(
+                    previousWi?.Attachments.Cast<Attachment>(),
+                    currentWi.Attachments.Cast<Attachment>(),
+                    a => RevisionArtifactDiff.AttachmentKey(a.Id));
+                if (attachments.Removed.Count > 0)
+                {
+                    CommonTools.Attachment.RemoveAttachments(attachments.Removed, targetWorkItem);
+                }
+                // On the last revision re-check all attachments (duplicate-safe), to catch any missing on a resumed target.
+                if (attachments.Added.Count > 0 || (isLastRevision && currentWi.Attachments.Count > 0))
+                {
+                    ProcessWorkItemAttachments(sourceRevision, targetWorkItem, false);
+                }
+            }
+
+            var links = RevisionArtifactDiff.Compare(
+                previousWi?.Links.Cast<Link>(),
+                currentWi.Links.Cast<Link>(),
+                LinkKey);
+            if (CommonTools.WorkItemLink.Enabled && links.Removed.Count > 0)
+            {
+                CommonTools.WorkItemLink.RemoveLinks(this, sourceRevision, links.Removed, targetWorkItem);
+            }
+            if (links.Added.Count > 0 || (isLastRevision && currentWi.Links.Count > 0))
+            {
+                ProcessWorkItemLinks(sourceRevision, targetWorkItem, true);
+            }
+        }
+
+        /// <summary>
+        /// When an already migrated item with no new source revisions still needs a save (e.g. a missing link),
+        /// keep the last revision's author and date it just after it, instead of "Migration" now (#3192).
+        /// </summary>
+        private static void StampCatchUpSave(WorkItemData targetWorkItem)
+        {
+            var wi = targetWorkItem.ToWorkItem();
+            if (!wi.IsDirty)
+            {
+                return;
+            }
+            var lastChangedBy = wi.Fields["System.ChangedBy"].OriginalValue?.ToString();
+            var lastChangedDate = (DateTime)wi.Fields["System.ChangedDate"].OriginalValue;
+            if (!string.IsNullOrEmpty(lastChangedBy))
+            {
+                wi.Fields["System.ChangedBy"].Value = lastChangedBy;
+            }
+            wi.Fields["System.ChangedDate"].Value = lastChangedDate.AddSeconds(1);
+        }
+
+        private void AppendMigrationComment(WorkItemData targetWorkItem)
+        {
+            var wi = targetWorkItem.ToWorkItem();
+            var reflectedUri = wi.Fields[Target.Options.ReflectedWorkItemIdField].Value;
+            wi.History = MigrationCommentHelper.AppendTo(wi.History, reflectedUri);
+        }
+
+        private static string LinkKey(Link link)
+        {
+            switch (link)
+            {
+                case Hyperlink hl:
+                    return RevisionArtifactDiff.HyperlinkKey(hl.Location);
+                case ExternalLink el:
+                    return RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri);
+                case RelatedLink rl:
+                    return RevisionArtifactDiff.RelatedLinkKey(rl.LinkTypeEnd?.ImmutableName ?? rl.ArtifactLinkType?.Name, rl.RelatedWorkItemId);
+                default:
+                    return link.GetType().Name + "|" + link.ArtifactLinkType?.Name;
+            }
+        }
+
+        private void ProcessWorkItemLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool inline = false)
         {
             if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", CommonTools.WorkItemLink.Enabled } });
-                CommonTools.WorkItemLink.Enrich(this, sourceWorkItem, targetWorkItem);
+                CommonTools.WorkItemLink.Enrich(this, sourceWorkItem, targetWorkItem, inline);
                 //AddMetric("RelatedLinkCount", processWorkItemMetrics, targetWorkItem.ToWorkItem().Links.Count);
-                int fixedLinkCount = CommonTools.GitRepository.Enrich(this, sourceWorkItem, targetWorkItem);
+                int fixedLinkCount = CommonTools.GitRepository.Enrich(this, sourceWorkItem, targetWorkItem, !inline);
                 // AddMetric("FixedGitLinkCount", processWorkItemMetrics, fixedLinkCount);
             }
             else if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count > 0 && sourceWorkItem.Type == "Test Case")
@@ -923,7 +1073,17 @@ namespace MigrationTools.Processors
                     CommonTools.RevisionManager.AttachSourceRevisionHistoryJsonToTarget(sourceWorkItem, targetWorkItem);
                 }
 
-                Dictionary<string, object> replayedIdentityValues = null;
+                // Baseline for attachment/link changes: when resuming an existing target, the source revision before
+                // the first one we replay. A new target has no baseline, so everything in its first replayed revision
+                // is added, even when revisions were skipped (ReplayRevisions=false or MaxRevisions).
+                WorkItemData previousSourceRevision = null;
+                var previousRevisionNumber = RevisionArtifactDiff.BaselineRevisionNumber(
+                    targetWorkItem.Id != "0", revisionsToMigrate.First().Number, sourceWorkItem.Revisions.Keys);
+                if (previousRevisionNumber.HasValue)
+                {
+                    previousSourceRevision = sourceWorkItem.GetRevision(previousRevisionNumber.Value);
+                }
+                var lastRevision = revisionsToMigrate.Last();
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -1041,6 +1201,17 @@ namespace MigrationTools.Processors
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
+                    // The last replayed revision is the source's latest, so use the work item's current attachments and
+                    // links for it. The per-revision view can miss removals when the source history is back-dated (for
+                    // example a source that was itself migrated), and this keeps the final state matching the source.
+                    var artifactSource = revision == lastRevision ? sourceWorkItem : currentRevisionWorkItem;
+                    ApplyRevisionAttachmentsAndLinks(previousSourceRevision, artifactSource, targetWorkItem, revision == lastRevision);
+                    previousSourceRevision = currentRevisionWorkItem;
+
+                    if (revision == lastRevision && Options.GenerateMigrationComment)
+                    {
+                        AppendMigrationComment(targetWorkItem);
+                    }
 
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
@@ -1051,8 +1222,14 @@ namespace MigrationTools.Processors
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
                         var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
-                        replayedIdentityValues = SnapshotIdentityFields(targetWorkItem);
                         targetWorkItem.SaveToAzureDevOps();
+                        CommonTools.Attachment.CleanUpAfterSave();
+                        if (CommonTools.WorkItemLink.Enabled && CommonTools.WorkItemLink.HasDeferredLinks)
+                        {
+                            // A child link skipped because this item was not saved yet; now it has an id, add it.
+                            // The child's conflicting parent is removed by saving the child, as before this change.
+                            ProcessWorkItemLinks(currentRevisionWorkItem, targetWorkItem, false);
+                        }
                         EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
@@ -1064,36 +1241,10 @@ namespace MigrationTools.Processors
                            });
                 }
 
-                // Until here we impersonate the maker of the revisions. From here we act as ourselves to push the attachments and add the comment
-                targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                // Once ChangedBy is no longer an impersonated user, the object model re-runs the process rules and
-                // "copy from current user" rules stamp the migration account into AssignedTo/ResolvedBy/ClosedBy.
-                // Put back the values written by the last replayed revision before every save from here on, including
-                // the per-link and attachment saves made inside the tools (#2869).
-                if (targetWorkItem != null)
-                using (targetWorkItem.RegisterBeforeSave(wi => RestoreIdentityFields(wi, replayedIdentityValues)))
-                {
-                    ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
-                    if (!string.IsNullOrEmpty(targetWorkItem.Id))
-                    {
-                        ProcessWorkItemLinks(sourceWorkItem, targetWorkItem);
-                        // The TFS client seems to plainly ignore the ChangedBy field when saving a link, so we need to put this back in place
-                        targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = "Migration";
-                    }
-
-                    if (Options.GenerateMigrationComment)
-                    {
-                        var reflectedUri = targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value;
-                        var history = new StringBuilder();
-                        history.Append(
-                            $"This work item was migrated from a different project or organization. You can find the old version at <a href=\"{reflectedUri}\">{reflectedUri}</a>.");
-                        targetWorkItem.ToWorkItem().History = history.ToString();
-                    }
-                    targetWorkItem.SaveToAzureDevOps();
-
-                    CommonTools.Attachment.CleanUpAfterSave();
-                    TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
-                }
+                // Attachments, links and the migration comment were saved with the replayed revisions (#3192),
+                // so there is no extra save here with a ChangedBy/ChangedDate later than the source history.
+                CommonTools.Attachment.CleanUpAfterSave();
+                TraceWriteLine(LogEventLevel.Information, "...Saved as {TargetWorkItemId}", new Dictionary<string, object> { { "TargetWorkItemId", targetWorkItem.Id } });
             }
             catch (Exception ex)
             {
@@ -1123,54 +1274,6 @@ namespace MigrationTools.Processors
             }
 
             return targetWorkItem;
-        }
-
-        private static readonly HashSet<string> _identityFieldsNotRestored = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "System.ChangedBy",
-            "System.AuthorizedAs",
-            "System.CreatedBy",
-        };
-
-        private static Dictionary<string, object> SnapshotIdentityFields(WorkItemData targetWorkItem)
-        {
-            var snapshot = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            if (targetWorkItem == null) return snapshot;
-            foreach (Field f in targetWorkItem.ToWorkItem().Fields)
-            {
-                if (f.FieldDefinition.IsIdentity && !_identityFieldsNotRestored.Contains(f.ReferenceName))
-                {
-                    snapshot[f.ReferenceName] = f.Value;
-                }
-            }
-            return snapshot;
-        }
-
-        /// <summary>
-        /// Puts back identity field values that process rules (e.g. "copy from current user") changed after the
-        /// replay finished, so the migration account is not written into AssignedTo/ResolvedBy/ClosedBy (#2869).
-        /// </summary>
-        private void RestoreIdentityFields(WorkItemData targetWorkItem, Dictionary<string, object> snapshot)
-        {
-            if (targetWorkItem == null || snapshot == null || snapshot.Count == 0) return;
-            var target = targetWorkItem.ToWorkItem();
-            foreach (var kvp in snapshot)
-            {
-                if (!target.Fields.Contains(kvp.Key)) continue;
-                var field = target.Fields[kvp.Key];
-                var current = field.Value as string ?? field.Value?.ToString() ?? string.Empty;
-                var expected = kvp.Value as string ?? kvp.Value?.ToString() ?? string.Empty;
-                if (string.Equals(current, expected, StringComparison.Ordinal)) continue;
-                try
-                {
-                    field.Value = kvp.Value;
-                    Log.LogDebug("RestoreIdentityFields: {field} reset to replayed value '{expected}' (rules had set '{current}')", kvp.Key, expected, current);
-                }
-                catch (Exception ex)
-                {
-                    Log.LogWarning(ex, "RestoreIdentityFields: could not reset {field} to '{expected}'; it stays '{current}'.", kvp.Key, expected, current);
-                }
-            }
         }
 
         private static string GetClosedDateField(WorkItem workItem)

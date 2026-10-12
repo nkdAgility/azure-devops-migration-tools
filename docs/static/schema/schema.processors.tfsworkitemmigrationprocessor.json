@@ -29,7 +29,7 @@
       "default": "true"
     },
     "GenerateMigrationComment": {
-      "description": "If enabled, adds a comment recording the migration",
+      "description": "If enabled, adds a comment recording the migration. The comment is added to the History of the last replayed\r\n revision, after that revision's own comment, rather than in a separate revision.",
       "type": "boolean",
       "default": "true"
     },

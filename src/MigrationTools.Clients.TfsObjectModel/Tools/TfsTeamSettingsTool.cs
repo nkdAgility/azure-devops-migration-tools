@@ -397,13 +397,22 @@ namespace MigrationTools.Tools
                 sourceName = sourceName.Substring(0, index).Trim();
             }
 
-            targetIdentity = MatchIdentity(sourceName, identityCache);
-            if ((targetIdentity is null) && (userMapping is not null))
+            var mappedName = userMapping is null ? null
+                : TfsUserIdentityReference.FindMappedTarget(userMapping, sourceCapacity.TeamMember.DisplayName)
+                    ?? TfsUserIdentityReference.FindMappedTarget(userMapping, sourceName);
+
+            // A "Display Name <upn>" mapping names one user; resolve it by unique name only, so a missing or
+            // shared display name never selects a different user.
+            if (TfsUserIdentityReference.TryParse(mappedName, out _, out var mappedUniqueName))
             {
-                if (userMapping.TryGetValue(sourceName, out var mappedName) && !string.IsNullOrEmpty(mappedName))
-                {
-                    targetIdentity = MatchIdentity(mappedName, identityCache);
-                }
+                targetIdentity = identityCache.Value.FirstOrDefault(i => string.Equals(i.UniqueName, mappedUniqueName, StringComparison.OrdinalIgnoreCase));
+                return targetIdentity is not null;
+            }
+
+            targetIdentity = MatchIdentity(sourceName, identityCache);
+            if ((targetIdentity is null) && !string.IsNullOrEmpty(mappedName))
+            {
+                targetIdentity = MatchIdentity(mappedName, identityCache);
             }
 
             // last attempt to match on unique name

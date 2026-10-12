@@ -20,6 +20,8 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.
+        /// Ignored while TfsWorkItemMigrationProcessor replays revisions, because links are then saved with the revision
+        /// where they were added or removed in the source.
         /// </summary>
         /// <default>false</default>
         public bool SaveAfterEachLinkIsAdded { get; set; }
