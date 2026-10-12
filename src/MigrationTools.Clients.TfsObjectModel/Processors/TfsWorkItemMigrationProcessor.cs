@@ -1298,31 +1298,50 @@ namespace MigrationTools.Processors
         /// <summary>
         /// The server can still apply the current date to ClosedDate, ActivatedDate and ResolvedDate on save, even with BypassRules,
         /// and they are read-only in the revision that changes state, so a mismatch after save is corrected with a
-        /// single fix-up revision.
+        /// single fix-up revision. A failed fix-up save is retried here, because a later run treats the revision
+        /// as migrated and could then only correct the latest state, not this revision.
         /// </summary>
         private void EnsureStateStampedDatesAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
         {
-            try
+            var source = sourceRevision.ToWorkItem();
+            var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
+            for (var attempt = 0; ; attempt++)
             {
-                var target = targetWorkItem.ToWorkItem();
-                if (!SetStateStampedDatesFromSource(sourceRevision.ToWorkItem(), target, "after save")) return;
-
-                var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
-                target.Fields["System.ChangedDate"].Value = fixUpDate;
-                target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
-                targetWorkItem.SaveToAzureDevOps();
-                var floor = fixUpDate;
-                for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
+                try
                 {
-                    revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
-                    floor = revisionsToMigrate[i].ChangedDate;
+                    var target = targetWorkItem.ToWorkItem();
+                    if (!SetStateStampedDatesFromSource(source, target, "after save"))
+                    {
+                        // Nothing to fix, or a failed attempt's save reached the server before it threw.
+                        if (attempt == 0) return;
+                        break;
+                    }
+                    target.Fields["System.ChangedDate"].Value = fixUpDate;
+                    target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
+                    targetWorkItem.SaveToAzureDevOps();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
+                    targetWorkItem.ToWorkItem().Reset();
+                    if (attempt >= Options.WorkItemCreateRetryLimit)
+                    {
+                        throw new StateStampedDateFixUpException($"Unable to apply fix-up save for state-stamped dates on target #{targetWorkItem.Id}", ex);
+                    }
+                    Log.LogWarning(ex, "Fix-up save for state-stamped dates on target #{targetId} failed; reloading and retrying ({attempt}/{retryLimit}).",
+                        targetWorkItem.Id, attempt + 1, Options.WorkItemCreateRetryLimit);
+                    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(attempt + 1));
+                    targetWorkItem.ToWorkItem().SyncToLatest();
+                    targetWorkItem.RefreshWorkItem();
                 }
             }
-            catch (Exception ex)
+
+            var floor = fixUpDate;
+            for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
             {
-                // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
-                targetWorkItem.ToWorkItem().Reset();
-                throw new StateStampedDateFixUpException($"Unable to apply fix-up save for state-stamped dates on target #{targetWorkItem.Id}", ex);
+                revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
+                floor = revisionsToMigrate[i].ChangedDate;
             }
         }
 
