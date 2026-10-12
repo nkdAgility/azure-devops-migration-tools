@@ -28,22 +28,22 @@ class Program
         };
 
 
-        // net472 builds of referenced projects bind Microsoft.Extensions.* by file version (e.g. 9.0.0.10), but the
-        // net8.0 packages ship 9.0.0.0. Bind by simple name; this tool only reflects over option types.
-        AppDomain.CurrentDomain.AssemblyResolve += (sender, resolveArgs) =>
+        string dir = AppDomain.CurrentDomain.BaseDirectory;
+        Console.WriteLine(dir);
+
+        // MigrationTools.Clients.TfsObjectModel targets net472 and references the .NET Framework builds of
+        // Microsoft.Extensions.* (assembly version 9.0.0.x), while this net8.0 host ships 9.0.0.0. The runtime
+        // refuses to bind a request for a higher version, so resolve by simple name from the output folder.
+        System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += (context, name) =>
         {
-            var name = new AssemblyName(resolveArgs.Name).Name;
-            var loaded = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == name);
+            var loaded = context.Assemblies.FirstOrDefault(a => a.GetName().Name == name.Name);
             if (loaded != null)
             {
                 return loaded;
             }
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, name + ".dll");
-            return File.Exists(path) ? Assembly.LoadFrom(path) : null;
+            string candidate = System.IO.Path.Combine(dir, name.Name + ".dll");
+            return File.Exists(candidate) ? context.LoadFromAssemblyPath(candidate) : null;
         };
-
-        string dir = AppDomain.CurrentDomain.BaseDirectory;
-        Console.WriteLine(dir);
         AppDomain currentDomain = AppDomain.CurrentDomain;
         currentDomain.Load("MigrationTools");
         currentDomain.Load("MigrationTools.Clients.TfsObjectModel");

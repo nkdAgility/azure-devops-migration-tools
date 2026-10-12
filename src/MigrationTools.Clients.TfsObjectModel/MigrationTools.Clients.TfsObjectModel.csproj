@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="MigrationTools.Clients.TfsObjectModel.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="EndpointEnrichers\**" />
     <Compile Remove="Enrichers\**" />
     <Compile Remove="ProcessorEnrichers\**" />
