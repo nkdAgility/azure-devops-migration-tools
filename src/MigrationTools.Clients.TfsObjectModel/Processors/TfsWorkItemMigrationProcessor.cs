@@ -181,6 +181,8 @@ namespace MigrationTools.Processors
 
                 //////////////////////////////////////////////////
 
+                sourceWorkItems = SharedItemsFirst(sourceWorkItems);
+
                 // After filtering, so the scan only covers (and only stops for) items that will be migrated.
                 ValidateRevisionHistoryFields(sourceWorkItems);
 
@@ -572,6 +574,17 @@ namespace MigrationTools.Processors
                 }
                 return newwit.AsWorkItemData();
             }
+        }
+
+        private static readonly string[] SharedItemTypes = { "Shared Steps", "Shared Parameter" };
+
+        // Test Case steps reference Shared Steps and Shared Parameters by id, and those references are only remapped
+        // when the target item already exists, so migrate them first; otherwise keep the query's order.
+        internal static List<WorkItemData> SharedItemsFirst(List<WorkItemData> workItems)
+        {
+            return workItems
+                .OrderBy(wi => SharedItemTypes.Contains(wi.Type, StringComparer.OrdinalIgnoreCase) ? 0 : 1)
+                .ToList();
         }
 
         private void PopulateIgnoreList()
