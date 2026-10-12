@@ -28,6 +28,14 @@ The TFS User Mapping Tool operates in two main phases during migration:
 
 The tool processes user identity fields in work items and applies configured mappings to ensure users are properly referenced in the target system.
 
+### Mapping Behaviour
+
+- **Exact field matching**: A field is processed only when its reference name exactly matches an entry in `IdentityFieldsToCheck`, ignoring case. Partial names are no longer matched as substrings, so an entry such as `AssignedTo` does not match `System.AssignedTo`. List the full reference name of every field you want mapped.
+- **Target only**: The mapped value is written to the target work item. The source work item is not changed.
+- **Empty values**: Null or empty identity values are passed through unchanged.
+- **Unmapped values**: Values with no mapping are passed through unchanged.
+- **Email matching**: With `MatchUsersByEmail` enabled, target users with no email address are skipped instead of causing a failure. Users who cannot be matched by email fall back to display name matching.
+
 ### Key Features
 
 - **Automatic Email Matching**: Attempts to match users based on email addresses
@@ -88,7 +96,7 @@ The TFS User Mapping Tool supports several configuration options for flexible us
 
 #### Configuration Options
 
-- **IdentityFieldsToCheck**: Array of field reference names that contain user identities
+- **IdentityFieldsToCheck**: Array of full field reference names that contain user identities (exact match, case-insensitive)
 - **UserMappingFile**: Path to JSON file containing manual user mappings
 - **MatchUsersByEmail**: Attempt automatic matching based on email addresses
 - **SkipValidateAllUsersExistOrAreMapped**: Skip validation that all users are properly mapped
@@ -226,6 +234,15 @@ When using a manual user mapping file, the format should be a JSON array of mapp
 - Check for email format differences or case sensitivity issues
 - Consider using manual mapping for problematic users
 - Review email address availability in both systems
+
+**Field Not Being Mapped:**
+
+- Check that the field is listed in `IdentityFieldsToCheck` by its full reference name (for example `Microsoft.VSTS.Common.ResolvedBy`, not `ResolvedBy`)
+- Earlier versions matched partial names; configurations that relied on this must be updated
+
+**Identity Fields Set to the Migration Account:**
+
+- Identity fields replayed from the source are kept through the final `Migration` saves, even when a target process rule sets the field to the current user. See [TfsWorkItemMigrationProcessor]({{< ref "docs/reference/processors/tfs-workitem-migration-processor" >}})
 
 **Mapping File Issues:**
 
