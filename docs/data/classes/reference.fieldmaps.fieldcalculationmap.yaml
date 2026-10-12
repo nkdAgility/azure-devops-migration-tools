@@ -59,6 +59,7 @@ configurationSamples:
     {
       "$type": "FieldCalculationMapOptions",
       "expression": "[effort] * [rate]",
+      "parsingFallback": 0,
       "parameters": {
         "effort": "Custom.EstimatedHours",
         "rate": "Custom.HourlyRate"
@@ -99,6 +100,12 @@ options:
   defaultValue: '{}'
   isRequired: false
   dotNetType: System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: parsingFallback
+  type: FieldCalculationMapParsingFallback
+  description: Gets or sets the parsing fallback.
+  defaultValue: null
+  isRequired: false
+  dotNetType: MigrationTools.Tools.FieldCalculationMapParsingFallback, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 - parameterName: targetField
   type: String
   description: Gets or sets the target field reference name where the calculated result will be stored.

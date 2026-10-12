@@ -47,6 +47,11 @@
                     "type": "string"
                   }
                 },
+                "parsingFallback": {
+                  "description": "Gets or sets the parsing fallback.",
+                  "type": "string",
+                  "default": "null"
+                },
                 "targetField": {
                   "description": "Gets or sets the target field reference name where the calculated result will be stored.",
                   "type": "string",

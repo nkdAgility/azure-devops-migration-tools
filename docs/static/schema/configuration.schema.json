@@ -1441,11 +1441,6 @@
                       "type": "integer",
                       "default": "0"
                     },
-                    "StopOnFirstError": {
-                      "description": "When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),\r\n the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.",
-                      "type": "boolean",
-                      "default": "false"
-                    },
                     "PauseAfterEachWorkItem": {
                       "description": "Pause after each work item is migrated",
                       "type": "boolean",
@@ -1466,6 +1461,11 @@
                     "SourceName": {
                       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
                       "type": "string"
+                    },
+                    "StopOnFirstError": {
+                      "description": "When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),\r\n the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.",
+                      "type": "boolean",
+                      "default": "false"
                     },
                     "TargetName": {
                       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
@@ -1803,6 +1803,11 @@
                               "additionalProperties": {
                                 "type": "string"
                               }
+                            },
+                            "parsingFallback": {
+                              "description": "Gets or sets the parsing fallback.",
+                              "type": "string",
+                              "default": "null"
                             },
                             "targetField": {
                               "description": "Gets or sets the target field reference name where the calculated result will be stored.",
@@ -2208,6 +2213,23 @@
                 }
               }
             },
+            "TfsChangeSetMappingTool": {
+              "title": "TfsChangeSetMappingTool",
+              "description": "missing XML code comments",
+              "type": "object",
+              "properties": {
+                "ChangeSetMappingFile": {
+                  "description": "Path to changeset mapping file.",
+                  "type": "string",
+                  "default": "null"
+                },
+                "Enabled": {
+                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "type": "boolean",
+                  "default": "true"
+                }
+              }
+            },
             "TfsEmbededImagesTool": {
               "title": "TfsEmbededImagesTool",
               "description": "missing XML code comments",
@@ -2241,23 +2263,6 @@
                 "ShouldDropChangedSetLinks": {
                   "description": "When set to true, changeset links in work items will be removed during migration to prevent broken links when repositories are not migrated.",
                   "type": "boolean"
-                }
-              }
-            },
-            "TfsChangeSetMappingTool": {
-              "title": "TfsChangeSetMappingTool",
-              "description": "missing XML code comments",
-              "type": "object",
-              "properties": {
-                "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
-                  "type": "boolean",
-                  "default": "true"
-                },
-                "ChangeSetMappingFile": {
-                  "description": "Path to changeset mapping file.",
-                  "type": "string",
-                  "default": "null"
                 }
               }
             },
@@ -2424,8 +2429,12 @@
                   "description": "When set to true, this setting will skip a validation that all users exists or mapped",
                   "type": "boolean"
                 },
+                "UseIdentityMapDataFormat": {
+                  "description": "When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)\r\n instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.\r\n Detailed entries match work item values against the source display name or account name, ignoring case.\r\n false",
+                  "type": "boolean"
+                },
                 "UserMappingFile": {
-                  "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.",
+                  "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.\r\n By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is\r\n enabled, the format is detected from the content: a JSON array of objects with \"Source\" and \"Target\" identities is read as\r\n detailed IdentityMapData, and a JSON object is read as the simple dictionary format.\r\n none",
                   "type": "string"
                 }
               }
