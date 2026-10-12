@@ -45,8 +45,7 @@ namespace MigrationTools.Endpoints.Tests
         {
             var endpoint = GetTfsWorkItemEndPoint();
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems();
-            // migrationSource1 is a shared live project whose work item count changes, so assert the query returns items rather than an exact count.
-            Assert.IsTrue(result.Any(), "Expected the query to return work items from migrationSource1.");
+            Assert.AreEqual(13, result.Count());
         }
 
         [TestMethod(), TestCategory("L3")]
@@ -59,8 +58,7 @@ namespace MigrationTools.Endpoints.Tests
                 Parameters = new Dictionary<string, string>() { { "TeamProject", "migrationSource1" } }
             };
             IEnumerable<WorkItemData> result = endpoint.GetWorkItems(qo);
-            // migrationSource1 is a shared live project whose work item count changes, so assert the query returns items rather than an exact count.
-            Assert.IsTrue(result.Any(), "Expected the query to return work items from migrationSource1.");
+            Assert.AreEqual(13, result.Count());
         }
 
         protected TfsWorkItemEndpoint GetTfsWorkItemEndPoint(string key = "Source", TfsWorkItemEndpointOptions options = null)
