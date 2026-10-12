@@ -249,7 +249,6 @@ namespace MigrationTools.Processors
             {
                 LogMissingTargetFieldSummary();
                 CommonTools.ExportWorkItemMapping.SaveMappings();
-                // always called: it is a no-op when no placeholder work item was created
                 CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
                 CommonTools.GitRepository?.LogUnresolvedSummary();
 

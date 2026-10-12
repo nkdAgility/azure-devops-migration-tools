@@ -99,7 +99,6 @@ namespace MigrationTools.Processors
             }
             finally
             {
-                // removes the placeholder work item(s) the embedded images tool created, even on failure
                 CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
             }
             //////////////////////////////////////////////////

@@ -31,7 +31,7 @@ namespace MigrationTools.Tools
         public TfsEmbededImagesTool(IOptions<TfsEmbededImagesToolOptions> options, IServiceProvider services, ILogger<TfsEmbededImagesTool> logger, ITelemetryLogger telemetryLogger) : base(options, services, logger, telemetryLogger)
         {
             _cachedUploadedUrisBySourceValue = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-            _placeholders = new EmbededImagesPlaceholderTracker(PlaceholderCapacity, DestroyWorkItem, Log);
+            _placeholders = new EmbededImagesPlaceholderTracker(PlaceholderImageCapacity, DestroyWorkItem, Log);
         }
 
         public void FixEmbededImages(TfsProcessor processor, WorkItemData targetWorkItem)
@@ -62,10 +62,7 @@ namespace MigrationTools.Tools
         /// </summary>
         public void ProcessorExecutionEnd(TfsProcessor processor)
         {
-            if (processor != null)
-            {
-                _processor = processor;
-            }
+            _processor = processor;
             _targetDummyWorkItem?.Close();
             _targetDummyWorkItem = null;
 
@@ -86,8 +83,7 @@ namespace MigrationTools.Tools
             }
         }
 
-        // each placeholder takes about 900 attach/detach pairs before it is replaced
-        private const int PlaceholderCapacity = 900;
+        private const int PlaceholderImageCapacity = 900;
 
         private readonly EmbededImagesPlaceholderTracker _placeholders;
 
