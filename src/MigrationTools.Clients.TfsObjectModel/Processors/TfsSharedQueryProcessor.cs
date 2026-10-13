@@ -31,7 +31,8 @@ namespace MigrationTools.Processors
         private int _totalQueryFailed;
         private WorkItemTrackingHttpClient _sourceQueryClient;
         private WorkItemTrackingHttpClient _targetQueryClient;
-        private readonly Dictionary<string, bool> _targetTeamExists = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        private bool? _restQueriesAvailable;
+        private HashSet<string> _targetTeams;
 
         public TfsSharedQueryProcessor(IOptions<TfsSharedQueryProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
@@ -163,7 +164,14 @@ namespace MigrationTools.Processors
             Log.LogInformation("Migrating query '{queryName}'", query.Name);
 
             // The object model drops the team context from macros such as @CurrentIteration('[Project]\Team') and
-            // rejects @CurrentIteration +/- n, so the WIQL is read and written through the REST API (#2705).
+            // rejects @CurrentIteration +/- n, so the WIQL is read and written through the REST API when the servers
+            // have it (TFS 2015+), and through the object model otherwise (#2705).
+            if (!RestQueriesAvailable)
+            {
+                MigrateQueryWithObjectModel(targetHierarchy, query, parentFolder);
+                return;
+            }
+
             string sourceQueryText;
             try
             {
@@ -177,21 +185,7 @@ namespace MigrationTools.Processors
             }
 
             var fixedQueryText = SharedQueryWiqlRewriter.Rewrite(sourceQueryText, Source.Project, Target.Project, Options.PrefixProjectToNodes, Options.SourceToTargetFieldMappings);
-
-            foreach (var team in SharedQueryWiqlRewriter.GetReferencedTeams(fixedQueryText, Target.Project))
-            {
-                var targetDefaultTeam = $"{Target.Project} Team";
-                if (!TargetTeamExists(team) && string.Equals(team, $"{Source.Project} Team", StringComparison.OrdinalIgnoreCase) && TargetTeamExists(targetDefaultTeam))
-                {
-                    // the default team is named after the project, so it changes name with it
-                    Log.LogInformation("Query '{queryName}' refers to the source default team '{team}'; using the target default team '{targetDefaultTeam}'", query.Name, team, targetDefaultTeam);
-                    fixedQueryText = SharedQueryWiqlRewriter.ReplaceTeam(fixedQueryText, Target.Project, team, targetDefaultTeam);
-                }
-                else if (!TargetTeamExists(team))
-                {
-                    Log.LogWarning("Query '{queryName}' refers to team '{team}', which does not exist in target project '{targetProject}'. The query is migrated but will not return results until the team is created, for example with TfsTeamSettingsProcessor.", query.Name, team, Target.Project);
-                }
-            }
+            fixedQueryText = MapTeams(query.Name, fixedQueryText);
 
             try
             {
@@ -207,27 +201,105 @@ namespace MigrationTools.Processors
             }
         }
 
+        private void MigrateQueryWithObjectModel(QueryHierarchy targetHierarchy, QueryDefinition query, QueryFolder parentFolder)
+        {
+            var fixedQueryText = SharedQueryWiqlRewriter.Rewrite(query.QueryText, Source.Project, Target.Project, Options.PrefixProjectToNodes, Options.SourceToTargetFieldMappings);
+            if (fixedQueryText.IndexOf("@CurrentIteration", StringComparison.OrdinalIgnoreCase) >= 0 || fixedQueryText.IndexOf("@TeamAreas", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                Log.LogWarning("Query '{queryName}' uses a team-scoped macro. Without the REST Queries API the team context cannot be read, so the migrated query uses the default team.", query.Name);
+            }
+
+            // you cannot just add an item from one store to another, we need to create a new object
+            parentFolder.Add(new QueryDefinition(query.Name, fixedQueryText));
+            try
+            {
+                targetHierarchy.Save(); // moved the save here for better error message
+                _totalQueriesMigrated++;
+            }
+            catch (Exception ex)
+            {
+                _totalQueryFailed++;
+                Log.LogDebug("Source Query: '{query}'", query);
+                Log.LogDebug("Target Query: '{fixedQueryText}'", fixedQueryText);
+                Log.LogError(ex, "Error saving query '{queryName}', probably due to invalid area or iteration paths", query.Name);
+                targetHierarchy.Refresh(); // get the tree without the last edit
+            }
+        }
+
+        private string MapTeams(string queryName, string queryText)
+        {
+            var sourceDefaultTeam = $"{Source.Project} Team";
+            var targetDefaultTeam = $"{Target.Project} Team";
+            foreach (var team in SharedQueryWiqlRewriter.GetReferencedTeams(queryText, Target.Project).ToList())
+            {
+                if (string.Equals(team, sourceDefaultTeam, StringComparison.OrdinalIgnoreCase) && !string.Equals(sourceDefaultTeam, targetDefaultTeam, StringComparison.OrdinalIgnoreCase) && TargetTeamExists(targetDefaultTeam) == true)
+                {
+                    // the default team is named after the project, so it changes name with it
+                    Log.LogInformation("Query '{queryName}' refers to the source default team '{team}'; using the target default team '{targetDefaultTeam}'", queryName, team, targetDefaultTeam);
+                    queryText = SharedQueryWiqlRewriter.ReplaceTeam(queryText, Target.Project, team, targetDefaultTeam);
+                }
+                else if (TargetTeamExists(team) == false)
+                {
+                    Log.LogWarning("Query '{queryName}' refers to team '{team}', which does not exist in target project '{targetProject}'. The query is migrated but will not return results until the team is created, for example with TfsTeamSettingsProcessor.", queryName, team, Target.Project);
+                }
+            }
+            return queryText;
+        }
+
+        private bool RestQueriesAvailable
+        {
+            get
+            {
+                if (_restQueriesAvailable == null)
+                {
+                    try
+                    {
+                        SourceQueryClient.GetQueriesAsync(Source.Project, depth: 0).GetAwaiter().GetResult();
+                        TargetQueryClient.GetQueriesAsync(Target.Project, depth: 0).GetAwaiter().GetResult();
+                        _restQueriesAvailable = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogWarning(ex, "The REST Queries API is not available (it needs TFS 2015 or later). Queries are migrated with the object model, which cannot keep the team context of @CurrentIteration or @TeamAreas.");
+                        _restQueriesAvailable = false;
+                    }
+                }
+                return _restQueriesAvailable.Value;
+            }
+        }
+
         private WorkItemTrackingHttpClient SourceQueryClient => _sourceQueryClient ??= Source.TfsCollection.GetClient<WorkItemTrackingHttpClient>();
 
         private WorkItemTrackingHttpClient TargetQueryClient => _targetQueryClient ??= Target.TfsCollection.GetClient<WorkItemTrackingHttpClient>();
 
-        private bool TargetTeamExists(string team)
+        /// <summary>
+        /// Whether the team exists in the target project, or null when the teams could not be read.
+        /// </summary>
+        private bool? TargetTeamExists(string team)
         {
-            if (!_targetTeamExists.TryGetValue(team, out var exists))
+            if (_targetTeams == null)
             {
                 try
                 {
-                    Target.TfsCollection.GetClient<TeamHttpClient>().GetTeamAsync(Target.Project, team).GetAwaiter().GetResult();
-                    exists = true;
+                    var teamClient = Target.TfsCollection.GetClient<TeamHttpClient>();
+                    var teams = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    const int pageSize = 100;
+                    for (var skip = 0; ; skip += pageSize)
+                    {
+                        var page = teamClient.GetTeamsAsync(Target.Project, top: pageSize, skip: skip).GetAwaiter().GetResult();
+                        teams.UnionWith(page.Select(t => t.Name));
+                        if (page.Count < pageSize) break;
+                    }
+                    _targetTeams = teams;
                 }
                 catch (Exception ex)
                 {
-                    Log.LogDebug(ex, "Team '{team}' not found in target project", team);
-                    exists = false;
+                    // not cached, so a transient failure does not mark every team as missing for the rest of the run
+                    Log.LogWarning(ex, "Could not read the teams of target project '{targetProject}' to check the teams that queries refer to", Target.Project);
+                    return null;
                 }
-                _targetTeamExists[team] = exists;
             }
-            return exists;
+            return _targetTeams.Contains(team);
         }
     }
 }

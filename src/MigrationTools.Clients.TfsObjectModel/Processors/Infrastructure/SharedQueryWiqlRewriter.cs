@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,13 +12,14 @@ namespace MigrationTools.Processors.Infrastructure
     /// </summary>
     public static class SharedQueryWiqlRewriter
     {
-        private static readonly Regex TeamReference = new Regex(@"'\[(?<project>[^\]]+)\]\\(?<team>[^']+)'", RegexOptions.Compiled);
+        // Only the argument of a team-scoped macro is a team reference; other '[x]\y' string literals are left alone.
+        private static readonly Regex TeamReference = new Regex(@"(?<macro>@(?:CurrentIteration|TeamAreas)\s*\(\s*)'\[(?<project>[^\]]+)\]\\(?<team>[^']+)'", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex TeamId = new Regex(@"\s*<id:[^>]*>$", RegexOptions.Compiled);
 
         public static string Rewrite(string wiql, string sourceProject, string targetProject, bool prefixProjectToNodes, IDictionary<string, string> fieldMappings)
         {
-            // the ' should only items at the start of areapath etc.
-            var fixedQueryText = wiql.Replace($"'{sourceProject}", $"'{targetProject}");
+            // the ' should only items at the start of areapath etc.; WIQL is case-insensitive
+            var fixedQueryText = Regex.Replace(wiql, "'" + Regex.Escape(sourceProject), "'" + targetProject.Replace("$", "$$"), RegexOptions.IgnoreCase);
 
             if (prefixProjectToNodes)
             {
@@ -27,8 +29,8 @@ namespace MigrationTools.Processors.Infrastructure
 
             // team context, e.g. @CurrentIteration('[Source]\Team') becomes @CurrentIteration('[Target]\Team')
             // the server may append the source team id, e.g. '[Source]\Team <id:guid>', which is meaningless in the target
-            fixedQueryText = TeamReference.Replace(fixedQueryText, m => m.Groups["project"].Value == sourceProject
-                ? $"'[{targetProject}]\\{TeamId.Replace(m.Groups["team"].Value, string.Empty)}'"
+            fixedQueryText = TeamReference.Replace(fixedQueryText, m => IsProject(m, sourceProject)
+                ? $"{m.Groups["macro"].Value}'[{targetProject}]\\{TeamId.Replace(m.Groups["team"].Value, string.Empty)}'"
                 : m.Value);
 
             if (fieldMappings != null)
@@ -42,11 +44,13 @@ namespace MigrationTools.Processors.Infrastructure
         }
 
         /// <summary>
-        /// Points every reference to a team in the given project at another team of that project.
+        /// Points every team-scoped macro that refers to a team in the given project at another team of that project.
         /// </summary>
         public static string ReplaceTeam(string wiql, string project, string fromTeam, string toTeam)
         {
-            return wiql.Replace($"'[{project}]\\{fromTeam}'", $"'[{project}]\\{toTeam}'");
+            return TeamReference.Replace(wiql, m => IsProject(m, project) && string.Equals(m.Groups["team"].Value, fromTeam, StringComparison.OrdinalIgnoreCase)
+                ? $"{m.Groups["macro"].Value}'[{project}]\\{toTeam}'"
+                : m.Value);
         }
 
         /// <summary>
@@ -55,9 +59,14 @@ namespace MigrationTools.Processors.Infrastructure
         public static IEnumerable<string> GetReferencedTeams(string wiql, string project)
         {
             return TeamReference.Matches(wiql).Cast<Match>()
-                .Where(m => m.Groups["project"].Value == project)
-                .Select(m => m.Groups["team"].Value)
-                .Distinct();
+                .Where(m => IsProject(m, project))
+                .Select(m => TeamId.Replace(m.Groups["team"].Value, string.Empty))
+                .Distinct(StringComparer.OrdinalIgnoreCase);
+        }
+
+        private static bool IsProject(Match match, string project)
+        {
+            return string.Equals(match.Groups["project"].Value, project, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

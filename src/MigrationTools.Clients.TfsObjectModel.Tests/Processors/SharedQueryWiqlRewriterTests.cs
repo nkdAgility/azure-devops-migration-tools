@@ -17,6 +17,20 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
+        public void Rewrite_IgnoresProjectCasing()
+        {
+            var wiql = @"[System.AreaPath] under 'src\Area' and [System.IterationPath] = @currentiteration('[SRC]\Team')";
+            Assert.AreEqual(@"[System.AreaPath] under 'Tgt\Area' and [System.IterationPath] = @currentiteration('[Tgt]\Team')", SharedQueryWiqlRewriter.Rewrite(wiql, "Src", "Tgt", false, null));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void Rewrite_LeavesBracketedLiteralsOutsideTeamMacrosAlone()
+        {
+            var wiql = @"[System.Title] = '[Src]\Team B' and [System.AreaPath] in @TeamAreas('[Src]\Team B')";
+            Assert.AreEqual(@"[System.Title] = '[Src]\Team B' and [System.AreaPath] in @TeamAreas('[Tgt]\Team B')", SharedQueryWiqlRewriter.Rewrite(wiql, "Src", "Tgt", false, null));
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void Rewrite_DropsSourceTeamId()
         {
             var wiql = @"= @CurrentIteration('[Src]\Team B <id:daa8efa0-213c-47f3-be65-0fcd439af9ef>')";
