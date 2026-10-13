@@ -196,11 +196,21 @@ Add-TestReleaseDefinition -Org $TargetOrg -Project $TargetProject
 # --- 3. GitHub environments and variables --------------------------------------------------------
 if (-not $SkipGitHub -and -not $LocalOnly) {
     Write-Host "== Configuring GitHub $Repository"
-    '{}' | gh api -X PUT "repos/$Repository/environments/integration-tests" --input - | Out-Null
+    # $ErrorActionPreference does not stop on a failed native command, and a silent failure here would leave
+    # the fork approval gate or the workflow variables unset.
+    function Assert-Gh([string] $What) { if ($LASTEXITCODE -ne 0) { throw "GitHub CLI failed: $What (exit $LASTEXITCODE). Check 'gh auth status' has admin rights on $Repository." } }
 
-    $reviewerIds = foreach ($login in $Reviewers) { @{ type = 'User'; id = [int](gh api "users/$login" --jq .id) } }
+    '{}' | gh api -X PUT "repos/$Repository/environments/integration-tests" --input - | Out-Null
+    Assert-Gh 'create environment integration-tests'
+
+    $reviewerIds = foreach ($login in $Reviewers) {
+        $id = gh api "users/$login" --jq .id
+        Assert-Gh "look up reviewer $login"
+        @{ type = 'User'; id = [int]$id }
+    }
     @{ prevent_self_review = $true; reviewers = @($reviewerIds) } | ConvertTo-Json -Depth 5 |
         gh api -X PUT "repos/$Repository/environments/integration-tests-forks" --input - | Out-Null
+    Assert-Gh 'create environment integration-tests-forks with required reviewers'
     Write-Host "   environments: integration-tests, integration-tests-forks (reviewers: $($Reviewers -join ', '))"
 
     $variables = [ordered]@{
@@ -209,7 +219,10 @@ if (-not $SkipGitHub -and -not $LocalOnly) {
         ADO_TEST_SOURCE_COLLECTION = "https://dev.azure.com/$SourceOrg/"
         ADO_TEST_TARGET_COLLECTION = "https://dev.azure.com/$TargetOrg/"
     }
-    foreach ($name in $variables.Keys) { gh variable set $name --body $variables[$name] --repo $Repository }
+    foreach ($name in $variables.Keys) {
+        gh variable set $name --body $variables[$name] --repo $Repository
+        Assert-Gh "set variable $name"
+    }
     Write-Host "   variables: $($variables.Keys -join ', ')"
 }
 

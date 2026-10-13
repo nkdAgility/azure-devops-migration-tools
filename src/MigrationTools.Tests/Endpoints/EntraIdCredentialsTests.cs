@@ -58,6 +58,14 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void GetAccessToken_ReusesAnUnexpiredToken()
+        {
+            EntraIdCredentials.GetAccessToken();
+            Assert.AreEqual("token-1", EntraIdCredentials.GetAccessToken());
+            Assert.AreEqual(1, _fake.Calls);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void FederatedCredential_TreatsUnauthorizedAsAChallenge()
         {
             var credential = new EntraIdCredentials.EntraIdFederatedCredential();

@@ -16,8 +16,11 @@ namespace MigrationTools.Tests
 
         private static string Env(string name) => Environment.GetEnvironmentVariable(name) is { Length: > 0 } v ? v : null;
 
-        public static Uri SourceCollection => new Uri(Env(Prefix + "SourceCollection") ?? DefaultCollection);
-        public static Uri TargetCollection => new Uri(Env(Prefix + "TargetCollection") ?? SourceCollection.ToString());
+        public static Uri SourceCollection => AsCollection(Env(Prefix + "SourceCollection") ?? DefaultCollection);
+        public static Uri TargetCollection => AsCollection(Env(Prefix + "TargetCollection") ?? SourceCollection.ToString());
+
+        // Relative API paths are resolved against the collection, which only keeps the org segment with a trailing slash.
+        private static Uri AsCollection(string url) => new Uri(url.EndsWith("/") ? url : url + "/");
 
         /// <summary>Target-side test projects (migrationTarget*) live in the target org; everything else in the source org.</summary>
         public static Uri CollectionFor(string project)

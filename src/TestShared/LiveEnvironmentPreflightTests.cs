@@ -42,7 +42,7 @@ namespace MigrationTools.Tests
             }
 
             HttpStatusCode status;
-            using (var client = new HttpClient())
+            using (var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                     Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + token)));
