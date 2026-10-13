@@ -14,18 +14,21 @@ namespace MigrationTools.Endpoints
     internal sealed class AzureDevOpsAuthenticationHandler : DelegatingHandler
     {
         private readonly Func<string> _resolveToken;
+        private readonly AuthenticationMode _authenticationMode;
 
-        public AzureDevOpsAuthenticationHandler(Func<string> resolveToken) : base(new HttpClientHandler())
+        public AzureDevOpsAuthenticationHandler(Func<string> resolveToken, AuthenticationMode authenticationMode) : base(new HttpClientHandler())
         {
             _resolveToken = resolveToken;
+            _authenticationMode = authenticationMode;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (request.Headers.Authorization == null)
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + _resolveToken())));
+                request.Headers.Authorization = _authenticationMode == AuthenticationMode.EntraId
+                    ? new AuthenticationHeaderValue("Bearer", _resolveToken())
+                    : new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + _resolveToken())));
             }
             return base.SendAsync(request, cancellationToken);
         }

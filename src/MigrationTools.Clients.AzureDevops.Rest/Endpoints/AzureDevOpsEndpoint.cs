@@ -86,7 +86,7 @@ namespace MigrationTools.Endpoints
 
         private HttpClient CreateHttpClientWithHeaders(string url, string versionParameter)
         {
-            HttpClient client = new HttpClient(new AzureDevOpsAuthenticationHandler(Options.ResolveAccessToken))
+            HttpClient client = new HttpClient(new AzureDevOpsAuthenticationHandler(Options.ResolveAccessToken, Options.AuthenticationMode))
             {
                 BaseAddress = new Uri(url)
             };

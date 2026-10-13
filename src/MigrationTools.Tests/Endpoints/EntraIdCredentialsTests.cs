@@ -65,6 +65,36 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(1, _fake.Calls);
         }
 
+        private sealed class SlowTokenCredential : TokenCredential
+        {
+            public int Calls;
+            public readonly TaskCompletionSource<bool> Release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
+                => throw new NotSupportedException();
+
+            public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+            {
+                var n = Interlocked.Increment(ref Calls);
+                await Release.Task;
+                return new AccessToken("slow-" + n, DateTimeOffset.UtcNow.AddHours(1));
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_ConcurrentCallersShareOneFetch()
+        {
+            var slow = new SlowTokenCredential();
+            EntraIdCredentials.TokenCredential = slow;
+
+            var first = EntraIdCredentials.GetFreshAccessTokenAsync();
+            var second = EntraIdCredentials.GetFreshAccessTokenAsync();
+            slow.Release.SetResult(true);
+
+            CollectionAssert.AreEqual(new[] { "slow-1", "slow-1" }, await Task.WhenAll(first, second));
+            Assert.AreEqual(1, slow.Calls);
+        }
+
         [TestMethod, TestCategory("L0")]
         public void FederatedCredential_TreatsUnauthorizedAsAChallenge()
         {

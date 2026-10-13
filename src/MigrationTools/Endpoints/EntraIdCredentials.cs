@@ -52,12 +52,47 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        /// <summary>Always asks the credential for a new token; used after the server rejected the current one.</summary>
-        public static async Task<string> GetFreshAccessTokenAsync(CancellationToken cancellationToken = default)
+        private static Task<AccessToken> _inFlight;
+
+        /// <summary>
+        /// Asks the credential for a new token; used after the server rejected the current one. Concurrent callers
+        /// (many requests failing with 401 at once) share a single fetch rather than each starting one.
+        /// </summary>
+        public static async Task<string> GetFreshAccessTokenAsync()
         {
-            var fresh = await Current.GetTokenAsync(RequestContext, cancellationToken).ConfigureAwait(false);
-            lock (_cacheLock) { _cached = fresh; }
-            return fresh.Token;
+            Task<AccessToken> fetch;
+            lock (_cacheLock)
+            {
+                if (_inFlight == null)
+                {
+                    _inFlight = FetchAndCacheAsync();
+                }
+                fetch = _inFlight;
+            }
+            try
+            {
+                return (await fetch.ConfigureAwait(false)).Token;
+            }
+            finally
+            {
+                lock (_cacheLock)
+                {
+                    if (ReferenceEquals(_inFlight, fetch)) { _inFlight = null; }
+                }
+            }
+        }
+
+        private static async Task<AccessToken> FetchAndCacheAsync()
+        {
+            var fresh = await Current.GetTokenAsync(RequestContext, CancellationToken.None).ConfigureAwait(false);
+            lock (_cacheLock)
+            {
+                if (!(_cached is AccessToken current) || fresh.ExpiresOn >= current.ExpiresOn)
+                {
+                    _cached = fresh;
+                }
+            }
+            return fresh;
         }
 
         /// <summary>
@@ -87,7 +122,7 @@ namespace MigrationTools.Endpoints
             public override bool GetTokenIsInteractive => false;
 
             protected override async Task<IssuedToken> OnGetTokenAsync(IssuedToken failedToken, CancellationToken cancellationToken)
-                => new VssOAuthAccessToken(await GetFreshAccessTokenAsync(cancellationToken).ConfigureAwait(false));
+                => new VssOAuthAccessToken(await GetFreshAccessTokenAsync().ConfigureAwait(false));
         }
     }
 }
