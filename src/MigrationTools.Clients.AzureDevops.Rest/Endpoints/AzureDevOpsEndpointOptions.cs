@@ -20,8 +20,16 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Personal Access Token (PAT) or other authentication token for accessing the Azure DevOps organization. Required for API authentication.
         /// </summary>
-        [Required]
         public string AccessToken { get; set; }
+
+        /// <summary>
+        /// The token to send as the password of Basic auth: the PAT, or a fresh Microsoft Entra token when
+        /// AuthenticationMode is EntraId (Azure DevOps accepts either).
+        /// </summary>
+        public string ResolveAccessToken()
+        {
+            return AuthenticationMode == AuthenticationMode.EntraId ? EntraIdCredentials.GetAccessToken() : AccessToken;
+        }
 
         /// <summary>
         /// URL of the Azure DevOps organization (e.g., "https://dev.azure.com/myorganization/"). Must include the full organization URL.

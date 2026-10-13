@@ -30,6 +30,7 @@ namespace MigrationTools.Endpoints.Tests
     {
 
         [TestMethod(), TestCategory("L3")]
+        [RequiresAzureDevOps]
         public void TfsWorkItemEndPointTest()
         {
             var endpoint = GetTfsWorkItemEndPoint();
@@ -45,6 +46,7 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod(), TestCategory("L3")]
+        [RequiresAzureDevOps]
         public void TfsWorkItemEndPointGetWorkItemsTest()
         {
             var endpoint = GetTfsWorkItemEndPoint();
@@ -58,7 +60,7 @@ namespace MigrationTools.Endpoints.Tests
         private static void AssertMatchesServer(IList<WorkItemData> result)
         {
             List<string> expectedIds;
-            using (var connection = new VssConnection(new Uri("https://dev.azure.com/nkdagility-preview/"), new VssBasicCredential(string.Empty, TestingConstants.AccessToken)))
+            using (var connection = new VssConnection(TestingConstants.SourceCollection, new VssBasicCredential(string.Empty, TestingConstants.ResolveAccessToken())))
             using (var client = connection.GetClient<WorkItemTrackingHttpClient>())
             {
                 expectedIds = client.QueryByWiqlAsync(new Wiql { Query = SourceProjectQuery }).Result.WorkItems.Select(r => r.Id.ToString()).ToList();
@@ -71,6 +73,7 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod(), TestCategory("L3")]
+        [RequiresAzureDevOps]
         public void TfsWorkItemEndPointGetWorkItemsQueryTest()
         {
             var endpoint = GetTfsWorkItemEndPoint();
@@ -102,12 +105,12 @@ namespace MigrationTools.Endpoints.Tests
             {
                 IOptions<TfsWorkItemEndpointOptions> wrappedOptions = Microsoft.Extensions.Options.Options.Create(new TfsWorkItemEndpointOptions()
                 {
-                    Collection = options != null ? options.Collection : new Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Collection = options != null ? options.Collection : TestingConstants.SourceCollection,
                     Project = options != null ? options.Project : "migrationSource1",
                     Authentication = new TfsAuthenticationOptions()
                     {
                         AccessToken = options != null ? options.Authentication.AccessToken : TestingConstants.AccessToken,
-                        AuthenticationMode = options != null ? options.Authentication.AuthenticationMode : AuthenticationMode.AccessToken
+                        AuthenticationMode = options != null ? options.Authentication.AuthenticationMode : TestingConstants.AuthenticationMode
                     },
                     Query = options != null ? options.Query : new Options.QueryOptions()
                     {
@@ -127,6 +130,7 @@ namespace MigrationTools.Endpoints.Tests
 
 
         [TestMethod(), TestCategory("L1")]
+        [RequiresAzureDevOps]
         public void TfsWorkItemEndPoint_EnvironmentOverrideTest()
         {
             Environment.SetEnvironmentVariable("MigrationTools__Endpoints__Source__Authentication__AccessToken", "654321");

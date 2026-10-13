@@ -49,11 +49,11 @@ namespace MigrationTools.Processors.Tests
             {
                 IOptions<TfsTeamSettingsEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamSettingsEndpointOptions()
                 {
-                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Collection = TestingConstants.CollectionFor("migrationSource1"),
                     Project = "migrationSource1",
                     Authentication = new TfsAuthenticationOptions()
                     {
-                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AuthenticationMode = TestingConstants.AuthenticationMode,
                         AccessToken = TestingConstants.AccessToken
                     },
                     ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId",
@@ -64,11 +64,11 @@ namespace MigrationTools.Processors.Tests
             {
                 IOptions<TfsTeamSettingsEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamSettingsEndpointOptions()
                 {
-                    Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Collection = TestingConstants.CollectionFor("migrationTarget1"),
                     Project = "migrationTarget1",
                     Authentication = new TfsAuthenticationOptions()
                     {
-                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AuthenticationMode = TestingConstants.AuthenticationMode,
                         AccessToken = TestingConstants.AccessToken
                     },
                     ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId",
@@ -118,11 +118,11 @@ namespace MigrationTools.Processors.Tests
             {
                 IOptions<TfsTeamProjectEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamProjectEndpointOptions()
                 {
-                    Collection = new System.Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Collection = TestingConstants.CollectionFor("migrationSource1"),
                     Project = "migrationSource1",
                     Authentication = new TfsAuthenticationOptions()
                     {
-                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AuthenticationMode = TestingConstants.AuthenticationMode,
                         AccessToken = TestingConstants.AccessToken
                     },
                     AllowCrossProjectLinking = false,
@@ -140,11 +140,11 @@ namespace MigrationTools.Processors.Tests
             {
                 IOptions<TfsTeamProjectEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new TfsTeamProjectEndpointOptions()
                 {
-                    Collection = new System.Uri("https://dev.azure.com/nkdagility-preview/"),
+                    Collection = TestingConstants.CollectionFor("migrationTarget1"),
                     Project = "migrationTarget1",
                     Authentication = new TfsAuthenticationOptions()
                     {
-                        AuthenticationMode = AuthenticationMode.AccessToken,
+                        AuthenticationMode = TestingConstants.AuthenticationMode,
                         AccessToken = TestingConstants.AccessToken
                     },
                     AllowCrossProjectLinking = false,

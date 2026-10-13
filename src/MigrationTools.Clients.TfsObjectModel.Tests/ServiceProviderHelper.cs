@@ -56,11 +56,11 @@ namespace MigrationTools.Tests
         {
             return new TfsTeamSettingsEndpointOptions()
             {
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                Collection = TestingConstants.CollectionFor(project),
                 Project = project,
                 Authentication = new Endpoints.Infrastructure.TfsAuthenticationOptions()
                 {
-                    AuthenticationMode = AuthenticationMode.AccessToken,
+                    AuthenticationMode = TestingConstants.AuthenticationMode,
                     AccessToken = TestingConstants.AccessToken,
                 }
             };
@@ -80,11 +80,11 @@ namespace MigrationTools.Tests
         {
             return new TfsEndpointOptions()
             {
-                Collection = new Uri("https://dev.azure.com/nkdagility-preview/"),
+                Collection = TestingConstants.CollectionFor(project),
                 Project = project,
                 Authentication = new Endpoints.Infrastructure.TfsAuthenticationOptions()
                 {
-                    AuthenticationMode = AuthenticationMode.AccessToken,
+                    AuthenticationMode = TestingConstants.AuthenticationMode,
                     AccessToken = TestingConstants.AccessToken,
                 }
             };

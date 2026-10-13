@@ -65,9 +65,9 @@ namespace MigrationTools.Processors.Tests
         {
             IOptions<AzureDevOpsEndpointOptions> options = Microsoft.Extensions.Options.Options.Create(new AzureDevOpsEndpointOptions()
             {
-                Organisation = "https://dev.azure.com/nkdagility-preview/",
+                Organisation = TestingConstants.CollectionFor(project).ToString(),
                 Project = project,
-                AuthenticationMode = AuthenticationMode.AccessToken,
+                AuthenticationMode = TestingConstants.AuthenticationMode,
                 AccessToken = TestingConstants.AccessToken,
             });
             return options;

@@ -387,7 +387,7 @@ namespace MigrationTools.Processors
         /// </summary>
         private void WarnOnCurrentUserRules()
         {
-            var token = Target.Options.Authentication?.AccessToken;
+            var token = Target.Options.Authentication?.ResolveAccessToken();
             if (string.IsNullOrEmpty(token))
             {
                 Log.LogDebug("WarnOnCurrentUserRules: no target PAT, skipping the process rule check.");
@@ -486,7 +486,7 @@ namespace MigrationTools.Processors
             string collUrl = Target.Options.Collection.ToString();
             if (collUrl.Contains("dev.azure.com") || collUrl.Contains(".visualstudio.com"))
             {
-                var token = Target.Options.Authentication.AccessToken;
+                var token = Target.Options.Authentication.ResolveAccessToken();
                 // Test that
                 if (token.IsNullOrEmpty())
                 {
@@ -520,7 +520,7 @@ namespace MigrationTools.Processors
             {
                 try
                 {
-                    string token = Target.Options.Authentication?.AccessToken;
+                    string token = Target.Options.Authentication?.ResolveAccessToken();
                     if (!string.IsNullOrEmpty(token))
                     {
                         using (var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token)))
@@ -1112,7 +1112,7 @@ namespace MigrationTools.Processors
                     {
                         ValidatePatTokenRequirement();
                         Uri collectionUri = Target.Options.Collection;
-                        string token = Target.Options.Authentication.AccessToken;
+                        string token = Target.Options.Authentication.ResolveAccessToken();
                         VssConnection connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
                         WorkItemTrackingHttpClient workItemTrackingClient = connection.GetClient<WorkItemTrackingHttpClient>();
                         JsonPatchDocument patchDocument = new JsonPatchDocument();

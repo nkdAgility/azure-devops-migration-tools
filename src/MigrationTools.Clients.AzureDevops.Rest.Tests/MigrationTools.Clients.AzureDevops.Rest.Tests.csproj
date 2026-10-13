@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -24,6 +24,9 @@
     <ProjectReference Include="..\MigrationTools.Clients.AzureDevops.Rest\MigrationTools.Clients.AzureDevops.Rest.csproj" />
     <ProjectReference Include="..\MigrationTools.Shadows\MigrationTools.Shadows.csproj" />
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\TestShared\RequiresAzureDevOpsAttribute.cs" Link="RequiresAzureDevOpsAttribute.cs" />
   </ItemGroup>
 
 </Project>

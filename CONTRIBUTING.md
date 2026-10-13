@@ -84,3 +84,23 @@ Pull requests should:
   git config --global core.autocrlf input
   git config --global core.whitespace cr-at-eol
   ```
+
+
+### Running the integration tests
+
+Most tests run offline. A small set (marked `[RequiresAzureDevOps]`) talk to live Azure DevOps test organisations. When no credentials are configured they are **skipped**, not failed, so you can build and run everything else without access.
+
+To run the live tests, set these environment variables (or the same keys in `dotnet user-secrets`):
+
+| Variable | Purpose |
+|---|---|
+| `MigrationTools__Tests__UseEntraId=true` | Use your Microsoft Entra login (`az login`, Visual Studio, managed identity). Preferred, no PAT needed. |
+| `MigrationTools__Tests__AccessToken` | Alternatively, a PAT (alias `AZDEVOPS_SYSTEM_TEST_PAT`). |
+| `MigrationTools__Tests__SourceCollection` | Source org URL, e.g. `https://dev.azure.com/my-source-org/`. |
+| `MigrationTools__Tests__TargetCollection` | Target org URL. Defaults to the source org. |
+
+The source org needs a project named `migrationSource1` and the target org a project named `migrationTarget1`.
+
+**External contributors:** use two free Azure DevOps organisations of your own with those projects, or leave the live tests skipped. On your pull request, a maintainer reviews the change and approves the `integration-tests-forks` environment, which runs the live tests against the project's test orgs. No credential is ever shared with you or exposed to your fork.
+
+**Maintainers and agents:** the `Integration tests (Azure DevOps)` workflow signs in with OIDC workload identity federation, so there is no secret to rotate. Locally, `az login` with an account that has access to the test orgs is enough.
