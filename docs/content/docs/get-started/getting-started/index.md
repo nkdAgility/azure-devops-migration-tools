@@ -65,7 +65,7 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 
    For example: `TfsMigrationTool.ReflectedWorkItemId` for TFS, `ReflectedWorkItemId` for VSTS, or `Custom.ReflectedWorkItemId` for Azure DevOps
 
-5. Enable the `WorkItemMigrationConfig` processor by setting `Enabled` to `true`
+5. Enable the `TfsWorkItemMigrationProcessor` processor by setting `Enabled` to `true`, and keep its `SourceName` and `TargetName` set to the names of your endpoints (`Source` and `Target`). Every processor requires both, and the tool will not start without them
 6. [OPTIONAL] Modify the `WIQLQueryBit` to migrate only the work items you want. The default WIQL will migrate all open work items and revisions excluding test suites and plans
 7. Adjust the [`NodeBasePaths`]({{< ref "docs/reference/processors/workitem-tracking-processor" >}}) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
