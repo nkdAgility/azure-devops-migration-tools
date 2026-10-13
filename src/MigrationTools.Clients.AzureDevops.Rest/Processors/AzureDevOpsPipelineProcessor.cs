@@ -172,7 +172,7 @@ namespace MigrationTools.Processors
                 var missingTasksNames = new List<string>();
                 var allTasksAreAvailable = g.Process.Phases.Select(p => p.Steps).SelectMany(s => s).All(t =>
                 {
-                    if (availableTasks.Any(a => a.Id == t.Task.Id) || taskGroupMapping.Any(m => m.SourceId == t.Task.Id))
+                    if (availableTasks.Any(a => a.Id == t.Task.Id) || taskGroupMapping?.Any(m => m.SourceId == t.Task.Id) == true)
                     {
                         return true;
                     }
