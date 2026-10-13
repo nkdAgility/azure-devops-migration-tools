@@ -59,9 +59,10 @@ namespace MigrationTools.Processors
                 {
                     return false;
                 }
-                // A spec without a fixed major ("*") or a target that doesn't report versions accepts any version.
                 var requiredMajor = RequiredMajor(task.VersionSpec);
-                return requiredMajor is null || majors.Count == 0 || majors.Contains(requiredMajor.Value);
+                var acceptsAnyMajor = requiredMajor is null;
+                var targetReportsNoVersions = majors.Count == 0;
+                return acceptsAnyMajor || targetReportsNoVersions || majors.Contains(requiredMajor.Value);
             }
 
             var taskGroups = sourceDefinitions.GroupBy(d => string.IsNullOrEmpty(d.Id) ? d.Name : d.Id).ToList();
