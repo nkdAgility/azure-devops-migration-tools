@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
@@ -25,6 +29,9 @@ namespace MigrationTools.Processors
         private int _totalQueriesSkipped;
         private int _totalQueriesMigrated;
         private int _totalQueryFailed;
+        private WorkItemTrackingHttpClient _sourceQueryClient;
+        private WorkItemTrackingHttpClient _targetQueryClient;
+        private readonly Dictionary<string, bool> _targetTeamExists = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
         public TfsSharedQueryProcessor(IOptions<TfsSharedQueryProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
@@ -57,6 +64,10 @@ namespace MigrationTools.Processors
             stopwatch.Stop();
             Log.LogInformation("Folders scanned {totalFoldersAttempted}", _totalFoldersAttempted);
             Log.LogInformation("Queries Found:{totalQueriesAttempted}  Skipped:{totalQueriesSkipped}  Migrated:{totalQueriesMigrated}   Failed:{totalQueryFailed}", _totalQueriesAttempted, _totalQueriesSkipped, _totalQueriesMigrated, _totalQueryFailed);
+            if (_totalQueryFailed > 0)
+            {
+                Log.LogWarning("{totalQueryFailed} queries could not be migrated. Check the errors above.", _totalQueryFailed);
+            }
             Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed.ToString("c"));
         }
 
@@ -148,41 +159,75 @@ namespace MigrationTools.Processors
                 Log.LogWarning("Skipping query '{queryName}' as already exists", query.Name);
                 return;
             }
-            // Sort out any path issues in the quertText
-            var fixedQueryText = query.QueryText.Replace($"'{Source.Project}", $"'{Target.Project}"); // the ' should only items at the start of areapath etc.
+            _totalQueriesAttempted++;
+            Log.LogInformation("Migrating query '{queryName}'", query.Name);
 
-            if (Options.PrefixProjectToNodes)
+            // The object model drops the team context from macros such as @CurrentIteration('[Project]\Team') and
+            // rejects @CurrentIteration +/- n, so the WIQL is read and written through the REST API (#2705).
+            string sourceQueryText;
+            try
             {
-                // we need to inject the team name as a folder in the structure too
-                fixedQueryText = fixedQueryText.Replace($"{Target.Project}\\", $"{Target.Project}\\{Source.Project}\\");
+                sourceQueryText = SourceQueryClient.GetQueryAsync(Source.Project, query.Id.ToString(), QueryExpand.Wiql).GetAwaiter().GetResult().Wiql;
+            }
+            catch (Exception ex)
+            {
+                _totalQueryFailed++;
+                Log.LogError(ex, "Error reading query '{queryName}' from the source through the REST API", query.Name);
+                return;
             }
 
-            if (Options.SourceToTargetFieldMappings != null)
+            var fixedQueryText = SharedQueryWiqlRewriter.Rewrite(sourceQueryText, Source.Project, Target.Project, Options.PrefixProjectToNodes, Options.SourceToTargetFieldMappings);
+
+            foreach (var team in SharedQueryWiqlRewriter.GetReferencedTeams(fixedQueryText, Target.Project))
             {
-                foreach (var sourceField in Options.SourceToTargetFieldMappings.Keys)
+                var targetDefaultTeam = $"{Target.Project} Team";
+                if (!TargetTeamExists(team) && string.Equals(team, $"{Source.Project} Team", StringComparison.OrdinalIgnoreCase) && TargetTeamExists(targetDefaultTeam))
                 {
-                    fixedQueryText = fixedQueryText.Replace(sourceField, Options.SourceToTargetFieldMappings[sourceField]);
+                    // the default team is named after the project, so it changes name with it
+                    Log.LogInformation("Query '{queryName}' refers to the source default team '{team}'; using the target default team '{targetDefaultTeam}'", query.Name, team, targetDefaultTeam);
+                    fixedQueryText = SharedQueryWiqlRewriter.ReplaceTeam(fixedQueryText, Target.Project, team, targetDefaultTeam);
+                }
+                else if (!TargetTeamExists(team))
+                {
+                    Log.LogWarning("Query '{queryName}' refers to team '{team}', which does not exist in target project '{targetProject}'. The query is migrated but will not return results until the team is created, for example with TfsTeamSettingsProcessor.", query.Name, team, Target.Project);
                 }
             }
 
-            // you cannot just add an item from one store to another, we need to create a new object
-            var queryCopy = new QueryDefinition(query.Name, fixedQueryText);
-            _totalQueriesAttempted++;
-            Log.LogInformation("Migrating query '{queryName}'", query.Name);
-            parentFolder.Add(queryCopy);
             try
             {
-                targetHierarchy.Save(); // moved the save here for better error message
+                TargetQueryClient.CreateQueryAsync(new QueryHierarchyItem { Name = query.Name, Wiql = fixedQueryText }, Target.Project, parentFolder.Id.ToString()).GetAwaiter().GetResult();
                 _totalQueriesMigrated++;
             }
             catch (Exception ex)
             {
                 _totalQueryFailed++;
-                Log.LogDebug("Source Query: '{query}'", query);
+                Log.LogDebug("Source Query: '{sourceQueryText}'", sourceQueryText);
                 Log.LogDebug("Target Query: '{fixedQueryText}'", fixedQueryText);
                 Log.LogError(ex, "Error saving query '{queryName}', probably due to invalid area or iteration paths", query.Name);
-                targetHierarchy.Refresh(); // get the tree without the last edit
             }
+        }
+
+        private WorkItemTrackingHttpClient SourceQueryClient => _sourceQueryClient ??= Source.TfsCollection.GetClient<WorkItemTrackingHttpClient>();
+
+        private WorkItemTrackingHttpClient TargetQueryClient => _targetQueryClient ??= Target.TfsCollection.GetClient<WorkItemTrackingHttpClient>();
+
+        private bool TargetTeamExists(string team)
+        {
+            if (!_targetTeamExists.TryGetValue(team, out var exists))
+            {
+                try
+                {
+                    Target.TfsCollection.GetClient<TeamHttpClient>().GetTeamAsync(Target.Project, team).GetAwaiter().GetResult();
+                    exists = true;
+                }
+                catch (Exception ex)
+                {
+                    Log.LogDebug(ex, "Team '{team}' not found in target project", team);
+                    exists = false;
+                }
+                _targetTeamExists[team] = exists;
+            }
+            return exists;
         }
     }
 }
