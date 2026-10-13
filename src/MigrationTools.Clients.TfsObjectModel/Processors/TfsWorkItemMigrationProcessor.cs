@@ -181,6 +181,8 @@ namespace MigrationTools.Processors
 
                 //////////////////////////////////////////////////
 
+                sourceWorkItems = SharedItemsFirst(sourceWorkItems);
+
                 // After filtering, so the scan only covers (and only stops for) items that will be migrated.
                 ValidateRevisionHistoryFields(sourceWorkItems);
 
@@ -574,6 +576,17 @@ namespace MigrationTools.Processors
             }
         }
 
+        private static readonly string[] SharedItemTypes = { "Shared Steps", "Shared Parameter" };
+
+        // Test Case steps reference Shared Steps and Shared Parameters by id, and those references are only remapped
+        // when the target item already exists, so migrate them first; otherwise keep the query's order.
+        internal static List<WorkItemData> SharedItemsFirst(List<WorkItemData> workItems)
+        {
+            return workItems
+                .OrderBy(wi => SharedItemTypes.Contains(wi.Type, StringComparer.OrdinalIgnoreCase) ? 0 : 1)
+                .ToList();
+        }
+
         private void PopulateIgnoreList()
         {
             _ignore = new List<string>
@@ -827,6 +840,10 @@ namespace MigrationTools.Processors
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                // A field map must not change the reflected id, or the next run cannot find this item (#2998).
+                                targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString();
+                                // Retries a fix-up that failed after its revision was saved on an earlier run.
+                                SetStateStampedDatesFromSource(sourceWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), "on the migrated item");
                                 StampCatchUpSave(targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
@@ -1166,11 +1183,6 @@ namespace MigrationTools.Processors
                     targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value = revision.Fields["System.ChangedBy"].Value.ToString();
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
-                    // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
-                    CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
-
-                    // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
-
                     var reflectedUri = (TfsReflectedWorkItemId)Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
                     if (!targetWorkItem.ToWorkItem().Fields.Contains(Target.Options.ReflectedWorkItemIdField))
                     {
@@ -1181,6 +1193,15 @@ namespace MigrationTools.Processors
                             Target.Options.ReflectedWorkItemIdField);
                         throw ex;
                     }
+                    // Set the reflected id before the field maps so a TargetToTarget map can copy it to another
+                    // field on the first revision (#2998), and again after so no map can overwrite it.
+                    targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri.ToString();
+
+                    // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
+                    CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
+
+                    // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
+
                     targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri.ToString();
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
@@ -1214,7 +1235,7 @@ namespace MigrationTools.Processors
                             // The child's conflicting parent is removed by saving the child, as before this change.
                             ProcessWorkItemLinks(currentRevisionWorkItem, targetWorkItem, false);
                         }
-                        EnsureClosedDateAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
+                        EnsureStateStampedDatesAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
@@ -1296,48 +1317,86 @@ namespace MigrationTools.Processors
             }
         }
 
-        private sealed class ClosedDateFixUpException : Exception
+        private sealed class StateStampedDateFixUpException : Exception
         {
-            public ClosedDateFixUpException(string message, Exception inner) : base(message, inner) { }
+            public StateStampedDateFixUpException(string message, Exception inner) : base(message, inner) { }
         }
 
         /// <summary>
-        /// The server can still apply the current date to ClosedDate on save, even with BypassRules,
-        /// so a mismatch after save is corrected with a fix-up revision.
+        /// The server can still apply the current date to ClosedDate, ActivatedDate and ResolvedDate on save, even with BypassRules,
+        /// and they are read-only in the revision that changes state, so a mismatch after save is corrected with a
+        /// single fix-up revision. A failed fix-up save is retried here, because a later run treats the revision
+        /// as migrated and could then only correct the latest state, not this revision.
         /// </summary>
-        private void EnsureClosedDateAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
+        private void EnsureStateStampedDatesAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
         {
-            try
+            var source = sourceRevision.ToWorkItem();
+            var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
+            for (var attempt = 0; ; attempt++)
             {
-                var target = targetWorkItem.ToWorkItem();
-                var source = sourceRevision.ToWorkItem();
-                var targetField = GetClosedDateField(target);
-                if (targetField == null) return;
-                var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
-                if (sourceField == null) return;
-                var sourceValue = source.Fields[sourceField].Value;
-                if (!ClosedDateHelper.NeedsUpdate(sourceValue, target.Fields[targetField].Value)) return;
-
-                Log.LogWarning("ClosedDate on target #{targetId} is {targetValue} after save but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
-                    target.Id, target.Fields[targetField].Value, source.Id, source.Rev, sourceValue);
-                target.Fields[targetField].Value = sourceValue;
-                var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
-                target.Fields["System.ChangedDate"].Value = fixUpDate;
-                target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
-                targetWorkItem.SaveToAzureDevOps();
-                var floor = fixUpDate;
-                for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
+                try
                 {
-                    revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
-                    floor = revisionsToMigrate[i].ChangedDate;
+                    var target = targetWorkItem.ToWorkItem();
+                    if (!SetStateStampedDatesFromSource(source, target, "after save"))
+                    {
+                        // Nothing to fix, or a failed attempt's save reached the server before it threw.
+                        if (attempt == 0) return;
+                        break;
+                    }
+                    target.Fields["System.ChangedDate"].Value = fixUpDate;
+                    target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
+                    targetWorkItem.SaveToAzureDevOps();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
+                    targetWorkItem.ToWorkItem().Reset();
+                    if (attempt >= Options.WorkItemCreateRetryLimit)
+                    {
+                        throw new StateStampedDateFixUpException($"Unable to apply fix-up save for state-stamped dates on target #{targetWorkItem.Id}", ex);
+                    }
+                    Log.LogWarning(ex, "Fix-up save for state-stamped dates on target #{targetId} failed; reloading and retrying ({attempt}/{retryLimit}).",
+                        targetWorkItem.Id, attempt + 1, Options.WorkItemCreateRetryLimit);
+                    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(attempt + 1));
+                    targetWorkItem.ToWorkItem().SyncToLatest();
+                    targetWorkItem.RefreshWorkItem();
                 }
             }
-            catch (Exception ex)
+
+            var floor = fixUpDate;
+            for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
             {
-                // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
-                targetWorkItem.ToWorkItem().Reset();
-                throw new ClosedDateFixUpException($"Unable to apply fix-up save for ClosedDate on target #{targetWorkItem.Id}", ex);
+                revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
+                floor = revisionsToMigrate[i].ChangedDate;
             }
+        }
+
+        private bool SetStateStampedDatesFromSource(WorkItem source, WorkItem target, string when)
+        {
+            var candidates = new List<(string Field, object SourceValue, object TargetValue)>();
+            var closedTargetField = GetClosedDateField(target);
+            var closedSourceField = closedTargetField == null ? null
+                : source.Fields.Contains(closedTargetField) ? closedTargetField : GetClosedDateField(source);
+            if (closedSourceField != null)
+            {
+                candidates.Add((closedTargetField, source.Fields[closedSourceField].Value, target.Fields[closedTargetField].Value));
+            }
+            foreach (var field in ClosedDateHelper.StateStampedDateFields)
+            {
+                if (target.Fields.Contains(field) && source.Fields.Contains(field))
+                {
+                    candidates.Add((field, source.Fields[field].Value, target.Fields[field].Value));
+                }
+            }
+            var fixUps = ClosedDateHelper.FieldsNeedingFixUp(candidates);
+            foreach (var (field, sourceValue, targetValue) in candidates.Where(c => fixUps.Contains(c.Field)))
+            {
+                Log.LogWarning("{field} on target #{targetId} is {targetValue} {when} but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
+                    field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
+                target.Fields[field].Value = sourceValue;
+            }
+            return fixUps.Count > 0;
         }
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)

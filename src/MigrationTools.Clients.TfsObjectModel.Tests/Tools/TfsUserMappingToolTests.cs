@@ -517,6 +517,29 @@ namespace MigrationTools.Tests.Tools
             Assert.AreEqual("Old Name", tool.MapUserIdentityValue(AssignedTo, "Old Name"));
         }
 
+        [TestMethod, TestCategory("L1")]
+        public void TryMapUserIdentityValue_ReboxedValueTypeOnUnmappedField_ReportsUnchanged()
+        {
+            var tool = CreateTool(WriteDictionaryFile(), useIdentityMapDataFormat: false);
+            var activated = new DateTime(2020, 10, 7, 14, 50, 44);
+
+            // Field.Value returns a new box on every read; a read-only Activated Date must not be written back (TF26194).
+            Assert.IsFalse(tool.TryMapUserIdentityValue("Microsoft.VSTS.Common.ActivatedDate", (object)activated, out var mapped));
+            Assert.AreEqual(activated, mapped);
+            Assert.IsFalse(tool.TryMapUserIdentityValue("Microsoft.VSTS.Common.ActivatedDate", null, out _));
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void TryMapUserIdentityValue_IdentityField_ReportsChangeOnlyWhenMapped()
+        {
+            var tool = CreateTool(WriteDictionaryFile(), useIdentityMapDataFormat: false);
+
+            Assert.IsTrue(tool.TryMapUserIdentityValue(AssignedTo, "Old Name", out var mapped));
+            Assert.AreEqual("New Name", mapped);
+            Assert.IsFalse(tool.TryMapUserIdentityValue(AssignedTo, "Someone Else", out mapped));
+            Assert.AreEqual("Someone Else", mapped);
+        }
+
         private static IdentityItemData User(string displayName, string mail = null, string account = null) =>
             new IdentityItemData { DisplayName = displayName, MailAddress = mail, AccountName = account ?? displayName };
 

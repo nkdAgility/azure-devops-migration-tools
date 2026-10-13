@@ -63,7 +63,8 @@ Each source revision is replayed as one target revision, with the source revisio
 - **Attachments** and **links** (hyperlinks, external and Git links, work item links) are added and removed at the matching revision.
 - **Links to work items that are not migrated yet** are added later, from the other work item, when that one is migrated.
 - **The migration comment** (`GenerateMigrationComment`) is added to the History of the last replayed revision.
-- **Re-running** against work items that are already migrated adds no revisions unless something is missing. If something is, it is saved as the last author, one second after the last revision.
+- **Re-running** against work items that are already migrated adds no revisions unless something is missing, or a Closed, Activated or Resolved Date differs from the source (for example after a fix-up save failed). If so, it is saved as the last author, one second after the last revision.
+- **Closed Date, Activated Date and Resolved Date** are stamped with the time of the save by Azure DevOps when a revision changes state, even with `BypassRules`, and are read-only in that revision. When the saved value differs from the source revision, the processor saves one fix-up revision straight after it, with the same author and `ChangedDate`, that sets the source value. The history then shows an extra revision after each activation, resolution or closing where the server stamped a different date: the first carries the migration time, and the fix-up carries the source date, which is the value from then on.
 
 ### Known limitations
 
@@ -78,6 +79,8 @@ Each source revision is replayed as one target revision, with the source revisio
 The Work Item queries are all built using Work Item [Query Language (WIQL)](https://docs.microsoft.com/en-us/azure/devops/boards/queries/wiql-syntax). We only support flat queries that have `FROM WorkItems` in the query.
 
 > Note: A useful Azure DevOps Extension to explore WIQL is the [WIQL Editor](https://marketplace.visualstudio.com/items?itemName=ottostreifel.wiql-editor)
+
+Work items are migrated in the order the query returns them, except that `Shared Steps` and `Shared Parameter` items are migrated first. Test Case steps refer to them by id, and those references can only be pointed at the migrated copies once the copies exist.
 
 ### Examples
 
