@@ -1,6 +1,6 @@
 ---
 title: Tfs Shared Query Processor
-description: The TfsSharedQueryProcessor migrates shared queries and their folders from one project to another, keeping the team context of @CurrentIteration and @TeamAreas.
+description: The TfsSharedQueryProcessor migrates shared queries and their folders from one project to another, keeping the team context of @CurrentIteration and @TeamAreas when both servers support the REST Queries API.
 dataFile: reference.processors.tfssharedqueryprocessor.yaml
 slug: tfs-shared-query-processor
 aliases:
