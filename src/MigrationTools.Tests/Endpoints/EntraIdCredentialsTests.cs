@@ -96,6 +96,23 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_CallerCanStopWaitingWithoutCancellingOthers()
+        {
+            var slow = new SlowTokenCredential();
+            EntraIdCredentials.TokenCredential = slow;
+            using (var cts = new CancellationTokenSource())
+            {
+                var cancelledCaller = EntraIdCredentials.GetFreshAccessTokenAsync(cts.Token);
+                var patientCaller = EntraIdCredentials.GetFreshAccessTokenAsync();
+                cts.Cancel();
+
+                await Assert.ThrowsExactlyAsync<OperationCanceledException>(() => cancelledCaller);
+                slow.Release.SetResult(true);
+                Assert.AreEqual("slow-1", await patientCaller);
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void FederatedCredential_TreatsUnauthorizedAsAChallenge()
         {
             var credential = new EntraIdCredentials.EntraIdFederatedCredential();

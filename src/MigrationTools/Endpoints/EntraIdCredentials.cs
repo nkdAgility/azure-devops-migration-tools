@@ -58,7 +58,7 @@ namespace MigrationTools.Endpoints
         /// Asks the credential for a new token; used after the server rejected the current one. Concurrent callers
         /// (many requests failing with 401 at once) share a single fetch rather than each starting one.
         /// </summary>
-        public static async Task<string> GetFreshAccessTokenAsync()
+        public static async Task<string> GetFreshAccessTokenAsync(CancellationToken cancellationToken = default)
         {
             Task<AccessToken> fetch;
             lock (_cacheLock)
@@ -71,7 +71,7 @@ namespace MigrationTools.Endpoints
             }
             try
             {
-                return (await fetch.ConfigureAwait(false)).Token;
+                return (await WaitAsync(fetch, cancellationToken).ConfigureAwait(false)).Token;
             }
             finally
             {
@@ -80,6 +80,22 @@ namespace MigrationTools.Endpoints
                     if (ReferenceEquals(_inFlight, fetch)) { _inFlight = null; }
                 }
             }
+        }
+
+        // The shared fetch ignores any one caller's cancellation (that would fail every waiter); each caller can
+        // still stop waiting on its own token.
+        private static async Task<AccessToken> WaitAsync(Task<AccessToken> fetch, CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.CanBeCanceled) { return await fetch.ConfigureAwait(false); }
+            var cancelled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            using (cancellationToken.Register(() => cancelled.TrySetResult(true)))
+            {
+                if (await Task.WhenAny(fetch, cancelled.Task).ConfigureAwait(false) != fetch)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+            }
+            return await fetch.ConfigureAwait(false);
         }
 
         private static async Task<AccessToken> FetchAndCacheAsync()
@@ -122,7 +138,7 @@ namespace MigrationTools.Endpoints
             public override bool GetTokenIsInteractive => false;
 
             protected override async Task<IssuedToken> OnGetTokenAsync(IssuedToken failedToken, CancellationToken cancellationToken)
-                => new VssOAuthAccessToken(await GetFreshAccessTokenAsync().ConfigureAwait(false));
+                => new VssOAuthAccessToken(await GetFreshAccessTokenAsync(cancellationToken).ConfigureAwait(false));
         }
     }
 }
