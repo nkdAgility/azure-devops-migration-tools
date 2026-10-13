@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Options;
 using MigrationTools.Endpoints.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -48,15 +49,28 @@ namespace MigrationTools.Endpoints
         /// </summary>
         [Required]
         public string ReflectedWorkItemIdField { get; set; }
+    }
 
-
-        //public override void SetDefaults()
-        //{
-        //    base.SetDefaults();
-        //    AccessToken = MigrationTools.Tests.TestingConstants.AccessToken;
-        //    Organisation = "https://dev.azure.com/nkdagility-preview/";
-        //    Project = "NeedToSetThis";
-        //    ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId";
-        //}
+    /// <summary>
+    /// An AccessToken is required only in AccessToken mode; EntraId gets its token from the ambient identity.
+    /// </summary>
+    public class AzureDevOpsEndpointOptionsValidator : IValidateOptions<AzureDevOpsEndpointOptions>
+    {
+        public ValidateOptionsResult Validate(string name, AzureDevOpsEndpointOptions options)
+        {
+            switch (options.AuthenticationMode)
+            {
+                case AuthenticationMode.AccessToken:
+                    if (string.IsNullOrWhiteSpace(options.AccessToken))
+                    {
+                        return ValidateOptionsResult.Fail($"The AccessToken must not be empty when AuthenticationMode is 'AccessToken'. Set it at 'MigrationTools:Endpoints:{name}:AccessToken' or the environment variable 'MigrationTools__Endpoints__{name}__AccessToken', or use AuthenticationMode 'EntraId'.");
+                    }
+                    return ValidateOptionsResult.Success;
+                case AuthenticationMode.EntraId:
+                    return ValidateOptionsResult.Success;
+                default:
+                    return ValidateOptionsResult.Fail($"The AuthenticationMode '{options.AuthenticationMode}' is not supported by the Azure DevOps REST endpoint. Use 'AccessToken' or 'EntraId'.");
+            }
+        }
     }
 }

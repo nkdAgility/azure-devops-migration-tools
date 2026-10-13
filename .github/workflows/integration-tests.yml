@@ -51,6 +51,10 @@ jobs:
           # For fork PRs: the exact commit the approver reviewed, not the moving branch head.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
+          # Deliberate opt-in, fork runs only: the job is gated by required-reviewer approval on the
+          # integration-tests-forks environment, has a read-only token and no secrets, and the OIDC
+          # identity can reach only the disposable test orgs. See https://gh.io/securely-using-pull_request_target
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4

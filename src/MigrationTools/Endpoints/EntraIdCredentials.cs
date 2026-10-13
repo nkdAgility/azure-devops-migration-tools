@@ -42,7 +42,7 @@ namespace MigrationTools.Endpoints
         public static VssCredentials CreateVssCredentials()
             => new VssCredentials(new EntraIdFederatedCredential());
 
-        private sealed class EntraIdFederatedCredential : FederatedCredential
+        internal sealed class EntraIdFederatedCredential : FederatedCredential
         {
             public EntraIdFederatedCredential() : base(new VssOAuthAccessToken(GetAccessToken())) { }
 
@@ -55,7 +55,7 @@ namespace MigrationTools.Endpoints
                 => new EntraIdTokenProvider(this, serverUrl);
         }
 
-        private sealed class EntraIdTokenProvider : IssuedTokenProvider
+        internal sealed class EntraIdTokenProvider : IssuedTokenProvider
         {
             public EntraIdTokenProvider(IssuedTokenCredential credential, Uri serverUrl) : base(credential, serverUrl, serverUrl) { }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Tests;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -29,6 +30,7 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(DisplayName = "TfsSharedQueryProcessorTests_BasicRun"), TestCategory("L0")]
+        [RequiresAzureDevOps]
         public void BasicRun()
         {
             var y = new TfsSharedQueryProcessorOptions

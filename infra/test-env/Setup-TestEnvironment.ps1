@@ -85,9 +85,20 @@ function Set-OrgAccess {
             accessLevel      = @{ accountLicenseType = 'express' }
             servicePrincipal = @{ origin = 'aad'; originId = $spObjectId; subjectKind = 'servicePrincipal' }
         }
-        $spDescriptor = $entitlement.operationResult.result.servicePrincipal.descriptor
-        if (-not $spDescriptor) { $spDescriptor = $entitlement.servicePrincipal.descriptor }
-        if (-not $spDescriptor) { throw "Could not add the service principal to $Org." }
+        # The 7.1 response carries the entitlement under servicePrincipalEntitlement; older shapes used
+        # operationResult.result. If neither has it, look the principal up by its Entra object id.
+        $spDescriptor = @(
+            $entitlement.servicePrincipalEntitlement.servicePrincipal.descriptor
+            $entitlement.operationResult.result.servicePrincipal.descriptor
+        ) | Where-Object { $_ } | Select-Object -First 1
+        if (-not $spDescriptor) {
+            $all = Invoke-Ado -Uri "https://vsaex.dev.azure.com/$Org/_apis/serviceprincipalentitlements?api-version=7.1-preview.1"
+            $spDescriptor = ($all.items | Where-Object { $_.servicePrincipal.originId -eq $spObjectId } | Select-Object -First 1).servicePrincipal.descriptor
+        }
+        if (-not $spDescriptor) {
+            $errors = ($entitlement.operationResult.errors | ForEach-Object { $_.value }) -join '; '
+            throw "Could not add the service principal to $Org. $errors"
+        }
 
         # Project Collection Administrators membership (PUT is idempotent).
         $groups = Invoke-Ado -Uri "https://vssps.dev.azure.com/$Org/_apis/graph/groups?scopeDescriptor=&api-version=7.1-preview.1"

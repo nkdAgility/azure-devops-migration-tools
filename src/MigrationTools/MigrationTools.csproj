@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
@@ -26,6 +26,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>..\..\docs\data\generated\MigrationTools.xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="MigrationTools.Tests" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\GlobalUsings.cs" Link="GlobalUsings.cs" />
