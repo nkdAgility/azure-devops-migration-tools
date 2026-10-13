@@ -1,0 +1,179 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-qt-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-qt-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      },
+      "SourceQueries": {
+        "EndpointType": "TfsEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-qt-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      },
+      "TargetQueries": {
+        "EndpointType": "TfsEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-qt-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      },
+      "SourceTeams": {
+        "EndpointType": "TfsTeamSettingsEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-qt-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      },
+      "TargetTeams": {
+        "EndpointType": "TfsTeamSettingsEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-qt-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      }
+    },
+    "CommonTools": {
+      "TfsNodeStructureTool": {
+        "Enabled": true,
+        "Areas": {
+          "Filters": [],
+          "Mappings": [
+            {
+              "Match": "^amte2e-qt-src([\\\\]?.*)$",
+              "Replacement": "amte2e-qt-tgt$1"
+            }
+          ]
+        },
+        "Iterations": {
+          "Filters": [],
+          "Mappings": [
+            {
+              "Match": "^amte2e-qt-src([\\\\]?.*)$",
+              "Replacement": "amte2e-qt-tgt$1"
+            }
+          ]
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManagerTool": {
+        "ReplayRevisions": true,
+        "MaxRevisions": 0,
+        "Enabled": true
+      },
+      "TfsAttachmentTool": {
+        "Enabled": true,
+        "MaxAttachmentSize": 480000000,
+        "ExportBasePath": "c:\\temp\\amte2e-attachments"
+      },
+      "TfsWorkItemLinkTool": {
+        "SaveAfterEachLinkIsAdded": false,
+        "Enabled": true,
+        "FilterIfLinkCountMatches": true
+      },
+      "TfsUserMappingTool": {
+        "Enabled": false
+      },
+      "TfsTeamSettingsTool": {
+        "Enabled": false
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "UpdateCreatedDate": true,
+        "UpdateCreatedBy": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.Id]",
+        "FixHtmlAttachmentLinks": false,
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": false,
+        "GenerateMigrationComment": true,
+        "MaxGracefulFailures": 0,
+        "SkipRevisionWithInvalidIterationPath": false,
+        "SkipRevisionWithInvalidAreaPath": false
+      },
+      {
+        "ProcessorType": "TfsTeamSettingsProcessor",
+        "Enabled": true,
+        "SourceName": "SourceTeams",
+        "TargetName": "TargetTeams",
+        "MigrateTeamSettings": true,
+        "UpdateTeamSettings": true,
+        "PrefixProjectToNodes": false,
+        "MigrateTeamCapacities": true,
+        "Teams": null,
+        "UseUserMapping": false
+      },
+      {
+        "ProcessorType": "TfsSharedQueryProcessor",
+        "Enabled": true,
+        "SourceName": "SourceQueries",
+        "TargetName": "TargetQueries",
+        "PrefixProjectToNodes": false,
+        "SharedFolderName": "Shared Queries",
+        "SourceToTargetFieldMappings": null
+      }
+    ]
+  }
+}

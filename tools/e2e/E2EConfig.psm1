@@ -2,9 +2,9 @@
 $script:SrcOrgUrl = "https://dev.azure.com/nkdagility-adomt-source/"
 $script:TgtOrgUrl = "https://dev.azure.com/nkdagility-adomt-target/"
 
-function New-E2ETfsEndpoint([string]$OrgUrl, [string]$Project) {
+function New-E2ETfsEndpoint([string]$OrgUrl, [string]$Project, [string]$Type = "TfsTeamProjectEndpoint") {
     [ordered]@{
-        EndpointType = "TfsTeamProjectEndpoint"; Collection = $OrgUrl; Project = $Project
+        EndpointType = $Type; Collection = $OrgUrl; Project = $Project
         ReflectedWorkItemIdField = "Custom.ReflectedWorkItemId"; AllowCrossProjectLinking = $false
         Authentication = @{ AuthenticationMode = "EntraId" }
         LanguageMaps = @{ AreaPath = "Area"; IterationPath = "Iteration" }
@@ -26,7 +26,8 @@ function New-E2EWorkItemProcessor([hashtable]$Overrides = @{}) {
 
 # Writes <Dir>/<Name>.json. $Tools is merged over the defaults; $Processors defaults to one work item processor.
 function New-E2EConfig {
-    param([string]$Dir, [string]$Name = "config", [string]$Src, [string]$Tgt, [hashtable]$Tools = @{}, [object[]]$Processors, [string]$LogLevel = "Information")
+    # $ExtraEndpoints adds endpoint pairs of another type for the same projects: @{ Teams = "TfsTeamSettingsEndpoint" } gives SourceTeams/TargetTeams.
+    param([string]$Dir, [string]$Name = "config", [string]$Src, [string]$Tgt, [hashtable]$Tools = @{}, [object[]]$Processors, [string]$LogLevel = "Information", [hashtable]$ExtraEndpoints = @{})
     $node = { param($s, $t) @{ Filters = @(); Mappings = @(@{ Match = "^$s([\\]?.*)$"; Replacement = "$t`$1" }) } }
     $common = [ordered]@{
         TfsNodeStructureTool = [ordered]@{ Enabled = $true; Areas = (& $node $Src $Tgt); Iterations = (& $node $Src $Tgt); ShouldCreateMissingRevisionPaths = $true; ReplicateAllExistingNodes = $true }
@@ -46,6 +47,10 @@ function New-E2EConfig {
             CommonTools = $common
             Processors = @($Processors)
         }
+    }
+    foreach ($k in $ExtraEndpoints.Keys) {
+        $cfg.MigrationTools.Endpoints["Source$k"] = New-E2ETfsEndpoint $script:SrcOrgUrl $Src $ExtraEndpoints[$k]
+        $cfg.MigrationTools.Endpoints["Target$k"] = New-E2ETfsEndpoint $script:TgtOrgUrl $Tgt $ExtraEndpoints[$k]
     }
     $path = Join-Path $Dir "$Name.json"
     $cfg | ConvertTo-Json -Depth 30 | Set-Content $path
