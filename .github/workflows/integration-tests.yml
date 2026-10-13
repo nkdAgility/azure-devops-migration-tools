@@ -26,7 +26,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: integration-tests-${{ github.event.pull_request.number || github.ref }}
+  group: integration-tests-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:

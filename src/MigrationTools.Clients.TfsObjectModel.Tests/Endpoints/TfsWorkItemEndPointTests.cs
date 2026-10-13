@@ -130,7 +130,6 @@ namespace MigrationTools.Endpoints.Tests
 
 
         [TestMethod(), TestCategory("L1")]
-        [RequiresAzureDevOps]
         public void TfsWorkItemEndPoint_EnvironmentOverrideTest()
         {
             Environment.SetEnvironmentVariable("MigrationTools__Endpoints__Source__Authentication__AccessToken", "654321");
