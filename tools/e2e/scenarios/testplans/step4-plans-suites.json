@@ -1,0 +1,97 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-tp-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-tp-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      }
+    },
+    "CommonTools": {
+      "TfsNodeStructureTool": {
+        "Enabled": true,
+        "Areas": {
+          "Filters": [],
+          "Mappings": [
+            {
+              "Replacement": "amte2e-tp-tgt$1",
+              "Match": "^amte2e-tp-src([\\\\]?.*)$"
+            }
+          ]
+        },
+        "Iterations": {
+          "Filters": [],
+          "Mappings": [
+            {
+              "Replacement": "amte2e-tp-tgt$1",
+              "Match": "^amte2e-tp-src([\\\\]?.*)$"
+            }
+          ]
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManagerTool": {
+        "MaxRevisions": 0,
+        "ReplayRevisions": true,
+        "Enabled": true
+      },
+      "TfsAttachmentTool": {
+        "MaxAttachmentSize": 480000000,
+        "Enabled": true,
+        "ExportBasePath": "c:\\temp\\amte2e-attachments"
+      },
+      "TfsWorkItemLinkTool": {
+        "SaveAfterEachLinkIsAdded": false,
+        "Enabled": true,
+        "FilterIfLinkCountMatches": true
+      },
+      "TfsUserMappingTool": {
+        "Enabled": false
+      },
+      "TfsTeamSettingsTool": {
+        "Enabled": false
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsTestPlansAndSuitesMigrationProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "OnlyElementsWithTag": "",
+        "RemoveAllLinks": false,
+        "MigrationDelay": 0,
+        "RemoveInvalidTestSuiteLinks": false,
+        "FilterCompleted": false
+      }
+    ]
+  }
+}
