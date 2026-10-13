@@ -107,8 +107,12 @@ namespace MigrationTools.Endpoints.Tests
                 cts.Cancel();
 
                 await Assert.ThrowsExactlyAsync<OperationCanceledException>(() => cancelledCaller);
+                // Arrives after a caller gave up but before the fetch finishes: must join it, not start another.
+                var lateCaller = EntraIdCredentials.GetFreshAccessTokenAsync();
                 slow.Release.SetResult(true);
                 Assert.AreEqual("slow-1", await patientCaller);
+                Assert.AreEqual("slow-1", await lateCaller);
+                Assert.AreEqual(1, slow.Calls);
             }
         }
 

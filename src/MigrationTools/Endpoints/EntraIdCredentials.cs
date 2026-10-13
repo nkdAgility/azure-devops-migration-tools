@@ -63,23 +63,24 @@ namespace MigrationTools.Endpoints
             Task<AccessToken> fetch;
             lock (_cacheLock)
             {
-                if (_inFlight == null)
-                {
-                    _inFlight = FetchAndCacheAsync();
-                }
                 fetch = _inFlight;
-            }
-            try
-            {
-                return (await WaitAsync(fetch, cancellationToken).ConfigureAwait(false)).Token;
-            }
-            finally
-            {
-                lock (_cacheLock)
+                if (fetch == null)
                 {
-                    if (ReferenceEquals(_inFlight, fetch)) { _inFlight = null; }
+                    var started = FetchAndCacheAsync();
+                    _inFlight = started;
+                    fetch = started;
+                    // Cleared when the fetch itself finishes (success or failure), never when a caller stops
+                    // waiting, so a cancelled caller cannot let a second fetch start alongside the first.
+                    started.ContinueWith(_ =>
+                    {
+                        lock (_cacheLock)
+                        {
+                            if (ReferenceEquals(_inFlight, started)) { _inFlight = null; }
+                        }
+                    }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
                 }
             }
+            return (await WaitAsync(fetch, cancellationToken).ConfigureAwait(false)).Token;
         }
 
         // The shared fetch ignores any one caller's cancellation (that would fail every waiter); each caller can
