@@ -166,7 +166,8 @@ namespace MigrationTools.Processors
                 WorkItemData wi = Target.WorkItems.FindReflectedWorkItem(sourceTestCaseEntry.TestCase.WorkItem.AsWorkItemData(), false);
                 if (wi == null)
                 {
-                    InnerLog(source, string.Format("    Can't find work item for Test Case. Has it been migrated? {0} : {1} - {2} ", sourceTestCaseEntry.EntryType.ToString(), sourceTestCaseEntry.Id, sourceTestCaseEntry.Title), 15);
+                    Log.LogError("Test Case {Id}:'{Title}' was not added to suite '{Suite}' because it has not been migrated to the target. Migrate the Test Cases first, then run this processor again.", sourceTestCaseEntry.Id, sourceTestCaseEntry.Title, source.Title);
+                    CompletedWithErrors = true;
                     continue;
                 }
                 var exists = (from tc in target.TestCases
@@ -392,6 +393,7 @@ namespace MigrationTools.Processors
                 if (targetTc == null)
                 {
                     Log.LogError("Target Reflected Work Item Not found for source WorkItem ID: {sourceTceTestCaseWorkItemId}", sourceTce.TestCase.WorkItem.Id);
+                    CompletedWithErrors = true;
                 }
                 else
                 {
@@ -1003,6 +1005,7 @@ namespace MigrationTools.Processors
                         {
                             InnerLog(sourceSuite, "            Source work item not migrated to target, cannot be found", 5);
                             Log.LogError("Unable to locate SourceWI:{SourceWI} in the Target. ReflectedWorkItemId:{ReflectedWorkItemId}", sourceReq.Id, Target.WorkItems.CreateReflectedWorkItemId(sourceReq), ex);
+                            CompletedWithErrors = true;
                             break;
                         }
                         targetSuiteChild = CreateNewRequirementTestSuite(sourceSuite, targetReq);

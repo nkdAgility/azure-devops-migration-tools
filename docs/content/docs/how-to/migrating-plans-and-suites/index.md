@@ -14,6 +14,8 @@ Migrating Plans and Suites is quite convoluted since Shared Steps, which we need
 3. Migrate `Test Variables` & `Test Configurations`
 4. Rebuild `Test Plans` & `Test Suites`
 
+Both field maps use `TargetToTarget`, not `SourceToTarget`. The value being copied is the reflected work item id that the migration writes to the target work item; it does not exist on the source, so it has to be read from the target. In older versions the copy was missed for newly created work items with a single revision, because the field maps ran before the reflected id was written ([#2998](https://github.com/nkdAgility/azure-devops-migration-tools/issues/2998)).
+
 _WARNING: The configs below are for illustration and were correct as of the version number in the `Version` field._
 
 ## 1. Migrate Basic Work Items
@@ -57,7 +59,9 @@ The important bits:
     "Processors": [
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",
-        "Enabled": false,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "Enabled": true,
         "UpdateCreatedDate": false,
         "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Case', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
       }
@@ -88,8 +92,10 @@ This will migrate Test Cases while fixing the links to the Shared bits that can'
 The important bits:
 
 - Target ReflectedWorkItemIdField is a common field that is available on the non-customisable work items
-- Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only
+- Field Map copies `Microsoft.VSTS.Build.IntegrationBuild` to `ReflectedWorkItemId` for Test Cases only. The target `Test Case` type must have your custom `ReflectedWorkItemId` field (here `Custom.ReflectedWorkItemId`); if it does not, the map logs a validation warning and copies nothing
 - The query includes only the Test items that we can migrate as work items (No Suites or Plans)
+- Shared Steps and Shared Parameters are migrated before the Test Cases whatever the query order, so the references in each Test Case's steps are pointed at the migrated copies
+- The work item type validator checks only those types, because the other types in the target may not have `Microsoft.VSTS.Build.IntegrationBuild`
 
 ```JSON
 {
@@ -122,10 +128,32 @@ The important bits:
     "Processors": [
       {
         "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "SourceName": "Source",
+        "TargetName": "Target",
         "Enabled": true,
         "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Test Case','Shared Steps','Shared Parameter') ORDER BY [System.ChangedDate] desc"
       }
-    ]
+    ],
+    "CommonTools": {
+      "TfsWorkItemTypeValidatorTool": {
+        "Enabled": true,
+        "ExcludeDefaultWorkItemTypes": false,
+        "IncludeWorkItemTypes": ["Test Case", "Shared Steps", "Shared Parameter"]
+      },
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": [
+          {
+            "FieldMapType": "FieldToFieldMap",
+            "fieldMapMode": "TargetToTarget",
+            "sourceField": "Microsoft.VSTS.Build.IntegrationBuild",
+            "targetField": "Custom.ReflectedWorkItemId",
+            "defaultValue": "",
+            "ApplyTo": ["Test Case"]
+          }
+        ]
+      }
+    }
   }
 }
 ```
@@ -169,11 +197,14 @@ The important bits:
     "Processors": [
       {
         "ProcessorType": "TfsTestVariablesMigrationProcessor",
-        "Enabled": true,
-        "Processor": "TestVariablesMigrationContext"
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "Enabled": true
       },
       {
         "ProcessorType": "TfsTestConfigurationsMigrationProcessor",
+        "SourceName": "Source",
+        "TargetName": "Target",
         "Enabled": true
       }
     ]
@@ -187,9 +218,11 @@ This will rebuild the Plans and Suites and wire up all of the Test Cases.
 
 _note: Runs are not migrated._
 
+If a Test Case in a suite has not been migrated in step 2, it is left out of the rebuilt suite, an error names it, and the run exits with code 1. Migrate it, then run this step again.
+
 The important bits:
 
-- Processors for `TestPlansAndSuitesMigrationConfig`
+- Processor `TfsTestPlansAndSuitesMigrationProcessor`
 
 ```JSON
 {
@@ -205,7 +238,7 @@ The important bits:
         "Project": "migrationSource1",
        "Authentication": {
           "AuthenticationMode": "AccessToken",
-          "AccessToken": "ouiasdhusahfkahfksdhksdhvksbdlsdvnlsdvsld"
+          "AccessToken": "** removed as a secret ***"
         }
       },
       "Target": {
@@ -221,10 +254,11 @@ The important bits:
     },
     "Processors": [
       {
-        "ProcessorType": "** removed as a secret ***",
+        "ProcessorType": "TfsTestPlansAndSuitesMigrationProcessor",
         "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
         "OnlyElementsWithTag": "",
-        "TestPlanQuery": null,
         "RemoveAllLinks": false,
         "MigrationDelay": 0,
         "RemoveInvalidTestSuiteLinks": false,
