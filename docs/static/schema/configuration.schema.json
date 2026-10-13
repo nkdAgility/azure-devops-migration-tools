@@ -525,17 +525,17 @@
                       ]
                     },
                     "MigrateBuildPipelines": {
-                      "description": "Migrate Build Pipelines",
+                      "description": "Migrate Build Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected build pipeline that is not migrated, because it uses a task that is not installed in the target, uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).",
                       "type": "boolean",
                       "default": "true"
                     },
                     "MigrateReleasePipelines": {
-                      "description": "Migrate Release Pipelines",
+                      "description": "Migrate Release Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected release pipeline that is not migrated, because it uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).",
                       "type": "boolean",
                       "default": "true"
                     },
                     "MigrateServiceConnections": {
-                      "description": "Migrate Service Connections **secrets need to be entered manually**",
+                      "description": "Migrate Service Connections **secrets need to be entered manually**. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A service connection the target rejects marks the run as failed (exit code 1).",
                       "type": "boolean",
                       "default": "true"
                     },
@@ -545,7 +545,7 @@
                       "default": "true"
                     },
                     "MigrateVariableGroups": {
-                      "description": "Migrate Variable Groups",
+                      "description": "Migrate Variable Groups. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A variable group the target rejects marks the run as failed (exit code 1).",
                       "type": "boolean",
                       "default": "true"
                     },

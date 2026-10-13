@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -130,6 +130,17 @@ namespace MigrationTools.Processors
             return alreadyMigratedMappings;
         }
 
+        private void RecordOutcome<DefinitionType>(DefinitionMigrationOutcome outcome)
+        {
+            if (!outcome.HasFailures)
+            {
+                return;
+            }
+            Log.LogError("{SkippedObjects} of {TotalObjects} source {DefinitionType}(s) were skipped and {FailedObjects} were rejected by the target; marking the run as failed.",
+                outcome.Skipped, outcome.Selected, typeof(DefinitionType).Name, outcome.Failed);
+            CompletedWithErrors = true;
+        }
+
         /// <summary>
         /// Filter existing Definitions
         /// </summary>
@@ -161,7 +172,7 @@ namespace MigrationTools.Processors
                 var missingTasksNames = new List<string>();
                 var allTasksAreAvailable = g.Process.Phases.Select(p => p.Steps).SelectMany(s => s).All(t =>
                 {
-                    if (availableTasks.Any(a => a.Id == t.Task.Id) || taskGroupMapping.Any(m => m.SourceId == t.Task.Id))
+                    if (availableTasks.Any(a => a.Id == t.Task.Id) || taskGroupMapping?.Any(m => m.SourceId == t.Task.Id) == true)
                     {
                         return true;
                     }
@@ -224,9 +235,9 @@ namespace MigrationTools.Processors
             var targetServiceConnections = await Target.GetApiDefinitionsAsync<ServiceConnection>();
             var sourceRepositories = await Source.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false);
             var targetRepositories = await Target.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false);
-            var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
-            definitionsToBeMigrated = FilterOutIncompatibleBuildDefinitions(definitionsToBeMigrated, availableTasks, TaskGroupMapping).ToList();
-            definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
+            var definitionsNotInTarget = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions).ToList();
+            var definitionsToBeMigrated = FilterOutIncompatibleBuildDefinitions(definitionsNotInTarget, availableTasks, TaskGroupMapping).ToList();
+            definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping).ToList();
 
             // Replace taskgroup and variablegroup sIds with tIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
@@ -309,7 +320,8 @@ namespace MigrationTools.Processors
                     }
                 }
             }
-            var mappings = await Target.CreateApiDefinitionsAsync<BuildDefinition>(definitionsToBeMigrated.ToList());
+            var mappings = await Target.CreateApiDefinitionsAsync<BuildDefinition>(definitionsToBeMigrated);
+            RecordOutcome<BuildDefinition>(DefinitionMigrationOutcome.Create(sourceDefinitions.Count(), definitionsNotInTarget.Count, definitionsToBeMigrated.Count, mappings.Count));
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }
@@ -376,8 +388,8 @@ namespace MigrationTools.Processors
             var agentPoolMappings = await CreatePoolMappingsAsync<TaskAgentPool>();
             var deploymentGroupMappings = await CreatePoolMappingsAsync<DeploymentGroup>();
 
-            var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
-            definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping);
+            var definitionsNotInTarget = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions).ToList();
+            var definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsNotInTarget, TaskGroupMapping, VariableGroupMapping).ToList();
 
             // Replace queue, taskgroup and variablegroup sourceIds with targetIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
@@ -400,6 +412,7 @@ namespace MigrationTools.Processors
             }
 
             var mappings = await Target.CreateApiDefinitionsAsync<ReleaseDefinition>(definitionsToBeMigrated);
+            RecordOutcome<ReleaseDefinition>(DefinitionMigrationOutcome.Create(sourceDefinitions.Count(), definitionsNotInTarget.Count, definitionsToBeMigrated.Count, mappings.Count));
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }
@@ -426,7 +439,7 @@ namespace MigrationTools.Processors
                 if (containsVariableGroup)
                 {
                     Log.LogWarning("You can't migrate pipelines that uses variablegroups if you didn't migrate variablegroups");
-                    definitionsToBeMigrated = definitionsToBeMigrated.Where(d => d.HasTaskGroups() == false);
+                    definitionsToBeMigrated = definitionsToBeMigrated.Where(d => d.HasVariableGroups() == false);
                 }
             }
 
@@ -546,7 +559,9 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<ServiceConnection>();
             var targetDefinitions = await Target.GetApiDefinitionsAsync<ServiceConnection>();
-            var mappings = await Target.CreateApiDefinitionsAsync(FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions));
+            var definitionsToBeMigrated = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions).ToList();
+            var mappings = await Target.CreateApiDefinitionsAsync(definitionsToBeMigrated);
+            RecordOutcome<ServiceConnection>(DefinitionMigrationOutcome.Create(sourceDefinitions.Count(), definitionsToBeMigrated.Count, definitionsToBeMigrated.Count, mappings.Count));
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }
@@ -598,7 +613,7 @@ namespace MigrationTools.Processors
 
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<VariableGroups>();
             var targetDefinitions = await Target.GetApiDefinitionsAsync<VariableGroups>();
-            var filteredDefinition = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions);
+            var filteredDefinition = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions).ToList();
             foreach (var variableGroup in filteredDefinition)
             {
                 //was needed when now trying to migrated to azure devops services
@@ -613,6 +628,7 @@ namespace MigrationTools.Processors
                 };
             }
             var mappings = await Target.CreateApiDefinitionsAsync(filteredDefinition);
+            RecordOutcome<VariableGroups>(DefinitionMigrationOutcome.Create(sourceDefinitions.Count(), filteredDefinition.Count, filteredDefinition.Count, mappings.Count));
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
         }

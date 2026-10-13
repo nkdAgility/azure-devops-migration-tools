@@ -104,7 +104,7 @@ namespace MigrationTools.DataContracts.Pipelines
 
         public override bool HasVariableGroups()
         {
-            return VariableGroups != null;
+            return VariableGroups?.Any(v => v != null) == true;
         }
     }
 
