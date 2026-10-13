@@ -1,0 +1,108 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-git-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-git-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "AreaPath": "Area",
+          "IterationPath": "Iteration"
+        }
+      }
+    },
+    "CommonTools": {
+      "TfsNodeStructureTool": {
+        "Enabled": true,
+        "Areas": {
+          "Mappings": [
+            {
+              "Replacement": "amte2e-git-tgt$1",
+              "Match": "^amte2e-git-src([\\\\]?.*)$"
+            }
+          ],
+          "Filters": []
+        },
+        "Iterations": {
+          "Mappings": [
+            {
+              "Replacement": "amte2e-git-tgt$1",
+              "Match": "^amte2e-git-src([\\\\]?.*)$"
+            }
+          ],
+          "Filters": []
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManagerTool": {
+        "Enabled": true,
+        "MaxRevisions": 0,
+        "ReplayRevisions": true
+      },
+      "TfsAttachmentTool": {
+        "Enabled": true,
+        "ExportBasePath": "c:\\temp\\amte2e-attachments",
+        "MaxAttachmentSize": 480000000
+      },
+      "TfsWorkItemLinkTool": {
+        "Enabled": true,
+        "SaveAfterEachLinkIsAdded": false,
+        "FilterIfLinkCountMatches": true
+      },
+      "TfsUserMappingTool": {
+        "Enabled": false
+      },
+      "TfsTeamSettingsTool": {
+        "Enabled": false
+      },
+      "TfsGitRepositoryTool": {
+        "Enabled": true,
+        "Mappings": {
+          "amte2e-git-src": "amte2e-git-tgt"
+        }
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "UpdateCreatedDate": true,
+        "UpdateCreatedBy": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.Id]",
+        "FixHtmlAttachmentLinks": false,
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": false,
+        "GenerateMigrationComment": true,
+        "MaxGracefulFailures": 0,
+        "SkipRevisionWithInvalidIterationPath": false,
+        "SkipRevisionWithInvalidAreaPath": false
+      }
+    ]
+  }
+}
