@@ -255,7 +255,7 @@ Discovers and documents:
 
 **Path:** `tools/e2e/Invoke-MigrationE2E.ps1`
 
-**Purpose:** Runs a built `MigrationTools.ConsoleFull` against the test organisation with the test PAT, for end-to-end validation of a change. See [Validating Changes End to End](#validating-changes-end-to-end).
+**Purpose:** Runs a built `MigrationTools.ConsoleFull` against the test organisations, signing in with Microsoft Entra ID by default, for end-to-end validation of a change. See [Validating Changes End to End](#validating-changes-end-to-end).
 
 **Usage:**
 ```powershell
@@ -263,9 +263,9 @@ Discovers and documents:
 .\tools\e2e\Invoke-MigrationE2E.ps1 -Config .\my-scenario.json -Filter '.'   # full output
 ```
 
-**Parameters:** `-Config` (required), `-RepoRoot`, `-BuildOutput` (default `src\MigrationTools.ConsoleFull\bin\Debug\net472`), `-Filter` (regex for the output lines to show).
+**Parameters:** `-Config` (required), `-RepoRoot`, `-BuildOutput` (default `src\MigrationTools.ConsoleFull\bin\Debug\net472`), `-Filter` (regex for the output lines to show), `-AllowedOrganisation` (orgs the config may target; defaults to the test orgs).
 
-**Requirements:** Windows PowerShell 5.1 or PowerShell 7+, a Debug build of `MigrationTools.ConsoleFull`, and `AMT_TEST_PAT` (or the token still in `TestingConstants.cs`).
+**Requirements:** Windows PowerShell 5.1 or PowerShell 7+, a Debug build of `MigrationTools.ConsoleFull`, and `az login` as an identity with access to the test orgs. Set `AMT_TEST_PAT` only to use a PAT instead.
 
 ---
 
@@ -300,8 +300,10 @@ Available templates for `init` command:
 
 Unit tests are not enough for changes to migration behaviour, exit codes, validation or error handling. Prove the change by running the built tool against the test organisation.
 
-- **Test environment:** `https://dev.azure.com/nkdagility-preview`. The test PAT is approved for this. The harness reads it from the `AMT_TEST_PAT` environment variable, falling back to `src/MigrationTools/Tests/TestingConstants.cs` while the token still lives there. Never print, log or commit the token anywhere else.
-- **Harness:** build `MigrationTools.ConsoleFull`, then run `tools/e2e/Invoke-MigrationE2E.ps1 -Config <scenario.json>`. It refuses any config whose endpoints are outside the test organisation, passes the PAT through the endpoint environment-variable overrides (TFS and REST, any endpoint name), masks it in output, restores any existing values afterwards, prints `EXIT CODE` and exits with it. Never put the real token in a scenario file. TFS endpoints can omit it, but the schema requires `AccessToken` on REST (`AzureDevOpsEndpoint`) endpoints, so put a placeholder such as `"set-by-harness"` there; the harness override replaces it at run time.
+- **Test environment:** two dedicated organisations, `https://dev.azure.com/nkdagility-adomt-source` and `https://dev.azure.com/nkdagility-adomt-target`, defined as code in `infra/test-env/` (see `CONTRIBUTING.md`, "Running the tests"). No credential is committed: sign in with `az login` (Microsoft Entra ID). Never print, log or commit a token.
+- **Harness:** build `MigrationTools.ConsoleFull`, then run `tools/e2e/Invoke-MigrationE2E.ps1 -Config <scenario.json>`. It refuses any config whose endpoints are outside the test organisations, switches every endpoint to `AuthenticationMode` `EntraId` through the endpoint environment-variable overrides (TFS and REST, any endpoint name), restores any existing values afterwards, prints `EXIT CODE` and exits with it. If `AMT_TEST_PAT` is set it uses that PAT instead and masks it in output. Scenario files need no token.
+- **Processors:** the configuration schema requires `SourceName` and `TargetName` on every processor.
+- **Reflected ID field:** the target process must have `Custom.ReflectedWorkItemId` (or the configured field) on every work item type that is validated, not just the ones being migrated. Use an inherited process for scratch projects.
 - **Projects:** create your own scratch source/target projects for the change (for example `amt<PR>-src` / `amt<PR>-tgt`) and seed only the work items the scenario needs. Do not modify projects used by the automated tests.
 - **Before and after:** run each scenario on `main` and on the change, and report both results, including the exit code.
 - **Failure scenarios:** cover the failure path as well as the happy path. A reliable way to force a real server-side item failure is to map a work item type to one that is disabled or missing in the target.

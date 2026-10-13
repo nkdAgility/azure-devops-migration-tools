@@ -26,6 +26,15 @@ namespace MigrationTools.Endpoints.Infrastructure
         [JsonConverter(typeof(DefaultOnlyConverter<string>), "** removed as a secret ***")]
         public string AccessToken { get; set; }
 
+        /// <summary>
+        /// The token to send as the password of Basic auth for REST calls: the PAT, or a fresh Microsoft Entra
+        /// token in EntraId mode (Azure DevOps accepts both in place of each other). Null when neither applies.
+        /// </summary>
+        public string ResolveAccessToken()
+        {
+            return AuthenticationMode == AuthenticationMode.EntraId ? EntraIdCredentials.GetAccessToken() : AccessToken;
+        }
+
         public ValidateOptionsResult Validate(string name, TfsAuthenticationOptions options)
         {
             var errors = new List<string>();
@@ -53,6 +62,7 @@ namespace MigrationTools.Endpoints.Infrastructure
                     }
                     break;
                 case AuthenticationMode.Prompt:
+                case AuthenticationMode.EntraId:
                     break;
                 default:
                     errors.Add($"The AuthenticationMode '{options.AuthenticationMode}' is not supported.");

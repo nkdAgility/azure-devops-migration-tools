@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Tests;
 using MigrationTools.Processors.Infrastructure;
 
 namespace MigrationTools.Processors.Tests
@@ -32,6 +33,7 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L3")]
+        [RequiresAzureDevOps]
         public void TfsTeamSettingsProcessorNoEnrichersTest()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.

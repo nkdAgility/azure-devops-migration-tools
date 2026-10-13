@@ -142,7 +142,7 @@ namespace MigrationTools.Clients.AzureDevops.Rest.Processors
                     var serializedDoc = JsonConvert.SerializeObject(adds);
                     var requestContent = new StringContent(serializedDoc, Encoding.UTF8, "application/json-patch+json");
                     var request = new HttpRequestMessage(new HttpMethod("PATCH"), targetItem.Url);
-                    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Target.Options.AccessToken))));
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Target.Options.ResolveAccessToken()))));
                     request.Headers.Add("Accept", $"application/json; api-version=6.0");
                     request.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
                     request.Content = requestContent;

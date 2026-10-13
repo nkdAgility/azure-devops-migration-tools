@@ -110,6 +110,11 @@ namespace MigrationTools.Clients
                             _vssCredentials = new VssCredentials(new Microsoft.VisualStudio.Services.Common.WindowsCredential(cred));
                             y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
                             break;
+                        case AuthenticationMode.EntraId:
+                            Log.LogInformation("Connecting with Microsoft Entra ID ");
+                            _vssCredentials = EntraIdCredentials.CreateVssCredentials();
+                            y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
+                            break;
                         case AuthenticationMode.Prompt:
                             Log.LogInformation("Prompting for credentials ");
                             _vssCredentials = new VssClientCredentials();

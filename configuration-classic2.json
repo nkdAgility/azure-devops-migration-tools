@@ -110,7 +110,7 @@
     "TfsWorkItemEndpoints": [
       {
         "Name": "Source",
-        "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+        "AccessToken": "",
         "Query": {
           "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
           "Parameters": {
@@ -122,7 +122,7 @@
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "AuthenticationMode": "Prompt",
         "AllowCrossProjectLinking": false,
-        "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+        "PersonalAccessToken": "",
         "LanguageMaps": {
           "AreaPath": "Area",
           "IterationPath": "Iteration"
@@ -130,7 +130,7 @@
       },
       {
         "Name": "Target",
-        "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+        "AccessToken": "",
         "Query": {
           "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
         },
@@ -153,7 +153,7 @@
     "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
     "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -166,7 +166,7 @@
     "ReflectedWorkItemIdField": "nkdScrum.ReflectedWorkItemId",
     "AuthenticationMode": "Prompt",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+    "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -224,7 +224,7 @@
         {
           "$type": "TfsWorkItemEndPointOptions",
           "Direction": "Target",
-          "AccessToken": "qosss7crwz3vie4fupzpaafjndoy6g6ulgkzhoxtmjgicv2lqjyq",
+          "AccessToken": "",
           "Query": {
             "Query": "SELECT [System.Id], [System.Tags] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
           },

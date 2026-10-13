@@ -43,9 +43,10 @@ namespace MigrationTools.Tools
             _targetProject = processor.Target.WorkItems.Project.ToProject();
 
             string? accessToken = null;
-            if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.AccessToken)
+            if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.AccessToken
+                || processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.EntraId)
             {
-                accessToken = GenerateAuthToken(string.Empty, processor.Source.Options.Authentication.AccessToken);
+                accessToken = GenerateAuthToken(string.Empty, processor.Source.Options.Authentication.ResolveAccessToken());
             }
             else if (processor.Source.Options.Authentication.AuthenticationMode == AuthenticationMode.Windows)
             {

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -47,6 +47,8 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
     <PackageReference Include="Riok.Mapperly" />
     <PackageReference Include="TfsUrlParser" />
+    <!-- Azure.Identity (via MigrationTools) is compiled against 4.6.x; without this net472 resolves 4.5.4 and fails to load types. -->
+    <PackageReference Include="System.Threading.Tasks.Extensions" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,112 @@
+# Live integration tests against the Azure DevOps test orgs (#3193).
+#
+# Authentication is Microsoft Entra workload identity federation (OIDC): no PAT or client secret exists.
+# Azure only issues a token to jobs running in the `integration-tests` or `integration-tests-forks`
+# environment of this repo, because those are the only federated credential subjects trusted.
+#
+# - push to main, merge queue, same-repo PRs, manual runs  -> environment `integration-tests` (no approval)
+# - PRs from forks (pull_request_target)                    -> environment `integration-tests-forks`, which has
+#   required reviewers. A maintainer reviews the diff, then approves the run. The exact reviewed commit
+#   (pull_request.head.sha) is checked out; a new push creates a new run that needs approval again.
+#
+# Repository variables (Settings > Secrets and variables > Actions > Variables; these are ids, not secrets):
+#   AZURE_TEST_CLIENT_ID, AZURE_TEST_TENANT_ID, ADO_TEST_SOURCE_COLLECTION, ADO_TEST_TARGET_COLLECTION
+name: Integration tests (Azure DevOps)
+
+on:
+  push:
+    branches: [main]
+  merge_group:
+  pull_request:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integration-tests-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live:
+    name: Live Azure DevOps tests
+    # Same-repo PRs run via pull_request; fork PRs only via pull_request_target (never both).
+    # Skips cleanly until the maintainer has configured the Entra app (AZURE_TEST_CLIENT_ID).
+    if: >-
+      vars.AZURE_TEST_CLIENT_ID != '' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      (github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.full_name != github.repository)
+    runs-on: windows-latest
+    environment: ${{ github.event_name == 'pull_request_target' && 'integration-tests-forks' || 'integration-tests' }}
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          # For fork PRs: the exact commit the approver reviewed, not the moving branch head.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          # Deliberate opt-in, fork runs only: the job is gated by required-reviewer approval on the
+          # integration-tests-forks environment, has a read-only token and no secrets, and the OIDC
+          # identity can reach only the disposable test orgs. See https://gh.io/securely-using-pull_request_target
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+
+      - name: Azure login (OIDC, no secrets)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_TEST_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TEST_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Warm the Azure DevOps token cache
+        # The GitHub OIDC assertion is short-lived; fetch the Azure DevOps token now so the Azure CLI cache
+        # holds it for the test run. Only the expiry is printed.
+        shell: pwsh
+        run: az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query expiresOn -o tsv
+
+      - name: Build
+        run: dotnet build MigrationTools.sln
+
+      - name: Live tests
+        env:
+          MigrationTools__Tests__UseEntraId: "true"
+          MigrationTools__Tests__SourceCollection: ${{ vars.ADO_TEST_SOURCE_COLLECTION }}
+          MigrationTools__Tests__TargetCollection: ${{ vars.ADO_TEST_TARGET_COLLECTION }}
+        shell: pwsh
+        run: |
+          dotnet test src/MigrationTools.Clients.TfsObjectModel.Tests/MigrationTools.Clients.TfsObjectModel.Tests.csproj --no-build --logger trx --results-directory test-results
+          if ($LASTEXITCODE -ne 0) { $failed = $true }
+          dotnet test src/MigrationTools.Clients.AzureDevops.Rest.Tests/MigrationTools.Clients.AzureDevops.Rest.Tests.csproj --no-build --logger trx --results-directory test-results
+          if ($LASTEXITCODE -ne 0) { $failed = $true }
+          if ($failed) { exit 1 }
+
+      - name: Explain failure
+        if: failure()
+        shell: pwsh
+        run: |
+          @"
+          ## Live Azure DevOps tests failed
+          - **Azure login step failed:** the Entra app or its federated credential for environment ``${{ github.event_name == 'pull_request_target' && 'integration-tests-forks' || 'integration-tests' }}`` is missing. Re-run ``infra/test-env/Setup-TestEnvironment.ps1``.
+          - **LiveEnvironment_* preflight failed:** its message says whether the token was rejected, the org/project is missing, or the org is unreachable, and how to fix it.
+          - **Only feature tests failed:** the environment is fine; it is a real test failure. Download the ``integration-test-results`` artifact for details.
+
+          Guide: [CONTRIBUTING.md - Troubleshooting live tests](https://github.com/${{ github.repository }}/blob/main/CONTRIBUTING.md#troubleshooting-live-tests)
+          "@ | Out-File -Append $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: test-results

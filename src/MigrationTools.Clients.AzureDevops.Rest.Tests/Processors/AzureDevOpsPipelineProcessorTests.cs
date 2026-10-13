@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Serilog.Events;
 using Serilog.Sinks.InMemory;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Tests;
 
 namespace MigrationTools.Processors.Tests
 {
@@ -52,6 +53,7 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L3")]
+        [RequiresAzureDevOps]
         public void AzureDevOpsPipelineProcessorNoEnrichersTest()
         {
             // Senario 1 Migration from Tfs to Tfs with no Enrichers.
@@ -61,6 +63,7 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod, TestCategory("L3")]
+        [RequiresAzureDevOps]
         public void AzureDevOpsPipelineProcessorSelectedBuildDefinitionsTest()
         {
             var config = new AzureDevOpsPipelineProcessorOptions
@@ -92,6 +95,7 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod, TestCategory("L3")]
+        [RequiresAzureDevOps]
         public void AzureDevOpsPipelineProcessorSelectedReleaseDefinitionsTest()
         {
             var config = new AzureDevOpsPipelineProcessorOptions

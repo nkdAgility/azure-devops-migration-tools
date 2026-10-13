@@ -86,11 +86,10 @@ namespace MigrationTools.Endpoints
 
         private HttpClient CreateHttpClientWithHeaders(string url, string versionParameter)
         {
-            HttpClient client = new HttpClient
+            HttpClient client = new HttpClient(new AzureDevOpsAuthenticationHandler(Options.ResolveAccessToken, Options.AuthenticationMode))
             {
                 BaseAddress = new Uri(url)
             };
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", Options.AccessToken))));
             client.DefaultRequestHeaders.Add("Accept", $"application/json; {versionParameter}");
             //client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)"); #1784
             return client;
