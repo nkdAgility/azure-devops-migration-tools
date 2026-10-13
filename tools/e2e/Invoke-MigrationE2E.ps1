@@ -3,15 +3,16 @@
     Runs a devopsmigration.exe build end to end against the test organisation and exits with the tool's exit code.
 
 .DESCRIPTION
-    Reads the test PAT from the AMT_TEST_PAT environment variable. While the token still lives in
-    src/MigrationTools/Tests/TestingConstants.cs (see #3193), it falls back to that file.
+    Authentication (see #3193):
+      - Default: Microsoft Entra ID. Every endpoint is switched to AuthenticationMode EntraId through the tool's
+        endpoint environment-variable overrides, so the run uses your 'az login' (or another ambient identity).
+        This script never handles a token.
+      - If AMT_TEST_PAT is set, that PAT is used instead. It is injected through the same overrides, never written
+        to disk, and masked in the output.
+    Any existing values of the override variables are restored afterwards.
 
-    Every endpoint in the scenario config must point at https://dev.azure.com/nkdagility-preview; the script refuses
-    to run otherwise, so the test PAT is never sent anywhere else. The token is injected through the tool's
-    endpoint environment-variable overrides for every endpoint in the config (any name, TFS or REST), is never
-    written to disk, and is masked in the output. Any existing values of those variables are restored afterwards.
-    REST (AzureDevOpsEndpoint) endpoints must still carry a placeholder AccessToken in the config, because the
-    schema requires it; the override replaces it at run time.
+    Every endpoint in the scenario config must point at one of the test organisations; the script refuses to run
+    otherwise, so credentials are never sent anywhere else. Pass -AllowedOrganisation to use your own orgs.
 
     Works with Windows PowerShell 5.1 and PowerShell 7+.
 
@@ -25,13 +26,17 @@ param(
     [Parameter(Mandatory)][string]$Config,
     [string]$RepoRoot,
     [string]$BuildOutput,
-    [string]$Filter = "Saved as|Could not save|could not be migrated|Continuing|Too many|stopped|failed|Exiting"
+    [string]$Filter = "Saved as|Could not save|could not be migrated|Continuing|Too many|stopped|failed|Exiting",
+    [string[]]$AllowedOrganisation = @(
+        "https://dev.azure.com/nkdagility-adomt-source",
+        "https://dev.azure.com/nkdagility-adomt-target",
+        "https://dev.azure.com/nkdagility-preview")
 )
 $ErrorActionPreference = "Stop"
 # Resolved here rather than as parameter defaults: Windows PowerShell 5.1 leaves $PSScriptRoot empty in the param block.
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "..\..")).Path }
 if (-not $BuildOutput) { $BuildOutput = Join-Path $RepoRoot "src\MigrationTools.ConsoleFull\bin\Debug\net472" }
-$AllowedOrganisation = "https://dev.azure.com/nkdagility-preview"
+$AllowedOrganisation = @($AllowedOrganisation | ForEach-Object { $_.TrimEnd('/') })
 
 # Validate everything before touching the environment or the disk.
 $configPath = (Resolve-Path $Config).Path
@@ -43,25 +48,25 @@ $endpointNames = @($endpoints.PSObject.Properties.Name)
 foreach ($name in $endpointNames) {
     $endpoint = $endpoints.$name
     $url = if ($endpoint.Collection) { $endpoint.Collection } else { $endpoint.Organisation }
-    if (-not $url -or $url.TrimEnd('/') -ne $AllowedOrganisation) {
-        throw "Endpoint '$name' points at '$url'. The harness only runs against $AllowedOrganisation."
+    if (-not $url -or $AllowedOrganisation -notcontains $url.TrimEnd('/')) {
+        throw "Endpoint '$name' points at '$url'. The harness only runs against: $($AllowedOrganisation -join ', ')."
     }
 }
 
 $pat = $env:AMT_TEST_PAT
-if (-not $pat) {
-    $constants = Join-Path $RepoRoot "src\MigrationTools\Tests\TestingConstants.cs"
-    if (Test-Path $constants) {
-        $pat = ([regex]::Match((Get-Content $constants -Raw), 'AccessTokenRaw = "([^"]+)"')).Groups[1].Value.Replace("fake", "")
+# TFS endpoints read Authentication:*; REST endpoints read the same keys at the endpoint root.
+$overrides = [ordered]@{}
+foreach ($name in $endpointNames) {
+    $mode = if ($pat) { "AccessToken" } else { "EntraId" }
+    $overrides["MigrationTools__Endpoints__${name}__Authentication__AuthenticationMode"] = $mode
+    $overrides["MigrationTools__Endpoints__${name}__AuthenticationMode"] = $mode
+    if ($pat) {
+        $overrides["MigrationTools__Endpoints__${name}__Authentication__AccessToken"] = $pat
+        $overrides["MigrationTools__Endpoints__${name}__AccessToken"] = $pat
     }
 }
-if (-not $pat) { throw "Test PAT not found. Set AMT_TEST_PAT." }
-
-# TFS endpoints read Authentication:AccessToken; REST endpoints read AccessToken.
-$varNames = foreach ($name in $endpointNames) {
-    "MigrationTools__Endpoints__${name}__Authentication__AccessToken"
-    "MigrationTools__Endpoints__${name}__AccessToken"
-}
+Write-Host ("Authentication: " + $(if ($pat) { "PAT from AMT_TEST_PAT" } else { "Microsoft Entra ID (ambient login)" }))
+$varNames = @($overrides.Keys)
 $saved = @{}
 foreach ($v in $varNames) { $saved[$v] = [Environment]::GetEnvironmentVariable($v) }
 
@@ -70,11 +75,11 @@ $pushed = $false
 $exitCode = 1
 try {
     Copy-Item $BuildOutput $runDir -Recurse
-    foreach ($v in $varNames) { [Environment]::SetEnvironmentVariable($v, $pat) }
+    foreach ($v in $varNames) { [Environment]::SetEnvironmentVariable($v, $overrides[$v]) }
     Push-Location $runDir
     $pushed = $true
     & .\devopsmigration.exe execute --config $configPath --skipVersionCheck --disableTelemetry 2>&1 |
-        Select-String -Pattern $Filter | ForEach-Object { $_.Line.Replace($pat, "***") }
+        Select-String -Pattern $Filter | ForEach-Object { if ($pat) { $_.Line.Replace($pat, "***") } else { $_.Line } }
     $exitCode = $LASTEXITCODE
     "EXIT CODE: $exitCode"
 }

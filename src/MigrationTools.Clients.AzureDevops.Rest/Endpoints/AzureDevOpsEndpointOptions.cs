@@ -12,14 +12,14 @@ namespace MigrationTools.Endpoints
     public class AzureDevOpsEndpointOptions : EndpointOptions
     {
         /// <summary>
-        /// Authentication mode to use when connecting to Azure DevOps. Typically uses AccessToken for modern Azure DevOps organizations.
+        /// Authentication mode to use when connecting to Azure DevOps: AccessToken (a PAT in AccessToken) or EntraId (a Microsoft Entra ID token from the signed-in identity, such as az login, a managed identity or workload identity federation, with no secret stored in configuration).
         /// </summary>
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
         public AuthenticationMode AuthenticationMode { get; set; }
 
         /// <summary>
-        /// Personal Access Token (PAT) or other authentication token for accessing the Azure DevOps organization. Required for API authentication.
+        /// Personal Access Token (PAT) for the Azure DevOps organization. Required when AuthenticationMode is AccessToken; not used with EntraId.
         /// </summary>
         public string AccessToken { get; set; }
 
