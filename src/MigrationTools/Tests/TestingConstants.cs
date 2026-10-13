@@ -10,7 +10,7 @@ namespace MigrationTools.Tests
         //   MigrationTools__Tests__UseEntraId          true to use the ambient Entra identity (az login, OIDC, managed identity)
         //   MigrationTools__Tests__SourceCollection    e.g. https://dev.azure.com/my-source-org/
         //   MigrationTools__Tests__TargetCollection    defaults to SourceCollection
-        // See CONTRIBUTING.md "Running the integration tests" for how to get access.
+        // See CONTRIBUTING.md "Running the tests" for how to get access.
         private const string Prefix = "MigrationTools__Tests__";
         private const string DefaultCollection = "https://dev.azure.com/nkdagility-preview/";
 
@@ -34,12 +34,25 @@ namespace MigrationTools.Tests
         /// <summary>The token to send to Azure DevOps for whichever mode is configured.</summary>
         public static string ResolveAccessToken() => UseEntraId ? MigrationTools.Endpoints.EntraIdCredentials.GetAccessToken() : AccessToken;
 
+        /// <summary>Which setting supplied the credential (never its value), for diagnosing failures.</summary>
+        public static string CredentialSource
+            => UseEntraId ? "Microsoft Entra ID (ambient login: az login / Visual Studio / managed identity / OIDC)"
+             : Env(Prefix + "AccessToken") != null ? "PAT from " + Prefix + "AccessToken"
+             : Env("AZDEVOPS_SYSTEM_TEST_PAT") != null ? "PAT from AZDEVOPS_SYSTEM_TEST_PAT"
+             : "built-in fallback token (temporary)";
+
+        /// <summary>One-line summary of the live test configuration, safe to log.</summary>
+        public static string Describe()
+            => $"Source={SourceCollection} Target={TargetCollection} Auth={CredentialSource}";
+
+        public const string TroubleshootingUrl = "https://github.com/nkdAgility/azure-devops-migration-tools/blob/main/CONTRIBUTING.md#troubleshooting-live-tests";
+
         public static bool IsLiveConfigured => UseEntraId || !string.IsNullOrEmpty(AccessToken);
 
         public const string NotConfiguredMessage =
             "Skipped: no Azure DevOps test credentials. Set MigrationTools__Tests__UseEntraId=true (after 'az login' with an identity that has access to the test orgs) " +
             "or MigrationTools__Tests__AccessToken to a PAT, plus MigrationTools__Tests__SourceCollection/TargetCollection for your own orgs. " +
-            "See https://github.com/nkdAgility/azure-devops-migration-tools/blob/main/CONTRIBUTING.md#running-the-integration-tests";
+            "See https://github.com/nkdAgility/azure-devops-migration-tools/blob/main/CONTRIBUTING.md#running-the-tests";
 
         // TEMPORARY: the previously committed token, kept only until the Entra-based test orgs are validated (#3193). Removed in the final commit.
         private static string LegacyAccessToken => AccessTokenRaw.Replace(@"fake", "");

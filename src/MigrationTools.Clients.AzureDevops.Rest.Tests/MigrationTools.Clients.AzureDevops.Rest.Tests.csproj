@@ -26,7 +26,7 @@
     <ProjectReference Include="..\MigrationTools\MigrationTools.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\TestShared\RequiresAzureDevOpsAttribute.cs" Link="RequiresAzureDevOpsAttribute.cs" />
+    <Compile Include="..\TestShared\*.cs" LinkBase="TestShared" />
   </ItemGroup>
 
 </Project>

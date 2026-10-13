@@ -85,22 +85,55 @@ Pull requests should:
   git config --global core.whitespace cr-at-eol
   ```
 
+### Running the tests
 
-### Running the integration tests
+There are three ways to run the tests. Pick the one that fits.
 
-Most tests run offline. A small set (marked `[RequiresAzureDevOps]`) talk to live Azure DevOps test organisations. When no credentials are configured they are **skipped**, not failed, so you can build and run everything else without access.
+#### 1. Unit tests only (no setup)
 
-To run the live tests, set these environment variables (or the same keys in `dotnet user-secrets`):
+```bash
+dotnet test MigrationTools.sln
+```
 
-| Variable | Purpose |
+Everything runs offline. Tests that need live Azure DevOps are marked `[RequiresAzureDevOps]` and are **skipped**, not failed, with a message explaining how to enable them. This is enough for most changes.
+
+#### 2. Live tests against your own Azure DevOps orgs
+
+1. Create two free Azure DevOps organisations, one for the source and one for the target.
+2. Sign in with an account that is an admin of both: `az login`.
+3. Create the test projects and configure the variables:
+
+   ```bash
+   ./infra/test-env/Setup-TestEnvironment.ps1 -LocalOnly -SourceOrg <your-source-org> -TargetOrg <your-target-org> -SetUserEnvironment
+   ```
+
+   This creates `migrationSource1` and `migrationTarget1` and saves these user environment variables (leave out `-SetUserEnvironment` to print them instead):
+
+   | Variable | Purpose |
+   |---|---|
+   | `MigrationTools__Tests__UseEntraId=true` | Use your Microsoft Entra login (`az login`, Visual Studio). No PAT needed. |
+   | `MigrationTools__Tests__SourceCollection` | Source org URL, e.g. `https://dev.azure.com/my-source-org/` |
+   | `MigrationTools__Tests__TargetCollection` | Target org URL (defaults to the source org) |
+   | `MigrationTools__Tests__AccessToken` | Optional: a PAT instead of Entra, e.g. for orgs backed by a personal Microsoft account (alias `AZDEVOPS_SYSTEM_TEST_PAT`) |
+
+4. Open a new terminal and run `dotnet test MigrationTools.sln`.
+
+#### 3. Live tests on your pull request
+
+You don't need any credentials. When you open a pull request from a fork, the `Integration tests (Azure DevOps)` workflow waits for a maintainer. They review your change and approve the `integration-tests-forks` environment, and the live tests then run against the project's test orgs. Credentials are never shared with you or exposed to your fork. A new push needs a new approval.
+
+**Maintainers and agents:** pushes to `main`, the merge queue and same-repo branches run the live tests automatically. CI signs in with OIDC workload identity federation, so there is no secret to rotate. Locally, `az login` with an account that has access to the test orgs is enough. The environment is defined as code in `infra/test-env/` (`main.bicep` plus `Setup-TestEnvironment.ps1`).
+
+### Troubleshooting live tests
+
+Live runs start with `LiveEnvironment_*` preflight tests. If something is wrong with the setup, they fail with a message naming the org, the auth method in use (never the credential itself) and the fix.
+
+| Message | Cause and fix |
 |---|---|
-| `MigrationTools__Tests__UseEntraId=true` | Use your Microsoft Entra login (`az login`, Visual Studio, managed identity). Preferred, no PAT needed. |
-| `MigrationTools__Tests__AccessToken` | Alternatively, a PAT (alias `AZDEVOPS_SYSTEM_TEST_PAT`). |
-| `MigrationTools__Tests__SourceCollection` | Source org URL, e.g. `https://dev.azure.com/my-source-org/`. |
-| `MigrationTools__Tests__TargetCollection` | Target org URL. Defaults to the source org. |
+| *The credential was rejected (HTTP 401/203/302)* | PAT expired or revoked, or the identity isn't a member of the org. A stale `AZDEVOPS_SYSTEM_TEST_PAT` overrides other settings, so remove it if you use Entra. For Entra, check that `az account show` shows the account you added to the org. |
+| *Could not get a Microsoft Entra token* | Run `az login` (or sign in to Visual Studio), or switch to a PAT. |
+| *Project 'migrationSource1' was not found* | Run `Setup-TestEnvironment.ps1 -LocalOnly ...` to create the projects, and check the org URL. |
+| *Could not reach the org* | Wrong org URL in `MigrationTools__Tests__*Collection`, or a network problem. |
+| Tests skipped with *no Azure DevOps test credentials* | Expected when nothing is configured. Follow option 2 to enable them. |
 
-The source org needs a project named `migrationSource1` and the target org a project named `migrationTarget1`.
-
-**External contributors:** use two free Azure DevOps organisations of your own with those projects, or leave the live tests skipped. On your pull request, a maintainer reviews the change and approves the `integration-tests-forks` environment, which runs the live tests against the project's test orgs. No credential is ever shared with you or exposed to your fork.
-
-**Maintainers and agents:** the `Integration tests (Azure DevOps)` workflow signs in with OIDC workload identity federation, so there is no secret to rotate. Locally, `az login` with an account that has access to the test orgs is enough.
+If the preflight passes but other tests fail, the environment is fine and it's a real test failure.

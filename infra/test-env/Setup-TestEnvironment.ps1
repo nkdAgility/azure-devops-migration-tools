@@ -15,25 +15,38 @@
 
     No secrets are created, printed or stored.
 
+    -LocalOnly is for contributors running the live tests against their own two orgs: it skips the
+    Entra app and GitHub steps, creates the test projects with your own login ('az login'), and
+    prints (or with -SetUserEnvironment, saves) the environment variables the tests read.
+
 .EXAMPLE
-    ./Setup-TestEnvironment.ps1 -SourceOrg adomt-test-source -TargetOrg adomt-test-target -Reviewers MrHinsh
+    # Maintainers: the project's CI environment
+    ./Setup-TestEnvironment.ps1 -SourceOrg nkdagility-adomt-source -TargetOrg nkdagility-adomt-target -Reviewers MrHinsh
+
+.EXAMPLE
+    # Contributors: your own orgs, for local runs
+    ./Setup-TestEnvironment.ps1 -LocalOnly -SourceOrg my-adomt-source -TargetOrg my-adomt-target -SetUserEnvironment
 #>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)] [string] $SourceOrg,
     [Parameter(Mandatory)] [string] $TargetOrg,
-    [Parameter(Mandatory)] [string[]] $Reviewers,
+    [string[]] $Reviewers,
     [string] $Repository = 'nkdAgility/azure-devops-migration-tools',
     [string] $ResourceGroup = 'rg-adomt-integration-tests',
     [string] $Location = 'westeurope',
     [string] $SourceProject = 'migrationSource1',
     [string] $TargetProject = 'migrationTarget1',
     [string] $ProcessName = 'Agile',
-    [switch] $SkipGitHub
+    [switch] $SkipGitHub,
+    [switch] $LocalOnly,
+    [switch] $SetUserEnvironment
 )
 
 $ErrorActionPreference = 'Stop'
 $AzureDevOpsResource = '499b84ac-1321-427f-aa17-267ca6975798'
+if (-not $LocalOnly -and -not $Reviewers) { throw '-Reviewers is required (GitHub logins who approve fork runs), unless -LocalOnly.' }
+$spObjectId = $null
 
 function Invoke-Ado {
     param([string] $Method = 'GET', [string] $Uri, $Body)
@@ -45,40 +58,44 @@ function Invoke-Ado {
 }
 
 # --- 1. Entra identity (Bicep) -------------------------------------------------------------------
-Write-Host "== Deploying Entra identity (main.bicep) into resource group $ResourceGroup"
-az group create --name $ResourceGroup --location $Location --output none
-$deployment = az deployment group create `
-    --resource-group $ResourceGroup `
-    --name adomt-integration-tests `
-    --template-file (Join-Path $PSScriptRoot 'main.bicep') `
-    --parameters repository=$Repository `
-    --query properties.outputs -o json | ConvertFrom-Json
-if ($LASTEXITCODE -ne 0) { throw 'Bicep deployment failed.' }
-$clientId = $deployment.clientId.value
-$spObjectId = $deployment.servicePrincipalObjectId.value
-$tenantId = $deployment.tenantId.value
-Write-Host "   clientId=$clientId tenant=$tenantId"
+if (-not $LocalOnly) {
+    Write-Host "== Deploying Entra identity (main.bicep) into resource group $ResourceGroup"
+    az group create --name $ResourceGroup --location $Location --output none
+    $deployment = az deployment group create `
+        --resource-group $ResourceGroup `
+        --name adomt-integration-tests `
+        --template-file (Join-Path $PSScriptRoot 'main.bicep') `
+        --parameters repository=$Repository `
+        --query properties.outputs -o json | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0) { throw 'Bicep deployment failed.' }
+    $clientId = $deployment.clientId.value
+    $spObjectId = $deployment.servicePrincipalObjectId.value
+    $tenantId = $deployment.tenantId.value
+    Write-Host "   clientId=$clientId tenant=$tenantId"
+}
 
 # --- 2. Azure DevOps orgs ------------------------------------------------------------------------
 function Set-OrgAccess {
     param([string] $Org, [string] $Project)
-    Write-Host "== Binding identity to https://dev.azure.com/$Org/"
+    Write-Host "== Preparing https://dev.azure.com/$Org/"
 
-    # Add the service principal to the org (idempotent: returns the existing entitlement).
-    $entitlement = Invoke-Ado -Method POST -Uri "https://vsaex.dev.azure.com/$Org/_apis/serviceprincipalentitlements?api-version=7.1-preview.1" -Body @{
-        accessLevel      = @{ accountLicenseType = 'express' }
-        servicePrincipal = @{ origin = 'aad'; originId = $spObjectId; subjectKind = 'servicePrincipal' }
+    if ($spObjectId) {
+        # Add the service principal to the org (idempotent: returns the existing entitlement).
+        $entitlement = Invoke-Ado -Method POST -Uri "https://vsaex.dev.azure.com/$Org/_apis/serviceprincipalentitlements?api-version=7.1-preview.1" -Body @{
+            accessLevel      = @{ accountLicenseType = 'express' }
+            servicePrincipal = @{ origin = 'aad'; originId = $spObjectId; subjectKind = 'servicePrincipal' }
+        }
+        $spDescriptor = $entitlement.operationResult.result.servicePrincipal.descriptor
+        if (-not $spDescriptor) { $spDescriptor = $entitlement.servicePrincipal.descriptor }
+        if (-not $spDescriptor) { throw "Could not add the service principal to $Org." }
+
+        # Project Collection Administrators membership (PUT is idempotent).
+        $groups = Invoke-Ado -Uri "https://vssps.dev.azure.com/$Org/_apis/graph/groups?scopeDescriptor=&api-version=7.1-preview.1"
+        $pca = $groups.value | Where-Object { $_.principalName -eq "[$Org]\Project Collection Administrators" } | Select-Object -First 1
+        if (-not $pca) { throw "Project Collection Administrators group not found in $Org." }
+        Invoke-Ado -Method PUT -Uri "https://vssps.dev.azure.com/$Org/_apis/graph/memberships/$spDescriptor/$($pca.descriptor)?api-version=7.1-preview.1" | Out-Null
+        Write-Host "   service principal is a Project Collection Administrator"
     }
-    $spDescriptor = $entitlement.operationResult.result.servicePrincipal.descriptor
-    if (-not $spDescriptor) { $spDescriptor = $entitlement.servicePrincipal.descriptor }
-    if (-not $spDescriptor) { throw "Could not add the service principal to $Org." }
-
-    # Project Collection Administrators membership (PUT is idempotent).
-    $groups = Invoke-Ado -Uri "https://vssps.dev.azure.com/$Org/_apis/graph/groups?scopeDescriptor=&api-version=7.1-preview.1"
-    $pca = $groups.value | Where-Object { $_.principalName -eq "[$Org]\Project Collection Administrators" } | Select-Object -First 1
-    if (-not $pca) { throw "Project Collection Administrators group not found in $Org." }
-    Invoke-Ado -Method PUT -Uri "https://vssps.dev.azure.com/$Org/_apis/graph/memberships/$spDescriptor/$($pca.descriptor)?api-version=7.1-preview.1" | Out-Null
-    Write-Host "   member of Project Collection Administrators"
 
     # Test project.
     $existing = (Invoke-Ado -Uri "https://dev.azure.com/$Org/_apis/projects?api-version=7.1").value | Where-Object name -eq $Project
@@ -105,7 +122,7 @@ Set-OrgAccess -Org $SourceOrg -Project $SourceProject
 Set-OrgAccess -Org $TargetOrg -Project $TargetProject
 
 # --- 3. GitHub environments and variables --------------------------------------------------------
-if (-not $SkipGitHub) {
+if (-not $SkipGitHub -and -not $LocalOnly) {
     Write-Host "== Configuring GitHub $Repository"
     '{}' | gh api -X PUT "repos/$Repository/environments/integration-tests" --input - | Out-Null
 
@@ -124,4 +141,21 @@ if (-not $SkipGitHub) {
     Write-Host "   variables: $($variables.Keys -join ', ')"
 }
 
+if ($LocalOnly) {
+    $testVariables = [ordered]@{
+        MigrationTools__Tests__UseEntraId       = 'true'
+        MigrationTools__Tests__SourceCollection = "https://dev.azure.com/$SourceOrg/"
+        MigrationTools__Tests__TargetCollection = "https://dev.azure.com/$TargetOrg/"
+    }
+    if ($SetUserEnvironment) {
+        foreach ($name in $testVariables.Keys) { [Environment]::SetEnvironmentVariable($name, $testVariables[$name], 'User') }
+        Write-Host "== Saved to your user environment. Open a new terminal, then run: dotnet test MigrationTools.sln"
+    }
+    else {
+        Write-Host "== Done. Set these, then run: dotnet test MigrationTools.sln"
+        foreach ($name in $testVariables.Keys) { Write-Host "   `$env:$name = '$($testVariables[$name])'" }
+    }
+    Write-Host "   (If 'az login' cannot reach your orgs, e.g. a personal Microsoft account, set MigrationTools__Tests__AccessToken to a PAT for them instead of UseEntraId.)"
+    return
+}
 Write-Host "== Done. Run the 'Integration tests (Azure DevOps)' workflow to validate."

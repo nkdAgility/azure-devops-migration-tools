@@ -87,6 +87,19 @@ jobs:
           if ($LASTEXITCODE -ne 0) { $failed = $true }
           if ($failed) { exit 1 }
 
+      - name: Explain failure
+        if: failure()
+        shell: pwsh
+        run: |
+          @"
+          ## Live Azure DevOps tests failed
+          - **Azure login step failed:** the Entra app or its federated credential for environment ``${{ github.event_name == 'pull_request_target' && 'integration-tests-forks' || 'integration-tests' }}`` is missing. Re-run ``infra/test-env/Setup-TestEnvironment.ps1``.
+          - **LiveEnvironment_* preflight failed:** its message says whether the token was rejected, the org/project is missing, or the org is unreachable, and how to fix it.
+          - **Only feature tests failed:** the environment is fine; it is a real test failure. Download the ``integration-test-results`` artifact for details.
+
+          Guide: [CONTRIBUTING.md - Troubleshooting live tests](https://github.com/${{ github.repository }}/blob/main/CONTRIBUTING.md#troubleshooting-live-tests)
+          "@ | Out-File -Append $env:GITHUB_STEP_SUMMARY
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
