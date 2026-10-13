@@ -104,6 +104,39 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
+        public void HasFailures_FalseWhenEverythingPlannedWasCreatedAndOnlyExistingGroupsWereSkipped()
+        {
+            var source = new[] { Version("a", "A", 1, AvailableTask), Version("a", "A", 2, AvailableTask), Version("b", "B", 1, AvailableTask) };
+            var target = new[] { Version("x", "B", 1) };
+
+            var plan = TaskGroupMigrationPlan.Create(source, target, AvailableTasks);
+
+            Assert.IsFalse(plan.HasFailures(createdRootVersions: 1, createdUpdatedVersions: 1));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void HasFailures_TrueWhenATaskGroupIsSkipped()
+        {
+            var source = new[] { Version("a", "A", 1, MissingTask), Version("a", "A", 2, AvailableTask) };
+
+            var plan = TaskGroupMigrationPlan.Create(source, new TaskGroup[0], AvailableTasks);
+
+            Assert.AreEqual(1, plan.SkippedTaskGroups);
+            Assert.IsTrue(plan.HasFailures(createdRootVersions: 0, createdUpdatedVersions: 0));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void HasFailures_TrueWhenTheTargetRejectsAPlannedVersion()
+        {
+            var source = new[] { Version("a", "A", 1, AvailableTask), Version("a", "A", 2, AvailableTask) };
+
+            var plan = TaskGroupMigrationPlan.Create(source, new TaskGroup[0], AvailableTasks);
+
+            Assert.IsTrue(plan.HasFailures(createdRootVersions: 0, createdUpdatedVersions: 0));
+            Assert.IsTrue(plan.HasFailures(createdRootVersions: 1, createdUpdatedVersions: 0));
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void ExistingInTarget_IsSkippedAndCountedSeparately()
         {
             var source = new[] { Version("a", "A", 1, MissingTask), Version("a", "A", 2, AvailableTask), Version("b", "B", 1, AvailableTask) };

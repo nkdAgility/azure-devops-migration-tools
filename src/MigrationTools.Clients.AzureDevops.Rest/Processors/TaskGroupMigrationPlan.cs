@@ -32,6 +32,16 @@ namespace MigrationTools.Processors
         /// <summary>Number of task groups with at least one version to migrate.</summary>
         public int TaskGroupsToMigrate => RootVersions.Count;
 
+        /// <summary>Number of task groups with at least one version that cannot be migrated.</summary>
+        public int SkippedTaskGroups => Warnings.Count;
+
+        /// <summary>
+        /// Whether the migration left something behind: a skipped version, or a planned version the target did not accept.
+        /// Task groups that already exist in the target are expected and do not count.
+        /// </summary>
+        public bool HasFailures(int createdRootVersions, int createdUpdatedVersions) =>
+            SkippedTaskGroups > 0 || createdRootVersions < RootVersions.Count || createdUpdatedVersions < UpdatedVersions.Count;
+
         /// <summary>One message per task group, or task group version, that will not be migrated.</summary>
         public List<string> Warnings { get; } = new List<string>();
 

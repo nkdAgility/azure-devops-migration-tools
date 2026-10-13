@@ -567,6 +567,8 @@ namespace MigrationTools.Processors
                 plan.TaskGroupsToMigrate, plan.TotalTaskGroups, typeof(TaskGroup).Name, plan.ExistingTaskGroups, plan.RootVersions.Count + plan.UpdatedVersions.Count);
 
             var mappings = await Target.CreateApiDefinitionsAsync(plan.RootVersions);
+            var createdRootVersions = mappings.Count;
+            var createdUpdatedVersions = 0;
 
             if (plan.UpdatedVersions.Count > 0)
             {
@@ -575,7 +577,14 @@ namespace MigrationTools.Processors
                     .Where(d => d.Id != null)
                     .GroupBy(d => d.Id)
                     .Select(g => g.OrderBy(d => d.Version?.Major ?? 0).First());
-                await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, plan.UpdatedVersions, mappings);
+                createdUpdatedVersions = (await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, plan.UpdatedVersions, mappings)).Count;
+            }
+
+            if (plan.HasFailures(createdRootVersions, createdUpdatedVersions))
+            {
+                Log.LogError("{SkippedObjects} source {DefinitionType}(s) were skipped and {FailedVersions} version(s) failed to migrate; marking the run as failed.",
+                    plan.SkippedTaskGroups, typeof(TaskGroup).Name, plan.RootVersions.Count + plan.UpdatedVersions.Count - createdRootVersions - createdUpdatedVersions);
+                CompletedWithErrors = true;
             }
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
