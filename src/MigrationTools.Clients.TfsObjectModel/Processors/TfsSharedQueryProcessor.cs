@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using MigrationTools.Endpoints;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
@@ -13,7 +17,7 @@ using MigrationTools.Tools;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
+    /// The TfsSharedQueryProcessor migrates shared queries and their folders from one project to another, keeping the team context of @CurrentIteration and @TeamAreas when both servers support the REST Queries API (Azure DevOps Services and TFS 2015 or later).
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Queries</processingtarget>
@@ -25,6 +29,10 @@ namespace MigrationTools.Processors
         private int _totalQueriesSkipped;
         private int _totalQueriesMigrated;
         private int _totalQueryFailed;
+        private WorkItemTrackingHttpClient _sourceQueryClient;
+        private WorkItemTrackingHttpClient _targetQueryClient;
+        private bool? _restQueriesAvailable;
+        private HashSet<string> _targetTeams;
 
         public TfsSharedQueryProcessor(IOptions<TfsSharedQueryProcessorOptions> options, CommonTools commonTools, ProcessorEnricherContainer processorEnrichers, IServiceProvider services, ITelemetryLogger telemetry, ILogger<Processor> logger) : base(options, commonTools, processorEnrichers, services, telemetry, logger)
         {
@@ -57,6 +65,10 @@ namespace MigrationTools.Processors
             stopwatch.Stop();
             Log.LogInformation("Folders scanned {totalFoldersAttempted}", _totalFoldersAttempted);
             Log.LogInformation("Queries Found:{totalQueriesAttempted}  Skipped:{totalQueriesSkipped}  Migrated:{totalQueriesMigrated}   Failed:{totalQueryFailed}", _totalQueriesAttempted, _totalQueriesSkipped, _totalQueriesMigrated, _totalQueryFailed);
+            if (_totalQueryFailed > 0)
+            {
+                Log.LogWarning("{totalQueryFailed} queries could not be migrated. Check the errors above.", _totalQueryFailed);
+            }
             Log.LogInformation("DONE in {Elapsed} seconds", stopwatch.Elapsed.ToString("c"));
         }
 
@@ -148,28 +160,57 @@ namespace MigrationTools.Processors
                 Log.LogWarning("Skipping query '{queryName}' as already exists", query.Name);
                 return;
             }
-            // Sort out any path issues in the quertText
-            var fixedQueryText = query.QueryText.Replace($"'{Source.Project}", $"'{Target.Project}"); // the ' should only items at the start of areapath etc.
+            _totalQueriesAttempted++;
+            Log.LogInformation("Migrating query '{queryName}'", query.Name);
 
-            if (Options.PrefixProjectToNodes)
+            // The object model drops the team context from macros such as @CurrentIteration('[Project]\Team') and
+            // rejects @CurrentIteration +/- n, so the WIQL is read and written through the REST API when the servers
+            // have it (TFS 2015+), and through the object model otherwise (#2705).
+            if (!RestQueriesAvailable)
             {
-                // we need to inject the team name as a folder in the structure too
-                fixedQueryText = fixedQueryText.Replace($"{Target.Project}\\", $"{Target.Project}\\{Source.Project}\\");
+                MigrateQueryWithObjectModel(targetHierarchy, query, parentFolder);
+                return;
             }
 
-            if (Options.SourceToTargetFieldMappings != null)
+            string sourceQueryText;
+            try
             {
-                foreach (var sourceField in Options.SourceToTargetFieldMappings.Keys)
-                {
-                    fixedQueryText = fixedQueryText.Replace(sourceField, Options.SourceToTargetFieldMappings[sourceField]);
-                }
+                sourceQueryText = SourceQueryClient.GetQueryAsync(Source.Project, query.Id.ToString(), QueryExpand.Wiql).GetAwaiter().GetResult().Wiql;
+            }
+            catch (Exception ex)
+            {
+                _totalQueryFailed++;
+                Log.LogError(ex, "Error reading query '{queryName}' from the source through the REST API", query.Name);
+                return;
+            }
+
+            var fixedQueryText = SharedQueryWiqlRewriter.Rewrite(sourceQueryText, Source.Project, Target.Project, Options.PrefixProjectToNodes, Options.SourceToTargetFieldMappings);
+            fixedQueryText = MapTeams(query.Name, fixedQueryText);
+
+            try
+            {
+                TargetQueryClient.CreateQueryAsync(new QueryHierarchyItem { Name = query.Name, Wiql = fixedQueryText }, Target.Project, parentFolder.Id.ToString()).GetAwaiter().GetResult();
+                _totalQueriesMigrated++;
+            }
+            catch (Exception ex)
+            {
+                _totalQueryFailed++;
+                Log.LogDebug("Source Query: '{sourceQueryText}'", sourceQueryText);
+                Log.LogDebug("Target Query: '{fixedQueryText}'", fixedQueryText);
+                Log.LogError(ex, "Error saving query '{queryName}', probably due to invalid area or iteration paths", query.Name);
+            }
+        }
+
+        private void MigrateQueryWithObjectModel(QueryHierarchy targetHierarchy, QueryDefinition query, QueryFolder parentFolder)
+        {
+            var fixedQueryText = SharedQueryWiqlRewriter.Rewrite(query.QueryText, Source.Project, Target.Project, Options.PrefixProjectToNodes, Options.SourceToTargetFieldMappings);
+            if (fixedQueryText.IndexOf("@CurrentIteration", StringComparison.OrdinalIgnoreCase) >= 0 || fixedQueryText.IndexOf("@TeamAreas", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                Log.LogWarning("Query '{queryName}' uses a team-scoped macro. Without the REST Queries API the team context cannot be read, so the migrated query uses the default team.", query.Name);
             }
 
             // you cannot just add an item from one store to another, we need to create a new object
-            var queryCopy = new QueryDefinition(query.Name, fixedQueryText);
-            _totalQueriesAttempted++;
-            Log.LogInformation("Migrating query '{queryName}'", query.Name);
-            parentFolder.Add(queryCopy);
+            parentFolder.Add(new QueryDefinition(query.Name, fixedQueryText));
             try
             {
                 targetHierarchy.Save(); // moved the save here for better error message
@@ -183,6 +224,82 @@ namespace MigrationTools.Processors
                 Log.LogError(ex, "Error saving query '{queryName}', probably due to invalid area or iteration paths", query.Name);
                 targetHierarchy.Refresh(); // get the tree without the last edit
             }
+        }
+
+        private string MapTeams(string queryName, string queryText)
+        {
+            var sourceDefaultTeam = $"{Source.Project} Team";
+            var targetDefaultTeam = $"{Target.Project} Team";
+            foreach (var team in SharedQueryWiqlRewriter.GetReferencedTeams(queryText, Target.Project).ToList())
+            {
+                if (string.Equals(team, sourceDefaultTeam, StringComparison.OrdinalIgnoreCase) && !string.Equals(sourceDefaultTeam, targetDefaultTeam, StringComparison.OrdinalIgnoreCase) && TargetTeamExists(targetDefaultTeam) == true)
+                {
+                    // the default team is named after the project, so it changes name with it
+                    Log.LogInformation("Query '{queryName}' refers to the source default team '{team}'; using the target default team '{targetDefaultTeam}'", queryName, team, targetDefaultTeam);
+                    queryText = SharedQueryWiqlRewriter.ReplaceTeam(queryText, Target.Project, team, targetDefaultTeam);
+                }
+                else if (TargetTeamExists(team) == false)
+                {
+                    Log.LogWarning("Query '{queryName}' refers to team '{team}', which does not exist in target project '{targetProject}'. The query is migrated but will not return results until the team is created, for example with TfsTeamSettingsProcessor.", queryName, team, Target.Project);
+                }
+            }
+            return queryText;
+        }
+
+        private bool RestQueriesAvailable
+        {
+            get
+            {
+                if (_restQueriesAvailable == null)
+                {
+                    try
+                    {
+                        SourceQueryClient.GetQueriesAsync(Source.Project, depth: 0).GetAwaiter().GetResult();
+                        TargetQueryClient.GetQueriesAsync(Target.Project, depth: 0).GetAwaiter().GetResult();
+                        _restQueriesAvailable = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.LogWarning(ex, "The REST Queries API is not available (it needs TFS 2015 or later). Queries are migrated with the object model, which cannot keep the team context of @CurrentIteration or @TeamAreas.");
+                        _restQueriesAvailable = false;
+                    }
+                }
+                return _restQueriesAvailable.Value;
+            }
+        }
+
+        private WorkItemTrackingHttpClient SourceQueryClient => _sourceQueryClient ??= Source.TfsCollection.GetClient<WorkItemTrackingHttpClient>();
+
+        private WorkItemTrackingHttpClient TargetQueryClient => _targetQueryClient ??= Target.TfsCollection.GetClient<WorkItemTrackingHttpClient>();
+
+        /// <summary>
+        /// Whether the team exists in the target project, or null when the teams could not be read.
+        /// </summary>
+        private bool? TargetTeamExists(string team)
+        {
+            if (_targetTeams == null)
+            {
+                try
+                {
+                    var teamClient = Target.TfsCollection.GetClient<TeamHttpClient>();
+                    var teams = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    const int pageSize = 100;
+                    for (var skip = 0; ; skip += pageSize)
+                    {
+                        var page = teamClient.GetTeamsAsync(Target.Project, top: pageSize, skip: skip).GetAwaiter().GetResult();
+                        teams.UnionWith(page.Select(t => t.Name));
+                        if (page.Count < pageSize) break;
+                    }
+                    _targetTeams = teams;
+                }
+                catch (Exception ex)
+                {
+                    // not cached, so a transient failure does not mark every team as missing for the rest of the run
+                    Log.LogWarning(ex, "Could not read the teams of target project '{targetProject}' to check the teams that queries refer to", Target.Project);
+                    return null;
+                }
+            }
+            return _targetTeams.Contains(team);
         }
     }
 }
