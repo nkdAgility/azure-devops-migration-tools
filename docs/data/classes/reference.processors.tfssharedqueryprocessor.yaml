@@ -25,7 +25,7 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools.Processors.TfsSharedQueryProcessorOptions
-description: The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
+description: The TfsSharedQueryProcessor migrates shared queries and their folders from one project to another, keeping the team context of @CurrentIteration and @TeamAreas when both servers support the REST Queries API (Azure DevOps Services and TFS 2015 or later).
 className: TfsSharedQueryProcessor
 typeName: Processors
 options:
