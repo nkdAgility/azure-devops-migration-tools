@@ -41,6 +41,22 @@ function Add-E2ERule {
     if (-not $existing) { Invoke-E2ERest "_apis/work/processes/$ProcessId/workitemtypes/$wit/rules" -Method POST -Body $Rule | Out-Null }
 }
 
+# Org-level custom fields. Only names starting "amte2e" (reference Custom.amte2e*) can be created or deleted.
+function New-E2EField {
+    param([string]$Name, [string]$Type = "string", [string]$Org)
+    if (-not $Name.StartsWith("amte2e")) { throw "Refusing to create field '$Name': only amte2e* fields are allowed." }
+    $existing = (Invoke-E2ERest "_apis/wit/fields" -Org $Org).value | Where-Object name -eq $Name
+    if ($existing) { return $existing.referenceName }
+    (Invoke-E2ERest "_apis/wit/fields" -Org $Org -Method POST -Body @{ name = $Name; type = $Type; usage = "workItem" }).referenceName
+}
+
+function Remove-E2EField([string]$ReferenceName, [string]$Org) {
+    if (-not $ReferenceName.StartsWith("Custom.amte2e")) { throw "Refusing to delete field '$ReferenceName'." }
+    try { Invoke-E2ERest "_apis/wit/fields/$([Uri]::EscapeDataString($ReferenceName))" -Org $Org -Method DELETE | Out-Null } catch { if ($_.Exception.Response.StatusCode -ne 404) { throw } }
+}
+
+function Get-E2EFields([string]$Org) { (Invoke-E2ERest "_apis/wit/fields" -Org $Org).value | Where-Object { $_.referenceName -like "Custom.amte2e*" } }
+
 # Creates an inherited Agile process with the ReflectedWorkItemId field on the given types.
 function New-E2EBaseProcess {
     param([string]$Name, [string[]]$Wits = @("User Story", "Bug", "Task", "Feature", "Epic", "Issue", "Test Case", "Test Plan", "Test Suite"), [string]$ReflectedField = "Custom.ReflectedWorkItemId", [string]$Org)
