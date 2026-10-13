@@ -49,11 +49,11 @@ if (-not $LocalOnly -and -not $Reviewers) { throw '-Reviewers is required (GitHu
 $spObjectId = $null
 
 function Invoke-Ado {
-    param([string] $Method = 'GET', [string] $Uri, $Body)
+    param([string] $Method = 'GET', [string] $Uri, $Body, [string] $ContentType = 'application/json')
     $token = az account get-access-token --resource $AzureDevOpsResource --query accessToken -o tsv
     $headers = @{ Authorization = "Bearer $token" }
-    $params = @{ Method = $Method; Uri = $Uri; Headers = $headers; ContentType = 'application/json' }
-    if ($null -ne $Body) { $params.Body = ($Body | ConvertTo-Json -Depth 10) }
+    $params = @{ Method = $Method; Uri = $Uri; Headers = $headers; ContentType = $ContentType }
+    if ($null -ne $Body) { $params.Body = (ConvertTo-Json -InputObject $Body -Depth 20) }
     Invoke-RestMethod @params
 }
 
@@ -118,8 +118,69 @@ function Set-OrgAccess {
     Write-Host "   created project $Project ($ProcessName)"
 }
 
+# --- Test data the live tests expect (idempotent) --------------------------------------------------
+$ReleaseDefinitionName = 'New release pipeline'
+
+function Add-TestWorkItems {
+    param([string] $Org, [string] $Project, [int] $Count = 3)
+    $wiql = @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '$Project' AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan')" }
+    $found = (Invoke-Ado -Method POST -Uri "https://dev.azure.com/$Org/$Project/_apis/wit/wiql?`$top=1&api-version=7.1" -Body $wiql).workItems
+    if ($found) { Write-Host "   work items exist in $Project"; return }
+    $type = if ($ProcessName -eq 'Scrum') { 'Product Backlog Item' } elseif ($ProcessName -eq 'Basic') { 'Issue' } else { 'User Story' }
+    for ($i = 1; $i -le $Count; $i++) {
+        $patch = @(@{ op = 'add'; path = '/fields/System.Title'; value = "Integration test item $i" })
+        Invoke-Ado -Method POST -Uri "https://dev.azure.com/$Org/$Project/_apis/wit/workitems/`$$([Uri]::EscapeDataString($type))?api-version=7.1" -Body $patch -ContentType 'application/json-patch+json' | Out-Null
+    }
+    Write-Host "   created $Count $type work items in $Project"
+}
+
+function Add-TestReleaseDefinition {
+    param([string] $Org, [string] $Project)
+    $base = "https://vsrm.dev.azure.com/$Org/$Project/_apis/release/definitions"
+    $existing = (Invoke-Ado -Uri "$base`?searchText=$([Uri]::EscapeDataString($ReleaseDefinitionName))&isExactNameMatch=true&api-version=7.1").value
+    if ($existing) { Write-Host "   release definition '$ReleaseDefinitionName' exists in $Project"; return }
+    $queue = (Invoke-Ado -Uri "https://dev.azure.com/$Org/$Project/_apis/distributedtask/queues?queueName=Azure%20Pipelines&api-version=7.1-preview.1").value | Select-Object -First 1
+    if (-not $queue) { throw "Agent queue 'Azure Pipelines' not found in $Org/$Project." }
+    $approval = @{ approvals = @(@{ rank = 1; isAutomated = $true; isNotificationOn = $false }) }
+    try {
+    Invoke-Ado -Method POST -Uri "$base`?api-version=7.1" -Body @{
+        name         = $ReleaseDefinitionName
+        environments = @(@{
+                name                = 'Stage 1'
+                rank                = 1
+                preDeployApprovals  = $approval
+                postDeployApprovals = $approval
+                retentionPolicy     = @{ daysToKeep = 30; releasesToKeep = 3; retainBuild = $true }
+                deployPhases        = @(@{
+                        name            = 'Agent job'
+                        rank            = 1
+                        phaseType       = 'agentBasedDeployment'
+                        deploymentInput = @{ queueId = $queue.id }
+                        workflowTasks   = @()
+                    })
+            })
+    } | Out-Null
+    }
+    catch {
+        if ("$_" -match 'classic pipelines are disabled') {
+            Write-Warning ("Classic release pipelines are disabled in $Org, so '$ReleaseDefinitionName' could not be created and the release pipeline test will fail. " +
+                "Fix: https://dev.azure.com/$Org/_settings/pipelinessettings (and Project settings > Pipelines > Settings in $Project): turn OFF " +
+                "'Disable creation of classic release pipelines', then re-run this script.")
+            return
+        }
+        throw
+    }
+    Write-Host "   created release definition '$ReleaseDefinitionName' in $Project"
+}
+
 Set-OrgAccess -Org $SourceOrg -Project $SourceProject
 Set-OrgAccess -Org $TargetOrg -Project $TargetProject
+
+Write-Host "== Seeding test data"
+Add-TestWorkItems -Org $SourceOrg -Project $SourceProject
+# The release pipeline test expects exactly one definition in the source that already exists in the target.
+Add-TestReleaseDefinition -Org $SourceOrg -Project $SourceProject
+Add-TestReleaseDefinition -Org $TargetOrg -Project $TargetProject
 
 # --- 3. GitHub environments and variables --------------------------------------------------------
 if (-not $SkipGitHub -and -not $LocalOnly) {
