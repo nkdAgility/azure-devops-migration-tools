@@ -31,7 +31,7 @@ In your configuration file under `MigrationTools:Endpoints` there will be both a
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "Authentication": {
           "AuthenticationMode": "AccessToken",
-          "AccessToken": "alakjhsaggdsad67869asdjksafksldjhgsjkdghsdkfhskdf",
+          "AccessToken": "",
           "NetworkCredentials": {
             "UserName": "",
             "Password": "",

@@ -9,7 +9,7 @@
     "ReflectedWorkItemIDFieldName": "Custom.ReflectedWorkItemId",
     "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+    "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"
@@ -22,7 +22,7 @@
     "ReflectedWorkItemIDFieldName": "nkdScrum.ReflectedWorkItemId",
     "AuthenticationMode": "AccessToken",
     "AllowCrossProjectLinking": false,
-    "PersonalAccessToken": "rrsne75npwj5ctn5vm337nrxiqlvdkfmcbkqrubl6ushts6syi5a",
+    "PersonalAccessToken": "",
     "LanguageMaps": {
       "AreaPath": "Area",
       "IterationPath": "Iteration"

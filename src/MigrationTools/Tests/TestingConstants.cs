@@ -23,7 +23,7 @@ namespace MigrationTools.Tests
         public static Uri CollectionFor(string project)
             => project != null && project.StartsWith("migrationTarget", StringComparison.OrdinalIgnoreCase) ? TargetCollection : SourceCollection;
 
-        public static string AccessToken => Env(Prefix + "AccessToken") ?? Env("AZDEVOPS_SYSTEM_TEST_PAT") ?? LegacyAccessToken;
+        public static string AccessToken => Env(Prefix + "AccessToken") ?? Env("AZDEVOPS_SYSTEM_TEST_PAT");
 
         public static bool UseEntraId => string.Equals(Env(Prefix + "UseEntraId"), "true", StringComparison.OrdinalIgnoreCase)
             || string.Equals(Env(Prefix + "AuthenticationMode"), nameof(MigrationTools.Endpoints.AuthenticationMode.EntraId), StringComparison.OrdinalIgnoreCase);
@@ -39,7 +39,7 @@ namespace MigrationTools.Tests
             => UseEntraId ? "Microsoft Entra ID (ambient login: az login / Visual Studio / managed identity / OIDC)"
              : Env(Prefix + "AccessToken") != null ? "PAT from " + Prefix + "AccessToken"
              : Env("AZDEVOPS_SYSTEM_TEST_PAT") != null ? "PAT from AZDEVOPS_SYSTEM_TEST_PAT"
-             : "built-in fallback token (temporary)";
+             : "none configured";
 
         /// <summary>One-line summary of the live test configuration, safe to log.</summary>
         public static string Describe()
@@ -54,8 +54,5 @@ namespace MigrationTools.Tests
             "or MigrationTools__Tests__AccessToken to a PAT, plus MigrationTools__Tests__SourceCollection/TargetCollection for your own orgs. " +
             "See https://github.com/nkdAgility/azure-devops-migration-tools/blob/main/CONTRIBUTING.md#running-the-tests";
 
-        // TEMPORARY: the previously committed token, kept only until the Entra-based test orgs are validated (#3193). Removed in the final commit.
-        private static string LegacyAccessToken => AccessTokenRaw.Replace(@"fake", "");
-        public static readonly string AccessTokenRaw = "5JuxdNPwL6LJ4unvKHK7wLS6ISE7ns3FRuvd4YjiyLvYz3MfzA4aJQQJ99CJfakeACAAAAAjtRX1AAASAZDOWMPe";
     }
 }
