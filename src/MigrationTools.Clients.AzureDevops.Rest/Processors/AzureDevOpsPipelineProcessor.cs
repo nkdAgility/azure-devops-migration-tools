@@ -182,70 +182,6 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Filter existing TaskGroups
-        /// </summary>
-        /// <param name="sourceDefinitions"></param>
-        /// <param name="targetDefinitions"></param>
-        /// <returns>List of filtered Definitions</returns>
-        private IEnumerable<TaskGroup> FilterOutExistingTaskGroups(IEnumerable<TaskGroup> sourceDefinitions, IEnumerable<TaskGroup> targetDefinitions)
-        {
-            var objectsToMigrate = sourceDefinitions.Where(s => !targetDefinitions.Any(t => t.Name == s.Name));
-            var rootSourceDefinitions = SortDefinitionsByVersion(objectsToMigrate).First();
-            Log.LogInformation("{ObjectsToBeMigrated} of {TotalObjects} source {DefinitionType}(s) are going to be migrated..", objectsToMigrate.GroupBy(o => o.Name).Where(o => o.Count() >= 1).Count(), rootSourceDefinitions.Count(), typeof(TaskGroup).Name);
-            return objectsToMigrate;
-        }
-
-        /// <summary>
-        /// Filter incompatible TaskGroups
-        /// </summary>
-        /// <param name="filteredTaskGroups"></param>
-        /// <param name="availableTasks"></param>
-        /// <returns>List of filtered Definitions</returns>
-        private IEnumerable<TaskGroup> FilterOutIncompatibleTaskGroups(IEnumerable<TaskGroup> filteredTaskGroups, IEnumerable<TaskDefinition> availableTasks)
-        {
-            var objectsToMigrate = filteredTaskGroups.Where(g =>
-            {
-                var missingTasksNames = new List<string>();
-                var allTasksAreAvailable = g.Tasks.All(t =>
-                {
-                    if (availableTasks.Any(a => a.Id == t.Task.Id))
-                    {
-                        return true;
-                    }
-                    missingTasksNames.Add(t.DisplayName);
-                    return false;
-                });
-
-                if (!allTasksAreAvailable)
-                {
-                    Log.LogWarning(
-                        @"{DefinitionType} ""{DefinitionName}"" cannot be migrated because the Task(s) ""{MissingTaskNames}"" are not available. This usually happens if the extension for the task is not installed.",
-                        typeof(TaskGroup).Name, g.Name, string.Join(",", missingTasksNames));
-                    return false;
-                }
-                return true;
-            });
-            return objectsToMigrate;
-        }
-
-        /// <summary>
-        /// Group and Sort Definitions by Version numer
-        /// </summary>
-        /// <param name="sourceDefinitions"></param>
-        /// <returns>List of sorted Definitions</returns>
-        private IEnumerable<IEnumerable<TaskGroup>> SortDefinitionsByVersion(IEnumerable<TaskGroup> sourceDefinitions)
-        {
-            var groupList = new List<IEnumerable<TaskGroup>>();
-            sourceDefinitions.OrderBy(d => d.Version.Major);
-            var rootGroups = sourceDefinitions.Where(d => d.Version.Major == 1);
-            var updatedGroups = sourceDefinitions.Where(d => d.Version.Major > 1);
-            groupList.Add(rootGroups);
-            groupList.Add(updatedGroups);
-
-            return groupList;
-        }
-
-        /// <summary>
         /// Retrieve the selected pipeline definitions from the Azure DevOps Endpoint for the <typeparamref name="DefinitionType"/> type.
         /// </summary>
         /// <typeparam name="DefinitionType">The type of Pipeline definition to query. The type must inherit from <see cref="RestApiDefinition"/>.</typeparam>
@@ -622,17 +558,34 @@ namespace MigrationTools.Processors
             var sourceDefinitions = await Source.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             var targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             var availableTasks = await Target.GetApiDefinitionsAsync<TaskDefinition>(queryForDetails: false);
-            var filteredTaskGroups = FilterOutExistingTaskGroups(sourceDefinitions, targetDefinitions);
-            filteredTaskGroups = FilterOutIncompatibleTaskGroups(filteredTaskGroups, availableTasks).ToList();
+            var plan = TaskGroupMigrationPlan.Create(sourceDefinitions, targetDefinitions, availableTasks);
+            foreach (var warning in plan.Warnings)
+            {
+                Log.LogWarning(warning);
+            }
+            Log.LogInformation("{ObjectsToBeMigrated} of {TotalObjects} source {DefinitionType}(s) are going to be migrated ({ExistingObjects} already exist in the target, {VersionsToBeMigrated} version(s) in total)..",
+                plan.TaskGroupsToMigrate, plan.TotalTaskGroups, typeof(TaskGroup).Name, plan.ExistingTaskGroups, plan.RootVersions.Count + plan.UpdatedVersions.Count);
 
-            var rootSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).First();
-            var updatedSourceDefinitions = SortDefinitionsByVersion(filteredTaskGroups).Last();
+            var mappings = await Target.CreateApiDefinitionsAsync(plan.RootVersions);
+            var createdRootVersions = mappings.Count;
+            var createdUpdatedVersions = 0;
 
-            var mappings = await Target.CreateApiDefinitionsAsync(rootSourceDefinitions);
+            if (plan.UpdatedVersions.Count > 0)
+            {
+                targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
+                var rootTargetDefinitions = targetDefinitions
+                    .Where(d => d.Id != null)
+                    .GroupBy(d => d.Id)
+                    .Select(g => g.OrderBy(d => d.Version?.Major ?? 0).First());
+                createdUpdatedVersions = (await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, plan.UpdatedVersions, mappings)).Count;
+            }
 
-            targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
-            var rootTargetDefinitions = SortDefinitionsByVersion(targetDefinitions).First();
-            await Target.UpdateTaskGroupsAsync(rootTargetDefinitions, updatedSourceDefinitions);
+            if (plan.HasFailures(createdRootVersions, createdUpdatedVersions))
+            {
+                Log.LogError("{SkippedObjects} source {DefinitionType}(s) were skipped and {FailedVersions} version(s) failed to migrate; marking the run as failed.",
+                    plan.SkippedTaskGroups, typeof(TaskGroup).Name, plan.RootVersions.Count + plan.UpdatedVersions.Count - createdRootVersions - createdUpdatedVersions);
+                CompletedWithErrors = true;
+            }
 
             targetDefinitions = await Target.GetApiDefinitionsAsync<TaskGroup>(queryForDetails: false);
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions.Where(d => d.Name != null), mappings));
