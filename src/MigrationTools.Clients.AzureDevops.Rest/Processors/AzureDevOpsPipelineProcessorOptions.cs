@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MigrationTools.Endpoints;
 using MigrationTools.Processors.Infrastructure;
@@ -28,13 +28,13 @@ namespace MigrationTools.Processors
             TargetName = "targetName";
         }
         /// <summary>
-        /// Migrate Build Pipelines
+        /// Migrate Build Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected build pipeline that is not migrated, because it uses a task that is not installed in the target, uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).
         /// </summary>
         /// <default>true</default>
         public bool MigrateBuildPipelines { get; set; }
 
         /// <summary>
-        /// Migrate Release Pipelines
+        /// Migrate Release Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected release pipeline that is not migrated, because it uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).
         /// </summary>
         /// <default>true</default>
         public bool MigrateReleasePipelines { get; set; }
@@ -46,13 +46,13 @@ namespace MigrationTools.Processors
         public bool MigrateTaskGroups { get; set; }
 
         /// <summary>
-        /// Migrate Variable Groups
+        /// Migrate Variable Groups. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A variable group the target rejects marks the run as failed (exit code 1).
         /// </summary>
         /// <default>true</default>
         public bool MigrateVariableGroups { get; set; }
 
         /// <summary>
-        /// Migrate Service Connections **secrets need to be entered manually**
+        /// Migrate Service Connections **secrets need to be entered manually**. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A service connection the target rejects marks the run as failed (exit code 1).
         /// </summary>
         /// <default>true</default>
         public bool MigrateServiceConnections { get; set; }
