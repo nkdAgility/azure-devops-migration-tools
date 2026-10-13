@@ -49,7 +49,8 @@ function Invoke-E2ERest {
     $uri = "https://$Host_/$Org/$($Path.TrimStart('/'))$sep" + "api-version=$ApiVersion"
     $params = @{ Uri = $uri; Method = $Method; Headers = $script:Headers; ContentType = $ContentType }
     if ($null -ne $Body) {
-        $params.Body = if ($Body -is [string] -or $Body -is [byte[]]) { $Body } else { $Body | ConvertTo-Json -Depth 20 }
+        # Assigned directly: returning a byte[] through an if-expression would unroll it and send it as text.
+        if ($Body -is [string] -or $Body -is [byte[]]) { $params.Body = $Body } else { $params.Body = $Body | ConvertTo-Json -Depth 20 }
     }
     Invoke-RestMethod @params
 }
