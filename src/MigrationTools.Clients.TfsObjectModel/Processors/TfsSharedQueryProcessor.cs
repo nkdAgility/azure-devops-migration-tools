@@ -17,7 +17,7 @@ using MigrationTools.Tools;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// The TfsSharedQueryProcessor enabled you to migrate queries from one locatio nto another.
+    /// The TfsSharedQueryProcessor migrates shared queries and their folders from one project to another, keeping the team context of @CurrentIteration and @TeamAreas when both servers support the REST Queries API (Azure DevOps Services and TFS 2015 or later).
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Queries</processingtarget>

@@ -43,9 +43,6 @@ namespace MigrationTools.Processors.Infrastructure
             return fixedQueryText;
         }
 
-        /// <summary>
-        /// Points every team-scoped macro that refers to a team in the given project at another team of that project.
-        /// </summary>
         public static string ReplaceTeam(string wiql, string project, string fromTeam, string toTeam)
         {
             return TeamReference.Replace(wiql, m => IsProject(m, project) && string.Equals(m.Groups["team"].Value, fromTeam, StringComparison.OrdinalIgnoreCase)
@@ -53,9 +50,6 @@ namespace MigrationTools.Processors.Infrastructure
                 : m.Value);
         }
 
-        /// <summary>
-        /// Returns the team names referenced in team-scoped macros for the given project.
-        /// </summary>
         public static IEnumerable<string> GetReferencedTeams(string wiql, string project)
         {
             return TeamReference.Matches(wiql).Cast<Match>()
