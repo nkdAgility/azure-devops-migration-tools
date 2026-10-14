@@ -75,6 +75,10 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 7. Adjust the [`NodeBasePaths`]({{< ref "docs/reference/processors/workitem-tracking-processor" >}}) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
+### Where the logs are written
+
+Each run writes `migration*.log` and `migration-errors*.log` to `logs\<timestamp>` under the folder you run the tool from, not the folder the tool is installed in. The full path is printed at the start of the run as `Logpath:` and again at the end as `Check the logs for errors:`. To write them somewhere else, pass `--logPath <folder>`; the `logs\<timestamp>` folder is created inside it. If the folder cannot be written to, the logs go to `%LOCALAPPDATA%\MigrationTools\logs\<timestamp>` instead.
+
 ### Common Issue: Work Item Type Validation Failures
 
 > **⚠️ IMPORTANT:** The migration tools include automatic validation that runs before migration starts and can cause your migration to fail if source and target systems have different work item types or fields.

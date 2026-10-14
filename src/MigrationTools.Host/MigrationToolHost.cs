@@ -50,6 +50,7 @@ namespace MigrationTools.Host
             var configFile = CommandSettingsBase.ForceGetConfigFile(args);
             var mtv = new MigrationToolVersion();
 
+            LogLocationService.SetBasePath(CommandSettingsBase.ForceGetLogPath(args));
             string logsPath = LogLocationService.GetLogPath();
 
             var hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);

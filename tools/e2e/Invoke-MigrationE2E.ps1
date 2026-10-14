@@ -17,7 +17,8 @@
     Works with Windows PowerShell 5.1 and PowerShell 7+.
 
     Build MigrationTools.ConsoleFull first. Long worktree paths can stop the exe launching, so the build output
-    is copied to a short temp folder before running.
+    is copied to a short temp folder before running. The tool is run from -LogDirectory, so its logs are written
+    there and kept after the copied build is removed; the path is printed as LOGS.
 
 .EXAMPLE
     ./tools/e2e/Invoke-MigrationE2E.ps1 -Config ./my-scenario.json
@@ -26,7 +27,9 @@ param(
     [Parameter(Mandatory)][string]$Config,
     [string]$RepoRoot,
     [string]$BuildOutput,
-    [string]$Filter = "Saved as|Could not save|could not be migrated|Continuing|Too many|stopped|failed|Exiting",
+    # Working directory for the run; the tool writes logs\<timestamp> here. Defaults to a new temp folder that is kept.
+    [string]$LogDirectory,
+    [string]$Filter ="Saved as|Could not save|could not be migrated|Continuing|Too many|stopped|failed|Exiting",
     [string[]]$AllowedOrganisation = @(
         "https://dev.azure.com/nkdagility-adomt-source",
         "https://dev.azure.com/nkdagility-adomt-target",
@@ -70,17 +73,28 @@ $varNames = @($overrides.Keys)
 $saved = @{}
 foreach ($v in $varNames) { $saved[$v] = [Environment]::GetEnvironmentVariable($v) }
 
-$runDir = Join-Path ([IO.Path]::GetTempPath()) ("amt-e2e-" + [Guid]::NewGuid().ToString("N").Substring(0, 8))
+$runId = [Guid]::NewGuid().ToString("N").Substring(0, 8)
+$runDir = Join-Path ([IO.Path]::GetTempPath()) ("amt-e2e-" + $runId)
+# The tool writes logs to the current working directory (#3216), so run it from a separate folder that is kept.
+if (-not $LogDirectory) { $LogDirectory = Join-Path ([IO.Path]::GetTempPath()) ("amt-e2e-logs-" + $runId) }
 $pushed = $false
 $exitCode = 1
 try {
     Copy-Item $BuildOutput $runDir -Recurse
+    New-Item -ItemType Directory -Force $LogDirectory | Out-Null
     foreach ($v in $varNames) { [Environment]::SetEnvironmentVariable($v, $overrides[$v]) }
-    Push-Location $runDir
+    Push-Location $LogDirectory
     $pushed = $true
-    & .\devopsmigration.exe execute --config $configPath --skipVersionCheck --disableTelemetry 2>&1 |
-        Select-String -Pattern $Filter | ForEach-Object { if ($pat) { $_.Line.Replace($pat, "***") } else { $_.Line } }
+    $logPath = $null
+    & (Join-Path $runDir "devopsmigration.exe") execute --config $configPath --skipVersionCheck --disableTelemetry 2>&1 |
+        ForEach-Object {
+            $line = "$_"
+            # Report the path the tool resolved, which may be the LocalAppData fallback.
+            if ($line -match 'Logpath: (.+?)\s*$') { $logPath = $Matches[1] }
+            if ($line -match $Filter) { if ($pat) { $line.Replace($pat, "***") } else { $line } }
+        }
     $exitCode = $LASTEXITCODE
+    if ($logPath) { "LOGS: $logPath" } else { Write-Warning "The tool did not report a Logpath line." }
     "EXIT CODE: $exitCode"
 }
 finally {
