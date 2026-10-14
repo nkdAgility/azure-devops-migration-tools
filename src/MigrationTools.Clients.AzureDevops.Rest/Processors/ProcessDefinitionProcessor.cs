@@ -147,6 +147,12 @@ namespace MigrationTools.Processors
                 });
 
                 await SourceModel.ProcessDefinitions.Values.ParallelForEachAsync(Math.Max(1,Options.MaxDegreeOfParallelism), SyncProcess);
+
+                if (Target.FailedSyncWrites > 0)
+                {
+                    Log.LogError("{FailedWrites} process definition change(s) were rejected by [{Target}]; see the errors above. Marking the run as failed.", Target.FailedSyncWrites, Target.Options.Name);
+                    CompletedWithErrors = true;
+                }
             }
             catch (Exception ex)
             {
@@ -163,15 +169,42 @@ namespace MigrationTools.Processors
             {
                 MappedFrom = sourceProc.Process.Name
             };
-            targetProc.Process = await Target.SyncDefinition(sourceProc.Process, targetProc.Process);
-
-            foreach (var sourceBehavior in sourceProc.WorkItemBehaviors)
+            if (targetProc.Process == null)
             {
-                if (sourceBehavior.Customization != "system") // system cannot be customized.. just skip it
+                var targetProcessName = ProcessDefinitionSync.ResolveTargetProcessName(Options.ProcessMaps, sourceProc.Process.Name);
+                var newProcess = sourceProc.Process.CloneAsNew();
+                if (!targetProcessName.Equals(sourceProc.Process.Name, StringComparison.OrdinalIgnoreCase))
                 {
-                    await SyncDefinitionType(TargetModel.WorkItemBehaviors, sourceBehavior,
-                        TargetModel.WorkItemBehaviors.Values.FirstOrDefault(x => x.ReferenceName == sourceBehavior.ReferenceName),
-                        targetProc.Process.Id);
+                    newProcess.Name = targetProcessName;
+                    newProcess.ReferenceName = null;
+                }
+                targetProc.Process = await Target.SyncDefinition(newProcess, null);
+            }
+            else
+            {
+                targetProc.Process = await Target.SyncDefinition(sourceProc.Process, targetProc.Process);
+            }
+            if (string.IsNullOrEmpty(targetProc.Process?.Id))
+            {
+                Log.LogError("Unable to create or find the target process for [{SourceProcess}]. Skipping its behaviors and work item types.", sourceProc.Process.Name);
+                return;
+            }
+
+            // A newly created process already has its system and inherited behaviors.
+            targetProc.WorkItemBehaviors ??= (await Target.GetApiDefinitionsAsync<WorkItemBehavior>(new string[] { targetProc.Process.Id })).ToList();
+
+            foreach (var sourceBehavior in sourceProc.WorkItemBehaviors.Where(b => !b.IsSystem))
+            {
+                var targetBehavior = ProcessDefinitionSync.FindTargetBehavior(targetProc.WorkItemBehaviors, sourceBehavior);
+                if (targetBehavior == null && sourceBehavior.IsInherited)
+                {
+                    Log.LogWarning("Inherited behavior [{Behavior}] ({ReferenceName}) does not exist in the target process [{TargetProcess}] and cannot be created. Skipping it.", sourceBehavior.Name, sourceBehavior.ReferenceName, targetProc.Process.Name);
+                    continue;
+                }
+                var syncedBehavior = await SyncDefinitionType(TargetModel.WorkItemBehaviors, sourceBehavior, targetBehavior, targetProc.Process.Id);
+                if (targetBehavior == null && !string.IsNullOrEmpty(syncedBehavior?.Id))
+                {
+                    targetProc.WorkItemBehaviors.Add(syncedBehavior);
                 }
             }
 
@@ -185,17 +218,30 @@ namespace MigrationTools.Processors
 
         private async Task SyncWorkItemType(WorkItemTypeModel sourceWit, string processId)
         {
-            var targetWit = TargetModel.WorkItemTypes.ContainsKey(sourceWit.WorkItemType.Name) ? TargetModel.WorkItemTypes[sourceWit.WorkItemType.Name] : new();
-            targetWit.WorkItemType = await Target.SyncDefinition(sourceWit.WorkItemType, targetWit.WorkItemType, processId);
-
-            // When you create a new WIT you need to go get the default states & fields that come after it gets created
-            if (targetWit.States == null || targetWit.States.Count == 0)
+            if (sourceWit.WorkItemType.IsSystem)
             {
-                targetWit.States = (await Target.GetApiDefinitionsAsync<WorkItemState>(new string[] { processId, targetWit.WorkItemType.Id })).ToDictionary(x => x.Id, x => x);
+                Log.LogInformation("Work item type [{WorkItemType}] is not customised in [{Source}]. Nothing to sync.", sourceWit.WorkItemType.Name, Source.Options.Name);
+                return;
             }
-            if (targetWit.Fields == null || targetWit.Fields.Count == 0)
+
+            TargetModel.WorkItemTypes.TryGetValue(sourceWit.WorkItemType.Name, out var targetWit);
+            if (ProcessDefinitionSync.NeedsTargetWorkItemTypeCreated(sourceWit.WorkItemType, targetWit?.WorkItemType))
             {
-                await LoadWorkItemFields(TargetModel, targetWit.WorkItemType, Target, processId);
+                targetWit = new WorkItemTypeModel()
+                {
+                    WorkItemType = await Target.SyncDefinition(sourceWit.WorkItemType, null, processId)
+                };
+                if (string.IsNullOrEmpty(targetWit.WorkItemType.Id))
+                {
+                    Log.LogError("Unable to create work item type [{WorkItemType}] in [{Target}]. Skipping its states, fields, rules and layout.", sourceWit.WorkItemType.Name, Target.Options.Name);
+                    return;
+                }
+                TargetModel.WorkItemTypes[sourceWit.WorkItemType.Name] = targetWit;
+                await LoadWorkItemTypeDetails(TargetModel, targetWit, Target, processId);
+            }
+            else
+            {
+                targetWit.WorkItemType = await Target.SyncDefinition(sourceWit.WorkItemType, targetWit.WorkItemType, processId);
             }
 
             foreach (var state in sourceWit.States.Where(x => x.Value.CustomizationType == "custom"))
@@ -212,32 +258,36 @@ namespace MigrationTools.Processors
                         processId, targetWit.WorkItemType.ReferenceName);
                 }
             }
-            foreach (var field in sourceWit.Fields)
+            // System fields come with the parent type and reject writes (VS403307), like system rules (#3210).
+            foreach (var field in sourceWit.Fields.Where(f => !f.IsSystem))
             {
-                var existingField = TargetModel.WorkItemFields.Values.FirstOrDefault(x => x.ReferenceName == field.ReferenceName);
-                //if (existingField == null || (existingField != null && field.Customization != "system")) // I don't think you can modify
-                //{
-                    await SyncDefinitionType<WorkItemTypeField>(
-                        TargetModel.WorkItemFields,
-                        field,
-                        existingField,
-                        processId, targetWit.WorkItemType.ReferenceName);
-                //}
+                var existingField = targetWit.Fields.FirstOrDefault(x => x.ReferenceName == field.ReferenceName);
+                await SyncDefinitionType<WorkItemTypeField>(
+                    TargetModel.WorkItemFields,
+                    field,
+                    existingField,
+                    processId, targetWit.WorkItemType.ReferenceName);
             }
-            foreach (var rule in sourceWit.Rules)
+            foreach (var rule in sourceWit.Rules.Values.Where(r => r.IsCustom))
             {
                 await SyncDefinitionType<WorkItemRule>(
                     targetWit.Rules,
-                    rule.Value,
-                    targetWit.Rules.Values.FirstOrDefault(x => x.Name == rule.Value.Name),
+                    rule,
+                    targetWit.Rules.Values.FirstOrDefault(x => x.IsCustom && string.Equals(x.Name, rule.Name, StringComparison.OrdinalIgnoreCase)),
                     processId, targetWit.WorkItemType.ReferenceName);
             }
             foreach (var behavior in sourceWit.Behaviors)
             {
+                var targetBehavior = targetWit.Behaviors.Values.FirstOrDefault(x => x.Id == behavior.Value.Id);
+                // The service fails with TF401349 when re-applying an unchanged inherited association.
+                if (targetBehavior != null && targetBehavior.IsDefault == behavior.Value.IsDefault)
+                {
+                    continue;
+                }
                 await SyncDefinitionType<WorkItemTypeBehavior>(
                     targetWit.Behaviors,
                     behavior.Value,
-                    targetWit.Behaviors.Values.FirstOrDefault(x => x.Id == behavior.Value.Id),
+                    targetBehavior,
                     processId, targetWit.WorkItemType.ReferenceName);
             }
 
@@ -248,10 +298,14 @@ namespace MigrationTools.Processors
                 var targetPage = targetWit.Layout.Pages
                     .FirstOrDefault(x => x.Label.Equals(page.Label, StringComparison.OrdinalIgnoreCase));
 
-                await SyncDefinitionType<WorkItemPage>(
+                var syncedPage = await SyncDefinitionType<WorkItemPage>(
                     TargetModel.WorkItemPages,
                     page, targetPage,
                     processId, targetWit.WorkItemType.ReferenceName);
+                if (targetPage == null && !string.IsNullOrEmpty(syncedPage?.Id))
+                {
+                    targetWit.Layout.Pages.Add(syncedPage);
+                }
             }
             #endregion
 
@@ -264,11 +318,17 @@ namespace MigrationTools.Processors
             {
                 var targetPage = targetWit.Layout.Pages
                     .FirstOrDefault(x => x.Label.Equals(sourcePage.Label, StringComparison.OrdinalIgnoreCase));
-
-                foreach (var sourceSection in sourcePage.Sections)
+                if (targetPage == null)
                 {
-                    foreach (var sourceGroup in sourceSection.Groups)
+                    Log.LogError("Page [{Page}] is missing from work item type [{WorkItemType}] in [{Target}]. Skipping its groups.", sourcePage.Label, targetWit.WorkItemType.Name, Target.Options.Name);
+                    continue;
+                }
+
+                foreach (var sourceSection in sourcePage.Sections ?? Enumerable.Empty<WorkItemSection>())
+                {
+                    foreach (var sourceGroup in sourceSection.Groups ?? Enumerable.Empty<WorkItemGroup>())
                     {
+                        var sourceControls = sourceGroup.Controls ?? new List<WorkItemControl>();
                         var sourceGroupKey = $"{sourceWit.WorkItemType.Name}::{sourcePage.Label}::{sourceSection.Id}::{sourceGroup.Label}";
                         // first let's see if the target has any inherited group for this source group ..
                         // It will have a group.inherits != null/"" if it is inherited.. you can edit "system" groups
@@ -278,7 +338,7 @@ namespace MigrationTools.Processors
                             var existingGroup = TargetModel.WorkItemGroups.Select(x => new { x.Key, x.Value })
                                 .FirstOrDefault(x =>
                                     x.Key.StartsWith($"{targetWit.WorkItemType.Name}::") &&
-                                    x.Value.Label.Equals(sourceGroup.Label, StringComparison.OrdinalIgnoreCase));
+                                    string.Equals(x.Value.Label, sourceGroup.Label, StringComparison.OrdinalIgnoreCase));
 
                             if (existingGroup != null)
                             {
@@ -339,31 +399,24 @@ namespace MigrationTools.Processors
                                     }
                                 }
 
-                                // TODO Finish this!
                                 // Iterate through the source controls and make sure the target has all the controls from source
-                                foreach (var sourceControl in sourceGroup.Controls)
+                                foreach (var sourceControl in sourceControls)
                                 {
-                                    if (sourceControl.ControlType == "HtmlFieldControl")
+                                    if (WorkItemGroup.IsHtmlControl(sourceControl))
                                     {
                                         Log.LogWarning($"Skipped HTML control sync [{sourceControl.Label}] as it should have already been migrated as part of the group sync.");
                                     }
                                     else
                                     {
-                                        // Let's see if we can't find the control already present in the "final target"
-                                        var targetControl = finalTargetGroup.Controls.FirstOrDefault(ctl => ctl.Id.Equals(sourceControl.Id, StringComparison.OrdinalIgnoreCase));
+                                        var targetControl = finalTargetGroup.Controls?.FirstOrDefault(ctl => string.Equals(ctl.Id, sourceControl.Id, StringComparison.OrdinalIgnoreCase));
 
                                         if (targetControl == null)
                                         {
-                                            // Let's see if its in another group perhaps.. if so we might want to move it.. that would imply that the group it was in is no longer
-                                            WorkItemGroup oldGroup = null;
-                                            foreach (var tempSection in finalTargetPage.Sections)
-                                            {
-                                                oldGroup = tempSection.Groups.FirstOrDefault(g => g.Controls.Any(c => c.Id.Equals(sourceControl.Id, StringComparison.OrdinalIgnoreCase)));
-                                                if (oldGroup != null)
-                                                {
-                                                    break;
-                                                }
-                                            }
+                                            // The page object we hold does not carry its sections, so search every target group of this type (#3218).
+                                            var targetWitGroups = TargetModel.WorkItemGroups
+                                                .Where(x => x.Key.StartsWith($"{targetWit.WorkItemType.Name}::"))
+                                                .Select(x => x.Value);
+                                            var oldGroup = ProcessDefinitionSync.FindGroupContainingControl(targetWitGroups, sourceControl.Id, finalTargetGroup);
 
                                             if (oldGroup == null) // It must be a new control
                                             {
@@ -403,9 +456,13 @@ namespace MigrationTools.Processors
                                 // Target doesn't have the group at all
                                 WorkItemGroup newGroup = await SyncDefinitionType<WorkItemGroup>(TargetModel.WorkItemGroups, sourceGroup,
                                     null, processId, targetWit.WorkItemType.ReferenceName, targetPage.Id, sourceSection.Id);
+                                if (string.IsNullOrEmpty(newGroup?.Id))
+                                {
+                                    Log.LogError("Unable to create group [{Group}] on [{WorkItemType}]. Skipping its controls.", sourceGroup.Label, targetWit.WorkItemType.Name);
+                                    continue;
+                                }
 
-                                // Add all the controls
-                                foreach (var sourceControl in sourceGroup.Controls.Where(c => !c.ControlType.Equals("HtmlFieldControl", StringComparison.OrdinalIgnoreCase)))
+                                foreach (var sourceControl in sourceControls.Where(c => !WorkItemGroup.IsHtmlControl(c)))
                                 {
                                     if (await Target.AddWorkItemControlToGroup(sourceControl.CloneAsNew(), processId, targetWit.WorkItemType.ReferenceName, newGroup.Id, sourceControl.Id))
                                     {
@@ -424,25 +481,8 @@ namespace MigrationTools.Processors
 
             #endregion
 
-            #region Sync Controls ...
-            // Let's get a fresh layout from the target, now that we know pages and groups are aligned.
+            // Refresh the target layout so the model reflects the groups and controls added or moved above.
             await LoadLayout(TargetModel, targetWit, Target, processId);
-            // At this point all Pages, Sections and Groups should be aligned.. lets sync the controls
-            foreach (var sourcePage in sourceWit.Layout.Pages)
-            {
-                foreach (var sourceSection in sourcePage.Sections)
-                {
-                    foreach (var sourceGroup in sourceSection.Groups)
-                    {
-                        foreach (var sourceControl in sourceGroup.Controls)
-                        {
-
-                        }
-                    }
-                }
-
-            }
-            #endregion
             Log.LogInformation($"Completed sync of work item type [{Source.Options.Name}::{sourceWit.WorkItemType.Name}] in [{Target.Options.Name}::{targetWit.WorkItemType.Name}].");
         }
 
@@ -453,6 +493,11 @@ namespace MigrationTools.Processors
         {
             targetDef = await Target.SyncDefinition(sourceDef, targetDef, routeParams);
 
+            if (string.IsNullOrEmpty(targetDef?.Id))
+            {
+                // The endpoint has already logged why the create failed; carry on with the rest of the sync (#3224).
+                return targetDef;
+            }
             if (!DataDictionary.ContainsKey(targetDef.Id))
             {
                 DataDictionary.Add(targetDef.Id, targetDef);
@@ -542,27 +587,11 @@ namespace MigrationTools.Processors
                                 };
                             }
 
-                            #region --- Loading Wit Type Details ---
-                            await Task.WhenAll(
-                                Task.Run(async () => await LoadLayout(model, model.WorkItemTypes[wit.Name], endpoint, proc.Id)),
-                                Task.Run(async () => await LoadWorkItemFields(model, model.WorkItemTypes[wit.Name].WorkItemType, endpoint, proc.Id)),
-                                Task.Run(async () =>
-                                {
-                                    model.WorkItemTypes[wit.Name].States =
-                                        (await endpoint.GetApiDefinitionsAsync<WorkItemState>(new string[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
-                                }),
-                                Task.Run(async () =>
-                                {
-                                    model.WorkItemTypes[wit.Name].Rules =
-                                        (await endpoint.GetApiDefinitionsAsync<WorkItemRule>(new string[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
-                                }),
-                                Task.Run(async () =>
-                                {
-                                    model.WorkItemTypes[wit.Name].Behaviors =
-                                        (await endpoint.GetApiDefinitionsAsync<WorkItemTypeBehavior>(new string[] { proc.Id, wit.Id })).ToDictionary(x => x.Id, x => x);
-                                })
-                            );
-                            #endregion
+                            // The layout of a locked system type cannot be read (VS403115), and there is nothing customised to sync from it (#3211).
+                            if (!wit.IsSystem)
+                            {
+                                await LoadWorkItemTypeDetails(model, model.WorkItemTypes[wit.Name], endpoint, proc.Id);
+                            }
                         }
                     }
                     #endregion
@@ -573,6 +602,28 @@ namespace MigrationTools.Processors
                 }
             }
         }
+
+        private async Task LoadWorkItemTypeDetails(ProcessorModel model, WorkItemTypeModel witModel, AzureDevOpsEndpoint endpoint, string processId)
+        {
+            var witId = witModel.WorkItemType.Id;
+            await Task.WhenAll(
+                Task.Run(async () => await LoadLayout(model, witModel, endpoint, processId)),
+                Task.Run(async () => await LoadWorkItemFields(model, witModel.WorkItemType, endpoint, processId)),
+                Task.Run(async () =>
+                {
+                    witModel.States = (await endpoint.GetApiDefinitionsAsync<WorkItemState>(new string[] { processId, witId })).ToDictionary(x => x.Id, x => x);
+                }),
+                Task.Run(async () =>
+                {
+                    witModel.Rules = (await endpoint.GetApiDefinitionsAsync<WorkItemRule>(new string[] { processId, witId })).ToDictionary(x => x.Id, x => x);
+                }),
+                Task.Run(async () =>
+                {
+                    witModel.Behaviors = (await endpoint.GetApiDefinitionsAsync<WorkItemTypeBehavior>(new string[] { processId, witId })).ToDictionary(x => x.Id, x => x);
+                })
+            );
+        }
+
         private async Task LoadWorkItemFields(ProcessorModel model, WorkItemType wit, AzureDevOpsEndpoint endpoint, string processId)
         {
 
@@ -590,6 +641,7 @@ namespace MigrationTools.Processors
         private async Task LoadLayout(ProcessorModel model, WorkItemTypeModel wit, AzureDevOpsEndpoint endpoint, string processId)
         {
             wit.Layout = (await endpoint.GetApiDefinitionAsync<WorkItemLayout>(new string[] { processId, wit.WorkItemType.ReferenceName }));
+            wit.Layout.Pages ??= new List<WorkItemPage>();
             foreach (var page in wit.Layout.Pages)
             {
                 var pageKey = $"{wit.WorkItemType.Name}::{page.Label}";
@@ -601,9 +653,9 @@ namespace MigrationTools.Processors
                 {
                     model.WorkItemPages.Add(pageKey, page);
                 }
-                foreach (var section in page.Sections)
+                foreach (var section in page.Sections ?? Enumerable.Empty<WorkItemSection>())
                 {
-                    foreach (var group in section.Groups)
+                    foreach (var group in section.Groups ?? Enumerable.Empty<WorkItemGroup>())
                     {
                         var groupKey = $"{wit.WorkItemType.Name}::{page.Label}::{section.Id}::{group.Label}";
                         if (model.WorkItemGroups.ContainsKey(groupKey))
@@ -614,7 +666,7 @@ namespace MigrationTools.Processors
                         {
                             model.WorkItemGroups.Add(groupKey, group);
                         }
-                        foreach (var control in group.Controls)
+                        foreach (var control in group.Controls ?? Enumerable.Empty<WorkItemControl>())
                         {
                             var controlKey = $"{wit.WorkItemType.Name}::{page.Label}::{section.Id}::{group.Label}::{control.Id}";
                             if (model.WorkItemControls.ContainsKey(controlKey))
