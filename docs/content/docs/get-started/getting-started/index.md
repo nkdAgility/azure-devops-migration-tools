@@ -66,6 +66,17 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
    workload identity federation in CI. That identity must be a member of the organisation, and for the
    TFS Object Model endpoints a Project Collection Administrator.
 
+   At startup the log shows which credential supplied the token (for example `AzureCliCredential`) and
+   the identity, tenant and validity window it is for; the token itself is never logged. If the first
+   connection is rejected, the tool retries it twice with a new token before stopping. If it still
+   fails, check that the logged identity is the account you expect: an earlier source in the chain,
+   such as Visual Studio, may be signed in as a different account.
+
+   To use only one sign-in source, set the `AZURE_TOKEN_CREDENTIALS` environment variable to its
+   credential name before running the tool, for example `AzureCliCredential` to use only your `az login`,
+   or `ManagedIdentityCredential` on an Azure VM. `dev` and `prod` limit the chain to developer tools or
+   deployed-service credentials. This is recommended for unattended runs. The log shows the value in use.
+
 4. Adjust the value of the `ReflectedWorkItemIdField` attribute (field name of the migration tracking field) for Source and Target
 
    For example: `TfsMigrationTool.ReflectedWorkItemId` for TFS, `ReflectedWorkItemId` for VSTS, or `Custom.ReflectedWorkItemId` for Azure DevOps
