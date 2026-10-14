@@ -57,7 +57,7 @@ namespace MigrationTools.Endpoints
         public static TokenCredential TokenCredential
         {
             get => _tokenCredential;
-            set { lock (_cacheLock) { _tokenCredential = value; _cached = null; } }
+            set { lock (_cacheLock) { _tokenCredential = value; _cached = null; _generation++; _inFlight = null; } }
         }
 
         private static TokenCredential Current => _tokenCredential ?? _default.Value;
@@ -90,6 +90,10 @@ namespace MigrationTools.Endpoints
                 _cached = null;
                 _selectedCredential = null;
                 if (_tokenCredential == null) { _default = NewDefault(); }
+                // A fetch already running belongs to the discarded credential: stop new callers joining it and
+                // stop it publishing its token when it completes.
+                _generation++;
+                _inFlight = null;
             }
         }
 
@@ -169,7 +173,7 @@ namespace MigrationTools.Endpoints
                 fetch = _inFlight;
                 if (fetch == null)
                 {
-                    var started = FetchAndCacheAsync();
+                    var started = FetchAndCacheAsync(Current, _generation);
                     _inFlight = started;
                     fetch = started;
                     // Cleared when the fetch itself finishes (success or failure), never when a caller stops
@@ -202,12 +206,15 @@ namespace MigrationTools.Endpoints
             return await fetch.ConfigureAwait(false);
         }
 
-        private static async Task<AccessToken> FetchAndCacheAsync()
+        // Bumped by Reset() and by setting TokenCredential, so a fetch started before either cannot publish its token.
+        private static int _generation;
+
+        private static async Task<AccessToken> FetchAndCacheAsync(TokenCredential credential, int generation)
         {
-            var fresh = await Current.GetTokenAsync(RequestContext, CancellationToken.None).ConfigureAwait(false);
+            var fresh = await credential.GetTokenAsync(RequestContext, CancellationToken.None).ConfigureAwait(false);
             lock (_cacheLock)
             {
-                if (!(_cached is AccessToken current) || fresh.ExpiresOn >= current.ExpiresOn)
+                if (generation == _generation && (!(_cached is AccessToken current) || fresh.ExpiresOn >= current.ExpiresOn))
                 {
                     _cached = fresh;
                 }

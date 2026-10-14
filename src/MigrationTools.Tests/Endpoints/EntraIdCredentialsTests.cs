@@ -185,6 +185,32 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual("token-2", EntraIdCredentials.GetAccessToken());
         }
 
+        private sealed class GatedTokenCredential : TokenCredential
+        {
+            public readonly TaskCompletionSource<AccessToken> Gate = new TaskCompletionSource<AccessToken>(TaskCreationOptions.RunContinuationsAsynchronously);
+            public int SyncCalls;
+
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
+                => new AccessToken("sync-" + Interlocked.Increment(ref SyncCalls), DateTimeOffset.UtcNow.AddHours(1));
+
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+                => new ValueTask<AccessToken>(Gate.Task);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task Reset_StopsAFetchStartedBeforeItFromPublishingItsToken()
+        {
+            var gated = new GatedTokenCredential();
+            EntraIdCredentials.TokenCredential = gated;
+
+            var stale = EntraIdCredentials.GetFreshAccessTokenAsync();
+            EntraIdCredentials.Reset();
+            gated.Gate.SetResult(new AccessToken("stale", DateTimeOffset.UtcNow.AddHours(2)));
+            Assert.AreEqual("stale", await stale, "The caller that started the fetch still gets its result.");
+
+            Assert.AreEqual("sync-1", EntraIdCredentials.GetAccessToken(), "The pre-reset token must not be cached.");
+        }
+
         [TestMethod, TestCategory("L0")]
         public void ConnectWithRetry_RetriesARejectedConnectionWithANewToken()
         {
