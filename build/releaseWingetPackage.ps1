@@ -78,7 +78,7 @@ $env:GH_TOKEN = $GH_TOKEN
 $ghUser = gh api user --jq .login
 if ($LASTEXITCODE -ne 0) { throw "GH_TOKEN could not be used to read the GitHub user" }
 
-$ourPrs = gh pr list -R microsoft/winget-pkgs --author $ghUser --state all --limit 50 --search "$wigetPackageId in:title" --json number,title,state,createdAt
+$ourPrs = gh pr list -R microsoft/winget-pkgs --author $ghUser --state all --limit 1000 --search "$wigetPackageId in:title" --json number,title,state,createdAt
 if ($LASTEXITCODE -ne 0) { throw "Could not list $ghUser pull requests in microsoft/winget-pkgs" }
 $plan = Get-WingetSubmissionPlan -Ring $ring -PackageId $wigetPackageId -OurPullRequests ($ourPrs | ConvertFrom-Json) -PreviewMinDaysBetweenSubmissions $PreviewMinDaysBetweenSubmissions -Force $Force.IsPresent
 Write-Output "Plan for $wigetPackageId $version : Submit=$($plan.Submit) ($($plan.Reason)); close superseded: $(($plan.Close | ForEach-Object { "#$($_.number)" }) -join ', ')"
