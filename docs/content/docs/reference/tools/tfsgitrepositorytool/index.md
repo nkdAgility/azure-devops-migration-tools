@@ -26,7 +26,7 @@ The TFS Git Repository Tool operates during work item migration to handle Git re
 1. **Repository Discovery**: Identifies Git repository references within work items being migrated
 2. **Mapping Application**: Maps source repository names to target repository names
 3. **Target Check**: With `VerifyTargetExists` (the default), checks that each linked commit or branch exists in the target repository. Answers are cached, so each commit or branch is checked once per run
-4. **Link Updates**: Repoints commit and branch links to the target repository. A link whose commit or branch is missing from the target is left pointing at the source and logged as a warning. Pull request links are dropped, because pull request ids don't carry over to the target
+4. **Link Updates**: Repoints commit and branch links to the target repository. A link whose commit or branch is missing from the target is left pointing at the source and logged as a warning. Pull request links are kept pointing at the source pull request and logged as a warning, because pull requests don't carry over to the target; set `DropPullRequestLinks` to remove them instead
 5. **Changeset Handling**: Coordinates with changeset mapping for complete traceability
 6. **Validation**: Ensures mapped repositories exist in the target system
 
@@ -101,6 +101,25 @@ When only some commits or branches reach the target (for example after a squash-
 ```
 
 Set `VerifyTargetExists` to `false` only to restore the earlier behaviour of repointing every link without checking.
+
+### Same Repository Name in Different Projects
+
+Repository names are only unique within a project. When the source has repositories with the same name in several projects (for example `ProjectA/Docs` and `ProjectB/Docs`), use `Project/Repo` keys to map each one separately. A `Project/Repo` key takes precedence over a plain `Repo` key, and a value may also be `Project/Repo` to pick a repository in another target project:
+
+```json
+{
+  "TfsGitRepositoryTool": {
+    "Enabled": true,
+    "Mappings": {
+      "ProjectA/Docs": "ProjectADocs",
+      "ProjectB/Docs": "OtherTargetProject/Docs",
+      "Build": "SharedBuild"
+    }
+  }
+}
+```
+
+A plain `Repo` key applies to every source project with a repository of that name. When it matches repositories in more than one source project (that have no `Project/Repo` key of their own), the tool logs a warning at startup listing them.
 
 ### Repository Name Mapping
 
@@ -236,6 +255,12 @@ Remove changeset links when repository migration is not needed:
 - The warning names the source work item, the commit or branch, the target repository and the original link
 - At the end of the run, a summary lists each target repository with the number of links left on the source
 - If those links should point at the target, push the missing commits or branches to the target repository before migrating work items
+
+**"pull requests are not migrated; leaving link ... pointing at the source" Warnings:**
+
+- A git push does not carry pull requests, so there is no target pull request to link to. The link is kept pointing at the source pull request, which stays valid while the source organisation exists
+- The warning names the source work item and the pull request link; the end-of-run summary gives the total
+- Set `DropPullRequestLinks` to `true` to remove these links instead
 
 **Performance Issues:**
 
