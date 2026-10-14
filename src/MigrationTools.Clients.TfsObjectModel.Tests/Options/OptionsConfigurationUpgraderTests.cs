@@ -117,5 +117,21 @@ namespace MigrationTools.Tests.Options
             Assert.IsTrue(tool.Value<bool>("Enabled"));
             Assert.AreEqual(@"C:\temp\changesetmapping.json", tool.Value<string>("ChangeSetMappingFile"));
         }
+
+        [TestMethod, TestCategory("L0")]
+        public void UpgradeConfiguration_V160_MapsLegacyFileToChangeSetMappingFile()
+        {
+            Assert.IsNotNull(typeof(TfsChangeSetMappingToolOptions));
+            var json = V160Config.Replace(@"""Enabled"": false
+      }", @"""Enabled"": true, ""File"": ""C:\\temp\\legacy.json""
+      }");
+
+            var result = Upgrade(json);
+
+            var tool = (JObject)result["MigrationTools"]["CommonTools"]["TfsChangeSetMappingTool"];
+            Assert.IsNotNull(tool, result.ToString());
+            Assert.AreEqual(@"C:\temp\legacy.json", tool.Value<string>("ChangeSetMappingFile"), tool.ToString());
+            Assert.IsNull(tool.Property("File"), tool.ToString());
+        }
     }
 }

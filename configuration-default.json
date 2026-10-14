@@ -75,7 +75,7 @@
       },
       "TfsChangeSetMappingTool": {
         "Enabled": true,
-        "File": "C:\\temp\\ChangeSetMappingFile.json"
+        "ChangeSetMappingFile": "C:\\temp\\ChangeSetMappingFile.json"
       },
       "FieldMappingTool": {
         "Enabled": true,
