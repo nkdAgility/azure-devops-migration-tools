@@ -24,5 +24,14 @@ namespace MigrationTools.Endpoints
         {
             return baseUrl.TrimEnd('/') + "/" + EscapeSegment(segment);
         }
+
+        /// <summary>
+        /// Joins an already escaped relative path onto a base such as the organisation URL, which users often
+        /// configure with a trailing slash (#3224).
+        /// </summary>
+        public static string CombinePath(string basePath, string relativePath)
+        {
+            return (basePath ?? string.Empty).TrimEnd('/') + "/" + (relativePath ?? string.Empty).TrimStart('/');
+        }
     }
 }
