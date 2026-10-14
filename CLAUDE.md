@@ -18,5 +18,5 @@ Then report: what was done, how it was tested, how the docs were updated (with `
 
 ## WinGet release policy
 
-`build/releaseWingetPackage.ps1 keeps at most one open PR per package in microsoft/winget-pkgs: Production always submits, Preview at most once every 7 days (`ForceRelease` overrides), Canary never. Our own open PRs for the same package are closed as superseded after a successful submission. The real package IDs are `nkdAgility.AzureDevOpsMigrationTools` and `.Preview`.
+`build/releaseWingetPackage.ps1` keeps at most one open PR per package in microsoft/winget-pkgs: Production always submits, Preview at most once every 7 days (`ForceRelease` overrides), Canary never. Our own open PRs for the same package are closed as superseded after a successful submission. The real package IDs are `nkdAgility.AzureDevOpsMigrationTools` and `.Preview`.
 
