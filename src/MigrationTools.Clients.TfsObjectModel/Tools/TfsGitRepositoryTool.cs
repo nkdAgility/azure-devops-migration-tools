@@ -244,8 +244,9 @@ namespace MigrationTools.Tools
 
             // During revision replay (#3192) this runs on every revision that adds links, so links already rewritten to
             // a target repository (and not also a source repository) are left alone instead of being re-mapped.
+            // TFVC changeset links resolve to a placeholder repo with no Id (#3226), so they are never treated as already rewritten.
             var targetRepoOfLink = TfsGitRepositoryInfo.Create(el, targetRepos, changeSetMappings, _processor.Target.Options.Project);
-            if (targetRepoOfLink?.GitRepo != null && !sourceRepos.Any(r => r.Id == targetRepoOfLink.GitRepo.Id))
+            if (targetRepoOfLink?.GitRepo != null && targetRepoOfLink.GitRepo.Id != Guid.Empty && !sourceRepos.Any(r => r.Id == targetRepoOfLink.GitRepo.Id))
             {
                 return null;
             }
