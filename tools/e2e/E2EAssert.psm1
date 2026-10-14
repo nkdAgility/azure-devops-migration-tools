@@ -7,10 +7,24 @@ $script:TgtOrg = "nkdagility-adomt-target"
 
 function New-E2EResult([string]$Check, [bool]$Pass, [string]$Evidence) { [pscustomobject]@{ Check = $Check; Pass = $Pass; Evidence = $Evidence } }
 
+# Prints one line per result and returns only the failure count (an [int]), so callers can `exit (Write-E2EResults ...)`.
+# An empty result set counts as one failure: nothing was checked.
 function Write-E2EResults([object[]]$Results, [string]$OutFile) {
-    $Results | ForEach-Object { "{0} {1} -- {2}" -f $(if ($_.Pass) { "PASS" } else { "FAIL" }), $_.Check, $_.Evidence }
+    foreach ($r in @($Results)) { Write-Host ("{0} {1} -- {2}" -f $(if ($r.Pass) { "PASS" } else { "FAIL" }), $r.Check, $r.Evidence) }
     if ($OutFile) { $Results | ConvertTo-Json -Depth 5 | Set-Content $OutFile }
-    @($Results | Where-Object { -not $_.Pass }).Count
+    if (-not @($Results).Count) { Write-Host "FAIL no checks ran"; return [int]1 }
+    [int]@($Results | Where-Object { -not $_.Pass }).Count
+}
+
+# Collapses a revision list the way date fix-up saves (#3180/#3205) are written: a fix-up is dated its revision's ChangedDate
+# plus at most 1 ms, so it replaces that revision. Anything further apart is a revision in its own right.
+function Get-E2ECollapsedRevisions([object[]]$Revs) {
+    $out = [System.Collections.Generic.List[object]]::new()
+    foreach ($r in $Revs) {
+        $d = [datetime]$r.fields.'System.ChangedDate'
+        if ($out.Count -and ($d - [datetime]$out[$out.Count - 1].fields.'System.ChangedDate').TotalMilliseconds -le 1) { $out[$out.Count - 1] = $r } else { $out.Add($r) }
+    }
+    $out.ToArray()
 }
 
 # Counts of each artifact (attachments, non-attachment links) per revision, keyed by revision index.
@@ -34,14 +48,12 @@ function Test-E2EItemFidelity {
     if (-not $t) { return New-E2EResult "src #$SourceId migrated" $false "no target item reflects it" }
     $sRevs = @(Get-E2ERevisions $SourceId -Org $script:SrcOrg)
     $tRevs = @(Get-E2ERevisions $t.id -Org $script:TgtOrg)
-    # Date fix-up saves (#3180/#3205) are extra revisions that keep the date of the revision they fix (to the second).
-    # Collapse them, then the target's (ChangedDate, ChangedBy, State) sequence must equal the source's.
-    $key = { param($r) "{0:yyyy-MM-dd HH:mm:ss}|{1}|{2}" -f ([datetime]$r.fields.'System.ChangedDate'), $r.fields.'System.ChangedBy'.uniqueName, $r.fields.'System.State' }
-    # Seeded revisions can share a second too, so both sides are collapsed the same way.
-    $sSeq = @(); foreach ($k in @($sRevs | ForEach-Object { & $key $_ })) { if (-not ($sSeq.Count -and $sSeq[-1] -eq $k)) { $sSeq += $k } }
-    $tAll = @($tRevs | ForEach-Object { & $key $_ })
-    $tSeq = @(); foreach ($k in $tAll) { if (-not ($tSeq.Count -and $tSeq[-1] -eq $k)) { $tSeq += $k } }
-    $fixups = $tRevs.Count - $sRevs.Count
+    # Collapse only date fix-up saves (<= 1 ms after the revision they fix); every other revision must line up one for one,
+    # compared on the full millisecond ChangedDate, ChangedBy and State.
+    $key = { param($r) "{0}|{1}|{2}" -f ([datetime]$r.fields.'System.ChangedDate').ToUniversalTime().ToString("o"), $r.fields.'System.ChangedBy'.uniqueName, $r.fields.'System.State' }
+    $sSeq = @(Get-E2ECollapsedRevisions $sRevs | ForEach-Object { & $key $_ })
+    $tSeq = @(Get-E2ECollapsedRevisions $tRevs | ForEach-Object { & $key $_ })
+    $fixups = $tRevs.Count - $tSeq.Count
     $seqOk = ($sSeq -join "`n") -eq ($tSeq -join "`n")
     $diff = if (-not $seqOk) { (Compare-Object $sSeq $tSeq | ForEach-Object { "$($_.SideIndicator) $($_.InputObject)" }) -join "; " } else { "" }
     $out += New-E2EResult "src #$SourceId -> tgt #$($t.id) revision sequence (date|by|state)" $seqOk $(if ($seqOk) { "$($sSeq.Count) source revisions matched; target $($tRevs.Count) incl. $fixups same-date fix-up save(s)" } else { $diff })

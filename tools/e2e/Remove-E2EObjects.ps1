@@ -22,11 +22,15 @@ foreach ($org in $Organisations) {
         $bin = (Invoke-E2ERest "_apis/projects?stateFilter=deleted&`$top=500" -Org $org).value | Where-Object { $_.name.StartsWith("amte2e-") }
         foreach ($p in $bin) {
             try { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)?hardDelete=true" -Org $org -Method DELETE -ApiVersion "7.1-preview.4") | Out-Null; "destroyed recycled project $org/$($p.name)" }
-            catch { "recycled project $org/$($p.name) not destroyed: $(($_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue).message)" }
+            catch { $leftovers += "project $org/$($p.name): soft-deleted, in the recycle bin until Azure DevOps purges it ($(($_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue).message))" }
         }
     } catch { "recycle bin not listed for $($org): $($_.Exception.Message)" }
     foreach ($pr in @(Get-E2EProcesses -Org $org)) {
-        try { Remove-E2EProcess $pr.name -Org $org; "deleted process $org/$($pr.name)" } catch { $leftovers += "process $org/$($pr.name): $(($_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue).message)" }
+        # Projects deleted moments ago can still hold the process, so retry before reporting it.
+        for ($try = 1; ; $try++) {
+            try { Remove-E2EProcess $pr.name -Org $org; "deleted process $org/$($pr.name)"; break }
+            catch { if ($try -ge 4) { $leftovers += "process $org/$($pr.name): $(($_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue).message)"; break }; Start-Sleep -Seconds 15 }
+        }
     }
     foreach ($f in @(Get-E2EFields -Org $org)) {
         try { Remove-E2EField $f.referenceName -Org $org; "deleted field $org/$($f.referenceName)" } catch { $leftovers += "field $org/$($f.referenceName): $(($_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue).message)" }

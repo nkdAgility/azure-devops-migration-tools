@@ -17,7 +17,10 @@ $iters = (Invoke-E2ERest "$Src/_apis/wit/classificationnodes/Iterations?`$depth=
 $s1 = $iters | Where-Object name -eq "Sprint 1"; $s2 = $iters | Where-Object name -eq "Sprint 2"
 
 $team = (Invoke-E2ERest "_apis/projects/$($p.id)/teams").value | Where-Object name -eq "Squad A"
-if (-not $team) { $team = Invoke-E2ERest "_apis/projects/$($p.id)/teams" -Method POST -Body @{ name = "Squad A"; description = "amte2e team" } }
+if (-not $team) { Invoke-E2ERest "_apis/projects/$($p.id)/teams" -Method POST -Body @{ name = "Squad A"; description = "amte2e team" } | Out-Null }
+# Re-read so the id used in the query WIQL below comes from the stored team.
+$team = (Invoke-E2ERest "_apis/projects/$($p.id)/teams").value | Where-Object name -eq "Squad A"
+if (-not $team.id) { throw "Team Squad A was not created." }
 $defaultTeam = "$Src Team"
 # A team created through REST has no backlog iteration, and every other team-settings write fails with TF400497 until it does.
 Invoke-E2ERest "$Src/Squad%20A/_apis/work/teamsettings" -Method PATCH -Body @{ backlogIteration = (Invoke-E2ERest "$Src/_apis/wit/classificationnodes/Iterations").identifier } | Out-Null

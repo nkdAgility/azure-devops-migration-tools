@@ -1,2 +1,3 @@
 state.local.json
 *.log
+scenarios/users/config*.json

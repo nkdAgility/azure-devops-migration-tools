@@ -40,7 +40,8 @@ function Invoke-E2ERest {
         $Body,
         [string]$ContentType = "application/json",
         [string]$Org = $script:DefaultOrg,
-        [string]$Host_ = "dev.azure.com",
+        # Only Azure DevOps hosts: the request carries the credential.
+        [ValidateSet("dev.azure.com", "vsrm.dev.azure.com", "vsaex.dev.azure.com", "vssps.dev.azure.com")][string]$Host_ = "dev.azure.com",
         [string]$ApiVersion = "7.1"
     )
     if ($script:AllowedOrgs -notcontains $Org) { throw "Organisation '$Org' is not a test organisation." }
@@ -55,9 +56,14 @@ function Invoke-E2ERest {
     Invoke-RestMethod @params
 }
 
-function Wait-E2EOperation($op) {
+function Wait-E2EOperation($op, [int]$TimeoutSeconds = 600) {
     if (-not $op.url) { return $op }
+    # The operation url comes from the server response; only send the credential back to an allowed organisation.
+    $u = [Uri]$op.url
+    if ($u.Scheme -ne "https" -or $u.Host -ne "dev.azure.com" -or $script:AllowedOrgs -notcontains $u.Segments[1].TrimEnd('/')) { throw "Refusing to poll operation url outside the test organisations: $($op.url)" }
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
     do {
+        if ((Get-Date) -gt $deadline) { throw "Operation $($op.id) did not finish within $TimeoutSeconds seconds." }
         Start-Sleep -Seconds 3
         $s = Invoke-RestMethod -Uri $op.url -Headers $script:Headers
     } while ($s.status -in "notSet", "queued", "inProgress")
@@ -75,7 +81,9 @@ function New-E2EProcess {
     $existing = Get-E2EProcessId $Name $Org
     if ($existing) { return $existing }
     $parentId = Get-E2EProcessId $Parent $Org
-    (Invoke-E2ERest "_apis/work/processes" -Org $Org -Method POST -Body @{ name = $Name; parentProcessTypeId = $parentId; referenceName = ($Name -replace '[^A-Za-z0-9]', '') }).typeId
+    if (-not $parentId) { throw "Parent process '$Parent' not found in $Org." }
+    # No referenceName: a deleted process keeps its reference name reserved, so let the service generate a unique one.
+    (Invoke-E2ERest "_apis/work/processes" -Org $Org -Method POST -Body @{ name = $Name; parentProcessTypeId = $parentId }).typeId
 }
 
 function Remove-E2EProcess([string]$Name, [string]$Org = $script:DefaultOrg) {
@@ -89,12 +97,15 @@ function New-E2EProject {
     Assert-E2EName $Name
     $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
     if ($p) { return $p }
+    $processId = Get-E2EProcessId $Process $Org
+    if (-not $processId) { throw "Process '$Process' not found in $Org. Run tools/e2e/Initialize-E2EEnvironment.ps1 first." }
     $op = Invoke-E2ERest "_apis/projects" -Org $Org -Method POST -Body @{
         name = $Name; description = "AMT e2e regression scratch project"
-        capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = (Get-E2EProcessId $Process $Org) } }
+        capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = $processId } }
     }
     Wait-E2EOperation $op | Out-Null
-    Invoke-E2ERest "_apis/projects/$Name" -Org $Org
+    # A new project can take a few seconds to be readable by name after the operation reports success.
+    for ($i = 0; ; $i++) { try { return Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { if ($i -ge 9) { throw }; Start-Sleep -Seconds 3 } }
 }
 
 function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
@@ -110,8 +121,12 @@ function Get-E2EProcesses([string]$Org = $script:DefaultOrg) { (Invoke-E2ERest "
 # Extra JSON-patch operations (relations, etc.) can be passed in $Ops.
 function Set-E2EWorkItem {
     param([string]$Project, [string]$Type, [int]$Id, [System.Collections.IDictionary]$Fields = @{}, [object[]]$Ops = @(), [switch]$BypassRules, [string]$Org = $script:DefaultOrg)
-    if (-not $Id) { Assert-E2EName $Project }
-    $patch = @(foreach ($k in $Fields.Keys) { @{ op = "add"; path = "/fields/$k"; value = $Fields[$k] } }) + $Ops
+    if ($Id) {
+        # Updates go to the organisation-wide endpoint, so check the item belongs to a scratch project first.
+        $existing = Invoke-E2ERest "_apis/wit/workitems/$Id`?fields=System.TeamProject" -Org $Org
+        Assert-E2EName $existing.fields.'System.TeamProject'
+    } else { Assert-E2EName $Project }
+    $patch =@(foreach ($k in $Fields.Keys) { @{ op = "add"; path = "/fields/$k"; value = $Fields[$k] } }) + $Ops
     $q = if ($BypassRules) { "?bypassRules=true&suppressNotifications=true" } else { "?suppressNotifications=true" }
     $path = if ($Id) { "_apis/wit/workitems/$Id$q" } else { "$Project/_apis/wit/workitems/`$$([Uri]::EscapeDataString($Type))$q" }
     $method = if ($Id) { "PATCH" } else { "POST" }
@@ -126,7 +141,12 @@ function Get-E2EWiql([string]$Project, [string]$Wiql, [string]$Org = $script:Def
 function Get-E2EAllWorkItems([string]$Project, [string]$Org = $script:DefaultOrg) {
     $ids = Get-E2EWiql $Project "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '$Project' ORDER BY [System.Id]" $Org | ForEach-Object id
     if (-not $ids) { return @() }
-    (Invoke-E2ERest "_apis/wit/workitems?ids=$($ids -join ',')&`$expand=relations" -Org $Org).value
+    # The work items list API takes at most 200 ids per request.
+    $ids = @($ids)
+    for ($i = 0; $i -lt $ids.Count; $i += 200) {
+        $batch = $ids[$i..([Math]::Min($i + 199, $ids.Count - 1))]
+        (Invoke-E2ERest "_apis/wit/workitems?ids=$($batch -join ',')&`$expand=relations" -Org $Org).value
+    }
 }
 
 function Get-E2ERevisions([int]$Id, [string]$Org = $script:DefaultOrg) { (Invoke-E2ERest "_apis/wit/workitems/$Id/revisions?`$expand=relations" -Org $Org).value }

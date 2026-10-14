@@ -33,18 +33,20 @@ $env:GIT_CONFIG_COUNT = "1"; $env:GIT_CONFIG_KEY_0 = "http.extraHeader"; $env:GI
 $env:GIT_AUTHOR_NAME = "amte2e"; $env:GIT_AUTHOR_EMAIL = "amte2e@example.invalid"; $env:GIT_COMMITTER_NAME = "amte2e"; $env:GIT_COMMITTER_EMAIL = "amte2e@example.invalid"
 $env:GIT_AUTHOR_DATE = "2026-10-01T10:00:00Z"; $env:GIT_COMMITTER_DATE = "2026-10-01T10:00:00Z"
 try {
+    # Native commands ignore $ErrorActionPreference, so every push checks its own exit code.
+    function Push-E2ERepo([string]$Url) { $o = git push -q $Url main 2>&1; if ($LASTEXITCODE -ne 0) { throw "git push to $Url failed ($LASTEXITCODE): $o" } }
     if (Test-Path $WorkDir) { Remove-Item $WorkDir -Recurse -Force }
     New-Item -ItemType Directory $WorkDir | Out-Null
     Push-Location $WorkDir
     git init -q -b main main; Set-Location main
     Set-Content a.txt "one"; git add a.txt; git commit -q -m "C1"; $c1 = (git rev-parse HEAD).Trim()
-    git push -q $tgtRepo.remoteUrl main 2>&1 | Out-Null
+    Push-E2ERepo $tgtRepo.remoteUrl
     Set-Content a.txt "two"; git commit -q -am "C2"; $c2 = (git rev-parse HEAD).Trim()
-    git push -q $srcRepo.remoteUrl main 2>&1 | Out-Null
+    Push-E2ERepo $srcRepo.remoteUrl
     Set-Location ..; git init -q -b main shared; Set-Location shared
     Set-Content s.txt "shared"; git add s.txt; git commit -q -m "S1"; $s1 = (git rev-parse HEAD).Trim()
-    git push -q $otherRepo.remoteUrl main 2>&1 | Out-Null
-    git push -q $tgtShared.remoteUrl main 2>&1 | Out-Null
+    Push-E2ERepo $otherRepo.remoteUrl
+    Push-E2ERepo $tgtShared.remoteUrl
 }
 finally {
     Pop-Location
