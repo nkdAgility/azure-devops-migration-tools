@@ -24,6 +24,8 @@ The tools will be installed to `%Localappdata%\Microsoft\WinGet\Packages\nkdAgil
 
 _NOTE: Do not install using an elevated command prompt!_
 
+Previews are published as `nkdAgility.AzureDevOpsMigrationTools.Preview`, normally at most once a week (a forced release can publish one sooner), so WinGet can trail the newest preview. Every preview is on [GitHub Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) as soon as it is built. Canary builds are not published to WinGet.
+
 ## Option 2: Chocolatey
 
 We also deploy to [Chocolatey](https://chocolatey.org/packages/nkdagility.azuredevopsmigrationtools) and you can use the command `choco install vsts-sync-migrator` to install them on Windows Server.

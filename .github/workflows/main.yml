@@ -231,23 +231,23 @@ jobs:
           Write-Output "Ring Control Setup"
           Write-Output "-------------------------------------------"
           $Ring = "${{ steps.RingDetection.outputs.Ring }}"
-          $WingetApplicationId = "nkdagility.azure-devops-migration-tools"
+          $WingetApplicationId = "nkdAgility.AzureDevOpsMigrationTools"
 
           switch ("${{ steps.RingDetection.outputs.Ring }}") {
               "Production" {
-                  $WingetApplicationId = "nkdagility.azure-devops-migration-tools";
+                  $WingetApplicationId = "nkdAgility.AzureDevOpsMigrationTools";
                   $AzureSitesEnvironment = ""
                   # Production: Release app when ForceRelease OR src changed
                   $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
               }
               "Preview" {
-                  $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Preview";
+                  $WingetApplicationId = "nkdAgility.AzureDevOpsMigrationTools.Preview";
                   $AzureSitesEnvironment = "preview";
                   # Preview: Release app when ForceRelease OR src changed
                   $RunRelease = ( ('${{ inputs.ForceRelease }}' -eq 'true' ) -or ('${{ steps.filter.outputs.src }}' -eq 'true') )
               }
               default {
-                  $WingetApplicationId = "nkdagility.azure-devops-migration-tools.Canary";
+                  $WingetApplicationId = "nkdAgility.AzureDevOpsMigrationTools.Canary";
                   $AzureSitesEnvironment = "${{ steps.RingDetection.outputs.Ring }}-${{ github.event.pull_request.number }}".ToLower()
                   $RunRelease = 'false'
               }
@@ -661,7 +661,7 @@ jobs:
       - name: "Winget Release"
         shell: pwsh
         run: |
-          .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.NKD_MRHINSH_TOKEN }}
+          .\build\releaseWingetPackage.ps1 -version ${{ needs.Setup.outputs.GitVersion_SemVer }} -ring ${{needs.Setup.outputs.nkdAgility_Ring}} -GH_TOKEN ${{ secrets.NKD_MRHINSH_TOKEN }} -Force:$${{ inputs.ForceRelease == true }}
 
   # Release to Docs
   DocsRelease:
