@@ -53,7 +53,7 @@
       },
       "TfsChangeSetMapping": {
         "Enabled": true,
-        "File": "C:\\temp\\ChangeSetMappingFile.json"
+        "ChangeSetMappingFile": "C:\\temp\\ChangeSetMappingFile.json"
       },
       "TfsFieldMappings": {
         "Enabled": true,
