@@ -74,7 +74,7 @@ options:
 - parameterName: Manipulators
   type: List
   description: List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
-  defaultValue: '{}'
+  defaultValue: '[]'
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[MigrationTools.Tools.RegexStringManipulator, MigrationTools, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: MaxStringLength

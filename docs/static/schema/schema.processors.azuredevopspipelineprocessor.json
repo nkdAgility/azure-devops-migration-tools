@@ -20,27 +20,27 @@
     "MigrateBuildPipelines": {
       "description": "Migrate Build Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected build pipeline that is not migrated, because it uses a task that is not installed in the target, uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "MigrateReleasePipelines": {
       "description": "Migrate Release Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected release pipeline that is not migrated, because it uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "MigrateServiceConnections": {
       "description": "Migrate Service Connections **secrets need to be entered manually**. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A service connection the target rejects marks the run as failed (exit code 1).",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "MigrateTaskGroups": {
       "description": "Migrate Task Groups. The versions of a task group are migrated together, lowest first. A task group that already exists in the target (matched by name) is skipped. If a version uses a task that is not installed in the target, that version and every higher version are skipped, because a version can only be created on top of the versions below it. A skipped task group, or a version the target rejects, marks the run as failed (exit code 1); task groups that already exist in the target do not.",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "MigrateVariableGroups": {
       "description": "Migrate Variable Groups. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A variable group the target rejects marks the run as failed (exit code 1).",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",

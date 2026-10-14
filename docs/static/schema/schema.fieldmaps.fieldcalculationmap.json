@@ -15,13 +15,12 @@
     },
     "expression": {
       "description": "Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., \"[x]*2\").",
-      "type": "string",
-      "default": "null"
+      "type": "string"
     },
     "parameters": {
       "description": "Gets or sets a dictionary mapping variable names used in the expression to source field reference names.",
       "type": "object",
-      "default": "{}"
+      "default": {}
     },
     "parsingFallback": {
       "description": "Gets or sets the parsing fallback.",
@@ -30,8 +29,7 @@
     },
     "targetField": {
       "description": "Gets or sets the target field reference name where the calculated result will be stored.",
-      "type": "string",
-      "default": "null"
+      "type": "string"
     }
   }
 }
