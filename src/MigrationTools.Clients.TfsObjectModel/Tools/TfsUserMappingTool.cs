@@ -314,13 +314,13 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
-        /// The identity fields to map: the configured IdentityFieldsToCheck, or
-        /// <see cref="TfsUserMappingToolOptions.DefaultIdentityFieldsToCheck"/> when none are configured. The defaults live in
+        /// The identity fields to map: the configured IdentityFieldsToCheck (an empty list maps no fields), or
+        /// <see cref="TfsUserMappingToolOptions.DefaultIdentityFieldsToCheck"/> when it is not set. The defaults live in
         /// code rather than appsettings.json because configuration providers merge arrays by index, so a shorter configured
         /// list would otherwise keep the remaining default entries.
         /// </summary>
         public IReadOnlyList<string> IdentityFieldsToCheck =>
-            Options.IdentityFieldsToCheck is { Count: > 0 } configured ? configured : TfsUserMappingToolOptions.DefaultIdentityFieldsToCheck;
+            (IReadOnlyList<string>)Options.IdentityFieldsToCheck ?? TfsUserMappingToolOptions.DefaultIdentityFieldsToCheck;
 
         /// <summary>
         /// Checks that each target value in the user mapping resolves to exactly one identity in <paramref name="targetUsers"/>.
@@ -358,6 +358,33 @@ namespace MigrationTools.Tools
                 if (candidates.Count != 1)
                 {
                     result.Add(new UnresolvedUserMapping(mapping.Key, mapping.Value, candidates.Count > 1, candidates));
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Finds mappings whose target is a bare account name or email (no display name, no angle brackets) that resolves to one
+        /// identity only through its account name or email. Azure DevOps resolves this for organisation members, but can save it as
+        /// plain text for an Entra B2B guest, and the identity data does not tell the two apart.
+        /// </summary>
+        /// <returns>The mapping and the identity it resolved to, for each such target.</returns>
+        public static List<(KeyValuePair<string, string> Mapping, IdentityItemData Identity)> FindBareAccountTargets(IDictionary<string, string> userMap, IEnumerable<IdentityItemData> targetUsers)
+        {
+            var users = (targetUsers ?? []).Where(u => u != null).ToList();
+            List<(KeyValuePair<string, string>, IdentityItemData)> result = [];
+            foreach (var mapping in userMap ?? new Dictionary<string, string>())
+            {
+                var target = mapping.Value?.Trim();
+                if (string.IsNullOrEmpty(target) || TfsUserIdentityReference.TryParse(target, out _, out _)
+                    || users.Any(u => string.Equals(u.DisplayName, target, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+                var matches = users.Where(u => MatchesUnique(u, target)).Take(2).ToList();
+                if (matches.Count == 1)
+                {
+                    result.Add((mapping, matches[0]));
                 }
             }
             return result;
@@ -404,6 +431,12 @@ namespace MigrationTools.Tools
             if (targetUsers == null || targetUsers.Count == 0)
             {
                 targetUsers = GetUsersListFromServer(processor.Target.GetService<IGroupSecurityService>());
+            }
+            foreach (var (mapping, identity) in FindBareAccountTargets(UserMappings.Value, targetUsers))
+            {
+                Log.LogWarning("TfsUserMappingTool: the mapping '{source}' -> '{target}' resolves only by account name or email. This works for members, "
+                    + "but an Entra B2B guest given this way can be saved as plain text. If this is a guest, map it to '{suggestion}'.",
+                    mapping.Key, mapping.Value, FormatUnambiguous(identity));
             }
             ReportUnresolvedMappingTargets(FindUnresolvedMappingTargets(UserMappings.Value, targetUsers));
         }

@@ -25,7 +25,7 @@ namespace MigrationTools.Tools
 
         /// <summary>
         /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.
-        /// A configured list replaces the default list; only the listed fields are mapped. When it is not set, System.AssignedTo, System.ChangedBy,
+        /// A configured list replaces the default list; only the listed fields are mapped, and an empty list maps none. When it is not set, System.AssignedTo, System.ChangedBy,
         /// System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy and Microsoft.VSTS.Common.ClosedBy are used.
         /// </summary>
         /// <default>System.AssignedTo, System.ChangedBy, System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy, Microsoft.VSTS.Common.ClosedBy</default>

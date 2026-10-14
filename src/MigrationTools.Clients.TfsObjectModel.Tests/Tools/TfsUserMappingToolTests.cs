@@ -701,6 +701,36 @@ namespace MigrationTools.Tests.Tools
             Assert.AreEqual("Martin", tool.MapUserIdentityValue("Microsoft.VSTS.Common.ResolvedBy", "Ghost Person"));
         }
 
+        [TestMethod, TestCategory("L0")]
+        public void IdentityFieldsToCheck_EmptyList_MapsNoFields()
+        {
+            var mappingFile = Path.Combine(_testDirectory, "map.json");
+            File.WriteAllText(mappingFile, "{\"Ghost Person\":\"Martin\"}");
+            var tool = CreateTool(mappingFile, useIdentityMapDataFormat: false);
+            tool.Options.IdentityFieldsToCheck = [];
+
+            Assert.IsEmpty(tool.IdentityFieldsToCheck);
+            Assert.AreEqual("Ghost Person", tool.MapUserIdentityValue(AssignedTo, "Ghost Person"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindBareAccountTargets_ReportsOnlyBareAccountOrEmailTargets()
+        {
+            var map = new Dictionary<string, string>
+            {
+                ["a"] = "guest@partner.com",
+                ["b"] = "Guest User",
+                ["c"] = "Guest User <00000000-tenant\\guest@partner.com>",
+                ["d"] = "nobody@example.com",
+            };
+
+            var result = TfsUserMappingTool.FindBareAccountTargets(map, TargetIdentities);
+
+            Assert.HasCount(1, result);
+            Assert.AreEqual("a", result[0].Mapping.Key);
+            Assert.AreEqual("Guest User <00000000-tenant\\guest@partner.com>", TfsUserMappingTool.FormatUnambiguous(result[0].Identity));
+        }
+
         private static readonly List<IdentityItemData> TargetIdentities =
         [
             new() { DisplayName = "Martin Hinshelwood", AccountName = "martin@example.com", MailAddress = "martin@example.com", Domain = "AzureAD" },
