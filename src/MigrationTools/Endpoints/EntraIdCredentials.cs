@@ -90,8 +90,7 @@ namespace MigrationTools.Endpoints
 
         // No usable sign-in (none available, or AZURE_TOKEN_CREDENTIALS names an unknown or unavailable credential):
         // the run cannot continue, so stop it with a readable reason rather than a processor crash.
-        // An InvalidOperationException counts only when it is DefaultAzureCredential rejecting the variable's value;
-        // any other one is a genuine bug and must surface as such, not as a sign-in hint.
+        // Any other InvalidOperationException is a genuine bug and must surface as such, not as a sign-in hint.
         internal static bool IsCredentialFailure(Exception ex) =>
             ex is AuthenticationFailedException
             || (ex is InvalidOperationException
