@@ -6,7 +6,7 @@
     - Production is always submitted.
     - Preview is submitted only when no Preview PR of ours was opened in the last
       $PreviewMinDaysBetweenSubmissions days (open or merged; closed-unmerged ones do not count).
-    - Before submitting, our own open PRs for the same package are closed as superseded.
+    - After a successful submission, our own older open PRs for the same package are closed as superseded.
     wingetcreate has no way to update or replace an open PR (--replace only replaces an existing
     manifest version in the repo), so superseded PRs are closed here with gh.
 #>
@@ -82,11 +82,12 @@ $ourPrs = gh pr list -R microsoft/winget-pkgs --author $ghUser --state all --lim
 if ($LASTEXITCODE -ne 0) { throw "Could not list $ghUser pull requests in microsoft/winget-pkgs" }
 $plan = Get-WingetSubmissionPlan -Ring $ring -PackageId $wigetPackageId -OurPullRequests ($ourPrs | ConvertFrom-Json) -PreviewMinDaysBetweenSubmissions $PreviewMinDaysBetweenSubmissions -Force $Force.IsPresent
 Write-Output "Plan for $wigetPackageId $version : Submit=$($plan.Submit) ($($plan.Reason)); close superseded: $(($plan.Close | ForEach-Object { "#$($_.number)" }) -join ', ')"
-if (-not $plan.Submit) {
+if (-not $plan.Submit -and -not $DryRun) {
     Write-Host "##[notice] Skipping WinGet submission of $wigetPackageId $version. $($plan.Reason)."
     return
 }
 if ($PlanOnly) { return }
+if (-not $plan.Submit) { Write-Output "DryRun: generating the manifest even though a real run would skip" }
 
 Write-Output "Download wingetcreate.exe"
 Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
