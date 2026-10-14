@@ -174,10 +174,20 @@ namespace MigrationTools.Tools
 
         internal static TfsGitRepositoryInfo Create(string targetRepoName, TfsGitRepositoryInfo sourceRepoInfo, IList<GitRepository> targetRepos)
         {
+            // A "Project/Repo" name (#3214) matches that project only; repo names cannot contain '/'.
+            string projectName = null;
+            string repoName = targetRepoName;
+            int slash = targetRepoName?.IndexOf('/') ?? -1;
+            if (slash >= 0)
+            {
+                projectName = targetRepoName.Substring(0, slash);
+                repoName = targetRepoName.Substring(slash + 1);
+            }
             // Names are unique within a project but not across a collection; treat an ambiguous name as not found.
             var matches = (from g in targetRepos
                            where
-                               string.Equals(g.Name, targetRepoName, StringComparison.OrdinalIgnoreCase)
+                               string.Equals(g.Name, repoName, StringComparison.OrdinalIgnoreCase)
+                               && (projectName == null || string.Equals(g.ProjectReference?.Name, projectName, StringComparison.OrdinalIgnoreCase))
                            select g).Take(2).ToList();
             var gitRepo = matches.Count == 1 ? matches[0] : null;
             return new TfsGitRepositoryInfo(sourceRepoInfo.CommitID, gitRepo?.Id.ToString(), gitRepo);

@@ -119,10 +119,79 @@ namespace MigrationTools.Tests.Tools
             Assert.AreSame(target, result.GitRepo);
         }
 
-        private static TfsGitRepositoryTool Tool(TfsGitTargetArtifactCache artifacts)
+        [TestMethod, TestCategory("L0")]
+        public void DropPullRequestLinks_DefaultsToFalse()
+        {
+            Assert.IsFalse(new TfsGitRepositoryToolOptions().DropPullRequestLinks);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void KeepOrDropPullRequestLink_Default_KeepsLinkAndCountsOncePerWorkItem()
+        {
+            var tool = Tool(null);
+            const string pr = "vstfs:///Git/PullRequestId/p%2fr%2f7";
+            Assert.IsFalse(tool.KeepOrDropPullRequestLink(pr, "1"));
+            Assert.IsFalse(tool.KeepOrDropPullRequestLink(pr, "1"));
+            Assert.IsFalse(tool.KeepOrDropPullRequestLink(pr, "2"));
+            Assert.AreEqual(2, tool.PullRequestLinksKept);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void KeepOrDropPullRequestLink_DropPullRequestLinks_Drops()
+        {
+            var tool = Tool(null, new TfsGitRepositoryToolOptions { DropPullRequestLinks = true });
+            Assert.IsTrue(tool.KeepOrDropPullRequestLink("vstfs:///Git/PullRequestId/p%2fr%2f7", "1"));
+            Assert.AreEqual(0, tool.PullRequestLinksKept);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void GetTargetRepoName_SameNameInTwoProjects_MappedSeparately()
+        {
+            var map = new Dictionary<string, string> { { "ProjectA/Docs", "ADocs" }, { "ProjectB/Docs", "BDocs" } };
+            Assert.AreEqual("ADocs", TfsGitRepositoryTool.GetTargetRepoName(map, new TfsGitRepositoryInfo("abc", null, Repo("ProjectA", "Docs"))));
+            Assert.AreEqual("BDocs", TfsGitRepositoryTool.GetTargetRepoName(map, new TfsGitRepositoryInfo("abc", null, Repo("ProjectB", "Docs"))));
+            Assert.AreEqual("Docs", TfsGitRepositoryTool.GetTargetRepoName(map, new TfsGitRepositoryInfo("abc", null, Repo("ProjectC", "Docs"))));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ShouldUseCrossProjectRepo_QualifiedKeyForOtherProject_DoesNotPullInRepo()
+        {
+            var source = Repo("ProjectB", "Docs");
+            var map = new Dictionary<string, string> { { "ProjectA/Docs", "ADocs" } };
+            Assert.IsFalse(TfsGitRepositoryTool.ShouldUseCrossProjectRepo(source, map, new List<GitRepository>()));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CreateByName_ProjectQualifiedName_PicksThatProject()
+        {
+            var source = new TfsGitRepositoryInfo("abc", null, Repo("OldProject", "MyRepo"));
+            var wanted = Repo("ProjectB", "Shared");
+            var collection = new List<GitRepository> { Repo("ProjectA", "Shared"), wanted };
+            Assert.AreSame(wanted, TfsGitRepositoryInfo.Create("projectb/shared", source, collection).GitRepo);
+            Assert.IsNull(TfsGitRepositoryInfo.Create("ProjectC/Shared", source, collection).GitRepo);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindAmbiguousNameMappings_BareKeyInTwoProjects_ListsThem()
+        {
+            var repos = new List<GitRepository> { Repo("ProjectA", "Docs"), Repo("ProjectB", "docs"), Repo("ProjectA", "Build") };
+            var result = TfsGitRepositoryTool.FindAmbiguousNameMappings(new Dictionary<string, string> { { "Docs", "X" }, { "Build", "Y" } }, repos);
+            Assert.AreEqual(1, result.Count);
+            CollectionAssert.AreEqual(new[] { "ProjectA/Docs", "ProjectB/docs" }, result["Docs"]);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindAmbiguousNameMappings_QualifiedKeyCoversOtherProject_NotAmbiguous()
+        {
+            var repos = new List<GitRepository> { Repo("ProjectA", "Docs"), Repo("ProjectB", "Docs") };
+            var map = new Dictionary<string, string> { { "Docs", "X" }, { "ProjectB/Docs", "Z" } };
+            Assert.AreEqual(0, TfsGitRepositoryTool.FindAmbiguousNameMappings(map, repos).Count);
+        }
+
+        private static TfsGitRepositoryTool Tool(TfsGitTargetArtifactCache artifacts, TfsGitRepositoryToolOptions options = null)
         {
             return new TfsGitRepositoryTool(
-                Microsoft.Extensions.Options.Options.Create(new TfsGitRepositoryToolOptions()),
+                Microsoft.Extensions.Options.Options.Create(options ?? new TfsGitRepositoryToolOptions()),
                 new Mock<IServiceProvider>().Object,
                 new Mock<ILogger<TfsGitRepositoryTool>>().Object,
                 new Mock<ITelemetryLogger>().Object)
