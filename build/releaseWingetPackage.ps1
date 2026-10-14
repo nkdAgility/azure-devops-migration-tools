@@ -78,9 +78,20 @@ $env:GH_TOKEN = $GH_TOKEN
 $ghUser = gh api user --jq .login
 if ($LASTEXITCODE -ne 0) { throw "GH_TOKEN could not be used to read the GitHub user" }
 
-$ourPrs = gh pr list -R microsoft/winget-pkgs --author $ghUser --state all --limit 1000 --search "$wigetPackageId in:title" --json number,title,state,createdAt
-if ($LASTEXITCODE -ne 0) { throw "Could not list $ghUser pull requests in microsoft/winget-pkgs" }
-$plan = Get-WingetSubmissionPlan -Ring $ring -PackageId $wigetPackageId -OurPullRequests ($ourPrs | ConvertFrom-Json) -PreviewMinDaysBetweenSubmissions $PreviewMinDaysBetweenSubmissions -Force $Force.IsPresent
+# Only open PRs (to close) and PRs created inside the throttle window matter, so query exactly those
+# and fail rather than decide on a truncated list.
+$prLimit = 1000
+$since = (Get-Date).ToUniversalTime().AddDays(-$PreviewMinDaysBetweenSubmissions).ToString('yyyy-MM-dd')
+$ourPrs = @()
+foreach ($query in @(@('--state', 'open', '--search', "$wigetPackageId in:title"), @('--state', 'all', '--search', "$wigetPackageId in:title created:>=$since"))) {
+    $result = gh pr list -R microsoft/winget-pkgs --author $ghUser --limit $prLimit @query --json number,title,state,createdAt
+    if ($LASTEXITCODE -ne 0) { throw "Could not list $ghUser pull requests in microsoft/winget-pkgs" }
+    $result = @($result | ConvertFrom-Json)
+    if ($result.Count -ge $prLimit) { throw "Found $prLimit or more matching pull requests; the list may be truncated" }
+    $ourPrs += $result
+}
+$ourPrs = @($ourPrs | Sort-Object number -Unique)
+$plan = Get-WingetSubmissionPlan -Ring $ring -PackageId $wigetPackageId -OurPullRequests $ourPrs -PreviewMinDaysBetweenSubmissions $PreviewMinDaysBetweenSubmissions -Force $Force.IsPresent
 Write-Output "Plan for $wigetPackageId $version : Submit=$($plan.Submit) ($($plan.Reason)); close superseded: $(($plan.Close | ForEach-Object { "#$($_.number)" }) -join ', ')"
 if (-not $plan.Submit -and -not $DryRun) {
     Write-Host "##[notice] Skipping WinGet submission of $wigetPackageId $version. $($plan.Reason)."
