@@ -158,6 +158,7 @@ namespace MigrationTools.Options
                 if (option != null)
                 {
                     BindReplacingCollections(childSection, option);
+                    MapLegacyChangeSetMappingFile(childSection, option);
                     switch (optionTypeString)
                     {
                         case "TfsNodeStructureOptions":
@@ -298,7 +299,28 @@ namespace MigrationTools.Options
             IOptions sourceOptions;
             sourceOptions = GetOptionWithDefaults(configuration, newOptionTypeString);
             BindReplacingCollections(optionsConfig, sourceOptions);
+            MapLegacyChangeSetMappingFile(optionsConfig, sourceOptions);
             return sourceOptions;
+        }
+
+        /// <summary>
+        /// Older samples configured TfsChangeSetMappingTool with "File", which was never read. Move it to
+        /// "ChangeSetMappingFile" so upgraded configurations keep the mapping file the user intended.
+        /// </summary>
+        private void MapLegacyChangeSetMappingFile(IConfigurationSection section, IOptions option)
+        {
+            if (option == null || option.GetType().Name != "TfsChangeSetMappingToolOptions")
+            {
+                return;
+            }
+            var legacyFile = section.GetValue<string>("File");
+            var property = option.GetType().GetProperty("ChangeSetMappingFile");
+            if (string.IsNullOrWhiteSpace(legacyFile) || property == null || !string.IsNullOrWhiteSpace(property.GetValue(option) as string))
+            {
+                return;
+            }
+            _logger.LogInformation("Upgrading {old} to {new}", "TfsChangeSetMappingTool:File", "TfsChangeSetMappingTool:ChangeSetMappingFile");
+            property.SetValue(option, legacyFile);
         }
 
         /// <summary>
