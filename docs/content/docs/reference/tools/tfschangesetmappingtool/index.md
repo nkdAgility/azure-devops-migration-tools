@@ -56,15 +56,27 @@ Common scenarios where the TFS Changeset Mapping Tool is essential:
 
 ### Basic Examples
 
-The TFS Changeset Mapping Tool requires minimal configuration to enable changeset mapping:
+Set `ChangeSetMappingFile` to the path of the mapping file:
 
 ```json
 {
   "TfsChangeSetMappingTool": {
-    "Enabled": true
+    "Enabled": true,
+    "ChangeSetMappingFile": "C:\\temp\\ChangeSetMappingFile.txt"
   }
 }
 ```
+
+The mapping file has one mapping per line in the form `changesetId-commitId`, for example as produced by a TFVC to Git conversion:
+
+```text
+1234-41dd2754058348d72a6417c0615c2543b9b55535
+1235-8a3f0c1d9e2b4c5a6f7e8d9c0b1a2f3e4d5c6b7a
+```
+
+The `TfsGitRepositoryTool` uses these mappings to replace `Fixed in Changeset` links with `Fixed in Commit` links to the target Git repository. Lines that do not match the format are skipped. If the file does not exist, a warning is logged and no mappings are loaded.
+
+> **Note:** Earlier samples used `"File"` instead of `"ChangeSetMappingFile"`, which the tool did not read. The tool now honours `"File"` with a warning, and the `upgrade` command renames it to `"ChangeSetMappingFile"`.
 
 ### Complex Examples
 
@@ -79,7 +91,8 @@ Enable changeset mapping for work item migration:
 ```json
 {
   "TfsChangeSetMappingTool": {
-    "Enabled": true
+    "Enabled": true,
+    "ChangeSetMappingFile": "C:\\temp\\ChangeSetMappingFile.txt"
   }
 }
 ```
@@ -92,7 +105,8 @@ When migrating both work items and source control, enable the tool to maintain l
 {
   "CommonTools": {
     "TfsChangeSetMappingTool": {
-      "Enabled": true
+      "Enabled": true,
+      "ChangeSetMappingFile": "C:\\temp\\ChangeSetMappingFile.txt"
     },
     "TfsGitRepositoryTool": {
       "Enabled": true,
@@ -126,7 +140,8 @@ When migrating both work items and source control, enable the tool to maintain l
 
 **Changeset Links Not Updated:**
 
-- Verify the tool is enabled (`"Enabled": true`)
+- Verify the tool is enabled (`"Enabled": true`) and `ChangeSetMappingFile` points at an existing file
+- Check the logs for a warning that the mapping file was not found
 - Check that changesets exist in the target system
 - Ensure proper changeset mapping is available
 - Review migration logs for changeset-related messages

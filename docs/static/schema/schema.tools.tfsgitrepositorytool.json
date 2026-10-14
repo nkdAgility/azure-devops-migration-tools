@@ -5,13 +5,18 @@
   "description": "missing XML code comments",
   "type": "object",
   "properties": {
+    "DropPullRequestLinks": {
+      "description": "Pull requests are not carried by a git push, so a pull request link cannot be rewritten to the target. By default the link is kept pointing at the source pull request and a warning names the work item and pull request. Set to true to remove pull request links instead.",
+      "type": "boolean",
+      "default": "false"
+    },
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean",
       "default": "true"
     },
     "Mappings": {
-      "description": "Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration. Keys may be a repository name (\"Repo\") or a project-qualified name (\"Project/Repo\"); the qualified form takes precedence. Repositories referenced from other (or renamed) projects are resolved by repository ID and rewritten when mapped here or when the target project contains a repository with the same name.",
+      "description": "Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration. Keys may be a repository name (\"Repo\") or a project-qualified name (\"Project/Repo\"); the qualified form takes precedence, so repositories with the same name in different source projects can be mapped separately. A bare \"Repo\" key that matches repositories in more than one source project logs a warning listing them. Values may also be \"Project/Repo\" to pick a repository in another target project. Repositories referenced from other (or renamed) projects are resolved by repository ID and rewritten when mapped here or when the target project contains a repository with the same name.",
       "type": "object",
       "default": "{}"
     },
@@ -20,7 +25,7 @@
       "type": "boolean"
     },
     "VerifyTargetExists": {
-      "description": "When true, a commit or branch link is only rewritten to the target repository if that commit or branch exists there; otherwise the source link is kept and a warning names the work item, repository and commit. Set to false to rewrite every link without checking (the behaviour before this option existed). Pull request links are dropped either way.",
+      "description": "When true, a commit or branch link is only rewritten to the target repository if that commit or branch exists there; otherwise the source link is kept and a warning names the work item, repository and commit. Set to false to rewrite every link without checking (the behaviour before this option existed). Pull request links are not affected; see DropPullRequestLinks.",
       "type": "boolean",
       "default": "true"
     }
