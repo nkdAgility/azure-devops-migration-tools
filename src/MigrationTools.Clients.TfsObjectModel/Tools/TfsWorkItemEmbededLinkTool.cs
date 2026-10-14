@@ -9,6 +9,7 @@ using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
@@ -91,16 +92,19 @@ namespace MigrationTools.Tools
                         if (workItemLinkMatch.Success)
                         {
                             var workItemId = workItemLinkMatch.Groups["id"].Value;
+                            if (IsTargetWorkItemUrl(href, oldTfsurl, oldTfsProject, newTfsurl, newTfsProject))
+                            {
+                                Log.LogDebug("{LogTypeName}: [SKIP] Work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} already points at the target.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                                continue;
+                            }
                             Log.LogDebug("{LogTypeName}: Source work item {workItemId} mention link traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
-                            var sourceLinkWi = processor.Source.WorkItems.GetWorkItem(workItemId, false);
+                            var sourceLinkWi = int.TryParse(workItemId, out var sourceId) ? FindSourceWorkItem(processor, sourceId) : null;
                             if (sourceLinkWi != null)
                             {
                                 var linkWI = processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
                                 if (linkWI != null)
                                 {
-                                    var replaceValue = anchorTagMatch.Value
-                                        .Replace(workItemId, linkWI.Id)
-                                        .Replace(oldTfsProject, newTfsProject)
+                                    var replaceValue = ReplaceProject(anchorTagMatch.Value.Replace(workItemId, linkWI.Id), oldTfsProject, newTfsProject)
                                         .Replace(oldTfsurl, newTfsurl);
                                     field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
                                     Log.LogInformation("{LogTypeName}: Source work item {workItemId} mention link was successfully replaced with target work item {linkWIId} mention link on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, linkWI.Id, field.Name, targetWorkItem.Id);
@@ -116,7 +120,7 @@ namespace MigrationTools.Tools
                             {
                                 var replaceValue = value;
                                 field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
-                                Log.LogInformation("{LogTypeName}: [SKIP] Source work item {workItemId} mention link on field {fieldName} was not found on the source collection.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
+                                Log.LogWarning("{LogTypeName}: [SKIP] Source work item {workItemId} mention link on field {fieldName} on target work item {targetWorkItemId} was not found on the source collection. So link is replaced with just simple text.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
                             }
                         }
                         else if ((href.StartsWith("mailto:") || href.StartsWith("#")) && value.StartsWith("@"))
@@ -150,6 +154,68 @@ namespace MigrationTools.Tools
 
             return 0;
         }
+
+        /// <summary>
+        /// Replaces the project in a mention, including its URL-encoded form in the href, so a re-sync recognises the link as a target link.
+        /// </summary>
+        internal static string ReplaceProject(string value, string oldProject, string newProject)
+        {
+            var oldEncoded = Uri.EscapeDataString(oldProject);
+            if (oldEncoded != oldProject)
+            {
+                value = value.Replace(oldEncoded, Uri.EscapeDataString(newProject));
+            }
+            return value.Replace(oldProject, newProject);
+        }
+
+        // A missing mention is expected (deleted, or never visible) and is reported by the caller as a warning,
+        // so this avoids GetWorkItem, which logs every failure as an error.
+        private WorkItemData FindSourceWorkItem(TfsProcessor processor, int id)
+        {
+            try
+            {
+                return ((TfsWorkItemMigrationClient)processor.Source.WorkItems).Store.GetWorkItem(id)?.AsWorkItemData();
+            }
+            catch (DeniedOrNotExistException)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns true when a work item URL already points at the target: it is under the target collection when the
+        /// collections differ, or under the target project when both endpoints share a collection. Such a mention was
+        /// rewritten by an earlier run and its id is a target id, so it must not be looked up on the source.
+        /// </summary>
+        internal static bool IsTargetWorkItemUrl(string href, string sourceCollection, string sourceProject, string targetCollection, string targetProject)
+        {
+            var editIndex = href.IndexOf("/_workitems/", StringComparison.OrdinalIgnoreCase);
+            if (editIndex < 0)
+            {
+                return false;
+            }
+            var prefix = NormaliseOrganisationUrl(href.Substring(0, editIndex));
+            var source = NormaliseOrganisationUrl(sourceCollection.TrimEnd('/'));
+            var target = NormaliseOrganisationUrl(targetCollection.TrimEnd('/'));
+            if (!string.Equals(source, target, StringComparison.OrdinalIgnoreCase))
+            {
+                return prefix.StartsWith(target + "/", StringComparison.OrdinalIgnoreCase)
+                    && !prefix.StartsWith(source + "/", StringComparison.OrdinalIgnoreCase);
+            }
+            if (string.Equals(sourceProject, targetProject, StringComparison.OrdinalIgnoreCase)
+                || !prefix.StartsWith(target + "/", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            var project = Uri.UnescapeDataString(prefix.Substring(prefix.LastIndexOf('/') + 1));
+            return string.Equals(project, targetProject, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static readonly Regex LegacyOrganisationUrl = new Regex(@"^https?://(?<org>[^./]+)\.visualstudio\.com(?:/DefaultCollection)?(?=/|$)", RegexOptions.IgnoreCase);
+
+        // Azure DevOps Services serves an organisation at both https://{org}.visualstudio.com and https://dev.azure.com/{org}.
+        internal static string NormaliseOrganisationUrl(string url) =>
+            LegacyOrganisationUrl.Replace(url, m => "https://dev.azure.com/" + m.Groups["org"].Value);
 
         private IDictionary<string, string> GetUserMappings()
         {
