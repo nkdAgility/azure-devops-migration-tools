@@ -442,21 +442,24 @@ namespace MigrationTools.Processors
 
         private void ValidateAllUsersExistOrAreMapped(List<WorkItemData> sourceWorkItems)
         {
+            IdentityMapResult usersToMap = null;
             if (CommonTools.UserMapping.Options.SkipValidateAllUsersExistOrAreMapped)
             {
                 contextLog.Information("Skipped: Validating::Check that all users in the source exist in the target or are mapped!");
-                return;
             }
-
-            contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
-            IdentityMapResult usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
-            if (usersToMap != null && usersToMap.IdentityMap != null && usersToMap.IdentityMap.Count > 0)
+            else
             {
-                Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist "
-                    + "in the target. This will not cause any errors, but may result in disconnected users that could have "
-                    + "been mapped. Use the ExportUsersForMapping processor to create a list of mappable users.",
-                    usersToMap.IdentityMap.Count);
+                contextLog.Information("Validating::Check that all users in the source exist in the target or are mapped!");
+                usersToMap = CommonTools.UserMapping.GetUsersInSourceMappedToTargetForWorkItems(this, sourceWorkItems);
+                if (usersToMap != null && usersToMap.IdentityMap != null && usersToMap.IdentityMap.Count > 0)
+                {
+                    Log.LogWarning("Validating Failed! There are {usersToMap} users that exist in the source that do not exist "
+                        + "in the target. This will not cause any errors, but may result in disconnected users that could have "
+                        + "been mapped. Use the ExportUsersForMapping processor to create a list of mappable users.",
+                        usersToMap.IdentityMap.Count);
+                }
             }
+            CommonTools.UserMapping.ValidateMappingTargets(this, usersToMap?.TargetUsers);
         }
 
         //private void ValidateAllNodesExistOrAreMapped(List<WorkItemData> sourceWorkItems)

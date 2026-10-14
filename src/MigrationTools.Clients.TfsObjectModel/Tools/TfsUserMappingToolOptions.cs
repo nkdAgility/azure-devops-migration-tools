@@ -11,9 +11,24 @@ namespace MigrationTools.Tools
     {
 
         /// <summary>
-        /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.
+        /// The identity fields used when IdentityFieldsToCheck is not set.
         /// </summary>
-        /// <default>none</default>
+        public static readonly IReadOnlyList<string> DefaultIdentityFieldsToCheck =
+        [
+            "System.AssignedTo",
+            "System.ChangedBy",
+            "System.CreatedBy",
+            "Microsoft.VSTS.Common.ActivatedBy",
+            "Microsoft.VSTS.Common.ResolvedBy",
+            "Microsoft.VSTS.Common.ClosedBy"
+        ];
+
+        /// <summary>
+        /// This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.
+        /// A configured list replaces the default list; only the listed fields are mapped. When it is not set, System.AssignedTo, System.ChangedBy,
+        /// System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy and Microsoft.VSTS.Common.ClosedBy are used.
+        /// </summary>
+        /// <default>System.AssignedTo, System.ChangedBy, System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy, Microsoft.VSTS.Common.ClosedBy</default>
         public List<string> IdentityFieldsToCheck { get; set; }
 
         /// <summary>
@@ -55,6 +70,14 @@ namespace MigrationTools.Tools
         /// <default>false</default>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool SkipValidateAllUsersExistOrAreMapped { get; set; } = false;
+
+        /// <summary>
+        /// At startup every target value in the UserMappingFile is resolved against the identities in the target. A value that does not
+        /// resolve, or resolves to more than one identity, would be saved as plain text with no identity behind it. When true (the default)
+        /// the run stops before any work item is migrated; when false each problem is logged as a warning and the run continues.
+        /// </summary>
+        /// <default>true</default>
+        public bool StopIfMappingTargetsDoNotResolve { get; set; } = true;
 
         /// <summary>
         /// This is the regionalized "Project Collection Valid Users" group name. Default is "Project Collection Valid Users".

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Server;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools.DataContracts;
+using MigrationTools.Exceptions;
 using MigrationTools.Processors.Infrastructure;
 using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json;
@@ -176,7 +177,7 @@ namespace MigrationTools.Tools
         /// <summary>
         /// Collects the distinct (case-insensitive) user values found in the given identity fields across all revisions.
         /// </summary>
-        public static HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, List<string> identityFieldsToCheck)
+        public static HashSet<string> GetUsersFromWorkItems(List<WorkItemData> workitems, IEnumerable<string> identityFieldsToCheck)
         {
             HashSet<string> foundUsers = new(StringComparer.CurrentCultureIgnoreCase);
             foreach (var wItem in workitems)
@@ -237,8 +238,8 @@ namespace MigrationTools.Tools
         /// <returns>The mapped target value, or the original value when no mapping applies</returns>
         public object MapUserIdentityValue(string referenceName, object value)
         {
-            if (!Options.Enabled || referenceName == null || Options.IdentityFieldsToCheck == null
-                || !Options.IdentityFieldsToCheck.Contains(referenceName, StringComparer.OrdinalIgnoreCase))
+            if (!Options.Enabled || referenceName == null
+                || !IdentityFieldsToCheck.Contains(referenceName, StringComparer.OrdinalIgnoreCase))
             {
                 return value;
             }
@@ -310,6 +311,124 @@ namespace MigrationTools.Tools
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// The identity fields to map: the configured IdentityFieldsToCheck, or
+        /// <see cref="TfsUserMappingToolOptions.DefaultIdentityFieldsToCheck"/> when none are configured. The defaults live in
+        /// code rather than appsettings.json because configuration providers merge arrays by index, so a shorter configured
+        /// list would otherwise keep the remaining default entries.
+        /// </summary>
+        public IReadOnlyList<string> IdentityFieldsToCheck =>
+            Options.IdentityFieldsToCheck is { Count: > 0 } configured ? configured : TfsUserMappingToolOptions.DefaultIdentityFieldsToCheck;
+
+        /// <summary>
+        /// Checks that each target value in the user mapping resolves to exactly one identity in <paramref name="targetUsers"/>.
+        /// A plain value matches a display name, account name, email address or <c>domain\account</c>; a
+        /// <c>Display Name &lt;unique&gt;</c> value matches on the unique part alone.
+        /// </summary>
+        /// <returns>One entry for each mapping whose target does not resolve or is ambiguous.</returns>
+        public static List<UnresolvedUserMapping> FindUnresolvedMappingTargets(IDictionary<string, string> userMap, IEnumerable<IdentityItemData> targetUsers)
+        {
+            var users = (targetUsers ?? []).Where(u => u != null).ToList();
+            List<UnresolvedUserMapping> result = [];
+            foreach (var mapping in userMap ?? new Dictionary<string, string>())
+            {
+                var target = mapping.Value?.Trim();
+                if (string.IsNullOrEmpty(target))
+                {
+                    continue;
+                }
+                List<IdentityItemData> candidates;
+                if (TfsUserIdentityReference.TryParse(target, out var displayName, out var unique))
+                {
+                    candidates = users.Where(u => MatchesUnique(u, unique)).ToList();
+                    if (candidates.Count == 0)
+                    {
+                        // Show users with the same display name to help correct the unique part.
+                        var sameName = users.Where(u => string.Equals(u.DisplayName, displayName, StringComparison.OrdinalIgnoreCase)).ToList();
+                        result.Add(new UnresolvedUserMapping(mapping.Key, mapping.Value, false, sameName));
+                        continue;
+                    }
+                }
+                else
+                {
+                    candidates = users.Where(u => string.Equals(u.DisplayName, target, StringComparison.OrdinalIgnoreCase) || MatchesUnique(u, target)).ToList();
+                }
+                if (candidates.Count != 1)
+                {
+                    result.Add(new UnresolvedUserMapping(mapping.Key, mapping.Value, candidates.Count > 1, candidates));
+                }
+            }
+            return result;
+        }
+
+        private static bool MatchesUnique(IdentityItemData user, string unique) =>
+            (!string.IsNullOrEmpty(user.AccountName) && string.Equals(user.AccountName, unique, StringComparison.OrdinalIgnoreCase))
+            || (!string.IsNullOrEmpty(user.MailAddress) && string.Equals(user.MailAddress, unique, StringComparison.OrdinalIgnoreCase))
+            || (!string.IsNullOrEmpty(user.AccountName) && !string.IsNullOrEmpty(user.Domain)
+                && string.Equals($"{user.Domain}\\{user.AccountName}", unique, StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
+        /// The unambiguous <c>Display Name &lt;domain\account&gt;</c> form for an identity, or the
+        /// <see cref="TfsUserIdentityReference.Format"/> form when the domain is unknown.
+        /// </summary>
+        public static string FormatUnambiguous(IdentityItemData user) =>
+            !string.IsNullOrEmpty(user?.Domain) && !string.IsNullOrEmpty(user.AccountName)
+                ? $"{user.DisplayName} <{user.Domain}\\{user.AccountName}>"
+                : TfsUserIdentityReference.Format(user);
+
+        /// <summary>
+        /// Startup validation: resolves every target value in the UserMappingFile against the target identities and reports each
+        /// one that does not resolve or is ambiguous. Azure DevOps would otherwise save such a value as plain text with no identity.
+        /// </summary>
+        /// <param name="processor">The processor whose target is checked.</param>
+        /// <param name="targetUsers">The target identities, when already loaded; otherwise they are read from the target.</param>
+        /// <exception cref="MigrationRunStoppedException">Thrown when a target does not resolve and StopIfMappingTargetsDoNotResolve is true.</exception>
+        public void ValidateMappingTargets(TfsProcessor processor, List<IdentityItemData> targetUsers = null)
+        {
+            if (!Options.Enabled)
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(Options.UserMappingFile) || !File.Exists(Options.UserMappingFile))
+            {
+                Log.LogWarning("TfsUserMappingTool::ValidateMappingTargets The UserMappingFile '{UserMappingFile}' cant be found, so no users will be mapped.", Options.UserMappingFile);
+                return;
+            }
+            if (UserMappings.Value.Count == 0)
+            {
+                return;
+            }
+            Log.LogInformation("Validating::Check that every target in the user mapping file resolves to one identity in the target");
+            if (targetUsers == null || targetUsers.Count == 0)
+            {
+                targetUsers = GetUsersListFromServer(processor.Target.GetService<IGroupSecurityService>());
+            }
+            ReportUnresolvedMappingTargets(FindUnresolvedMappingTargets(UserMappings.Value, targetUsers));
+        }
+
+        internal void ReportUnresolvedMappingTargets(List<UnresolvedUserMapping> unresolved)
+        {
+            if (unresolved.Count == 0)
+            {
+                Log.LogInformation("Validating::All user mapping targets resolve to an identity in the target.");
+                return;
+            }
+            foreach (var item in unresolved)
+            {
+                var candidates = item.Candidates.Count == 0 ? "none" : string.Join("; ", item.Candidates.Select(FormatUnambiguous));
+                Log.LogWarning("TfsUserMappingTool: the mapping '{source}' -> '{target}' {problem} in the target, so it would be saved as plain text. Candidate identities: {candidates}",
+                    item.Source, item.Target, item.IsAmbiguous ? "matches more than one identity" : "does not match any identity", candidates);
+            }
+            if (Options.StopIfMappingTargetsDoNotResolve)
+            {
+                Log.LogError("Validating Failed! {count} user mapping target(s) do not resolve to exactly one identity in the target. Correct the UserMappingFile, "
+                    + "using the unambiguous 'Display Name <domain\\account>' form shown in the candidates, or set StopIfMappingTargetsDoNotResolve to false to continue.", unresolved.Count);
+                throw new MigrationRunStoppedException($"{unresolved.Count} user mapping target(s) do not resolve to an identity in the target.");
+            }
+            Log.LogWarning("Validating Failed! {count} user mapping target(s) do not resolve to exactly one identity in the target and will be saved as plain text. "
+                + "StopIfMappingTargetsDoNotResolve is false, so the migration continues.", unresolved.Count);
         }
 
         public Lazy<Dictionary<string, string>> UserMappings { get; }
@@ -473,7 +592,7 @@ namespace MigrationTools.Tools
             if (Options.Enabled)
             {
                 Dictionary<string, string> result = new Dictionary<string, string>();
-                HashSet<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, Options.IdentityFieldsToCheck);
+                HashSet<string> workItemUsers = GetUsersFromWorkItems(sourceWorkItems, IdentityFieldsToCheck);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [workItemUsers|{workItemUsers.Count}]");
                 IdentityMapResult mappedUsers = GetUsersInSourceMappedToTarget(processor);
                 Log.LogDebug($"TfsUserMappingTool::GetUsersInSourceMappedToTargetForWorkItems [mappedUsers|{mappedUsers.IdentityMap.Count}]");
@@ -488,6 +607,24 @@ namespace MigrationTools.Tools
                 return null;
             }
         }
+    }
+
+    /// <summary>
+    /// A user mapping whose target does not resolve to exactly one identity in the target.
+    /// </summary>
+    public class UnresolvedUserMapping(string source, string target, bool isAmbiguous, IReadOnlyList<IdentityItemData> candidates)
+    {
+        /// <summary>The source name in the mapping file.</summary>
+        public string Source { get; } = source;
+
+        /// <summary>The mapped target value.</summary>
+        public string Target { get; } = target;
+
+        /// <summary>True when the target matches more than one identity; false when it matches none.</summary>
+        public bool IsAmbiguous { get; } = isAmbiguous;
+
+        /// <summary>The matching identities, or for an unmatched <c>Display Name &lt;unique&gt;</c> value those with the same display name.</summary>
+        public IReadOnlyList<IdentityItemData> Candidates { get; } = candidates ?? [];
     }
 
     [Mapper]
