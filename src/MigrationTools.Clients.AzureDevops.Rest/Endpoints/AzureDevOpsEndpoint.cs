@@ -28,6 +28,14 @@ namespace MigrationTools.Endpoints
         [Obsolete("Dont know what this is for")]
         public override int Count => 0;
 
+        private int _failedSyncWrites;
+
+        /// <summary>
+        /// Number of creates, updates and layout moves made through <see cref="SyncDefinition"/> and the layout
+        /// move methods that the service rejected. Each one has already been logged with the request and response.
+        /// </summary>
+        public int FailedSyncWrites => _failedSyncWrites;
+
         /// <summary>
         /// Initializes a new instance of the AzureDevOpsEndpoint class with the specified configuration and dependencies.
         /// </summary>
@@ -120,7 +128,7 @@ namespace MigrationTools.Endpoints
             //}
 
             string unformatted = (apiPathAttribute.IncludeProject ? "/" + Options.Project : "") + "/_apis/" + pathSplit[0] + (apiPathAttribute.IncludeTrailingSlash ? "/" : "");
-            builder.Path += Regex.IsMatch(unformatted, @"{\d}") ? RestUrlHelper.FormatRoute(unformatted, routeParameters) : unformatted;
+            builder.Path = RestUrlHelper.CombinePath(builder.Path, Regex.IsMatch(unformatted, @"{\d}") ? RestUrlHelper.FormatRoute(unformatted, routeParameters) : unformatted);
 
             if (apiNameAttribute.Name == "Release Piplines")
             {
@@ -463,6 +471,11 @@ namespace MigrationTools.Endpoints
                 else if (result.StatusCode == HttpStatusCode.NotModified)
                 {
                     Log.LogInformation("{DefinitionType}: {DefinitionName}) was already up to date.", typeof(DefinitionType).Name, definitionToBeMigrated.Name);
+                    migratedDefinitions.Add(new Mapping()
+                    {
+                        Name = definitionToBeMigrated.Name,
+                        TargetId = definitionToBeMigrated.Id
+                    });
                 }
                 else
                 {
@@ -498,7 +511,7 @@ namespace MigrationTools.Endpoints
                 var result = await CreateApiDefinitionsAsync<DefinitionType>(new DefinitionType[] { targetDef }, parentIds);
                 if (result.Count == 0)
                 {
-                    // TODO: Give them option to bail out?
+                    System.Threading.Interlocked.Increment(ref _failedSyncWrites);
                 }
                 else
                 {
@@ -513,7 +526,7 @@ namespace MigrationTools.Endpoints
                 var result = await UpdateApiDefinitionsAsync<DefinitionType>(new DefinitionType[] { targetDef }, parentIds);
                 if (result.Count == 0)
                 {
-                    // TODO: Give them option to bail out?
+                    System.Threading.Interlocked.Increment(ref _failedSyncWrites);
                 }
                 else
                 {
@@ -558,7 +571,7 @@ namespace MigrationTools.Endpoints
         private async Task<bool> MoveWorkItemGroup(WorkItemGroup group, string processId, string witRefName, string pageId, string sectionId, string oldSectionId, string oldPageId = null)
         {
             var client = GetHttpClient(
-                $"{new UriBuilder(Options.Organisation)}/_apis/work/processes" +
+                RestUrlHelper.CombinePath(new UriBuilder(Options.Organisation).ToString(), "_apis/work/processes") +
                 $"/{RestUrlHelper.EscapeSegment(processId)}/workItemTypes/{RestUrlHelper.EscapeSegment(witRefName)}/layout/pages/{RestUrlHelper.EscapeSegment(pageId)}/sections/{RestUrlHelper.EscapeSegment(sectionId)}/groups/{RestUrlHelper.EscapeSegment(group.Id)}?" +
                 $"removeFromSectionId={RestUrlHelper.EscapeSegment(oldSectionId)}" +
                 (!string.IsNullOrEmpty(oldPageId) ? $"&removeFromPageId={RestUrlHelper.EscapeSegment(oldPageId)}" : ""),
@@ -582,6 +595,7 @@ namespace MigrationTools.Endpoints
             if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.Created)
             {
                 Log.LogError("Error moving {DefinitionType}: {processId}::{witRefName}::{pageId}::{sectionId}::{groupLabel}. Please migrate it manually. \r\nUrl: PUT {Url}\r\n{ErrorText}", typeof(WorkItemGroup).Name, processId, witRefName, pageId, sectionId, group.Label, result.RequestMessage.RequestUri.ToString(), responseContent);
+                System.Threading.Interlocked.Increment(ref _failedSyncWrites);
                 return false;
             }
             else
@@ -624,9 +638,9 @@ namespace MigrationTools.Endpoints
         private async Task<bool> MoveWorkItemControl(WorkItemControl control, string processId, string witRefName, string groupId, string fieldName, string oldGroupId = null)
         {
             var client = GetHttpClient(
-                $"{new UriBuilder(Options.Organisation)}/_apis/work/processes" +
+                RestUrlHelper.CombinePath(new UriBuilder(Options.Organisation).ToString(), "_apis/work/processes") +
                 $"/{RestUrlHelper.EscapeSegment(processId)}/workItemTypes/{RestUrlHelper.EscapeSegment(witRefName)}/layout/groups/{RestUrlHelper.EscapeSegment(groupId)}/Controls/{RestUrlHelper.EscapeSegment(fieldName)}?" +
-                (!string.IsNullOrEmpty(oldGroupId) ? $"&removeFromGroupId={RestUrlHelper.EscapeSegment(oldGroupId)}" : ""),
+                (!string.IsNullOrEmpty(oldGroupId) ? $"removeFromGroupId={RestUrlHelper.EscapeSegment(oldGroupId)}" : ""),
                 "api-version=6.1-preview.1");
 
             DefaultContractResolver contractResolver = new DefaultContractResolver
@@ -647,6 +661,7 @@ namespace MigrationTools.Endpoints
             if (result.StatusCode != HttpStatusCode.OK && result.StatusCode != HttpStatusCode.Created)
             {
                 Log.LogError("Error moving {DefinitionType}: {processId}::{witRefName}::{groupLabel}::{controlLabel}. Please migrate it manually. \r\nUrl: PUT {Url}\r\n{ErrorText}", typeof(WorkItemGroup).Name, processId, witRefName, groupId, control.Label, result.RequestMessage.RequestUri.ToString(), responseContent);
+                System.Threading.Interlocked.Increment(ref _failedSyncWrites);
                 return false;
             }
             else
