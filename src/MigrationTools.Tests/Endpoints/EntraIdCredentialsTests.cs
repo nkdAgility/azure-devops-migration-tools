@@ -204,6 +204,47 @@ namespace MigrationTools.Endpoints.Tests
             await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => EntraIdCredentials.GetFreshAccessTokenAsync());
         }
 
+        private sealed class BuggyTokenCredential : TokenCredential
+        {
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
+                => throw new InvalidOperationException("Collection was modified.");
+
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+                => throw new InvalidOperationException("Collection was modified.");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void GetAccessToken_DoesNotTurnUnrelatedErrorsIntoASignInStop()
+        {
+            EntraIdCredentials.TokenCredential = new BuggyTokenCredential();
+
+            Assert.ThrowsExactly<InvalidOperationException>(() => EntraIdCredentials.GetAccessToken());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsCredentialFailure_AcceptsOnlyTheTokenCredentialsVariableRejection()
+        {
+            var saved = Environment.GetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable);
+            try
+            {
+                EntraIdCredentials.TokenCredential = null;
+                var rejected = new InvalidOperationException("Invalid value for environment variable AZURE_TOKEN_CREDENTIALS: notacredential.");
+                var unrelated = new InvalidOperationException("Collection was modified.");
+
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, null);
+                Assert.IsFalse(EntraIdCredentials.IsCredentialFailure(rejected), "Not a pinning failure when the variable is unset.");
+
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, "NotACredential");
+                Assert.IsTrue(EntraIdCredentials.IsCredentialFailure(rejected));
+                Assert.IsFalse(EntraIdCredentials.IsCredentialFailure(unrelated));
+                Assert.IsTrue(EntraIdCredentials.IsCredentialFailure(new Azure.Identity.CredentialUnavailableException("none")));
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, saved);
+            }
+        }
+
         [TestMethod, TestCategory("L0")]
         public void CredentialFailure_NamesThePinnedCredential()
         {
