@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
+using Azure.Core.Diagnostics;
 using Azure.Identity;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.OAuth;
@@ -18,7 +19,33 @@ namespace MigrationTools.Endpoints
         /// <summary>The well-known Azure DevOps resource id; tokens are requested for its default scope.</summary>
         public const string AzureDevOpsScope = "499b84ac-1321-427f-aa17-267ca6975798/.default";
 
-        private static readonly Lazy<TokenCredential> _default = new Lazy<TokenCredential>(() => new DefaultAzureCredential());
+        private static Lazy<TokenCredential> _default = NewDefault();
+
+        private static Lazy<TokenCredential> NewDefault() => new Lazy<TokenCredential>(() =>
+        {
+            EnsureSelectionListener();
+            return new DefaultAzureCredential();
+        });
+
+        // DefaultAzureCredential reports the credential it settled on only through its event source (#3225).
+        private static AzureEventSourceListener _selectionListener;
+        private static string _selectedCredential;
+
+        /// <summary>The credential DefaultAzureCredential selected, when known (for example "AzureCliCredential").</summary>
+        public static string SelectedCredential => _tokenCredential != null ? _tokenCredential.GetType().Name : _selectedCredential;
+
+        private static void EnsureSelectionListener()
+        {
+            if (_selectionListener != null) { return; }
+            _selectionListener = new AzureEventSourceListener((e, message) =>
+            {
+                if (e.EventName == "DefaultAzureCredentialCredentialSelected" && e.Payload != null && e.Payload.Count > 0)
+                {
+                    var name = e.Payload[0]?.ToString();
+                    _selectedCredential = name?.Substring(name.LastIndexOf('.') + 1);
+                }
+            }, System.Diagnostics.Tracing.EventLevel.Informational);
+        }
 
         // Some credentials (Azure CLI) start a process per call, so a token is reused until close to expiry.
         private static readonly TimeSpan RefreshMargin = TimeSpan.FromMinutes(5);
@@ -50,6 +77,82 @@ namespace MigrationTools.Endpoints
                 _cached = fresh;
                 return fresh.Token;
             }
+        }
+
+        /// <summary>
+        /// Drops the cached token and, unless a credential was set explicitly, the DefaultAzureCredential instance,
+        /// so the next request probes the credential chain again. Used before retrying a rejected first connection.
+        /// </summary>
+        public static void Reset()
+        {
+            lock (_cacheLock)
+            {
+                _cached = null;
+                _selectedCredential = null;
+                if (_tokenCredential == null) { _default = NewDefault(); }
+            }
+        }
+
+        /// <summary>
+        /// Runs <paramref name="connect"/>, retrying up to <paramref name="retries"/> more times when it fails with an
+        /// exception <paramref name="isRejected"/> accepts. Before each retry the token cache and credential chain are
+        /// reset and the caller waits <paramref name="delay"/> times the attempt number. Any other failure, or the
+        /// last rejection, is thrown unchanged.
+        /// </summary>
+        public static T ConnectWithRetry<T>(Func<T> connect, Func<Exception, bool> isRejected, int retries, TimeSpan delay,
+            Action<Exception, int, TimeSpan> onRetry, Action<TimeSpan> sleep = null)
+        {
+            sleep = sleep ?? Thread.Sleep;
+            for (var attempt = 0; ; attempt++)
+            {
+                try
+                {
+                    return connect();
+                }
+                catch (Exception ex) when (attempt < retries && isRejected(ex))
+                {
+                    var wait = TimeSpan.FromTicks(delay.Ticks * (attempt + 1));
+                    onRetry?.Invoke(ex, attempt + 2, wait);
+                    Reset();
+                    sleep(wait);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Who the current token is for and when it is valid, for diagnostics. Never contains the token itself.
+        /// </summary>
+        public static string DescribeCurrentToken()
+        {
+            AccessToken? cached;
+            lock (_cacheLock) { cached = _cached; }
+            if (!(cached is AccessToken token)) { return "no token acquired"; }
+            return DescribeToken(token.Token, token.ExpiresOn, SelectedCredential);
+        }
+
+        internal static string DescribeToken(string jwt, DateTimeOffset expiresOn, string credential)
+        {
+            var source = string.IsNullOrEmpty(credential) ? "unknown credential" : credential;
+            var claims = TryReadClaims(jwt);
+            if (claims == null) { return $"{source}, expires {expiresOn:u} (not a readable JWT)"; }
+            string Claim(string name) => claims.TryGetValue(name, out var v) ? v?.ToString() : null;
+            string Time(string name) => long.TryParse(Claim(name), out var s) ? DateTimeOffset.FromUnixTimeSeconds(s).ToString("u") : "?";
+            var who = Claim("upn") ?? Claim("unique_name") ?? Claim("appid") ?? Claim("oid") ?? "?";
+            return $"{source}, identity {who}, tenant {Claim("tid") ?? "?"}, audience {Claim("aud") ?? "?"}, not before {Time("nbf")}, expires {Time("exp")}, now {DateTimeOffset.UtcNow:u}";
+        }
+
+        private static System.Collections.Generic.Dictionary<string, object> TryReadClaims(string jwt)
+        {
+            try
+            {
+                var parts = jwt?.Split('.');
+                if (parts == null || parts.Length < 2) { return null; }
+                var payload = parts[1].Replace('-', '+').Replace('_', '/');
+                payload = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
+                var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(payload));
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, object>>(json);
+            }
+            catch (Exception) { return null; }
         }
 
         private static Task<AccessToken> _inFlight;
