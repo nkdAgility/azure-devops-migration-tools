@@ -8,7 +8,7 @@
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "ExcludeDefaultWorkItemTypes": {
       "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemTypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.",
@@ -16,8 +16,7 @@
     },
     "ExcludeSourceFields": {
       "description": "List of fields in source work item types, that are excluded from validation.\r\n Fields excluded from validation are still validated and all found issues are logged.\r\n But the result of the validation is 'valid' and the issues are logged as information instead of warning.\r\n\n The key is the source work item type name. The value is list of fields' reference names which are excluded.\r\n You can also use `*` as key to exclude fields from all source work item types.",
-      "type": "object",
-      "default": "Empty dictionary"
+      "type": "object"
     },
     "ExcludeWorkItemTypes": {
       "description": "List of work item types which will be excluded from validation.",
@@ -25,18 +24,17 @@
     },
     "IncludeWorkItemTypes": {
       "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
-      "type": "array",
-      "default": "null"
+      "type": "array"
     },
     "ScanRevisionHistoryForFields": {
       "description": "If `true`, before migration starts the work items to be migrated are scanned for fields that\r\n have a value only in revision history: the revision was saved under another team project or work item type\r\n (the item was moved or its type changed), and the field is on neither the source type in the current project\r\n nor the target type the revision is replayed to. These values cannot be migrated, and field maps cannot read\r\n them. Only moved or retyped revisions are checked, but each one is loaded with a separate server request,\r\n so the scan can add significant time when many items were moved. It is off by default.",
       "type": "boolean",
-      "default": "false"
+      "default": false
     },
     "StopIfHistoryOnlyFieldsFound": {
       "description": "If `true` and `ScanRevisionHistoryForFields` finds history-only fields that are\r\n not excluded by `ExcludeSourceFields`, the migration stops before any work item is migrated.\r\n If `false`, the fields are logged as warnings and the migration continues.",
       "type": "boolean",
-      "default": "false"
+      "default": false
     }
   }
 }

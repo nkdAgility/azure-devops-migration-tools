@@ -26,6 +26,21 @@ namespace MigrationTools.Host.Commands
         [CommandOption("--skipVersionCheck")]
         public bool skipVersionCheck { get; set; }
 
+        [Description("Folder to write the logs to. A `logs/{timestamp}` folder is created inside it. Defaults to the current working directory.")]
+        [CommandOption("--logPath")]
+        [JsonIgnore, YamlIgnore]
+        public string LogPath { get; set; }
+
+        public static string ForceGetLogPath(string[] args)
+        {
+            var logPathOption = new Option<string?>("--logPath");
+
+            var rootCommand = new RootCommand();
+            rootCommand.AddOption(logPathOption);
+
+            return rootCommand.Parse(args).GetValueForOption<string>(logPathOption);
+        }
+
         public static string ForceGetConfigFile(string[] args)
         {
             var fileOption = new Option<string?>("--config");

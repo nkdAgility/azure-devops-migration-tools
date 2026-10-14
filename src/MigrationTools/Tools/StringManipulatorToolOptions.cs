@@ -21,7 +21,7 @@ namespace MigrationTools.Tools
         /// <summary>
         /// List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.
         /// </summary>
-        /// <default>{}</default>
+        /// <default>[]</default>
         public List<RegexStringManipulator> Manipulators { get; set; }
     }
 

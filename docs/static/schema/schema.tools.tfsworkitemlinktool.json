@@ -8,7 +8,7 @@
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "FilterIfLinkCountMatches": {
       "description": "Skip validating links if the number of links in the source and the target matches!",
@@ -17,7 +17,7 @@
     "SaveAfterEachLinkIsAdded": {
       "description": "Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.\r\n Ignored while TfsWorkItemMigrationProcessor replays revisions, because links are then saved with the revision\r\n where they were added or removed in the source.",
       "type": "boolean",
-      "default": "false"
+      "default": false
     }
   }
 }

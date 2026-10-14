@@ -7,28 +7,34 @@
   "properties": {
     "EmailDomainMappings": {
       "description": "Used with MatchUsersByEmail to handle a tenant or domain change. Maps source email domains to target email domains,\r\n for example { \"old.com\": \"new.com\" } matches first.last@old.com to first.last@new.com. Applied when no exact email match is found.",
-      "type": "object",
-      "default": "none"
+      "type": "object"
     },
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "IdentityFieldsToCheck": {
-      "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.",
+      "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.\r\n A configured list replaces the default list; only the listed fields are mapped, and an empty list maps none. When it is not set, System.AssignedTo, System.ChangedBy,\r\n System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy and Microsoft.VSTS.Common.ClosedBy are used.",
       "type": "array",
-      "default": "none"
+      "default": [
+        "System.AssignedTo",
+        "System.ChangedBy",
+        "System.CreatedBy",
+        "Microsoft.VSTS.Common.ActivatedBy",
+        "Microsoft.VSTS.Common.ResolvedBy",
+        "Microsoft.VSTS.Common.ClosedBy"
+      ]
     },
     "MatchUsersByEmail": {
       "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the\r\n users will be mapped by their email address first. If no match is found, then the display name will be used.",
       "type": "boolean",
-      "default": "false"
+      "default": false
     },
     "MatchUsersByEmailLocalPart": {
       "description": "Used with MatchUsersByEmail. When true and neither the exact email nor EmailDomainMappings produce a match, users are matched\r\n on the email local part (the part before @), ignoring the domain. Only a single unambiguous match is used.",
       "type": "boolean",
-      "default": "false"
+      "default": false
     },
     "ProjectCollectionValidUsersGroupName": {
       "description": "This is the regionalized \"Project Collection Valid Users\" group name. Default is \"Project Collection Valid Users\".",
@@ -38,17 +44,21 @@
     "SkipValidateAllUsersExistOrAreMapped": {
       "description": "When set to true, this setting will skip a validation that all users exists or mapped",
       "type": "boolean",
-      "default": "false"
+      "default": false
+    },
+    "StopIfMappingTargetsDoNotResolve": {
+      "description": "At startup every target value in the UserMappingFile is resolved against the identities in the target. A value that does not\r\n resolve, or resolves to more than one identity, would be saved as plain text with no identity behind it. When true (the default)\r\n the run stops before any work item is migrated; when false each problem is logged as a warning and the run continues.",
+      "type": "boolean",
+      "default": true
     },
     "UseIdentityMapDataFormat": {
       "description": "When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)\r\n instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.\r\n Detailed entries match work item values against the source display name or account name, ignoring case.",
       "type": "boolean",
-      "default": "false"
+      "default": false
     },
     "UserMappingFile": {
       "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.\r\n By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is\r\n enabled, the format is detected from the content: a JSON array of objects with \"Source\" and \"Target\" identities is read as\r\n detailed IdentityMapData, and a JSON object is read as the simple dictionary format.\r\n In the dictionary format a key or value may be written as the display name followed by the UPN in angle brackets to identify one of several users that share a display name.",
-      "type": "string",
-      "default": "none"
+      "type": "string"
     }
   }
 }

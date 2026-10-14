@@ -20,12 +20,12 @@
     "MigrationDelay": {
       "description": "??Not sure what this does. Check code.",
       "type": "integer",
-      "default": "0"
+      "default": 0
     },
     "OnlyElementsWithTag": {
       "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
       "type": "string",
-      "default": "`String.Empty`"
+      "default": ""
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -34,12 +34,12 @@
     "RemoveAllLinks": {
       "description": "??Not sure what this does. Check code.",
       "type": "boolean",
-      "default": "false"
+      "default": false
     },
     "RemoveInvalidTestSuiteLinks": {
       "description": "Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used",
       "type": "boolean",
-      "default": "false"
+      "default": false
     },
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
@@ -56,7 +56,7 @@
     "TestPlanQuery": {
       "description": "Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.",
       "type": "string",
-      "default": "`String.Empty`"
+      "default": ""
     }
   },
   "required": [

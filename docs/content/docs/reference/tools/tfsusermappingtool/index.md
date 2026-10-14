@@ -31,6 +31,8 @@ The tool processes user identity fields in work items and applies configured map
 ### Mapping Behaviour
 
 - **Exact field matching**: A field is processed only when its reference name exactly matches an entry in `IdentityFieldsToCheck`, ignoring case. Partial names are no longer matched as substrings, so an entry such as `AssignedTo` does not match `System.AssignedTo`. List the full reference name of every field you want mapped.
+- **Configured list replaces the defaults**: When `IdentityFieldsToCheck` is set, only the listed fields are mapped, and an empty list maps none. When it is not set, `System.AssignedTo`, `System.ChangedBy`, `System.CreatedBy`, `Microsoft.VSTS.Common.ActivatedBy`, `Microsoft.VSTS.Common.ResolvedBy` and `Microsoft.VSTS.Common.ClosedBy` are mapped. Earlier versions merged a configured list with these defaults by position, so a shorter list still mapped the remaining default fields.
+- **Mapping targets are validated at startup**: Before any work item is migrated, every target value in the `UserMappingFile` is resolved against the identities in the target's Project Collection Valid Users. A plain value must match exactly one identity by display name, account name, email address or `domain\account`; a `Display Name <unique>` value must match one identity on the unique part. A value that does not resolve would be saved by Azure DevOps as plain text with no identity behind it, so each one is logged with the candidate identities in the unambiguous `Display Name <domain\account>` form, and the run stops. Set `StopIfMappingTargetsDoNotResolve` to `false` to log warnings and continue.
 - **Target only**: The mapped value is written to the target work item. The source work item is not changed.
 - **Empty values**: Null or empty identity values are passed through unchanged.
 - **Unmapped values**: Values with no mapping are passed through unchanged.
@@ -97,7 +99,8 @@ The TFS User Mapping Tool supports several configuration options for flexible us
 
 #### Configuration Options
 
-- **IdentityFieldsToCheck**: Array of full field reference names that contain user identities (exact match, case-insensitive)
+- **IdentityFieldsToCheck**: Array of full field reference names that contain user identities (exact match, case-insensitive). A configured list replaces the default list
+- **StopIfMappingTargetsDoNotResolve**: Stop the run at startup when a target value in the mapping file does not resolve to exactly one target identity (default `true`)
 - **UserMappingFile**: Path to JSON file containing manual user mappings
 - **MatchUsersByEmail**: Attempt automatic matching based on email addresses
 - **EmailDomainMappings**: Source-to-target email domain rewrites (e.g. `{ "old.com": "new.com" }`) used by MatchUsersByEmail for domain changes
@@ -257,6 +260,16 @@ When `UseIdentityMapDataFormat` is enabled, the file can instead be a JSON array
 
 - Check that the field is listed in `IdentityFieldsToCheck` by its full reference name (for example `Microsoft.VSTS.Common.ResolvedBy`, not `ResolvedBy`)
 - Earlier versions matched partial names; configurations that relied on this must be updated
+
+**Fields Mapped That Are Not Listed:**
+
+- Earlier versions merged a configured `IdentityFieldsToCheck` with the six default fields, so fields such as `Microsoft.VSTS.Common.ResolvedBy` were mapped even when not listed. A configured list now replaces the defaults
+
+**Run Stopped Because a Mapping Target Does Not Resolve:**
+
+- The log names each mapping, says whether its target matches no identity or more than one, and lists the candidate identities. Change the target to the `Display Name <domain\account>` form shown
+- The check uses the identities the target reports. An Entra B2B guest given as a bare email can match the guest's account name and pass the check, yet Azure DevOps may still save it as plain text. A target given as a bare account name or email is therefore logged as a warning with the `Display Name <domain\account>` form to use. This warning does not stop the run, so check it and map guests with that form
+- Set `StopIfMappingTargetsDoNotResolve` to `false` only if you accept that targets which do not resolve to exactly one identity are saved as plain text
 
 **Identity Fields Set to the Migration Account:**
 
