@@ -10,8 +10,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
-            "Enabled": "False",
-            "File": ""
+            "ChangeSetMappingFile": "",
+            "Enabled": "False"
           }
         }
       }
@@ -26,8 +26,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
-            "Enabled": "True",
-            "File": "c:\\changesetmappings.json"
+            "ChangeSetMappingFile": "c:\\changesetmappings.json",
+            "Enabled": "True"
           }
         }
       }
@@ -40,7 +40,7 @@ configurationSamples:
     {
       "$type": "TfsChangeSetMappingToolOptions",
       "Enabled": true,
-      "ChangeSetMappingFile": null
+      "ChangeSetMappingFile": "c:\\changesetmappings.json"
     }
   sampleFor: MigrationTools.Tools.TfsChangeSetMappingToolOptions
 description: missing XML code comments
