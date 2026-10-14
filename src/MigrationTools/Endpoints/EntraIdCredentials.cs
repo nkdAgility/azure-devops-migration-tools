@@ -13,6 +13,7 @@ namespace MigrationTools.Endpoints
     /// Gets Microsoft Entra ID access tokens for Azure DevOps from the ambient identity, so no PAT has to be
     /// stored. DefaultAzureCredential tries, in order: environment service principal (AZURE_CLIENT_ID etc.),
     /// workload identity, managed identity, Visual Studio, Azure CLI, Azure PowerShell and azd logins.
+    /// Set AZURE_TOKEN_CREDENTIALS (for example to AzureCliCredential) to use only that credential.
     /// </summary>
     public static class EntraIdCredentials
     {
@@ -73,10 +74,31 @@ namespace MigrationTools.Endpoints
                 {
                     return cached.Token;
                 }
-                var fresh = Current.GetToken(RequestContext, cancellationToken);
+                AccessToken fresh;
+                try
+                {
+                    fresh = Current.GetToken(RequestContext, cancellationToken);
+                }
+                catch (Exception ex) when (IsCredentialFailure(ex))
+                {
+                    throw CredentialFailure(ex);
+                }
                 _cached = fresh;
                 return fresh.Token;
             }
+        }
+
+        // No usable sign-in (none available, or AZURE_TOKEN_CREDENTIALS names an unknown or unavailable credential):
+        // the run cannot continue, so stop it with a readable reason rather than a processor crash.
+        private static bool IsCredentialFailure(Exception ex) => ex is AuthenticationFailedException || ex is InvalidOperationException;
+
+        internal static MigrationTools.Exceptions.MigrationRunStoppedException CredentialFailure(Exception ex)
+        {
+            var pinned = _tokenCredential == null ? Environment.GetEnvironmentVariable(TokenCredentialsVariable) : null;
+            var hint = string.IsNullOrEmpty(pinned)
+                ? " Sign in first (for example 'az login'), or set " + TokenCredentialsVariable + " to the credential to use."
+                : $" {TokenCredentialsVariable} is set to '{pinned}': check that value, and that this credential is signed in on this machine.";
+            return new MigrationTools.Exceptions.MigrationRunStoppedException("Could not get a Microsoft Entra ID token: " + ex.Message.Split('\n')[0].Trim() + hint, ex);
         }
 
         /// <summary>
@@ -131,12 +153,20 @@ namespace MigrationTools.Endpoints
             AccessToken? cached;
             lock (_cacheLock) { cached = _cached; }
             if (!(cached is AccessToken token)) { return "no token acquired"; }
-            return DescribeToken(token.Token, token.ExpiresOn, SelectedCredential);
+            var pinned = _tokenCredential == null ? Environment.GetEnvironmentVariable(TokenCredentialsVariable) : null;
+            return DescribeToken(token.Token, token.ExpiresOn, SelectedCredential, pinned);
         }
 
-        internal static string DescribeToken(string jwt, DateTimeOffset expiresOn, string credential)
+        /// <summary>
+        /// Azure.Identity's variable for limiting DefaultAzureCredential to one credential (for example
+        /// "AzureCliCredential") or to "dev"/"prod" credentials, so an unattended run cannot pick another sign-in (#3225).
+        /// </summary>
+        public const string TokenCredentialsVariable = "AZURE_TOKEN_CREDENTIALS";
+
+        internal static string DescribeToken(string jwt, DateTimeOffset expiresOn, string credential, string pinnedTo = null)
         {
             var source = string.IsNullOrEmpty(credential) ? "unknown credential" : credential;
+            if (!string.IsNullOrEmpty(pinnedTo)) { source += $" ({TokenCredentialsVariable}={pinnedTo})"; }
             var claims = TryReadClaims(jwt);
             if (claims == null) { return $"{source}, expires {expiresOn:u} (not a readable JWT)"; }
             string Claim(string name) => claims.TryGetValue(name, out var v) ? v?.ToString() : null;
@@ -211,7 +241,15 @@ namespace MigrationTools.Endpoints
 
         private static async Task<AccessToken> FetchAndCacheAsync(TokenCredential credential, int generation)
         {
-            var fresh = await credential.GetTokenAsync(RequestContext, CancellationToken.None).ConfigureAwait(false);
+            AccessToken fresh;
+            try
+            {
+                fresh = await credential.GetTokenAsync(RequestContext, CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (IsCredentialFailure(ex))
+            {
+                throw CredentialFailure(ex);
+            }
             lock (_cacheLock)
             {
                 if (generation == _generation && (!(_cached is AccessToken current) || fresh.ExpiresOn >= current.ExpiresOn))

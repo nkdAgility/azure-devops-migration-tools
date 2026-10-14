@@ -166,6 +166,64 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void DescribeToken_ShowsWhenTheCredentialIsPinned()
+        {
+            var jwt = Jwt("{\"upn\":\"user@example.com\"}");
+
+            var description = EntraIdCredentials.DescribeToken(jwt, DateTimeOffset.UtcNow, "AzureCliCredential", "AzureCliCredential");
+
+            StringAssert.StartsWith(description, "AzureCliCredential (AZURE_TOKEN_CREDENTIALS=AzureCliCredential)");
+        }
+
+        private sealed class UnavailableTokenCredential : TokenCredential
+        {
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
+                => throw new Azure.Identity.CredentialUnavailableException("No credential is signed in.");
+
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+                => throw new Azure.Identity.CredentialUnavailableException("No credential is signed in.");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void GetAccessToken_StopsTheRunWithAReadableReasonWhenNoCredentialIsAvailable()
+        {
+            EntraIdCredentials.TokenCredential = new UnavailableTokenCredential();
+
+            var ex = Assert.ThrowsExactly<MigrationTools.Exceptions.MigrationRunStoppedException>(() => EntraIdCredentials.GetAccessToken());
+
+            StringAssert.StartsWith(ex.Message, "Could not get a Microsoft Entra ID token: No credential is signed in.");
+            StringAssert.Contains(ex.Message, "az login");
+            Assert.IsInstanceOfType(ex.InnerException, typeof(Azure.Identity.CredentialUnavailableException));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_StopsTheRunWithAReadableReasonWhenNoCredentialIsAvailable()
+        {
+            EntraIdCredentials.TokenCredential = new UnavailableTokenCredential();
+
+            await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => EntraIdCredentials.GetFreshAccessTokenAsync());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CredentialFailure_NamesThePinnedCredential()
+        {
+            var saved = Environment.GetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable);
+            try
+            {
+                EntraIdCredentials.TokenCredential = null;
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, "NotACredential");
+
+                var ex = EntraIdCredentials.CredentialFailure(new InvalidOperationException("Invalid value for environment variable AZURE_TOKEN_CREDENTIALS: notacredential."));
+
+                StringAssert.Contains(ex.Message, "AZURE_TOKEN_CREDENTIALS is set to 'NotACredential'");
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, saved);
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void DescribeToken_HandlesATokenThatIsNotAJwt()
         {
             var description = EntraIdCredentials.DescribeToken("opaque-secret", DateTimeOffset.UtcNow, null);

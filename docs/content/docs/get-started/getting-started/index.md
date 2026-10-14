@@ -72,6 +72,11 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
    fails, check that the logged identity is the account you expect: an earlier source in the chain,
    such as Visual Studio, may be signed in as a different account.
 
+   To use only one sign-in source, set the `AZURE_TOKEN_CREDENTIALS` environment variable to its
+   credential name before running the tool, for example `AzureCliCredential` to use only your `az login`,
+   or `ManagedIdentityCredential` on an Azure VM. `dev` and `prod` limit the chain to developer tools or
+   deployed-service credentials. This is recommended for unattended runs. The log shows the value in use.
+
 4. Adjust the value of the `ReflectedWorkItemIdField` attribute (field name of the migration tracking field) for Source and Target
 
    For example: `TfsMigrationTool.ReflectedWorkItemId` for TFS, `ReflectedWorkItemId` for VSTS, or `Custom.ReflectedWorkItemId` for Azure DevOps
