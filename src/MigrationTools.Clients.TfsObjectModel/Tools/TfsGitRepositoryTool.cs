@@ -55,6 +55,11 @@ namespace MigrationTools.Tools
                     targetRepoService = _processor.Target.GetService<GitRepositoryService>();
                     targetRepos = targetRepoService.QueryRepositories(_processor.Target.Options.Project);
                     allTargetRepos = targetRepoService.QueryRepositories("");
+                    foreach (var kv in FindAmbiguousNameMappings(Options.Mappings, allSourceRepos))
+                    {
+                        Log.LogWarning("GitRepositoryEnricher: Mapping key \"{Key}\" matches repositories in more than one source project ({Repos}); it applies to all of them. Use \"Project/Repo\" keys to map them separately.",
+                            kv.Key, string.Join(", ", kv.Value));
+                    }
                 }
                 catch (Exception)
                 {
@@ -235,11 +240,43 @@ namespace MigrationTools.Tools
             return exists;
         }
 
+        private readonly HashSet<string> _reportedPullRequests = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Number of pull request links left pointing at the source.</summary>
+        public int PullRequestLinksKept { get; private set; }
+
+        /// <summary>
+        /// Decides what happens to a pull request link. Returns true when it should be removed (<see cref="TfsGitRepositoryToolOptions.DropPullRequestLinks"/>);
+        /// otherwise logs a warning naming the work item and pull request and the link is left pointing at the source.
+        /// </summary>
+        public bool KeepOrDropPullRequestLink(string sourceLinkUri, string sourceWorkItemId)
+        {
+            if (Options.DropPullRequestLinks)
+            {
+                Log.LogDebug("GitRepositoryEnricher: Source work item {SourceWorkItemId}: dropping pull request link {SourceLink}", sourceWorkItemId, sourceLinkUri);
+                return true;
+            }
+            // Revision replay enriches every revision, so each link is reported once per work item.
+            if (_reportedPullRequests.Add($"{sourceWorkItemId}|{sourceLinkUri}"))
+            {
+                Log.LogWarning("GitRepositoryEnricher: Source work item {SourceWorkItemId}: pull requests are not migrated; leaving link {SourceLink} pointing at the source pull request.",
+                    sourceWorkItemId, sourceLinkUri);
+                PullRequestLinksKept++;
+            }
+            return false;
+        }
+
         private string MapGitLinkToTargetUri(ExternalLink el, string sourceProjectName, out bool dropLink, out string linkTypeId, bool report = true, string sourceWorkItemId = null)
         {
             bool verifyTarget = report && Options.VerifyTargetExists;
             dropLink = false;
             linkTypeId = null;
+            // Pull request ids are not preserved by a git push, so there is no target equivalent to rewrite to (#3215).
+            if (el.ArtifactLinkType.Name == "Pull Request")
+            {
+                dropLink = report && KeepOrDropPullRequestLink(el.LinkedArtifactUri, sourceWorkItemId);
+                return null;
+            }
             var changeSetMappings = Services.GetRequiredService<TfsChangeSetMappingTool>();
 
             // During revision replay (#3192) this runs on every revision that adds links, so links already rewritten to
@@ -284,7 +321,7 @@ namespace MigrationTools.Tools
             string targetRepoName = GetTargetRepoName(Options.Mappings, sourceRepoInfo);
             TfsGitRepositoryInfo targetRepoInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, targetRepos);
             // if repo was not found in the target project, try to find it in the whole target project collection
-            if (targetRepoInfo.GitRepo == null && Options.Mappings.Values.Contains(targetRepoName))
+            if (targetRepoInfo.GitRepo == null && Options.Mappings.Values.Contains(targetRepoName, StringComparer.OrdinalIgnoreCase))
             {
                 var anyTargetRepoInCollectionInfo = TfsGitRepositoryInfo.Create(targetRepoName, sourceRepoInfo, allTargetRepos);
                 if (anyTargetRepoInCollectionInfo.GitRepo != null)
@@ -325,12 +362,6 @@ namespace MigrationTools.Tools
                     linkTypeId = ArtifactLinkIds.Commit;
                     return $"vstfs:///git/commit/{targetRepoInfo.GitRepo.ProjectReference.Id}%2f{targetRepoInfo.GitRepo.Id}%2f{sourceRepoInfo.CommitID}";
 
-                // Pull request ids are not preserved by a git push, so there is no target equivalent to check; the
-                // link is dropped as before.
-                case "Pull Request":
-                    dropLink = true;
-                    return null;
-
                 default:
                     Log.LogWarning("Skipping unsupported link type {0}", el.ArtifactLinkType.Name);
                     return null;
@@ -364,6 +395,10 @@ namespace MigrationTools.Tools
         /// <summary>Logs one line per unresolved repository with its link count. Call once at the end of a run.</summary>
         public void LogUnresolvedSummary()
         {
+            if (PullRequestLinksKept > 0)
+            {
+                Log.LogWarning("GitRepositoryEnricher: {LinkCount} pull request link(s) were left pointing at the source; set DropPullRequestLinks to remove them instead.", PullRequestLinksKept);
+            }
             if (_linksLeftOnSource.Count > 0)
             {
                 Log.LogWarning("GitRepositoryEnricher: {RepoCount} target repo(s) are missing linked commits or branches; those links were left pointing at the source:", _linksLeftOnSource.Count);
@@ -425,6 +460,34 @@ namespace MigrationTools.Tools
                 return true;
             }
             return targetProjectRepos != null && targetProjectRepos.Any(r => string.Equals(r.Name, repo.Name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Finds bare "Repo" mapping keys that match repositories in more than one source project, with the matching
+        /// "Project/Repo" names. Repositories that also have a "Project/Repo" key are excluded, as that key wins for them.
+        /// </summary>
+        public static Dictionary<string, List<string>> FindAmbiguousNameMappings(Dictionary<string, string> gitRepoMappings, IList<GitRepository> sourceRepos)
+        {
+            var result = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            if (gitRepoMappings == null || sourceRepos == null)
+            {
+                return result;
+            }
+            foreach (var key in gitRepoMappings.Keys.Where(k => !k.Contains('/')))
+            {
+                var matches = sourceRepos
+                    .Where(r => string.Equals(r.Name, key, StringComparison.OrdinalIgnoreCase))
+                    .Select(r => $"{r.ProjectReference?.Name}/{r.Name}")
+                    .Where(q => !gitRepoMappings.Keys.Any(k => string.Equals(k, q, StringComparison.OrdinalIgnoreCase)))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(q => q, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                if (matches.Count > 1)
+                {
+                    result[key] = matches;
+                }
+            }
+            return result;
         }
 
         public static string GetTargetRepoName(Dictionary<string, string> gitRepoMappings, TfsGitRepositoryInfo repoInfo)
