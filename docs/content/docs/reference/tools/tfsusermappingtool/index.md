@@ -268,8 +268,8 @@ When `UseIdentityMapDataFormat` is enabled, the file can instead be a JSON array
 **Run Stopped Because a Mapping Target Does Not Resolve:**
 
 - The log names each mapping, says whether its target matches no identity or more than one, and lists the candidate identities. Change the target to the `Display Name <domain\account>` form shown
-- The check uses the identities the target reports. An Entra B2B guest given as a bare email can match the guest's account name and pass the check, yet Azure DevOps may still save it as plain text. A target given as a bare account name or email is therefore logged as a warning with the `Display Name <domain\account>` form to use; map guests with that form
-- Set `StopIfMappingTargetsDoNotResolve` to `false` only if you accept that those values are saved as plain text
+- The check uses the identities the target reports. An Entra B2B guest given as a bare email can match the guest's account name and pass the check, yet Azure DevOps may still save it as plain text. A target given as a bare account name or email is therefore logged as a warning with the `Display Name <domain\account>` form to use. This warning does not stop the run, so check it and map guests with that form
+- Set `StopIfMappingTargetsDoNotResolve` to `false` only if you accept that targets which do not resolve to exactly one identity are saved as plain text
 
 **Identity Fields Set to the Migration Account:**
 

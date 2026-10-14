@@ -418,7 +418,11 @@ namespace MigrationTools.Tools
             {
                 return;
             }
-            if (string.IsNullOrEmpty(Options.UserMappingFile) || !File.Exists(Options.UserMappingFile))
+            if (string.IsNullOrEmpty(Options.UserMappingFile))
+            {
+                return;
+            }
+            if (!File.Exists(Options.UserMappingFile))
             {
                 Log.LogWarning("TfsUserMappingTool::ValidateMappingTargets The UserMappingFile '{UserMappingFile}' cant be found, so no users will be mapped.", Options.UserMappingFile);
                 return;
