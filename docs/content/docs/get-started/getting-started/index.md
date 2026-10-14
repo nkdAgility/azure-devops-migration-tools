@@ -77,7 +77,7 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 
 ### Where the logs are written
 
-Each run writes `migration*.log` and `migration-errors*.log` to `logs\<timestamp>` under the folder you run the tool from, not the folder the tool is installed in. The full path is printed at the start and end of the run as `Logpath`. To write them somewhere else, pass `--logPath <folder>`; the `logs\<timestamp>` folder is created inside it. If the folder cannot be written to, the logs go to `%LOCALAPPDATA%\MigrationTools\logs\<timestamp>` instead.
+Each run writes `migration*.log` and `migration-errors*.log` to `logs\<timestamp>` under the folder you run the tool from, not the folder the tool is installed in. The full path is printed at the start of the run as `Logpath:` and again at the end as `Check the logs for errors:`. To write them somewhere else, pass `--logPath <folder>`; the `logs\<timestamp>` folder is created inside it. If the folder cannot be written to, the logs go to `%LOCALAPPDATA%\MigrationTools\logs\<timestamp>` instead.
 
 ### Common Issue: Work Item Type Validation Failures
 

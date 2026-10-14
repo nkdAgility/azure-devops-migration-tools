@@ -85,10 +85,16 @@ try {
     foreach ($v in $varNames) { [Environment]::SetEnvironmentVariable($v, $overrides[$v]) }
     Push-Location $LogDirectory
     $pushed = $true
+    $logPath = $null
     & (Join-Path $runDir "devopsmigration.exe") execute --config $configPath --skipVersionCheck --disableTelemetry 2>&1 |
-        Select-String -Pattern $Filter | ForEach-Object { if ($pat) { $_.Line.Replace($pat, "***") } else { $_.Line } }
+        ForEach-Object {
+            $line = "$_"
+            # Report the path the tool resolved, which may be the LocalAppData fallback.
+            if ($line -match 'Logpath: (.+?)\s*$') { $logPath = $Matches[1] }
+            if ($line -match $Filter) { if ($pat) { $line.Replace($pat, "***") } else { $line } }
+        }
     $exitCode = $LASTEXITCODE
-    "LOGS: " + (Join-Path $LogDirectory "logs")
+    if ($logPath) { "LOGS: $logPath" } else { Write-Warning "The tool did not report a Logpath line." }
     "EXIT CODE: $exitCode"
 }
 finally {

@@ -6,6 +6,7 @@ using MigrationTools.Services;
 namespace MigrationTools.Tests.Services
 {
     [TestClass]
+    [DoNotParallelize] // Changes the process-wide current directory.
     public class LogLocationServiceTests
     {
         private string _root;
@@ -47,6 +48,22 @@ namespace MigrationTools.Tests.Services
             string path = LogLocationService.CreateLogsPath(basePath, "20260101000000");
             Assert.AreEqual(Path.Combine(basePath, "logs", "20260101000000"), path);
             Assert.IsTrue(Directory.Exists(path));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CreateLogsPath_InvalidBasePath_FallsBackToLocalAppData()
+        {
+            string timestamp = "test-" + Guid.NewGuid().ToString("N");
+            string path = LogLocationService.CreateLogsPath("bad\0path", timestamp);
+            try
+            {
+                string expected = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MigrationTools", "logs", timestamp);
+                Assert.AreEqual(expected, path);
+            }
+            finally
+            {
+                Directory.Delete(path, true);
+            }
         }
 
         [TestMethod, TestCategory("L0")]

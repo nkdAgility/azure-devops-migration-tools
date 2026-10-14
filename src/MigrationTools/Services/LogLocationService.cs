@@ -35,14 +35,18 @@ namespace MigrationTools.Services
 
         public static string CreateLogsPath(string basePath, string timestamp)
         {
-            string root = string.IsNullOrWhiteSpace(basePath) ? Directory.GetCurrentDirectory() : Path.GetFullPath(basePath);
-            string exportPath = Path.Combine(root, "logs", timestamp);
             try
             {
+                string root = string.IsNullOrWhiteSpace(basePath) ? Directory.GetCurrentDirectory() : Path.GetFullPath(basePath);
+                string exportPath = Path.Combine(root, "logs", timestamp);
                 Directory.CreateDirectory(exportPath);
+                // The folder can exist but not allow files to be created, so prove a file can be written.
+                string probe = Path.Combine(exportPath, ".write-test");
+                File.WriteAllText(probe, string.Empty);
+                File.Delete(probe);
                 return exportPath;
             }
-            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException || ex is ArgumentException || ex is NotSupportedException)
             {
                 string fallback = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MigrationTools", "logs", timestamp);
                 Directory.CreateDirectory(fallback);
