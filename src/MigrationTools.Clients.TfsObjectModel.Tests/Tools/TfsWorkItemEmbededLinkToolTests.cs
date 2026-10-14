@@ -34,6 +34,26 @@ namespace MigrationTools.Tests.Tools
             return map;
         }
 
+        private const string SourceOrg = "https://dev.azure.com/source/";
+        private const string TargetOrg = "https://dev.azure.com/target/";
+
+        [TestMethod, TestCategory("L0")]
+        public void IsTargetWorkItemUrl_DifferentCollections_RecognisesTargetUrl()
+        {
+            // Issue #3212: a re-sync must not look up an already rewritten target id on the source.
+            Assert.IsTrue(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/target/Tgt/_workitems/edit/105651", SourceOrg, "Src", TargetOrg, "Tgt"));
+            Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/source/Src/_workitems/edit/42", SourceOrg, "Src", TargetOrg, "Tgt"));
+            Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/targetother/Tgt/_workitems/edit/42", SourceOrg, "Src", TargetOrg, "Tgt"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsTargetWorkItemUrl_SameCollection_UsesProject()
+        {
+            Assert.IsTrue(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/org/Target%20Project/_workitems/edit/7", "https://dev.azure.com/org", "Src", "https://dev.azure.com/org", "Target Project"));
+            Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/org/Src/_workitems/edit/7", "https://dev.azure.com/org", "Src", "https://dev.azure.com/org", "Target Project"));
+            Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/org/Same/_workitems/edit/7", "https://dev.azure.com/org", "Same", "https://dev.azure.com/org", "Same"));
+        }
+
         [TestMethod, TestCategory("L0")]
         public void FindMentionIdentity_MappedToDisplayName_ReturnsMappedTarget()
         {
