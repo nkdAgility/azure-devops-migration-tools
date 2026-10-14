@@ -1,4 +1,5 @@
-﻿using MigrationTools.ConsoleDataGenerator.ReferenceData;
+using System.Globalization;
+using MigrationTools.ConsoleDataGenerator.ReferenceData;
 using MigrationTools.Options;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -110,13 +111,7 @@ namespace MigrationTools.ConsoleDataGenerator
                         }
                     }
 
-                    // Add default value if available and not "missing XML code comments"
-                    if (option.DefaultValue != null &&
-                        !option.DefaultValue.ToString().Contains("missing XML code comments") &&
-                        !string.IsNullOrEmpty(option.DefaultValue.ToString()))
-                    {
-                        propertySchema.Default = JToken.FromObject(option.DefaultValue);
-                    }
+                    propertySchema.Default = ConvertDefaultValue(option.DefaultValue, propertySchema.Type);
 
                     schema.Properties.Add(propertyName, propertySchema);
                 }
@@ -138,6 +133,58 @@ namespace MigrationTools.ConsoleDataGenerator
             {
                 return $"{{ \"error\": \"Failed to generate schema for {data.ClassName}: {ex.Message}\" }}";
             }
+        }
+
+        /// <summary>
+        /// Converts the text of a <c>&lt;default&gt;</c> XML doc tag into a JSON value of the property's schema type.
+        /// Returns null (no default emitted) when the text is missing, a placeholder such as "none", or cannot be
+        /// represented as the schema type.
+        /// </summary>
+        internal static JToken ConvertDefaultValue(object defaultValue, JSchemaType? schemaType)
+        {
+            var text = defaultValue?.ToString()?.Trim().Trim('`').Trim();
+            if (string.IsNullOrEmpty(text) ||
+                text.Contains("missing XML code comments") ||
+                text.Equals("none", StringComparison.OrdinalIgnoreCase) ||
+                text.Equals("null", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            var type = schemaType ?? JSchemaType.String;
+            if (type.HasFlag(JSchemaType.Boolean))
+            {
+                return bool.TryParse(text, out var b) ? new JValue(b) : null;
+            }
+            if (type.HasFlag(JSchemaType.Integer))
+            {
+                return long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var l) ? new JValue(l) : null;
+            }
+            if (type.HasFlag(JSchemaType.Number))
+            {
+                return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? new JValue(d) : null;
+            }
+            if (type.HasFlag(JSchemaType.Array))
+            {
+                if (text.StartsWith("["))
+                {
+                    try { return JArray.Parse(text); } catch (JsonReaderException) { return null; }
+                }
+                return new JArray(text.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0));
+            }
+            if (type.HasFlag(JSchemaType.Object))
+            {
+                if (text.StartsWith("{"))
+                {
+                    try { return JObject.Parse(text); } catch (JsonReaderException) { return null; }
+                }
+                return null;
+            }
+            if (text.Equals("String.Empty", StringComparison.Ordinal))
+            {
+                return new JValue(string.Empty);
+            }
+            return new JValue(text);
         }
 
         private static JSchemaType GetJsonSchemaType(string dotnetType)
@@ -391,13 +438,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 var propertyName = option.ParameterName;
                 var propertySchema = BuildPropertySchema(option);
 
-                // Add default value if available and not "missing XML code comments"
-                if (option.DefaultValue != null &&
-                    !option.DefaultValue.ToString().Contains("missing XML code comments") &&
-                    !string.IsNullOrEmpty(option.DefaultValue.ToString()))
-                {
-                    propertySchema.Default = JToken.FromObject(option.DefaultValue);
-                }
+                propertySchema.Default = ConvertDefaultValue(option.DefaultValue, propertySchema.Type);
 
                 schema.Properties.Add(propertyName, propertySchema);
             }

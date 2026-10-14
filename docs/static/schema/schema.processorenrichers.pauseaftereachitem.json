@@ -8,7 +8,7 @@
     "Enabled": {
       "description": "If enabled this will run this migrator",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "RefName": {
       "description": "For internal use",

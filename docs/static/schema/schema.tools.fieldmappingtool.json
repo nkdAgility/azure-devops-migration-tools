@@ -8,7 +8,7 @@
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "FieldMaps": {
       "description": "Gets or sets the list of field mapping configurations to apply.",
@@ -36,13 +36,12 @@
                 },
                 "expression": {
                   "description": "Gets or sets the NCalc expression to evaluate. Variables in the expression should be enclosed in square brackets (e.g., \"[x]*2\").",
-                  "type": "string",
-                  "default": "null"
+                  "type": "string"
                 },
                 "parameters": {
                   "description": "Gets or sets a dictionary mapping variable names used in the expression to source field reference names.",
                   "type": "object",
-                  "default": "{}",
+                  "default": {},
                   "additionalProperties": {
                     "type": "string"
                   }
@@ -54,8 +53,7 @@
                 },
                 "targetField": {
                   "description": "Gets or sets the target field reference name where the calculated result will be stored.",
-                  "type": "string",
-                  "default": "null"
+                  "type": "string"
                 }
               }
             },

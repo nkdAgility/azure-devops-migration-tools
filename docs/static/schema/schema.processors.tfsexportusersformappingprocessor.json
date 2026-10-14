@@ -20,7 +20,7 @@
     "OnlyListUsersInWorkItems": {
       "description": "When true, only users that appear in the identity fields of the work items selected by WIQLQuery are exported.\r\n When false, all users in the source are exported.",
       "type": "boolean",
-      "default": "true"
+      "default": true
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",

@@ -16,7 +16,7 @@
     "PrefixProjectToNodes": {
       "description": "Do we add the source project name into the folder path",
       "type": "boolean",
-      "default": "false"
+      "default": false
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",

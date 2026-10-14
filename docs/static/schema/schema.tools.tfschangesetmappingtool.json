@@ -7,13 +7,12 @@
   "properties": {
     "ChangeSetMappingFile": {
       "description": "Path to changeset mapping file.",
-      "type": "string",
-      "default": "null"
+      "type": "string"
     },
     "Enabled": {
       "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
       "type": "boolean",
-      "default": "true"
+      "default": true
     }
   }
 }
