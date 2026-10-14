@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
+using MigrationTools.Exceptions;
 using MigrationTools.Tools;
 using Moq;
 using Newtonsoft.Json;
@@ -630,6 +631,194 @@ namespace MigrationTools.Tests.Tools
             var options = new TfsUserMappingToolOptions();
             config.Bind(options);
             Assert.IsTrue(options.SkipValidateAllUsersExistOrAreMapped);
+        }
+
+        private static string FindShippedAppSettings()
+        {
+            for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir != null; dir = dir.Parent)
+            {
+                if (File.Exists(Path.Combine(dir.FullName, "MigrationTools.sln")))
+                {
+                    return Path.Combine(dir.FullName, "appsettings.json");
+                }
+            }
+            Assert.Fail("Could not find the repository root appsettings.json.");
+            return null;
+        }
+
+        private TfsUserMappingTool CreateToolFromConfiguration(IConfiguration configuration)
+        {
+            var options = new TfsUserMappingToolOptions();
+            configuration.GetSection(options.ConfigurationMetadata.PathToInstance).Bind(options);
+            return new TfsUserMappingTool(
+                Microsoft.Extensions.Options.Options.Create(options),
+                new Mock<IServiceProvider>().Object,
+                _logger,
+                new Mock<ITelemetryLogger>().Object);
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void IdentityFieldsToCheck_ConfiguredListReplacesShippedDefaults()
+        {
+            // Issue #3223: the shipped appsettings.json and the user's configuration are layered, and arrays merge by index.
+            var mappingFile = Path.Combine(_testDirectory, "map.json");
+            File.WriteAllText(mappingFile, "{\"Ghost Person\":\"Martin\"}");
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile(FindShippedAppSettings(), optional: false)
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["MigrationTools:CommonTools:TfsUserMappingTool:Enabled"] = "true",
+                    ["MigrationTools:CommonTools:TfsUserMappingTool:UserMappingFile"] = mappingFile,
+                    ["MigrationTools:CommonTools:TfsUserMappingTool:IdentityFieldsToCheck:0"] = AssignedTo,
+                })
+                .Build();
+
+            var tool = CreateToolFromConfiguration(configuration);
+
+            CollectionAssert.AreEqual(new[] { AssignedTo }, tool.IdentityFieldsToCheck.ToArray());
+            Assert.AreEqual("Martin", tool.MapUserIdentityValue(AssignedTo, "Ghost Person"));
+            Assert.AreEqual("Ghost Person", tool.MapUserIdentityValue("Microsoft.VSTS.Common.ResolvedBy", "Ghost Person"));
+            Assert.AreEqual("Ghost Person", tool.MapUserIdentityValue("Microsoft.VSTS.Common.ClosedBy", "Ghost Person"));
+        }
+
+        [TestMethod, TestCategory("L1")]
+        public void IdentityFieldsToCheck_NotConfigured_UsesDefaults()
+        {
+            var mappingFile = Path.Combine(_testDirectory, "map.json");
+            File.WriteAllText(mappingFile, "{\"Ghost Person\":\"Martin\"}");
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile(FindShippedAppSettings(), optional: false)
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["MigrationTools:CommonTools:TfsUserMappingTool:Enabled"] = "true",
+                    ["MigrationTools:CommonTools:TfsUserMappingTool:UserMappingFile"] = mappingFile,
+                })
+                .Build();
+
+            var tool = CreateToolFromConfiguration(configuration);
+
+            CollectionAssert.AreEqual(TfsUserMappingToolOptions.DefaultIdentityFieldsToCheck.ToArray(), tool.IdentityFieldsToCheck.ToArray());
+            Assert.AreEqual("Martin", tool.MapUserIdentityValue("Microsoft.VSTS.Common.ResolvedBy", "Ghost Person"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IdentityFieldsToCheck_EmptyList_MapsNoFields()
+        {
+            var mappingFile = Path.Combine(_testDirectory, "map.json");
+            File.WriteAllText(mappingFile, "{\"Ghost Person\":\"Martin\"}");
+            var tool = CreateTool(mappingFile, useIdentityMapDataFormat: false);
+            tool.Options.IdentityFieldsToCheck = [];
+
+            Assert.IsEmpty(tool.IdentityFieldsToCheck);
+            Assert.AreEqual("Ghost Person", tool.MapUserIdentityValue(AssignedTo, "Ghost Person"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindBareAccountTargets_ReportsOnlyBareAccountOrEmailTargets()
+        {
+            var map = new Dictionary<string, string>
+            {
+                ["a"] = "guest@partner.com",
+                ["b"] = "Guest User",
+                ["c"] = "Guest User <00000000-tenant\\guest@partner.com>",
+                ["d"] = "nobody@example.com",
+            };
+
+            var result = TfsUserMappingTool.FindBareAccountTargets(map, TargetIdentities);
+
+            Assert.HasCount(1, result);
+            Assert.AreEqual("a", result[0].Mapping.Key);
+            Assert.AreEqual("Guest User <00000000-tenant\\guest@partner.com>", TfsUserMappingTool.FormatUnambiguous(result[0].Identity));
+        }
+
+        private static readonly List<IdentityItemData> TargetIdentities =
+        [
+            new() { DisplayName = "Martin Hinshelwood", AccountName = "martin@example.com", MailAddress = "martin@example.com", Domain = "AzureAD" },
+            new() { DisplayName = "John Smith", AccountName = "john.smith@example.com", MailAddress = "john.smith@example.com", Domain = "AzureAD" },
+            new() { DisplayName = "John Smith", AccountName = "jsmith@example.com", MailAddress = "jsmith@example.com", Domain = "AzureAD" },
+            new() { DisplayName = "Guest User", AccountName = "guest@partner.com", MailAddress = "guest@partner.com", Domain = "00000000-tenant" },
+        ];
+
+        [TestMethod, TestCategory("L0")]
+        public void FindUnresolvedMappingTargets_ResolvableTargets_ReportsNothing()
+        {
+            var map = new Dictionary<string, string>
+            {
+                ["a"] = "Martin Hinshelwood",
+                ["b"] = "martin hinshelwood",
+                ["c"] = "John Smith <jsmith@example.com>",
+                ["d"] = "Guest User <00000000-tenant\\guest@partner.com>",
+                ["e"] = "AzureAD\\martin@example.com",
+                ["f"] = null,
+                ["g"] = "",
+            };
+
+            Assert.IsEmpty(TfsUserMappingTool.FindUnresolvedMappingTargets(map, TargetIdentities));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindUnresolvedMappingTargets_UnknownTarget_ReportedAsUnresolved()
+        {
+            var result = TfsUserMappingTool.FindUnresolvedMappingTargets(new Dictionary<string, string> { ["Ghost"] = "Nobody Here" }, TargetIdentities);
+
+            Assert.HasCount(1, result);
+            Assert.AreEqual("Ghost", result[0].Source);
+            Assert.AreEqual("Nobody Here", result[0].Target);
+            Assert.IsFalse(result[0].IsAmbiguous);
+            Assert.IsEmpty(result[0].Candidates);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindUnresolvedMappingTargets_SharedDisplayName_ReportedAsAmbiguousWithCandidates()
+        {
+            var result = TfsUserMappingTool.FindUnresolvedMappingTargets(new Dictionary<string, string> { ["Old John"] = "John Smith" }, TargetIdentities);
+
+            Assert.HasCount(1, result);
+            Assert.IsTrue(result[0].IsAmbiguous);
+            CollectionAssert.AreEquivalent(new[] { "John Smith <AzureAD\\john.smith@example.com>", "John Smith <AzureAD\\jsmith@example.com>" },
+                result[0].Candidates.Select(TfsUserMappingTool.FormatUnambiguous).ToArray());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FindUnresolvedMappingTargets_QualifiedWithUnknownUniqueName_SuggestsSameDisplayName()
+        {
+            var result = TfsUserMappingTool.FindUnresolvedMappingTargets(
+                new Dictionary<string, string> { ["Old Guest"] = "Guest User <other-tenant\\guest@partner.com>" }, TargetIdentities);
+
+            Assert.HasCount(1, result);
+            Assert.IsFalse(result[0].IsAmbiguous);
+            Assert.AreEqual("Guest User <00000000-tenant\\guest@partner.com>", TfsUserMappingTool.FormatUnambiguous(result[0].Candidates.Single()));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void StopIfMappingTargetsDoNotResolve_DefaultsTrueAndBinds()
+        {
+            Assert.IsTrue(new TfsUserMappingToolOptions().StopIfMappingTargetsDoNotResolve);
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string> { ["StopIfMappingTargetsDoNotResolve"] = "false" })
+                .Build();
+            var options = new TfsUserMappingToolOptions();
+            config.Bind(options);
+            Assert.IsFalse(options.StopIfMappingTargetsDoNotResolve);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ReportUnresolvedMappingTargets_StopsRunByDefault()
+        {
+            var tool = CreateTool(Path.Combine(_testDirectory, "none.json"), useIdentityMapDataFormat: false);
+            var unresolved = new List<UnresolvedUserMapping> { new("Ghost", "Nobody", false, []) };
+
+            Assert.ThrowsExactly<MigrationRunStoppedException>(() => tool.ReportUnresolvedMappingTargets(unresolved));
+            tool.ReportUnresolvedMappingTargets([]);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ReportUnresolvedMappingTargets_WhenStopDisabled_Continues()
+        {
+            var tool = CreateTool(Path.Combine(_testDirectory, "none.json"), useIdentityMapDataFormat: false);
+            tool.Options.StopIfMappingTargetsDoNotResolve = false;
+
+            tool.ReportUnresolvedMappingTargets([new("Ghost", "Nobody", false, [])]);
         }
     }
 }

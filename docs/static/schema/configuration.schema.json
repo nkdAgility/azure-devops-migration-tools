@@ -2428,8 +2428,16 @@
                   "default": true
                 },
                 "IdentityFieldsToCheck": {
-                  "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.",
+                  "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.\r\n A configured list replaces the default list; only the listed fields are mapped, and an empty list maps none. When it is not set, System.AssignedTo, System.ChangedBy,\r\n System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy and Microsoft.VSTS.Common.ClosedBy are used.",
                   "type": "array",
+                  "default": [
+                    "System.AssignedTo",
+                    "System.ChangedBy",
+                    "System.CreatedBy",
+                    "Microsoft.VSTS.Common.ActivatedBy",
+                    "Microsoft.VSTS.Common.ResolvedBy",
+                    "Microsoft.VSTS.Common.ClosedBy"
+                  ],
                   "prefixItems": [
                     {
                       "type": "string"
@@ -2455,6 +2463,11 @@
                   "description": "When set to true, this setting will skip a validation that all users exists or mapped",
                   "type": "boolean",
                   "default": false
+                },
+                "StopIfMappingTargetsDoNotResolve": {
+                  "description": "At startup every target value in the UserMappingFile is resolved against the identities in the target. A value that does not\r\n resolve, or resolves to more than one identity, would be saved as plain text with no identity behind it. When true (the default)\r\n the run stops before any work item is migrated; when false each problem is logged as a warning and the run continues.",
+                  "type": "boolean",
+                  "default": true
                 },
                 "UseIdentityMapDataFormat": {
                   "description": "When set to true, the ExportUsersForMapping processor exports a JSON array of detailed IdentityMapData entries (Source and Target identities)\r\n instead of simple display name mappings, and the UserMappingFile format is detected on import so either format can be used.\r\n Detailed entries match work item values against the source display name or account name, ignoring case.",

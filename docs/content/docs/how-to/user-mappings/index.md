@@ -27,7 +27,7 @@ When `UseIdentityMapDataFormat` is enabled, the export instead writes a JSON arr
 ## How it works
 
 1. Run `TfsExportUsersForMappingProcessor`. It loads the users from source and target, pairs them, and writes the users whose names differ to `UserMappingFile`. Review and edit the file.
-2. Run `TfsWorkItemMigrationProcessor`. It warns about source users that do not exist in the target and, for each identity field listed in `IdentityFieldsToCheck`, replaces the source value with the mapped target value.
+2. Run `TfsWorkItemMigrationProcessor`. It warns about source users that do not exist in the target and checks that every target value in `UserMappingFile` resolves to exactly one target identity; by default it stops if one does not (see `StopIfMappingTargetsDoNotResolve`). Then, for each identity field listed in `IdentityFieldsToCheck`, it replaces the source value with the mapped target value.
 
 Users are paired by display name. With `MatchUsersByEmail` enabled they are paired by email address first, then by display name.
 
@@ -42,7 +42,7 @@ A match is used only when it identifies a single target user. Otherwise the disp
 
 ## Notes
 
-- Applies to all identity fields specified in `IdentityFieldsToCheck`. Use full field reference names (for example `System.AssignedTo`); matching is exact and ignores case, and partial names are not matched.
+- Applies to all identity fields specified in `IdentityFieldsToCheck`. Use full field reference names (for example `System.AssignedTo`); matching is exact and ignores case, and partial names are not matched. A configured list replaces the six default fields rather than adding to them.
 - Mappings are applied to the target work item only; the source is not changed. Empty and unmapped values are passed through unchanged.
 - Identity fields replayed from the source are kept through the final `Migration` saves (attachments, links and the migration comment), so process rules that set a field to the current user do not replace it with the migration account.
 - On `TfsExportUsersForMappingProcessor` you can set `OnlyListUsersInWorkItems` to export only the users found in the work items selected by `WIQLQuery`. This is better if you have many users.
