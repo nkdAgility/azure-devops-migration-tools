@@ -142,6 +142,13 @@ namespace MigrationTools.ConsoleDataGenerator
         /// </summary>
         internal static JToken ConvertDefaultValue(object defaultValue, JSchema propertySchema)
         {
+            var value = ConvertDefaultText(defaultValue, propertySchema);
+            // A default that does not satisfy its own property schema is worse than no default.
+            return value != null && propertySchema != null && !value.IsValid(propertySchema) ? null : value;
+        }
+
+        private static JToken ConvertDefaultText(object defaultValue, JSchema propertySchema)
+        {
             var text = defaultValue?.ToString()?.Trim().Trim('`').Trim();
             if (string.IsNullOrEmpty(text) ||
                 text.Contains("missing XML code comments") ||
