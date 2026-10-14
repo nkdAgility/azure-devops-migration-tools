@@ -21,6 +21,16 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        [DataRow("/nkdagility-preview/", "/_apis/work/processes", "/nkdagility-preview/_apis/work/processes")]
+        [DataRow("/nkdagility-preview", "/_apis/work/processes", "/nkdagility-preview/_apis/work/processes")]
+        [DataRow("https://dev.azure.com/org/", "_apis/work/processes", "https://dev.azure.com/org/_apis/work/processes")]
+        [DataRow("/", "/_apis/wit/fields", "/_apis/wit/fields")]
+        public void CombinePath_NeverDoublesTheSlash(string basePath, string relativePath, string expected)
+        {
+            Assert.AreEqual(expected, RestUrlHelper.CombinePath(basePath, relativePath));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void EscapeSegment_NullIsEmpty()
         {
             Assert.AreEqual(string.Empty, RestUrlHelper.EscapeSegment(null));
