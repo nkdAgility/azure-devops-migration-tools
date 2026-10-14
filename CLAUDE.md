@@ -15,3 +15,8 @@ Unit tests are not enough for changes to migration behaviour, exit codes, valida
 1. Up to date with `main`. 2. Builds. 3. Tests pass. 4. A real end-to-end migration completes correctly on the test orgs. 5. Meets the architectural norms. 6. Meets the original ask. 7. Clean up anything created only for the work (scratch projects, temp worktrees, logs).
 
 Then report: what was done, how it was tested, how the docs were updated (with `GenerateDocs.ps1`), confidence, and what was not done. Turn auto-merge on only when confidence is 90% or higher; otherwise make sure it is off.
+
+## WinGet release policy
+
+uild/releaseWingetPackage.ps1 keeps at most one open PR per package in microsoft/winget-pkgs: Production always submits, Preview at most once every 7 days (`ForceRelease` overrides), Canary never. Our own open PRs for the same package are closed as superseded after a successful submission. The real package IDs are `nkdAgility.AzureDevOpsMigrationTools` and `.Preview`.
+
