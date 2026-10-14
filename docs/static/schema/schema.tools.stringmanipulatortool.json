@@ -13,9 +13,7 @@
     "Manipulators": {
       "description": "List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.",
       "type": "array",
-      "default": [
-        "{}"
-      ]
+      "default": []
     },
     "MaxStringLength": {
       "description": "Max number of chars in a string. Applied last, and set to 1000000 by default.",

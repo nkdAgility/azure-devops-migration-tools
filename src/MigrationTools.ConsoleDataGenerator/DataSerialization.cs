@@ -111,7 +111,7 @@ namespace MigrationTools.ConsoleDataGenerator
                         }
                     }
 
-                    propertySchema.Default = ConvertDefaultValue(option.DefaultValue, propertySchema.Type);
+                    propertySchema.Default = ConvertDefaultValue(option.DefaultValue, propertySchema);
 
                     schema.Properties.Add(propertyName, propertySchema);
                 }
@@ -140,7 +140,7 @@ namespace MigrationTools.ConsoleDataGenerator
         /// Returns null (no default emitted) when the text is missing, a placeholder such as "none", or cannot be
         /// represented as the schema type.
         /// </summary>
-        internal static JToken ConvertDefaultValue(object defaultValue, JSchemaType? schemaType)
+        internal static JToken ConvertDefaultValue(object defaultValue, JSchema propertySchema)
         {
             var text = defaultValue?.ToString()?.Trim().Trim('`').Trim();
             if (string.IsNullOrEmpty(text) ||
@@ -151,7 +151,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 return null;
             }
 
-            var type = schemaType ?? JSchemaType.String;
+            var type = propertySchema?.Type ?? JSchemaType.String;
             if (type.HasFlag(JSchemaType.Boolean))
             {
                 return bool.TryParse(text, out var b) ? new JValue(b) : null;
@@ -169,6 +169,12 @@ namespace MigrationTools.ConsoleDataGenerator
                 if (text.StartsWith("["))
                 {
                     try { return JArray.Parse(text); } catch (JsonReaderException) { return null; }
+                }
+                // Only split comma-separated text into string items; any other item type (or object syntax) has no safe conversion.
+                var itemsAreStrings = propertySchema.Items.All(i => i.Type == null || i.Type == JSchemaType.String);
+                if (text.StartsWith("{") || !itemsAreStrings)
+                {
+                    return null;
                 }
                 return new JArray(text.Split(',').Select(s => s.Trim()).Where(s => s.Length > 0));
             }
@@ -438,7 +444,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 var propertyName = option.ParameterName;
                 var propertySchema = BuildPropertySchema(option);
 
-                propertySchema.Default = ConvertDefaultValue(option.DefaultValue, propertySchema.Type);
+                propertySchema.Default = ConvertDefaultValue(option.DefaultValue, propertySchema);
 
                 schema.Properties.Add(propertyName, propertySchema);
             }
