@@ -15,3 +15,7 @@ Unit tests are not enough for changes to migration behaviour, exit codes, valida
 1. Up to date with `main`. 2. Builds. 3. Tests pass. 4. A real end-to-end migration completes correctly on the test orgs. 5. Meets the architectural norms. 6. Meets the original ask. 7. Clean up anything created only for the work (scratch projects, temp worktrees, logs).
 
 Then report: what was done, how it was tested, how the docs were updated (with `GenerateDocs.ps1`), confidence, and what was not done. Turn auto-merge on only when confidence is 90% or higher; otherwise make sure it is off.
+
+## Azure DevOps scope (Martin)
+
+Ignore `dev.azure.com/nkdagility/AzureDevOps-Tools`: never query it or use it to decide anything. Releases run from `.github/workflows/main.yml`; the legacy `build/azure-pipeline.yml` was removed in October 2026.
