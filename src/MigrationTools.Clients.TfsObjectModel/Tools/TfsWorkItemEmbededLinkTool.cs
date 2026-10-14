@@ -98,15 +98,13 @@ namespace MigrationTools.Tools
                                 continue;
                             }
                             Log.LogDebug("{LogTypeName}: Source work item {workItemId} mention link traced on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, field.Name, targetWorkItem.Id);
-                            var sourceLinkWi = FindSourceWorkItem(processor, int.Parse(workItemId));
+                            var sourceLinkWi = int.TryParse(workItemId, out var sourceId) ? FindSourceWorkItem(processor, sourceId) : null;
                             if (sourceLinkWi != null)
                             {
                                 var linkWI = processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceLinkWi);
                                 if (linkWI != null)
                                 {
-                                    var replaceValue = anchorTagMatch.Value
-                                        .Replace(workItemId, linkWI.Id)
-                                        .Replace(oldTfsProject, newTfsProject)
+                                    var replaceValue = ReplaceProject(anchorTagMatch.Value.Replace(workItemId, linkWI.Id), oldTfsProject, newTfsProject)
                                         .Replace(oldTfsurl, newTfsurl);
                                     field.Value = field.Value.ToString().Replace(anchorTagMatch.Value, replaceValue);
                                     Log.LogInformation("{LogTypeName}: Source work item {workItemId} mention link was successfully replaced with target work item {linkWIId} mention link on field {fieldName} on target work item {targetWorkItemId}.", LogTypeName, workItemId, linkWI.Id, field.Name, targetWorkItem.Id);
@@ -158,8 +156,20 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
-        /// Looks up a mentioned work item on the source without logging an error when it does not exist or is not visible.
+        /// Replaces the project in a mention, including its URL-encoded form in the href, so a re-sync recognises the link as a target link.
         /// </summary>
+        internal static string ReplaceProject(string value, string oldProject, string newProject)
+        {
+            var oldEncoded = Uri.EscapeDataString(oldProject);
+            if (oldEncoded != oldProject)
+            {
+                value = value.Replace(oldEncoded, Uri.EscapeDataString(newProject));
+            }
+            return value.Replace(oldProject, newProject);
+        }
+
+        // A missing mention is expected (deleted, or never visible) and is reported by the caller as a warning,
+        // so this avoids GetWorkItem, which logs every failure as an error.
         private WorkItemData FindSourceWorkItem(TfsProcessor processor, int id)
         {
             try
@@ -192,7 +202,8 @@ namespace MigrationTools.Tools
                 return prefix.StartsWith(target + "/", StringComparison.OrdinalIgnoreCase)
                     && !prefix.StartsWith(source + "/", StringComparison.OrdinalIgnoreCase);
             }
-            if (string.Equals(sourceProject, targetProject, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(sourceProject, targetProject, StringComparison.OrdinalIgnoreCase)
+                || !prefix.StartsWith(target + "/", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }

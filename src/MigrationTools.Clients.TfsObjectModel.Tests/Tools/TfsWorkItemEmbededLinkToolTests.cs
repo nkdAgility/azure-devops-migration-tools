@@ -52,6 +52,15 @@ namespace MigrationTools.Tests.Tools
             Assert.IsTrue(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/org/Target%20Project/_workitems/edit/7", "https://dev.azure.com/org", "Src", "https://dev.azure.com/org", "Target Project"));
             Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/org/Src/_workitems/edit/7", "https://dev.azure.com/org", "Src", "https://dev.azure.com/org", "Target Project"));
             Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/org/Same/_workitems/edit/7", "https://dev.azure.com/org", "Same", "https://dev.azure.com/org", "Same"));
+            Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/other/Target%20Project/_workitems/edit/7", "https://dev.azure.com/org", "Src", "https://dev.azure.com/org", "Target Project"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ReplaceProject_EncodedProjectInHref_IsRewrittenSoResyncRecognisesIt()
+        {
+            var rewritten = TfsWorkItemEmbededLinkTool.ReplaceProject("<a href=\"https://dev.azure.com/org/Source%20Project/_workitems/edit/9/\" data-vss-mention=\"version:1.0\">#9</a>", "Source Project", "Target Project");
+            StringAssert.Contains(rewritten, "/Target%20Project/_workitems/edit/9/");
+            Assert.IsTrue(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/org/Target%20Project/_workitems/edit/9/", "https://dev.azure.com/org/", "Source Project", "https://dev.azure.com/org/", "Target Project"));
         }
 
         [TestMethod, TestCategory("L0")]
