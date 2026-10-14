@@ -1,0 +1,44 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "AzureDevOpsEndpoint",
+        "AuthenticationMode": "EntraId",
+        "AccessToken": "set-by-harness",
+        "Organisation": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-procdef-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      },
+      "Target": {
+        "EndpointType": "AzureDevOpsEndpoint",
+        "AuthenticationMode": "EntraId",
+        "AccessToken": "set-by-harness",
+        "Organisation": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-procdef-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "ProcessDefinitionProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "Processes": {
+          "amte2e-procdef": [
+            "User Story"
+          ]
+        },
+        "ProcessMaps": {
+          "amte2e-procdef": "amte2e-procdef"
+        },
+        "UpdateProcessDetails": true,
+        "MaxDegreeOfParallelism": 1
+      }
+    ]
+  }
+}
