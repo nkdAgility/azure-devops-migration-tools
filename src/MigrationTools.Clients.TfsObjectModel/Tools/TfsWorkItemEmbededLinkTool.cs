@@ -194,9 +194,9 @@ namespace MigrationTools.Tools
             {
                 return false;
             }
-            var prefix = href.Substring(0, editIndex);
-            var source = sourceCollection.TrimEnd('/');
-            var target = targetCollection.TrimEnd('/');
+            var prefix = NormaliseOrganisationUrl(href.Substring(0, editIndex));
+            var source = NormaliseOrganisationUrl(sourceCollection.TrimEnd('/'));
+            var target = NormaliseOrganisationUrl(targetCollection.TrimEnd('/'));
             if (!string.Equals(source, target, StringComparison.OrdinalIgnoreCase))
             {
                 return prefix.StartsWith(target + "/", StringComparison.OrdinalIgnoreCase)
@@ -210,6 +210,12 @@ namespace MigrationTools.Tools
             var project = Uri.UnescapeDataString(prefix.Substring(prefix.LastIndexOf('/') + 1));
             return string.Equals(project, targetProject, StringComparison.OrdinalIgnoreCase);
         }
+
+        private static readonly Regex LegacyOrganisationUrl = new Regex(@"^https?://(?<org>[^./]+)\.visualstudio\.com(?:/DefaultCollection)?(?=/|$)", RegexOptions.IgnoreCase);
+
+        // Azure DevOps Services serves an organisation at both https://{org}.visualstudio.com and https://dev.azure.com/{org}.
+        internal static string NormaliseOrganisationUrl(string url) =>
+            LegacyOrganisationUrl.Replace(url, m => "https://dev.azure.com/" + m.Groups["org"].Value);
 
         private IDictionary<string, string> GetUserMappings()
         {

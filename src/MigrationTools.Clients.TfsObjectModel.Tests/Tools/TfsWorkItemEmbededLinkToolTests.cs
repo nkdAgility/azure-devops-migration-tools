@@ -56,6 +56,14 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void IsTargetWorkItemUrl_LegacyHostForm_IsSameOrganisation()
+        {
+            Assert.IsTrue(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://target.visualstudio.com/Tgt/_workitems/edit/7", SourceOrg, "Src", TargetOrg, "Tgt"));
+            Assert.IsTrue(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://dev.azure.com/target/Tgt/_workitems/edit/7", "https://source.visualstudio.com/", "Src", "https://target.visualstudio.com/", "Tgt"));
+            Assert.IsFalse(TfsWorkItemEmbededLinkTool.IsTargetWorkItemUrl("https://source.visualstudio.com/Src/_workitems/edit/7", SourceOrg, "Src", TargetOrg, "Tgt"));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void ReplaceProject_EncodedProjectInHref_IsRewrittenSoResyncRecognisesIt()
         {
             var rewritten = TfsWorkItemEmbededLinkTool.ReplaceProject("<a href=\"https://dev.azure.com/org/Source%20Project/_workitems/edit/9/\" data-vss-mention=\"version:1.0\">#9</a>", "Source Project", "Target Project");
