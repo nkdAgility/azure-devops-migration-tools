@@ -59,7 +59,29 @@ namespace MigrationTools.DataContracts.Process
         public string Description { get; set; }
         public string Color { get; set; }
         public string Icon { get; set; }
+        public string Inherits { get; set; }
         public List<WorkItemState> States { get; set; }
+
+        [JsonIgnore]
+        public bool IsSystem => string.Equals(Customization, "system", StringComparison.OrdinalIgnoreCase);
+
+        public override dynamic ToJson()
+        {
+            if (string.IsNullOrEmpty(Id))
+            {
+                // An inherited type takes its name from its parent, and the service rejects a create without color and icon.
+                return new
+                {
+                    Name = string.IsNullOrEmpty(Inherits) ? Name : null,
+                    InheritsFrom = Inherits,
+                    Description,
+                    Color,
+                    Icon,
+                    IsDisabled
+                };
+            }
+            return new { Description, Color, Icon, IsDisabled };
+        }
 
         public WorkItemType CloneAsNew()
         {
@@ -69,8 +91,8 @@ namespace MigrationTools.DataContracts.Process
             wit.ReferenceName = this.ReferenceName;
             wit.Description = this.Description;
             wit.Color = this.Color;
-            wit.Name = this.Name;
             wit.Icon = this.Icon;
+            wit.Inherits = this.Inherits;
             return wit;
         }
 
@@ -129,6 +151,19 @@ namespace MigrationTools.DataContracts.Process
         public List<RuleCondition> Conditions { get; set; }
         public List<RuleAction> Actions { get; set; }
         public string CustomizationType { get; set; }
+        public bool IsDisabled { get; set; }
+
+        /// <summary>
+        /// Only custom rules can be written. System and inherited rules have no name, and the service rejects
+        /// any update to them with VS1640103 Missing required property friendlyName (#3210).
+        /// </summary>
+        [JsonIgnore]
+        public bool IsCustom => string.Equals(CustomizationType, "custom", StringComparison.OrdinalIgnoreCase);
+
+        public override dynamic ToJson()
+        {
+            return new { Id, Name, Conditions, Actions, IsDisabled };
+        }
 
         public WorkItemRule CloneAsNew()
         {
@@ -137,7 +172,8 @@ namespace MigrationTools.DataContracts.Process
                 Name = Name,
                 CustomizationType = CustomizationType,
                 Actions = Actions,
-                Conditions = Conditions
+                Conditions = Conditions,
+                IsDisabled = IsDisabled
             };
         }
 
@@ -147,6 +183,7 @@ namespace MigrationTools.DataContracts.Process
             CustomizationType = existing.CustomizationType;
             Actions = existing.Actions;
             Conditions = existing.Conditions;
+            IsDisabled = existing.IsDisabled;
         }
     }
     [ApiPath("wit/fields", IncludeProject: false, IncludeTrailingSlash: false, UpdateVerb = HttpVerbs.Patch)]
@@ -230,6 +267,9 @@ namespace MigrationTools.DataContracts.Process
         public string Customization { get; set; }
         public string[] AllowedValues { get; set; }
 
+        [JsonIgnore]
+        public bool IsSystem => string.Equals(Customization, "system", StringComparison.OrdinalIgnoreCase);
+
         public override dynamic ToJson()
         {
             switch (ReferenceName)
@@ -294,7 +334,7 @@ namespace MigrationTools.DataContracts.Process
     }
 
 
-    [ApiPath("work/processes/{0}/workitemtypesbehaviors/{1}/behaviors", IncludeProject: false, IncludeTrailingSlash: false)]
+    [ApiPath("work/processes/{0}/workitemtypesbehaviors/{1}/behaviors", IncludeProject: false, IncludeTrailingSlash: false, IncludeIdOnUpdate = false, UpdateVerb = HttpVerbs.Patch)]
     [ApiName("Work Item Type Behaviors")]
     public partial class WorkItemTypeBehavior : ProcessDefBase, ISynchronizeable<WorkItemTypeBehavior>
     {
@@ -313,11 +353,19 @@ namespace MigrationTools.DataContracts.Process
         public WorkItemTypeBehaviorRef Behavior { get; set; }
         public bool IsDefault { get; set; }
 
+        public override dynamic ToJson()
+        {
+            // ResetObject clears Id (and so Behavior) before a create, but the behavior id is the payload.
+            var behaviorId = string.IsNullOrEmpty(Id) ? GetSourceId() : Id;
+            return new { Behavior = new { Id = behaviorId }, IsDefault };
+        }
+
         public WorkItemTypeBehavior CloneAsNew()
         {
             return new WorkItemTypeBehavior()
             {
-                Behavior = new WorkItemTypeBehaviorRef()
+                Behavior = new WorkItemTypeBehaviorRef() { Id = Behavior?.Id },
+                IsDefault = IsDefault
             };
         }
 
@@ -347,6 +395,25 @@ namespace MigrationTools.DataContracts.Process
         public string Customization { get; set; }
         public WorkItemBehaviorRef Inherits { get; set; }
 
+        [JsonIgnore]
+        public bool IsSystem => string.Equals(Customization, "system", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// An inherited behavior (e.g. Stories once User Story is derived) already exists in every derived process,
+        /// so it can only be updated, never created (#3224).
+        /// </summary>
+        [JsonIgnore]
+        public bool IsInherited => string.Equals(Customization, "inherited", StringComparison.OrdinalIgnoreCase);
+
+        public override dynamic ToJson()
+        {
+            if (string.IsNullOrEmpty(Id))
+            {
+                return new { Name, Color, Inherits = Inherits?.BehaviorRefName };
+            }
+            return new { Name, Color };
+        }
+
         public WorkItemBehavior CloneAsNew()
         {
             return new WorkItemBehavior()
@@ -363,8 +430,8 @@ namespace MigrationTools.DataContracts.Process
 
         public void UpdateWithExisting(WorkItemBehavior existing)
         {
+            // ReferenceName is kept: it addresses the target, and a custom behavior's differs between organisations.
             Name = existing.Name;
-            ReferenceName = existing.ReferenceName;
             Color = existing.Color;
             Description = existing.Description;
             Customization = existing.Customization;
@@ -462,15 +529,20 @@ namespace MigrationTools.DataContracts.Process
 
         public WorkItemGroup CloneAsNew()
         {
-            // When cloning a group, you need to ensure that the HTML controls stick with the group.. you cannot add an HTML control to a group later
-            var htmlControls = Controls != null ? Controls.Where(c => c.ControlType.Equals("HtmlFieldControl", StringComparison.OrdinalIgnoreCase)) : null;
+            // HTML controls can only be created together with their group; every other control is added afterwards (#3217).
+            var htmlControls = Controls?.Where(IsHtmlControl).ToList();
             return new()
             {
-                Controls = htmlControls != null ? Controls : null,
+                Controls = htmlControls?.Count > 0 ? htmlControls : null,
                 Label = Label,
                 IsContribution = IsContribution,
                 Visible = Visible,
             };
+        }
+
+        public static bool IsHtmlControl(WorkItemControl control)
+        {
+            return string.Equals(control?.ControlType, "HtmlFieldControl", StringComparison.OrdinalIgnoreCase);
         }
 
         public void UpdateWithExisting(WorkItemGroup existing)
