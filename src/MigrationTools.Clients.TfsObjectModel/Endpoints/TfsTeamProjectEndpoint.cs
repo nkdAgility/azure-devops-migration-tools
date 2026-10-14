@@ -112,8 +112,7 @@ namespace MigrationTools.Clients
                             break;
                         case AuthenticationMode.EntraId:
                             Log.LogInformation("Connecting with Microsoft Entra ID ");
-                            _vssCredentials = EntraIdCredentials.CreateVssCredentials();
-                            y = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
+                            y = ConnectWithEntraId();
                             break;
                         case AuthenticationMode.Prompt:
                             Log.LogInformation("Prompting for credentials ");
@@ -146,7 +145,7 @@ namespace MigrationTools.Clients
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     activity?.SetTag("http.response.status_code", "401");
-                    Log.LogError(ex, "Unable to configure store: Check persmissions and credentials for {AuthenticationMode}!", Options.Authentication.AuthenticationMode);
+                    Log.LogError(ex, "Unable to configure store: Check permissions and credentials for {AuthenticationMode}!", Options.Authentication.AuthenticationMode);
                     throw new MigrationRunStoppedException("Unable to configure store: check permissions and credentials.");
                 }
                 catch (Exception ex)
@@ -155,7 +154,7 @@ namespace MigrationTools.Clients
                     activity?.SetStatus(ActivityStatusCode.Error);
                     activity?.SetTag("http.response.status_code", "500");
                     Telemetry.TrackException(ex, activity?.Tags);
-                    Log.LogError("Unable to configure store: Check persmissions and credentials for {AuthenticationMode}: " + ex.Message, Options.Authentication.AuthenticationMode);
+                    Log.LogError("Unable to configure store: Check permissions and credentials for {AuthenticationMode}: " + ex.Message, Options.Authentication.AuthenticationMode);
                     switch (Options.Authentication.AuthenticationMode)
                     {
                         case AuthenticationMode.AccessToken:
@@ -168,6 +167,38 @@ namespace MigrationTools.Clients
                 }
                 return y;
             }
+        }
+
+        /// <summary>How many times a rejected first Entra ID connection is retried with a newly acquired token (#3225).</summary>
+        private const int EntraIdConnectRetries = 2;
+        private static readonly TimeSpan EntraIdRetryDelay = TimeSpan.FromSeconds(3);
+
+        // An occasional first connection is rejected with 401 although the same login works seconds later (#3225).
+        // Retry a bounded number of times, each with a freshly probed credential chain, and log the token's
+        // identity and validity so a persistent failure shows which account was used.
+        private TfsTeamProjectCollection ConnectWithEntraId()
+        {
+            return EntraIdCredentials.ConnectWithRetry(() =>
+            {
+                _vssCredentials = EntraIdCredentials.CreateVssCredentials();
+                Log.LogInformation("Microsoft Entra ID token: {TokenDescription}", EntraIdCredentials.DescribeCurrentToken());
+                var collection = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
+                try
+                {
+                    collection.EnsureAuthenticated();
+                    return collection;
+                }
+                catch
+                {
+                    collection.Dispose();
+                    throw;
+                }
+            },
+            ex => ex is TeamFoundationServerUnauthorizedException,
+            EntraIdConnectRetries,
+            EntraIdRetryDelay,
+            (ex, attempt, wait) => Log.LogWarning("Microsoft Entra ID connection to {CollectionUrl} was rejected ({Message}). Retrying with a new token in {Delay}s (attempt {Attempt} of {MaxAttempts}).",
+                Options.Collection, ex.Message, wait.TotalSeconds, attempt, EntraIdConnectRetries + 1));
         }
 
         public T GetService<T>()
