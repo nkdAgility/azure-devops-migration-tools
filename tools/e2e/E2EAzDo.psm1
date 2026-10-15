@@ -104,8 +104,11 @@ function New-E2EProject {
         capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = $processId } }
     }
     Wait-E2EOperation $op | Out-Null
-    # A new project can take a few seconds to be readable by name after the operation reports success.
-    for ($i = 0; ; $i++) { try { return Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { if ($i -ge 9) { throw }; Start-Sleep -Seconds 3 } }
+    # A new project can take a while to be readable by name, and its classification nodes longer, after the operation succeeds.
+    for ($i = 0; ; $i++) {
+        try { $p = Invoke-E2ERest "_apis/projects/$Name" -Org $Org; Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null; return $p }
+        catch { if ($i -ge 19) { throw }; Start-Sleep -Seconds 3 }
+    }
 }
 
 function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
