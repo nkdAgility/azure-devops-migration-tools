@@ -29,7 +29,7 @@ configurationSamples:
       "TargetName": null
     }
   sampleFor: MigrationTools._EngineV1.Configuration.Processing.TfsTestPlansAndSuitesMigrationProcessorOptions
-description: Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+description: Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration
 className: TfsTestPlansAndSuitesMigrationProcessor
 typeName: Processors
 options:

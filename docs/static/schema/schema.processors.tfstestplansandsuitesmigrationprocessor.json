@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.processors.tfstestplansandsuitesmigrationprocessor.json",
   "title": "TfsTestPlansAndSuitesMigrationProcessor",
-  "description": "Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration",
+  "description": "Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration",
   "type": "object",
   "properties": {
     "Enabled": {
