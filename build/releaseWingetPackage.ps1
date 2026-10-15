@@ -127,12 +127,14 @@ Write-Host $"##[warning] $installURL"
 
 Write-Host "Winget Create with $wigetPackageId"
 $manifestOut = Join-Path $PWD "winget-manifests"
-./wingetcreate.exe update --urls $installURL --version $version --out $manifestOut $wigetPackageId
+if (Test-Path $manifestOut) { Remove-Item $manifestOut -Recurse -Force }
+# The token lets wingetcreate fill ReleaseNotesUrl and ReleaseDate from the GitHub release.
+./wingetcreate.exe update --token $GH_TOKEN --urls $installURL --version $version --out $manifestOut $wigetPackageId
 if ($LASTEXITCODE -ne 0) { throw "wingetcreate failed for $wigetPackageId" }
 
 # wingetcreate update copies the locale text from the previous manifest in winget-pkgs, so apply ours.
 $templateLocale = Join-Path $PSScriptRoot "..\src\MigrationTools.WinGet\nkdAgility.AzureDevOpsMigrationTools.locale.en-US.yaml"
-$generatedLocale = Get-ChildItem $manifestOut -Recurse -Filter "$wigetPackageId.locale.en-US.yaml" | Select-Object -First 1
+$generatedLocale = Get-ChildItem $manifestOut -Recurse -Filter "$wigetPackageId.locale.en-US.yaml" | Where-Object { $_.Directory.Name -eq $version } | Select-Object -First 1
 if (-not $generatedLocale) { throw "Generated locale manifest for $wigetPackageId not found under $manifestOut" }
 $localeText = Get-Content $generatedLocale.FullName -Raw
 foreach ($key in @('ShortDescription', 'Description')) {
@@ -143,7 +145,7 @@ Set-Content -Path $generatedLocale.FullName -Value $localeText -NoNewline
 Write-Output "Locale text from $templateLocale applied to $($generatedLocale.FullName)"
 
 if (-not $DryRun) {
-    ./wingetcreate.exe submit --no-open --token $GH_TOKEN $generatedLocale.DirectoryName
+    ./wingetcreate.exe submit --no-open --token $GH_TOKEN --prtitle "New version: $wigetPackageId version $version" $generatedLocale.DirectoryName
     if ($LASTEXITCODE -ne 0) { throw "wingetcreate submit failed for $wigetPackageId" }
 }
 
