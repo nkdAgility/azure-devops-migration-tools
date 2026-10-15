@@ -31,7 +31,7 @@ menu:
 
 # Site-wide parameters
 params:
-  description: "Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, Work Items, Tasks, Test Cases, and Plans & Suits from one Project to another in Azure DevOps / TFS both within the same Organisation, and between Organisations."
+  description: "Azure DevOps Migration Tools allow you to migrate Teams, Backlogs, Work Items, Tasks, Test Cases, and Plans & Suites from one Project to another in Azure DevOps / TFS both within the same Organisation, and between Organisations."
   keywords: "Azure DevOps, Migration Tools, DevOps, Migration"
   og_image: "/images/og-image.jpg" # URL to the default Open Graph image
   siteProdUrl: "https://devopsmigration.io"

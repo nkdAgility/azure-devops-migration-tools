@@ -1127,7 +1127,7 @@
                 },
                 {
                   "title": "TfsTestPlansAndSuitesMigrationProcessor",
-                  "description": "Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration",
+                  "description": "Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration",
                   "type": "object",
                   "properties": {
                     "Enabled": {

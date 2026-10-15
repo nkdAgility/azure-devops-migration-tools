@@ -33,7 +33,7 @@ using System.Diagnostics.Metrics;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Rebuilds Suits and plans for Test Cases migrated using the WorkItemMigration
+    /// Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>

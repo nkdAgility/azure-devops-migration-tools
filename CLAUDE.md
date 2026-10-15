@@ -24,3 +24,5 @@ Ignore `dev.azure.com/nkdagility/AzureDevOps-Tools`: never query it or use it to
 
 `build/releaseWingetPackage.ps1` keeps at most one open PR per package in microsoft/winget-pkgs: Production always submits, Preview at most once every 7 days (`ForceRelease` overrides), Canary never. Our own open PRs for the same package are closed as superseded after a successful submission. The real package IDs are `nkdAgility.AzureDevOpsMigrationTools` and `.Preview`.
 
+`wingetcreate update` copies the locale text from the previous manifest in microsoft/winget-pkgs, not from this repo, so the script overwrites `ShortDescription`/`Description` with the values from `src/MigrationTools.WinGet/*.locale.en-US.yaml` before `wingetcreate submit`. To test locally, run it with `-DryRun` and `DOTNET_ROLL_FORWARD=Major` (wingetcreate needs .NET 9). Manifest validation fails on long paths such as the scratchpad.
+
