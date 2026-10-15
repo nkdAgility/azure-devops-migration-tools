@@ -79,7 +79,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modern", "Modern", "{83F368
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{88C3582D-6C5D-4A8B-9EC3-F816C501AFA0}"
 	ProjectSection(SolutionItems) = preProject
-		build\azure-pipeline.yml = build\azure-pipeline.yml
 		build\build.ps1 = build\build.ps1
 		build\buildDocs.ps1 = build\buildDocs.ps1
 		build\compile-and-test.ps1 = build\compile-and-test.ps1

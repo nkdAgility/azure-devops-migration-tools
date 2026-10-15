@@ -16,6 +16,10 @@ Unit tests are not enough for changes to migration behaviour, exit codes, valida
 
 Then report: what was done, how it was tested, how the docs were updated (with `GenerateDocs.ps1`), confidence, and what was not done. Turn auto-merge on only when confidence is 90% or higher; otherwise make sure it is off.
 
+## Azure DevOps scope (Martin)
+
+Ignore `dev.azure.com/nkdagility/AzureDevOps-Tools`: never query it or use it to decide anything. Releases run from `.github/workflows/main.yml`; the legacy `build/azure-pipeline.yml` was removed in October 2026.
+
 ## WinGet release policy
 
 `build/releaseWingetPackage.ps1` keeps at most one open PR per package in microsoft/winget-pkgs: Production always submits, Preview at most once every 7 days (`ForceRelease` overrides), Canary never. Our own open PRs for the same package are closed as superseded after a successful submission. The real package IDs are `nkdAgility.AzureDevOpsMigrationTools` and `.Preview`.

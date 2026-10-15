@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/.build/">
-    <File Path="build/azure-pipeline.yml" />
     <File Path="build/build.ps1" />
     <File Path="build/buildDocs.ps1" />
     <File Path="build/compile-and-test.ps1" />
