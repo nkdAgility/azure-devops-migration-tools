@@ -33,4 +33,4 @@ foreach ($p in "\$Tgt\Area\Team A", "\$Tgt\Area\Team A\Sub", "\$Tgt\Iteration\Sp
 $sp1 = $nodes.value | Where-Object structureType -eq iteration | ForEach-Object children | Where-Object name -eq "Sprint 1"
 $r += New-E2EResult "iteration dates copied" ($sp1.attributes.startDate -and ([datetime]$sp1.attributes.startDate).Date -eq [datetime]"2026-09-01") "Sprint 1 start '$($sp1.attributes.startDate)'"
 
-$lines = @(Write-E2EResults $r $OutFile); $lines[0..($lines.Count - 2)]; exit $lines[-1]
+exit (Write-E2EResults $r $OutFile)

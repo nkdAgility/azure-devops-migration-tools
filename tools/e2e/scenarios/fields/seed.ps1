@@ -3,7 +3,8 @@
 #             project, whose process does not have the field: its value only exists in revision history (#3173 case).
 #  issue    - Issue with Custom.amte2eIssueOnly (only on Issue in the source process). The config maps Issue -> Task and
 #             has a FieldtoFieldMap with ApplyTo ["Issue"] for the field, so validation must pass (#3151).
-#  reflect  - Task with one revision; a TargetToTarget map copies Custom.ReflectedWorkItemId to Integration Build (#3209).
+#  reflect  - Task with one revision; a TargetToTarget map copies Custom.ReflectedWorkItemId to System.Description (#3209);
+#             the Issue-only field is mapped to Integration Build, which is why the reflected id goes to Description.
 param()
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force

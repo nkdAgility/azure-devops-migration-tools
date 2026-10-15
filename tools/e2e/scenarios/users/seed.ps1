@@ -5,7 +5,7 @@
 #       prefix of ResolvedBy): AssignedTo must be mapped, ResolvedBy must stay the ghost.
 #  U2 - AssignedTo empty.
 #  U3 - Description with an @mention of the real user.
-param([string]$Src = "amte2e-users-src", [string[]]$Tgt = @("amte2e-users-tgt", "amte2e-users2-tgt"))
+param([string]$Src = "amte2e-users-src", [string[]]$Tgt = @("amte2e-users-tgt", "amte2e-users2-tgt", "amte2e-users3-tgt", "amte2e-users4-tgt", "amte2e-users5-tgt"))
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force

@@ -99,11 +99,15 @@ Not created by this pass, but noticed in `nkdagility-preview`: inherited process
 
 ## Re-running
 ```powershell
-az login   # an identity with Project Collection Administrator in both test orgs
+az login                                                   # an identity with Project Collection Administrator in both test orgs
 dotnet build MigrationTools.sln
-./tools/e2e/scenarios/wicore/seed.ps1                      # each scenario has seed.ps1 (+ assert.ps1 where needed)
+./tools/e2e/Initialize-E2EEnvironment.ps1                  # creates the shared amte2e-agile process in both orgs (needed again after cleanup)
+./tools/e2e/scenarios/wicore/seed.ps1                      # every scenario has a seed.ps1
 ./tools/e2e/Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/wicore/config.json
-./tools/e2e/scenarios/wicore/assert.ps1
-./tools/e2e/Remove-E2EObjects.ps1                         # removes every amte2e-* project/process and Custom.amte2e* field
+./tools/e2e/scenarios/wicore/assert.ps1                    # exit code = number of failed checks
+./tools/e2e/Remove-E2EObjects.ps1                          # removes every amte2e-* project/process and Custom.amte2e* field; lists leftovers
 ```
-The helpers sign in like the harness (`az` Entra token, or `AMT_TEST_PAT`), talk only to the test orgs, and refuse to create or delete anything outside the `amte2e` prefix. Scenario state (seeded ids) goes in git-ignored `state.local.json` files. Generated configs under `scenarios/users` contain absolute paths to their mapping files; regenerate them on another machine.
+- **Executable assertions exist only for `wicore` and `identity`.** For the other scenarios, the evidence in this report came from log lines and REST checks run by hand during the pass. Re-running those scenarios repeats the migration, but checking the target state is still manual. Adding an `assert.ps1` for each is a follow-up.
+- `users`: run `scenarios/users/New-UsersConfigs.ps1` after seeding. `TfsUserMappingTool` needs an absolute path to the mapping file, so the configs are generated for the current checkout and are not committed.
+- `procdef`: `seed.ps1` creates the `#` field, the customised `amte2e-procdef` process and the projects. The target org must not already have that process.
+- The helpers sign in like the harness (`az` Entra token, or `AMT_TEST_PAT`). They only call the four Azure DevOps hosts for the test orgs, check a work item's project before updating it by id, and refuse to create or delete anything outside the `amte2e` prefix. Seeded ids are stored in git-ignored `state.local.json` files.

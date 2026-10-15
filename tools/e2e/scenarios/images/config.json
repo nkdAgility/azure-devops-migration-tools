@@ -8,7 +8,7 @@
       "Source": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
-        "Project": "amte2e-images2-src",
+        "Project": "amte2e-images-src",
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "Authentication": {
@@ -22,7 +22,7 @@
       "Target": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
-        "Project": "amte2e-images2-tgt",
+        "Project": "amte2e-images-tgt",
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "Authentication": {
@@ -38,40 +38,40 @@
       "TfsNodeStructureTool": {
         "Enabled": true,
         "Areas": {
-          "Filters": [],
           "Mappings": [
             {
-              "Match": "^amte2e-images2-src([\\\\]?.*)$",
-              "Replacement": "amte2e-images2-tgt$1"
+              "Replacement": "amte2e-images-tgt$1",
+              "Match": "^amte2e-images-src([\\\\]?.*)$"
             }
-          ]
+          ],
+          "Filters": []
         },
         "Iterations": {
-          "Filters": [],
           "Mappings": [
             {
-              "Match": "^amte2e-images2-src([\\\\]?.*)$",
-              "Replacement": "amte2e-images2-tgt$1"
+              "Replacement": "amte2e-images-tgt$1",
+              "Match": "^amte2e-images-src([\\\\]?.*)$"
             }
-          ]
+          ],
+          "Filters": []
         },
         "ShouldCreateMissingRevisionPaths": true,
         "ReplicateAllExistingNodes": true
       },
       "TfsRevisionManagerTool": {
-        "MaxRevisions": 0,
+        "Enabled": true,
         "ReplayRevisions": true,
-        "Enabled": true
+        "MaxRevisions": 0
       },
       "TfsAttachmentTool": {
-        "MaxAttachmentSize": 480000000,
+        "ExportBasePath": "c:\\temp\\amte2e-attachments",
         "Enabled": true,
-        "ExportBasePath": "c:\\temp\\amte2e-attachments"
+        "MaxAttachmentSize": 480000000
       },
       "TfsWorkItemLinkTool": {
-        "SaveAfterEachLinkIsAdded": false,
         "FilterIfLinkCountMatches": true,
-        "Enabled": true
+        "Enabled": true,
+        "SaveAfterEachLinkIsAdded": false
       },
       "TfsUserMappingTool": {
         "Enabled": false

@@ -44,9 +44,11 @@ if (-not $tg) {
 }
 $versions = (Invoke-E2ERest "$Src/_apis/distributedtask/taskgroups/$($tg.id)?expanded=true" -ApiVersion $av).value
 if (-not ($versions | Where-Object { $_.version.major -eq 2 })) {
-    $b = $tg | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
-    foreach ($k in "id", "revision", "createdBy", "createdOn", "modifiedBy", "modifiedOn", "owner") { $b.Remove($k) }
-    $b.version = @{ major = 2; minor = 0; patch = 0; isTest = $true }; $b.parentDefinitionId = $tg.id
+    # Deep copy without -AsHashtable, which Windows PowerShell 5.1 does not have.
+    $b = $tg | ConvertTo-Json -Depth 20 | ConvertFrom-Json
+    foreach ($k in "id", "revision", "createdBy", "createdOn", "modifiedBy", "modifiedOn", "owner") { $b.PSObject.Properties.Remove($k) }
+    $b | Add-Member -NotePropertyName version -NotePropertyValue ([pscustomobject]@{ major = 2; minor = 0; patch = 0; isTest = $true }) -Force
+    $b | Add-Member -NotePropertyName parentDefinitionId -NotePropertyValue $tg.id -Force
     $b.tasks[0].inputs.script = "echo v2"; $b.tasks[0].displayName = "echo v2"
     $draft = Invoke-E2ERest "$Src/_apis/distributedtask/taskgroups" -ApiVersion $av -Method POST -Body $b
     Invoke-E2ERest "$Src/_apis/distributedtask/taskgroups?parentTaskGroupId=$($tg.id)" -ApiVersion $av -Method PUT -Body @{ comment = "preview"; parentDefinitionRevision = $tg.revision; preview = $true; taskGroupId = $draft.id; taskGroupRevision = 1 } | Out-Null
