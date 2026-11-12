@@ -17,3 +17,4 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision:** the nkda-engineering-delivery plugin must support the workflow this repo has chosen, not impose its own.
 - **Decision:** NKDAEngineering-Delivery provides the tools and the wrapper; the workflow itself is defined by this repo.
 - **Decision:** any change that affects NKDAContent-Hub's setup (including the plugin's built-in states and checks) is agreed with the CONTROL-HUB session first.
+- **Decision:** document in NKDAEngineering-Delivery the prompts to use to integrate a new engineering flow, to add new tools, and to create a new product's workflow.
