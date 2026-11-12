@@ -250,6 +250,23 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
+        /// Reads one picklist by id. The list call only returns lists in use by a work item type, so a field's list
+        /// has to be read through its <see cref="WorkItemField.PicklistId"/> (#3241).
+        /// </summary>
+        /// <returns>The picklist, or null if the service did not return it; the failure has been logged.</returns>
+        public async Task<WorkItemPicklist> GetPicklistAsync(string picklistId)
+        {
+            var client = GetHttpClient<WorkItemPicklist>();
+            var httpResponse = await client.GetAsync(RestUrlHelper.AppendSegment(client.BaseAddress.ToString(), picklistId));
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                Log.LogError("Failed to read picklist [{PicklistId}] from [{Endpoint}].\r\nUrl: GET {Url}\r\nResponse Code:{StatusCode}\r\n{ErrorText}", picklistId, Options.Name, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, await httpResponse.Content.ReadAsStringAsync());
+                return null;
+            }
+            return await httpResponse.Content.ReadAsAsync<WorkItemPicklist>();
+        }
+
+        /// <summary>
         /// Make HTTP Request to add Revision / Version of Task Group
         /// </summary>
         /// <param name="rootDefinitions"></param>

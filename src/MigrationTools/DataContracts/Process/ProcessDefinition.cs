@@ -211,6 +211,7 @@ namespace MigrationTools.DataContracts.Process
         public bool IsIdentity { get; set; }
         public bool IsPicklist { get; set; }
         public bool IsPicklistSuggested { get; set; }
+        public string PicklistId { get; set; }
 
         public WorkItemField CloneAsNew()
         {
@@ -227,6 +228,7 @@ namespace MigrationTools.DataContracts.Process
                 IsIdentity = IsIdentity,
                 IsPicklist = IsPicklist,
                 IsPicklistSuggested = IsPicklistSuggested,
+                PicklistId = PicklistId,
                 SupportedOperations = SupportedOperations
             };
         }
@@ -244,11 +246,48 @@ namespace MigrationTools.DataContracts.Process
             IsIdentity = existing.IsIdentity;
             IsPicklist = existing.IsPicklist;
             IsPicklistSuggested = existing.IsPicklistSuggested;
+            PicklistId = existing.PicklistId;
             SupportedOperations = existing.SupportedOperations;
         }
     }
 
-    [ApiPath("work/processes/{0}/workitemtypes/{1}/fields?$expand=All", IncludeProject: false, IncludeTrailingSlash: false, UpdateVerb = HttpVerbs.Patch)]
+    /// <summary>
+    /// An organisation-level list of values that a picklist field points at through <see cref="WorkItemField.PicklistId"/> (#3241).
+    /// </summary>
+    [ApiPath("work/processes/lists", IncludeProject: false, IncludeTrailingSlash: false)]
+    [ApiName("Work Item Picklist")]
+    public class WorkItemPicklist : ProcessDefBase, ISynchronizeable<WorkItemPicklist>
+    {
+        /// <summary>String or Integer.</summary>
+        public string Type { get; set; }
+        public bool IsSuggested { get; set; }
+        public List<string> Items { get; set; } = new List<string>();
+
+        public override dynamic ToJson()
+        {
+            return new { Id, Name, Type, IsSuggested, Items };
+        }
+
+        public WorkItemPicklist CloneAsNew()
+        {
+            return new WorkItemPicklist()
+            {
+                Name = Name,
+                Type = Type,
+                IsSuggested = IsSuggested,
+                Items = new List<string>(Items ?? new List<string>())
+            };
+        }
+
+        public void UpdateWithExisting(WorkItemPicklist existing)
+        {
+            Type = existing.Type;
+            IsSuggested = existing.IsSuggested;
+            Items = new List<string>(existing.Items ?? new List<string>());
+        }
+    }
+
+    [ApiPath("work/processes/{0}/workitemtypes/{1}/fields?$expand=All",IncludeProject: false, IncludeTrailingSlash: false, UpdateVerb = HttpVerbs.Patch)]
     [ApiName("Work Item Type Field")]
     public partial class WorkItemTypeField : ProcessDefBase, ISynchronizeable<WorkItemTypeField>
     {

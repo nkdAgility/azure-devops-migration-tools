@@ -139,10 +139,14 @@ namespace MigrationTools.Processors
                     {
                         return;
                     }
-                    WorkItemField targetField = null;
-                    if (!TargetFields.ContainsKey(sourceField.ReferenceName))
+                    TargetFields.TryGetValue(sourceField.ReferenceName, out var targetField);
+                    if (sourceField.IsPicklist && !string.IsNullOrEmpty(sourceField.PicklistId))
                     {
-                        await SyncDefinitionType<WorkItemField>(TargetFields, sourceField, targetField);
+                        await SyncPicklistField(sourceField, targetField);
+                    }
+                    else if (targetField == null)
+                    {
+                        await SyncDefinitionType<WorkItemField>(TargetFields, sourceField, null);
                     }
                 });
 
@@ -153,11 +157,83 @@ namespace MigrationTools.Processors
                     Log.LogError("{FailedWrites} process definition change(s) were rejected by [{Target}]; see the errors above. Marking the run as failed.", Target.FailedSyncWrites, Target.Options.Name);
                     CompletedWithErrors = true;
                 }
+                if (_skippedPicklistFields > 0)
+                {
+                    Log.LogError("{SkippedFields} picklist field(s) were not created on [{Target}] because their picklist could not be read or created; see the errors above. Marking the run as failed.", _skippedPicklistFields, Target.Options.Name);
+                    CompletedWithErrors = true;
+                }
             }
             catch (Exception ex)
             {
                 Log.LogError(ex, "Failed to synchronize processes.");
                 throw;
+            }
+        }
+
+        private int _skippedPicklistFields;
+
+        /// <summary>
+        /// A field created without its picklist becomes plain text and cannot be converted later (#3241), so the list
+        /// is created first and the field is never created without it. An existing target field or list is only added to.
+        /// </summary>
+        private async Task SyncPicklistField(WorkItemField sourceField, WorkItemField targetField)
+        {
+            var sourceList = await Source.GetPicklistAsync(sourceField.PicklistId);
+            if (sourceList == null)
+            {
+                Log.LogError("Unable to read the picklist of field [{Field}] from [{Source}]. The field is not created on [{Target}], so that it is not created as plain text.", sourceField.ReferenceName, Source.Options.Name, Target.Options.Name);
+                System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
+                return;
+            }
+
+            WorkItemPicklist targetList = null;
+            if (targetField != null && targetField.IsPicklist && !string.IsNullOrEmpty(targetField.PicklistId))
+            {
+                targetList = await Target.GetPicklistAsync(targetField.PicklistId);
+                if (targetList == null)
+                {
+                    Log.LogWarning("Unable to read the picklist of field [{Field}] on [{Target}]. The field is left unchanged.", sourceField.ReferenceName, Target.Options.Name);
+                    return;
+                }
+            }
+
+            var plan = PicklistSync.Plan(sourceList, targetField, targetList);
+            switch (plan.Action)
+            {
+                case PicklistFieldAction.CreateListAndField:
+                    var createdList = await Target.SyncDefinition(PicklistSync.NewTargetList(sourceList), null);
+                    if (string.IsNullOrEmpty(createdList?.Id))
+                    {
+                        Log.LogError("Unable to create the picklist for field [{Field}] on [{Target}]. The field is not created, so that it is not created as plain text.", sourceField.ReferenceName, Target.Options.Name);
+                        System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
+                        return;
+                    }
+                    var fieldToCreate = sourceField.CloneAsNew();
+                    fieldToCreate.PicklistId = createdList.Id;
+                    var createdField = await SyncDefinitionType<WorkItemField>(TargetFields, fieldToCreate, null);
+                    if (string.IsNullOrEmpty(createdField?.Id) || !TargetFields.ContainsKey(sourceField.ReferenceName))
+                    {
+                        Log.LogError("Created picklist [{Picklist}] on [{Target}], but field [{Field}] could not be created, so the list is unused; see the error above.", createdList.Name, Target.Options.Name, sourceField.ReferenceName);
+                        return;
+                    }
+                    Log.LogInformation("Created picklist field [{Field}] on [{Target}] with {Count} {Type} value(s){Suggested}.", sourceField.ReferenceName, Target.Options.Name, createdList.Items?.Count ?? 0, sourceList.Type, sourceList.IsSuggested ? ", suggested" : "");
+                    return;
+                case PicklistFieldAction.TargetFieldIsNotPicklist:
+                    Log.LogWarning("Field [{Field}] already exists on [{Target}] as {TargetType} without a picklist, but on [{Source}] it is a picklist of [{Values}]. It is left unchanged: converting it would mean deleting the field and its data. Work items migrated into it keep their values as text.", sourceField.ReferenceName, Target.Options.Name, targetField.Type, Source.Options.Name, string.Join(", ", sourceList.Items ?? new List<string>()));
+                    return;
+                case PicklistFieldAction.TypeMismatch:
+                    Log.LogWarning("Field [{Field}] uses a {TargetType} picklist on [{Target}] but a {SourceType} picklist on [{Source}]. A picklist's type cannot be changed, so it is left unchanged.", sourceField.ReferenceName, targetList.Type, Target.Options.Name, sourceList.Type, Source.Options.Name);
+                    return;
+            }
+
+            if (plan.TargetOnlyItems.Count > 0 || plan.IsSuggestedDiffers)
+            {
+                Log.LogWarning("Field [{Field}] already exists on [{Target}] with a picklist that differs from [{Source}]. Its values not in the source [{TargetOnly}] and its suggested setting ({TargetSuggested}) are kept.", sourceField.ReferenceName, Target.Options.Name, Source.Options.Name, string.Join(", ", plan.TargetOnlyItems), targetList.IsSuggested);
+            }
+            if (plan.Action == PicklistFieldAction.AddMissingItems)
+            {
+                Log.LogWarning("Adding the source values [{Missing}] to the existing picklist of field [{Field}] on [{Target}].", string.Join(", ", plan.MissingItems), sourceField.ReferenceName, Target.Options.Name);
+                await Target.SyncDefinition(PicklistSync.WithItemsAdded(targetList, plan.MissingItems), targetList);
             }
         }
 
@@ -259,8 +335,9 @@ namespace MigrationTools.Processors
                 }
             }
             // System fields come with the parent type and reject writes (VS403307), like system rules (#3210).
-            foreach (var field in sourceWit.Fields.Where(f => !f.IsSystem))
+            foreach (var sourceField in sourceWit.Fields.Where(f => !f.IsSystem))
             {
+                var field = PicklistSync.WithoutListValues(sourceField, SourceFields.TryGetValue(sourceField.ReferenceName, out var orgField) && orgField.IsPicklist);
                 var existingField = targetWit.Fields.FirstOrDefault(x => x.ReferenceName == field.ReferenceName);
                 await SyncDefinitionType<WorkItemTypeField>(
                     TargetModel.WorkItemFields,
