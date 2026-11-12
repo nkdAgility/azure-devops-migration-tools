@@ -19,3 +19,4 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision:** any change that affects NKDAContent-Hub's setup (including the plugin's built-in states and checks) is agreed with the CONTROL-HUB session first.
 - **Decision:** document in NKDAEngineering-Delivery the prompts to use to integrate a new engineering flow, to add new tools, and to create a new product's workflow.
 - **Decision:** ADMT records which worker chat owns an issue as a hidden tag (an HTML comment such as `<!-- worker: ... -->`) in the issue's status comment, written only by the stage-gate tool.
+- **Fact (Martin, to check):** the "azure-devops-migration-platform" repository comes in next for this way of working. It includes a number of new tools and workflows.
