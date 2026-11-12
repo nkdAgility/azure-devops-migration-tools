@@ -100,6 +100,18 @@ namespace MigrationTools.Processors
             return sourceField != null && targetField != null && !string.Equals(sourceField.Type, targetField.Type, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Remembers a list this run saved, so a later stale read of it does not drop the values. A rejected write is
+        /// not recorded: its values were never saved, and an earlier accepted version stays.
+        /// </summary>
+        public static void RecordWrite(IDictionary<string, WorkItemPicklist> written, WorkItemPicklist list, bool accepted)
+        {
+            if (accepted)
+            {
+                written[list.Id] = list;
+            }
+        }
+
         /// <summary>Items of <paramref name="first"/>, then those of <paramref name="second"/> it lacks.</summary>
         public static List<string> Union(IEnumerable<string> first, IEnumerable<string> second)
         {

@@ -282,8 +282,15 @@ namespace MigrationTools.Processors
             if (plan.Action == PicklistFieldAction.AddMissingItems)
             {
                 Log.LogWarning("Adding the source values [{Missing}] to the existing picklist of field [{Field}] on [{Target}].", string.Join(", ", plan.MissingItems), sourceField.ReferenceName, Target.Options.Name);
-                var writtenList = await Target.SyncDefinition(PicklistSync.WithItemsAdded(targetList, plan.MissingItems), targetList);
-                _writtenTargetLists[writtenList.Id] = writtenList;
+                // SyncDefinition returns the changed list even when the service rejects it, so check the update itself.
+                var updatedList = PicklistSync.WithItemsAdded(targetList, plan.MissingItems);
+                var accepted = (await Target.UpdateApiDefinitionsAsync(new[] { updatedList })).Count > 0;
+                if (!accepted)
+                {
+                    Log.LogError("Unable to add the source values [{Missing}] to the picklist of field [{Field}] on [{Target}]; see the error above.", string.Join(", ", plan.MissingItems), sourceField.ReferenceName, Target.Options.Name);
+                    System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
+                }
+                PicklistSync.RecordWrite(_writtenTargetLists, updatedList, accepted);
             }
         }
 

@@ -114,6 +114,19 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
+        public void SharedList_RejectedWrite_IsNotRecorded_AndTheNextFieldStillAddsItsValues()
+        {
+            var written = new Dictionary<string, WorkItemPicklist>();
+            PicklistSync.RecordWrite(written, List("String", false, "X", "Y"), accepted: true);
+            PicklistSync.RecordWrite(written, List("String", false, "X", "Y", "Z"), accepted: false);
+            CollectionAssert.AreEqual(new[] { "X", "Y" }, written["list-1"].Items, "The earlier accepted write stays.");
+
+            var read = PicklistSync.Union(written["list-1"].Items, new[] { "X" });
+            var plan = PicklistSync.Plan(List("String", false, "X", "Z"), PicklistField(), List("String", false, read.ToArray()));
+            CollectionAssert.AreEqual(new[] { "Z" }, plan.MissingItems, "Z was never saved, so the next field adds it again.");
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void PicklistField_IsCreatedLinkedToItsList()
         {
             var field = new WorkItemField { Name = "Colour", ReferenceName = "Custom.Colour", Type = "string", IsPicklist = true, PicklistId = "src-list" };
