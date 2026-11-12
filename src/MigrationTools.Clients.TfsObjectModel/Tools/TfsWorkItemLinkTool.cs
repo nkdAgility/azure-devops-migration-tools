@@ -202,6 +202,7 @@ namespace MigrationTools.Tools
                         $"sharedParameterDataSetId\":{matchingTargetSharedParameter.Id}");
                     newSteps = newSteps.Replace($"sharedParameterDataSetIds\":[{sourceSharedParameter.Id}]",
                         $"sharedParameterDataSetIds\":[{matchingTargetSharedParameter.Id}]");
+                    newSteps = SharedParameterDataSource.RemapDataSetId(newSteps, sourceSharedParameter.Id, matchingTargetSharedParameter.Id);
                     wiTargetL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource].Value = newSteps;
                 }
             }

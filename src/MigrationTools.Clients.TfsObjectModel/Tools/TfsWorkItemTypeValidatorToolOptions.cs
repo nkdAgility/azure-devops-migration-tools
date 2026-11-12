@@ -38,7 +38,12 @@ namespace MigrationTools.Tools
         /// If <see langword="true"/>, some work item types will be automatically added to <see cref="ExcludeWorkItemTypes"/> list.
         /// Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,
         /// Feedback Response, Shared Parameter, Shared Steps.
+        /// On an inherited process these types cannot have custom fields, so they cannot hold the reflected work item ID
+        /// field. Migrated work items of a type without that field get a hyperlink to the source work item (comment
+        /// "Migrated from (ReflectedWorkItemId)"), and later runs find them by that hyperlink. The validator logs which
+        /// types use this fallback.
         /// </summary>
+        /// <default>true</default>
         public bool ExcludeDefaultWorkItemTypes { get; set; } = true;
 
         /// <summary>

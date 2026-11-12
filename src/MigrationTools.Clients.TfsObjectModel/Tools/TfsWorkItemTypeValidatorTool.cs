@@ -111,7 +111,29 @@ namespace MigrationTools.Tools
                 }
             }
             LogReflectedWorkItemIdValidationResult(isValid, reflectedWorkItemIdField);
+            foreach (string witName in GetTypesUsingReflectedHyperlink(targetWits, reflectedWorkItemIdField))
+            {
+                Log.LogInformation("'{targetWit}' has no reflected work item ID field '{fieldName}'. Migrated work items of"
+                    + " this type are found again by a hyperlink to the source work item.", witName, reflectedWorkItemIdField);
+            }
             return isValid;
+        }
+
+        /// <summary>
+        /// Target types excluded from validation that lack the reflected work item ID field, and so use the
+        /// hyperlink fallback.
+        /// </summary>
+        public List<string> GetTypesUsingReflectedHyperlink(List<WorkItemType> targetWits, string reflectedWorkItemIdField)
+            => SelectTypesUsingReflectedHyperlink(
+                targetWits.Select(w => (w.Name, w.FieldDefinitions.Contains(reflectedWorkItemIdField))),
+                Options.ExcludeWorkItemTypes);
+
+        public static List<string> SelectTypesUsingReflectedHyperlink(
+            IEnumerable<(string Name, bool HasReflectedField)> targetWits,
+            IEnumerable<string> excludedWorkItemTypes)
+        {
+            var excluded = new HashSet<string>(excludedWorkItemTypes ?? [], StringComparer.OrdinalIgnoreCase);
+            return targetWits.Where(w => !w.HasReflectedField && excluded.Contains(w.Name)).Select(w => w.Name).ToList();
         }
 
         public bool ScanRevisionHistoryForFields => Options.ScanRevisionHistoryForFields;

@@ -844,7 +844,7 @@ namespace MigrationTools.Processors
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
-                                targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString();
+                                SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                                 // Retries a fix-up that failed after its revision was saved on an earlier run.
                                 SetStateStampedDatesFromSource(sourceWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), "on the migrated item");
                                 StampCatchUpSave(targetWorkItem);
@@ -869,6 +869,7 @@ namespace MigrationTools.Processors
                         if (targetWorkItem != null)
                         {
                             CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
+                            (Target.WorkItems as TfsWorkItemMigrationClient)?.RegisterReflectedHyperlink(targetWorkItem);
                             targetWorkItem.ToWorkItem().Close();
                         }
                         if (sourceWorkItem != null)
@@ -1009,11 +1010,33 @@ namespace MigrationTools.Processors
             wi.Fields["System.ChangedDate"].Value = lastChangedDate.AddSeconds(1);
         }
 
-        private void AppendMigrationComment(WorkItemData targetWorkItem)
+        private void AppendMigrationComment(WorkItemData targetWorkItem, string reflectedUri)
         {
             var wi = targetWorkItem.ToWorkItem();
-            var reflectedUri = wi.Fields[Target.Options.ReflectedWorkItemIdField].Value;
             wi.History = MigrationCommentHelper.AppendTo(wi.History, reflectedUri);
+        }
+
+        private readonly HashSet<string> _typesUsingReflectedHyperlink = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Writes the reflected work item ID to the configured field, or, when the target type cannot have that
+        /// field (Shared Steps and Shared Parameter on an inherited process), to a marker hyperlink that the
+        /// target lookup also searches.
+        /// </summary>
+        private void SetReflectedWorkItemId(WorkItemData targetWorkItem, string reflectedUri)
+        {
+            var wi = targetWorkItem.ToWorkItem();
+            if (wi.Fields.Contains(Target.Options.ReflectedWorkItemIdField))
+            {
+                wi.Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri;
+                return;
+            }
+            if (_typesUsingReflectedHyperlink.Add(wi.Type.Name))
+            {
+                Log.LogInformation("Work item type '{WorkItemType}' has no field '{ReflectedWorkItemIdField}'; the source work item is recorded as a hyperlink so later runs can find it.",
+                    wi.Type.Name, Target.Options.ReflectedWorkItemIdField);
+            }
+            ReflectedWorkItemIdHyperlink.Ensure(wi, reflectedUri);
         }
 
         private static string LinkKey(Link link)
@@ -1187,25 +1210,16 @@ namespace MigrationTools.Processors
                     targetWorkItem.ToWorkItem().Fields["System.History"].Value = revision.Fields["System.History"].Value;
 
                     var reflectedUri = (TfsReflectedWorkItemId)Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem);
-                    if (!targetWorkItem.ToWorkItem().Fields.Contains(Target.Options.ReflectedWorkItemIdField))
-                    {
-                        var ex = new InvalidOperationException("ReflectedWorkItemIdField Field Missing");
-                        Log.LogError(ex,
-                            " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}",
-                            targetWorkItem.Type,
-                            Target.Options.ReflectedWorkItemIdField);
-                        throw ex;
-                    }
                     // Set the reflected id before the field maps so a TargetToTarget map can copy it to another
                     // field on the first revision (#2998), and again after so no map can overwrite it.
-                    targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri.ToString();
+                    SetReflectedWorkItemId(targetWorkItem, reflectedUri.ToString());
 
                     // Todo: Ensure all field maps use WorkItemData.Fields to apply a correct mapping
                     CommonTools.FieldMappingTool.ApplyFieldMappings(currentRevisionWorkItem, targetWorkItem);
 
                     // Todo: Think about an "UpdateChangedBy" flag as this is expensive! (2s/WI instead of 1,5s when writing "Migration")
 
-                    targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri.ToString();
+                    SetReflectedWorkItemId(targetWorkItem, reflectedUri.ToString());
 
                     ProcessHTMLFieldAttachements(targetWorkItem);
                     ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
@@ -1218,7 +1232,7 @@ namespace MigrationTools.Processors
 
                     if (revision == lastRevision && Options.GenerateMigrationComment)
                     {
-                        AppendMigrationComment(targetWorkItem);
+                        AppendMigrationComment(targetWorkItem, reflectedUri.ToString());
                     }
 
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
