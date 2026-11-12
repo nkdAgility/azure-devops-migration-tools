@@ -19,7 +19,8 @@ $ttc = $items | Where-Object { $_.fields.'System.WorkItemType' -eq "Test Case" }
 
 foreach ($pair in @(@($tss, $s.ss), @($tsp, $s.sp))) {
     $v = $pair[0].fields.'Microsoft.VSTS.Build.IntegrationBuild'
-    $r += New-E2EResult "$($pair[0].fields.'System.WorkItemType') has reflected id in IntegrationBuild" ($v -match "/_workitems/edit/$($pair[1])$") "$v"
+    $expected = "https://dev.azure.com/nkdagility-adomt-source/$Src/_workitems/edit/$($pair[1])"
+    $r += New-E2EResult "$($pair[0].fields.'System.WorkItemType') has reflected id in IntegrationBuild" ($v -eq $expected) "$v (expected $expected)"
 }
 $steps = $ttc.fields.'Microsoft.VSTS.TCM.Steps'
 $r += New-E2EResult "test case compref points at target shared steps" ($steps -match "ref=""$($tss.id)""") $(if ($steps -match 'ref="(\d+)"') { "ref=$($matches[1]), target SS $($tss.id)" } else { "no compref" })

@@ -54,6 +54,14 @@ namespace MigrationTools.Tests.Clients
         }
 
         [TestMethod, TestCategory("L0")]
+        public void IsReflectedWorkItemId_AcceptsOnlyReflectedUrls()
+        {
+            Assert.IsTrue(TfsReflectedWorkItemId.IsReflectedWorkItemId("https://dev.azure.com/org/proj/_workitems/edit/5"));
+            Assert.IsFalse(TfsReflectedWorkItemId.IsReflectedWorkItemId("20261112.3"));
+            Assert.IsFalse(TfsReflectedWorkItemId.IsReflectedWorkItemId(null));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void DefaultExcludedTypes_AreTheNonCustomisableTypes()
         {
             var options = new TfsWorkItemTypeValidatorToolOptions();
@@ -94,3 +102,4 @@ namespace MigrationTools.Tests.Clients
         }
     }
 }
+

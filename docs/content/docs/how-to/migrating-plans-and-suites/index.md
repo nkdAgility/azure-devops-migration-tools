@@ -68,7 +68,7 @@ The important bits:
 
 - Target `ReflectedWorkItemIdField` is your main custom field, as in step 1.
 - The query includes only the test items that are migrated as work items (no Suites or Plans).
-- Leave the work item type validator at its defaults. Do not add `Shared Steps` or `Shared Parameter` to `IncludeWorkItemTypes`: the validator would then require your custom field on them and stop the run.
+- Leave the work item type validator at its defaults. If you do validate `Shared Steps` or `Shared Parameter` (`ExcludeDefaultWorkItemTypes: false` or `IncludeWorkItemTypes`), the validator accepts `Microsoft.VSTS.Build.IntegrationBuild` for them.
 - Shared Steps and Shared Parameters are migrated before the Test Cases whatever the query order, so the references in each Test Case's steps (`compref`) and parameters (`sharedParameterDataSetIds`, `dataSetId`) are pointed at the migrated copies.
 - You can run this step again. Items already migrated are found by their reflected work item id, so no duplicates are created, and Test Case references are repaired if they were missed before.
 
@@ -107,7 +107,7 @@ The important bits:
 
 ### Troubleshooting
 
-- **`'Shared Steps' does not contain reflected work item ID field`, then the run stops:** you have `ExcludeDefaultWorkItemTypes: false` or have listed `Shared Steps`/`Shared Parameter` in `IncludeWorkItemTypes`. Remove that so the defaults apply.
+- **`'<type>' does not contain reflected work item ID field`, then the run stops:** a validated target type that is not one of the six above lacks your `ReflectedWorkItemIdField`. Add the field to that type in the target process.
 - **`'Shared Steps' has neither '...' nor 'Microsoft.VSTS.Build.IntegrationBuild'`:** the target process has neither field on that type (possible on some on-premises XML processes). Add one of them to the type, or set `ReflectedWorkItemIdField` to a field it does have.
 - **`Overwriting 'Microsoft.VSTS.Build.IntegrationBuild' value ...`:** the source item already had a value in that field, and it is replaced by the reflected work item id on the target.
 

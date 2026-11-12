@@ -99,10 +99,11 @@ namespace MigrationTools.Tools
                     Log.LogInformation("Work item type '{sourceWit}' is mapped to '{targetWit}'.",
                         witPair.SourceWit.Name, witPair.ExpectedTargetWitName);
                 }
-                if (targetWit.FieldDefinitions.Contains(reflectedWorkItemIdField))
+                string resolvedField = NonCustomisableWorkItemTypes.ResolveField(targetWit.Name, reflectedWorkItemIdField, targetWit.FieldDefinitions.Contains);
+                if (resolvedField is not null)
                 {
-                    Log.LogDebug("'{targetWit}' contains reflected work item ID field '{fieldName}'.",
-                        targetWit.Name, reflectedWorkItemIdField);
+                    Log.LogDebug("'{targetWit}' holds the reflected work item ID in '{fieldName}'.",
+                        targetWit.Name, resolvedField);
                 }
                 else
                 {
