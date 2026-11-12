@@ -35,7 +35,12 @@ foreach ($f in $fields) {
         }
     }
 }
-Expect (@($fields).Count -eq 6) "expected 6 Custom.amte2eAmt3241* fields on the target, found $(@($fields).Count)"
+$expectedNames = @("AsText", "Colour", "Diff", "Points", "Size", "Tag") | ForEach-Object { "Custom.amte2eAmt3241$_" }
+$actualNames = @($fields | ForEach-Object referenceName)
+$missing = @($expectedNames | Where-Object { $actualNames -notcontains $_ })
+$extra = @($actualNames | Where-Object { $expectedNames -notcontains $_ })
+Expect ($missing.Count -eq 0) "missing target fields: $($missing -join ', ')"
+Expect ($extra.Count -eq 0) "unexpected target fields: $($extra -join ', ')"
 
 $procId = Get-E2EProcessId "amte2e-amt3241-pl-tgt" $tgtOrg
 Expect ([bool]$procId) "target process amte2e-amt3241-pl-tgt should exist"

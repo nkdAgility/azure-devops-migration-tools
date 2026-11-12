@@ -140,7 +140,7 @@ namespace MigrationTools.Processors
                         return;
                     }
                     TargetFields.TryGetValue(sourceField.ReferenceName, out var targetField);
-                    if (sourceField.IsPicklist && !string.IsNullOrEmpty(sourceField.PicklistId))
+                    if (sourceField.IsPicklist)
                     {
                         await SyncPicklistField(sourceField, targetField);
                     }
@@ -178,6 +178,12 @@ namespace MigrationTools.Processors
         /// </summary>
         private async Task SyncPicklistField(WorkItemField sourceField, WorkItemField targetField)
         {
+            if (string.IsNullOrEmpty(sourceField.PicklistId))
+            {
+                Log.LogError("Field [{Field}] is a picklist on [{Source}] but has no picklist id. It is not synced to [{Target}], so that it is not created as plain text.", sourceField.ReferenceName, Source.Options.Name, Target.Options.Name);
+                System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
+                return;
+            }
             var sourceList = await Source.GetPicklistAsync(sourceField.PicklistId);
             if (sourceList == null)
             {
@@ -186,6 +192,29 @@ namespace MigrationTools.Processors
                 return;
             }
 
+            var targetListId = targetField != null && targetField.IsPicklist ? targetField.PicklistId : null;
+            if (string.IsNullOrEmpty(targetListId))
+            {
+                await SyncPicklistFieldWithTarget(sourceField, sourceList, targetField);
+                return;
+            }
+            // Fields can share a target list; each read-plan-write of one list must see the previous one's items.
+            var listLock = _targetListLocks.GetOrAdd(targetListId, _ => new System.Threading.SemaphoreSlim(1, 1));
+            await listLock.WaitAsync();
+            try
+            {
+                await SyncPicklistFieldWithTarget(sourceField, sourceList, targetField);
+            }
+            finally
+            {
+                listLock.Release();
+            }
+        }
+
+        private readonly ConcurrentDictionary<string, System.Threading.SemaphoreSlim> _targetListLocks = new ConcurrentDictionary<string, System.Threading.SemaphoreSlim>(StringComparer.OrdinalIgnoreCase);
+
+        private async Task SyncPicklistFieldWithTarget(WorkItemField sourceField, WorkItemPicklist sourceList, WorkItemField targetField)
+        {
             WorkItemPicklist targetList = null;
             if (targetField != null && targetField.IsPicklist && !string.IsNullOrEmpty(targetField.PicklistId))
             {
