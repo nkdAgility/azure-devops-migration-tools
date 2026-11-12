@@ -213,12 +213,20 @@ namespace MigrationTools.Processors
                     fieldToCreate.PicklistId = createdList.Id;
                     await SyncDefinitionType<WorkItemField>(TargetFields, fieldToCreate, null);
                     // A field's Id is its reference name, so it is set even when the create was rejected; read it back.
-                    var createdField = await Target.GetFieldAsync(sourceField.ReferenceName);
-                    if (createdField == null || !string.Equals(createdField.PicklistId, createdList.Id, StringComparison.OrdinalIgnoreCase))
+                    var (readSucceeded, createdField) = await Target.GetFieldAsync(sourceField.ReferenceName);
+                    if (!readSucceeded)
+                    {
+                        System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
+                        Log.LogError("Unable to confirm that field [{Field}] was created on [{Target}] with picklist [{Picklist}]. The list is kept, as the field may use it.", sourceField.ReferenceName, Target.Options.Name, createdList.Name);
+                        return;
+                    }
+                    if (!string.Equals(createdField?.PicklistId, createdList.Id, StringComparison.OrdinalIgnoreCase))
                     {
                         TargetFields.Remove(sourceField.ReferenceName);
                         System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
-                        Log.LogError("Created picklist [{Picklist}] on [{Target}], but field [{Field}] could not be created, so the list is unused; see the error above.", createdList.Name, Target.Options.Name, sourceField.ReferenceName);
+                        // Each retry would otherwise leave another unused list behind (2,048 per organisation).
+                        var removed = await Target.DeletePicklistAsync(createdList.Id);
+                        Log.LogError("Field [{Field}] could not be created on [{Target}] with its picklist; see the error above. The new picklist [{Picklist}] {Outcome}.", sourceField.ReferenceName, Target.Options.Name, createdList.Name, removed ? "was deleted again" : "is unused and could not be deleted");
                         return;
                     }
                     Log.LogInformation("Created picklist field [{Field}] on [{Target}] with {Count} {Type} value(s){Suggested}.", sourceField.ReferenceName, Target.Options.Name, createdList.Items?.Count ?? 0, sourceList.Type, sourceList.IsSuggested ? ", suggested" : "");

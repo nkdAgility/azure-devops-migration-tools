@@ -266,16 +266,35 @@ namespace MigrationTools.Endpoints
             return await httpResponse.Content.ReadAsAsync<WorkItemPicklist>();
         }
 
-        /// <returns>The organisation-level field, or null if it does not exist or could not be read.</returns>
-        public async Task<WorkItemField> GetFieldAsync(string referenceName)
+        /// <returns>
+        /// ReadSucceeded is false when the service could not answer; Field is null when the field does not exist.
+        /// </returns>
+        public async Task<(bool ReadSucceeded, WorkItemField Field)> GetFieldAsync(string referenceName)
         {
             var client = GetHttpClient<WorkItemField>();
             var httpResponse = await client.GetAsync(RestUrlHelper.AppendSegment(client.BaseAddress.ToString(), referenceName));
+            if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return (true, null);
+            }
             if (!httpResponse.IsSuccessStatusCode)
             {
-                return null;
+                return (false, null);
             }
-            return await httpResponse.Content.ReadAsAsync<WorkItemField>();
+            return (true, await httpResponse.Content.ReadAsAsync<WorkItemField>());
+        }
+
+        /// <returns>true if the picklist was deleted; a failure has been logged.</returns>
+        public async Task<bool> DeletePicklistAsync(string picklistId)
+        {
+            var client = GetHttpClient<WorkItemPicklist>();
+            var httpResponse = await client.DeleteAsync(RestUrlHelper.AppendSegment(client.BaseAddress.ToString(), picklistId));
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                Log.LogWarning("Failed to delete unused picklist [{PicklistId}] on [{Endpoint}]: {StatusCode} {ErrorText}", picklistId, Options.Name, httpResponse.StatusCode, await httpResponse.Content.ReadAsStringAsync());
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
