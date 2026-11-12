@@ -61,14 +61,36 @@ namespace MigrationTools.Tests.Clients
             CollectionAssert.AreEquivalent(new List<string>(NonCustomisableWorkItemTypes.Types), options.ExcludeWorkItemTypes);
         }
 
-        [TestMethod, TestCategory("L0")]
-        public void RemapDataSetId_ReplacesOnlyExactId()
+        private static string Remap(string json, params (string From, string To)[] pairs)
         {
-            var json = "{\"parameterMap\":[{\"paramName\":\"a\",\"dataSetId\":86},{\"paramName\":\"b\",\"dataSetId\": 861}],\"sharedParameterDataSetIds\":[86]}";
-            var result = SharedParameterDataSource.RemapDataSetId(json, "86", "99");
-            StringAssert.Contains(result, "\"dataSetId\":99}");
-            StringAssert.Contains(result, "\"dataSetId\": 861");
-            StringAssert.Contains(result, "[86]");
+            var map = new Dictionary<string, string>();
+            foreach (var (from, to) in pairs) { map[from] = to; }
+            return SharedParameterDataSource.Remap(json, map);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Remap_AllThreeFormsAndOnlyExactIds()
+        {
+            var json = "{\"parameterMap\":[{\"paramName\":\"a\",\"dataSetId\":86},{\"paramName\":\"b\",\"dataSetId\": 861}],\"sharedParameterDataSetIds\":[86, 861],\"sharedParameterDataSetId\":86}";
+            Assert.AreEqual(
+                "{\"parameterMap\":[{\"paramName\":\"a\",\"dataSetId\":99},{\"paramName\":\"b\",\"dataSetId\": 861}],\"sharedParameterDataSetIds\":[99, 861],\"sharedParameterDataSetId\":99}",
+                Remap(json, ("86", "99")));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Remap_ChainedIdsAreTranslatedOnce()
+        {
+            var json = "{\"parameterMap\":[{\"dataSetId\":86},{\"dataSetId\":87}],\"sharedParameterDataSetIds\":[86,87]}";
+            Assert.AreEqual("{\"parameterMap\":[{\"dataSetId\":87},{\"dataSetId\":99}],\"sharedParameterDataSetIds\":[87,99]}",
+                Remap(json, ("86", "87"), ("87", "99")));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Remap_SwappedIds()
+        {
+            var json = "{\"parameterMap\":[{\"dataSetId\":10},{\"dataSetId\":20}],\"sharedParameterDataSetIds\":[10,20]}";
+            Assert.AreEqual("{\"parameterMap\":[{\"dataSetId\":20},{\"dataSetId\":10}],\"sharedParameterDataSetIds\":[20,10]}",
+                Remap(json, ("10", "20"), ("20", "10")));
         }
     }
 }

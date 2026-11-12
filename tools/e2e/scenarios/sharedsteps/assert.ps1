@@ -24,10 +24,12 @@ foreach ($pair in @(@($tss, $s.ss), @($tsp, $s.sp))) {
 $steps = $ttc.fields.'Microsoft.VSTS.TCM.Steps'
 $r += New-E2EResult "test case compref points at target shared steps" ($steps -match "ref=""$($tss.id)""") $(if ($steps -match 'ref="(\d+)"') { "ref=$($matches[1]), target SS $($tss.id)" } else { "no compref" })
 $data = $ttc.fields.'Microsoft.VSTS.TCM.LocalDataSource'
-$r += New-E2EResult "test case data source points at target shared parameter" ($data -match """sharedParameterDataSetIds"":\[$($tsp.id)\]") "$data"
+$parsed = $data | ConvertFrom-Json
+$ids = @($parsed.sharedParameterDataSetIds) + @($parsed.parameterMap | ForEach-Object dataSetId)
+$r += New-E2EResult "test case data source points at target shared parameter" ($ids.Count -ge 2 -and -not ($ids | Where-Object { $_ -ne $tsp.id })) "$data"
 $ssLink = @($ttc.relations | Where-Object { $_.rel -eq "Microsoft.VSTS.TestCase.SharedStepReferencedBy-Reverse" -and $_.url -match "/$($tss.id)$" })
 $r += New-E2EResult "test case links to target shared steps" ($ssLink.Count -eq 1) "$($ssLink.Count) link(s)"
 $spLink = @($ttc.relations | Where-Object { $_.rel -eq "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse" -and $_.url -match "/$($tsp.id)$" })
 $r += New-E2EResult "test case links to target shared parameter" ($spLink.Count -eq 1) "$($spLink.Count) link(s)"
 
-Write-E2EResults $r $OutFile
+exit (Write-E2EResults $r $OutFile)
