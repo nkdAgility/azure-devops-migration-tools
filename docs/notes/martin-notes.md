@@ -16,3 +16,4 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision:** the stage-gate tool keeps a package's state as a `state:*` label on its issue (one at a time, changed only by the tool) and posts a short comment for each stage shift with its reason, worded for a customer to read. The issue description is never edited.
 - **Decision:** the nkda-engineering-delivery plugin must support the workflow this repo has chosen, not impose its own.
 - **Decision:** NKDAEngineering-Delivery provides the tools and the wrapper; the workflow itself is defined by this repo.
+- **Decision:** any change that affects NKDAContent-Hub's setup (including the plugin's built-in states and checks) is agreed with the CONTROL-HUB session first.
