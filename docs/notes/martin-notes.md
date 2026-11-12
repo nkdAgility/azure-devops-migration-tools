@@ -10,3 +10,5 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision:** no changes to the way of working until Martin approves them.
 - **Decision:** in this repo the GitHub issue is the work package. There is no separate WKR-{id}.md file.
 - **Decision:** adapt the nkda-engineering-delivery stage-gate tool to store a package's state in its GitHub issue (the issue has the original description, then comments).
+- **Decision:** for #3242, remove the issue's `triage` label and post a comment saying Martin is working on it. Keep that comment updated with the latest findings and the status of the fix (PR #3246). This supersedes the earlier "do not comment on the GitHub issue" for #3242.
+- **Decision:** issue workers use their own `amt<issue>-*` scratch processes and projects, and never modify an existing process.
