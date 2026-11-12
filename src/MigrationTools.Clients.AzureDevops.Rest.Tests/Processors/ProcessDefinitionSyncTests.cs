@@ -69,6 +69,19 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
+        public void GroupWithSameId_IsMatchedEvenWhenRelabelled()
+        {
+            var target = Layout("g", true);
+            target.Pages[0].Sections[0].Groups[0].Label = "Renamed";
+            target.Pages[0].Sections[0].Groups.Add(new WorkItemGroup { Id = "other", Label = "Planning", Visible = false });
+
+            var changes = ProcessDefinitionSync.FindVisibilityChanges(Layout("g", false), target);
+
+            Assert.AreEqual(1, changes.Count);
+            Assert.AreEqual("g", changes[0].GroupId);
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void HiddenSystemControl_IsHiddenOnTarget()
         {
             var source = Layout("g", true);

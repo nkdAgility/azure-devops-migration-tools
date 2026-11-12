@@ -59,9 +59,14 @@ namespace MigrationTools.Processors
             var targetGroups = GroupsOf(target).ToList();
             foreach (var (sourcePage, _, sourceGroup) in GroupsOf(source))
             {
-                var targetGroup = targetGroups.FirstOrDefault(t =>
-                    string.Equals(t.Page.Label, sourcePage.Label, StringComparison.OrdinalIgnoreCase) &&
-                    string.Equals(t.Group.Label, sourceGroup.Label, StringComparison.OrdinalIgnoreCase));
+                // Inherited groups share their id across organisations; custom groups get a new id, so fall back to the label.
+                var targetGroup = targetGroups.FirstOrDefault(t => string.Equals(t.Group.Id, sourceGroup.Id, StringComparison.OrdinalIgnoreCase));
+                if (targetGroup.Group == null)
+                {
+                    targetGroup = targetGroups.FirstOrDefault(t =>
+                        string.Equals(t.Page.Label, sourcePage.Label, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(t.Group.Label, sourceGroup.Label, StringComparison.OrdinalIgnoreCase));
+                }
                 if (targetGroup.Group != null && targetGroup.Group.Visible != sourceGroup.Visible)
                 {
                     changes.Add(new LayoutVisibilityChange(LayoutVisibilityTarget.Group, sourceGroup.Label, sourceGroup.Visible,
