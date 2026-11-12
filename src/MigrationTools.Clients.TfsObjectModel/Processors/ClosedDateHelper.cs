@@ -29,6 +29,29 @@ namespace MigrationTools.Processors
             return fields.Where(f => NeedsUpdate(f.SourceValue, f.TargetValue)).Select(f => f.Field).ToList();
         }
 
+        /// <summary>
+        /// True when a fix-up may write the field. Azure DevOps system rules make ActivatedDate, ResolvedDate and ClosedDate
+        /// read-only in any revision that does not change state, and a fix-up revision never does. Only a store that bypasses
+        /// rules can write them then; otherwise the save fails with TF26194 (#3240).
+        /// </summary>
+        public static bool CanFixUp(bool isEditable, bool storeBypassesRules)
+        {
+            return isEditable || storeBypassesRules;
+        }
+
+        /// <summary>
+        /// True for TF26194 ("The value for field '...' cannot be changed"): the target will reject the same save every time,
+        /// so retrying it cannot help.
+        /// </summary>
+        public static bool IsFieldCannotBeChangedError(Exception ex)
+        {
+            for (var e = ex; e != null; e = e.InnerException)
+            {
+                if (e.Message != null && e.Message.Contains("TF26194")) return true;
+            }
+            return false;
+        }
+
         /// <summary>Returns the ClosedDate field to use, preferring Microsoft.VSTS.Common.ClosedDate, or null if neither exists.</summary>
         public static string ResolveField(bool hasCommonClosedDate, bool hasSystemClosedDate)
         {
