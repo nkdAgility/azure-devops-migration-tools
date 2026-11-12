@@ -95,73 +95,35 @@ namespace MigrationTools.Clients
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
             var workItemQueryBuilder = CreateReflectedWorkItemQuery(refId);
-            return FindWorkItemByQuery(workItemQueryBuilder) ?? FindByReflectedHyperlink(refId);
-        }
-
-        private Dictionary<string, int> _reflectedHyperlinkIndex;
-
-        /// <summary>
-        /// Target work item types in the project that cannot hold the reflected work item ID field.
-        /// </summary>
-        public List<string> GetTypesWithoutReflectedWorkItemIdField()
-        {
-            return Store.Projects[Options.Project].WorkItemTypes.Cast<WorkItemType>()
-                .Where(t => !t.FieldDefinitions.Contains(Options.ReflectedWorkItemIdField))
-                .Select(t => t.Name)
-                .ToList();
-        }
-
-        private WorkItemData FindByReflectedHyperlink(string refId)
-        {
-            EnsureReflectedHyperlinkIndex();
-            if (_reflectedHyperlinkIndex.TryGetValue(ReflectedWorkItemIdHyperlink.ToKey(refId), out int targetId))
-            {
-                Log.Debug("FindByReflectedHyperlink: found {TargetId} for {ReflectedWorkItemId}", targetId, refId);
-                return GetWorkItem(targetId, false);
-            }
-            return null;
-        }
-
-        private void EnsureReflectedHyperlinkIndex()
-        {
-            if (_reflectedHyperlinkIndex is not null)
-            {
-                return;
-            }
-            var index = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            var types = GetTypesWithoutReflectedWorkItemIdField();
-            if (types.Count > 0)
-            {
-                var query = ReflectedWorkItemIdHyperlinkQuery.Build(types);
-                foreach (var item in GetWorkItems(query))
-                {
-                    var reflectedId = ReflectedWorkItemIdHyperlink.Find(item.ToWorkItem());
-                    if (reflectedId is not null)
-                    {
-                        index[ReflectedWorkItemIdHyperlink.ToKey(reflectedId)] = int.Parse(item.Id);
-                    }
-                }
-                Log.Information("Found {Count} migrated work items of types without '{ReflectedWorkItemIdField}' ({Types}) by their source hyperlink.",
-                    index.Count, Options.ReflectedWorkItemIdField, string.Join(", ", types));
-            }
-            _reflectedHyperlinkIndex = index;
+            return FindWorkItemByQuery(workItemQueryBuilder) ?? FindInNonCustomisableTypes(refId);
         }
 
         /// <summary>
-        /// Adds a just-saved target work item that carries the reflected ID as a hyperlink, so later lookups in the
-        /// same run find it without querying again.
+        /// Finds a target work item of a type that cannot be customised, whose reflected work item ID is kept in
+        /// <see cref="NonCustomisableWorkItemTypes.ReflectedWorkItemIdField"/>.
         /// </summary>
-        public void RegisterReflectedHyperlink(WorkItemData targetWorkItem)
+        private WorkItemData FindInNonCustomisableTypes(string refId)
         {
-            if (_reflectedHyperlinkIndex is null || targetWorkItem is null)
+            if (string.Equals(Options.ReflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, StringComparison.OrdinalIgnoreCase))
             {
-                return;
+                return null;
             }
-            var reflectedId = ReflectedWorkItemIdHyperlink.Find(targetWorkItem.ToWorkItem());
-            if (reflectedId is not null && int.TryParse(targetWorkItem.Id, out int id) && id > 0)
+            var workItemQueryBuilder = _workItemQueryBuilderFactory.Create();
+            var query = new StringBuilder("SELECT [System.Id] FROM WorkItems WHERE ");
+            if (!Options.AllowCrossProjectLinking)
             {
-                _reflectedHyperlinkIndex[ReflectedWorkItemIdHyperlink.ToKey(reflectedId)] = id;
+                query.Append("[System.TeamProject]=@TeamProject AND ");
+                workItemQueryBuilder.AddParameter("TeamProject", Options.Project);
             }
+            query.Append(NonCustomisableWorkItemTypes.BuildLookupQuery());
+            workItemQueryBuilder.AddParameter("idToFind", refId);
+            workItemQueryBuilder.Query = query.ToString();
+            var found = FindWorkItemByQuery(workItemQueryBuilder);
+            if (found is not null)
+            {
+                Log.Debug("FindInNonCustomisableTypes: found {TargetId} for {ReflectedWorkItemId} in {Field}", found.Id, refId, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField);
+            }
+            return found;
         }
 
         public override ProjectData GetProject()
@@ -217,13 +179,13 @@ namespace MigrationTools.Clients
             Log.Debug("GetReflectedWorkItemId: START");
             var local = workItem.ToWorkItem();
 
-            if (!local.Fields.Contains(Options.ReflectedWorkItemIdField))
+            var field = NonCustomisableWorkItemTypes.ResolveField(local.Type.Name, Options.ReflectedWorkItemIdField, local.Fields.Contains);
+            if (field is null)
             {
-                var fromHyperlink = ReflectedWorkItemIdHyperlink.Find(local);
-                Log.Debug("GetReflectedWorkItemId: END - type has no reflected work item id field; hyperlink {Found}", fromHyperlink is not null);
-                return fromHyperlink is null ? null : new TfsReflectedWorkItemId(fromHyperlink);
+                Log.Debug("GetReflectedWorkItemId: END - no reflected work item id on work item");
+                return null;
             }
-            string rwiid = local.Fields[Options.ReflectedWorkItemIdField].Value.ToString();
+            string rwiid = local.Fields[field].Value?.ToString();
             if (!string.IsNullOrEmpty(rwiid))
             {
                 Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField and has value");
@@ -343,7 +305,7 @@ namespace MigrationTools.Clients
                     var items = query.GetWorkItems();
                     var reflectedFielName = Options.ReflectedWorkItemIdField;
                     foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[reflectedFielName].Value.ToString() == refId.ToString())
-                        ?? FindByReflectedHyperlink(refId.ToString());
+                        ?? FindInNonCustomisableTypes(refId.ToString());
                     if (cache && foundWorkItem is not null)
                     {
                         AddToCache(foundWorkItem);

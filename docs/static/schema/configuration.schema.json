@@ -2546,7 +2546,7 @@
                   "default": true
                 },
                 "ExcludeDefaultWorkItemTypes": {
-                  "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemTypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.\r\n On an inherited process these types cannot have custom fields, so they cannot hold the reflected work item ID\r\n field. Migrated work items of a type without that field get a hyperlink to the source work item (comment\r\n \"Migrated from (ReflectedWorkItemId)\"), and later runs find them by that hyperlink. The validator logs which\r\n types use this fallback.",
+                  "description": "If `true`, some work item types will be automatically added to `ExcludeWorkItemTypes` list.\r\n Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,\r\n Feedback Response, Shared Parameter, Shared Steps.\r\n On an inherited process these types cannot have custom fields, so they cannot hold the reflected work item ID\r\n field. When one of these types lacks that field, its reflected work item ID is stored in\r\n Microsoft.VSTS.Build.IntegrationBuild, and later runs find the work item by that field. The validator logs\r\n which types use this fallback.",
                   "type": "boolean",
                   "default": true
                 },

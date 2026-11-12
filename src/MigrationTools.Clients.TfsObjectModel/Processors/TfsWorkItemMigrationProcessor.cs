@@ -868,9 +868,7 @@ namespace MigrationTools.Processors
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
                         {
-                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
-                            (Target.WorkItems as TfsWorkItemMigrationClient)?.RegisterReflectedHyperlink(targetWorkItem);
-                            targetWorkItem.ToWorkItem().Close();
+                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);                            targetWorkItem.ToWorkItem().Close();
                         }
                         if (sourceWorkItem != null)
                         {
@@ -1016,27 +1014,34 @@ namespace MigrationTools.Processors
             wi.History = MigrationCommentHelper.AppendTo(wi.History, reflectedUri);
         }
 
-        private readonly HashSet<string> _typesUsingReflectedHyperlink = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _typesUsingFallbackField = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Writes the reflected work item ID to the configured field, or, when the target type cannot have that
-        /// field (Shared Steps and Shared Parameter on an inherited process), to a marker hyperlink that the
-        /// target lookup also searches.
+        /// Writes the reflected work item ID to the configured field or, for a type that cannot be customised
+        /// (<see cref="NonCustomisableWorkItemTypes"/>) and lacks it, to the fallback field.
         /// </summary>
         private void SetReflectedWorkItemId(WorkItemData targetWorkItem, string reflectedUri)
         {
             var wi = targetWorkItem.ToWorkItem();
-            if (wi.Fields.Contains(Target.Options.ReflectedWorkItemIdField))
+            var field = NonCustomisableWorkItemTypes.ResolveField(wi.Type.Name, Target.Options.ReflectedWorkItemIdField, wi.Fields.Contains);
+            if (field is null)
             {
-                wi.Fields[Target.Options.ReflectedWorkItemIdField].Value = reflectedUri;
-                return;
-            }
-            if (_typesUsingReflectedHyperlink.Add(wi.Type.Name))
-            {
-                Log.LogInformation("Work item type '{WorkItemType}' has no field '{ReflectedWorkItemIdField}'; the source work item is recorded as a hyperlink so later runs can find it.",
+                var ex = new InvalidOperationException("ReflectedWorkItemIdField Field Missing");
+                Log.LogError(ex, " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}",
                     wi.Type.Name, Target.Options.ReflectedWorkItemIdField);
+                throw ex;
             }
-            ReflectedWorkItemIdHyperlink.Ensure(wi, reflectedUri);
+            if (field != Target.Options.ReflectedWorkItemIdField && _typesUsingFallbackField.Add(wi.Type.Name))
+            {
+                Log.LogInformation("Work item type '{WorkItemType}' cannot have field '{ReflectedWorkItemIdField}'; the reflected work item ID is stored in '{FallbackField}' instead.",
+                    wi.Type.Name, Target.Options.ReflectedWorkItemIdField, field);
+            }
+            var existing = wi.Fields[field].Value?.ToString();
+            if (!string.IsNullOrEmpty(existing) && existing != reflectedUri && field != Target.Options.ReflectedWorkItemIdField)
+            {
+                Log.LogWarning("Overwriting '{Field}' value '{Existing}' on target work item {Id} with the reflected work item ID.", field, existing, wi.Id);
+            }
+            wi.Fields[field].Value = reflectedUri;
         }
 
         private static string LinkKey(Link link)

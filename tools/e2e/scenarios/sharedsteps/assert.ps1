@@ -1,5 +1,5 @@
 # sharedsteps assertions: one target item per source item, Test Case steps and parameters point at the target
-# Shared Steps and Shared Parameter, and both carry the source hyperlink that lets a re-run find them.
+# Shared Steps and Shared Parameter, and both carry the reflected id in Microsoft.VSTS.Build.IntegrationBuild.
 param([string]$Src = "amte2e-ss-src", [string]$Tgt = "amte2e-ss-tgt", [string]$OutFile)
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
@@ -18,9 +18,8 @@ $tsp = $items | Where-Object { $_.fields.'System.WorkItemType' -eq "Shared Param
 $ttc = $items | Where-Object { $_.fields.'System.WorkItemType' -eq "Test Case" } | Select-Object -First 1
 
 foreach ($pair in @(@($tss, $s.ss), @($tsp, $s.sp))) {
-    $hl = @($pair[0].relations | Where-Object { $_.rel -eq "Hyperlink" -and $_.attributes.comment -eq "Migrated from (ReflectedWorkItemId)" })
-    $ok = $hl.Count -eq 1 -and $hl[0].url -match "/_workitems/edit/$($pair[1])$"
-    $r += New-E2EResult "$($pair[0].fields.'System.WorkItemType') has one source hyperlink" $ok "$($hl.Count): $($hl.url -join ', ')"
+    $v = $pair[0].fields.'Microsoft.VSTS.Build.IntegrationBuild'
+    $r += New-E2EResult "$($pair[0].fields.'System.WorkItemType') has reflected id in IntegrationBuild" ($v -match "/_workitems/edit/$($pair[1])$") "$v"
 }
 $steps = $ttc.fields.'Microsoft.VSTS.TCM.Steps'
 $r += New-E2EResult "test case compref points at target shared steps" ($steps -match "ref=""$($tss.id)""") $(if ($steps -match 'ref="(\d+)"') { "ref=$($matches[1]), target SS $($tss.id)" } else { "no compref" })

@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.Processors.Infrastructure;
@@ -111,29 +112,21 @@ namespace MigrationTools.Tools
                 }
             }
             LogReflectedWorkItemIdValidationResult(isValid, reflectedWorkItemIdField);
-            foreach (string witName in GetTypesUsingReflectedHyperlink(targetWits, reflectedWorkItemIdField))
+            foreach (WorkItemType targetWit in targetWits)
             {
-                Log.LogInformation("'{targetWit}' has no reflected work item ID field '{fieldName}'. Migrated work items of"
-                    + " this type are found again by a hyperlink to the source work item.", witName, reflectedWorkItemIdField);
+                string field = NonCustomisableWorkItemTypes.ResolveField(targetWit.Name, reflectedWorkItemIdField, targetWit.FieldDefinitions.Contains);
+                if (field == NonCustomisableWorkItemTypes.ReflectedWorkItemIdField && field != reflectedWorkItemIdField)
+                {
+                    Log.LogInformation("'{targetWit}' cannot have reflected work item ID field '{fieldName}'. Its reflected work"
+                        + " item ID is stored in '{fallbackField}'.", targetWit.Name, reflectedWorkItemIdField, field);
+                }
+                else if (field is null && NonCustomisableWorkItemTypes.Contains(targetWit.Name))
+                {
+                    Log.LogWarning("'{targetWit}' has neither '{fieldName}' nor '{fallbackField}'. Work items of this type cannot be migrated.",
+                        targetWit.Name, reflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField);
+                }
             }
             return isValid;
-        }
-
-        /// <summary>
-        /// Target types excluded from validation that lack the reflected work item ID field, and so use the
-        /// hyperlink fallback.
-        /// </summary>
-        public List<string> GetTypesUsingReflectedHyperlink(List<WorkItemType> targetWits, string reflectedWorkItemIdField)
-            => SelectTypesUsingReflectedHyperlink(
-                targetWits.Select(w => (w.Name, w.FieldDefinitions.Contains(reflectedWorkItemIdField))),
-                Options.ExcludeWorkItemTypes);
-
-        public static List<string> SelectTypesUsingReflectedHyperlink(
-            IEnumerable<(string Name, bool HasReflectedField)> targetWits,
-            IEnumerable<string> excludedWorkItemTypes)
-        {
-            var excluded = new HashSet<string>(excludedWorkItemTypes ?? [], StringComparer.OrdinalIgnoreCase);
-            return targetWits.Where(w => !w.HasReflectedField && excluded.Contains(w.Name)).Select(w => w.Name).ToList();
         }
 
         public bool ScanRevisionHistoryForFields => Options.ScanRevisionHistoryForFields;
