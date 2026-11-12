@@ -266,6 +266,18 @@ namespace MigrationTools.Endpoints
             return await httpResponse.Content.ReadAsAsync<WorkItemPicklist>();
         }
 
+        /// <returns>The organisation-level field, or null if it does not exist or could not be read.</returns>
+        public async Task<WorkItemField> GetFieldAsync(string referenceName)
+        {
+            var client = GetHttpClient<WorkItemField>();
+            var httpResponse = await client.GetAsync(RestUrlHelper.AppendSegment(client.BaseAddress.ToString(), referenceName));
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                return null;
+            }
+            return await httpResponse.Content.ReadAsAsync<WorkItemField>();
+        }
+
         /// <summary>
         /// Make HTTP Request to add Revision / Version of Task Group
         /// </summary>

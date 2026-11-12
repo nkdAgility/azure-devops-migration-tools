@@ -211,9 +211,13 @@ namespace MigrationTools.Processors
                     }
                     var fieldToCreate = sourceField.CloneAsNew();
                     fieldToCreate.PicklistId = createdList.Id;
-                    var createdField = await SyncDefinitionType<WorkItemField>(TargetFields, fieldToCreate, null);
-                    if (string.IsNullOrEmpty(createdField?.Id) || !TargetFields.ContainsKey(sourceField.ReferenceName))
+                    await SyncDefinitionType<WorkItemField>(TargetFields, fieldToCreate, null);
+                    // A field's Id is its reference name, so it is set even when the create was rejected; read it back.
+                    var createdField = await Target.GetFieldAsync(sourceField.ReferenceName);
+                    if (createdField == null || !string.Equals(createdField.PicklistId, createdList.Id, StringComparison.OrdinalIgnoreCase))
                     {
+                        TargetFields.Remove(sourceField.ReferenceName);
+                        System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
                         Log.LogError("Created picklist [{Picklist}] on [{Target}], but field [{Field}] could not be created, so the list is unused; see the error above.", createdList.Name, Target.Options.Name, sourceField.ReferenceName);
                         return;
                     }
@@ -338,7 +342,14 @@ namespace MigrationTools.Processors
             // System fields come with the parent type and reject writes (VS403307), like system rules (#3210).
             foreach (var sourceField in sourceWit.Fields.Where(f => !f.IsSystem))
             {
-                var field = PicklistSync.WithoutListValues(sourceField, SourceFields.TryGetValue(sourceField.ReferenceName, out var orgField) && orgField.IsPicklist);
+                SourceFields.TryGetValue(sourceField.ReferenceName, out var sourceOrgField);
+                TargetFields.TryGetValue(sourceField.ReferenceName, out var targetOrgField);
+                var targetTypeDiffers = PicklistSync.TypesDiffer(sourceOrgField, targetOrgField);
+                if (targetTypeDiffers && !string.IsNullOrEmpty(sourceField.DefaultValue))
+                {
+                    Log.LogWarning("Field [{Field}] is {TargetType} on [{Target}] but {SourceType} on [{Source}], so its default [{Default}] on [{WorkItemType}] is not copied.", sourceField.ReferenceName, targetOrgField.Type, Target.Options.Name, sourceOrgField.Type, Source.Options.Name, sourceField.DefaultValue, sourceWit.WorkItemType.Name);
+                }
+                var field = PicklistSync.WithoutListValues(sourceField, sourceOrgField?.IsPicklist == true, targetTypeDiffers);
                 var existingField = targetWit.Fields.FirstOrDefault(x => x.ReferenceName == field.ReferenceName);
                 await SyncDefinitionType<WorkItemTypeField>(
                     TargetModel.WorkItemFields,

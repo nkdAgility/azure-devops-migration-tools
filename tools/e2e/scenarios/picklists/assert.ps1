@@ -16,7 +16,7 @@ if ($procId) {
     $witFields = (Invoke-E2ERest "_apis/work/processes/$procId/workitemtypes/$($story.referenceName)/fields?`$expand=all" -Org $tgtOrg).value | Where-Object referenceName -like "Custom.amte2eAmt3241*"
     foreach ($w in $witFields) { "User Story field $($w.referenceName): default=[$($w.defaultValue)] allowed=[$($w.allowedValues -join ', ')]" }
 }
-$ids = try { (Invoke-E2ERest "amte2e-amt3241-tgt/_apis/wit/wiql" -Org $tgtOrg -Method POST -Body @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = 'amte2e-amt3241-tgt'" }).workItems.id } catch { "target project amte2e-amt3241-tgt not created yet" }
+$ids = try { (Invoke-E2ERest "amte2e-amt3241-tgt/_apis/wit/wiql" -Org $tgtOrg -Method POST -Body @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = 'amte2e-amt3241-tgt'" }).workItems.id } catch { Write-Warning "target project amte2e-amt3241-tgt not created yet"; @() }
 foreach ($id in $ids) {
     $wi = Invoke-E2ERest "_apis/wit/workitems/$id" -Org $tgtOrg
     $vals = $wi.fields.PSObject.Properties | Where-Object Name -like "Custom.amte2eAmt3241*" | ForEach-Object { "$($_.Name.Replace('Custom.amte2eAmt3241',''))=$($_.Value)" }

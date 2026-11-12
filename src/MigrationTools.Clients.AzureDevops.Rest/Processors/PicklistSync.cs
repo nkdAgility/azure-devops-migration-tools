@@ -74,15 +74,30 @@ namespace MigrationTools.Processors
         /// A picklist field's allowed values on a work item type are its list's items. Sending them writes them into the
         /// target's list, which fails when the types differ (VS403060) and would bypass the non-destructive list sync.
         /// </summary>
-        public static WorkItemTypeField WithoutListValues(WorkItemTypeField sourceField, bool isPicklist)
+        /// <param name="targetTypeDiffers">The target field kept a different type, so the source default may not be valid there.</param>
+        public static WorkItemTypeField WithoutListValues(WorkItemTypeField sourceField, bool isPicklist, bool targetTypeDiffers = false)
         {
-            if (!isPicklist || sourceField.AllowedValues == null)
+            var dropValues = isPicklist && sourceField.AllowedValues != null;
+            var dropDefault = targetTypeDiffers && !string.IsNullOrEmpty(sourceField.DefaultValue);
+            if (!dropValues && !dropDefault)
             {
                 return sourceField;
             }
             var field = sourceField.CloneAsNew();
-            field.AllowedValues = null;
+            if (dropValues)
+            {
+                field.AllowedValues = null;
+            }
+            if (dropDefault)
+            {
+                field.DefaultValue = null;
+            }
             return field;
+        }
+
+        public static bool TypesDiffer(WorkItemField sourceField, WorkItemField targetField)
+        {
+            return sourceField != null && targetField != null && !string.Equals(sourceField.Type, targetField.Type, StringComparison.OrdinalIgnoreCase);
         }
 
         public static WorkItemPicklist WithItemsAdded(WorkItemPicklist targetList, IEnumerable<string> missingItems)

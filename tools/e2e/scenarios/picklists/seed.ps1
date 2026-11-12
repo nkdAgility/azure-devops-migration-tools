@@ -5,7 +5,7 @@
 #     Tag      String  Alpha, Beta, suggested (free values allowed)
 #     AsText   String  High, Low        target already has it as plain text
 #     Diff     String  One, Two, Three  target already has it with a list of One, Four
-#     Size     String  S, M             target already has it with an Integer list of 1, 2 (type mismatch)
+#     Size     String  S, M (default M on the Bug)  target already has it with an Integer list of 1, 2 (type mismatch)
 #   project amte2e-amt3241-src with one User Story that sets every field, including a free "Gamma" in the suggested Tag.
 #   target org: the process amte2e-amt3241-pl-tgt must NOT exist; step 1 creates it. Step 2 needs the target project
 #   created from it: run this script again with -TargetProject after step 1.
@@ -55,6 +55,7 @@ foreach ($k in $fields.Keys) {
     $wit = if ($k -eq "Size") { Get-E2EDerivedWit $procId "Bug" } else { $story }
     $body = @{ referenceName = $fields[$k] }
     if ($k -eq "Colour") { $body.defaultValue = "Green" }
+    if ($k -eq "Size") { $body.defaultValue = "M" }
     $has = (Invoke-E2ERest "_apis/work/processes/$procId/workitemtypes/$wit/fields" -Org $srcOrg).value | Where-Object referenceName -eq $fields[$k]
     if (-not $has) { Invoke-E2ERest "_apis/work/processes/$procId/workitemtypes/$wit/fields" -Org $srcOrg -Method POST -Body $body | Out-Null }
 }

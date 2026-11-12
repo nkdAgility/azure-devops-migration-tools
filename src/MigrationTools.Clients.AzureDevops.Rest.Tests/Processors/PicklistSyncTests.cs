@@ -82,6 +82,24 @@ namespace MigrationTools.Processors.Tests
         }
 
         [TestMethod(), TestCategory("L0")]
+        public void TargetFieldOfOtherType_DefaultIsNotSent()
+        {
+            var source = new WorkItemTypeField { ReferenceName = "Custom.Size", DefaultValue = "M", AllowedValues = new[] { "S", "M" } };
+            var sent = PicklistSync.WithoutListValues(source, isPicklist: true, targetTypeDiffers: true);
+            Assert.IsNull(sent.DefaultValue);
+            Assert.IsNull(sent.AllowedValues);
+            Assert.AreEqual("M", source.DefaultValue);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void TypesDiffer_ComparesOrgFieldTypes()
+        {
+            Assert.IsTrue(PicklistSync.TypesDiffer(new WorkItemField { Type = "string" }, new WorkItemField { Type = "integer" }));
+            Assert.IsFalse(PicklistSync.TypesDiffer(new WorkItemField { Type = "string" }, new WorkItemField { Type = "String" }));
+            Assert.IsFalse(PicklistSync.TypesDiffer(new WorkItemField { Type = "string" }, null));
+        }
+
+        [TestMethod(), TestCategory("L0")]
         public void PicklistField_IsCreatedLinkedToItsList()
         {
             var field = new WorkItemField { Name = "Colour", ReferenceName = "Custom.Colour", Type = "string", IsPicklist = true, PicklistId = "src-list" };
