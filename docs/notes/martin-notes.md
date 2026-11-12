@@ -9,3 +9,4 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision:** spawn one worker each for #3240, #3241 and #3242. Each must run the end-to-end tests on the test orgs (tools/e2e/Invoke-MigrationE2E.ps1) against main and the branch.
 - **Decision:** no changes to the way of working until Martin approves them.
 - **Decision:** in this repo the GitHub issue is the work package. There is no separate WKR-{id}.md file.
+- **Decision:** adapt the nkda-engineering-delivery stage-gate tool to store a package's state in its GitHub issue (the issue has the original description, then comments).
