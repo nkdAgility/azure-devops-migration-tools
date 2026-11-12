@@ -139,7 +139,8 @@ namespace MigrationTools.Processors
                     {
                         return;
                     }
-                    TargetFields.TryGetValue(sourceField.ReferenceName, out var targetField);
+                    WorkItemField targetField;
+                    lock (TargetFields) { TargetFields.TryGetValue(sourceField.ReferenceName, out targetField); }
                     if (sourceField.IsPicklist)
                     {
                         await SyncPicklistField(sourceField, targetField);
@@ -251,7 +252,7 @@ namespace MigrationTools.Processors
                     }
                     if (!string.Equals(createdField?.PicklistId, createdList.Id, StringComparison.OrdinalIgnoreCase))
                     {
-                        TargetFields.Remove(sourceField.ReferenceName);
+                        lock (TargetFields) { TargetFields.Remove(sourceField.ReferenceName); }
                         System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
                         // Each retry would otherwise leave another unused list behind (2,048 per organisation).
                         var removed = await Target.DeletePicklistAsync(createdList.Id);
@@ -380,7 +381,8 @@ namespace MigrationTools.Processors
             foreach (var sourceField in sourceWit.Fields.Where(f => !f.IsSystem))
             {
                 SourceFields.TryGetValue(sourceField.ReferenceName, out var sourceOrgField);
-                TargetFields.TryGetValue(sourceField.ReferenceName, out var targetOrgField);
+                WorkItemField targetOrgField;
+                lock (TargetFields) { TargetFields.TryGetValue(sourceField.ReferenceName, out targetOrgField); }
                 var targetTypeDiffers = PicklistSync.TypesDiffer(sourceOrgField, targetOrgField);
                 if (targetTypeDiffers && !string.IsNullOrEmpty(sourceField.DefaultValue))
                 {
@@ -624,11 +626,8 @@ namespace MigrationTools.Processors
                 // The endpoint has already logged why the create failed; carry on with the rest of the sync (#3224).
                 return targetDef;
             }
-            if (!DataDictionary.ContainsKey(targetDef.Id))
-            {
-                DataDictionary.Add(targetDef.Id, targetDef);
-            }
-            else
+            // The organisation-level field sync writes to TargetFields from parallel tasks.
+            lock (DataDictionary)
             {
                 DataDictionary[targetDef.Id] = targetDef;
             }
