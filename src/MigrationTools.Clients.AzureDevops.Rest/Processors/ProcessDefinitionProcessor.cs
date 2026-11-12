@@ -226,6 +226,12 @@ namespace MigrationTools.Processors
                     System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
                     return;
                 }
+                // A list read straight after this run updated it can still return the old items, which a second
+                // field sharing the list would then write back (#3241, shared-list run).
+                if (_writtenTargetLists.TryGetValue(targetList.Id, out var written))
+                {
+                    targetList.Items = PicklistSync.Union(written.Items, targetList.Items);
+                }
             }
 
             var plan = PicklistSync.Plan(sourceList, targetField, targetList);
@@ -276,9 +282,12 @@ namespace MigrationTools.Processors
             if (plan.Action == PicklistFieldAction.AddMissingItems)
             {
                 Log.LogWarning("Adding the source values [{Missing}] to the existing picklist of field [{Field}] on [{Target}].", string.Join(", ", plan.MissingItems), sourceField.ReferenceName, Target.Options.Name);
-                await Target.SyncDefinition(PicklistSync.WithItemsAdded(targetList, plan.MissingItems), targetList);
+                var writtenList = await Target.SyncDefinition(PicklistSync.WithItemsAdded(targetList, plan.MissingItems), targetList);
+                _writtenTargetLists[writtenList.Id] = writtenList;
             }
         }
+
+        private readonly ConcurrentDictionary<string, WorkItemPicklist> _writtenTargetLists = new ConcurrentDictionary<string, WorkItemPicklist>(StringComparer.OrdinalIgnoreCase);
 
         private async Task SyncProcess(ProcessDefinitionModel sourceProc)
         {

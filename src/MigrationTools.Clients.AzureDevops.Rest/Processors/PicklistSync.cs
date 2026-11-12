@@ -100,6 +100,14 @@ namespace MigrationTools.Processors
             return sourceField != null && targetField != null && !string.Equals(sourceField.Type, targetField.Type, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>Items of <paramref name="first"/>, then those of <paramref name="second"/> it lacks.</summary>
+        public static List<string> Union(IEnumerable<string> first, IEnumerable<string> second)
+        {
+            var items = new List<string>(first ?? Enumerable.Empty<string>());
+            items.AddRange((second ?? Enumerable.Empty<string>()).Where(s => !items.Contains(s, StringComparer.OrdinalIgnoreCase)));
+            return items;
+        }
+
         public static WorkItemPicklist WithItemsAdded(WorkItemPicklist targetList, IEnumerable<string> missingItems)
         {
             return new WorkItemPicklist

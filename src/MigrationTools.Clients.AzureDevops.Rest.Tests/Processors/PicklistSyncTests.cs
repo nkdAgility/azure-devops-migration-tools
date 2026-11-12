@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts.Process;
 using Newtonsoft.Json;
@@ -97,6 +98,19 @@ namespace MigrationTools.Processors.Tests
             Assert.IsTrue(PicklistSync.TypesDiffer(new WorkItemField { Type = "string" }, new WorkItemField { Type = "integer" }));
             Assert.IsFalse(PicklistSync.TypesDiffer(new WorkItemField { Type = "string" }, new WorkItemField { Type = "String" }));
             Assert.IsFalse(PicklistSync.TypesDiffer(new WorkItemField { Type = "string" }, null));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void SharedList_StaleReadAfterWrite_KeepsTheWrittenValues()
+        {
+            var written = new[] { "X", "Y" };
+            var staleRead = new[] { "X" };
+            var merged = PicklistSync.Union(written, staleRead);
+            CollectionAssert.AreEqual(new[] { "X", "Y" }, merged);
+
+            var plan = PicklistSync.Plan(List("String", false, "X", "Z"), PicklistField(), List("String", false, merged.ToArray()));
+            CollectionAssert.AreEqual(new[] { "Z" }, plan.MissingItems);
+            CollectionAssert.AreEqual(new[] { "X", "Y", "Z" }, PicklistSync.WithItemsAdded(List("String", false, merged.ToArray()), plan.MissingItems).Items);
         }
 
         [TestMethod(), TestCategory("L0")]
