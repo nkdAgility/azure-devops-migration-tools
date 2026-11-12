@@ -118,8 +118,9 @@ function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
     if ($p) { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null }
 }
 
-function Get-E2EProjects([string]$Org = $script:DefaultOrg) { (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($script:Prefix) } }
-function Get-E2EProcesses([string]$Org = $script:DefaultOrg) { (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($script:Prefix) } }
+# -Prefix selects one issue's scratch objects (for example "amt3242-"); it must itself pass Assert-E2EName.
+function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
+function Get-E2EProcesses([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
 
 # Creates or updates a work item. $Fields is an ordered hashtable of reference name -> value.
 # Extra JSON-patch operations (relations, etc.) can be passed in $Ops.

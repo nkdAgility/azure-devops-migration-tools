@@ -527,8 +527,17 @@ namespace MigrationTools.Processors
                     }
                     foreach (var sourceControl in (sourceGroup.Controls ?? Enumerable.Empty<WorkItemControl>()).Where(c => !c.Inherited && !WorkItemGroup.IsHtmlControl(c)))
                     {
-                        if (ProcessDefinitionSync.FindGroupContainingControl(targetWitGroups, sourceControl.Id) != null)
+                        if (targetGroup.Controls?.Any(c => string.Equals(c.Id, sourceControl.Id, StringComparison.OrdinalIgnoreCase)) == true)
                         {
+                            continue;
+                        }
+                        var oldGroup = ProcessDefinitionSync.FindGroupContainingControl(targetWitGroups, sourceControl.Id, targetGroup);
+                        if (oldGroup != null)
+                        {
+                            if (await Target.MoveWorkItemControlToOtherGroup(sourceControl.CloneAsNew(), processId, targetWit.WorkItemType.ReferenceName, targetGroup.Id, sourceControl.Id, oldGroup.Id))
+                            {
+                                Log.LogInformation("Moved control [{Control}] from [{OldGroup}] to inherited group [{Group}].", sourceControl.Label ?? sourceControl.Id, oldGroup.Label, targetGroup.Label);
+                            }
                             continue;
                         }
                         if (await Target.AddWorkItemControlToGroup(sourceControl.CloneAsNew(), processId, targetWit.WorkItemType.ReferenceName, targetGroup.Id, sourceControl.Id))
