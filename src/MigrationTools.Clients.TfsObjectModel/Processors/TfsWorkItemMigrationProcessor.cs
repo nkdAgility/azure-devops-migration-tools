@@ -1320,27 +1320,26 @@ namespace MigrationTools.Processors
             }
         }
 
-        private sealed class StateStampedDateFixUpException : Exception
-        {
-            public StateStampedDateFixUpException(string message, Exception inner) : base(message, inner) { }
-        }
-
         /// <summary>
-        /// The server can still apply the current date to ClosedDate, ActivatedDate and ResolvedDate on save, even with BypassRules,
-        /// and they are read-only in the revision that changes state, so a mismatch after save is corrected with a
-        /// single fix-up revision. A failed fix-up save is retried here, because a later run treats the revision
-        /// as migrated and could then only correct the latest state, not this revision.
+        /// The server applies the current date to ClosedDate, ActivatedDate and ResolvedDate when a revision changes state,
+        /// even with BypassRules (system rules copyFromServerClock), and the same rules make them read-only in that revision,
+        /// so they cannot be set in the revision that changes state. A mismatch after save is corrected with a single
+        /// fix-up revision. A failed fix-up save is retried here, because a later run treats the revision as migrated and
+        /// could then only correct the latest state, not this revision. The fix-up never fails the work item (#3240): a
+        /// date it cannot correct keeps the target's value and is logged.
         /// </summary>
         private void EnsureStateStampedDatesAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
         {
             var source = sourceRevision.ToWorkItem();
             var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
+            var fixUps = new List<(string Field, object SourceValue, object TargetValue)>();
             for (var attempt = 0; ; attempt++)
             {
                 try
                 {
                     var target = targetWorkItem.ToWorkItem();
-                    if (!SetStateStampedDatesFromSource(source, target, "after save"))
+                    fixUps = SetStateStampedDatesFromSource(source, target, "after save");
+                    if (fixUps.Count == 0)
                     {
                         // Nothing to fix, or a failed attempt's save reached the server before it threw.
                         if (attempt == 0) return;
@@ -1355,9 +1354,16 @@ namespace MigrationTools.Processors
                 {
                     // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
                     targetWorkItem.ToWorkItem().Reset();
-                    if (attempt >= Options.WorkItemCreateRetryLimit)
+                    if (ClosedDateHelper.IsFieldCannotBeChangedError(ex) || attempt >= Options.WorkItemCreateRetryLimit)
                     {
-                        throw new StateStampedDateFixUpException($"Unable to apply fix-up save for state-stamped dates on target #{targetWorkItem.Id}", ex);
+                        foreach (var (field, sourceValue, targetValue) in fixUps)
+                        {
+                            Log.LogWarning(ex, "Could not correct {field} on target #{targetId}: it stays {targetValue}, but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}. The work item continues to migrate.",
+                                field, targetWorkItem.Id, targetValue, source.Id, source.Rev, sourceValue);
+                        }
+                        targetWorkItem.ToWorkItem().SyncToLatest();
+                        targetWorkItem.RefreshWorkItem();
+                        break;
                     }
                     Log.LogWarning(ex, "Fix-up save for state-stamped dates on target #{targetId} failed; reloading and retrying ({attempt}/{retryLimit}).",
                         targetWorkItem.Id, attempt + 1, Options.WorkItemCreateRetryLimit);
@@ -1375,7 +1381,11 @@ namespace MigrationTools.Processors
             }
         }
 
-        private bool SetStateStampedDatesFromSource(WorkItem source, WorkItem target, string when)
+        /// <summary>
+        /// Sets each state-stamped date that differs from the source and that the target lets this connection write, and
+        /// returns those. A date the target makes read-only (see <see cref="ClosedDateHelper.CanFixUp"/>) is logged and left.
+        /// </summary>
+        private List<(string Field, object SourceValue, object TargetValue)> SetStateStampedDatesFromSource(WorkItem source, WorkItem target, string when)
         {
             var candidates = new List<(string Field, object SourceValue, object TargetValue)>();
             var closedTargetField = GetClosedDateField(target);
@@ -1392,14 +1402,22 @@ namespace MigrationTools.Processors
                     candidates.Add((field, source.Fields[field].Value, target.Fields[field].Value));
                 }
             }
-            var fixUps = ClosedDateHelper.FieldsNeedingFixUp(candidates);
-            foreach (var (field, sourceValue, targetValue) in candidates.Where(c => fixUps.Contains(c.Field)))
+            var needed = ClosedDateHelper.FieldsNeedingFixUp(candidates);
+            var applied = new List<(string Field, object SourceValue, object TargetValue)>();
+            foreach (var (field, sourceValue, targetValue) in candidates.Where(c => needed.Contains(c.Field)))
             {
+                if (!ClosedDateHelper.CanFixUp(target.Fields[field].IsEditable, target.Store.BypassRules))
+                {
+                    Log.LogWarning("Could not correct {field} on target #{targetId}: it is {targetValue} {when}, but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}. The target makes it read-only in a revision that does not change state, and this connection does not bypass rules, so it keeps the target's value. Give the migration identity 'Bypass rules on work item updates' in the target to keep the source dates.",
+                        field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
+                    continue;
+                }
                 Log.LogWarning("{field} on target #{targetId} is {targetValue} {when} but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
                     field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
                 target.Fields[field].Value = sourceValue;
+                applied.Add((field, sourceValue, targetValue));
             }
-            return fixUps.Count > 0;
+            return applied;
         }
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)

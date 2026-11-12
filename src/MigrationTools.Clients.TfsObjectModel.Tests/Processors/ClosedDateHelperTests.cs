@@ -72,6 +72,39 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CanFixUp_ReadOnlyFieldWithoutBypassRules_ReturnsFalse()
+        {
+            Assert.IsFalse(ClosedDateHelper.CanFixUp(isEditable: false, storeBypassesRules: false));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CanFixUp_ReadOnlyFieldWithBypassRules_ReturnsTrue()
+        {
+            Assert.IsTrue(ClosedDateHelper.CanFixUp(isEditable: false, storeBypassesRules: true));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CanFixUp_EditableField_ReturnsTrue()
+        {
+            Assert.IsTrue(ClosedDateHelper.CanFixUp(isEditable: true, storeBypassesRules: false));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsFieldCannotBeChangedError_DetectsTF26194InInnerException()
+        {
+            var ex = new InvalidOperationException("save failed",
+                new Exception("TF26194: The value for field 'Activated Date' cannot be changed."));
+            Assert.IsTrue(ClosedDateHelper.IsFieldCannotBeChangedError(ex));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsFieldCannotBeChangedError_OtherErrors_ReturnsFalse()
+        {
+            Assert.IsFalse(ClosedDateHelper.IsFieldCannotBeChangedError(new Exception("TF237124: Work Item is not ready to save")));
+            Assert.IsFalse(ClosedDateHelper.IsFieldCannotBeChangedError(null));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void ResolveField_PrefersCommonClosedDate()
         {
             Assert.AreEqual(ClosedDateHelper.CommonClosedDate, ClosedDateHelper.ResolveField(true, true));
