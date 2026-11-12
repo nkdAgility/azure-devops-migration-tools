@@ -12,6 +12,8 @@ namespace MigrationTools.Clients
         private string _WorkItemId;
         private static readonly Regex ReflectedIdRegex = new Regex(@"^(?<org>[\S ]+)\/(?<project>[\S ]+)\/_workitems\/edit\/(?<id>\d+)", RegexOptions.Compiled);
 
+        public static bool IsReflectedWorkItemId(string value) => value is not null && ReflectedIdRegex.IsMatch(value);
+
         public TfsReflectedWorkItemId(WorkItemData workItem) : base(workItem)
         {
             if (workItem is null)

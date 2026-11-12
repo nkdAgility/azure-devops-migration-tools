@@ -15,6 +15,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.DataContracts.Pipelines;
 using MigrationTools.DataContracts.Process;
 using MigrationTools.EndpointEnrichers;
+using MigrationTools.Processors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -682,6 +683,43 @@ namespace MigrationTools.Endpoints
             return await MoveWorkItemControl(control, processId, witRefName, groupId, fieldName);
         }
 
+
+        /// <summary>
+        /// Shows or hides a layout control, group or system control. Hiding an inherited one stores an override on the
+        /// target process (#3242).
+        /// </summary>
+        public async Task<bool> SetLayoutVisibility(LayoutVisibilityChange change, string processId, string witRefName)
+        {
+            var layoutPath = RestUrlHelper.CombinePath(new UriBuilder(Options.Organisation).ToString(), "_apis/work/processes") +
+                $"/{RestUrlHelper.EscapeSegment(processId)}/workItemTypes/{RestUrlHelper.EscapeSegment(witRefName)}/layout";
+            string path;
+            switch (change.Target)
+            {
+                case LayoutVisibilityTarget.Control:
+                    path = $"{layoutPath}/groups/{RestUrlHelper.EscapeSegment(change.GroupId)}/controls/{RestUrlHelper.EscapeSegment(change.ControlId)}";
+                    break;
+                case LayoutVisibilityTarget.Group:
+                    path = $"{layoutPath}/pages/{RestUrlHelper.EscapeSegment(change.PageId)}/sections/{RestUrlHelper.EscapeSegment(change.SectionId)}/groups/{RestUrlHelper.EscapeSegment(change.GroupId)}";
+                    break;
+                default:
+                    path = $"{layoutPath}/systemcontrols/{RestUrlHelper.EscapeSegment(change.ControlId)}";
+                    break;
+            }
+            var client = GetHttpClient(path, "api-version=7.1");
+            // The group update rejects a body without its label.
+            var body = change.Target == LayoutVisibilityTarget.Group
+                ? JsonConvert.SerializeObject(new { label = change.Label, visible = change.Visible })
+                : JsonConvert.SerializeObject(new { visible = change.Visible });
+            var result = await client.PatchAsync(client.BaseAddress.ToString(), new StringContent(body, Encoding.UTF8, "application/json"));
+            if (result.StatusCode != HttpStatusCode.OK)
+            {
+                var responseContent = await result.Content.ReadAsStringAsync();
+                Log.LogError("Error setting visibility of {LayoutTarget} [{Label}] on [{WorkItemType}] to {Visible}. Please change it manually. \r\nUrl: PATCH {Url}\r\n{ErrorText}", change.Target, change.Label, witRefName, change.Visible, result.RequestMessage.RequestUri.ToString(), responseContent);
+                System.Threading.Interlocked.Increment(ref _failedSyncWrites);
+                return false;
+            }
+            return true;
+        }
 
         private async Task<bool> MoveWorkItemControl(WorkItemControl control, string processId, string witRefName, string groupId, string fieldName, string oldGroupId = null)
         {

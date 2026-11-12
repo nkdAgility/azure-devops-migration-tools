@@ -94,8 +94,45 @@ namespace MigrationTools.Clients
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
+            if (!CollectionHasConfiguredField)
+            {
+                return FindInNonCustomisableTypes(refId);
+            }
             var workItemQueryBuilder = CreateReflectedWorkItemQuery(refId);
-            return FindWorkItemByQuery(workItemQueryBuilder);
+            return FindWorkItemByQuery(workItemQueryBuilder) ?? FindInNonCustomisableTypes(refId);
+        }
+
+        /// <summary>
+        /// A WIQL query on a field the collection does not define fails instead of returning nothing.
+        /// </summary>
+        private bool CollectionHasConfiguredField => Store.FieldDefinitions.Contains(Options.ReflectedWorkItemIdField);
+
+        /// <summary>
+        /// Finds a target work item of a type that cannot be customised, whose reflected work item ID is kept in
+        /// <see cref="NonCustomisableWorkItemTypes.ReflectedWorkItemIdField"/>.
+        /// </summary>
+        private WorkItemData FindInNonCustomisableTypes(string refId)
+        {
+            if (string.Equals(Options.ReflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+            var workItemQueryBuilder = _workItemQueryBuilderFactory.Create();
+            var query = new StringBuilder("SELECT [System.Id] FROM WorkItems WHERE ");
+            if (!Options.AllowCrossProjectLinking)
+            {
+                query.Append("[System.TeamProject]=@TeamProject AND ");
+                workItemQueryBuilder.AddParameter("TeamProject", Options.Project);
+            }
+            query.Append(NonCustomisableWorkItemTypes.BuildLookupQuery());
+            workItemQueryBuilder.AddParameter("idToFind", refId);
+            workItemQueryBuilder.Query = query.ToString();
+            var found = FindWorkItemByQuery(workItemQueryBuilder);
+            if (found is not null)
+            {
+                Log.Debug("FindInNonCustomisableTypes: found {TargetId} for {ReflectedWorkItemId} in {Field}", found.Id, refId, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField);
+            }
+            return found;
         }
 
         public override ProjectData GetProject()
@@ -151,14 +188,21 @@ namespace MigrationTools.Clients
             Log.Debug("GetReflectedWorkItemId: START");
             var local = workItem.ToWorkItem();
 
-            if (!local.Fields.Contains(Options.ReflectedWorkItemIdField))
+            var field = NonCustomisableWorkItemTypes.ResolveField(local.Type.Name, Options.ReflectedWorkItemIdField, local.Fields.Contains);
+            if (field is null)
             {
                 Log.Debug("GetReflectedWorkItemId: END - no reflected work item id on work item");
                 return null;
             }
-            string rwiid = local.Fields[Options.ReflectedWorkItemIdField].Value.ToString();
+            string rwiid = local.Fields[field].Value?.ToString();
             if (!string.IsNullOrEmpty(rwiid))
             {
+                // The fallback field is a built-in field, so it may hold a value the migration did not write.
+                if (field != Options.ReflectedWorkItemIdField && !TfsReflectedWorkItemId.IsReflectedWorkItemId(rwiid))
+                {
+                    Log.Debug("GetReflectedWorkItemId: END - {Field} holds a value that is not a reflected work item id", field);
+                    return null;
+                }
                 Log.Debug("GetReflectedWorkItemId: END - Has ReflectedWorkItemIdField and has value");
                 return new TfsReflectedWorkItemId(rwiid);
             }
@@ -271,11 +315,15 @@ namespace MigrationTools.Clients
                 var foundWorkItem = GetFromCache(refId);
                 if (foundWorkItem is null)
                 {
-                    var workItemQueryBuilder = CreateReflectedWorkItemQuery(refId.ToString());
-                    var query = workItemQueryBuilder.BuildWIQLQuery(MigrationClient);
-                    var items = query.GetWorkItems();
-                    var reflectedFielName = Options.ReflectedWorkItemIdField;
-                    foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[reflectedFielName].Value.ToString() == refId.ToString());
+                    if (CollectionHasConfiguredField)
+                    {
+                        var workItemQueryBuilder = CreateReflectedWorkItemQuery(refId.ToString());
+                        var query = workItemQueryBuilder.BuildWIQLQuery(MigrationClient);
+                        var items = query.GetWorkItems();
+                        var reflectedFielName = Options.ReflectedWorkItemIdField;
+                        foundWorkItem = items.FirstOrDefault(wi => wi.ToWorkItem().Fields[reflectedFielName].Value.ToString() == refId.ToString());
+                    }
+                    foundWorkItem ??= FindInNonCustomisableTypes(refId.ToString());
                     if (cache && foundWorkItem is not null)
                     {
                         AddToCache(foundWorkItem);

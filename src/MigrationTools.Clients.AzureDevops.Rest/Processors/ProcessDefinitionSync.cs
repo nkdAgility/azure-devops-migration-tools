@@ -43,6 +43,88 @@ namespace MigrationTools.Processors
                 .FirstOrDefault(g => g.Controls != null && g.Controls.Any(c => string.Equals(c.Id, controlId, StringComparison.OrdinalIgnoreCase)));
         }
 
+        /// <summary>
+        /// Lists the controls, groups and system controls whose visibility on the target differs from the source (#3242).
+        /// Controls and system controls match on their field reference name, groups on their label within the page of
+        /// the same label. Anything already matching is left out, so applying the result again changes nothing.
+        /// </summary>
+        public static List<LayoutVisibilityChange> FindVisibilityChanges(WorkItemLayout source, WorkItemLayout target)
+        {
+            var changes = new List<LayoutVisibilityChange>();
+            if (source == null || target == null)
+            {
+                return changes;
+            }
+
+            var targetGroups = GroupsOf(target).ToList();
+            foreach (var (sourcePage, _, sourceGroup) in GroupsOf(source))
+            {
+                // Inherited groups share their id across organisations; custom groups get a new id, so fall back to the label.
+                var targetGroup = targetGroups.FirstOrDefault(t => string.Equals(t.Group.Id, sourceGroup.Id, StringComparison.OrdinalIgnoreCase));
+                if (targetGroup.Group == null)
+                {
+                    targetGroup = targetGroups.FirstOrDefault(t =>
+                        string.Equals(t.Page.Label, sourcePage.Label, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(t.Group.Label, sourceGroup.Label, StringComparison.OrdinalIgnoreCase));
+                }
+                if (targetGroup.Group != null && targetGroup.Group.Visible != sourceGroup.Visible)
+                {
+                    changes.Add(new LayoutVisibilityChange(LayoutVisibilityTarget.Group, sourceGroup.Label, sourceGroup.Visible,
+                        targetGroup.Page.Id, targetGroup.Section.Id, targetGroup.Group.Id, null));
+                }
+
+                foreach (var sourceControl in sourceGroup.Controls ?? Enumerable.Empty<WorkItemControl>())
+                {
+                    var match = targetGroups
+                        .SelectMany(t => (t.Group.Controls ?? Enumerable.Empty<WorkItemControl>()).Select(c => new { t.Group, Control = c }))
+                        .FirstOrDefault(x => string.Equals(x.Control.Id, sourceControl.Id, StringComparison.OrdinalIgnoreCase));
+                    if (match != null && match.Control.Visible != sourceControl.Visible)
+                    {
+                        changes.Add(new LayoutVisibilityChange(LayoutVisibilityTarget.Control, sourceControl.Label ?? sourceControl.Id, sourceControl.Visible,
+                            null, null, match.Group.Id, match.Control.Id));
+                    }
+                }
+            }
+
+            foreach (var sourceSystem in source.SystemControls ?? Enumerable.Empty<SystemControl>())
+            {
+                var targetSystem = (target.SystemControls ?? Enumerable.Empty<SystemControl>())
+                    .FirstOrDefault(t => string.Equals(t.Id, sourceSystem.Id, StringComparison.OrdinalIgnoreCase));
+                if (targetSystem != null && targetSystem.Visible != sourceSystem.Visible)
+                {
+                    changes.Add(new LayoutVisibilityChange(LayoutVisibilityTarget.SystemControl, sourceSystem.Label ?? sourceSystem.Id, sourceSystem.Visible,
+                        null, null, null, targetSystem.Id));
+                }
+            }
+            return changes;
+        }
+
+        /// <summary>
+        /// Inherited groups keep their id across processes derived from the same parent; fall back to the label on the
+        /// page of the same label.
+        /// </summary>
+        public static WorkItemGroup FindTargetInheritedGroup(WorkItemLayout target, string pageLabel, WorkItemGroup source)
+        {
+            if (target == null || source == null)
+            {
+                return null;
+            }
+            var groups = GroupsOf(target).ToList();
+            return groups.Select(g => g.Group).FirstOrDefault(g => string.Equals(g.Id, source.Id, StringComparison.OrdinalIgnoreCase))
+                ?? groups.Where(g => string.Equals(g.Page.Label, pageLabel, StringComparison.OrdinalIgnoreCase))
+                    .Select(g => g.Group)
+                    .FirstOrDefault(g => string.Equals(g.Label, source.Label, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static IEnumerable<(WorkItemPage Page, WorkItemSection Section, WorkItemGroup Group)> GroupsOf(WorkItemLayout layout)
+        {
+            return from page in layout.Pages ?? Enumerable.Empty<WorkItemPage>()
+                   from section in page.Sections ?? Enumerable.Empty<WorkItemSection>()
+                   from grp in section.Groups ?? Enumerable.Empty<WorkItemGroup>()
+                   where grp != null
+                   select (page, section, grp);
+        }
+
         public static string ResolveTargetProcessName(IDictionary<string, string> processMaps, string sourceProcessName)
         {
             if (processMaps != null && processMaps.TryGetValue(sourceProcessName, out var mapped) && !string.IsNullOrEmpty(mapped))
@@ -51,5 +133,34 @@ namespace MigrationTools.Processors
             }
             return sourceProcessName;
         }
+    }
+
+    public enum LayoutVisibilityTarget
+    {
+        Control,
+        Group,
+        SystemControl,
+    }
+
+    public sealed class LayoutVisibilityChange
+    {
+        public LayoutVisibilityChange(LayoutVisibilityTarget target, string label, bool visible, string pageId, string sectionId, string groupId, string controlId)
+        {
+            Target = target;
+            Label = label;
+            Visible = visible;
+            PageId = pageId;
+            SectionId = sectionId;
+            GroupId = groupId;
+            ControlId = controlId;
+        }
+
+        public LayoutVisibilityTarget Target { get; }
+        public string Label { get; }
+        public bool Visible { get; }
+        public string PageId { get; }
+        public string SectionId { get; }
+        public string GroupId { get; }
+        public string ControlId { get; }
     }
 }

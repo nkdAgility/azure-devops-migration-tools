@@ -5,7 +5,7 @@
 .DESCRIPTION
     Signs in like Invoke-MigrationE2E.ps1: Microsoft Entra ID through 'az login' by default, or AMT_TEST_PAT if set.
     The token is held in memory only, never printed, and only sent to the allowed test organisations.
-    Only projects and processes whose names start with "amte2e-" can be created or deleted through this module.
+    Only projects and processes whose names start with "amte2e-" or "amt<issue>-" can be created or deleted through this module.
 #>
 $script:AllowedOrgs = @("nkdagility-adomt-source", "nkdagility-adomt-target", "nkdagility-preview")
 $script:Prefix = "amte2e-"
@@ -29,8 +29,9 @@ function Set-E2EOrg([string]$Org) {
     $script:DefaultOrg = $Org
 }
 
+# Workers fixing an issue use their own amt<issue>-* scratch objects so they never collide with amte2e-* or each other.
 function Assert-E2EName([string]$Name) {
-    if (-not $Name.StartsWith($script:Prefix)) { throw "Refusing to touch '$Name': only '$($script:Prefix)*' objects are allowed." }
+    if (-not ($Name.StartsWith($script:Prefix) -or $Name -match '^amt\d+-')) { throw "Refusing to touch '$Name': only '$($script:Prefix)*' or 'amt<issue>-*' objects are allowed." }
 }
 
 function Invoke-E2ERest {
@@ -117,8 +118,9 @@ function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
     if ($p) { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null }
 }
 
-function Get-E2EProjects([string]$Org = $script:DefaultOrg) { (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($script:Prefix) } }
-function Get-E2EProcesses([string]$Org = $script:DefaultOrg) { (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($script:Prefix) } }
+# -Prefix selects one issue's scratch objects (for example "amt3242-"); it must itself pass Assert-E2EName.
+function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
+function Get-E2EProcesses([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
 
 # Creates or updates a work item. $Fields is an ordered hashtable of reference name -> value.
 # Extra JSON-patch operations (relations, etc.) can be passed in $Ops.

@@ -1,0 +1,106 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-ss-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-ss-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": {
+          "AuthenticationMode": "EntraId"
+        },
+        "LanguageMaps": {
+          "IterationPath": "Iteration",
+          "AreaPath": "Area"
+        }
+      }
+    },
+    "CommonTools": {
+      "TfsNodeStructureTool": {
+        "Enabled": true,
+        "Areas": {
+          "Filters": [],
+          "Mappings": [
+            {
+              "Replacement": "amte2e-ss-tgt$1",
+              "Match": "^amte2e-ss-src([\\\\]?.*)$"
+            }
+          ]
+        },
+        "Iterations": {
+          "Filters": [],
+          "Mappings": [
+            {
+              "Replacement": "amte2e-ss-tgt$1",
+              "Match": "^amte2e-ss-src([\\\\]?.*)$"
+            }
+          ]
+        },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManagerTool": {
+        "MaxRevisions": 0,
+        "ReplayRevisions": true,
+        "Enabled": true
+      },
+      "TfsAttachmentTool": {
+        "MaxAttachmentSize": 480000000,
+        "Enabled": true,
+        "ExportBasePath": "c:\\temp\\amte2e-attachments"
+      },
+      "TfsWorkItemLinkTool": {
+        "SaveAfterEachLinkIsAdded": false,
+        "Enabled": true,
+        "FilterIfLinkCountMatches": true
+      },
+      "TfsUserMappingTool": {
+        "Enabled": false
+      },
+      "TfsTeamSettingsTool": {
+        "Enabled": false
+      },
+      "FieldMappingTool": {
+        "FieldMaps": [],
+        "Enabled": true
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "UpdateCreatedDate": true,
+        "UpdateCreatedBy": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter','Test Case') ORDER BY [System.ChangedDate] desc",
+        "FixHtmlAttachmentLinks": false,
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": true,
+        "GenerateMigrationComment": true,
+        "MaxGracefulFailures": 0,
+        "SkipRevisionWithInvalidIterationPath": false,
+        "SkipRevisionWithInvalidAreaPath": false
+      }
+    ]
+  }
+}

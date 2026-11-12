@@ -1,0 +1,45 @@
+{
+  "storage": {
+    "kind": "github-issue",
+    "repo": "nkdAgility/azure-devops-migration-tools",
+    "labelPrefix": "state:",
+    "reportedLabel": "triage",
+    "statusMarker": "<!-- nkda-status -->",
+    "adoptPrefix": "I'm working on this",
+    "adoptAuthor": "MrHinsh"
+  },
+  "initialState": "reported",
+  "inProgress": ["fixing", "in-review"],
+  "wipLimit": 3,
+  "pullOrder": "Martin chooses; a regression that stops migrations comes first",
+  "work": {},
+  "shifts": [
+    {
+      "name": "PickedUp",
+      "from": "reported",
+      "to": "fixing",
+      "records": ["started"],
+      "checks": [
+        { "type": "pattern", "pattern": "(?m)^I'm working on this", "message": "no status comment saying Martin is working on it" }
+      ]
+    },
+    {
+      "name": "InReview",
+      "from": "fixing",
+      "to": "in-review",
+      "checks": [
+        { "type": "pattern", "pattern": "#\\d{4,}", "message": "the status comment names no pull request" },
+        { "type": "pattern", "pattern": "(?i)end[- ]to[- ]end|e2e", "message": "the status comment reports no end-to-end run on the test orgs" }
+      ]
+    },
+    {
+      "name": "Closed",
+      "from": "in-review",
+      "to": "closed",
+      "records": ["closed"],
+      "checks": [
+        { "type": "pattern", "pattern": "(?i)\\bmerged\\b", "message": "the status comment does not say the pull request merged" }
+      ]
+    }
+  ]
+}

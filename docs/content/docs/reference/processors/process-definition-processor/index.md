@@ -26,7 +26,8 @@ For each source process in `Processes`, the processor finds the target process b
   - **as a plain field:** it is left as it is and a warning is logged.
   - **with a picklist of the same type:** any source values it lacks are added. Its other values and its *suggested* setting are kept.
   - **with a picklist of another type:** it is left as it is and a warning is logged.
-- **Layout:** pages and custom groups are created when missing. A custom group's controls are added to it, and a control that sits in a different group in the target is moved into the right group.
+- **Layout:** pages and custom groups are created when missing. A custom group's controls are added to it, and a control that sits in a different group in the target is moved into the right group. Custom fields that the source places on an inherited group are added to the same group in the target.
+- **Visibility:** controls, custom groups and system controls (such as *Reason*) that are hidden in the source are hidden in the target, and ones shown in the source are shown again. This covers inherited controls, such as *Risk* or *Remaining Work*, as well as custom fields. Only what differs is changed, so a re-run changes nothing. Azure DevOps does not store a hidden flag on an inherited group, so to hide one, hide its controls.
 
 ## Troubleshooting
 
