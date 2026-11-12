@@ -159,7 +159,7 @@ namespace MigrationTools.Processors
                 }
                 if (_skippedPicklistFields > 0)
                 {
-                    Log.LogError("{SkippedFields} picklist field(s) were not created on [{Target}] because their picklist could not be read or created; see the errors above. Marking the run as failed.", _skippedPicklistFields, Target.Options.Name);
+                    Log.LogError("{SkippedFields} picklist field(s) were not created or updated on [{Target}] because a picklist could not be read or created; see the errors above. Marking the run as failed.", _skippedPicklistFields, Target.Options.Name);
                     CompletedWithErrors = true;
                 }
             }
@@ -192,7 +192,8 @@ namespace MigrationTools.Processors
                 targetList = await Target.GetPicklistAsync(targetField.PicklistId);
                 if (targetList == null)
                 {
-                    Log.LogWarning("Unable to read the picklist of field [{Field}] on [{Target}]. The field is left unchanged.", sourceField.ReferenceName, Target.Options.Name);
+                    Log.LogError("Unable to read the picklist of field [{Field}] on [{Target}], so the source values it may lack cannot be added. The field is left unchanged.", sourceField.ReferenceName, Target.Options.Name);
+                    System.Threading.Interlocked.Increment(ref _skippedPicklistFields);
                     return;
                 }
             }
