@@ -26,3 +26,4 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision:** document in NKDAEngineering-Delivery the prompts to use to integrate a new engineering flow, to add new tools, and to create a new product's workflow.
 - **Decision:** ADMT records which worker chat owns an issue as a hidden tag (an HTML comment such as `<!-- worker: ... -->`) in the issue's status comment, written only by the stage-gate tool.
 - **Fact (Martin, to check):** the "azure-devops-migration-platform" repository comes in next for this way of working. It includes a number of new tools and workflows.
+- **Decision:** the plugin's tools can be skills, workflows, agents or anything else. A repository's Definition of Workflow drives them, directly or indirectly: it combines the available tools into what that repository uses, so new skills can be added to the plugin and each repository chooses whether to use them.
