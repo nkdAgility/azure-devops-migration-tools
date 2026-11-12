@@ -70,7 +70,7 @@ The important bits:
 - The query includes only the test items that are migrated as work items (no Suites or Plans).
 - Leave the work item type validator at its defaults. If you do validate `Shared Steps` or `Shared Parameter` (`ExcludeDefaultWorkItemTypes: false` or `IncludeWorkItemTypes`), the validator accepts `Microsoft.VSTS.Build.IntegrationBuild` for them.
 - Shared Steps and Shared Parameters are migrated before the Test Cases whatever the query order, so the references in each Test Case's steps (`compref`) and parameters (`sharedParameterDataSetIds`, `dataSetId`) are pointed at the migrated copies.
-- You can run this step again. Items already migrated are found by their reflected work item id, so no duplicates are created, and Test Case references are repaired if they were missed before.
+- You can run this step again. Items already migrated are found by their reflected work item id, so no duplicates are created. With `FilterWorkItemsThatAlreadyExistInTarget: true`, as in the sample, those items are skipped. To repair Test Case step and parameter references that an earlier run missed, run this step once with `FilterWorkItemsThatAlreadyExistInTarget: false`, so the existing Test Cases are processed again.
 
 ```JSON
 {
