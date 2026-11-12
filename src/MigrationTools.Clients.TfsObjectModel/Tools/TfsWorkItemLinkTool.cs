@@ -183,26 +183,31 @@ namespace MigrationTools.Tools
         public void MigrateSharedParameters(TfsProcessor processor, WorkItemData wiSourceL, WorkItemData wiTargetL)
         {
             const string microsoftVstsTcmLocalDataSource = "Microsoft.VSTS.TCM.LocalDataSource";
-            var oldSteps = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource].Value.ToString();
-            var newSteps = oldSteps;
-
             var sourceSharedParametersLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.ImmutableName == "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse").ToList();
             var sourceSharedParameters =
                 sourceSharedParametersLinks.Select(x => processor.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
 
+            var sourceToTarget = new Dictionary<string, string>();
             foreach (WorkItemData sourceSharedParameter in sourceSharedParameters)
             {
                 WorkItemData matchingTargetSharedParameter =
                     processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedParameter);
-
                 if (matchingTargetSharedParameter != null)
                 {
-                    newSteps = newSteps.Replace($"sharedParameterDataSetId\":{sourceSharedParameter.Id}",
-                        $"sharedParameterDataSetId\":{matchingTargetSharedParameter.Id}");
-                    newSteps = newSteps.Replace($"sharedParameterDataSetIds\":[{sourceSharedParameter.Id}]",
-                        $"sharedParameterDataSetIds\":[{matchingTargetSharedParameter.Id}]");
-                    wiTargetL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource].Value = newSteps;
+                    sourceToTarget[sourceSharedParameter.Id] = matchingTargetSharedParameter.Id;
+                }
+            }
+
+            if (sourceToTarget.Count > 0)
+            {
+                // Remap from the source value so a re-run never translates an ID that is already a target ID.
+                var sourceDataSource = wiSourceL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource].Value?.ToString();
+                var newDataSource = SharedParameterDataSource.Remap(sourceDataSource, sourceToTarget);
+                var targetField = wiTargetL.ToWorkItem().Fields[microsoftVstsTcmLocalDataSource];
+                if (newDataSource != targetField.Value?.ToString())
+                {
+                    targetField.Value = newDataSource;
                 }
             }
 

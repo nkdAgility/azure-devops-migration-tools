@@ -52,7 +52,7 @@ When you create the field you will be able to see the`RefName` (different from t
 
 ## Work Items you can't customise!
 
-If you need to migrate work items that you can't customise, then you will need to use one of the built in fields and I recommend `Microsoft.VSTS.Build.IntegrationBuild`. This field is only used by builds, and is relatively safe to use.
+On an inherited process `Shared Steps`, `Shared Parameter`, `Code Review Request`, `Code Review Response`, `Feedback Request` and `Feedback Response` can't have custom fields, so they can't hold your `ReflectedWorkItemId` field. You don't need to do anything for them: when one of these six types lacks your field, the migration stores the reflected work item id in the built-in `Microsoft.VSTS.Build.IntegrationBuild` field instead and finds the work items by it on later runs. This field is only used by builds, and is relatively safe to use. Any other type without your field still fails validation, so add the field to every type you can customise.
 
 This is primarily of concern for [How-to: Migrating Plans and Suites]({{< ref "docs/how-to/migrating-plans-and-suites" >}}).
 

@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
+using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.FieldMaps.AzureDevops.ObjectModel;
 using MigrationTools.Processors.Infrastructure;
@@ -98,10 +99,11 @@ namespace MigrationTools.Tools
                     Log.LogInformation("Work item type '{sourceWit}' is mapped to '{targetWit}'.",
                         witPair.SourceWit.Name, witPair.ExpectedTargetWitName);
                 }
-                if (targetWit.FieldDefinitions.Contains(reflectedWorkItemIdField))
+                string resolvedField = NonCustomisableWorkItemTypes.ResolveField(targetWit.Name, reflectedWorkItemIdField, targetWit.FieldDefinitions.Contains);
+                if (resolvedField is not null)
                 {
-                    Log.LogDebug("'{targetWit}' contains reflected work item ID field '{fieldName}'.",
-                        targetWit.Name, reflectedWorkItemIdField);
+                    Log.LogDebug("'{targetWit}' holds the reflected work item ID in '{fieldName}'.",
+                        targetWit.Name, resolvedField);
                 }
                 else
                 {
@@ -111,6 +113,20 @@ namespace MigrationTools.Tools
                 }
             }
             LogReflectedWorkItemIdValidationResult(isValid, reflectedWorkItemIdField);
+            foreach (WorkItemType targetWit in targetWits)
+            {
+                string field = NonCustomisableWorkItemTypes.ResolveField(targetWit.Name, reflectedWorkItemIdField, targetWit.FieldDefinitions.Contains);
+                if (field == NonCustomisableWorkItemTypes.ReflectedWorkItemIdField && field != reflectedWorkItemIdField)
+                {
+                    Log.LogInformation("'{targetWit}' cannot have reflected work item ID field '{fieldName}'. Its reflected work"
+                        + " item ID is stored in '{fallbackField}'.", targetWit.Name, reflectedWorkItemIdField, field);
+                }
+                else if (field is null && NonCustomisableWorkItemTypes.Contains(targetWit.Name))
+                {
+                    Log.LogWarning("'{targetWit}' has neither '{fieldName}' nor '{fallbackField}'. Work items of this type cannot be migrated.",
+                        targetWit.Name, reflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField);
+                }
+            }
             return isValid;
         }
 

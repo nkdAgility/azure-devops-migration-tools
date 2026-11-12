@@ -84,7 +84,11 @@ options:
     If `true`, some work item types will be automatically added to `ExcludeWorkItemTypes` list.
      Work item types excluded by default are: Code Review Request, Code Review Response, Feedback Request,
      Feedback Response, Shared Parameter, Shared Steps.
-  defaultValue: missing XML code comments
+     On an inherited process these types cannot have custom fields, so they cannot hold the reflected work item ID
+     field. When one of these types lacks that field, its reflected work item ID is stored in
+     Microsoft.VSTS.Build.IntegrationBuild, and later runs find the work item by that field. The validator logs
+     which types use this fallback.
+  defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: ExcludeSourceFields
