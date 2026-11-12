@@ -827,7 +827,8 @@ namespace MigrationTools.Processors
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", CommonTools.RevisionManager.ReplayRevisions }}
                             );
-                        List<RevisionItem> revisionsToMigrate = CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
+                        var catchUpDateFixUps = new List<(string Field, object SourceValue, object TargetValue)>();
+                        List<RevisionItem> revisionsToMigrate =CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                         if (targetWorkItem == null)
                         {
                             targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
@@ -846,7 +847,7 @@ namespace MigrationTools.Processors
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 targetWorkItem.ToWorkItem().Fields[Target.Options.ReflectedWorkItemIdField].Value = Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString();
                                 // Retries a fix-up that failed after its revision was saved on an earlier run.
-                                SetStateStampedDatesFromSource(sourceWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), "on the migrated item");
+                                catchUpDateFixUps = SetStateStampedDatesFromSource(sourceWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), "on the migrated item");
                                 StampCatchUpSave(targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
@@ -863,7 +864,7 @@ namespace MigrationTools.Processors
                         }
                         if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
                         {
-                            targetWorkItem.SaveToAzureDevOps();
+                            SaveCatchUp(sourceWorkItem, targetWorkItem, catchUpDateFixUps);
                         }
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
@@ -1284,6 +1285,33 @@ namespace MigrationTools.Processors
             return targetWorkItem;
         }
 
+        /// <summary>
+        /// Saves the catch-up changes on an already migrated item. If the target rejects a corrected state-stamped date with
+        /// TF26194, the dates go back to the target's values and the other changes (attachments, links, field maps) are saved
+        /// without them, so the date correction never fails the work item (#3240).
+        /// </summary>
+        private void SaveCatchUp(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, List<(string Field, object SourceValue, object TargetValue)> dateFixUps)
+        {
+            try
+            {
+                targetWorkItem.SaveToAzureDevOps();
+            }
+            catch (Exception ex) when (dateFixUps.Count > 0 && ClosedDateHelper.IsFieldCannotBeChangedError(ex))
+            {
+                var target = targetWorkItem.ToWorkItem();
+                foreach (var (field, sourceValue, targetValue) in dateFixUps)
+                {
+                    Log.LogWarning(ex, "Could not correct {field} on target #{targetId}: it stays {targetValue}, but source #{sourceId} is {sourceValue}. The work item continues to migrate.",
+                        field, targetWorkItem.Id, targetValue, sourceWorkItem.Id, sourceValue);
+                    target.Fields[field].Value = targetValue;
+                }
+                if (target.IsDirty)
+                {
+                    targetWorkItem.SaveToAzureDevOps();
+                }
+            }
+        }
+
         private static string GetClosedDateField(WorkItem workItem)
         {
             return ClosedDateHelper.ResolveField(
@@ -1412,9 +1440,18 @@ namespace MigrationTools.Processors
                         field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
                     continue;
                 }
+                try
+                {
+                    target.Fields[field].Value = sourceValue;
+                }
+                catch (Exception ex) when (ClosedDateHelper.IsFieldCannotBeChangedError(ex))
+                {
+                    Log.LogWarning(ex, "Could not correct {field} on target #{targetId}: it is {targetValue} {when}, but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}. The target rejected the change, so it keeps the target's value.",
+                        field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
+                    continue;
+                }
                 Log.LogWarning("{field} on target #{targetId} is {targetValue} {when} but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
                     field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
-                target.Fields[field].Value = sourceValue;
                 applied.Add((field, sourceValue, targetValue));
             }
             return applied;
