@@ -1,0 +1,45 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "AzureDevOpsEndpoint",
+        "AuthenticationMode": "EntraId",
+        "AccessToken": "set-by-harness",
+        "Organisation": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amt3242-vis-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      },
+      "Target": {
+        "EndpointType": "AzureDevOpsEndpoint",
+        "AuthenticationMode": "EntraId",
+        "AccessToken": "set-by-harness",
+        "Organisation": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amt3242-vis-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "ProcessDefinitionProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "Processes": {
+          "amt3242-vis": [
+            "User Story",
+            "Task"
+          ]
+        },
+        "ProcessMaps": {
+          "amt3242-vis": "amt3242-viscreate"
+        },
+        "UpdateProcessDetails": true,
+        "MaxDegreeOfParallelism": 1
+      }
+    ]
+  }
+}

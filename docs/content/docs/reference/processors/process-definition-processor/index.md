@@ -22,7 +22,8 @@ For each source process in `Processes`, the processor finds the target process b
 - **Behaviors:** custom behaviors are created or updated. Inherited behaviors, such as *Stories* once *User Story* is customised, already exist in every derived process, so they are only updated. System behaviors are skipped.
 - **Work item types:** types that are not customised in the source are skipped. If the source type is inherited and the target only has the locked system type, the processor first creates an inherited copy of it in the target.
 - **Fields and rules:** only custom and inherited definitions are written. System fields and system rules come with the parent process and cannot be changed, so they are skipped.
-- **Layout:** pages and custom groups are created when missing. A custom group's controls are added to it, and a control that sits in a different group in the target is moved into the right group.
+- **Layout:** pages and custom groups are created when missing. A custom group's controls are added to it, and a control that sits in a different group in the target is moved into the right group. Custom fields that the source places on an inherited group are added to the same group in the target.
+- **Visibility:** controls, custom groups and system controls (such as *Reason*) that are hidden in the source are hidden in the target, and ones shown in the source are shown again. This covers inherited controls, such as *Risk* or *Remaining Work*, as well as custom fields. Only what differs is changed, so a re-run changes nothing. Azure DevOps does not store a hidden flag on an inherited group, so to hide one, hide its controls.
 
 ## Troubleshooting
 

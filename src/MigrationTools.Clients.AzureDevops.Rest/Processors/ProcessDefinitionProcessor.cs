@@ -481,12 +481,64 @@ namespace MigrationTools.Processors
 
             #endregion
 
+            // The page sync clears the sections on the page objects we hold, so read the groups again first.
+            await LoadLayout(TargetModel, targetWit, Target, processId);
+            await AddControlsMissingFromInheritedGroups(sourceWit, targetWit, processId);
+
             // Refresh the target layout so the model reflects the groups and controls added or moved above.
             await LoadLayout(TargetModel, targetWit, Target, processId);
+
+            var visibilityChanges = ProcessDefinitionSync.FindVisibilityChanges(sourceWit.Layout, targetWit.Layout);
+            foreach (var change in visibilityChanges)
+            {
+                if (await Target.SetLayoutVisibility(change, processId, targetWit.WorkItemType.ReferenceName))
+                {
+                    Log.LogInformation("Set {LayoutTarget} [{Label}] on [{WorkItemType}] to {Visibility}.", change.Target, change.Label, targetWit.WorkItemType.Name, change.Visible ? "visible" : "hidden");
+                }
+            }
+            if (visibilityChanges.Count > 0)
+            {
+                await LoadLayout(TargetModel, targetWit, Target, processId);
+            }
             Log.LogInformation($"Completed sync of work item type [{Source.Options.Name}::{sourceWit.WorkItemType.Name}] in [{Target.Options.Name}::{targetWit.WorkItemType.Name}].");
         }
 
 
+
+        /// <summary>
+        /// The group sync above only walks custom groups, so a custom field placed on an inherited group never reached
+        /// the target layout and its visibility could not be matched (#3242).
+        /// </summary>
+        private async Task AddControlsMissingFromInheritedGroups(WorkItemTypeModel sourceWit, WorkItemTypeModel targetWit, string processId)
+        {
+            var targetWitGroups = TargetModel.WorkItemGroups
+                .Where(x => x.Key.StartsWith($"{targetWit.WorkItemType.Name}::"))
+                .Select(x => x.Value)
+                .ToList();
+            foreach (var sourcePage in sourceWit.Layout.Pages)
+            {
+                foreach (var sourceGroup in (sourcePage.Sections ?? Enumerable.Empty<WorkItemSection>()).SelectMany(s => s.Groups ?? Enumerable.Empty<WorkItemGroup>()).Where(g => g.Inherited))
+                {
+                    var targetGroup = ProcessDefinitionSync.FindTargetInheritedGroup(targetWit.Layout, sourcePage.Label, sourceGroup);
+                    if (targetGroup == null)
+                    {
+                        Log.LogWarning("Inherited group [{Group}] on page [{Page}] of [{WorkItemType}] is missing from [{Target}]. Skipping its controls.", sourceGroup.Label, sourcePage.Label, targetWit.WorkItemType.Name, Target.Options.Name);
+                        continue;
+                    }
+                    foreach (var sourceControl in (sourceGroup.Controls ?? Enumerable.Empty<WorkItemControl>()).Where(c => !c.Inherited && !WorkItemGroup.IsHtmlControl(c)))
+                    {
+                        if (ProcessDefinitionSync.FindGroupContainingControl(targetWitGroups, sourceControl.Id) != null)
+                        {
+                            continue;
+                        }
+                        if (await Target.AddWorkItemControlToGroup(sourceControl.CloneAsNew(), processId, targetWit.WorkItemType.ReferenceName, targetGroup.Id, sourceControl.Id))
+                        {
+                            Log.LogInformation("Attached control [{Control}] to inherited group [{Group}].", sourceControl.Label ?? sourceControl.Id,targetGroup.Label);
+                        }
+                    }
+                }
+            }
+        }
 
         private async Task<DefinitionType> SyncDefinitionType<DefinitionType>(Dictionary<string, DefinitionType> DataDictionary, DefinitionType sourceDef, DefinitionType targetDef, params string[] routeParams)
             where DefinitionType : RestApiDefinition, ISynchronizeable<DefinitionType>, new()

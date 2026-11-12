@@ -11,6 +11,112 @@ namespace MigrationTools.Processors.Tests
 
         private static WorkItemControl Control(string id) => new WorkItemControl { Id = id, ControlType = "FieldControl" };
 
+        private static WorkItemControl Ctl(string id, bool visible, bool inherited = true) =>
+            new WorkItemControl { Id = id, Label = id, ControlType = "FieldControl", Visible = visible, Inherited = inherited };
+
+        private static WorkItemLayout Layout(string groupId, bool groupVisible, params WorkItemControl[] controls) => new WorkItemLayout
+        {
+            Pages = new List<WorkItemPage>
+            {
+                new WorkItemPage
+                {
+                    Id = "page-" + groupId, Label = "Details", Visible = true,
+                    Sections = new List<WorkItemSection>
+                    {
+                        new WorkItemSection { Id = "Section2", Groups = new List<WorkItemGroup>
+                        {
+                            new WorkItemGroup { Id = groupId, Label = "Planning", Inherited = true, Visible = groupVisible, Controls = new List<WorkItemControl>(controls) },
+                        } },
+                    },
+                },
+            },
+            SystemControls = new List<SystemControl>(),
+        };
+
+        [TestMethod(), TestCategory("L0")]
+        public void HiddenInheritedAndCustomControls_AreHiddenOnTarget()
+        {
+            var source = Layout("src-g", true, Ctl("Microsoft.VSTS.Common.Priority", false), Ctl("Custom.Thing", false, inherited: false));
+            var target = Layout("tgt-g", true, Ctl("Microsoft.VSTS.Common.Priority", true), Ctl("Custom.Thing", true, inherited: false));
+
+            var changes = ProcessDefinitionSync.FindVisibilityChanges(source, target);
+
+            Assert.AreEqual(2, changes.Count);
+            Assert.IsTrue(changes.TrueForAll(c => c.Target == LayoutVisibilityTarget.Control && !c.Visible && c.GroupId == "tgt-g"));
+            CollectionAssert.AreEquivalent(new[] { "Microsoft.VSTS.Common.Priority", "Custom.Thing" }, changes.ConvertAll(c => c.ControlId));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void ControlShownAgainOnSource_IsShownOnTarget()
+        {
+            var changes = ProcessDefinitionSync.FindVisibilityChanges(
+                Layout("g", true, Ctl("System.Tags", true)), Layout("g", true, Ctl("System.Tags", false)));
+
+            Assert.AreEqual(1, changes.Count);
+            Assert.IsTrue(changes[0].Visible);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void HiddenGroup_IsHiddenOnTargetUsingTargetIds()
+        {
+            var changes = ProcessDefinitionSync.FindVisibilityChanges(Layout("src-g", false), Layout("tgt-g", true));
+
+            Assert.AreEqual(1, changes.Count);
+            Assert.AreEqual(LayoutVisibilityTarget.Group, changes[0].Target);
+            Assert.AreEqual("page-tgt-g", changes[0].PageId);
+            Assert.AreEqual("Section2", changes[0].SectionId);
+            Assert.AreEqual("tgt-g", changes[0].GroupId);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void HiddenSystemControl_IsHiddenOnTarget()
+        {
+            var source = Layout("g", true);
+            source.SystemControls.Add(new SystemControl { Id = "System.AreaPath", Visible = false });
+            var target = Layout("g", true);
+            target.SystemControls.Add(new SystemControl { Id = "System.AreaPath", Visible = true });
+
+            var changes = ProcessDefinitionSync.FindVisibilityChanges(source, target);
+
+            Assert.AreEqual(1, changes.Count);
+            Assert.AreEqual(LayoutVisibilityTarget.SystemControl, changes[0].Target);
+            Assert.AreEqual("System.AreaPath", changes[0].ControlId);
+            Assert.IsFalse(changes[0].Visible);
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void MatchingVisibility_ProducesNoChanges_SoReRunsAreIdempotent()
+        {
+            var source = Layout("g", false, Ctl("Microsoft.VSTS.Common.Priority", false));
+            source.SystemControls.Add(new SystemControl { Id = "System.AreaPath", Visible = false });
+            var target = Layout("g2", false, Ctl("Microsoft.VSTS.Common.Priority", false));
+            target.SystemControls.Add(new SystemControl { Id = "System.AreaPath", Visible = false });
+
+            Assert.IsEmpty(ProcessDefinitionSync.FindVisibilityChanges(source, target));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void ControlMissingFromTarget_ProducesNoVisibilityChange()
+        {
+            Assert.IsEmpty(ProcessDefinitionSync.FindVisibilityChanges(Layout("g", true, Ctl("Custom.Gone", false)), Layout("g", true)));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void NullLayouts_ProduceNoChanges()
+        {
+            Assert.IsEmpty(ProcessDefinitionSync.FindVisibilityChanges(null, Layout("g", true)));
+            Assert.IsEmpty(ProcessDefinitionSync.FindVisibilityChanges(new WorkItemLayout(), new WorkItemLayout()));
+        }
+
+        [TestMethod(), TestCategory("L0")]
+        public void InheritedGroup_IsFoundById_ThenByLabelOnSamePage()
+        {
+            var target = Layout("tgt-g", true);
+            Assert.AreEqual("tgt-g", ProcessDefinitionSync.FindTargetInheritedGroup(target, "Details", new WorkItemGroup { Id = "tgt-g", Label = "Other" })?.Id);
+            Assert.AreEqual("tgt-g", ProcessDefinitionSync.FindTargetInheritedGroup(target, "Details", new WorkItemGroup { Id = "x", Label = "planning" })?.Id);
+            Assert.IsNull(ProcessDefinitionSync.FindTargetInheritedGroup(target, "History", new WorkItemGroup { Id = "x", Label = "Planning" }));
+        }
+
         [TestMethod(), TestCategory("L0")]
         public void TargetTypeMissing_IsCreated()
         {
