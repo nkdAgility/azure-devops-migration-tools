@@ -38,6 +38,7 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision:** the plugin is versioned with GitVersion, like every other tool Martin uses.
 - **Decision (given in CONTROL-HUB, relayed):** plugins are installed machine-wide only (managed settings), never at user scope. The plugin's build.ps1 installs nothing and prints the steps for Martin.
 - **Fact (Martin):** in this repo the backlog and the options are stored in GitHub issues.
+- **Fact (Martin):** you can't push on main. Checked: main's ruleset requires a pull request, status checks and the merge queue. The earlier direct pushes (22202606, 3db6b3fb, 8af3e1bc on 2026-11-12/13) went around that rule.
 
 ## 2026-11-13
 
