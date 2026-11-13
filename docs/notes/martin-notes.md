@@ -34,6 +34,8 @@ These are the facts and decisions Martin has given, so they can be checked. They
 ## 2026-11-13
 
 - **Decision:** Martin approved the "Issue status comment" wording for CLAUDE.md and AGENTS.md (workers update the status comment only with `Test-StageGate.ps1 -Status`), and the matching sentence in definition-of-workflow.md. It is pushed together with the plugin's status-comment hook.
+- **Finding:** sessions run a cached copy of nkda-engineering-delivery 0.1.0 (from 2026-11-12 12:22), because the plugin's version never changed. None of the 2026-11-12 plugin changes (definition-of-workflow.json, issue storage, -Status, the gh hook) are live yet.
+- **Decision:** the plugin is versioned with GitVersion, like every other tool Martin uses.
 
 ## 2026-11-13
 
