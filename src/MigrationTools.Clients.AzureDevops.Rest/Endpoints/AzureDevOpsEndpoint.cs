@@ -251,6 +251,54 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>
+        /// Reads one picklist by id. The list call only returns lists in use by a work item type, so a field's list
+        /// has to be read through its <see cref="WorkItemField.PicklistId"/> (#3241).
+        /// </summary>
+        /// <returns>The picklist, or null if the service did not return it; the failure has been logged.</returns>
+        public async Task<WorkItemPicklist> GetPicklistAsync(string picklistId)
+        {
+            var client = GetHttpClient<WorkItemPicklist>();
+            var httpResponse = await client.GetAsync(RestUrlHelper.AppendSegment(client.BaseAddress.ToString(), picklistId));
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                Log.LogError("Failed to read picklist [{PicklistId}] from [{Endpoint}].\r\nUrl: GET {Url}\r\nResponse Code:{StatusCode}\r\n{ErrorText}", picklistId, Options.Name, httpResponse.RequestMessage.RequestUri, httpResponse.StatusCode, await httpResponse.Content.ReadAsStringAsync());
+                return null;
+            }
+            return await httpResponse.Content.ReadAsAsync<WorkItemPicklist>();
+        }
+
+        /// <returns>
+        /// ReadSucceeded is false when the service could not answer; Field is null when the field does not exist.
+        /// </returns>
+        public async Task<(bool ReadSucceeded, WorkItemField Field)> GetFieldAsync(string referenceName)
+        {
+            var client = GetHttpClient<WorkItemField>();
+            var httpResponse = await client.GetAsync(RestUrlHelper.AppendSegment(client.BaseAddress.ToString(), referenceName));
+            if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return (true, null);
+            }
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                return (false, null);
+            }
+            return (true, await httpResponse.Content.ReadAsAsync<WorkItemField>());
+        }
+
+        /// <returns>true if the picklist was deleted; a failure has been logged.</returns>
+        public async Task<bool> DeletePicklistAsync(string picklistId)
+        {
+            var client = GetHttpClient<WorkItemPicklist>();
+            var httpResponse = await client.DeleteAsync(RestUrlHelper.AppendSegment(client.BaseAddress.ToString(), picklistId));
+            if (!httpResponse.IsSuccessStatusCode)
+            {
+                Log.LogWarning("Failed to delete unused picklist [{PicklistId}] on [{Endpoint}]: {StatusCode} {ErrorText}", picklistId, Options.Name, httpResponse.StatusCode, await httpResponse.Content.ReadAsStringAsync());
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Make HTTP Request to add Revision / Version of Task Group
         /// </summary>
         /// <param name="rootDefinitions"></param>
