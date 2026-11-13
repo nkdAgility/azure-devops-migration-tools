@@ -26,3 +26,13 @@ Ignore `dev.azure.com/nkdagility/AzureDevOps-Tools`: never query it or use it to
 
 `wingetcreate update` copies the locale text from the previous manifest in microsoft/winget-pkgs, not from this repo, so the script overwrites `ShortDescription`/`Description` with the values from `src/MigrationTools.WinGet/*.locale.en-US.yaml` before `wingetcreate submit`. To test locally, run it with `-DryRun` and `DOTNET_ROLL_FORWARD=Major` (wingetcreate needs .NET 9). Manifest validation fails on long paths such as the scratchpad.
 
+## Issue status comment
+
+Each issue being worked on has one status comment, the one that starts "I'm working on this".
+Update it only with the nkda-engineering-delivery stage-gate tool, from the repository root:
+
+    Test-StageGate.ps1 -Package <issue number> -Status "<the current status, written for the customer>"
+
+`-Status` replaces the current status and keeps the comment's hidden tags and its History. Never edit
+or delete the status comment with `gh` directly; the plugin's hook refuses it. Other comments, PR
+comments and review replies are unaffected.

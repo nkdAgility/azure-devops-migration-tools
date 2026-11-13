@@ -33,4 +33,8 @@ These are the facts and decisions Martin has given, so they can be checked. They
 
 ## 2026-11-13
 
+- **Decision:** Martin approved the "Issue status comment" wording for CLAUDE.md and AGENTS.md (workers update the status comment only with `Test-StageGate.ps1 -Status`), and the matching sentence in definition-of-workflow.md. It is pushed together with the plugin's status-comment hook.
+
+## 2026-11-13
+
 - **Decision:** on PR #3249 (#3241), the two failure paths that can't be forced on the test organisations stay untested live: the read-back of a new field failing after a successful create, and the service rejecting an update to an existing picklist. They are covered by code review and unit tests and listed under "Not covered" in the PR.

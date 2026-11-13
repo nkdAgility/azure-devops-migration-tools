@@ -20,7 +20,7 @@ Martin says it is to be worked on.
 One worker chat owns the issue, in its own worktree, branch and pull request. It reproduces the
 problem, finds the cause, makes the fix and tests it: unit tests, and end-to-end runs on the test
 organisations against `main` and the branch, covering failure paths as well as the happy path, in
-its own scratch projects. The status comment is edited as findings and the fix progress. Work moves
+its own scratch projects. The worker replaces the status comment's current status, through the stage-gate tool, as findings and the fix progress. Work moves
 on when the pull request is open, says which issue it fixes, and reports against the Definition of
 Done: up to date with `main`, builds, tests pass, the end-to-end migration completes on the test
 orgs, meets the architectural norms and the original ask, the docs are updated with
