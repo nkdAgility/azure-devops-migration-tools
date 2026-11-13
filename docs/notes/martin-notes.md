@@ -30,3 +30,7 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision (given in CONTROL-HUB, relayed):** any change to the plugin, or to how we interact with it, is worked through with every active CONTROL-* chat to ensure compatibility before it is pushed.
 - **Decision (given in CONTROL-HUB, relayed):** the machine-readable workflow lives in a file of the same name with a .json extension, beside the prose: `platform/development/definition-of-workflow.md` and `platform/development/definition-of-workflow.json`. It is not embedded in the Markdown. ADMT needs its own .json.
 - **Decision:** ADMT's WIP limit is 3 issues in fixing and in review together.
+
+## 2026-11-13
+
+- **Decision:** on PR #3249 (#3241), the two failure paths that can't be forced on the test organisations stay untested live: the read-back of a new field failing after a successful create, and the service rejecting an update to an existing picklist. They are covered by code review and unit tests and listed under "Not covered" in the PR.
