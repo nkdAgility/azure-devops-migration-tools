@@ -419,9 +419,9 @@ namespace MigrationTools.ConsoleDataGenerator
                     obj["prefixItems"] = new JArray(prefixItemsToken);
                     prefixItemsToken = obj["prefixItems"];
                 }
-                // A list option has one element schema, which must apply to every element ('items'), not only the
-                // first ('prefixItems'). The processor and field map lists keep their 'anyOf' prefixItems.
-                if (prefixItemsToken is JArray single && single.Count == 1 && single[0] is JObject element && element["anyOf"] == null)
+                // A list has one element schema (for processors and field maps an 'anyOf'), which must apply to every
+                // element ('items'), not only the first ('prefixItems').
+                if (prefixItemsToken is JArray single && single.Count == 1 && single[0] is JObject element)
                 {
                     obj.Remove("prefixItems");
                     obj["items"] = element;
@@ -487,11 +487,31 @@ namespace MigrationTools.ConsoleDataGenerator
             if (IsSimpleDotNetType(t)) return false;
             if (!t.IsClass) return false;
             if (t.Name.EndsWith("Options", StringComparison.Ordinal)) return true;
-            // Could extend with interface checks similar to resolver if needed
+            // List elements such as RegexStringManipulator are configuration objects too, so their property types are emitted.
+            if (t.Namespace != null && t.Namespace.StartsWith("MigrationTools", StringComparison.Ordinal)) return true;
             return false;
         }
 
         private static JSchema BuildPropertySchema(OptionsItem option)
+        {
+            return AllowNullForReferenceTypes(BuildPropertySchemaCore(option), option.DotNetType);
+        }
+
+        /// <summary>
+        /// A string, list, dictionary or object option, or a Nullable value, can be null in a configuration the runtime
+        /// accepts (for example "OnlyElementsWithTag": null), so its schema must accept null too.
+        /// </summary>
+        private static JSchema AllowNullForReferenceTypes(JSchema schema, Type t)
+        {
+            bool canBeNull = t != null && (!t.IsValueType || Nullable.GetUnderlyingType(t) != null);
+            if (canBeNull && schema.Type.HasValue)
+            {
+                schema.Type = schema.Type.Value | JSchemaType.Null;
+            }
+            return schema;
+        }
+
+        private static JSchema BuildPropertySchemaCore(OptionsItem option)
         {
             // If we captured the runtime type, prefer that path for richer schema
             if (option.DotNetType != null)
@@ -579,13 +599,10 @@ namespace MigrationTools.ConsoleDataGenerator
                          .Where(p => p.CanRead && p.CanWrite);
             foreach (var p in props)
             {
-                var ps = BuildSchemaForType(p.PropertyType);
+                var ps = AllowNullForReferenceTypes(BuildSchemaForType(p.PropertyType), p.PropertyType);
                 schema.Properties[p.Name] = ps;
-                // Capture required attribute for nested complex types
-                if (p.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), inherit: true).Any())
-                {
-                    schema.Required.Add(p.Name);
-                }
+                // [Required] on a nested type is not emitted: configuration is bound into an instance that already holds
+                // the defaults, so a configuration that sets only some nested values is valid at run time.
             }
             return schema;
         }

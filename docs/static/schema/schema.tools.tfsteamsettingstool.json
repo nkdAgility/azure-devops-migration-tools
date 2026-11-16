@@ -22,7 +22,10 @@
     },
     "Teams": {
       "description": "List of Teams to process. If this is `null` then all teams will be processed.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "string"
       }

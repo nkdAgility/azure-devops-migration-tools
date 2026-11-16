@@ -77,7 +77,7 @@ options:
 - parameterName: BuildPipelines
   type: List
   description: List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
-  defaultValue: ''
+  defaultValue: null
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enabled
@@ -131,7 +131,7 @@ options:
 - parameterName: ReleasePipelines
   type: List
   description: List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
-  defaultValue: ''
+  defaultValue: null
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: RepositoryNameMaps

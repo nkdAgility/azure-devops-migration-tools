@@ -7,22 +7,45 @@
   "properties": {
     "Areas": {
       "description": "Rules to apply to the Area Path. Is an object of NodeOptions e.g. { \"Filters\": [\"*/**\"], \"Mappings\": [{\"Match\": \"^oldProjectName([\\\\\\\\]?.*)$\", \"Replacement\": \"targetProjectA$1\"}] }",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "default": {
         "Filters": [],
         "Mappings": []
       },
       "properties": {
         "Filters": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string"
           }
         },
         "Mappings": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "Match": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "Replacement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
           }
         }
       }
@@ -34,22 +57,45 @@
     },
     "Iterations": {
       "description": "Rules to apply to the Iteration Path. Is an object of NodeOptions e.g. { \"Filters\": [\"*/**\"], \"Mappings\": [{\"Match\": \"^oldProjectName([\\\\\\\\]?.*)$\", \"Replacement\": \"targetProjectA$1\"}] }",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "default": {
         "Filters": [],
         "Mappings": []
       },
       "properties": {
         "Filters": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
             "type": "string"
           }
         },
         "Mappings": {
-          "type": "array",
+          "type": [
+            "array",
+            "null"
+          ],
           "items": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "Match": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "Replacement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
           }
         }
       }

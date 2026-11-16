@@ -7,14 +7,20 @@
   "properties": {
     "ApplyTo": {
       "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "string"
       }
     },
     "defaultValue": {
       "description": "Gets or sets the default value to use when the source field is empty or null.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "Enabled": {
       "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -27,11 +33,17 @@
     },
     "sourceField": {
       "description": "Gets or sets the name of the source field to copy data from during migration.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "targetField": {
       "description": "Gets or sets the name of the target field to copy data to during migration.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   }
 }

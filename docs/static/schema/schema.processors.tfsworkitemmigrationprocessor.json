@@ -17,7 +17,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "object"
       }
@@ -49,7 +52,10 @@
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "SkipRevisionWithInvalidAreaPath": {
       "description": "When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.",
@@ -63,7 +69,10 @@
     },
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-      "type": "string",
+      "type": [
+        "string",
+        "null"
+      ],
       "default": "Source"
     },
     "StopOnFirstError": {
@@ -73,12 +82,18 @@
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-      "type": "string",
+      "type": [
+        "string",
+        "null"
+      ],
       "default": "Target"
     },
     "WIQLQuery": {
       "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
-      "type": "string",
+      "type": [
+        "string",
+        "null"
+      ],
       "default": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
     },
     "WorkItemCreateRetryLimit": {
@@ -88,7 +103,10 @@
     },
     "WorkItemIDs": {
       "description": "A list of work items to import",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "default": [],
       "items": {
         "type": "integer"

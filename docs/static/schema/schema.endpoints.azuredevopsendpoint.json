@@ -7,7 +7,10 @@
   "properties": {
     "AccessToken": {
       "description": "Personal Access Token (PAT) for the Azure DevOps organization. Required when AuthenticationMode is AccessToken; not used with EntraId.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "AuthenticationMode": {
       "description": "Authentication mode to use when connecting to Azure DevOps: AccessToken (a PAT in AccessToken) or EntraId (a Microsoft Entra ID token from the signed-in identity, such as az login, a managed identity or workload identity federation, with no secret stored in configuration).",
@@ -19,26 +22,41 @@
     },
     "EndpointEnrichers": {
       "description": "missing XML code comments",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "object"
       }
     },
     "Name": {
       "description": "missing XML code comments",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "Organisation": {
       "description": "URL of the Azure DevOps organization (e.g., \"https://dev.azure.com/myorganization/\"). Must include the full organization URL.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "Project": {
       "description": "Name of the Azure DevOps project within the organization to connect to. This is the project that will be used for migration operations.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "ReflectedWorkItemIdField": {
       "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

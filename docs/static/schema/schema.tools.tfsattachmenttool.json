@@ -12,7 +12,10 @@
     },
     "ExportBasePath": {
       "description": "`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.",
-      "type": "string",
+      "type": [
+        "string",
+        "null"
+      ],
       "default": "c:\\temp\\WorkItemAttachmentExport"
     },
     "MaxAttachmentSize": {

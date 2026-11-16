@@ -7,7 +7,10 @@
   "properties": {
     "ApplyTo": {
       "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "string"
       }
@@ -18,7 +21,10 @@
     },
     "targetField": {
       "description": "Gets or sets the name of the target field to be cleared/set to null during work item migration.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   }
 }

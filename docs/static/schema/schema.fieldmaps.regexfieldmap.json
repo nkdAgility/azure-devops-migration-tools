@@ -7,7 +7,10 @@
   "properties": {
     "ApplyTo": {
       "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "string"
       }
@@ -18,19 +21,31 @@
     },
     "pattern": {
       "description": "Gets or sets the regular expression pattern to match against the source field value.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "replacement": {
       "description": "Gets or sets the replacement pattern that defines how matched groups should be used to construct the target value.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "sourceField": {
       "description": "Gets or sets the name of the source field to read data from and apply regex pattern matching.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "targetField": {
       "description": "Gets or sets the name of the target field to write the regex-transformed data to.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   }
 }

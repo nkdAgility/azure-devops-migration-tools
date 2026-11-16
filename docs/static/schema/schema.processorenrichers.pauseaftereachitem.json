@@ -12,7 +12,10 @@
     },
     "RefName": {
       "description": "For internal use",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   }
 }

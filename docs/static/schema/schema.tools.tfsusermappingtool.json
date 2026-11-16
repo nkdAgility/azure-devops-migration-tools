@@ -7,7 +7,10 @@
   "properties": {
     "EmailDomainMappings": {
       "description": "Used with MatchUsersByEmail to handle a tenant or domain change. Maps source email domains to target email domains,\r\n for example { \"old.com\": \"new.com\" } matches first.last@old.com to first.last@new.com. Applied when no exact email match is found.",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": {
         "type": "string"
       }
@@ -19,7 +22,10 @@
     },
     "IdentityFieldsToCheck": {
       "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.\r\n A configured list replaces the default list; only the listed fields are mapped, and an empty list maps none. When it is not set, System.AssignedTo, System.ChangedBy,\r\n System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy and Microsoft.VSTS.Common.ClosedBy are used.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "default": [
         "System.AssignedTo",
         "System.ChangedBy",
@@ -44,7 +50,10 @@
     },
     "ProjectCollectionValidUsersGroupName": {
       "description": "This is the regionalized \"Project Collection Valid Users\" group name. Default is \"Project Collection Valid Users\".",
-      "type": "string",
+      "type": [
+        "string",
+        "null"
+      ],
       "default": "Project Collection Valid Users"
     },
     "SkipValidateAllUsersExistOrAreMapped": {
@@ -64,7 +73,10 @@
     },
     "UserMappingFile": {
       "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.\r\n By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is\r\n enabled, the format is detected from the content: a JSON array of objects with \"Source\" and \"Target\" identities is read as\r\n detailed IdentityMapData, and a JSON object is read as the simple dictionary format.\r\n In the dictionary format a key or value may be written as the display name followed by the UPN in angle brackets to identify one of several users that share a display name.",
-      "type": "string",
+      "type": [
+        "string",
+        "null"
+      ],
       "default": "C:\\temp\\userExport.json"
     }
   }

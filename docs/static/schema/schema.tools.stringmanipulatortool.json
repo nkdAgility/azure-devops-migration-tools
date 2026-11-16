@@ -12,10 +12,36 @@
     },
     "Manipulators": {
       "description": "List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "default": [],
       "items": {
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "Enabled": {
+            "type": "boolean"
+          },
+          "Pattern": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "Replacement": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "Description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
       }
     },
     "MaxStringLength": {

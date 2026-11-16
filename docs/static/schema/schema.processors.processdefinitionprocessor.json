@@ -11,7 +11,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "object"
       }
@@ -22,7 +25,10 @@
     },
     "Processes": {
       "description": "Dictionary mapping process names to lists of work item type names to be included in the migration. If null, all work item types will be migrated.",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": {
         "type": "array",
         "items": {
@@ -32,22 +38,34 @@
     },
     "ProcessMaps": {
       "description": "Dictionary mapping source process names to target process names for process template transformations during migration.",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": {
         "type": "string"
       }
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "UpdateProcessDetails": {
       "description": "Indicates whether to update existing process details in the target organization or only create new processes.",

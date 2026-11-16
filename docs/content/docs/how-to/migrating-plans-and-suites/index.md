@@ -127,7 +127,7 @@ This will rebuild the Plans and Suites and wire up all of the Test Cases.
 
 _note: Runs are not migrated._
 
-If a Test Case in a suite has not been migrated in step 1, it is left out of the rebuilt suite, an error names it, and the run exits with code 1. Migrate it, then run this step again.
+If a Test Case in a suite has not been migrated in step 1, it is left out of the rebuilt suite, an error names it, and the run exits with code 1. Migrate it, then run this step again. That repairs suites under the root suite, but not a Test Case that sits directly in the plan's root suite: those are only added when the plan is created, so on a re-run against the existing plan they stay missing ([#3260](https://github.com/nkdAgility/azure-devops-migration-tools/issues/3260)). For those, add the Test Case to the root suite in the target by hand, or delete the target plan and run this step again so it is created afresh.
 
 The important bits:
 

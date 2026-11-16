@@ -11,25 +11,54 @@
     },
     "Authentication": {
       "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "properties": {
         "AuthenticationMode": {
           "type": "string"
         },
         "NetworkCredentials": {
-          "type": "object"
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "Domain": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "UserName": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "Password": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
         },
         "AccessToken": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
-      },
-      "required": [
-        "AuthenticationMode"
-      ]
+      }
     },
     "Collection": {
       "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "Enabled": {
       "description": "Will be used if enabled",
@@ -37,30 +66,41 @@
     },
     "EndpointEnrichers": {
       "description": "missing XML code comments",
-      "type": "array",
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "type": "object"
       }
     },
     "LanguageMaps": {
       "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "properties": {
         "AreaPath": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "IterationPath": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
-      },
-      "required": [
-        "AreaPath",
-        "IterationPath"
-      ]
+      }
     },
     "Name": {
       "description": "missing XML code comments",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "ProductVersion": {
       "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
@@ -68,11 +108,17 @@
     },
     "Project": {
       "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "ReflectedWorkItemIdField": {
       "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

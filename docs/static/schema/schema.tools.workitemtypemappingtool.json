@@ -12,7 +12,10 @@
     },
     "Mappings": {
       "description": "List of work item mappings.",
-      "type": "object",
+      "type": [
+        "object",
+        "null"
+      ],
       "default": {},
       "additionalProperties": {
         "type": "string"
