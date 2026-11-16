@@ -160,7 +160,7 @@ Remove emojis that can cause issues with SOAP interfaces. Like the built-in patt
 ```json
 {
   "$type": "RegexStringManipulator",
-  "Description": "Remove emojis but preserve Unicode letters and symbols",
+  "Description": "Remove characters outside the BMP (most emoji) and U+FE0F",
   "Enabled": true,
   "Pattern": "[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
   "Replacement": ""
