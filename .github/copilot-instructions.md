@@ -107,12 +107,14 @@ string[] clientAssemblies = {
 - Assembly reflection to discover types
 - Automatic YAML data generation
 - Markdown documentation generation
-- Jekyll-compatible output format
+- Hugo data files (YAML) and JSON schemas
 - Configuration type discovery
 
 **Output Locations:**
-- YAML data: `../../../../../docs/_data/`
-- Markdown documentation: `../../../../../docs/Reference/Generated/`
+- YAML data: `docs/data/classes/` (`reference.<type>.<name>.yaml`), read by each page's `dataFile`
+- JSON schemas: `docs/static/schema/` (`schema.<type>.<name>.json` and `configuration.schema.json`), read by each page's `schemaFile`
+
+The documentation site is built with Hugo (`docs/hugo.yaml`). Reference pages are hand-written under `docs/content/docs/reference/` and render the generated data with the `class-options`, `class-sample` and `class-schema` shortcodes.
 
 **Type Discovery:**
 Discovers and documents:
@@ -234,8 +236,8 @@ Discovers and documents:
 - Uses PowerShell's built-in `-Verbose` parameter for detailed output
 
 **Generated Output:**
-- YAML data files in `docs/_data/` for Jekyll site integration
-- Markdown documentation in `docs/Reference/Generated/`
+- YAML data files in `docs/data/classes/` for the Hugo site
+- JSON schemas in `docs/static/schema/`
 - Progress feedback showing file counts and generation status
 
 **Environment Requirements:**
@@ -333,13 +335,13 @@ When modifying any option classes or configuration-related classes, the document
    dotnet run
    ```
 
-3. **Verify Configuration Samples:** Check that generated YAML files in `/docs/_data/` contain configuration samples that match the actual class properties:
+3. **Verify Configuration Samples:** Check that generated YAML files in `docs/data/classes/` contain configuration samples that match the actual class properties:
    - Property names must match exactly
    - Default values must be current
    - All required properties must be present
    - Deprecated properties should be removed
 
-4. **Validate Documentation Pages:** Ensure that any code samples in `/docs/Reference/` markdown files reflect the current class structure and property names.
+4. **Validate Documentation Pages:** Ensure that any code samples in the reference pages under `docs/content/docs/reference/` reflect the current class structure and property names.
 
 5. **Cross-Reference Class Data:** Verify that the documentation accurately represents what is actually in the code by comparing:
    - Property types and names in the class vs. documentation
@@ -349,8 +351,8 @@ When modifying any option classes or configuration-related classes, the document
 
 **Documentation Generation Process:**
 The `ConsoleDataGenerator` uses reflection to discover types and generates:
-- YAML data files in `/docs/_data/` (e.g., `reference.processors.*.yaml`)
-- Markdown documentation in `/docs/Reference/Generated/`
+- YAML data files in `docs/data/classes/` (e.g., `reference.processors.*.yaml`)
+- JSON schemas in `docs/static/schema/`
 - Configuration samples that include all properties with their current default values
 
 **Validation Checklist:**
