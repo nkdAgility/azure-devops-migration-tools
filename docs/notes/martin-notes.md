@@ -42,6 +42,8 @@ These are the facts and decisions Martin has given, so they can be checked. They
 
 ## 2026-11-16
 
+- **Fact (Martin, to check):** the config wizard on the docs site (`docs/content/docs/config/config-wizard`, `docs/static/js/config-wizard.js`) does not work.
+- **Decision (Martin):** the config wizard must not be live unless it works.
 - **Decision:** enforce the rule that every plugin change is agreed by all active CONTROL chats before it is pushed: a check blocks the push until they have agreed. (Prompted by 3d693d8, 24fff0d and 69c4ee9, each announced as it was pushed.)
 
 ## 2026-11-13
