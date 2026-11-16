@@ -21,15 +21,14 @@ The tool processes string fields through a series of regex-based manipulators th
 
 ### How It Works
 
-The String Manipulator Tool operates on all string fields within work items during migration:
+`TfsWorkItemMigrationProcessor` runs the tool on every field of type `String` (single-line text, such as `System.Title`) as it copies each revision. HTML fields such as `System.Description`, plain-text (multi-line) fields and other field types are not processed.
 
-1. **Field Processing**: The tool identifies all string-type fields in each work item
-2. **Sequential Application**: Each configured manipulator is applied in the order defined in the configuration
-3. **Regex Transformations**: Pattern-based replacements using regular expressions
-4. **Length Enforcement**: Truncates fields that exceed the maximum allowed length
-5. **Conditional Execution**: Each manipulator can be individually enabled or disabled
+1. **Sequential Application**: Each enabled manipulator is applied in the order defined in the configuration
+2. **Regex Transformations**: Pattern-based replacements using regular expressions
+3. **Length Enforcement**: The result is cut to `MaxStringLength`
+4. **Conditional Execution**: Each manipulator can be individually enabled or disabled
 
-The tool is automatically invoked by migration processors and applies transformations before work items are saved to the target system.
+If the tool is enabled and `Manipulators` is empty, a built-in manipulator is used that removes control characters and emojis but keeps Unicode letters and symbols (the first pattern under [Removing Invalid Characters](#removing-invalid-characters)).
 
 ### Use Cases
 
@@ -68,8 +67,8 @@ The String Manipulator Tool is configured with an array of manipulators, each de
       {
         "$type": "RegexStringManipulator",
         "Enabled": true,
-        "Description": "Remove invalid characters",
-        "Pattern": "[^\\x20-\\x7E\\r\\n\\t]",
+        "Description": "Remove control characters and emojis but preserve Unicode letters and symbols",
+        "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
         "Replacement": ""
       }
     ]
@@ -111,7 +110,7 @@ Remove control characters and emojis while preserving Unicode content:
 }
 ```
 
-For legacy ASCII-only environments, you can use the more restrictive pattern:
+For legacy ASCII-only environments, you can use the more restrictive pattern. It removes every non-ASCII character, including accented letters such as `ł`, `ę` and `ó`:
 
 ```json
 {
@@ -219,7 +218,12 @@ Replace common encoding artifacts:
 - Verify the tool is enabled (`"Enabled": true`)
 - Check that individual manipulators are enabled
 - Review regex patterns for syntax errors
-- Ensure the tool is configured in the processor's tool list
+- Ensure the tool is configured under `CommonTools`
+- Remember it only processes single-line `String` fields, not HTML or multi-line fields
+
+**Accented or non-Latin letters are missing from the Title (but not the Description):**
+
+- A manipulator in your configuration removes non-ASCII characters, for example the legacy pattern `[^( -~)\n\r\t]+` or `[^\x20-\x7E\r\n\t]`. Earlier versions of this page and of the generated sample used it. Replace it with the Unicode-preserving pattern under [Removing Invalid Characters](#removing-invalid-characters), or remove your manipulators to use the built-in one. The Description is not affected because it is an HTML field, which the tool does not process.
 
 **Unexpected Results:**
 

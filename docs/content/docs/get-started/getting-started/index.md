@@ -28,7 +28,7 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 This is going to be a crash course and I really recommend watching [What can go wrong and what can go right with a migration via Azure DevOps](https://youtu.be/3jYFD-6_kZk?si=xxvBoljBWjGAOVuv) and then [Basic Work Item Migration with the Azure DevOps Migration Tools](https://youtu.be/Qt1Ywu_KLrc?si=uEXjLS2pwe244ugV) before you get started! This will prep you for the journey ahead.
 
-> **New to migration tools?** Try our [Interactive Configuration Wizard]({{< ref "docs/config/config-wizard" >}}) to build your configuration step-by-step with guided explanations!
+> **New to migration tools?** An Interactive Configuration Wizard is in preview. It is not published on this site yet; you can try it on the [preview documentation](https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net/docs/config/config-wizard/).
 
 ### 1. Create a default configuration file
 
@@ -86,6 +86,8 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 7. Adjust the [`NodeBasePaths`]({{< ref "docs/reference/processors/workitem-tracking-processor" >}}) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
+There is no dry-run or `-validate` option: `execute` always migrates. The validation described below runs at the start of every `execute` and stops the run before any data is written if it fails. To try a configuration safely, point the target at a scratch project, or limit the run with `WorkItemIDs` or a narrow `WIQLQuery`.
+
 ### Where the logs are written
 
 Each run writes `migration*.log` and `migration-errors*.log` to `logs\<timestamp>` under the folder you run the tool from, not the folder the tool is installed in. The full path is printed at the start of the run as `Logpath:` and again at the end as `Check the logs for errors:`. To write them somewhere else, pass `--logPath <folder>`; the `logs\<timestamp>` folder is created inside it. If the folder cannot be written to, the logs go to `%LOCALAPPDATA%\MigrationTools\logs\<timestamp>` instead.
@@ -131,6 +133,14 @@ Missing field 'Microsoft.VSTS.Common.CustomField' in 'User Story'.
 - **Solution 2:** Configure field mapping to map to an existing field
 - **Solution 3:** Exclude the field from validation if it's not needed
 
+
+### Common Issue: "Unable to load Common Structure"
+
+```text
+Unable to load Common Structure for Target. This is usually due to TFS having a different installed language version than was expected.
+```
+
+The tool looks for the root area and iteration nodes by the names in the endpoint's `LanguageMaps` (`AreaPath` and `IterationPath`, `Area` and `Iteration` by default). If your server uses another language, set them to the names shown at the top of the area and iteration trees, for example `Fläche` or `Aire`. Don't put a specific area or iteration path there. See the [TFS Team Project Endpoint]({{< ref "docs/reference/endpoints/tfs-team-project-endpoint" >}}). The same message for the Source with "more than one node path matches" means more than one root node starts with the project name and `AreaPath`.
 
 For a complete overview of the validation process—including both pre-migration and pre-data-load validation steps—see the [Validation Process documentation]({{< ref "docs/get-started/validation" >}}).
 
