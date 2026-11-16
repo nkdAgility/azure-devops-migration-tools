@@ -7,7 +7,10 @@
   "properties": {
     "ApplyTo": {
       "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "defaultValue": {
       "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
@@ -27,7 +30,10 @@
     },
     "valueMapping": {
       "description": "Gets or sets the dictionary that maps source field values to target field values. Key is the source value, value is the target value.",
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
     }
   }
 }

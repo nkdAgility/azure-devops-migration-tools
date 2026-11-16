@@ -11,14 +11,17 @@
       "default": false
     },
     "Enabled": {
-      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
       "type": "boolean",
       "default": true
     },
     "Mappings": {
       "description": "Dictionary mapping source repository names to target repository names. Used to update Git repository links and references in work items during migration. Keys may be a repository name (\"Repo\") or a project-qualified name (\"Project/Repo\"); the qualified form takes precedence, so repositories with the same name in different source projects can be mapped separately. A bare \"Repo\" key that matches repositories in more than one source project logs a warning listing them. Values may also be \"Project/Repo\" to pick a repository in another target project. Repositories referenced from other (or renamed) projects are resolved by repository ID and rewritten when mapped here or when the target project contains a repository with the same name.",
       "type": "object",
-      "default": {}
+      "default": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "ShouldDropChangedSetLinks": {
       "description": "When set to true, changeset links in work items will be removed during migration to prevent broken links when repositories are not migrated.",

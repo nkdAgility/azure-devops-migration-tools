@@ -6,14 +6,17 @@
   "type": "object",
   "properties": {
     "Enabled": {
-      "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+      "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "Mappings": {
       "description": "List of work item mappings.",
       "type": "object",
-      "default": {}
+      "default": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     }
   }
 }

@@ -16,7 +16,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "Password": {
       "description": "The password of the user that is used to export the pictures.",

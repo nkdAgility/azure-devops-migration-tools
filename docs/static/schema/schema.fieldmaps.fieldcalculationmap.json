@@ -7,7 +7,10 @@
   "properties": {
     "ApplyTo": {
       "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "Enabled": {
       "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -20,7 +23,10 @@
     "parameters": {
       "description": "Gets or sets a dictionary mapping variable names used in the expression to source field reference names.",
       "type": "object",
-      "default": {}
+      "default": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "parsingFallback": {
       "description": "Gets or sets the parsing fallback.",

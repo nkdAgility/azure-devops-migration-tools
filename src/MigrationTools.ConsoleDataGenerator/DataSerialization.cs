@@ -73,11 +73,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 foreach (var option in data.Options)
                 {
                     var propertyName = option.ParameterName;
-                    var propertySchema = new JSchema
-                    {
-                        Type = GetJsonSchemaType(option.Type.ToString()),
-                        Description = option.Description.ToString()
-                    };
+                    var propertySchema = BuildPropertySchema(option);
 
                     // Special handling for FieldMappingTool's fieldMaps property
                     if (data.ClassName.Equals("FieldMappingTool", StringComparison.OrdinalIgnoreCase) &&
@@ -421,6 +417,14 @@ namespace MigrationTools.ConsoleDataGenerator
                 if (obj.TryGetValue("prefixItems", out var prefixItemsToken) && prefixItemsToken is JObject)
                 {
                     obj["prefixItems"] = new JArray(prefixItemsToken);
+                    prefixItemsToken = obj["prefixItems"];
+                }
+                // A list option has one element schema, which must apply to every element ('items'), not only the
+                // first ('prefixItems'). The processor and field map lists keep their 'anyOf' prefixItems.
+                if (prefixItemsToken is JArray single && single.Count == 1 && single[0] is JObject element && element["anyOf"] == null)
+                {
+                    obj.Remove("prefixItems");
+                    obj["items"] = element;
                 }
                 // Recurse properties
                 foreach (var prop in obj.Properties().ToList())
@@ -503,7 +507,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 // Arrays / IEnumerable<T>
                 if (TryGetEnumerableElementType(t, out var elemType))
                 {
-                    var arrSchema = new JSchema { Type = JSchemaType.Array, Description = option.Description?.ToString() };
+                    var arrSchema = new JSchema { Type = JSchemaType.Array, Description = option.Description?.ToString(), ItemsPositionValidation = false };
                     arrSchema.Items.Add(BuildSchemaForType(elemType));
                     return arrSchema;
                 }
@@ -550,7 +554,7 @@ namespace MigrationTools.ConsoleDataGenerator
             }
             if (TryGetEnumerableElementType(t, out var elemType))
             {
-                var a = new JSchema { Type = JSchemaType.Array };
+                var a = new JSchema { Type = JSchemaType.Array, ItemsPositionValidation = false };
                 a.Items.Add(BuildSchemaForType(elemType));
                 return a;
             }

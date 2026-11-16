@@ -75,10 +75,9 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassFullName = optionInFocus.FullName;
                 data.OptionsClassName = optionInFocus.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
-                ///bind Item or Defaults
+                IConfigurationSection mainOrDefaultSection = null;
                 if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToDefault))
                 {
-                    IConfigurationSection mainOrDefaultSection;
                     mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToDefault);
                     if (mainOrDefaultSection.Exists())
                     {
@@ -109,7 +108,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 if (instanceOfOption != null)
                 {
                     JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
-                    data.Options = populateOptions(instanceOfOption, joptions);
+                    data.Options = populateOptions(instanceOfOption, joptions, mainOrDefaultSection);
                 }
             }
             else
@@ -119,7 +118,8 @@ namespace MigrationTools.ConsoleDataGenerator
             return data;
         }
 
-        private List<OptionsItem> populateOptions(object item, JObject joptions)
+        /// <param name="shippedDefaults">The option's section in the shipped appsettings.json. It overrides the defaults set in code at run time, so a plain value there is the documented default.</param>
+        private List<OptionsItem> populateOptions(object item, JObject joptions, IConfigurationSection shippedDefaults)
         {
             List<OptionsItem> options = new List<OptionsItem>();
 
@@ -142,7 +142,10 @@ namespace MigrationTools.ConsoleDataGenerator
                 optionsItem.Type = property.PropertyType.Name.Replace("`1", "").Replace("`2", "").Replace("`", "");
                 optionsItem.DotNetType = property.PropertyType;
                 optionsItem.Description = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "summary");
-                optionsItem.DefaultValue = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
+                string shippedDefault = shippedDefaults != null && shippedDefaults.Exists() ? shippedDefaults[property.Name] : null;
+                optionsItem.DefaultValue = shippedDefault != null
+                    ? shippedDefault.ToLowerInvariant() is "true" or "false" ? shippedDefault.ToLowerInvariant() : shippedDefault
+                    : codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
                 // Determine if the property is required via DataAnnotations [Required]
                 var isRequired = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), inherit: true).Any();
                 optionsItem.IsRequired = isRequired;

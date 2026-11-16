@@ -84,7 +84,7 @@ options:
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missing XML code comments
+  defaultValue: false
   isRequired: true
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enrichers
@@ -142,19 +142,19 @@ options:
 - parameterName: SkipRevisionWithInvalidAreaPath
   type: Boolean
   description: When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.
-  defaultValue: missing XML code comments
+  defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SkipRevisionWithInvalidIterationPath
   type: Boolean
   description: This will skip a revision if the source iteration has not been migrated i.e. it was deleted
-  defaultValue: missing XML code comments
+  defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SourceName
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
-  defaultValue: missing XML code comments
+  defaultValue: Source
   isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: StopOnFirstError
@@ -168,7 +168,7 @@ options:
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
-  defaultValue: missing XML code comments
+  defaultValue: Target
   isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WIQLQuery

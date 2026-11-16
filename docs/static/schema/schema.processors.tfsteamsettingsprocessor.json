@@ -11,7 +11,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "MigrateTeamCapacities": {
       "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
@@ -42,7 +45,10 @@
     },
     "Teams": {
       "description": "List of Teams to process. If this is `null` then all teams will be processed.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "UpdateTeamSettings": {
       "description": "Reset the target team settings to match the source if the team exists",

@@ -33,7 +33,7 @@ using System.Diagnostics.Metrics;
 namespace MigrationTools.Processors
 {
     /// <summary>
-    /// Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration
+    /// Rebuilds Test Plans and Test Suites in the target and adds the Test Cases already migrated by TfsWorkItemMigrationProcessor. Plans are matched by name and suites by title, so both must be unique. Test runs are not migrated.
     /// </summary>
     /// <status>Beta</status>
     /// <processingtarget>Suites &amp; Plans</processingtarget>

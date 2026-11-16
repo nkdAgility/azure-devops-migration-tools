@@ -36,11 +36,9 @@
                   "EndpointEnrichers": {
                     "description": "missing XML code comments",
                     "type": "array",
-                    "prefixItems": [
-                      {
-                        "type": "object"
-                      }
-                    ]
+                    "items": {
+                      "type": "object"
+                    }
                   },
                   "Name": {
                     "description": "missing XML code comments",
@@ -85,11 +83,9 @@
                   "EndpointEnrichers": {
                     "description": "missing XML code comments",
                     "type": "array",
-                    "prefixItems": [
-                      {
-                        "type": "object"
-                      }
-                    ]
+                    "items": {
+                      "type": "object"
+                    }
                   },
                   "FileStore": {
                     "description": "Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.",
@@ -117,7 +113,8 @@
                 "properties": {
                   "AllowCrossProjectLinking": {
                     "description": "When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "default": false
                   },
                   "Authentication": {
                     "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
@@ -148,11 +145,9 @@
                   "EndpointEnrichers": {
                     "description": "missing XML code comments",
                     "type": "array",
-                    "prefixItems": [
-                      {
-                        "type": "object"
-                      }
-                    ]
+                    "items": {
+                      "type": "object"
+                    }
                   },
                   "LanguageMaps": {
                     "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
@@ -184,7 +179,8 @@
                   },
                   "ReflectedWorkItemIdField": {
                     "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",
-                    "type": "string"
+                    "type": "string",
+                    "default": "Custom.ReflectedWorkItemId"
                   },
                   "EndpointType": {
                     "type": "string",
@@ -207,7 +203,8 @@
                 "properties": {
                   "AllowCrossProjectLinking": {
                     "description": "When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "default": false
                   },
                   "Authentication": {
                     "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
@@ -238,11 +235,9 @@
                   "EndpointEnrichers": {
                     "description": "missing XML code comments",
                     "type": "array",
-                    "prefixItems": [
-                      {
-                        "type": "object"
-                      }
-                    ]
+                    "items": {
+                      "type": "object"
+                    }
                   },
                   "LanguageMaps": {
                     "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
@@ -274,7 +269,8 @@
                   },
                   "ReflectedWorkItemIdField": {
                     "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",
-                    "type": "string"
+                    "type": "string",
+                    "default": "Custom.ReflectedWorkItemId"
                   },
                   "EndpointType": {
                     "type": "string",
@@ -328,11 +324,9 @@
                   "EndpointEnrichers": {
                     "description": "missing XML code comments",
                     "type": "array",
-                    "prefixItems": [
-                      {
-                        "type": "object"
-                      }
-                    ]
+                    "items": {
+                      "type": "object"
+                    }
                   },
                   "LanguageMaps": {
                     "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
@@ -418,11 +412,9 @@
                   "EndpointEnrichers": {
                     "description": "missing XML code comments",
                     "type": "array",
-                    "prefixItems": [
-                      {
-                        "type": "object"
-                      }
-                    ]
+                    "items": {
+                      "type": "object"
+                    }
                   },
                   "LanguageMaps": {
                     "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
@@ -504,24 +496,21 @@
                     "BuildPipelines": {
                       "description": "List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "string"
-                        }
-                      ]
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "Enabled": {
                       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "MigrateBuildPipelines": {
                       "description": "Migrate Build Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected build pipeline that is not migrated, because it uses a task that is not installed in the target, uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).",
@@ -555,11 +544,9 @@
                     "ReleasePipelines": {
                       "description": "List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "string"
-                        }
-                      ]
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "RepositoryNameMaps": {
                       "description": "Map of Source Repository to Target Repository Names",
@@ -570,11 +557,13 @@
                     },
                     "SourceName": {
                       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                      "type": "string"
+                      "type": "string",
+                      "default": "sourceName"
                     },
                     "TargetName": {
                       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                      "type": "string"
+                      "type": "string",
+                      "default": "targetName"
                     },
                     "ProcessorType": {
                       "type": "string",
@@ -609,11 +598,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "PrependCommand": {
                       "description": "Command to prepend to each line in the cleanup script, such as \"start\" for Windows batch files.",
@@ -669,11 +656,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -722,11 +707,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "MaxDegreeOfParallelism": {
                       "description": "Maximum number of parallel operations to execute simultaneously during process definition migration to optimize performance.",
@@ -737,11 +720,9 @@
                       "type": "object",
                       "additionalProperties": {
                         "type": "array",
-                        "prefixItems": [
-                          {
-                            "type": "string"
-                          }
-                        ]
+                        "items": {
+                          "type": "string"
+                        }
                       }
                     },
                     "ProcessMaps": {
@@ -797,11 +778,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "Password": {
                       "description": "The password of the user that is used to export the pictures.",
@@ -855,11 +834,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "ExportAllUsers": {
                       "description": "Set to `true`, if you want to export all users in source and target server.\r\n The lists of user can be useful, if you need tu manually edit mapping file.\r\n Users will be exported to file set in `UserExportFile`.",
@@ -915,11 +892,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -958,11 +933,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "PrefixProjectToNodes": {
                       "description": "Do we add the source project name into the folder path",
@@ -1018,11 +991,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "MigrateTeamCapacities": {
                       "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
@@ -1054,11 +1025,9 @@
                     "Teams": {
                       "description": "List of Teams to process. If this is `null` then all teams will be processed.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "string"
-                        }
-                      ]
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "UpdateTeamSettings": {
                       "description": "Reset the target team settings to match the source if the team exists",
@@ -1094,11 +1063,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -1127,7 +1094,7 @@
                 },
                 {
                   "title": "TfsTestPlansAndSuitesMigrationProcessor",
-                  "description": "Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration",
+                  "description": "Rebuilds Test Plans and Test Suites in the target and adds the Test Cases already migrated by TfsWorkItemMigrationProcessor. Plans are matched by name and suites by title, so both must be unique. Test runs are not migrated.",
                   "type": "object",
                   "properties": {
                     "Enabled": {
@@ -1137,37 +1104,35 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "FilterCompleted": {
-                      "description": "missing XML code comments",
-                      "type": "boolean"
+                      "description": "If `true`, skips each source Test Plan whose name already exists in the target, so plans migrated by an earlier run are not processed again.",
+                      "type": "boolean",
+                      "default": false
                     },
                     "MigrationDelay": {
-                      "description": "??Not sure what this does. Check code.",
+                      "description": "Milliseconds to wait before processing each Test Suite. Use it to slow the run down when the target throttles requests. `0` means no delay.",
                       "type": "integer",
                       "default": 0
                     },
                     "OnlyElementsWithTag": {
-                      "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
-                      "type": "string",
-                      "default": ""
+                      "description": "Only plans, suites and Test Cases whose tags contain this text are migrated. The match is a substring of the tags text, so `move` also matches `remove`. A plan or suite under the root suite that does not match is skipped with everything below it. Leave it empty or unset to migrate everything.",
+                      "type": "string"
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
                       "type": "string"
                     },
                     "RemoveAllLinks": {
-                      "description": "??Not sure what this does. Check code.",
+                      "description": "If `true`, removes every link from each Test Plan the processor creates in the target. Plans that already exist in the target are not changed.",
                       "type": "boolean",
                       "default": false
                     },
                     "RemoveInvalidTestSuiteLinks": {
-                      "description": "Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used",
+                      "description": "If `true`, removes links whose URI is not valid from each Test Plan the processor creates in the target, and logs each one. If `false`, such links are kept and a warning is logged, and the save can fail with \"The URL specified has a potentially unsafe URL protocol\". See https://github.com/nkdAgility/azure-devops-migration-tools/issues/178.",
                       "type": "boolean",
                       "default": false
                     },
@@ -1180,18 +1145,16 @@
                       "type": "string"
                     },
                     "TestPlanIds": {
-                      "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789] \r\n Works optimally when \"TestPlanQuery\" is set to null.",
+                      "description": "Migrates only the Test Plans with these IDs. Pass the test plan IDs as an array, for example `[123, 456, 789]`. Leave it empty to migrate every plan selected by `TestPlanQuery`.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "integer"
-                        }
-                      ]
+                      "default": [],
+                      "items": {
+                        "type": "integer"
+                      }
                     },
                     "TestPlanQuery": {
-                      "description": "Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.",
-                      "type": "string",
-                      "default": ""
+                      "description": "Filtering conditions to decide whether to migrate a test plan or not. This is not WIQL: when provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields. Leave it empty to select every plan.",
+                      "type": "string"
                     },
                     "ProcessorType": {
                       "type": "string",
@@ -1218,11 +1181,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -1261,11 +1222,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "FilterWorkItemsThatAlreadyExistInTarget": {
                       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
@@ -1308,11 +1267,9 @@
                       "description": "A list of work items to import",
                       "type": "array",
                       "default": [],
-                      "prefixItems": [
-                        {
-                          "type": "integer"
-                        }
-                      ]
+                      "items": {
+                        "type": "integer"
+                      }
                     },
                     "ProcessorType": {
                       "type": "string",
@@ -1340,11 +1297,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "FilterWorkItemsThatAlreadyExistInTarget": {
                       "description": "Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.",
@@ -1378,11 +1333,9 @@
                     "WorkItemIDs": {
                       "description": "Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "integer"
-                        }
-                      ]
+                      "items": {
+                        "type": "integer"
+                      }
                     },
                     "ProcessorType": {
                       "type": "string",
@@ -1409,16 +1362,15 @@
                     },
                     "Enabled": {
                       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "FilterWorkItemsThatAlreadyExistInTarget": {
                       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
@@ -1451,15 +1403,18 @@
                     },
                     "SkipRevisionWithInvalidAreaPath": {
                       "description": "When set to true, this setting will skip a revision if the source area has not been migrated, has been deleted or is somehow invalid, etc.",
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "SkipRevisionWithInvalidIterationPath": {
                       "description": "This will skip a revision if the source iteration has not been migrated i.e. it was deleted",
-                      "type": "boolean"
+                      "type": "boolean",
+                      "default": false
                     },
                     "SourceName": {
                       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-                      "type": "string"
+                      "type": "string",
+                      "default": "Source"
                     },
                     "StopOnFirstError": {
                       "description": "When true, the run stops immediately on the first work item that fails to migrate (the previous default behaviour). When false (the default),\r\n the failed item is recorded and the remaining items are migrated; the failed IDs are summarised at the end and the process exits non-zero.",
@@ -1468,7 +1423,8 @@
                     },
                     "TargetName": {
                       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-                      "type": "string"
+                      "type": "string",
+                      "default": "Target"
                     },
                     "WIQLQuery": {
                       "description": "A work item query based on WIQL to select only important work items. To migrate all leave this empty. See [WIQL Query Bits](#wiql-query-bits)",
@@ -1484,11 +1440,9 @@
                       "description": "A list of work items to import",
                       "type": "array",
                       "default": [],
-                      "prefixItems": [
-                        {
-                          "type": "integer"
-                        }
-                      ]
+                      "items": {
+                        "type": "integer"
+                      }
                     },
                     "ProcessorType": {
                       "type": "string",
@@ -1521,11 +1475,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -1564,11 +1516,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "FilterWorkItemsThatAlreadyExistInTarget": {
                       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
@@ -1606,11 +1556,9 @@
                       "description": "A list of work items to import",
                       "type": "array",
                       "default": [],
-                      "prefixItems": [
-                        {
-                          "type": "integer"
-                        }
-                      ]
+                      "items": {
+                        "type": "integer"
+                      }
                     },
                     "ProcessorType": {
                       "type": "string",
@@ -1638,11 +1586,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -1689,11 +1635,9 @@
                     "Enrichers": {
                       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     },
                     "RefName": {
                       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
@@ -1741,9 +1685,9 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
-                  "default": true
+                  "default": false
                 },
                 "PreserveExisting": {
                   "description": "Indicates whether existing mappings in the target file should be preserved when saving new mappings.\r\n Default value is `true`.",
@@ -1762,9 +1706,9 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
-                  "default": true
+                  "default": false
                 },
                 "FieldMaps": {
                   "description": "Gets or sets the list of field mapping configurations to apply.",
@@ -1780,11 +1724,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -1821,11 +1763,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -1845,11 +1785,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -1873,11 +1811,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -1890,11 +1826,9 @@
                             "sourceFields": {
                               "description": "missing XML code comments",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "targetField": {
                               "description": "missing XML code comments",
@@ -1910,11 +1844,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -1934,11 +1866,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "defaultValue": {
                               "description": "Gets or sets the default value to use when the source field is empty or null.",
@@ -1971,11 +1901,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -1998,11 +1926,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -2026,11 +1952,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "defaultValue": {
                               "description": "Gets or sets the default value to use when no mapping is found for the source field value.",
@@ -2065,11 +1989,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -2097,11 +2019,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -2131,11 +2051,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -2167,11 +2085,9 @@
                             "ApplyTo": {
                               "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                               "type": "array",
-                              "prefixItems": [
-                                {
-                                  "type": "string"
-                                }
-                              ]
+                              "items": {
+                                "type": "string"
+                              }
                             },
                             "Enabled": {
                               "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
@@ -2199,7 +2115,7 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
@@ -2207,11 +2123,9 @@
                   "description": "List of regex based string manipulations to apply to all string fields. Each regex replacement is applied in order and can be enabled or disabled.",
                   "type": "array",
                   "default": [],
-                  "prefixItems": [
-                    {
-                      "type": "object"
-                    }
-                  ]
+                  "items": {
+                    "type": "object"
+                  }
                 },
                 "MaxStringLength": {
                   "description": "Max number of chars in a string. Applied last, and set to 1000000 by default.",
@@ -2226,14 +2140,14 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
                 "ExportBasePath": {
                   "description": "`AttachmentMigration` is set to true then you need to specify a working path for attachments to be saved locally.",
                   "type": "string",
-                  "default": "C:\\temp\\Migration\\"
+                  "default": "c:\\temp\\WorkItemAttachmentExport"
                 },
                 "MaxAttachmentSize": {
                   "description": "`AttachmentMigration` is set to true then you need to specify a max file size for upload in bites.\r\n For Azure DevOps Services the default is 480,000,000 bites (60mb), for TFS its 32,000,000 bites (4mb).",
@@ -2252,9 +2166,9 @@
                   "type": "string"
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
-                  "default": true
+                  "default": false
                 }
               }
             },
@@ -2264,7 +2178,7 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 }
@@ -2281,7 +2195,7 @@
                   "default": false
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
@@ -2319,24 +2233,20 @@
                   "properties": {
                     "Filters": {
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "string"
-                        }
-                      ]
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "Mappings": {
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     }
                   }
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
@@ -2350,19 +2260,15 @@
                   "properties": {
                     "Filters": {
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "string"
-                        }
-                      ]
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "Mappings": {
                       "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "object"
-                        }
-                      ]
+                      "items": {
+                        "type": "object"
+                      }
                     }
                   }
                 },
@@ -2372,11 +2278,13 @@
                 },
                 "ReplicateAllExistingNodes": {
                   "description": "missing XML code comments",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": true
                 },
                 "ShouldCreateMissingRevisionPaths": {
                   "description": "When set to True the susyem will try to create any missing missing area or iteration paths from the revisions.",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": true
                 }
               }
             },
@@ -2386,7 +2294,7 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
@@ -2408,33 +2316,31 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
                 "MigrateTeamCapacities": {
                   "description": "Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.",
                   "type": "boolean",
-                  "default": false
+                  "default": true
                 },
                 "MigrateTeamSettings": {
                   "description": "Migrate original team settings after their creation on target team project",
                   "type": "boolean",
-                  "default": false
+                  "default": true
                 },
                 "Teams": {
                   "description": "List of Teams to process. If this is `null` then all teams will be processed.",
                   "type": "array",
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    }
-                  ]
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "UpdateTeamSettings": {
                   "description": "Reset the target team settings to match the source if the team exists",
                   "type": "boolean",
-                  "default": false
+                  "default": true
                 },
                 "UseUserMapping": {
                   "description": "Use user mapping file from TfsTeamSettingsTool when matching users when migrating capacities.\r\n By default, users in source are matched in target users by current display name. When this is set to `true`,\r\n users are matched also by mapped name from user mapping file.",
@@ -2455,9 +2361,9 @@
                   }
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
-                  "default": true
+                  "default": false
                 },
                 "IdentityFieldsToCheck": {
                   "description": "This is a list of the Identiy fields in the Source to check for user mapping purposes. You should list all identiy fields that you want to map.\r\n A configured list replaces the default list; only the listed fields are mapped, and an empty list maps none. When it is not set, System.AssignedTo, System.ChangedBy,\r\n System.CreatedBy, Microsoft.VSTS.Common.ActivatedBy, Microsoft.VSTS.Common.ResolvedBy and Microsoft.VSTS.Common.ClosedBy are used.",
@@ -2470,11 +2376,9 @@
                     "Microsoft.VSTS.Common.ResolvedBy",
                     "Microsoft.VSTS.Common.ClosedBy"
                   ],
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    }
-                  ]
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "MatchUsersByEmail": {
                   "description": "By default, users in source are mapped to target users by their display name. If this is set to true, then the\r\n users will be mapped by their email address first. If no match is found, then the display name will be used.",
@@ -2508,7 +2412,8 @@
                 },
                 "UserMappingFile": {
                   "description": "This is the file that will be used to export or import the user mappings. Use the ExportUsersForMapping processor to create the file.\r\n By default the file is a JSON object mapping source display names to target display names. When UseIdentityMapDataFormat is\r\n enabled, the format is detected from the content: a JSON array of objects with \"Source\" and \"Target\" identities is read as\r\n detailed IdentityMapData, and a JSON object is read as the simple dictionary format.\r\n In the dictionary format a key or value may be written as the display name followed by the UPN in angle brackets to identify one of several users that share a display name.",
-                  "type": "string"
+                  "type": "string",
+                  "default": "C:\\temp\\userExport.json"
                 }
               }
             },
@@ -2518,19 +2423,17 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
-                  "default": true
+                  "default": false
                 },
                 "Exclusions": {
                   "description": "Add a list of work item types from the source that you want to exclude from validation. This is a case-insensitive comparison.\r\n WARNING: If you exclude a work item type that exists in the migration dataset, the migration will fail when trying to.",
                   "type": "array",
                   "default": [],
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    }
-                  ]
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             },
@@ -2540,7 +2443,7 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 }
@@ -2552,13 +2455,14 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
                 "FilterIfLinkCountMatches": {
                   "description": "Skip validating links if the number of links in the source and the target matches!",
-                  "type": "boolean"
+                  "type": "boolean",
+                  "default": true
                 },
                 "SaveAfterEachLinkIsAdded": {
                   "description": "Save the work item after each link is added. This will slow the migration as it will cause many saves to the TFS database.\r\n Ignored while TfsWorkItemMigrationProcessor replays revisions, because links are then saved with the revision\r\n where they were added or removed in the source.",
@@ -2573,7 +2477,7 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
                   "default": true
                 },
@@ -2587,30 +2491,24 @@
                   "type": "object",
                   "additionalProperties": {
                     "type": "array",
-                    "prefixItems": [
-                      {
-                        "type": "string"
-                      }
-                    ]
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 },
                 "ExcludeWorkItemTypes": {
                   "description": "List of work item types which will be excluded from validation.",
                   "type": "array",
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    }
-                  ]
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "IncludeWorkItemTypes": {
                   "description": "List of work item types which will be validated. If this list is empty, all work item types will be validated.",
                   "type": "array",
-                  "prefixItems": [
-                    {
-                      "type": "string"
-                    }
-                  ]
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "ScanRevisionHistoryForFields": {
                   "description": "If `true`, before migration starts the work items to be migrated are scanned for fields that\r\n have a value only in revision history: the revision was saved under another team project or work item type\r\n (the item was moved or its type changed), and the field is on neither the source type in the current project\r\n nor the target type the revision is replayed to. These values cannot be migrated, and field maps cannot read\r\n them. Only moved or retyped revisions are checked, but each one is loaded with a separate server request,\r\n so the scan can add significant time when many items were moved. It is off by default.",
@@ -2630,9 +2528,9 @@
               "type": "object",
               "properties": {
                 "Enabled": {
-                  "description": "If set to `true` then the tool will run. Set to `false` and the processor will not run.",
+                  "description": "If set to `true` then the tool will run. Set to `false` and the tool will not run.",
                   "type": "boolean",
-                  "default": true
+                  "default": false
                 },
                 "Mappings": {
                   "description": "List of work item mappings.",

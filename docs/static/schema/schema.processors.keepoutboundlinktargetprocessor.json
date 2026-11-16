@@ -19,7 +19,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "PrependCommand": {
       "description": "Command to prepend to each line in the cleanup script, such as \"start\" for Windows batch files.",

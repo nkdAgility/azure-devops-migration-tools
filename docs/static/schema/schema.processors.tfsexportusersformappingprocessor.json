@@ -11,7 +11,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "ExportAllUsers": {
       "description": "Set to `true`, if you want to export all users in source and target server.\r\n The lists of user can be useful, if you need tu manually edit mapping file.\r\n Users will be exported to file set in `UserExportFile`.",

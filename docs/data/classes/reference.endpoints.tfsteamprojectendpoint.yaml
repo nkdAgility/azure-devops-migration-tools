@@ -94,7 +94,7 @@ options:
 - parameterName: AllowCrossProjectLinking
   type: Boolean
   description: When true, allows work items to link to items in different projects within the same collection. Default is false for security and organizational clarity.
-  defaultValue: missing XML code comments
+  defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Authentication
@@ -106,7 +106,7 @@ options:
 - parameterName: Collection
   type: Uri
   description: URI of the TFS collection (e.g., "http://tfsserver:8080/tfs/DefaultCollection"). Must be a valid absolute URL pointing to the TFS collection.
-  defaultValue: missing XML code comments
+  defaultValue: ''
   isRequired: true
   dotNetType: System.Uri, System.Private.Uri, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
 - parameterName: Enabled
@@ -142,13 +142,13 @@ options:
 - parameterName: Project
   type: String
   description: Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.
-  defaultValue: missing XML code comments
+  defaultValue: ''
   isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: ReflectedWorkItemIdField
   type: String
   description: Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically "Custom.ReflectedWorkItemId".
-  defaultValue: missing XML code comments
+  defaultValue: Custom.ReflectedWorkItemId
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments

@@ -1,7 +1,7 @@
 ---
 title: 'How-to: Migrating Plans and Suites'
 description: |
-  This guide explains how to migrate Test Cases, Shared Steps and Shared Parameters, and then rebuild Test Plans and Suites in Azure DevOps.
+  Migrate work items, Test Cases, Shared Steps and Shared Parameters in one run, then rebuild Test Plans and Suites in Azure DevOps with the Migration Tools.
 short_title: Migrating Plans and Suites
 discussionId: 2049
 date: 2025-06-24T12:07:31Z
@@ -17,66 +17,25 @@ The migration handles this for you. When one of these six types does not have yo
 
 The steps are:
 
-1. Migrate Basic Work Items
-2. Migrate `Test Cases` with their `Shared Steps` and `Shared Parameter`
-3. Migrate `Test Variables` & `Test Configurations`
-4. Rebuild `Test Plans` & `Test Suites`
+1. Migrate the work items, including `Test Cases`, `Shared Steps` and `Shared Parameter`
+2. Migrate `Test Variables` & `Test Configurations`
+3. Rebuild `Test Plans` & `Test Suites`
 
-You can run each step as its own configuration, or put all the processors in one configuration in this order: processors run in the order they are listed. If you only want the test artefacts, you can skip step 1, but requirement-based suites need their requirements in the target: a suite whose requirement was not migrated is not created, and the run ends with errors. Migrate those requirements first.
-
-Test Plans and Test Suites are not migrated as work items. Leave `Test Plan` and `Test Suite` out of every `TfsWorkItemMigrationProcessor` query; step 4 rebuilds them.
-
-> **Include `Shared Steps` and `Shared Parameter` in the Test Case run.** The default `WIQLQuery` shipped with the tool excludes them. A Test Case's step and parameter references are only pointed at the migrated copies when the Shared Steps or Shared Parameter is already in the target; otherwise the reference is left with the source ID and no error is logged. In one run they are migrated before the Test Cases whatever the query order.
+You can run each step as its own configuration, or put all the processors in one configuration in this order: processors run in the order they are listed.
 
 _WARNING: The configs below are for illustration and were correct as of the version number in the `Version` field. Always check the options on each processor's reference page._
 
-## 1. Migrate Basic Work Items
+## 1. Migrate the work items
 
-Migrate everything except the test types, with your custom `ReflectedWorkItemIdField`. No field maps are needed.
-
-```JSON
-{
-  "MigrationTools": {
-    "Version": "16.0",
-    "Endpoints": {
-      "Source": {
-        "EndpointType": "TfsTeamProjectEndpoint",
-        "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "migrationSource1",
-        "Authentication": { "AuthenticationMode": "EntraId" }
-      },
-      "Target": {
-        "EndpointType": "TfsTeamProjectEndpoint",
-        "Collection": "https://dev.azure.com/nkdagility-preview/",
-        "Project": "migrationTest5",
-        "Authentication": { "AuthenticationMode": "EntraId" },
-        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
-      }
-    },
-    "Processors": [
-      {
-        "ProcessorType": "TfsWorkItemMigrationProcessor",
-        "SourceName": "Source",
-        "TargetName": "Target",
-        "Enabled": true,
-        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Case', 'Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
-      }
-    ]
-  }
-}
-```
-
-## 2. Migrate `Test Cases` with their `Shared Steps` and `Shared Parameter`
-
-Use the same `ReflectedWorkItemIdField` as step 1. The target `Test Case` type must have that field; `Shared Steps` and `Shared Parameter` use `Microsoft.VSTS.Build.IntegrationBuild` automatically.
+One `TfsWorkItemMigrationProcessor` run migrates your work items and the test items together, with your custom `ReflectedWorkItemIdField`. No field maps and no separate run for the test items are needed.
 
 The important bits:
 
-- Target `ReflectedWorkItemIdField` is your main custom field, as in step 1.
-- The query includes only the test items that are migrated as work items (no Suites or Plans).
+- The query excludes only `Test Plan` and `Test Suite`. They are not migrated as work items; step 3 rebuilds them.
+- **Keep `Shared Steps` and `Shared Parameter` in the query.** The default `WIQLQuery` shipped with the tool excludes them. A Test Case's step and parameter references are only pointed at the migrated copies when the Shared Steps or Shared Parameter is already in the target; otherwise the reference keeps the source ID and nothing is logged. Within one run they are migrated before everything else whatever the query order, so the references in each Test Case's steps (`ref`) and parameters (`sharedParameterDataSetIds`, `dataSetId`) are pointed at the migrated copies.
+- **Migrate the requirements too.** Requirement-based suites are rebuilt only when their requirement is in the target; if it isn't, the suite is not created and step 3 ends with errors. If you restrict the query to test items, include the requirements their suites are based on.
 - Leave the work item type validator at its defaults. If you do validate `Shared Steps` or `Shared Parameter` (`ExcludeDefaultWorkItemTypes: false` or `IncludeWorkItemTypes`), the validator accepts `Microsoft.VSTS.Build.IntegrationBuild` for them.
-- Shared Steps and Shared Parameters are migrated before the Test Cases whatever the query order, so the references in each Test Case's steps (`compref`) and parameters (`sharedParameterDataSetIds`, `dataSetId`) are pointed at the migrated copies.
-- You can run this step again. Items already migrated are found by their reflected work item id, so no duplicates are created. With `FilterWorkItemsThatAlreadyExistInTarget: true`, as in the sample, those items are skipped. To repair Test Case step and parameter references that an earlier run missed, run this step once with `FilterWorkItemsThatAlreadyExistInTarget: false`, so the existing Test Cases are processed again. Source IDs in the target's step text are replaced with target IDs, so if source and target IDs overlap, check the Test Cases afterwards.
+- You can run this step again. Items already migrated are found by their reflected work item id, so no duplicates are created. With `FilterWorkItemsThatAlreadyExistInTarget: true` those items are skipped. To repair Test Case step and parameter references that an earlier run missed, run once with it set to `false`, so the existing Test Cases are processed again. Source IDs in the target's step text are replaced with target IDs, so if source and target IDs overlap, check the Test Cases afterwards.
 
 ```JSON
 {
@@ -104,7 +63,7 @@ The important bits:
         "TargetName": "Target",
         "Enabled": true,
         "FilterWorkItemsThatAlreadyExistInTarget": true,
-        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Test Case','Shared Steps','Shared Parameter') ORDER BY [System.ChangedDate] desc"
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan') ORDER BY [System.ChangedDate] desc"
       }
     ]
   }
@@ -117,7 +76,7 @@ The important bits:
 - **`'Shared Steps' has neither '...' nor 'Microsoft.VSTS.Build.IntegrationBuild'`:** the target process has neither field on that type (possible on some on-premises XML processes). Add one of them to the type, or set `ReflectedWorkItemIdField` to a field it does have.
 - **`Overwriting 'Microsoft.VSTS.Build.IntegrationBuild' value ...`:** the source item already had a value in that field, and it is replaced by the reflected work item id on the target.
 
-## 3. Migrate `Test Variables` & `Test Configurations`
+## 2. Migrate `Test Variables` & `Test Configurations`
 
 These are pre-requisites for rebuilding the Plans and Suites.
 
@@ -162,13 +121,13 @@ The important bits:
 }
 ```
 
-## 4. Rebuild `Test Plans` & `Test Suites`
+## 3. Rebuild `Test Plans` & `Test Suites`
 
 This will rebuild the Plans and Suites and wire up all of the Test Cases.
 
 _note: Runs are not migrated._
 
-If a Test Case in a suite has not been migrated in step 2, it is left out of the rebuilt suite, an error names it, and the run exits with code 1. Migrate it, then run this step again.
+If a Test Case in a suite has not been migrated in step 1, it is left out of the rebuilt suite, an error names it, and the run exits with code 1. Migrate it, then run this step again.
 
 The important bits:
 
@@ -225,7 +184,7 @@ See the [TfsTestPlansAndSuitesMigrationProcessor reference]({{< ref "docs/refere
 
 ## Older versions: using `IntegrationBuild` for all test items
 
-Before the migration stored the reflected work item id for these types itself, steps 1 and 2 used `Microsoft.VSTS.Build.IntegrationBuild` as the target `ReflectedWorkItemIdField` with field maps. This still works: when `ReflectedWorkItemIdField` is `Microsoft.VSTS.Build.IntegrationBuild`, every type uses it as before.
+Before the migration stored the reflected work item id for these types itself, the work items and the test items had to be migrated in two separate runs, and they used `Microsoft.VSTS.Build.IntegrationBuild` as the target `ReflectedWorkItemIdField` with field maps. This still works: when `ReflectedWorkItemIdField` is `Microsoft.VSTS.Build.IntegrationBuild`, every type uses it as before.
 Both field maps use `TargetToTarget`, not `SourceToTarget`. The value being copied is the reflected work item id that the migration writes to the target work item; it does not exist on the source, so it has to be read from the target. In older versions the copy was missed for newly created work items with a single revision, because the field maps ran before the reflected id was written ([#2998](https://github.com/nkdAgility/azure-devops-migration-tools/issues/2998)).
 
 _WARNING: The configs below are for illustration and were correct as of the version number in the `Version` field._

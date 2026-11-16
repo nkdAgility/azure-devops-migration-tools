@@ -77,13 +77,13 @@ options:
 - parameterName: BuildPipelines
   type: List
   description: List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
-  defaultValue: missing XML code comments
+  defaultValue: ''
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enabled
   type: Boolean
   description: If set to `true` then the processor will run. Set to `false` and the processor will not run.
-  defaultValue: missing XML code comments
+  defaultValue: false
   isRequired: true
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enrichers
@@ -131,7 +131,7 @@ options:
 - parameterName: ReleasePipelines
   type: List
   description: List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
-  defaultValue: missing XML code comments
+  defaultValue: ''
   isRequired: false
   dotNetType: System.Collections.Generic.List`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: RepositoryNameMaps
@@ -143,13 +143,13 @@ options:
 - parameterName: SourceName
   type: String
   description: This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.
-  defaultValue: missing XML code comments
+  defaultValue: sourceName
   isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: TargetName
   type: String
   description: This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.
-  defaultValue: missing XML code comments
+  defaultValue: targetName
   isRequired: true
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: Beta

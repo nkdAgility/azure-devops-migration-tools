@@ -11,7 +11,21 @@
     },
     "Authentication": {
       "description": "Authentication configuration for connecting to the TFS server. Supports various authentication modes including Windows authentication and access tokens.",
-      "type": "string"
+      "type": "object",
+      "properties": {
+        "AuthenticationMode": {
+          "type": "string"
+        },
+        "NetworkCredentials": {
+          "type": "object"
+        },
+        "AccessToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AuthenticationMode"
+      ]
     },
     "Collection": {
       "description": "URI of the TFS collection (e.g., \"http://tfsserver:8080/tfs/DefaultCollection\"). Must be a valid absolute URL pointing to the TFS collection.",
@@ -23,11 +37,26 @@
     },
     "EndpointEnrichers": {
       "description": "missing XML code comments",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "LanguageMaps": {
       "description": "Language mapping configuration for translating area and iteration path names between different language versions of TFS.",
-      "type": "string"
+      "type": "object",
+      "properties": {
+        "AreaPath": {
+          "type": "string"
+        },
+        "IterationPath": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "AreaPath",
+        "IterationPath"
+      ]
     },
     "Name": {
       "description": "missing XML code comments",
@@ -43,7 +72,21 @@
     },
     "Query": {
       "description": "Gets or sets the query options that define which work items to retrieve from the source endpoint, including WIQL queries and parameters.",
-      "type": "string"
+      "type": "object",
+      "properties": {
+        "Query": {
+          "type": "string"
+        },
+        "Parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "Query"
+      ]
     },
     "ReflectedWorkItemIdField": {
       "description": "Name of the custom field used to store the reflected work item ID for tracking migrated items. Typically \"Custom.ReflectedWorkItemId\".",

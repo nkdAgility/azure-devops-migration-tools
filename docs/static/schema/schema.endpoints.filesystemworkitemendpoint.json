@@ -11,7 +11,10 @@
     },
     "EndpointEnrichers": {
       "description": "missing XML code comments",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "FileStore": {
       "description": "Path to the directory where work item data will be stored or read from. This should be a valid local file system path with appropriate read/write permissions.",

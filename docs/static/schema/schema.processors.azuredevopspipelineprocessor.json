@@ -7,15 +7,22 @@
   "properties": {
     "BuildPipelines": {
       "description": "List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "Enabled": {
       "description": "If set to `true` then the processor will run. Set to `false` and the processor will not run.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "MigrateBuildPipelines": {
       "description": "Migrate Build Pipelines. A definition that already exists in the target (matched by name) is skipped and does not affect the result. A selected build pipeline that is not migrated, because it uses a task that is not installed in the target, uses a task group or variable group that was not migrated, or is rejected by the target, marks the run as failed (exit code 1).",
@@ -48,19 +55,27 @@
     },
     "ReleasePipelines": {
       "description": "List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "RepositoryNameMaps": {
       "description": "Map of Source Repository to Target Repository Names",
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-      "type": "string"
+      "type": "string",
+      "default": "sourceName"
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-      "type": "string"
+      "type": "string",
+      "default": "targetName"
     }
   },
   "required": [

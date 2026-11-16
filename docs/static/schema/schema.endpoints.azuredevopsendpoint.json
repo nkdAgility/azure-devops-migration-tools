@@ -19,7 +19,10 @@
     },
     "EndpointEnrichers": {
       "description": "missing XML code comments",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "Name": {
       "description": "missing XML code comments",

@@ -11,7 +11,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "PrefixProjectToNodes": {
       "description": "Do we add the source project name into the folder path",
@@ -33,7 +36,10 @@
     },
     "SourceToTargetFieldMappings": {
       "description": "Mapping of the source to the target",
-      "type": "object"
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",

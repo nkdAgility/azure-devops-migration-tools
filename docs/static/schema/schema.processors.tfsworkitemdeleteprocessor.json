@@ -11,7 +11,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "FilterWorkItemsThatAlreadyExistInTarget": {
       "description": "Gets or sets a value indicating whether to filter out work items that already exist in the target before deletion. Typically used to avoid deleting items that shouldn't be removed.",
@@ -44,7 +47,10 @@
     },
     "WorkItemIDs": {
       "description": "Gets or sets a specific list of work item IDs to delete. When specified, takes precedence over the WIQL query.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
     }
   },
   "required": [

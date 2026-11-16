@@ -11,7 +11,10 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     },
     "FilterWorkItemsThatAlreadyExistInTarget": {
       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
@@ -53,7 +56,10 @@
     "WorkItemIDs": {
       "description": "A list of work items to import",
       "type": "array",
-      "default": []
+      "default": [],
+      "items": {
+        "type": "integer"
+      }
     }
   },
   "required": [
