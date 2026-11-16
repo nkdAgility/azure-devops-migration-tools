@@ -10,8 +10,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
-            "ChangeSetMappingFile": "",
-            "Enabled": "False"
+            "Enabled": false,
+            "ChangeSetMappingFile": null
           }
         }
       }
@@ -26,8 +26,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
-            "ChangeSetMappingFile": "c:\\changesetmappings.json",
-            "Enabled": "True"
+            "Enabled": true,
+            "ChangeSetMappingFile": "c:\\changesetmappings.json"
           }
         }
       }

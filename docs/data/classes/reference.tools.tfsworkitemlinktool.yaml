@@ -10,9 +10,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemLinkTool": {
-            "Enabled": "True",
-            "FilterIfLinkCountMatches": "True",
-            "SaveAfterEachLinkIsAdded": "False"
+            "Enabled": true,
+            "FilterIfLinkCountMatches": true,
+            "SaveAfterEachLinkIsAdded": false
           }
         }
       }
@@ -27,9 +27,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemLinkTool": {
-            "Enabled": "True",
-            "FilterIfLinkCountMatches": "True",
-            "SaveAfterEachLinkIsAdded": "False"
+            "Enabled": true,
+            "FilterIfLinkCountMatches": true,
+            "SaveAfterEachLinkIsAdded": false
           }
         }
       }

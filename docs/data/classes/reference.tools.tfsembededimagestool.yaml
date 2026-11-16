@@ -10,7 +10,7 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsEmbededImagesTool": {
-            "Enabled": "True"
+            "Enabled": true
           }
         }
       }
@@ -25,7 +25,7 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsEmbededImagesTool": {
-            "Enabled": "True"
+            "Enabled": true
           }
         }
       }

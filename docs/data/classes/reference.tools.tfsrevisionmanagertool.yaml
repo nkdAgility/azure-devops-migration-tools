@@ -10,9 +10,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsRevisionManagerTool": {
-            "Enabled": "True",
-            "MaxRevisions": "0",
-            "ReplayRevisions": "True"
+            "Enabled": true,
+            "ReplayRevisions": true,
+            "MaxRevisions": 0
           }
         }
       }
@@ -27,9 +27,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsRevisionManagerTool": {
-            "Enabled": "True",
-            "MaxRevisions": "0",
-            "ReplayRevisions": "True"
+            "Enabled": true,
+            "ReplayRevisions": true,
+            "MaxRevisions": 0
           }
         }
       }

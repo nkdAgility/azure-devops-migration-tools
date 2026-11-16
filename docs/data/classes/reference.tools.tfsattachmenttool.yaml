@@ -10,10 +10,10 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsAttachmentTool": {
-            "Enabled": "True",
+            "RefName": "TfsAttachmentTool",
+            "Enabled": true,
             "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-            "MaxAttachmentSize": "480000000",
-            "RefName": "TfsAttachmentTool"
+            "MaxAttachmentSize": 480000000
           }
         }
       }
@@ -28,10 +28,10 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsAttachmentTool": {
-            "Enabled": "True",
+            "RefName": "TfsAttachmentTool",
+            "Enabled": true,
             "ExportBasePath": "c:\\temp\\WorkItemAttachmentExport",
-            "MaxAttachmentSize": "480000000",
-            "RefName": "TfsAttachmentTool"
+            "MaxAttachmentSize": 480000000
           }
         }
       }

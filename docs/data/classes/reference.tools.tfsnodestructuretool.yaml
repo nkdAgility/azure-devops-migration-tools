@@ -10,17 +10,17 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsNodeStructureTool": {
+            "Enabled": true,
             "Areas": {
-              "Filters": null,
-              "Mappings": null
+              "Filters": [],
+              "Mappings": []
             },
-            "Enabled": "True",
             "Iterations": {
-              "Filters": null,
-              "Mappings": null
+              "Filters": [],
+              "Mappings": []
             },
-            "ReplicateAllExistingNodes": "True",
-            "ShouldCreateMissingRevisionPaths": "True"
+            "ShouldCreateMissingRevisionPaths": true,
+            "ReplicateAllExistingNodes": true
           }
         }
       }
@@ -35,8 +35,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsNodeStructureTool": {
+            "Enabled": true,
             "Areas": {
-              "Filters": null,
+              "Filters": [],
               "Mappings": [
                 {
                   "Match": "^Skypoint Cloud$",
@@ -44,9 +45,8 @@ configurationSamples:
                 }
               ]
             },
-            "Enabled": "True",
             "Iterations": {
-              "Filters": null,
+              "Filters": [],
               "Mappings": [
                 {
                   "Match": "^Skypoint Cloud\\\\Sprint 1$",
@@ -54,8 +54,8 @@ configurationSamples:
                 }
               ]
             },
-            "ReplicateAllExistingNodes": "True",
-            "ShouldCreateMissingRevisionPaths": "True"
+            "ShouldCreateMissingRevisionPaths": true,
+            "ReplicateAllExistingNodes": true
           }
         }
       }

@@ -38,9 +38,9 @@ configurationSamples:
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "formatExpression": "{0}",
+                "sourceField": "Microsoft.VSTS.CMMI.Blocked",
                 "pattern": "Yes",
-                "sourceField": "Microsoft.VSTS.CMMI.Blocked"
+                "formatExpression": "{0}"
               }
             ]
           }

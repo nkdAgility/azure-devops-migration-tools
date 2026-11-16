@@ -227,7 +227,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 else
                 {
                     // We are at the target section, serialize its children
-                    JToken sectionObject = ConvertSectionToJson(section);
+                    JToken sectionObject = RawSection(configuration, section.Path)?.DeepClone() ?? ConvertSectionToJson(section);
 
                     if (option != null && option.ConfigurationMetadata.IsCollection)
                     {
@@ -265,6 +265,38 @@ namespace MigrationTools.ConsoleDataGenerator
             }
 
             return root.ToString(Formatting.Indented);
+        }
+
+        private static JObject _rawSettings;
+
+        /// <summary>
+        /// The section as written in appsettings.json. IConfiguration turns every value into a string (true becomes
+        /// "True", null becomes ""), and a sample copied with those strings fails the configuration schema.
+        /// </summary>
+        static JToken RawSection(IConfiguration configuration, string path)
+        {
+            if (_rawSettings == null)
+            {
+                var jsonSource = (configuration as IConfigurationRoot)?.Providers
+                    .OfType<Microsoft.Extensions.Configuration.Json.JsonConfigurationProvider>()
+                    .Select(p => p.Source.FileProvider?.GetFileInfo(p.Source.Path ?? string.Empty)?.PhysicalPath)
+                    .FirstOrDefault(f => f != null && File.Exists(f));
+                if (jsonSource == null)
+                {
+                    return null;
+                }
+                _rawSettings = JObject.Parse(File.ReadAllText(jsonSource));
+            }
+            JToken token = _rawSettings;
+            foreach (var key in path.Split(':'))
+            {
+                token = (token as JObject)?.GetValue(key, StringComparison.OrdinalIgnoreCase);
+                if (token == null)
+                {
+                    return null;
+                }
+            }
+            return token;
         }
 
         static JToken ConvertSectionToJson(IConfigurationSection section)

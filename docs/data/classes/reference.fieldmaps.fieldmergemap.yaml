@@ -38,12 +38,12 @@ configurationSamples:
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "formatExpression": "{0} \n {1}",
                 "sourceFields": [
                   "Custom.FieldA",
                   "Custom.FieldB"
                 ],
-                "targetField": "Custom.FieldC"
+                "targetField": "Custom.FieldC",
+                "formatExpression": "{0} \n {1}"
               }
             ]
           }

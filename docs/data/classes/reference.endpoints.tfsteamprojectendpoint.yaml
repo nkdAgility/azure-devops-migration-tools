@@ -11,24 +11,24 @@ configurationSamples:
         "Endpoints": {
           "#KEY#": {
             "EndpointType": "TfsTeamProjectEndpoint",
-            "AllowCrossProjectLinking": "False",
+            "Collection": "",
+            "Project": "",
+            "AllowCrossProjectLinking": false,
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
             "Authentication": {
-              "AccessToken": "",
               "AuthenticationMode": "AccessToken",
+              "AccessToken": "",
               "NetworkCredentials": {
-                "Domain": "",
+                "UserName": "",
                 "Password": "",
-                "UserName": ""
+                "Domain": ""
               }
             },
             "AuthenticationMode": "AccessToken",
-            "Collection": "",
             "LanguageMaps": {
               "AreaPath": "Area",
               "IterationPath": "Iteration"
-            },
-            "Project": "",
-            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+            }
           }
         }
       }
@@ -44,19 +44,19 @@ configurationSamples:
         "Endpoints": {
           "#KEY#": {
             "EndpointType": "TfsTeamProjectEndpoint",
-            "AllowCrossProjectLinking": "False",
-            "Authentication": {
-              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
-              "AuthenticationMode": "AccessToken",
-              "NetworkCredentials": {
-                "Domain": "",
-                "Password": "",
-                "UserName": ""
-              }
-            },
             "Collection": "https://dev.azure.com/nkdagility-preview/",
             "Project": "migrationSource1",
-            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+            "AllowCrossProjectLinking": false,
+            "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+            "Authentication": {
+              "AuthenticationMode": "AccessToken",
+              "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
+              "NetworkCredentials": {
+                "UserName": "",
+                "Password": "",
+                "Domain": ""
+              }
+            }
           }
         }
       }

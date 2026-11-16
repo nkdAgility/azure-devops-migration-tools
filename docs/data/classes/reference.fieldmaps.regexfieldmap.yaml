@@ -38,10 +38,10 @@ configurationSamples:
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "pattern": "PRODUCT \\d{4}.(\\d{1})",
-                "replacement": "$1",
                 "sourceField": "COMPANY.PRODUCT.Release",
-                "targetField": "COMPANY.DEVISION.MinorReleaseVersion"
+                "targetField": "COMPANY.DEVISION.MinorReleaseVersion",
+                "pattern": "PRODUCT \\d{4}.(\\d{1})",
+                "replacement": "$1"
               }
             ]
           }

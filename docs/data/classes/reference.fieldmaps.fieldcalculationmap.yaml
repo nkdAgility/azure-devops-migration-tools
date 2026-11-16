@@ -34,12 +34,12 @@ configurationSamples:
           "FieldMappingTool": {
             "FieldMaps": [
               {
+                "FieldMapType": "FieldCalculationMap",
                 "ApplyTo": [
                   "Bug",
                   "Task"
                 ],
                 "expression": "[effort] * [rate]",
-                "FieldMapType": "FieldCalculationMap",
                 "parameters": {
                   "effort": "Custom.EstimatedHours",
                   "rate": "Custom.HourlyRate"

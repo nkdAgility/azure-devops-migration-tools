@@ -10,7 +10,7 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "WorkItemTypeMappingTool": {
-            "Enabled": "False",
+            "Enabled": false,
             "Mappings": {
               "Source Work Item Type Name": "Target Work Item Type Name"
             }
@@ -28,7 +28,7 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "WorkItemTypeMappingTool": {
-            "Enabled": "True",
+            "Enabled": true,
             "Mappings": {
               "User Story": "Product Backlog Item"
             }

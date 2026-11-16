@@ -15,9 +15,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "ExportWorkItemMappingTool": {
-            "Enabled": "True",
-            "PreserveExisting": "True",
-            "TargetFile": "c:\\temp\\WorkItemMappings.json"
+            "Enabled": true,
+            "TargetFile": "c:\\temp\\WorkItemMappings.json",
+            "PreserveExisting": true
           }
         }
       }

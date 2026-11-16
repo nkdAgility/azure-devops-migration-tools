@@ -10,7 +10,7 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsUserMappingTool": {
-            "Enabled": "False",
+            "Enabled": false,
             "UserMappingFile": "C:\\temp\\userExport.json"
           }
         }
@@ -26,7 +26,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsUserMappingTool": {
-            "Enabled": "True",
+            "Enabled": true,
+            "UserMappingFile": "C:\\temp\\userExport.json",
             "IdentityFieldsToCheck": [
               "System.AssignedTo",
               "System.ChangedBy",
@@ -34,8 +35,7 @@ configurationSamples:
               "Microsoft.VSTS.Common.ActivatedBy",
               "Microsoft.VSTS.Common.ResolvedBy",
               "Microsoft.VSTS.Common.ClosedBy"
-            ],
-            "UserMappingFile": "C:\\temp\\userExport.json"
+            ]
           }
         }
       }

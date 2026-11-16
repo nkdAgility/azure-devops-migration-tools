@@ -10,9 +10,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "StringManipulatorTool": {
-            "Enabled": "True",
-            "Manipulators": null,
-            "MaxStringLength": "1000000"
+            "Enabled": true,
+            "MaxStringLength": 1000000,
+            "Manipulators": []
           }
         }
       }
@@ -27,17 +27,17 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "StringManipulatorTool": {
-            "Enabled": "True",
+            "Enabled": true,
+            "MaxStringLength": 1000000,
             "Manipulators": [
               {
                 "$type": "RegexStringManipulator",
-                "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F",
-                "Enabled": "True",
+                "Enabled": true,
                 "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
-                "Replacement": ""
+                "Replacement": "",
+                "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F"
               }
-            ],
-            "MaxStringLength": "1000000"
+            ]
           }
         }
       }

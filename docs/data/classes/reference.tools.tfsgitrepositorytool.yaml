@@ -10,8 +10,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsGitRepositoryTool": {
-            "Enabled": "True",
-            "Mappings": null
+            "Enabled": true,
+            "Mappings": {}
           }
         }
       }
@@ -26,7 +26,7 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsGitRepositoryTool": {
-            "Enabled": "True",
+            "Enabled": true,
             "Mappings": {
               "RepoInSource": "RepoInTarget"
             }

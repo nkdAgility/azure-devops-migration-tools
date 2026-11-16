@@ -11,23 +11,23 @@ configurationSamples:
         "Processors": [
           {
             "ProcessorType": "TfsWorkItemMigrationProcessor",
-            "AttachRevisionHistory": "False",
-            "Enabled": "False",
-            "FilterWorkItemsThatAlreadyExistInTarget": "False",
-            "FixHtmlAttachmentLinks": "True",
-            "GenerateMigrationComment": "True",
-            "MaxGracefulFailures": "0",
-            "PauseAfterEachWorkItem": "False",
-            "SkipRevisionWithInvalidAreaPath": "False",
-            "SkipRevisionWithInvalidIterationPath": "False",
-            "SourceName": "Source",
-            "StopOnFirstError": "False",
-            "TargetName": "Target",
-            "UpdateCreatedBy": "True",
-            "UpdateCreatedDate": "True",
+            "Enabled": false,
+            "UpdateCreatedDate": true,
+            "UpdateCreatedBy": true,
             "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
-            "WorkItemCreateRetryLimit": "5",
-            "WorkItemIDs": null
+            "FixHtmlAttachmentLinks": true,
+            "WorkItemCreateRetryLimit": 5,
+            "FilterWorkItemsThatAlreadyExistInTarget": false,
+            "PauseAfterEachWorkItem": false,
+            "AttachRevisionHistory": false,
+            "GenerateMigrationComment": true,
+            "SourceName": "Source",
+            "TargetName": "Target",
+            "WorkItemIDs": [],
+            "MaxGracefulFailures": 0,
+            "StopOnFirstError": false,
+            "SkipRevisionWithInvalidIterationPath": false,
+            "SkipRevisionWithInvalidAreaPath": false
           }
         ]
       }
@@ -43,11 +43,11 @@ configurationSamples:
         "Processors": [
           {
             "ProcessorType": "TfsWorkItemMigrationProcessor",
-            "Enabled": "False",
-            "FilterWorkItemsThatAlreadyExistInTarget": "False",
+            "Enabled": false,
+            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc",
+            "FilterWorkItemsThatAlreadyExistInTarget": false,
             "SourceName": "Source",
-            "TargetName": "Target",
-            "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] NOT IN ('Test Suite', 'Test Plan','Shared Steps','Shared Parameter','Feedback Request') ORDER BY [System.ChangedDate] desc"
+            "TargetName": "Target"
           }
         ]
       }

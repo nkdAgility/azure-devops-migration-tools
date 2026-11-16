@@ -38,9 +38,9 @@ configurationSamples:
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "defaultValue": "StateB",
                 "sourceField": "System.State",
                 "targetField": "System.State",
+                "defaultValue": "StateB",
                 "valueMapping": {
                   "StateA": "StateB"
                 }

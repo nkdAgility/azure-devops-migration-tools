@@ -11,14 +11,14 @@ configurationSamples:
         "Processors": [
           {
             "ProcessorType": "AzureDevOpsPipelineProcessor",
-            "BuildPipelines": "",
-            "Enabled": "False",
-            "MigrateBuildPipelines": "True",
-            "MigrateReleasePipelines": "True",
-            "MigrateServiceConnections": "True",
-            "MigrateTaskGroups": "True",
-            "MigrateVariableGroups": "True",
-            "ReleasePipelines": "",
+            "Enabled": false,
+            "MigrateBuildPipelines": true,
+            "MigrateReleasePipelines": true,
+            "MigrateTaskGroups": true,
+            "MigrateVariableGroups": true,
+            "MigrateServiceConnections": true,
+            "BuildPipelines": null,
+            "ReleasePipelines": null,
             "SourceName": "sourceName",
             "TargetName": "targetName"
           }
@@ -36,14 +36,14 @@ configurationSamples:
         "Processors": [
           {
             "ProcessorType": "AzureDevOpsPipelineProcessor",
-            "BuildPipelines": "",
-            "Enabled": "False",
-            "MigrateBuildPipelines": "True",
-            "MigrateReleasePipelines": "True",
-            "MigrateServiceConnections": "True",
-            "MigrateTaskGroups": "True",
-            "MigrateVariableGroups": "True",
-            "ReleasePipelines": "",
+            "Enabled": false,
+            "MigrateBuildPipelines": true,
+            "MigrateReleasePipelines": true,
+            "MigrateTaskGroups": true,
+            "MigrateVariableGroups": true,
+            "MigrateServiceConnections": true,
+            "BuildPipelines": null,
+            "ReleasePipelines": null,
             "SourceName": "sourceName",
             "TargetName": "targetName"
           }

@@ -10,12 +10,12 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemTypeValidatorTool": {
-            "Enabled": "True",
-            "ExcludeDefaultWorkItemTypes": "True",
-            "ExcludeSourceFields": null,
-            "ExcludeWorkItemTypes": null,
-            "ScanRevisionHistoryForFields": "False",
-            "StopIfHistoryOnlyFieldsFound": "False"
+            "Enabled": true,
+            "ExcludeWorkItemTypes": [],
+            "ExcludeDefaultWorkItemTypes": true,
+            "ExcludeSourceFields": {},
+            "ScanRevisionHistoryForFields": false,
+            "StopIfHistoryOnlyFieldsFound": false
           }
         }
       }
@@ -30,17 +30,17 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemTypeValidatorTool": {
-            "Enabled": "True",
-            "ExcludeDefaultWorkItemTypes": "True",
+            "Enabled": true,
+            "ExcludeWorkItemTypes": [],
+            "ExcludeDefaultWorkItemTypes": true,
             "ExcludeSourceFields": {
               "Bug": [
                 "Microsoft.VSTS.Common.AcceptanceCriteria",
                 "Microsoft.VSTS.Scheduling.Effort"
               ]
             },
-            "ExcludeWorkItemTypes": null,
-            "ScanRevisionHistoryForFields": "True",
-            "StopIfHistoryOnlyFieldsFound": "False"
+            "ScanRevisionHistoryForFields": true,
+            "StopIfHistoryOnlyFieldsFound": false
           }
         }
       }

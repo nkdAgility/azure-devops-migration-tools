@@ -38,9 +38,9 @@ configurationSamples:
                 "ApplyTo": [
                   "SomeWorkItemType"
                 ],
-                "defaultValue": "42",
                 "sourceField": "Microsoft.VSTS.Common.BacklogPriority",
-                "targetField": "Microsoft.VSTS.Common.StackRank"
+                "targetField": "Microsoft.VSTS.Common.StackRank",
+                "defaultValue": 42
               }
             ]
           }

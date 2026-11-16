@@ -16,8 +16,8 @@ configurationSamples:
         "Endpoints": {
           "#KEY#": {
             "EndpointType": "AzureDevOpsEndpoint",
-            "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
             "AuthenticationMode": "AccessToken",
+            "AccessToken": "jklsadhjksahfkjsdhjksahsadjhksadhsad",
             "Organisation": "https://dev.azure.com/xxx/",
             "Project": "myProject",
             "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
