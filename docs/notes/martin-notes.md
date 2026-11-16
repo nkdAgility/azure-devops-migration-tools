@@ -43,6 +43,7 @@ These are the facts and decisions Martin has given, so they can be checked. They
 ## 2026-11-16
 
 - **Instruction (Martin):** bring the documentation, including README.md, up to date with main (issue #3250). Rule text in `.github/copilot-instructions.md` and `docs/copilot-instructions.md` changes only once Martin approves the wording proposed in the PR. The stale `docs/data/releases*.json` is mentioned in the PR, not deleted.
+- **Decision (Martin):** raise a validate (dry-run) mode as its own feature request, separate from the docs PR: #3252.
 - **Reminder (Martin):** much of the docs runs through the generator, so fix XML comments and appsettings.json samples and regenerate rather than hand-editing generated output.
 
 ## 2026-11-13
