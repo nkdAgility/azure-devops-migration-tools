@@ -44,6 +44,7 @@ These are the facts and decisions Martin has given, so they can be checked. They
 
 - **Fact (Martin, to check):** the config wizard on the docs site (`docs/content/docs/config/config-wizard`, `docs/static/js/config-wizard.js`) does not work.
 - **Decision (Martin):** the config wizard must not be live unless it works.
+- **Finding (checked 2026-11-16, #3261):** confirmed. Step 2 throws `renderConstrainedEndpointForm is not a function`, the schema reader finds 0 processors and 0 endpoints, and the tool rejects its output (exit -1). The wizard is taken off every environment; the source is kept for a later fix.
 - **Decision:** enforce the rule that every plugin change is agreed by all active CONTROL chats before it is pushed: a check blocks the push until they have agreed. (Prompted by 3d693d8, 24fff0d and 69c4ee9, each announced as it was pushed.)
 
 ## 2026-11-13
