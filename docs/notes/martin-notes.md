@@ -44,7 +44,8 @@ These are the facts and decisions Martin has given, so they can be checked. They
 
 - **Instruction (Martin):** bring the documentation, including README.md, up to date with main (issue #3250). Rule text in `.github/copilot-instructions.md` and `docs/copilot-instructions.md` changes only once Martin approves the wording proposed in the PR. The stale `docs/data/releases*.json` is mentioned in the PR, not deleted.
 - **Decision (Martin):** raise a validate (dry-run) mode as its own feature request, separate from the docs PR: #3252.
-- **Instruction (Martin):** while reconciling the docs, raise other findings as GitHub issues too. Raised from #3251: #3253 (Enabled default wrong in generated docs), #3254 (Basic template same as WorkItemTracking; templates use samples), #3255 (unused releases*.json).
+- **Instruction (Martin):** while reconciling the docs, raise other findings as GitHub issues too. Raised from #3251: #3253 (Enabled default wrong in generated docs), #3254 (Basic template same as WorkItemTracking; templates use samples), #3255 (unused releases*.json), #3256 (Test Case references left at source IDs), #3257 (plans and suites options undocumented).
+- **Fact (Martin, to check):** the Migrating Plans and Suites how-to was still wrong after the recent changes. Checked and updated in #3251 against discussion #2049 and the code.
 - **Reminder (Martin):** much of the docs runs through the generator, so fix XML comments and appsettings.json samples and regenerate rather than hand-editing generated output.
 
 ## 2026-11-13
