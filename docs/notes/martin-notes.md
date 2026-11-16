@@ -34,6 +34,18 @@ These are the facts and decisions Martin has given, so they can be checked. They
 ## 2026-11-13
 
 - **Decision:** Martin approved the "Issue status comment" wording for CLAUDE.md and AGENTS.md (workers update the status comment only with `Test-StageGate.ps1 -Status`), and the matching sentence in definition-of-workflow.md. It is pushed together with the plugin's status-comment hook.
+- **Finding:** sessions run a cached copy of nkda-engineering-delivery 0.1.0 (from 2026-11-12 12:22), because the plugin's version never changed. None of the 2026-11-12 plugin changes (definition-of-workflow.json, issue storage, -Status, the gh hook) are live yet.
+- **Decision:** the plugin is versioned with GitVersion, like every other tool Martin uses.
+- **Decision (given in CONTROL-HUB, relayed):** plugins are installed machine-wide only (managed settings), never at user scope. The plugin's build.ps1 installs nothing and prints the steps for Martin.
+- **Fact (Martin):** in this repo the backlog and the options are stored in GitHub issues.
+- **Fact (Martin):** you can't push on main. Checked: main's ruleset requires a pull request, status checks and the merge queue. The earlier direct pushes (22202606, 3db6b3fb, 8af3e1bc on 2026-11-12/13) went around that rule.
+
+## 2026-11-16
+
+- **Fact (Martin, to check):** the config wizard on the docs site (`docs/content/docs/config/config-wizard`, `docs/static/js/config-wizard.js`) does not work.
+- **Decision (Martin):** the config wizard must not be live unless it works.
+- **Finding (checked 2026-11-16, #3261):** confirmed. Step 2 throws `renderConstrainedEndpointForm is not a function`, the schema reader finds 0 processors and 0 endpoints, and the tool rejects its output (exit -1). The wizard is taken off every environment; the source is kept for a later fix.
+- **Decision:** enforce the rule that every plugin change is agreed by all active CONTROL chats before it is pushed: a check blocks the push until they have agreed. (Prompted by 3d693d8, 24fff0d and 69c4ee9, each announced as it was pushed.)
 
 ## 2026-11-13
 

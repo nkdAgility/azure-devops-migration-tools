@@ -9,6 +9,6 @@ buildExpired: true
 
 params:
   features:
-    configWizard: true
+    configWizard: false # off until the wizard works (#3261)
 
 # PullRequestNumber

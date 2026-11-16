@@ -1,5 +1,10 @@
 # Interactive Configuration Tool Implementation
 
+> **Status: not live.** The wizard does not work, so it is not built or linked in any environment
+> (issue #3261 lists the faults). To bring it back, fix it, prove the generated configuration runs
+> end to end, then remove `draft`/`build` from `docs/content/docs/config/config-wizard/index.md`
+> and set `params.features.configWizard: true` in the environment's `docs/hugo.*.yaml`.
+
 ## Design Constraints
 
 ### 🎯 **Migration Type Architecture**

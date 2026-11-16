@@ -10,12 +10,13 @@ aliases:
 - /wizard/
 - /configure/
 layout: config-wizard
-cascade:
-- build:
-    list: never
-    render: never
-  target:
-    environment: production
+# The wizard does not work (#3261). It must not be live until it does, so it is
+# never rendered or listed in any environment. Keep the source for the later fix.
+draft: true
+build:
+  list: never
+  render: never
+  publishResources: false
 
 ---
 Use this interactive wizard to build your Azure DevOps Migration Tools configuration. The wizard supports three primary migration types:
