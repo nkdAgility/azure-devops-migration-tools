@@ -28,7 +28,7 @@ Watch the [Video Overview](https://youtu.be/RCJsST0xBCE) to get started in 30 mi
 
 This is going to be a crash course and I really recommend watching [What can go wrong and what can go right with a migration via Azure DevOps](https://youtu.be/3jYFD-6_kZk?si=xxvBoljBWjGAOVuv) and then [Basic Work Item Migration with the Azure DevOps Migration Tools](https://youtu.be/Qt1Ywu_KLrc?si=uEXjLS2pwe244ugV) before you get started! This will prep you for the journey ahead.
 
-> **New to migration tools?** An Interactive Configuration Wizard is in preview. It is not published on this site yet; you can try it on the [preview documentation](https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net/docs/config/config-wizard/).
+> **New to migration tools?** Try our [Interactive Configuration Wizard]({{< ref "docs/config/config-wizard" >}}) to build your configuration step-by-step with guided explanations!
 
 ### 1. Create a default configuration file
 
