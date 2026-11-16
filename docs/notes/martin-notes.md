@@ -49,6 +49,10 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Fact (Martin, checked):** with #3245, work items and test items (Test Cases, Shared Steps, Shared Parameter) don't need separate runs. One TfsWorkItemMigrationProcessor run works: `SharedItemsFirst` orders Shared Steps and Shared Parameter first, and the six non-customisable types use IntegrationBuild. The how-to now has three steps.
 - **Fact (Martin, to check):** the Migrating Plans and Suites how-to was still wrong after the recent changes. Checked and updated in #3251 against discussion #2049 and the code.
 - **Reminder (Martin):** much of the docs runs through the generator, so fix XML comments and appsettings.json samples and regenerate rather than hand-editing generated output.
+- **Fact (Martin, to check):** the config wizard on the docs site (`docs/content/docs/config/config-wizard`, `docs/static/js/config-wizard.js`) does not work.
+- **Decision (Martin):** the config wizard must not be live unless it works.
+- **Finding (checked 2026-11-16, #3261):** confirmed. Step 2 throws `renderConstrainedEndpointForm is not a function`, the schema reader finds 0 processors and 0 endpoints, and the tool rejects its output (exit -1). The wizard is taken off every environment; the source is kept for a later fix.
+- **Decision:** enforce the rule that every plugin change is agreed by all active CONTROL chats before it is pushed: a check blocks the push until they have agreed. (Prompted by 3d693d8, 24fff0d and 69c4ee9, each announced as it was pushed.)
 
 ## 2026-11-13
 
