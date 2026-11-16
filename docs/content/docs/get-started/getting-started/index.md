@@ -31,7 +31,7 @@ This is going to be a crash course and I really recommend watching [What can go 
 ### 1. Create a default configuration file
 
 1. Open your [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) in your chosen working folder
-2. Run `devopsmigration init --options Basic` to create a default configuration
+2. Run `devopsmigration init --template Basic` to create a default configuration
 3. Open `configuration.json` from the current directory
 
 You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process will likely look something like:
@@ -84,6 +84,8 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 7. Adjust the [`NodeBasePaths`]({{< ref "docs/reference/processors/workitem-tracking-processor" >}}) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
+There is no dry-run or `-validate` option: `execute` always migrates. The work item type validation described below runs at the start of `TfsWorkItemMigrationProcessor` and stops that processor before it writes anything if it fails. It does not protect processors listed before it, which run first and can write to the target (for example `TfsTestVariablesMigrationProcessor` creates test variables). Not every check in `TfsWorkItemMigrationProcessor` runs that early, either: the area and iteration tool (`TfsNodeStructureTool`, which by default replicates every existing node) and the team settings tool write to the target before the query runs, and the node and user checks run after the query. To try a configuration safely, point the target at a scratch project. A narrow `WIQLQuery` (for example `[System.Id] IN (101, 102)`) limits which work items are migrated, but not those area, iteration and team changes. `TfsWorkItemMigrationProcessor` does not read `WorkItemIDs`, so that option does not limit a run.
+
 ### Where the logs are written
 
 Each run writes `migration*.log` and `migration-errors*.log` to `logs\<timestamp>` under the folder you run the tool from, not the folder the tool is installed in. The full path is printed at the start of the run as `Logpath:` and again at the end as `Check the logs for errors:`. To write them somewhere else, pass `--logPath <folder>`; the `logs\<timestamp>` folder is created inside it. If the folder cannot be written to, the logs go to `%LOCALAPPDATA%\MigrationTools\logs\<timestamp>` instead.
@@ -117,7 +119,7 @@ Work item type 'Risk' does not exist in target system.
 'User Story' does not contain reflected work item ID field 'Custom.ReflectedWorkItemId'.
 ```
 
-- **Solution:** Add the custom field to ALL work item types in your target project (see [ReflectedWorkItemId setup]({{< ref "docs/setup/reflected-workitem-id" >}}))
+- **Solution:** Add the custom field to every work item type you can customise in your target project (see [ReflectedWorkItemId setup]({{< ref "docs/setup/reflected-workitem-id" >}})). Shared Steps, Shared Parameter, Code Review Request/Response and Feedback Request/Response can't be customised on an inherited process; for them the migration uses `Microsoft.VSTS.Build.IntegrationBuild` automatically.
 
 **Missing Custom Fields:**
 
@@ -130,6 +132,14 @@ Missing field 'Microsoft.VSTS.Common.CustomField' in 'User Story'.
 - **Solution 3:** Exclude the field from validation if it's not needed
 
 
+### Common Issue: "Unable to load Common Structure"
+
+```text
+Unable to load Common Structure for Target. This is usually due to TFS having a different installed language version than was expected.
+```
+
+The tool looks for the root area and iteration nodes by the names in the endpoint's `LanguageMaps` (`AreaPath` and `IterationPath`, `Area` and `Iteration` by default). If your server uses another language, set them to the names shown at the top of the area and iteration trees, for example `Fläche` or `Aire`. Don't put a specific area or iteration path there. See the [TFS Team Project Endpoint]({{< ref "docs/reference/endpoints/tfs-team-project-endpoint" >}}). The same message for the Source with "more than one node path matches" means more than one root node starts with the project name and `AreaPath`.
+
 For a complete overview of the validation process—including both pre-migration and pre-data-load validation steps—see the [Validation Process documentation]({{< ref "docs/get-started/validation" >}}).
 
 For detailed troubleshooting and configuration options, see the [TfsWorkItemTypeValidatorTool documentation]({{< ref "docs/reference/tools/tfsworkitemtypevalidatortool" >}}).
@@ -140,9 +150,11 @@ Refer to the [Reference Guide]({{< ref "docs/reference" >}}) for more details.
 
 ## Other Configuration Options
 
-When running `devopsmigration init` you can also pass `--options` with one of the following:
+When running `devopsmigration init` you can pass `--template` (or its short form `-t`) with one of the following. `--options` and `--outputMode` still work as aliases. Add `--overwrite` to replace an existing `configuration.json`.
 
-- _Full_ -
-- _WorkItemTracking_ -
-- _Fullv2_ -
-- _WorkItemTrackingv2_ -
+- _WorkItemTracking_ - the default. A `TfsWorkItemMigrationProcessor`, the `FieldMappingTool` with a `FieldLiteralMap`, and `Source` and `Target` `TfsTeamProjectEndpoint` endpoints.
+- _Basic_ - currently produces the same configuration as _WorkItemTracking_.
+- _PipelineProcessor_ - an `AzureDevOpsPipelineProcessor` with `PipelineSource` and `PipelineTarget` `AzureDevOpsEndpoint` endpoints.
+- _Reference_ - every processor, tool, field map and endpoint, filled with sample values. The values are examples, not the defaults the tool uses at run time. Use it as a reference, not as a configuration to run.
+
+Every template fills its options from the samples, so check each value rather than assuming it is the default.

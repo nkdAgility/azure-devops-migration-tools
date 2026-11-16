@@ -10,8 +10,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
-            "ChangeSetMappingFile": "",
-            "Enabled": "False"
+            "Enabled": false,
+            "ChangeSetMappingFile": null
           }
         }
       }
@@ -26,8 +26,8 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsChangeSetMappingTool": {
-            "ChangeSetMappingFile": "c:\\changesetmappings.json",
-            "Enabled": "True"
+            "Enabled": true,
+            "ChangeSetMappingFile": "c:\\changesetmappings.json"
           }
         }
       }
@@ -55,8 +55,8 @@ options:
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Enabled
   type: Boolean
-  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: true
+  description: If set to `true` then the tool will run. Set to `false` and the tool will not run.
+  defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 status: missing XML code comments

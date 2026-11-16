@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devopsmigration.io/schema/schema.processors.tfstestplansandsuitesmigrationprocessor.json",
   "title": "TfsTestPlansAndSuitesMigrationProcessor",
-  "description": "Rebuilds Suites and plans for Test Cases migrated using the WorkItemMigration",
+  "description": "Rebuilds Test Plans and Test Suites in the target and adds the Test Cases already migrated by TfsWorkItemMigrationProcessor. Plans are matched by name and suites by title, so both must be unique. Test runs are not migrated.",
   "type": "object",
   "properties": {
     "Enabled": {
@@ -11,52 +11,79 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object"
+      }
     },
     "FilterCompleted": {
-      "description": "missing XML code comments",
-      "type": "boolean"
+      "description": "If `true`, skips each source Test Plan whose name already exists in the target, so plans migrated by an earlier run are not processed again.",
+      "type": "boolean",
+      "default": false
     },
     "MigrationDelay": {
-      "description": "??Not sure what this does. Check code.",
+      "description": "Milliseconds to wait before processing each Test Suite. Use it to slow the run down when the target throttles requests. `0` means no delay.",
       "type": "integer",
       "default": 0
     },
     "OnlyElementsWithTag": {
-      "description": "The tag name that is present on all elements that must be migrated. If this option isn't present this processor will migrate all.",
-      "type": "string",
-      "default": ""
+      "description": "Only plans, suites and Test Cases whose tags contain this text are migrated. The match is a substring of the tags text, so `move` also matches `remove`. A plan or suite under the root suite that does not match is skipped with everything below it. Leave it empty or unset to migrate everything.",
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "RemoveAllLinks": {
-      "description": "??Not sure what this does. Check code.",
+      "description": "If `true`, removes every link from each Test Plan the processor creates in the target. Plans that already exist in the target are not changed.",
       "type": "boolean",
       "default": false
     },
     "RemoveInvalidTestSuiteLinks": {
-      "description": "Indicates whether the configuration for node structure transformation should be taken from the common enricher configs. Otherwise the configuration elements below are used",
+      "description": "If `true`, removes links whose URI is not valid from each Test Plan the processor creates in the target, and logs each one. If `false`, such links are kept and a warning is logged, and the save can fail with \"The URL specified has a potentially unsafe URL protocol\". See https://github.com/nkdAgility/azure-devops-migration-tools/issues/178.",
       "type": "boolean",
       "default": false
     },
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "TestPlanIds": {
-      "description": "This flag filters all test plans and retains only the specified ones for migration. Pass the test plan IDs as an array. Example: \"TestPlanIds\": [123, 456, 789] \r\n Works optimally when \"TestPlanQuery\" is set to null.",
-      "type": "string"
+      "description": "Migrates only the Test Plans with these IDs. Pass the test plan IDs as an array, for example `[123, 456, 789]`. Leave it empty to migrate every plan selected by `TestPlanQuery`.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "default": [],
+      "items": {
+        "type": "integer"
+      }
     },
     "TestPlanQuery": {
-      "description": "Filtering conditions to decide whether to migrate a test plan or not. When provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields.",
-      "type": "string",
-      "default": ""
+      "description": "Filtering conditions to decide whether to migrate a test plan or not. This is not WIQL: when provided, this partial query is added after `Select * From TestPlan Where` when selecting test plans. Among filtering options, `AreaPath`, `PlanName` and `PlanState` are known to work. There is unfortunately no documentation regarding the available fields. Leave it empty to select every plan.",
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

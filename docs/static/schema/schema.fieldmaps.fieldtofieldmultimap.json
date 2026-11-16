@@ -6,16 +6,28 @@
   "type": "object",
   "properties": {
     "ApplyTo": {
-      "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
-      "type": "array"
+      "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
     },
     "Enabled": {
-      "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+      "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
       "type": "boolean"
     },
     "SourceToTargetMappings": {
       "description": "missing XML code comments",
-      "type": "object"
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
     }
   }
 }

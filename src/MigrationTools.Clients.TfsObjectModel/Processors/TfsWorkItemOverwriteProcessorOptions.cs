@@ -29,7 +29,7 @@ namespace MigrationTools.Processors
         /// This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
         /// While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
         /// </summary>
-        /// <default>true</default>
+        /// <default>false</default>
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace MigrationTools.Processors
         /// **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
         /// This allows for periodic network glitches not to end the process.
         /// </summary>
-        /// <default>5</default>
+        /// <default>0</default>
         public int WorkItemCreateRetryLimit { get; set; }
 
 

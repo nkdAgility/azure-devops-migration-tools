@@ -49,7 +49,7 @@ options:
   description: >-
     This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
      While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
-  defaultValue: true
+  defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: PauseAfterEachWorkItem
@@ -93,7 +93,7 @@ options:
   description: >-
     **beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.
      This allows for periodic network glitches not to end the process.
-  defaultValue: 5
+  defaultValue: 0
   isRequired: false
   dotNetType: System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: WorkItemIDs

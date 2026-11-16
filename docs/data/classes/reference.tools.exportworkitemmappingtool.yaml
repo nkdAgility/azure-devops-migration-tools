@@ -9,7 +9,19 @@ configurationSamples:
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "ExportWorkItemMappingTool": {
+            "Enabled": true,
+            "TargetFile": "c:\\temp\\WorkItemMappings.json",
+            "PreserveExisting": true
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.ExportWorkItemMappingToolOptions
 - name: classic
   order: 3
@@ -17,8 +29,8 @@ configurationSamples:
   code: >-
     {
       "$type": "ExportWorkItemMappingToolOptions",
-      "Enabled": false,
-      "TargetFile": "",
+      "Enabled": true,
+      "TargetFile": "c:\\temp\\WorkItemMappings.json",
       "PreserveExisting": true
     }
   sampleFor: MigrationTools.Tools.ExportWorkItemMappingToolOptions
@@ -31,8 +43,8 @@ typeName: Tools
 options:
 - parameterName: Enabled
   type: Boolean
-  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
-  defaultValue: true
+  description: If set to `true` then the tool will run. Set to `false` and the tool will not run.
+  defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: PreserveExisting

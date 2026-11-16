@@ -22,9 +22,9 @@ namespace MigrationTools.Tools.Infrastructure
         };
 
         /// <summary>
-        /// If set to `true` then the tool will run. Set to `false` and the processor will not run.
+        /// If set to `true` then the tool will run. Set to `false` and the tool will not run.
         /// </summary>
-        /// <default>true</default>
+        /// <default>false</default>
 
         public bool Enabled { get; set; }
 

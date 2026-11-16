@@ -10,9 +10,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemLinkTool": {
-            "Enabled": "True",
-            "FilterIfLinkCountMatches": "True",
-            "SaveAfterEachLinkIsAdded": "False"
+            "Enabled": true,
+            "FilterIfLinkCountMatches": true,
+            "SaveAfterEachLinkIsAdded": false
           }
         }
       }
@@ -27,9 +27,9 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsWorkItemLinkTool": {
-            "Enabled": "True",
-            "FilterIfLinkCountMatches": "True",
-            "SaveAfterEachLinkIsAdded": "False"
+            "Enabled": true,
+            "FilterIfLinkCountMatches": true,
+            "SaveAfterEachLinkIsAdded": false
           }
         }
       }
@@ -52,14 +52,14 @@ typeName: Tools
 options:
 - parameterName: Enabled
   type: Boolean
-  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  description: If set to `true` then the tool will run. Set to `false` and the tool will not run.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: FilterIfLinkCountMatches
   type: Boolean
   description: Skip validating links if the number of links in the source and the target matches!
-  defaultValue: missing XML code comments
+  defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: SaveAfterEachLinkIsAdded

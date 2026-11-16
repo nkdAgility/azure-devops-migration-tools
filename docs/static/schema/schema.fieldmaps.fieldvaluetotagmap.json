@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.fieldmaps.fieldvaluetotagmap.json",
+  "title": "FieldValuetoTagMap",
+  "description": "missing XML code comments",
+  "type": "object",
+  "properties": {
+    "ApplyTo": {
+      "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "Enabled": {
+      "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
+      "type": "boolean"
+    },
+    "formatExpression": {
+      "description": "missing XML code comments",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pattern": {
+      "description": "missing XML code comments",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sourceField": {
+      "description": "missing XML code comments",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

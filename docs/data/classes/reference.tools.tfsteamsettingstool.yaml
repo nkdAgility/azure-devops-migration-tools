@@ -10,11 +10,11 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsTeamSettingsTool": {
-            "Enabled": "True",
-            "MigrateTeamCapacities": "True",
-            "MigrateTeamSettings": "True",
-            "Teams": null,
-            "UpdateTeamSettings": "True"
+            "Enabled": true,
+            "MigrateTeamSettings": true,
+            "UpdateTeamSettings": true,
+            "MigrateTeamCapacities": true,
+            "Teams": []
           }
         }
       }
@@ -29,14 +29,14 @@ configurationSamples:
         "Version": "16.0",
         "CommonTools": {
           "TfsTeamSettingsTool": {
-            "Enabled": "True",
-            "MigrateTeamCapacities": "True",
-            "MigrateTeamSettings": "True",
+            "Enabled": true,
+            "MigrateTeamSettings": true,
+            "UpdateTeamSettings": true,
+            "MigrateTeamCapacities": true,
             "Teams": [
               "Team 1",
               "Team 2"
-            ],
-            "UpdateTeamSettings": "True"
+            ]
           }
         }
       }
@@ -65,20 +65,20 @@ typeName: Tools
 options:
 - parameterName: Enabled
   type: Boolean
-  description: If set to `true` then the tool will run. Set to `false` and the processor will not run.
+  description: If set to `true` then the tool will run. Set to `false` and the tool will not run.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: MigrateTeamCapacities
   type: Boolean
   description: 'Migrate original team member capacities after their creation on the target team project. Note: It will only migrate team member capacity if the team member with same display name exists on the target collection otherwise it will be ignored.'
-  defaultValue: false
+  defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: MigrateTeamSettings
   type: Boolean
   description: Migrate original team settings after their creation on target team project
-  defaultValue: false
+  defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: Teams
@@ -90,7 +90,7 @@ options:
 - parameterName: UpdateTeamSettings
   type: Boolean
   description: Reset the target team settings to match the source if the team exists
-  defaultValue: false
+  defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
 - parameterName: UseUserMapping

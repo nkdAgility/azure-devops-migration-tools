@@ -7,7 +7,10 @@
   "properties": {
     "CleanupFileName": {
       "description": "File path where the cleanup script or batch file will be generated for removing unwanted outbound links.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "DryRun": {
       "description": "When true, performs a dry run without making actual changes, only generating the cleanup script for review.",
@@ -19,35 +22,62 @@
     },
     "Enrichers": {
       "description": "List of Enrichers that can be used to add more features to this processor. Only works with Native Processors and not legacy Processors.",
-      "type": "array"
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "object"
+      }
     },
     "PrependCommand": {
       "description": "Command to prepend to each line in the cleanup script, such as \"start\" for Windows batch files.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "RefName": {
       "description": "`Refname` will be used in the future to allow for using named Options without the need to copy all of the options.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "SourceName": {
       "description": "This is the `IEndpoint` that will be used as the source of the Migration. Can be null for a write only processor.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "TargetLinksToKeepOrganization": {
       "description": "URL of the Azure DevOps organization whose links should be preserved during cleanup operations.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "TargetLinksToKeepProject": {
       "description": "Project name or GUID within the target organization whose links should be preserved.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "TargetName": {
       "description": "This is the `IEndpoint` that will be used as the Target of the Migration. Can be null for a read only processor.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "WIQLQuery": {
       "description": "WIQL (Work Item Query Language) query used to select the work items whose outbound links should be processed for preservation.",
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

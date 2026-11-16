@@ -70,10 +70,15 @@
       <!-- Default Value -->
       <div class="col-12 col-md-1">
           <div class="d-md-none fw-bold text-muted small">Default:</div>
-          {{ if .defaultValue }}
-          <code class="text-success">{{ .defaultValue }}</code>
-          {{ else }}
+          {{/* false, 0, null and "" are real defaults, so test for the key rather than a truthy value. */}}
+          {{ if not (isset . "defaultValue") }}
           <em class="text-muted">Not specified</em>
+          {{ else if eq .defaultValue nil }}
+          <code class="text-success">null</code>
+          {{ else if eq (printf "%v" .defaultValue) "" }}
+          <code class="text-success">""</code>
+          {{ else }}
+          <code class="text-success">{{ printf "%v" .defaultValue }}</code>
           {{ end }}
       </div>
   </div>

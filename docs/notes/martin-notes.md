@@ -42,6 +42,14 @@ These are the facts and decisions Martin has given, so they can be checked. They
 
 ## 2026-11-16
 
+- **Instruction (Martin):** bring the documentation, including README.md, up to date with main (issue #3250). Rule text in `.github/copilot-instructions.md` and `docs/copilot-instructions.md` changes only once Martin approves the wording proposed in the PR. The stale `docs/data/releases*.json` is mentioned in the PR, not deleted.
+- **Decision (Martin):** raise a validate (dry-run) mode as its own feature request, separate from the docs PR: #3252.
+- **Instruction (Martin):** while reconciling the docs, raise other findings as GitHub issues too. Raised from #3251: #3253 (Enabled default wrong in generated docs), #3254 (Basic template same as WorkItemTracking; templates use samples), #3255 (unused releases*.json), #3256 (Test Case references left at source IDs), #3257 (plans and suites options undocumented), #3258 (StringManipulatorTool default removes non-BMP letters), #3259 (generated schemas lack array items), #3260 (root-suite Test Cases not added to an existing plan).
+- **Decision (Martin):** approved the copilot-instructions wording shown in chat (paths `docs/data/classes` and `docs/static/schema`, Hugo not Jekyll) for `.github/copilot-instructions.md` and `docs/copilot-instructions.md`; applied in #3251. He approves nothing he has not seen.
+- **Decision (Martin):** #3253, #3257 and #3259 are approved to be fixed in #3251 (docs generator and XML comments), not left as issues.
+- **Fact (Martin, checked):** with #3245, work items and test items (Test Cases, Shared Steps, Shared Parameter) don't need separate runs. One TfsWorkItemMigrationProcessor run works: `SharedItemsFirst` orders Shared Steps and Shared Parameter first, and the six non-customisable types use IntegrationBuild. The how-to now has three steps.
+- **Fact (Martin, to check):** the Migrating Plans and Suites how-to was still wrong after the recent changes. Checked and updated in #3251 against discussion #2049 and the code.
+- **Reminder (Martin):** much of the docs runs through the generator, so fix XML comments and appsettings.json samples and regenerate rather than hand-editing generated output.
 - **Fact (Martin, to check):** the config wizard on the docs site (`docs/content/docs/config/config-wizard`, `docs/static/js/config-wizard.js`) does not work.
 - **Decision (Martin):** the config wizard must not be live unless it works.
 - **Finding (checked 2026-11-16, #3261):** confirmed. Step 2 throws `renderConstrainedEndpointForm is not a function`, the schema reader finds 0 processors and 0 endpoints, and the tool rejects its output (exit -1). The wizard is taken off every environment; the source is kept for a later fix.

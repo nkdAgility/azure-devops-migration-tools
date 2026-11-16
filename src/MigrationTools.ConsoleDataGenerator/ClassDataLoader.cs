@@ -54,7 +54,7 @@ namespace MigrationTools.ConsoleDataGenerator
             where TOptionsInterface : IOptions
         {
             var oConfig = GetOptionsConfiguration(optionInFocus);
-            var typeOftargetOfOption = allTypes.Where(t => t.Name == oConfig.OptionFor && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            var typeOftargetOfOption = allTypes.Where(t => t.Name.Equals(oConfig.OptionFor, StringComparison.OrdinalIgnoreCase) &&!t.IsAbstract && !t.IsInterface).SingleOrDefault();
             if (typeOftargetOfOption == null)
             {
                 Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions:: {optionInFocus.Name} - {oConfig.OptionFor} not found");
@@ -75,10 +75,9 @@ namespace MigrationTools.ConsoleDataGenerator
                 data.OptionsClassFullName = optionInFocus.FullName;
                 data.OptionsClassName = optionInFocus.Name;
                 data.OptionsClassFile = codeFinder.FindCodeFile(optionInFocus);
-                ///bind Item or Defaults
+                IConfigurationSection mainOrDefaultSection = null;
                 if (!string.IsNullOrEmpty(instanceOfOption.ConfigurationMetadata.PathToDefault))
                 {
-                    IConfigurationSection mainOrDefaultSection;
                     mainOrDefaultSection = configuration.GetSection(instanceOfOption.ConfigurationMetadata.PathToDefault);
                     if (mainOrDefaultSection.Exists())
                     {
@@ -109,7 +108,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 if (instanceOfOption != null)
                 {
                     JObject joptions = (JObject)JToken.FromObject(instanceOfOption);
-                    data.Options = populateOptions(instanceOfOption, joptions);
+                    data.Options = populateOptions(instanceOfOption, joptions, mainOrDefaultSection);
                 }
             }
             else
@@ -119,7 +118,8 @@ namespace MigrationTools.ConsoleDataGenerator
             return data;
         }
 
-        private List<OptionsItem> populateOptions(object item, JObject joptions)
+        /// <param name="shippedDefaults">The option's section in the shipped appsettings.json. It overrides the defaults set in code at run time, so a plain value there is the documented default.</param>
+        private List<OptionsItem> populateOptions(object item, JObject joptions, IConfigurationSection shippedDefaults)
         {
             List<OptionsItem> options = new List<OptionsItem>();
 
@@ -142,7 +142,13 @@ namespace MigrationTools.ConsoleDataGenerator
                 optionsItem.Type = property.PropertyType.Name.Replace("`1", "").Replace("`2", "").Replace("`", "");
                 optionsItem.DotNetType = property.PropertyType;
                 optionsItem.Description = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "summary");
-                optionsItem.DefaultValue = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
+                string shippedDefault = shippedDefaults != null && shippedDefaults.Exists() ? shippedDefaults[property.Name] : null;
+                string xmlDefault = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
+                // IConfiguration reads a JSON null as an empty string, so an empty shipped value keeps the XML default when there is one.
+                bool shippedIsEmptyAndXmlKnown = shippedDefault == string.Empty && xmlDefault != "missing XML code comments";
+                optionsItem.DefaultValue = shippedDefault != null && !shippedIsEmptyAndXmlKnown
+                    ? shippedDefault.ToLowerInvariant() is "true" or "false" ? shippedDefault.ToLowerInvariant() : shippedDefault
+                    : xmlDefault;
                 // Determine if the property is required via DataAnnotations [Required]
                 var isRequired = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), inherit: true).Any();
                 optionsItem.IsRequired = isRequired;
@@ -221,7 +227,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 else
                 {
                     // We are at the target section, serialize its children
-                    JToken sectionObject = ConvertSectionToJson(section);
+                    JToken sectionObject = RawSection(configuration, section.Path)?.DeepClone() ?? ConvertSectionToJson(section);
 
                     if (option != null && option.ConfigurationMetadata.IsCollection)
                     {
@@ -259,6 +265,38 @@ namespace MigrationTools.ConsoleDataGenerator
             }
 
             return root.ToString(Formatting.Indented);
+        }
+
+        private static JObject _rawSettings;
+
+        /// <summary>
+        /// The section as written in appsettings.json. IConfiguration turns every value into a string (true becomes
+        /// "True", null becomes ""), and a sample copied with those strings fails the configuration schema.
+        /// </summary>
+        static JToken RawSection(IConfiguration configuration, string path)
+        {
+            if (_rawSettings == null)
+            {
+                var jsonSource = (configuration as IConfigurationRoot)?.Providers
+                    .OfType<Microsoft.Extensions.Configuration.Json.JsonConfigurationProvider>()
+                    .Select(p => p.Source.FileProvider?.GetFileInfo(p.Source.Path ?? string.Empty)?.PhysicalPath)
+                    .FirstOrDefault(f => f != null && File.Exists(f));
+                if (jsonSource == null)
+                {
+                    return null;
+                }
+                _rawSettings = JObject.Parse(File.ReadAllText(jsonSource));
+            }
+            JToken token = _rawSettings;
+            foreach (var key in path.Split(':'))
+            {
+                token = (token as JObject)?.GetValue(key, StringComparison.OrdinalIgnoreCase);
+                if (token == null)
+                {
+                    return null;
+                }
+            }
+            return token;
         }
 
         static JToken ConvertSectionToJson(IConfigurationSection section)

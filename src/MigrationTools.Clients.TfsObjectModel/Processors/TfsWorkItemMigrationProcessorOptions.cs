@@ -39,7 +39,7 @@ namespace MigrationTools.Processors
         /// This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
         /// While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
         /// </summary>
-        /// <default>true</default>
+        /// <default>false</default>
         public bool FilterWorkItemsThatAlreadyExistInTarget { get; set; }
 
         /// <summary>

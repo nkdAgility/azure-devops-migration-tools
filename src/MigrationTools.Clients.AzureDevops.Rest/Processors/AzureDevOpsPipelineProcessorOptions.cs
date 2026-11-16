@@ -60,11 +60,13 @@ namespace MigrationTools.Processors
         /// <summary>
         /// List of Build Pipelines to process. If this is `null` then all Build Pipelines will be processed.
         /// </summary>
+        /// <default>null</default>
         public List<string> BuildPipelines { get; set; }
 
         /// <summary>
         /// List of Release Pipelines to process. If this is `null` then all Release Pipelines will be processed.
         /// </summary>
+        /// <default>null</default>
         public List<string> ReleasePipelines { get; set; }
 
         /// <summary>

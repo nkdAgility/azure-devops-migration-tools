@@ -15,21 +15,20 @@ discussionId: 2643
 
 ## Overview
 
-The String Manipulator Tool provides powerful text processing capabilities for work item migration. It applies configurable string manipulations to all text fields in work items, enabling data cleanup, standardization, and format corrections during the migration process.
+The String Manipulator Tool provides powerful text processing capabilities for work item migration. It applies configurable string manipulations to single-line `String` fields (such as the Title), enabling data cleanup, standardization, and format corrections during the migration process.
 
 The tool processes string fields through a series of regex-based manipulators that can remove invalid characters, standardize formats, replace text patterns, and enforce field length limits. Each manipulation is applied in sequence and can be individually enabled or disabled.
 
 ### How It Works
 
-The String Manipulator Tool operates on all string fields within work items during migration:
+`TfsWorkItemMigrationProcessor` runs the tool on every field of type `String` (single-line text, such as `System.Title`) as it copies each revision. HTML fields such as `System.Description`, plain-text (multi-line) fields and other field types are not processed.
 
-1. **Field Processing**: The tool identifies all string-type fields in each work item
-2. **Sequential Application**: Each configured manipulator is applied in the order defined in the configuration
-3. **Regex Transformations**: Pattern-based replacements using regular expressions
-4. **Length Enforcement**: Truncates fields that exceed the maximum allowed length
-5. **Conditional Execution**: Each manipulator can be individually enabled or disabled
+1. **Sequential Application**: Each enabled manipulator is applied in the order defined in the configuration
+2. **Regex Transformations**: Pattern-based replacements using regular expressions
+3. **Length Enforcement**: The result is cut to `MaxStringLength`
+4. **Conditional Execution**: Each manipulator can be individually enabled or disabled
 
-The tool is automatically invoked by migration processors and applies transformations before work items are saved to the target system.
+If the tool is enabled and `Manipulators` is empty, a built-in manipulator is used: the first pattern under [Removing Invalid Characters](#removing-invalid-characters). It keeps accented and other everyday letters, but read its limits there.
 
 ### Use Cases
 
@@ -68,8 +67,8 @@ The String Manipulator Tool is configured with an array of manipulators, each de
       {
         "$type": "RegexStringManipulator",
         "Enabled": true,
-        "Description": "Remove invalid characters",
-        "Pattern": "[^\\x20-\\x7E\\r\\n\\t]",
+        "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F",
+        "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
         "Replacement": ""
       }
     ]
@@ -99,19 +98,22 @@ Each manipulator supports these properties:
 
 ### Removing Invalid Characters
 
-Remove control characters and emojis while preserving Unicode content:
+Remove control characters, characters outside the Basic Multilingual Plane, and the emoji variation selector U+FE0F. This is the built-in pattern. It keeps letters such as `é`, `ł` and `ж`, and most CJK text. Its limits:
+
+- It removes **every** character outside the Basic Multilingual Plane (stored as a surrogate pair). That includes most emoji, but also rare letters such as Osage (`𐓏`) and CJK Extension B (`𠀀`).
+- Emoji inside the Basic Multilingual Plane, such as `⌚` (U+231A), are not removed.
 
 ```json
 {
   "$type": "RegexStringManipulator",
-  "Description": "Remove control characters and emojis but preserve Unicode letters and symbols",
+  "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F",
   "Enabled": true,
   "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
   "Replacement": ""
 }
 ```
 
-For legacy ASCII-only environments, you can use the more restrictive pattern:
+For legacy ASCII-only environments, you can use the more restrictive pattern. It removes every non-ASCII character, including accented letters such as `ł`, `ę` and `ó`:
 
 ```json
 {
@@ -139,7 +141,7 @@ Convert all line endings to a consistent format:
 
 ### Cleaning HTML Content
 
-Remove or clean HTML tags from text fields:
+Remove HTML tags from single-line `String` fields. HTML fields such as `System.Description` are not processed by this tool, so this does not change them:
 
 ```json
 {
@@ -153,12 +155,12 @@ Remove or clean HTML tags from text fields:
 
 ### Removing Emojis for SOAP Compatibility
 
-Remove emojis that can cause issues with SOAP interfaces while preserving other Unicode symbols:
+Remove emojis that can cause issues with SOAP interfaces. Like the built-in pattern, it removes every character outside the Basic Multilingual Plane (including rare letters) and leaves emoji inside it, such as `⌚`:
 
 ```json
 {
   "$type": "RegexStringManipulator",
-  "Description": "Remove emojis but preserve Unicode letters and symbols",
+  "Description": "Remove characters outside the BMP (most emoji) and U+FE0F",
   "Enabled": true,
   "Pattern": "[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
   "Replacement": ""
@@ -168,7 +170,7 @@ Remove emojis that can cause issues with SOAP interfaces while preserving other 
 This pattern removes:
 - Emoji surrogate pairs (😀🔥💻🇺🇸)
 - Variation selectors that control emoji presentation
-- But preserves mathematical symbols (∑), arrows (→), checkmarks (✓), stars (★), and accented letters (café)
+- But preserves mathematical symbols (∑), arrows (→), checkmarks (✓), stars (★), and accented letters (café), which are all inside the Basic Multilingual Plane
 
 ### Fixing Encoding Issues
 
@@ -219,7 +221,12 @@ Replace common encoding artifacts:
 - Verify the tool is enabled (`"Enabled": true`)
 - Check that individual manipulators are enabled
 - Review regex patterns for syntax errors
-- Ensure the tool is configured in the processor's tool list
+- Ensure the tool is configured under `CommonTools`
+- Remember it only processes single-line `String` fields, not HTML or multi-line fields
+
+**Accented or non-Latin letters are missing from the Title (but not the Description):**
+
+- A manipulator in your configuration removes non-ASCII characters, for example the legacy pattern `[^( -~)\n\r\t]+` or `[^\x20-\x7E\r\n\t]`. Earlier versions of this page and of the generated sample used it. Replace it with the built-in pattern under [Removing Invalid Characters](#removing-invalid-characters), or remove your manipulators to use the built-in one. The Description is not affected because it is an HTML field, which the tool does not process.
 
 **Unexpected Results:**
 
