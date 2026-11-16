@@ -174,7 +174,11 @@ The important bits:
 
 - Processor `TfsTestPlansAndSuitesMigrationProcessor`. It needs no `WIQLQuery`.
 - To choose plans, use `TestPlanIds` (for example `[123, 456]`). `TestPlanQuery` is not WIQL: it is the condition added after `Select * From TestPlan Where`, and `AreaPath`, `PlanName` and `PlanState` are known to work, for example `PlanName <> 'Old plan'`. Leave both empty to migrate every plan.
-- Leave `OnlyElementsWithTag` empty unless you want only plans, suites and Test Cases carrying that tag. The check is a substring match on the tags text, so `move` also matches an item tagged `remove`; choose a tag that no other tag contains.
+- Leave `OnlyElementsWithTag` empty unless you want only plans, suites and Test Cases carrying that tag. The check is a substring match on the tags text, so `move` also matches an item tagged `remove`; choose a tag that no other tag contains. The filter applies at every level, so tag the whole hierarchy:
+  - a plan without the tag is skipped with everything in it;
+  - a suite without the tag is skipped with all of its child suites;
+  - a suite's own Test Cases, including those directly in the plan's root suite, are only added when that suite has the tag;
+  - each Test Case must have the tag too.
 - `FilterCompleted: true` skips source plans whose name already exists in the target.
 - Test Plan names must be unique in the target, and suite titles must be unique among the suites under the same parent. Plans are matched by name and suites by title, so duplicates stop the run (`Test plans ... all have the same name!` or `Sequence contains more than one element`).
 - Only suites reachable from a plan's root suite are rebuilt. A suite that is no longer under any plan is not migrated.
