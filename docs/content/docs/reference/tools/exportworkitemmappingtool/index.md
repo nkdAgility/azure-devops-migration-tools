@@ -19,7 +19,7 @@ The Export Work Item Mapping Tool records which target work item each source wor
 ### How It Works
 
 1. **Recording:** as `TfsWorkItemMigrationProcessor` finishes each work item that has a target work item, it records the pair of IDs. This includes work items that already existed in the target from an earlier run.
-2. **Saving:** when the processor finishes, including when it stops after a failure, the mappings are written to `TargetFile`. The file is written to `<TargetFile>.tmp` first and then copied over `TargetFile`, so a failed write does not leave a half-written file.
+2. **Saving:** when the processor finishes, including when it stops after a failure, the mappings are written to `TargetFile`. The mappings are written to `<TargetFile>.tmp` first and then copied over `TargetFile`, so a failure while writing the mappings leaves `TargetFile` as it was. The final copy is not atomic: a failure during that copy can still leave `TargetFile` incomplete.
 3. **Merging:** with `PreserveExisting` set to `true` (the default), the mappings already in `TargetFile` are loaded and kept. If a source ID is mapped to a different target ID in this run, the new target ID wins and a warning is logged.
 
 If the same source ID is recorded twice in one run with different target IDs, the first mapping is kept and an error is logged.

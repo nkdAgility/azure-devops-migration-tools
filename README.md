@@ -34,12 +34,12 @@ Previews reach WinGet at most once a week; every preview is on GitHub Releases a
 
 The command is `devopsmigration`:
 
-- `devopsmigration init --template <template>` creates `configuration.json`. Templates: `WorkItemTracking` (the default), `Basic`, `PipelineProcessor` and `Reference` (every option with its defaults). `--options` still works as an alias for `--template`.
+- `devopsmigration init --template <template>` creates `configuration.json`. Templates: `WorkItemTracking` (the default), `Basic`, `PipelineProcessor` and `Reference` (every option, filled with sample values; these are examples, not the defaults the tool uses at run time). `--options` still works as an alias for `--template`.
 - `devopsmigration execute --config configuration.json` runs the enabled processors.
 - `devopsmigration upgrade --config configuration.json` upgrades a configuration from an older version.
 - `devopsmigration version` shows the version.
 
-Each endpoint signs in with its `AuthenticationMode`: `EntraId` (the identity you are signed in with, such as `az login`, a managed identity or workload identity federation; no secret in the configuration), `AccessToken` (a personal access token), `Windows` or `Prompt`. See [Getting Started](https://devopsmigration.io/getting-started/).
+Each endpoint signs in with its `AuthenticationMode`: `EntraId` (the identity you are signed in with, such as `az login`, a managed identity or workload identity federation; no secret in the configuration), or `AccessToken` (a personal access token). TFS Object Model endpoints (such as `TfsTeamProjectEndpoint`) also accept `Windows` and `Prompt`; the REST `AzureDevOpsEndpoint` accepts only `AccessToken` and `EntraId`. See [Getting Started](https://devopsmigration.io/getting-started/).
 
 **Ask Questions on Github: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
 

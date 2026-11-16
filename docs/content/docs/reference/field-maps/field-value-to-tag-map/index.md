@@ -20,8 +20,8 @@ The Field Value To Tag Map turns a source field's value into a tag on the target
 
 For each work item it applies to:
 
-1. If the source work item does not have `sourceField`, or the value is empty, nothing happens.
-2. If `pattern` is set, the value must match it as a regular expression. If `pattern` is empty, any value matches.
+1. If the source work item does not have `sourceField`, or its value is null, nothing happens. An empty string is not skipped.
+2. If `pattern` is set, the value must match it as a regular expression. If `pattern` is empty, any non-null value matches, including an empty string: with `formatExpression` set to `Blocked`, an empty field still adds the `Blocked` tag. Use a pattern such as `.+` to skip empty values.
 3. The tag is `formatExpression` with the value in place of `{0}`. If `formatExpression` is empty, the tag is the value itself.
 4. The tag is added to the target work item's existing tags. Duplicate tags are removed, and the tags are only written if they changed.
 

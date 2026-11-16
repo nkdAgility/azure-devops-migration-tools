@@ -157,4 +157,6 @@ When running `devopsmigration init` you can pass `--template` (or its short form
 - _WorkItemTracking_ - the default. A `TfsWorkItemMigrationProcessor`, the `FieldMappingTool` with a `FieldLiteralMap`, and `Source` and `Target` `TfsTeamProjectEndpoint` endpoints.
 - _Basic_ - currently produces the same configuration as _WorkItemTracking_.
 - _PipelineProcessor_ - an `AzureDevOpsPipelineProcessor` with `PipelineSource` and `PipelineTarget` `AzureDevOpsEndpoint` endpoints.
-- _Reference_ - every processor, tool, field map and endpoint with its default options. Use it as a reference, not as a configuration to run.
+- _Reference_ - every processor, tool, field map and endpoint, filled with sample values. The values are examples, not the defaults the tool uses at run time. Use it as a reference, not as a configuration to run.
+
+Every template fills its options from the samples, so check each value rather than assuming it is the default.
