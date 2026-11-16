@@ -54,7 +54,7 @@ namespace MigrationTools.ConsoleDataGenerator
             where TOptionsInterface : IOptions
         {
             var oConfig = GetOptionsConfiguration(optionInFocus);
-            var typeOftargetOfOption = allTypes.Where(t => t.Name == oConfig.OptionFor && !t.IsAbstract && !t.IsInterface).SingleOrDefault();
+            var typeOftargetOfOption = allTypes.Where(t => t.Name.Equals(oConfig.OptionFor, StringComparison.OrdinalIgnoreCase) &&!t.IsAbstract && !t.IsInterface).SingleOrDefault();
             if (typeOftargetOfOption == null)
             {
                 Console.WriteLine($"ClassDataLoader::CreateClassDataFromOptions:: {optionInFocus.Name} - {oConfig.OptionFor} not found");

@@ -2,8 +2,7 @@
 ![GitHub release](https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools)
 ![GitHub pre-release](https://img.shields.io/github/v/release/nkdAgility/azure-devops-migration-tools?include_prereleases)
 
-[![Build Status](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_apis/build/status%2FMigrationTools-CIv2?branchName=main)](https://dev.azure.com/nkdagility/AzureDevOps-Tools/_build/latest?definitionId=115&branchName=main)
-![Azure DevOps tests](https://img.shields.io/azure-devops/tests/nkdagility/AzureDevOps-Tools/115?compact_message&style=plastic&logo=azuredevops&label=Tests)
+[![Build & Release](https://github.com/nkdAgility/azure-devops-migration-tools/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/nkdAgility/azure-devops-migration-tools/actions/workflows/main.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=coverage)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=vsts-sync-migrator%3Amaster&metric=security_rating)](https://sonarcloud.io/dashboard?id=vsts-sync-migrator%3Amaster)
@@ -19,11 +18,32 @@ Created and maintained by [Martin Hinshelwood](https://www.linkedin.com/in/marti
 
 # Azure DevOps Migration Tools
 
-The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://devopsmigration.io/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/) as well as a Winget package a `nkdAgility.AzureDevOpsMigrationTools`.
+The Azure DevOps Migration Tools allow you to bulk edit and migrate data between Team Projects on both Microsoft Team Foundation Server (TFS) and Azure DevOps Services. Take a look at the  [documentation](https://devopsmigration.io/) to find out how. This project is published as [code on GitHub](https://github.com/nkdAgility/azure-devops-migration-tools/), as a WinGet package and as a Chocolatey package.
+
+## Install
+
+| Method | Release | Preview |
+|---|---|---|
+| [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) | `winget install nkdAgility.AzureDevOpsMigrationTools` | `winget install nkdAgility.AzureDevOpsMigrationTools.Preview` |
+| [Chocolatey](https://community.chocolatey.org/packages/vsts-sync-migrator) | `choco install vsts-sync-migrator` | |
+| Zip | [GitHub Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases/latest) | [GitHub Releases](https://github.com/nkdAgility/azure-devops-migration-tools/releases) |
+
+Previews reach WinGet at most once a week; every preview is on GitHub Releases as soon as it is built. See [Installation](https://devopsmigration.io/installation/).
+
+## Run
+
+The command is `devopsmigration`:
+
+- `devopsmigration init --template <template>` creates `configuration.json`. Templates: `WorkItemTracking` (the default), `Basic`, `PipelineProcessor` and `Reference` (every option with its defaults). `--options` still works as an alias for `--template`.
+- `devopsmigration execute --config configuration.json` runs the enabled processors.
+- `devopsmigration upgrade --config configuration.json` upgrades a configuration from an older version.
+- `devopsmigration version` shows the version.
+
+Each endpoint signs in with its `AuthenticationMode`: `EntraId` (the identity you are signed in with, such as `az login`, a managed identity or workload identity federation; no secret in the configuration), `AccessToken` (a personal access token), `Windows` or `Prompt`. See [Getting Started](https://devopsmigration.io/getting-started/).
 
 **Ask Questions on Github: https://github.com/nkdAgility/azure-devops-migration-tools/discussions**
 
-## Compatability
+## Compatibility
 
 These tools run on Windows and support connecting to Team Foundation Server 2013+, Azure DevOps Server, & Azure DevOps Services. They support both hosted and on-premise instances and can move data between any two.
 
@@ -48,12 +68,12 @@ For the most part we support moving data between ((Azure DevOps Server | Team Fo
 	- Optionaly includes `Teams`, `Shared Queries`
 - `Test Plans & Suites` 
 	- Copy Test Plans & Suites between locations
-	- Includes `Configurations`, `Shared Steps`, `Shared Parameters`
+	- Includes `Configurations`, `Shared Steps`, `Shared Parameters`. These two can't be customised on an inherited target, so their reflected work item ID is kept in `Microsoft.VSTS.Build.IntegrationBuild` and they are found again on re-runs
 - `Pipelines`
 	- Copy Pipelines between locations
 	- excludes XAML & Classic Builds & Release
 - `Processes`
-	- Copy Processes between locations
+	- Copy inherited processes between organisations, including work item types, fields with their picklists, rules, behaviours and layout (pages, groups, controls and what is hidden)
 
 **Note**: 'Locations' includes `Projects`, `Collections`, `Organizations`
 
@@ -63,16 +83,16 @@ For the most part we support moving data between ((Azure DevOps Server | Team Fo
 
 ## Quick Links
 
-- [Documenation](https://devopsmigration.io)
+- [Documentation](https://devopsmigration.io)
 - [Installation](https://devopsmigration.io/installation/)
 - [Permissions](https://devopsmigration.io/permissions/)
 - [Getting Started](https://devopsmigration.io/getting-started/)
-- [Configuration Reference](https://devopsmigration.io/Reference/)
+- [Configuration Reference](https://devopsmigration.io/docs/reference/)
 - [Community Support](https://github.com/nkdAgility/azure-devops-migration-tools/discussions)
 - [Commercial Support](https://nkdagility.com/capabilities/azure-devops-migration-services/)
-- [Change Log](https://devopsmigration.io/change-log/)
+- [Release notes](https://github.com/nkdAgility/azure-devops-migration-tools/releases)
 
-The documentation for the preview is on [Preview](https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net/)]
+The documentation for the preview is on [Preview](https://blue-river-093197403-preview.westeurope.5.azurestaticapps.net/).
 
 ## Metrics
 

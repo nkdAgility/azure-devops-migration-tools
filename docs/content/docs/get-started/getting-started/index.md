@@ -33,7 +33,7 @@ This is going to be a crash course and I really recommend watching [What can go 
 ### 1. Create a default configuration file
 
 1. Open your [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/) in your chosen working folder
-2. Run `devopsmigration init --options Basic` to create a default configuration
+2. Run `devopsmigration init --template Basic` to create a default configuration
 3. Open `configuration.json` from the current directory
 
 You can now customize the configuration depending on what you need to do. However, a basic config that you can use to migrate from one team project to another with the same process will likely look something like:
@@ -119,7 +119,7 @@ Work item type 'Risk' does not exist in target system.
 'User Story' does not contain reflected work item ID field 'Custom.ReflectedWorkItemId'.
 ```
 
-- **Solution:** Add the custom field to ALL work item types in your target project (see [ReflectedWorkItemId setup]({{< ref "docs/setup/reflected-workitem-id" >}}))
+- **Solution:** Add the custom field to every work item type you can customise in your target project (see [ReflectedWorkItemId setup]({{< ref "docs/setup/reflected-workitem-id" >}})). Shared Steps, Shared Parameter, Code Review Request/Response and Feedback Request/Response can't be customised on an inherited process; for them the migration uses `Microsoft.VSTS.Build.IntegrationBuild` automatically.
 
 **Missing Custom Fields:**
 
@@ -142,9 +142,9 @@ Refer to the [Reference Guide]({{< ref "docs/reference" >}}) for more details.
 
 ## Other Configuration Options
 
-When running `devopsmigration init` you can also pass `--options` with one of the following:
+When running `devopsmigration init` you can pass `--template` (or its short form `-t`) with one of the following. `--options` and `--outputMode` still work as aliases. Add `--overwrite` to replace an existing `configuration.json`.
 
-- _Full_ -
-- _WorkItemTracking_ -
-- _Fullv2_ -
-- _WorkItemTrackingv2_ -
+- _WorkItemTracking_ - the default. A `TfsWorkItemMigrationProcessor`, the `FieldMappingTool` with a `FieldLiteralMap`, and `Source` and `Target` `TfsTeamProjectEndpoint` endpoints.
+- _Basic_ - currently produces the same configuration as _WorkItemTracking_.
+- _PipelineProcessor_ - an `AzureDevOpsPipelineProcessor` with `PipelineSource` and `PipelineTarget` `AzureDevOpsEndpoint` endpoints.
+- _Reference_ - every processor, tool, field map and endpoint with its default options. Use it as a reference, not as a configuration to run.

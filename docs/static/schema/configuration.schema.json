@@ -1270,7 +1270,7 @@
                     "FilterWorkItemsThatAlreadyExistInTarget": {
                       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                       "type": "boolean",
-                      "default": true
+                      "default": false
                     },
                     "PauseAfterEachWorkItem": {
                       "description": "Pause after each work item is migrated",
@@ -1302,7 +1302,7 @@
                     "WorkItemCreateRetryLimit": {
                       "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.\r\n This allows for periodic network glitches not to end the process.",
                       "type": "integer",
-                      "default": 5
+                      "default": 0
                     },
                     "WorkItemIDs": {
                       "description": "A list of work items to import",
@@ -1423,7 +1423,7 @@
                     "FilterWorkItemsThatAlreadyExistInTarget": {
                       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                       "type": "boolean",
-                      "default": true
+                      "default": false
                     },
                     "FixHtmlAttachmentLinks": {
                       "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML\r\n fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;\r\n TFS should use integrated authentication.",
@@ -1573,7 +1573,7 @@
                     "FilterWorkItemsThatAlreadyExistInTarget": {
                       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
                       "type": "boolean",
-                      "default": true
+                      "default": false
                     },
                     "PauseAfterEachWorkItem": {
                       "description": "Pause after each work item is migrated",
@@ -1600,7 +1600,7 @@
                     "WorkItemCreateRetryLimit": {
                       "description": "**beta** If set to a number greater than 0 work items that fail to save will retry after a number of seconds equal to the retry count.\r\n This allows for periodic network glitches not to end the process.",
                       "type": "integer",
-                      "default": 5
+                      "default": 0
                     },
                     "WorkItemIDs": {
                       "description": "A list of work items to import",
@@ -2054,6 +2054,38 @@
                               "additionalProperties": {
                                 "type": "string"
                               }
+                            }
+                          }
+                        },
+                        {
+                          "title": "FieldValuetoTagMap",
+                          "description": "missing XML code comments",
+                          "type": "object",
+                          "properties": {
+                            "ApplyTo": {
+                              "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                              "type": "array",
+                              "prefixItems": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "Enabled": {
+                              "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                              "type": "boolean"
+                            },
+                            "formatExpression": {
+                              "description": "missing XML code comments",
+                              "type": "string"
+                            },
+                            "pattern": {
+                              "description": "missing XML code comments",
+                              "type": "string"
+                            },
+                            "sourceField": {
+                              "description": "missing XML code comments",
+                              "type": "string"
                             }
                           }
                         },

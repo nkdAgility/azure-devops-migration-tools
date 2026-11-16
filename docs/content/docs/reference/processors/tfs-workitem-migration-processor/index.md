@@ -56,6 +56,12 @@ The `WorkItemMigrationContext` processor is used for migrating work items from o
 
 Overall, the `WorkItemMigrationContext` processor is a comprehensive tool for transferring work items and their associated data and metadata between Azure DevOps instances. It should be used whenever there is a need to move work items between instances while preserving as much information as possible.
 
+## How migrated work items are found again
+
+On a re-run, with `FilterWorkItemsThatAlreadyExistInTarget`, and when Test Case steps, parameters and links point at other work items, the processor finds the target work item by the reflected work item ID: the source work item's URL, stored in the target's `ReflectedWorkItemIdField`.
+
+`Code Review Request`, `Code Review Response`, `Feedback Request`, `Feedback Response`, `Shared Parameter` and `Shared Steps` can't have custom fields on an inherited process. When one of these types lacks your `ReflectedWorkItemIdField` in the target, the reflected work item ID is written to the built-in `Microsoft.VSTS.Build.IntegrationBuild` field instead, and lookups search that field for those six types. So a re-run does not create a second copy of a Shared Steps or Shared Parameter item, and a Test Case's step and parameter references are rewired to the migrated items. Any other type without your field still fails validation. See [Migrating Plans and Suites]({{< ref "docs/how-to/migrating-plans-and-suites" >}}).
+
 ## How revisions, attachments and links are saved
 
 Each source revision is replayed as one target revision, with the source revision's `ChangedBy` and `ChangedDate`. Attachments and links are saved as part of the revision where they were added or removed in the source, so the migration does not add revisions dated after the source history:

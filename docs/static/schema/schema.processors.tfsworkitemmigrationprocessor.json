@@ -21,7 +21,7 @@
     "FilterWorkItemsThatAlreadyExistInTarget": {
       "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "FixHtmlAttachmentLinks": {
       "description": "**beta** If enabled this will fix any image attachments URL's, work item mention URL's or user mentions in the HTML\r\n fields as well as discussion comments. You must specify a PersonalAccessToken in the Source project for Azure DevOps;\r\n TFS should use integrated authentication.",

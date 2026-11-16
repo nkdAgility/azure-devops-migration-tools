@@ -9,7 +9,19 @@ configurationSamples:
 - name: sample
   order: 1
   description: 
-  code: There is no sample, but you can check the classic below for a general feel.
+  code: >-
+    {
+      "MigrationTools": {
+        "Version": "16.0",
+        "CommonTools": {
+          "ExportWorkItemMappingTool": {
+            "Enabled": "True",
+            "PreserveExisting": "True",
+            "TargetFile": "c:\\temp\\WorkItemMappings.json"
+          }
+        }
+      }
+    }
   sampleFor: MigrationTools.Tools.ExportWorkItemMappingToolOptions
 - name: classic
   order: 3
@@ -17,8 +29,8 @@ configurationSamples:
   code: >-
     {
       "$type": "ExportWorkItemMappingToolOptions",
-      "Enabled": false,
-      "TargetFile": "",
+      "Enabled": true,
+      "TargetFile": "c:\\temp\\WorkItemMappings.json",
       "PreserveExisting": true
     }
   sampleFor: MigrationTools.Tools.ExportWorkItemMappingToolOptions

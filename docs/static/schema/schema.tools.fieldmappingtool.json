@@ -302,6 +302,38 @@
               }
             },
             {
+              "title": "FieldValuetoTagMap",
+              "description": "missing XML code comments",
+              "type": "object",
+              "properties": {
+                "ApplyTo": {
+                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "Enabled": {
+                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "type": "boolean"
+                },
+                "formatExpression": {
+                  "description": "missing XML code comments",
+                  "type": "string"
+                },
+                "pattern": {
+                  "description": "missing XML code comments",
+                  "type": "string"
+                },
+                "sourceField": {
+                  "description": "missing XML code comments",
+                  "type": "string"
+                }
+              }
+            },
+            {
               "title": "MultiValueConditionalMap",
               "description": "missing XML code comments",
               "type": "object",
