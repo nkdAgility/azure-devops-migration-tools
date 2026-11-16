@@ -86,7 +86,7 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 7. Adjust the [`NodeBasePaths`]({{< ref "docs/reference/processors/workitem-tracking-processor" >}}) or leave empty to migrate all nodes
 8. From your working folder run `devopsmigration execute --config .\configuration.json`
 
-There is no dry-run or `-validate` option: `execute` always migrates. The validation described below runs at the start of every `execute` and stops the run before any data is written if it fails. To try a configuration safely, point the target at a scratch project, or limit the run with `WorkItemIDs` or a narrow `WIQLQuery`.
+There is no dry-run or `-validate` option: `execute` always migrates. The validation described below runs at the start of every `execute` and stops the run before any data is written if it fails. To try a configuration safely, point the target at a scratch project, or limit the run with a narrow `WIQLQuery` (for example `[System.Id] IN (101, 102)`). `TfsWorkItemMigrationProcessor` does not read `WorkItemIDs`, so that option does not limit a run.
 
 ### Where the logs are written
 

@@ -22,7 +22,7 @@ The steps are:
 3. Migrate `Test Variables` & `Test Configurations`
 4. Rebuild `Test Plans` & `Test Suites`
 
-You can run each step as its own configuration, or put all the processors in one configuration in this order: processors run in the order they are listed. If you only want the test artefacts, skip step 1.
+You can run each step as its own configuration, or put all the processors in one configuration in this order: processors run in the order they are listed. If you only want the test artefacts, you can skip step 1, but requirement-based suites need their requirements in the target: a suite whose requirement was not migrated is not created, and the run ends with errors. Migrate those requirements first.
 
 Test Plans and Test Suites are not migrated as work items. Leave `Test Plan` and `Test Suite` out of every `TfsWorkItemMigrationProcessor` query; step 4 rebuilds them.
 
@@ -174,7 +174,7 @@ The important bits:
 
 - Processor `TfsTestPlansAndSuitesMigrationProcessor`. It needs no `WIQLQuery`.
 - To choose plans, use `TestPlanIds` (for example `[123, 456]`). `TestPlanQuery` is not WIQL: it is the condition added after `Select * From TestPlan Where`, and `AreaPath`, `PlanName` and `PlanState` are known to work, for example `PlanName <> 'Old plan'`. Leave both empty to migrate every plan.
-- Leave `OnlyElementsWithTag` empty unless you want only plans, suites and Test Cases carrying that tag.
+- Leave `OnlyElementsWithTag` empty unless you want only plans, suites and Test Cases carrying that tag. The check is a substring match on the tags text, so `move` also matches an item tagged `remove`; choose a tag that no other tag contains.
 - `FilterCompleted: true` skips source plans whose name already exists in the target.
 - Test Plan names must be unique in the target, and suite titles must be unique among the suites under the same parent. Plans are matched by name and suites by title, so duplicates stop the run (`Test plans ... all have the same name!` or `Sequence contains more than one element`).
 - Only suites reachable from a plan's root suite are rebuilt. A suite that is no longer under any plan is not migrated.

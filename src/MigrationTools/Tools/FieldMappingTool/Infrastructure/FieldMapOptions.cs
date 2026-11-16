@@ -29,7 +29,7 @@ namespace MigrationTools.Tools.Infrastructure
         }
 
         /// <summary>
-        /// If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.
+        /// Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.
         /// </summary>
         [JsonIgnore]
         public bool Enabled { get; set; }

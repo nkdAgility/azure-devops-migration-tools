@@ -22,7 +22,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -31,7 +31,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "expression": {
@@ -63,7 +63,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -72,7 +72,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "targetField": {
@@ -87,7 +87,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -96,7 +96,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "targetField": {
@@ -115,7 +115,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -124,7 +124,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "formatExpression": {
@@ -152,7 +152,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -161,7 +161,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "targetField": {
@@ -176,7 +176,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -189,7 +189,7 @@
                   "type": "string"
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "fieldMapMode": {
@@ -213,7 +213,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -222,7 +222,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "SourceToTargetMappings": {
@@ -240,7 +240,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -249,7 +249,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "formatExpression": {
@@ -268,7 +268,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -281,7 +281,7 @@
                   "type": "string"
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "sourceField": {
@@ -307,7 +307,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -316,7 +316,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "formatExpression": {
@@ -339,7 +339,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -348,7 +348,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "sourceFieldsAndValues": {
@@ -373,7 +373,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -382,7 +382,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "pattern": {
@@ -409,7 +409,7 @@
               "type": "object",
               "properties": {
                 "ApplyTo": {
-                  "description": "A list of Work Item Types that this Field Map will apply to. If the list is empty it will apply to all Work Item Types. You can use \"*\" to apply to all Work Item Types.",
+                  "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
                   "type": "array",
                   "prefixItems": [
                     {
@@ -418,7 +418,7 @@
                   ]
                 },
                 "Enabled": {
-                  "description": "If set to `true` then the Fieldmap will run. Set to `false` and the processor will not run.",
+                  "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
                   "type": "boolean"
                 },
                 "timeTravel": {

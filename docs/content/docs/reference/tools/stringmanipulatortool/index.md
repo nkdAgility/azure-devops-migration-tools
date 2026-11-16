@@ -15,7 +15,7 @@ discussionId: 2643
 
 ## Overview
 
-The String Manipulator Tool provides powerful text processing capabilities for work item migration. It applies configurable string manipulations to all text fields in work items, enabling data cleanup, standardization, and format corrections during the migration process.
+The String Manipulator Tool provides powerful text processing capabilities for work item migration. It applies configurable string manipulations to single-line `String` fields (such as the Title), enabling data cleanup, standardization, and format corrections during the migration process.
 
 The tool processes string fields through a series of regex-based manipulators that can remove invalid characters, standardize formats, replace text patterns, and enforce field length limits. Each manipulation is applied in sequence and can be individually enabled or disabled.
 
@@ -28,7 +28,7 @@ The tool processes string fields through a series of regex-based manipulators th
 3. **Length Enforcement**: The result is cut to `MaxStringLength`
 4. **Conditional Execution**: Each manipulator can be individually enabled or disabled
 
-If the tool is enabled and `Manipulators` is empty, a built-in manipulator is used that removes control characters and emojis but keeps Unicode letters and symbols (the first pattern under [Removing Invalid Characters](#removing-invalid-characters)).
+If the tool is enabled and `Manipulators` is empty, a built-in manipulator is used: the first pattern under [Removing Invalid Characters](#removing-invalid-characters). It keeps accented and other everyday letters, but read its limits there.
 
 ### Use Cases
 
@@ -67,7 +67,7 @@ The String Manipulator Tool is configured with an array of manipulators, each de
       {
         "$type": "RegexStringManipulator",
         "Enabled": true,
-        "Description": "Remove control characters and emojis but preserve Unicode letters and symbols",
+        "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F",
         "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
         "Replacement": ""
       }
@@ -98,12 +98,15 @@ Each manipulator supports these properties:
 
 ### Removing Invalid Characters
 
-Remove control characters and emojis while preserving Unicode content:
+Remove control characters, characters outside the Basic Multilingual Plane, and the emoji variation selector U+FE0F. This is the built-in pattern. It keeps letters such as `é`, `ł` and `ж`, and most CJK text. Its limits:
+
+- It removes **every** character outside the Basic Multilingual Plane (stored as a surrogate pair). That includes most emoji, but also rare letters such as Osage (`𐓏`) and CJK Extension B (`𠀀`).
+- Emoji inside the Basic Multilingual Plane, such as `⌚` (U+231A), are not removed.
 
 ```json
 {
   "$type": "RegexStringManipulator",
-  "Description": "Remove control characters and emojis but preserve Unicode letters and symbols",
+  "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F",
   "Enabled": true,
   "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
   "Replacement": ""
@@ -138,7 +141,7 @@ Convert all line endings to a consistent format:
 
 ### Cleaning HTML Content
 
-Remove or clean HTML tags from text fields:
+Remove HTML tags from single-line `String` fields. HTML fields such as `System.Description` are not processed by this tool, so this does not change them:
 
 ```json
 {
@@ -152,7 +155,7 @@ Remove or clean HTML tags from text fields:
 
 ### Removing Emojis for SOAP Compatibility
 
-Remove emojis that can cause issues with SOAP interfaces while preserving other Unicode symbols:
+Remove emojis that can cause issues with SOAP interfaces. Like the built-in pattern, it removes every character outside the Basic Multilingual Plane (including rare letters) and leaves emoji inside it, such as `⌚`:
 
 ```json
 {
@@ -167,7 +170,7 @@ Remove emojis that can cause issues with SOAP interfaces while preserving other 
 This pattern removes:
 - Emoji surrogate pairs (😀🔥💻🇺🇸)
 - Variation selectors that control emoji presentation
-- But preserves mathematical symbols (∑), arrows (→), checkmarks (✓), stars (★), and accented letters (café)
+- But preserves mathematical symbols (∑), arrows (→), checkmarks (✓), stars (★), and accented letters (café), which are all inside the Basic Multilingual Plane
 
 ### Fixing Encoding Issues
 
@@ -223,7 +226,7 @@ Replace common encoding artifacts:
 
 **Accented or non-Latin letters are missing from the Title (but not the Description):**
 
-- A manipulator in your configuration removes non-ASCII characters, for example the legacy pattern `[^( -~)\n\r\t]+` or `[^\x20-\x7E\r\n\t]`. Earlier versions of this page and of the generated sample used it. Replace it with the Unicode-preserving pattern under [Removing Invalid Characters](#removing-invalid-characters), or remove your manipulators to use the built-in one. The Description is not affected because it is an HTML field, which the tool does not process.
+- A manipulator in your configuration removes non-ASCII characters, for example the legacy pattern `[^( -~)\n\r\t]+` or `[^\x20-\x7E\r\n\t]`. Earlier versions of this page and of the generated sample used it. Replace it with the built-in pattern under [Removing Invalid Characters](#removing-invalid-characters), or remove your manipulators to use the built-in one. The Description is not affected because it is an HTML field, which the tool does not process.
 
 **Unexpected Results:**
 
