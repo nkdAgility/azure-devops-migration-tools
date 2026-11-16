@@ -143,9 +143,12 @@ namespace MigrationTools.ConsoleDataGenerator
                 optionsItem.DotNetType = property.PropertyType;
                 optionsItem.Description = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "summary");
                 string shippedDefault = shippedDefaults != null && shippedDefaults.Exists() ? shippedDefaults[property.Name] : null;
-                optionsItem.DefaultValue = shippedDefault != null
+                string xmlDefault = codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
+                // IConfiguration reads a JSON null as an empty string, so an empty shipped value keeps the XML default when there is one.
+                bool shippedIsEmptyAndXmlKnown = shippedDefault == string.Empty && xmlDefault != "missing XML code comments";
+                optionsItem.DefaultValue = shippedDefault != null && !shippedIsEmptyAndXmlKnown
                     ? shippedDefault.ToLowerInvariant() is "true" or "false" ? shippedDefault.ToLowerInvariant() : shippedDefault
-                    : codeDocs.GetPropertyData(item.GetType(), joptions, tempJProperty, "default");
+                    : xmlDefault;
                 // Determine if the property is required via DataAnnotations [Required]
                 var isRequired = property.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), inherit: true).Any();
                 optionsItem.IsRequired = isRequired;
