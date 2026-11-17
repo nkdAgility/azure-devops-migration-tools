@@ -43,7 +43,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
             target.Tags = TagRules.Join(result.Tags);
             foreach (var rename in result.Renamed)
             {
-                Log.LogDebug("TagMappingMap: renamed tag '{From}' to '{To}' on work item {SourceId} (target {TargetId})", rename.Key, rename.Value, source.Id, target.Id);
+                Log.LogDebug("TagMappingMap: renamed tag '{From}' to '{To}' on source work item {SourceId} revision {Revision}", rename.Key, rename.Value, source.Id, source.Rev);
             }
         }
     }

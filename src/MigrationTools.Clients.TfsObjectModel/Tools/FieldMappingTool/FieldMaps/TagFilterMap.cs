@@ -37,7 +37,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
             target.Tags = TagRules.Join(result.Kept);
             foreach (var tag in result.Dropped)
             {
-                Log.LogInformation("TagFilterMap: dropped tag '{Tag}' from work item {SourceId} (target {TargetId})", tag, source.Id, target.Id);
+                Log.LogInformation("TagFilterMap: dropped tag '{Tag}' from source work item {SourceId} revision {Revision}", tag, source.Id, source.Rev);
             }
         }
     }
