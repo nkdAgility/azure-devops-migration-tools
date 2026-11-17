@@ -78,6 +78,14 @@ namespace MigrationTools.Tests.Tools.FieldMaps
         }
 
         [TestMethod, TestCategory("L0")]
+        public void Map_EmptyReplacement_KeepsOriginalTag()
+        {
+            var result = TagRules.Map(L("Old"), new List<TagMapping> { new TagMapping { source = "regex:^Old(.*)$", target = "$1" } });
+            CollectionAssert.AreEqual(L("Old"), result.Tags);
+            Assert.AreEqual(0, result.Renamed.Count);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Map_FirstMatchingMappingWins()
         {
             var mappings = new List<TagMapping>

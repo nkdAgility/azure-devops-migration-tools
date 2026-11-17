@@ -80,7 +80,8 @@ In configuration, set `FieldMapType` to `TagMappingMap`.
 
 ## Good Practices
 
-- List the Tag Mapping Map **before** the [Tag Filter Map]({{< ref "docs/reference/field-maps/tag-filter-map" >}}), so the approved list only needs the new names.
+- Run the Tag Mapping Map **before** the [Tag Filter Map]({{< ref "docs/reference/field-maps/tag-filter-map" >}}), so the approved list only needs the new names. Maps with `ApplyTo` `["*"]` run before type-specific maps whatever their configuration order, so give both maps the same `ApplyTo`; within one scope they run in configuration order.
+- A `regex:` rename that would give an empty tag (for example `$1` when the group is empty) keeps the original tag.
 - Put specific entries before general patterns: the first entry that matches wins.
 
 ## Troubleshooting

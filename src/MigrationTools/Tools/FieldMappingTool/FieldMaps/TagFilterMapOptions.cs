@@ -4,7 +4,7 @@ using MigrationTools.Tools.Infrastructure;
 namespace MigrationTools.Tools
 {
     /// <summary>
-    /// Only want approved tags on the target? This keeps the tags you list in `includeTags`, always drops the tags in `excludeTags`, and logs every tag it drops. An entry matches the exact tag name (case-sensitive); start it with `regex:` to use a .NET regular expression. List it after any field map that adds tags.
+    /// Only want approved tags on the target? This keeps the tags you list in `includeTags`, always drops the tags in `excludeTags`, and logs every tag it drops. An entry matches the exact tag name (case-sensitive); start it with `regex:` to use a .NET regular expression. Run it after every field map that adds tags, with the same `ApplyTo`: maps with `ApplyTo` `*` run before type-specific maps, and maps in one scope run in configuration order.
     /// </summary>
     /// <status>ready</status>
     /// <processingtarget>Work Item Field</processingtarget>

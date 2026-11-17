@@ -85,7 +85,8 @@ In configuration, set `FieldMapType` to `TagFilterMap`.
 
 ## Good Practices
 
-- List the Tag Filter Map **after** any field map that adds tags, such as the [Field Value To Tag Map]({{< ref "docs/reference/field-maps/field-value-to-tag-map" >}}), so the tags those maps add are filtered too, or include them in `includeTags`.
+- Run the Tag Filter Map **after** every field map that adds tags, such as the [Field Value To Tag Map]({{< ref "docs/reference/field-maps/field-value-to-tag-map" >}}). The filter only sees the tags present when it runs, so a tag added later is neither kept by `includeTags` nor removed by `excludeTags`.
+- Field maps with `ApplyTo` `["*"]` run before the maps for a specific work item type, whatever their order in the configuration. Within one `ApplyTo` scope, maps run in configuration order. Give the Tag Filter Map the same `ApplyTo` as the maps it must follow, or a narrower one.
 - To rename tags as well, list the [Tag Mapping Map]({{< ref "docs/reference/field-maps/tag-mapping-map" >}}) before this one, so `includeTags` only needs the new names.
 - Because matching is case-sensitive, list each spelling you want to keep, or use a pattern such as `regex:(?i)^approved$`.
 

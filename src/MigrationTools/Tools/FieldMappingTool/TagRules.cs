@@ -108,6 +108,10 @@ namespace MigrationTools.Tools
                     newTag = (IsPattern(mapping.source)
                         ? Regex.Replace(tag, Pattern(mapping.source), mapping.target)
                         : mapping.target).Trim();
+                    if (newTag.Length == 0)
+                    {
+                        newTag = tag;
+                    }
                 }
                 if (newTag.Length > 0 && !result.Tags.Contains(newTag, StringComparer.Ordinal))
                 {
