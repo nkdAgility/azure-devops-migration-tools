@@ -55,6 +55,11 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Finding (checked 2026-11-16, #3261):** confirmed. Step 2 throws `renderConstrainedEndpointForm is not a function`, the schema reader finds 0 processors and 0 endpoints, and the tool rejects its output (exit -1). The wizard is taken off every environment; the source is kept for a later fix.
 - **Decision:** enforce the rule that every plugin change is agreed by all active CONTROL chats before it is pushed: a check blocks the push until they have agreed. (Prompted by 3d693d8, 24fff0d and 69c4ee9, each announced as it was pushed.)
 
+## 2026-11-17
+
+- **Decision:** CONTROL-ADMT may record its agreement to plugin commits with `Approve-Change.ps1`, which pushes only the agreement note (`refs/notes/control`) and never commits. This holds for all agreements from now on.
+- **Decision (Martin):** the migration hyperlink from each migrated target work item back to its source work item (in addition to the ReflectedWorkItemId field and the migration comment) must have a flag so it can be turned off. Still open: default on or off, scope (work item processor only, or test plans too), link comment text, and what a re-run does when the source URL has changed.
+
 ## 2026-11-13
 
 - **Decision:** on PR #3249 (#3241), the two failure paths that can't be forced on the test organisations stay untested live: the read-back of a new field failing after a successful create, and the service rejecting an update to an existing picklist. They are covered by code review and unit tests and listed under "Not covered" in the PR.
