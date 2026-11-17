@@ -124,7 +124,10 @@ options:
     If enabled, adds a hyperlink with the comment `Migrated from source` from each migrated work item to the web page of
      its source work item, in addition to the reflected work item ID and the migration comment. The link is added in the
      last replayed revision, or in a save that a re-run makes anyway, so it never adds a revision. Re-runs keep exactly one
-     such link: if the source URL has changed, the old migration hyperlink is replaced. The exception is a `Migrated from source`
+     such link: if the source URL has changed, the old migration hyperlink is replaced. A missing link is added the next time
+     a migration run processes and saves the item, not by a save made in Azure DevOps. If the target already has a hyperlink
+     to the source URL with a different comment, it counts as present and is neither duplicated nor changed; this is how it
+     was built and Martin has not approved it yet. The exception is a `Migrated from source`
      hyperlink that the source work item has itself (for example because the source was itself migrated): it is copied and
      kept, so the target can then have two.
   defaultValue: true
