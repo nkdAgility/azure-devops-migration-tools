@@ -60,5 +60,24 @@ namespace MigrationTools.Tests.Processors
             Assert.IsFalse(MigrationHyperlinkHelper.IsMigrationHyperlink("something else"));
             Assert.IsFalse(MigrationHyperlinkHelper.IsMigrationHyperlink(null));
         }
+    
+        [TestMethod, TestCategory("L0")]
+        public void IsGeneratedBacklink_OnlyMatchesCommentAndSourceUrl()
+        {
+            Assert.IsTrue(MigrationHyperlinkHelper.IsGeneratedBacklink(Url.ToUpperInvariant(), MigrationHyperlinkHelper.Comment, Url));
+            Assert.IsFalse(MigrationHyperlinkHelper.IsGeneratedBacklink(OldUrl, MigrationHyperlinkHelper.Comment, Url), "a copied marked link to another URL is an ordinary link");
+            Assert.IsFalse(MigrationHyperlinkHelper.IsGeneratedBacklink(Url, "something else", Url));
+            Assert.IsFalse(MigrationHyperlinkHelper.IsGeneratedBacklink(Url, MigrationHyperlinkHelper.Comment, null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void GenerateMigrationHyperlink_FalseSurvivesSerialisation()
+        {
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new TfsWorkItemMigrationProcessorOptions { GenerateMigrationHyperlink = false });
+            StringAssert.Contains(json, "\"GenerateMigrationHyperlink\":false");
+            var back = Newtonsoft.Json.JsonConvert.DeserializeObject<TfsWorkItemMigrationProcessorOptions>(json);
+            Assert.IsFalse(back.GenerateMigrationHyperlink);
+            Assert.IsFalse(Newtonsoft.Json.JsonConvert.SerializeObject(new TfsWorkItemMigrationProcessorOptions()).Contains("GenerateMigrationHyperlink"), "the default true is omitted");
+        }
     }
 }

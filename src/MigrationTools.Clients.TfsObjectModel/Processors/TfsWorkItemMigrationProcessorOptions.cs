@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
@@ -68,9 +69,12 @@ namespace MigrationTools.Processors
         /// If enabled, adds a hyperlink with the comment `Migrated from source` from each migrated work item to the web page of
         /// its source work item, in addition to the reflected work item ID and the migration comment. The link is added in the
         /// last replayed revision, or in a save that a re-run makes anyway, so it never adds a revision. Re-runs keep exactly one
-        /// such link: if the source URL has changed, the old migration hyperlink is replaced.
+        /// such link: if the source URL has changed, the old migration hyperlink is replaced. The exception is a `Migrated from source`
+        /// hyperlink that the source work item has itself (for example because the source was itself migrated): it is copied and
+        /// kept, so the target can then have two.
         /// </summary>
         /// <default>true</default>
+        [DefaultValue(true)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool GenerateMigrationHyperlink { get; set; } = true;
 

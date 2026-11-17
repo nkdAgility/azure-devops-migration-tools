@@ -17,6 +17,13 @@ namespace MigrationTools.Processors
         public static bool IsMigrationHyperlink(string comment) => string.Equals(comment?.Trim(), Comment, StringComparison.Ordinal);
 
         /// <summary>
+        /// True only for the backlink the migration generates: the migration comment and a location equal to the source work
+        /// item's web URL. A copied hyperlink that happens to carry the same comment but points elsewhere is not the backlink.
+        /// </summary>
+        public static bool IsGeneratedBacklink(string location, string comment, string sourceUrl) =>
+            IsMigrationHyperlink(comment) && !string.IsNullOrWhiteSpace(sourceUrl) && Normalise(location) == Normalise(sourceUrl);
+
+        /// <summary>
         /// Works out which existing target hyperlinks to remove and whether to add the link to <paramref name="sourceUrl"/>.
         /// A migration hyperlink that points elsewhere is stale (the source has moved) and is removed, unless the source work
         /// item has that same hyperlink itself (it was copied from the source, for example when the source was itself migrated).

@@ -72,8 +72,11 @@ function Test-E2EItemFidelity {
         if ($u.fields.'System.ChangedDate') { $changed = [datetime]$u.fields.'System.ChangedDate'.newValue }
         if ($u.fields.'System.AuthorizedDate') { $authToChanged[([datetime]$u.fields.'System.AuthorizedDate'.newValue).ToString("o")] = $changed }
     }
-    # The migration hyperlink (GenerateMigrationHyperlink) exists only on the target; it is checked by Test-E2EMigrationHyperlink.
-    $tRel = @($t.relations | Where-Object { $_.rel -in "AttachedFile", "Hyperlink" -and $_.attributes.comment -ne "Migrated from source" } | ForEach-Object {
+    # The generated backlink (GenerateMigrationHyperlink) exists only on the target; it is checked by Test-E2EMigrationHyperlink.
+    # Only that link is left out: a copied relation with the same comment that points elsewhere is still compared.
+    $backlink = "https://dev.azure.com/$($script:SrcOrg)/$($sw.fields.'System.TeamProject')/_workitems/edit/$SourceId"
+    $isBacklink = { param($rel) $rel.rel -eq "Hyperlink" -and $rel.attributes.comment -eq "Migrated from source" -and ([uri]$rel.url).AbsoluteUri -ieq ([uri]$backlink).AbsoluteUri }
+    $tRel = @($t.relations | Where-Object { $_.rel -in "AttachedFile", "Hyperlink" -and -not (& $isBacklink $_) } | ForEach-Object {
         $a = ([datetime]$_.attributes.authorizedDate).ToString("o")
         $d = if ($authToChanged.ContainsKey($a)) { "{0:yyyy-MM-dd HH:mm:ss}" -f $authToChanged[$a] } else { "unmatched($a)" }
         "{0}@{1}" -f ((& $relKey $_) -replace '\[originalId:\d+\]', ''), $d } | Sort-Object)

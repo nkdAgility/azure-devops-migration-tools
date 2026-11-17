@@ -74,7 +74,7 @@ namespace MigrationTools.Tools
                 return 0;
             }
 
-            if (ShouldCopyLinks(sourceWorkItemLinkStart, targetWorkItemLinkStart))
+            if (ShouldCopyLinks(processor, sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
                 Log.LogTrace("Links = '{@sourceWorkItemLinkStartLinks}", sourceWorkItemLinkStart.Links);
                 foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
@@ -590,13 +590,15 @@ namespace MigrationTools.Tools
             }
         }
 
-        private bool ShouldCopyLinks(WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
+        private bool ShouldCopyLinks(TfsProcessor processor, WorkItemData sourceWorkItemLinkStart, WorkItemData targetWorkItemLinkStart)
         {
             if (Options.FilterIfLinkCountMatches)
             {
-                // The migration hyperlink (GenerateMigrationHyperlink) exists only on the target, so it is not counted.
+                // The generated backlink (GenerateMigrationHyperlink) exists only on the target, so it is not counted.
+                // Copied hyperlinks that carry the same comment but point elsewhere are counted like any other link.
+                var sourceUrl = processor?.Source?.WorkItems?.CreateReflectedWorkItemId(sourceWorkItemLinkStart)?.ToString();
                 var targetLinks = targetWorkItemLinkStart.ToWorkItem().Links;
-                var targetLinkCount = targetLinks.Count - targetLinks.OfType<Hyperlink>().Count(h => MigrationHyperlinkHelper.IsMigrationHyperlink(h.Comment));
+                var targetLinkCount = targetLinks.Count - targetLinks.OfType<Hyperlink>().Count(h => MigrationHyperlinkHelper.IsGeneratedBacklink(h.Location, h.Comment, sourceUrl));
                 if (targetLinkCount == sourceWorkItemLinkStart.ToWorkItem().Links.Count) // we should never have this as the target should not have existed in this path
                 {
                     Log.LogInformation("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
