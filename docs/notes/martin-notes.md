@@ -61,7 +61,12 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision (Martin):** the migration hyperlink from each migrated target work item back to its source work item (in addition to the ReflectedWorkItemId field and the migration comment) must have a flag so it can be turned off.
 - **Decision (Martin):** the migration hyperlink is on by default.
 - **Decision (Martin):** only the work item migration processor adds the migration hyperlink; the Test Plans and Suites processor does not.
-- **Decision (Martin):** the migration hyperlink's comment is `Migrated from source`. Still open: what a re-run does when the source URL has changed.
+- **Decision (Martin):** the migration hyperlink's comment is `Migrated from source`.
+- **Decision (Martin):** when the source URL has changed, a re-run replaces the old migration hyperlink: it removes any hyperlink with the comment `Migrated from source` that points elsewhere and adds the current one, so each item keeps exactly one.
+- **Decision (Martin):** the planned tag filter field map (include list of approved tags, plus exclude list) drops tags that do not pass the filter from the target work item, logging each dropped tag rather than keeping it.
+- **Decision (Martin):** tag filter entries match the exact tag name, case-sensitive (tags trimmed); an entry starting with `regex:` is a .NET regex pattern. The same matching applies to the planned tag mapping map.
+- **Decision (Martin):** build two new field maps, a tag filter map and a tag mapping map (renames tags from source → target pairs; unmatched tags pass unchanged). Area path → tag needs no new map: add a worked example to the `FieldValueToTagMap` docs instead.
+- **Decision (Martin):** in the tag filter, the exclude list wins over the include list, and an empty include list lets every tag pass except excluded ones.
 
 ## 2026-11-13
 
