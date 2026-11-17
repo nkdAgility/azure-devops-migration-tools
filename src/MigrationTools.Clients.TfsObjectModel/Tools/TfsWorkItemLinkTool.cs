@@ -594,7 +594,10 @@ namespace MigrationTools.Tools
         {
             if (Options.FilterIfLinkCountMatches)
             {
-                if (targetWorkItemLinkStart.ToWorkItem().Links.Count == sourceWorkItemLinkStart.ToWorkItem().Links.Count) // we should never have this as the target should not have existed in this path
+                // The migration hyperlink (GenerateMigrationHyperlink) exists only on the target, so it is not counted.
+                var targetLinks = targetWorkItemLinkStart.ToWorkItem().Links;
+                var targetLinkCount = targetLinks.Count - targetLinks.OfType<Hyperlink>().Count(h => MigrationHyperlinkHelper.IsMigrationHyperlink(h.Comment));
+                if (targetLinkCount == sourceWorkItemLinkStart.ToWorkItem().Links.Count) // we should never have this as the target should not have existed in this path
                 {
                     Log.LogInformation("[SKIP] Source and Target have same number of links  {sourceWorkItemLinkStartId} - {sourceWorkItemLinkStartType}", sourceWorkItemLinkStart.Id, sourceWorkItemLinkStart.Type.ToString());
                     return false;

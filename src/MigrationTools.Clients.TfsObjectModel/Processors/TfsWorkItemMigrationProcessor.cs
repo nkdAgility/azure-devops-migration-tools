@@ -864,6 +864,11 @@ namespace MigrationTools.Processors
                         }
                         if (targetWorkItem != null && targetWorkItem.ToWorkItem().IsDirty)
                         {
+                            // Only in a save that happens anyway: the migration hyperlink never causes a revision of its own.
+                            if (Options.GenerateMigrationHyperlink)
+                            {
+                                EnsureMigrationHyperlink(sourceWorkItem, targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
+                            }
                             SaveCatchUp(sourceWorkItem, targetWorkItem, catchUpDateFixUps);
                         }
                         CommonTools.Attachment.CleanUpAfterSave();
@@ -1013,6 +1018,27 @@ namespace MigrationTools.Processors
         {
             var wi = targetWorkItem.ToWorkItem();
             wi.History = MigrationCommentHelper.AppendTo(wi.History, reflectedUri);
+        }
+
+        /// <summary>
+        /// Keeps exactly one hyperlink from the target to the source work item's web page (GenerateMigrationHyperlink).
+        /// Changes the work item in memory only; the caller saves it with a revision it is saving anyway.
+        /// </summary>
+        private void EnsureMigrationHyperlink(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, string sourceUrl)
+        {
+            var wi = targetWorkItem.ToWorkItem();
+            var hyperlinks = wi.Links.OfType<Hyperlink>().ToList();
+            var sourceLocations = sourceWorkItem.ToWorkItem().Links.OfType<Hyperlink>().Select(h => h.Location);
+            var plan = MigrationHyperlinkHelper.Plan(hyperlinks.Select(h => (h.Location, h.Comment)).ToList(), sourceLocations, sourceUrl);
+            foreach (var index in plan.Remove)
+            {
+                Log.LogInformation("Replacing migration hyperlink '{OldUrl}' on target work item {Id} with '{NewUrl}'.", hyperlinks[index].Location, wi.Id, sourceUrl);
+                wi.Links.Remove(hyperlinks[index]);
+            }
+            if (plan.Add)
+            {
+                wi.Links.Add(new Hyperlink(sourceUrl) { Comment = MigrationHyperlinkHelper.Comment });
+            }
         }
 
         private readonly HashSet<string> _typesUsingFallbackField = new(StringComparer.OrdinalIgnoreCase);
@@ -1239,6 +1265,10 @@ namespace MigrationTools.Processors
                     if (revision == lastRevision && Options.GenerateMigrationComment)
                     {
                         AppendMigrationComment(targetWorkItem, reflectedUri.ToString());
+                    }
+                    if (revision == lastRevision && Options.GenerateMigrationHyperlink)
+                    {
+                        EnsureMigrationHyperlink(sourceWorkItem, targetWorkItem, reflectedUri.ToString());
                     }
 
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);

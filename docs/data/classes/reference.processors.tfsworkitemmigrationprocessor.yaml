@@ -65,6 +65,7 @@ configurationSamples:
       "WorkItemCreateRetryLimit": 5,
       "FilterWorkItemsThatAlreadyExistInTarget": false,
       "GenerateMigrationComment": true,
+      "GenerateMigrationHyperlink": true,
       "SourceName": "Source",
       "TargetName": "Target"
     }
@@ -115,6 +116,16 @@ options:
   description: >-
     If enabled, adds a comment recording the migration. The comment is added to the History of the last replayed
      revision, after that revision's own comment, rather than in a separate revision.
+  defaultValue: true
+  isRequired: false
+  dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: GenerateMigrationHyperlink
+  type: Boolean
+  description: >-
+    If enabled, adds a hyperlink with the comment `Migrated from source` from each migrated work item to the web page of
+     its source work item, in addition to the reflected work item ID and the migration comment. The link is added in the
+     last replayed revision, or in a save that a re-run makes anyway, so it never adds a revision. Re-runs keep exactly one
+     such link: if the source URL has changed, the old migration hyperlink is replaced.
   defaultValue: true
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

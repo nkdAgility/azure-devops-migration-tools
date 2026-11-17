@@ -65,6 +65,16 @@ namespace MigrationTools.Processors
         public bool GenerateMigrationComment { get; set; } = true;
 
         /// <summary>
+        /// If enabled, adds a hyperlink with the comment `Migrated from source` from each migrated work item to the web page of
+        /// its source work item, in addition to the reflected work item ID and the migration comment. The link is added in the
+        /// last replayed revision, or in a save that a re-run makes anyway, so it never adds a revision. Re-runs keep exactly one
+        /// such link: if the source URL has changed, the old migration hyperlink is replaced.
+        /// </summary>
+        /// <default>true</default>
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool GenerateMigrationHyperlink { get; set; } = true;
+
+        /// <summary>
         /// A list of work items to import
         /// </summary>
         /// <default>[]</default>
