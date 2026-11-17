@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.fieldmaps.tagfiltermap.json",
+  "title": "TagFilterMap",
+  "description": "Keeps only the approved tags (`includeTags`) on the target work item, always drops the blocked ones (`excludeTags`), and logs each tag it drops.",
+  "type": "object",
+  "properties": {
+    "ApplyTo": {
+      "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "Enabled": {
+      "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
+      "type": "boolean"
+    },
+    "excludeTags": {
+      "description": "The blocked tags. A tag that matches one of them is always dropped, even when it also matches `includeTags`.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    },
+    "includeTags": {
+      "description": "The approved tags. When it has entries, only tags that match one of them are kept. When it is empty, every tag is kept unless it matches `excludeTags`.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "default": [],
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

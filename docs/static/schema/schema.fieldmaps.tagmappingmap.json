@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devopsmigration.io/schema/schema.fieldmaps.tagmappingmap.json",
+  "title": "TagMappingMap",
+  "description": "Renames tags on the target work item from a list of source → target pairs; tags that match no pair are kept unchanged.",
+  "type": "object",
+  "properties": {
+    "ApplyTo": {
+      "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "Enabled": {
+      "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
+      "type": "boolean"
+    },
+    "mappings": {
+      "description": "The renames, applied in order; the first `source` that matches a tag wins.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "default": [],
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

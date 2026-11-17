@@ -81,6 +81,8 @@ namespace MigrationTools
             context.AddTransient<MultiValueConditionalMap>();
             context.AddTransient<RegexFieldMap>();
             context.AddTransient<TreeToTagFieldMap>();
+            context.AddTransient<TagFilterMap>();
+            context.AddTransient<TagMappingMap>();
             context.AddTransient<FieldCalculationMap>();
             context.AddTransient<FieldClearMap>();
 

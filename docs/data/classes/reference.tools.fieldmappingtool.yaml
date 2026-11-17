@@ -203,6 +203,34 @@ configurationSamples:
                 "pattern": "Yes",
                 "formatExpression": "{0}"
               },
+              "TagFilterMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "includeTags": [
+                  "Approved",
+                  "Release",
+                  "regex:^Team-"
+                ],
+                "excludeTags": [
+                  "Team-Legacy"
+                ]
+              },
+              "TagMappingMap": {
+                "ApplyTo": [
+                  "SomeWorkItemType"
+                ],
+                "mappings": [
+                  {
+                    "source": "Bug-Bash",
+                    "target": "BugBash"
+                  },
+                  {
+                    "source": "regex:^v1\\..*$",
+                    "target": "Legacy"
+                  }
+                ]
+              },
               "TreeToTagMap": {
                 "ApplyTo": [
                   "SomeWorkItemType"

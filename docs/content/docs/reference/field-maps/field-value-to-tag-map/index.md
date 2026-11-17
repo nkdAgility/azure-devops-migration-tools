@@ -72,6 +72,22 @@ In configuration, set `FieldMapType` to `FieldValueToTagMap`.
 }
 ```
 
+#### Tag work items by area path
+
+Add one specific tag to every work item under an area. Leave `{0}` out of `formatExpression`, so the tag is fixed text rather than the area path. Backslashes in the path are escaped twice: once for JSON and once for the regular expression.
+
+```json
+{
+  "FieldMapType": "FieldValueToTagMap",
+  "ApplyTo": ["*"],
+  "sourceField": "System.AreaPath",
+  "pattern": "\\\\Team A(\\\\|$)",
+  "formatExpression": "Team-A"
+}
+```
+
+This tags work items in `MyProject\Team A` and everything below it, but not `MyProject\Team AB`. Use one map for each area and tag.
+
 ## Good Practices
 
 - Anchor the pattern (`^Yes$`) when a partial match would tag too much: the pattern matches anywhere in the value, and the match is case-sensitive.

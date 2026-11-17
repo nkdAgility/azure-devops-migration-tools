@@ -500,6 +500,95 @@
             }
           },
           {
+            "title": "TagFilterMap",
+            "description": "Keeps only the approved tags (`includeTags`) on the target work item, always drops the blocked ones (`excludeTags`), and logs each tag it drops.",
+            "type": "object",
+            "properties": {
+              "ApplyTo": {
+                "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Enabled": {
+                "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
+                "type": "boolean"
+              },
+              "excludeTags": {
+                "description": "The blocked tags. A tag that matches one of them is always dropped, even when it also matches `includeTags`.",
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "includeTags": {
+                "description": "The approved tags. When it has entries, only tags that match one of them are kept. When it is empty, every tag is kept unless it matches `excludeTags`.",
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "default": [],
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "title": "TagMappingMap",
+            "description": "Renames tags on the target work item from a list of source → target pairs; tags that match no pair are kept unchanged.",
+            "type": "object",
+            "properties": {
+              "ApplyTo": {
+                "description": "A list of Work Item Types that this Field Map will apply to. Use \"*\" to apply it to all Work Item Types. A field map with an empty list applies to no Work Item Types and never runs.",
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Enabled": {
+                "description": "Not used: every configured field map runs for the work item types in `ApplyTo`. To turn a field map off, remove it from `FieldMaps`.",
+                "type": "boolean"
+              },
+              "mappings": {
+                "description": "The renames, applied in order; the first `source` that matches a tag wins.",
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "default": [],
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "target": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
             "title": "TreeToTagFieldMap",
             "description": "Maps work item area path or iteration path hierarchies to tags, allowing tree structures to be represented as flat tag collections.",
             "type": "object",
