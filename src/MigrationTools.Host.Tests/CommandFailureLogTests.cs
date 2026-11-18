@@ -40,6 +40,19 @@ namespace MigrationTools.Host.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void Describe_ConfigurationValidationFailure_KeepsThePathAndEveryFailure()
+        {
+            var section = new Microsoft.Extensions.Configuration.ConfigurationBuilder().Build().GetSection("MigrationTools:Processors:0");
+            var validation = Microsoft.Extensions.Options.ValidateOptionsResult.Fail(new[] { "SourceName is required.", "TargetName is required." });
+            var ex = new InvalidOperationException("Could not create the migration engine.", new MigrationTools.Exceptions.ConfigurationValidationException(section, null, validation));
+
+            var description = CommandFailureLog.Describe(ex);
+
+            StringAssert.Contains(description, "'MigrationTools:Processors:0' did not pass validation");
+            StringAssert.Contains(description, "SourceName is required.; TargetName is required.");
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Describe_WrappedException_GivesWhatFailedThenTheCause()
         {
             var ex = new InvalidDataException("Failed to load configuration from file 'x.json'.", new FormatException("Bad JSON at line 3."));
