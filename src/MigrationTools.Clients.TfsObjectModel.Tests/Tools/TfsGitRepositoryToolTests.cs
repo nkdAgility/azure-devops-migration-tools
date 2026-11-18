@@ -207,6 +207,18 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void IsTargetRepositoryLink_LinkToTargetRepo_True_SourceRepo_False()
+        {
+            var src = Repo("S", "app");
+            var tgt = Repo("T", "app");
+            var sources = new List<GitRepository> { src };
+            var targets = new List<GitRepository> { tgt };
+            Assert.IsTrue(TfsGitRepositoryTool.IsTargetRepositoryLink($"vstfs:///Git/PullRequestId/{tgt.ProjectReference.Id}%2F{tgt.Id}%2F3", sources, targets));
+            Assert.IsFalse(TfsGitRepositoryTool.IsTargetRepositoryLink($"vstfs:///Git/PullRequestId/{src.ProjectReference.Id}%2F{src.Id}%2F3", sources, targets));
+            Assert.IsFalse(TfsGitRepositoryTool.IsTargetRepositoryLink("vstfs:///Git/PullRequestId/garbage", sources, targets));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void TfsPullRequestLink_TryParse_AcceptsEncodedAndPlainSeparators()
         {
             Assert.IsTrue(TfsPullRequestLink.TryParse("vstfs:///Git/PullRequestId/a%2Fb%2F12", out var l1));

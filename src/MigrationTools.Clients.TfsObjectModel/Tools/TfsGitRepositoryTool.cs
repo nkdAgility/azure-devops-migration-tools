@@ -116,6 +116,10 @@ namespace MigrationTools.Tools
                     }
                     else if (el.ArtifactLinkType.Name == "Pull Request")
                     {
+                        if (IsTargetRepositoryLink(el.LinkedArtifactUri, allSourceRepos, allTargetRepos))
+                        {
+                            continue;
+                        }
                         var action = DecidePullRequestLink(el.LinkedArtifactUri, sourceWorkItem.Id, _processor.Source.Options.Collection, _processor.Target.Options.Collection, allSourceRepos, out string webUrl, out string comment);
                         if (action == PullRequestLinkAction.Drop)
                         {
@@ -314,11 +318,7 @@ namespace MigrationTools.Tools
                 }
                 return PullRequestLinkAction.LeaveUnchanged;
             }
-            var repo = sourceRepositories?.FirstOrDefault(r => string.Equals(r.Id.ToString(), link.Repository, StringComparison.OrdinalIgnoreCase)
-                                                             || string.Equals(r.Name, link.Repository, StringComparison.OrdinalIgnoreCase)
-                                                                && (string.Equals(r.ProjectReference?.Name, link.Project, StringComparison.OrdinalIgnoreCase) || string.Equals(r.ProjectReference?.Id.ToString(), link.Project, StringComparison.OrdinalIgnoreCase)));
-            // Azure DevOps also accepts project and repository ids in the web address, so a link to a deleted or unreadable repository still gets a hyperlink.
-            webUrl = TfsPullRequestLink.WebUrl(sourceCollection, repo?.ProjectReference?.Name ?? link.Project, repo?.Name ?? link.Repository, link.PullRequestId);
+            webUrl = PullRequestWebUrl(link, sourceCollection, sourceRepositories);
             comment = TfsPullRequestLink.Comment(link.PullRequestId, ReadPullRequestTitle(link.PullRequestId));
             if (firstTime)
             {
@@ -327,6 +327,54 @@ namespace MigrationTools.Tools
                 PullRequestLinksConverted++;
             }
             return PullRequestLinkAction.ConvertToHyperlink;
+        }
+
+        private static GitRepository FindRepository(TfsPullRequestLink link, IList<GitRepository> repositories)
+        {
+            return repositories?.FirstOrDefault(r => string.Equals(r.Id.ToString(), link.Repository, StringComparison.OrdinalIgnoreCase)
+                                                    || string.Equals(r.Name, link.Repository, StringComparison.OrdinalIgnoreCase)
+                                                       && (string.Equals(r.ProjectReference?.Name, link.Project, StringComparison.OrdinalIgnoreCase) || string.Equals(r.ProjectReference?.Id.ToString(), link.Project, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        private static string PullRequestWebUrl(TfsPullRequestLink link, Uri sourceCollection, IList<GitRepository> sourceRepositories)
+        {
+            var repo = FindRepository(link, sourceRepositories);
+            // Azure DevOps also accepts project and repository ids in the web address, so a link to a deleted or unreadable repository still gets a hyperlink.
+            return TfsPullRequestLink.WebUrl(sourceCollection, repo?.ProjectReference?.Name ?? link.Project, repo?.Name ?? link.Repository, link.PullRequestId);
+        }
+
+        /// <summary>
+        /// True when a pull request link on the target belongs to a target repository (added on the target after an earlier run),
+        /// so it already opens there and must not be converted.
+        /// </summary>
+        public static bool IsTargetRepositoryLink(string artifactUri, IList<GitRepository> sourceRepositories, IList<GitRepository> targetRepositories)
+        {
+            if (!TfsPullRequestLink.TryParse(artifactUri, out var link))
+            {
+                return false;
+            }
+            return FindRepository(link, targetRepositories) != null && FindRepository(link, sourceRepositories) == null;
+        }
+
+        /// <summary>
+        /// The hyperlink address that <see cref="Enrich"/> writes on the target for a source pull request link, or null when the
+        /// link is not converted. Used during revision replay to find the hyperlink to remove when the source removes the link.
+        /// </summary>
+        public string GetPullRequestHyperlinkUrl(TfsProcessor processor, ExternalLink sourceLink)
+        {
+            if (!Options.Enabled || Options.ShouldDropChangedSetLinks || Options.DropPullRequestLinks || sourceLink?.ArtifactLinkType?.Name != "Pull Request")
+            {
+                return null;
+            }
+            _processor = processor;
+            SetupRepoBits();
+            if (sourceRepoService == null
+                || TfsPullRequestLink.SameCollection(processor.Source.Options.Collection, processor.Target.Options.Collection)
+                || !TfsPullRequestLink.TryParse(sourceLink.LinkedArtifactUri, out var link))
+            {
+                return null;
+            }
+            return PullRequestWebUrl(link, processor.Source.Options.Collection, allSourceRepos);
         }
 
         private string ReadPullRequestTitle(int pullRequestId)
