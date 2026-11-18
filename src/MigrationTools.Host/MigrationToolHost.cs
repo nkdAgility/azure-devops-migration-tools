@@ -53,7 +53,8 @@ namespace MigrationTools.Host
         /// </summary>
         public static bool IsExecutableConfigSchemaValid(string[] args, string configFile)
         {
-            if (!(args ?? []).Any(a => string.Equals(a, "execute", StringComparison.OrdinalIgnoreCase))
+            // The command is the first argument; a later "execute" may be an option's value.
+            if (!string.Equals((args ?? []).FirstOrDefault(), "execute", StringComparison.OrdinalIgnoreCase)
                 || string.IsNullOrEmpty(configFile) || !File.Exists(configFile))
             {
                 return true;

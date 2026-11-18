@@ -577,7 +577,8 @@ namespace MigrationTools.ConsoleDataGenerator
             var numbers = Enum.GetValues(enumType).Cast<object>().Select(v => Convert.ToInt64(v, CultureInfo.InvariantCulture)).Distinct();
             var alternatives = Enum.GetNames(enumType).Select(CaseInsensitivePattern)
                 .Concat(numbers.Select(n => n.ToString(CultureInfo.InvariantCulture)));
-            return new JSchema { Type = JSchemaType.String, Description = description, Pattern = "^(?:" + string.Join("|", alternatives) + ")$" };
+            // Enum.Parse ignores surrounding white space, so the pattern does too.
+            return new JSchema { Type = JSchemaType.String, Description = description, Pattern = "^\\s*(?:" + string.Join("|", alternatives) + ")\\s*$" };
         }
 
         private static string CaseInsensitivePattern(string name) =>

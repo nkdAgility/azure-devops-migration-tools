@@ -120,7 +120,6 @@ namespace MigrationTools.Tests.Tools
         [TestMethod, TestCategory("L0")]
         public void ReadUsers_NullResult_IsReadOnItsOwn()
         {
-            // A member the batched read returns as null is not silently dropped: it is read on its own.
             var fallback = new List<string>();
             var reader = Reader(new FakeServer(), k => { fallback.Add(k); return (FallbackIdentityKind.User, new IdentityItemData { Sid = k }); });
 
@@ -185,7 +184,7 @@ namespace MigrationTools.Tests.Tools
             new() { DisplayName = "Bob Target", AccountName = "bob@target.com", MailAddress = "bob@target.com" },
         ];
 
-        private TfsUserMappingTool CreateTool(MappingTargetValidationScope scope, bool stop = true)
+        private TfsUserMappingTool CreateTool(MappingTargetValidationScope scope, bool stop = true, ILogger<TfsUserMappingTool> logger = null)
         {
             var file = Path.Combine(_dir, "map.json");
             File.WriteAllText(file, JsonConvert.SerializeObject(new Dictionary<string, string>
@@ -201,7 +200,7 @@ namespace MigrationTools.Tests.Tools
                 StopIfMappingTargetsDoNotResolve = stop
             };
             return new TfsUserMappingTool(Microsoft.Extensions.Options.Options.Create(options), new Mock<IServiceProvider>().Object,
-                new Mock<ILogger<TfsUserMappingTool>>().Object, new Mock<ITelemetryLogger>().Object);
+                logger ?? new Mock<ILogger<TfsUserMappingTool>>().Object, new Mock<ITelemetryLogger>().Object);
         }
 
         [TestMethod, TestCategory("L0")]
@@ -278,10 +277,18 @@ namespace MigrationTools.Tests.Tools
         [TestMethod, TestCategory("L0")]
         public void UnreadableTargetIdentities_MakeACleanResultInconclusiveNotAStop()
         {
-            var tool = CreateTool(MappingTargetValidationScope.Referenced);
+            var log = new Mock<ILogger<TfsUserMappingTool>>();
+            var tool = CreateTool(MappingTargetValidationScope.Referenced, logger: log.Object);
             tool.UnreadableTargetIdentities = ["Microsoft.IdentityModel.Claims.ClaimsIdentity;x"];
 
             tool.ValidateMappingTargets(() => Targets, null, ["Alice Source"]);
+
+            log.Verify(l => l.Log(LogLevel.Warning, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, _) => v.ToString().StartsWith("Validating::Inconclusive")),
+                It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
+            log.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, _) => v.ToString().Contains("resolve to an identity in the target")),
+                It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Never);
         }
 
         [TestMethod, TestCategory("L0")]

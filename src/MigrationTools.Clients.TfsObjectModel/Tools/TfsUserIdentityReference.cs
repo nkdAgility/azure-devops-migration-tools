@@ -57,6 +57,11 @@ namespace MigrationTools.Tools
         /// </summary>
         public static string FindMappedTarget(IDictionary<string, string> userMap, string sourceValue)
         {
+            // Replay calls this for every identity field of every revision, so an exact hit stays a single lookup.
+            if (userMap != null && !string.IsNullOrEmpty(sourceValue) && userMap.TryGetValue(sourceValue, out var exact))
+            {
+                return exact;
+            }
             var key = FindMappedKey(userMap, sourceValue);
             return key == null ? null : userMap[key];
         }

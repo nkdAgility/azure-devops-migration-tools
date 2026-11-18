@@ -50,7 +50,7 @@ namespace MigrationTools.Host.Tests
         [TestMethod, TestCategory("L1")]
         public void Execute_EnumInAnyCase_IsAccepted()
         {
-            WithSchema(() => Assert.IsTrue(MigrationToolHost.IsExecutableConfigSchemaValid(["execute"], Config("referenced"))));
+            WithSchema(() => Assert.IsTrue(MigrationToolHost.IsExecutableConfigSchemaValid(["execute"], Config(" referenced "))));
         }
 
         [TestMethod, TestCategory("L1")]
@@ -65,6 +65,7 @@ namespace MigrationTools.Host.Tests
         public void OtherCommandsAndMissingFiles_AreNotChecked()
         {
             Assert.IsTrue(MigrationToolHost.IsExecutableConfigSchemaValid(["upgrade"], Config("Referneced")));
+            Assert.IsTrue(MigrationToolHost.IsExecutableConfigSchemaValid(["upgrade", "--config", Config("Referneced"), "--logPath", "execute"], Config("Referneced")));
             Assert.IsTrue(MigrationToolHost.IsExecutableConfigSchemaValid(["execute"], Path.Combine(_dir, "missing.json")));
         }
     }
