@@ -154,10 +154,6 @@ namespace MigrationTools.ConsoleDataGenerator
                 return null;
             }
 
-            if (propertySchema?.Enum.Count > 0)
-            {
-                return propertySchema.Enum.FirstOrDefault(e => string.Equals(e.ToString(), text, StringComparison.Ordinal))?.DeepClone();
-            }
             var type = propertySchema?.Type ?? JSchemaType.String;
             if (type.HasFlag(JSchemaType.Boolean))
             {
@@ -571,22 +567,28 @@ namespace MigrationTools.ConsoleDataGenerator
         }
 
         /// <summary>
-        /// The configuration binder accepts an enum by name (any case) or by number, so both are allowed; anything else, such as a
-        /// misspelt name, is rejected.
+        /// The configuration binder accepts an enum by name in any case, or by number as a number or a string, so the schema accepts
+        /// all of those and rejects anything else, such as a misspelt name. JSON Schema has no case-insensitive enum, so names are
+        /// matched by a pattern with a character class per letter.
         /// </summary>
         internal static JSchema BuildEnumSchema(Type enumType, string description)
         {
-            var schema = new JSchema { Type = JSchemaType.String | JSchemaType.Integer, Description = description };
-            foreach (var name in Enum.GetNames(enumType))
+            var numbers = Enum.GetValues(enumType).Cast<object>().Select(v => Convert.ToInt64(v, CultureInfo.InvariantCulture)).Distinct().ToList();
+            var alternatives = Enum.GetNames(enumType).Select(CaseInsensitivePattern)
+                .Concat(numbers.Select(n => n.ToString(CultureInfo.InvariantCulture)));
+            var schema = new JSchema { Description = description };
+            schema.AnyOf.Add(new JSchema { Type = JSchemaType.String, Pattern = "^(?:" + string.Join("|", alternatives) + ")$" });
+            var integers = new JSchema { Type = JSchemaType.Integer };
+            foreach (var n in numbers)
             {
-                schema.Enum.Add(new JValue(name));
+                integers.Enum.Add(new JValue(n));
             }
-            foreach (var value in Enum.GetValues(enumType))
-            {
-                schema.Enum.Add(new JValue(Convert.ToInt64(value, CultureInfo.InvariantCulture)));
-            }
+            schema.AnyOf.Add(integers);
             return schema;
         }
+
+        private static string CaseInsensitivePattern(string name) =>
+            string.Concat(name.Select(c => char.IsLetter(c) ? $"[{char.ToUpperInvariant(c)}{char.ToLowerInvariant(c)}]" : System.Text.RegularExpressions.Regex.Escape(c.ToString())));
 
         private static JSchema BuildSchemaForType(Type t)
         {

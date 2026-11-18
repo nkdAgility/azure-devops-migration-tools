@@ -284,6 +284,24 @@ namespace MigrationTools.Tests.Tools
             tool.ValidateMappingTargets(() => Targets, null, ["Alice Source"]);
         }
 
+        [TestMethod, TestCategory("L0")]
+        public void UnreadableTargetIdentities_ZeroMatchIsInconclusiveNotAStop()
+        {
+            var tool = CreateTool(MappingTargetValidationScope.All);
+            tool.UnreadableTargetIdentities = ["Microsoft.IdentityModel.Claims.ClaimsIdentity;x"];
+
+            tool.ValidateMappingTargets(() => Targets, null, null);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void UnreadableTargetIdentities_AmbiguousMatchStillStops()
+        {
+            var tool = CreateTool(MappingTargetValidationScope.All);
+            tool.UnreadableTargetIdentities = ["Microsoft.IdentityModel.Claims.ClaimsIdentity;x"];
+            var twins = new List<IdentityItemData>(Targets) { new() { DisplayName = "Alice Target", AccountName = "alice2@target.com" } };
+
+            Assert.ThrowsExactly<MigrationRunStoppedException>(() => tool.ValidateMappingTargets(() => twins, null, null));
+        }
         [TestMethod, TestCategory("L1")]
         public void ValidateMappingTargets_DefaultsAllAndBindsFromString()
         {

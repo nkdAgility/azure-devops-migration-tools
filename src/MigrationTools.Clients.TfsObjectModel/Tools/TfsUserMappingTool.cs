@@ -506,6 +506,22 @@ namespace MigrationTools.Tools
 
         internal void ReportUnresolvedMappingTargets(List<UnresolvedUserMapping> unresolved, string scope = "All user mapping targets")
         {
+            if (UnreadableTargetIdentities.Count > 0 && unresolved.Count > 0)
+            {
+                // An unreadable identity is missing from the list, so a target that matched nothing may be that identity.
+                foreach (var item in unresolved.Where(u => !u.IsAmbiguous))
+                {
+                    Log.LogWarning("Validating::Inconclusive. The mapping '{source}' -> '{target}' matches no readable identity in the target, but {count} target "
+                        + "identities could not be read and it may be one of them. If it is not, it will be saved as plain text. Check it against these "
+                        + "identities, or grant the migration account permission to read them: {identities}",
+                        item.Source, item.Target, UnreadableTargetIdentities.Count, string.Join(", ", UnreadableTargetIdentities));
+                }
+                unresolved = unresolved.Where(u => u.IsAmbiguous).ToList();
+                if (unresolved.Count == 0)
+                {
+                    return;
+                }
+            }
             if (unresolved.Count == 0)
             {
                 if (UnreadableTargetIdentities.Count > 0)

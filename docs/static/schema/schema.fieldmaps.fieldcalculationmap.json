@@ -39,16 +39,19 @@
     },
     "parsingFallback": {
       "description": "Gets or sets the parsing fallback.",
-      "type": [
-        "string",
-        "integer"
-      ],
       "default": "RaiseError",
-      "enum": [
-        "RaiseError",
-        "ResetToZero",
-        0,
-        1
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(?:[Rr][Aa][Ii][Ss][Ee][Ee][Rr][Rr][Oo][Rr]|[Rr][Ee][Ss][Ee][Tt][Tt][Oo][Zz][Ee][Rr][Oo]|0|1)$"
+        },
+        {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        }
       ]
     },
     "targetField": {

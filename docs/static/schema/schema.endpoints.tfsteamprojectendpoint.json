@@ -105,17 +105,19 @@
     },
     "ProductVersion": {
       "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
-      "type": [
-        "string",
-        "integer"
-      ],
-      "enum": [
-        "OnPremisesClassic",
-        "OnPremises",
-        "Cloud",
-        0,
-        1,
-        2
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
+        },
+        {
+          "type": "integer",
+          "enum": [
+            0,
+            1,
+            2
+          ]
+        }
       ]
     },
     "Project": {
