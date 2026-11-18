@@ -55,6 +55,18 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void IsTransientNetworkError_ObjectModelConnectionLoss_IsRetried()
+        {
+            // The object model reports a dropped connection as TF400324, wrapping the WebException.
+            var tf400324 = new Microsoft.TeamFoundation.TeamFoundationServiceUnavailableException("TF400324: Azure DevOps services are not available");
+            Assert.IsTrue(TfsWorkItemMigrationProcessor.IsTransientNetworkError(tf400324));
+            Assert.IsTrue(TfsWorkItemMigrationProcessor.IsTransientNetworkError(new Exception("outer", new System.Net.WebException("closed"))));
+            Assert.IsTrue(TfsWorkItemMigrationProcessor.IsTransientNetworkError(new AggregateException(tf400324)));
+            Assert.AreSame(tf400324, TfsWorkItemMigrationProcessor.PassThroughReplay(new AggregateException(tf400324)));
+            Assert.IsFalse(TfsWorkItemMigrationProcessor.IsTransientNetworkError(new InvalidOperationException("TF26194")));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Advice_Unknown_PointsAtDebugLogging()
         {
             StringAssert.Contains(WorkItemMigrationFailedException.Advice("something new", "Bug"), "MinimumLevel 'Debug'");
