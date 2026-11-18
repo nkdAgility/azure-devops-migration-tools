@@ -112,11 +112,6 @@ namespace MigrationTools.Services
             TelemeteryDebug = true;
         }
 
-        public static void FlushTelemetery()
-        {
-            throw new NotImplementedException();
-        }
-
         internal class ActivityFilteringProcessor : BaseProcessor<Activity>
         {
             public override void OnStart(Activity activity)
