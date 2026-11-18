@@ -23,7 +23,9 @@ if ($rTarget) {
     $rRelated = @($rTarget.relations | Where-Object rel -eq "System.LinkTypes.Related")
     $r += New-E2EResult "R has no Related link (removed in the source)" ($rRelated.Count -eq 0) "$($rRelated.Count) Related link(s)"
 }
-$r += New-E2EResult "only A, B and R migrated" ($tgtItems.Count -eq 3) "$($tgtItems.Count) target items"
+$tTarget = Find-E2ETargetItem -Project $Tgt -SourceId $s.t
+$r += New-E2EResult "T migrated (unreadable shared steps don't fail it)" ($null -ne $tTarget) "T $($tTarget.id)"
+$r += New-E2EResult "only A, B, R and T migrated" ($tgtItems.Count -eq 4) "$($tgtItems.Count) target items"
 if ($a -and $b) {
     $related = @($a.relations | Where-Object rel -eq "System.LinkTypes.Related" | ForEach-Object { [int]($_.url -split '/')[-1] })
     $r += New-E2EResult "A links to B" ($related -contains [int]$b.id) "A related to: $($related -join ', ')"
@@ -35,6 +37,7 @@ $r += New-E2EResult "run log found" ($null -ne $log) "LogDirectory $LogDirectory
 $r += New-E2EResult "no NotImplementedException" ($text -notmatch "NotImplementedException") "log $($log.Name)"
 $r += New-E2EResult "unreadable target X reported and skipped" ($text -match "\[SKIP\][^\r\n]*to $($s.x) not migrated") ""
 $r += New-E2EResult "removal of the link to unreadable X reported and skipped" ($text -match "\[SKIP\][^\r\n]*to $($s.x) not removed from target") ""
+$r += New-E2EResult "unreadable shared steps reported and skipped" ($text -match "\[SKIP\] Shared Steps $($s.shared) used by Test Case $($s.t)") ""
 $r += New-E2EResult "no stack frames in the log" ($text -notmatch "(?m)^\s+at ") ""
 $r += New-E2EResult "out-of-query target O reported and skipped" ($text -match "\[SKIP\][^\r\n]*wiSourceR=$($s.o)[^\r\n]*has not been migrated") ""
 exit (Write-E2EResults $r $OutFile)

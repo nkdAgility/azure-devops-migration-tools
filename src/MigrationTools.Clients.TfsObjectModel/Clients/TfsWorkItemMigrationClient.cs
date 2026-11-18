@@ -244,7 +244,8 @@ namespace MigrationTools.Clients
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     Telemetry.TrackException(ex, activity?.Tags);
-                    Log.Error(ex, "Unable to GetWorkItem with id[{id}]", id);
+                    Log.Error("Could not read work item {id} in {Collection}: {Reason} Check that it exists and that the migration identity can read its project.", id, Options.Collection, ex.Message);
+                    Log.Debug(ex, "TfsWorkItemMigrationClient::GetWorkItem({id}) failed", id);
                     if (stopOnError)
                     {
                         // Rethrown as is: the caller decides whether this is an item failure or must stop the run.

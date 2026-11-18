@@ -40,8 +40,13 @@ Start-Sleep -Seconds 2
 Set-E2EWorkItem -Id $rItem.id -Fields ([ordered]@{ "System.Description" = "link to X added" }) -Ops @((Add-E2ELinkOp "System.LinkTypes.Related" $x.id "to X, removed later")) | Out-Null
 Start-Sleep -Seconds 2
 Set-E2EWorkItem -Id $rItem.id -Fields ([ordered]@{ "System.Description" = "link to X removed" }) -Ops @(@{ op = "remove"; path = "/relations/0" }) | Out-Null
+# T, a Test Case, uses Shared Steps S in the project that is deleted, so remapping its step reference reads an
+# item the source can't return (TfsWorkItemLinkTool.MigrateSharedSteps).
+$sharedSteps = Set-E2EWorkItem $Gone "Shared Steps" -Fields ([ordered]@{ "System.Title" = "S, shared steps in a project that is then deleted" })
+$t = Set-E2EWorkItem $Src "Test Case" -Fields ([ordered]@{ "System.Title" = "in-scope T (uses unreadable shared steps)" }) -Ops @(
+    @{ op = "add"; path = "/relations/-"; value = @{ rel = "Microsoft.VSTS.TestCase.SharedStepReferencedBy-Reverse"; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/wit/workItems/$($sharedSteps.id)" } })
 Remove-E2EProject $Gone
 $bug = Set-E2EWorkItem $Src "Bug" -Fields ([ordered]@{ "System.Title" = "fail-scope Bug" })
 
-Save-E2EState $PSScriptRoot @{ a = $a.id; b = $b.id; o = $o.id; x = $x.id; r = $rItem.id; bug = $bug.id }
-"seeded linkscope: A $($a.id) B $($b.id) O $($o.id) (outside the query) X $($x.id) (project deleted) R $($rItem.id) (link to X removed)"
+Save-E2EState $PSScriptRoot @{ a = $a.id; b = $b.id; o = $o.id; x = $x.id; r = $rItem.id; t = $t.id; shared = $sharedSteps.id; bug = $bug.id }
+"seeded linkscope: A $($a.id) B $($b.id) O $($o.id) (outside the query) X $($x.id) (project deleted) R $($rItem.id) (link to X removed) T $($t.id) (uses shared steps $($sharedSteps.id))"

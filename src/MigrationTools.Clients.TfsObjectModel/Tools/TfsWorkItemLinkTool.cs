@@ -148,8 +148,8 @@ namespace MigrationTools.Tools
 
             var sourceSharedStepLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
-            var sourceSharedSteps =
-                sourceSharedStepLinks.Select(x => processor.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
+            var sourceSharedSteps = ReadableSourceItems(processor, sourceSharedStepLinks, wiSourceL, wiTargetL, "Shared Steps",
+                "its step reference keeps the source id");
 
             foreach (WorkItemData sourceSharedStep in sourceSharedSteps)
             {
@@ -174,6 +174,23 @@ namespace MigrationTools.Tools
             }
         }
 
+        private List<WorkItemData> ReadableSourceItems(TfsProcessor processor, List<RelatedLink> links, WorkItemData wiSourceL, WorkItemData wiTargetL, string kind, string consequence)
+        {
+            var client = (TfsWorkItemMigrationClient)processor.Source.WorkItems;
+            var items = new List<WorkItemData>();
+            foreach (var link in links)
+            {
+                var item = client.GetWorkItemIfExists(link.RelatedWorkItemId);
+                if (item == null)
+                {
+                    Log.LogWarning("  [SKIP] {Kind} {RelatedId} used by Test Case {SourceId} (target {TargetId}) not remapped: it does not exist in the source or the migration identity cannot read it (TF26198), so {Consequence}. Grant the identity read access to its project, or migrate it, and re-run.", kind, link.RelatedWorkItemId, wiSourceL.Id, wiTargetL.Id, consequence);
+                    continue;
+                }
+                items.Add(item);
+            }
+            return items;
+        }
+
         /// <summary>
         /// Migrates shared parameters for test case work items, updating parameter references in the target work item.
         /// </summary>
@@ -185,8 +202,8 @@ namespace MigrationTools.Tools
             const string microsoftVstsTcmLocalDataSource = "Microsoft.VSTS.TCM.LocalDataSource";
             var sourceSharedParametersLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.ImmutableName == "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse").ToList();
-            var sourceSharedParameters =
-                sourceSharedParametersLinks.Select(x => processor.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
+            var sourceSharedParameters = ReadableSourceItems(processor, sourceSharedParametersLinks, wiSourceL, wiTargetL, "Shared Parameter",
+                "its data source reference keeps the source id");
 
             var sourceToTarget = new Dictionary<string, string>();
             foreach (WorkItemData sourceSharedParameter in sourceSharedParameters)
