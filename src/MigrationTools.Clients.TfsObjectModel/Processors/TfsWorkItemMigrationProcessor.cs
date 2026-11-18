@@ -519,8 +519,7 @@ namespace MigrationTools.Processors
                 // Test that
                 if (token.IsNullOrEmpty())
                 {
-                    var ex = new InvalidOperationException("Missing PersonalAccessToken from Target");
-                    Log.LogError(ex, "When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
+                    Log.LogError("When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
                     throw new MigrationRunStoppedException("Missing PersonalAccessToken from Target.");
                 }
             }
@@ -915,7 +914,8 @@ namespace MigrationTools.Processors
                 }
                 catch (WebException ex)
                 {
-                    Log.LogError(ex, "Some kind of internet pipe blockage");
+                    Log.LogWarning("Network error while migrating source work item {SourceId}: {Reason}", sourceWorkItem?.Id, WorkItemMigrationFailedException.ServerReason(ex));
+                    Log.LogDebug(ex, "Network error details for source work item {SourceId}", sourceWorkItem?.Id);
                     if (retries < retryLimit)
                     {
                         TraceWriteLine(LogEventLevel.Warning, "WebException: Will retry in {retrys}s ",
@@ -1076,10 +1076,8 @@ namespace MigrationTools.Processors
             var field = NonCustomisableWorkItemTypes.ResolveField(wi.Type.Name, Target.Options.ReflectedWorkItemIdField, wi.Fields.Contains);
             if (field is null)
             {
-                var ex = new InvalidOperationException("ReflectedWorkItemIdField Field Missing");
-                Log.LogError(ex, " The WorkItemType {WorkItemType} does not have a Field called {ReflectedWorkItemID}",
-                    wi.Type.Name, Target.Options.ReflectedWorkItemIdField);
-                throw ex;
+                // The caller logs this as the work item's one-line failure message (#3275).
+                throw new InvalidOperationException($"the target work item type '{wi.Type.Name}' has no field '{Target.Options.ReflectedWorkItemIdField}' to hold the reflected work item ID. Add the field to '{wi.Type.Name}' in the target process, or set ReflectedWorkItemIdField to a field that exists.");
             }
             if (field != Target.Options.ReflectedWorkItemIdField && _typesUsingFallbackField.Add(wi.Type.Name))
             {

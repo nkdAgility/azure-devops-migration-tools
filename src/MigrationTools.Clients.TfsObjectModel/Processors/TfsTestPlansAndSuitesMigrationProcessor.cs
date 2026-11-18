@@ -1115,7 +1115,8 @@ namespace MigrationTools.Processors
             }
             catch (TestManagementServerException ex)
             {
-                Log.LogError(ex, " FAILED {TestSuiteType} : {Id} - {Title}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id.ToString(), newTestSuite.Title,
+                Log.LogDebug(ex, "Adding test suite {Id} failed", newTestSuite.Id);
+                Log.LogError(" FAILED {TestSuiteType} : {Id} - {Title}: {Reason}", newTestSuite.TestSuiteType.ToString(), newTestSuite.Id.ToString(), newTestSuite.Title, ex.GetBaseException().Message,
                       new Dictionary<string, string> {
                           { "Name", Name},
                           { "Target Project", Target.Options.Project},
