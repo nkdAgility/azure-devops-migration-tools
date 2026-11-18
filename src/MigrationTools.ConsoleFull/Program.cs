@@ -23,9 +23,7 @@ namespace VstsSyncMigrator.ConsoleApp
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"devopsmigration could not start: {CommandFailureLog.Describe(ex)} Fix the cause (for example the configuration file) and run again.");
-                Serilog.Log.Debug(ex, "devopsmigration could not start.");
-                Serilog.Log.CloseAndFlush();
+                Console.Error.WriteLine(CommandFailureLog.ReportStartupFailure(ex));
                 return 1;
             }
         }

@@ -53,6 +53,14 @@ namespace MigrationTools.Host.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void Describe_MessagesWithLineBreaks_GivesOneLine()
+        {
+            Assert.AreEqual("First line Second line", CommandFailureLog.Describe(new InvalidOperationException("First line\r\nSecond line")));
+            Assert.AreEqual("bad key A  B", CommandFailureLog.Describe(new InvalidOperationException("bad\nkey", new FormatException("A\r\rB"))));
+            Assert.AreEqual("Single line.", CommandFailureLog.Describe(new InvalidOperationException("Single line.")));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Describe_WrappedException_GivesWhatFailedThenTheCause()
         {
             var ex = new InvalidDataException("Failed to load configuration from file 'x.json'.", new FormatException("Bad JSON at line 3."));

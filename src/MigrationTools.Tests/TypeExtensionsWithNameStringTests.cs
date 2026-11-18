@@ -26,6 +26,26 @@ namespace MigrationTools.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void WithNameString_SameTypeFromTwoLoadsOfItsAssembly_ReturnsOneOfThem()
+        {
+            var secondLoad = new System.Runtime.Loader.AssemblyLoadContext(nameof(WithNameString_SameTypeFromTwoLoadsOfItsAssembly_ReturnsOneOfThem), isCollectible: true);
+            try
+            {
+                var copy = secondLoad.LoadFromAssemblyPath(typeof(SampleProcessor).Assembly.Location).GetType(typeof(SampleProcessor).FullName, throwOnError: true);
+                Assert.AreNotSame(typeof(SampleProcessor), copy);
+                Assert.AreEqual(typeof(SampleProcessor).AssemblyQualifiedName, copy.AssemblyQualifiedName);
+
+                var found = new[] { typeof(SampleProcessor), copy, typeof(SampleProcessorExtended) }.WithNameString("SampleProcessor");
+
+                Assert.AreEqual(typeof(SampleProcessor).AssemblyQualifiedName, found.AssemblyQualifiedName);
+            }
+            finally
+            {
+                secondLoad.Unload();
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void WithNameString_ExactMatchAndLongerNames_ReturnsExactMatch()
         {
             var types = new[] { typeof(SampleProcessorExtended), typeof(SampleProcessor), typeof(SampleProcessorOther), typeof(SampleProcessor) };
