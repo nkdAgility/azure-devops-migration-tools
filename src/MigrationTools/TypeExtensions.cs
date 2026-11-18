@@ -31,12 +31,26 @@ namespace MigrationTools
 
         public static Type WithNameString(this IEnumerable<Type> types, string search)
         {
-            return types.SingleOrDefault(type => type.Name.StartsWith(search, StringComparison.InvariantCultureIgnoreCase));
+            return SingleByName(types, search, StringComparison.InvariantCultureIgnoreCase);
         }
 
         public static Type FromOptions(this IEnumerable<Type> types, IOptions option)
         {
-            return types.SingleOrDefault(type => type.Name.StartsWith(option.GetType().Name.Replace("Options", "")));
+            return SingleByName(types, option.GetType().Name.Replace("Options", ""), StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// An exact name match wins over a prefix match. The same type loaded twice (for example from an 8.3 short path and its
+        /// long path) is counted once, by assembly-qualified name. Different types that still match ambiguously throw.
+        /// </summary>
+        private static Type SingleByName(IEnumerable<Type> types, string name, StringComparison comparison)
+        {
+            var candidates = types.Where(type => type.Name.StartsWith(name, comparison))
+                .GroupBy(type => type.AssemblyQualifiedName)
+                .Select(group => group.First())
+                .ToList();
+            var exact = candidates.Where(type => string.Equals(type.Name, name, comparison)).ToList();
+            return (exact.Count > 0 ? exact : candidates).SingleOrDefault();
         }
 
 

@@ -7,13 +7,30 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using MigrationTools;
 using MigrationTools.Host;
+using MigrationTools.Host.Commands;
 using MigrationTools.Services;
 
 namespace VstsSyncMigrator.ConsoleApp
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static async Task<int> Main(string[] args)
+        {
+            try
+            {
+                await RunAsync(args);
+                return Environment.ExitCode;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"devopsmigration could not start: {CommandFailureLog.Describe(ex)} Fix the cause (for example the configuration file) and run again.");
+                Serilog.Log.Debug(ex, "devopsmigration could not start.");
+                Serilog.Log.CloseAndFlush();
+                return 1;
+            }
+        }
+
+        private static async Task RunAsync(string[] args)
         {
             string binDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string[] clientAssemblies = { "MigrationTools.Clients.TfsObjectModel.dll", "MigrationTools.Clients.FileSystem.dll", "MigrationTools.Clients.AzureDevops.Rest.dll" };
@@ -22,7 +39,12 @@ namespace VstsSyncMigrator.ConsoleApp
                 string assemblyPath = Path.Combine(binDirectory, assemblyName);
                 if (File.Exists(assemblyPath))
                 {
-                    Assembly.LoadFrom(assemblyPath);
+                    // Load by identity, not by path: a path load from an 8.3 short path would load a second copy alongside the reference load.
+                    var identity = AssemblyName.GetAssemblyName(assemblyPath);
+                    if (!AppDomain.CurrentDomain.GetAssemblies().Any(loaded => AssemblyName.ReferenceMatchesDefinition(identity, loaded.GetName())))
+                    {
+                        Assembly.Load(identity);
+                    }
                 }
                 else
                 {

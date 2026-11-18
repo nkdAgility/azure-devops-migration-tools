@@ -88,7 +88,7 @@ namespace MigrationTools.Host.Commands
                 {
                     CommandActivity.RecordException(ex);
                     TelemetryLogger.TrackException(ex, CommandActivity.Tags);
-                    _logger.LogError(ex, "Unhandled exception!");
+                    _logger.LogCommandFailure(context.Name, ex);
                     return -1;
                 }
                 finally

@@ -104,7 +104,7 @@ namespace MigrationTools.Host.Commands
             catch (Exception ex)
             {
                 Telemetery.TrackException(ex, null);
-                _logger.LogError(ex, "Unhandled exception!");
+                _logger.LogCommandFailure(context.Name, ex);
                 _exitCode = 1;
             }
             finally
