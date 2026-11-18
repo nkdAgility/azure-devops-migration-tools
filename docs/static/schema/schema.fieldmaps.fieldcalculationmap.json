@@ -40,7 +40,8 @@
     "parsingFallback": {
       "description": "Gets or sets the parsing fallback.",
       "type": "string",
-      "default": "RaiseError"
+      "default": "RaiseError",
+      "pattern": "^\\s*(?:[Rr][Aa][Ii][Ss][Ee][Ee][Rr][Rr][Oo][Rr]|[Rr][Ee][Ss][Ee][Tt][Tt][Oo][Zz][Ee][Rr][Oo]|\\+?0*0|\\+?0*1)\\s*$"
     },
     "targetField": {
       "description": "Gets or sets the target field reference name where the calculated result will be stored.",

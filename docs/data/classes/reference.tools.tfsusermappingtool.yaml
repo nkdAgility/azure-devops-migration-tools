@@ -59,6 +59,7 @@ configurationSamples:
       "UserMappingFile": "C:\\temp\\userExport.json",
       "MatchUsersByEmail": false,
       "StopIfMappingTargetsDoNotResolve": true,
+      "ValidateMappingTargets": "All",
       "ProjectCollectionValidUsersGroupName": "Project Collection Valid Users"
     }
   sampleFor: MigrationTools.Tools.TfsUserMappingToolOptions
@@ -146,6 +147,16 @@ options:
   defaultValue: C:\temp\userExport.json
   isRequired: false
   dotNetType: System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e
+- parameterName: ValidateMappingTargets
+  type: MappingTargetValidationScope
+  description: >-
+    Which targets in the UserMappingFile are resolved against the target identities at startup. All checks every mapping in the
+     file; Referenced checks only the mappings whose source user appears in an identity field of the work items being migrated;
+     Skip turns the check off. With Skip, a target that does not resolve is saved as plain text and StopIfMappingTargetsDoNotResolve
+     has no effect.
+  defaultValue: All
+  isRequired: false
+  dotNetType: MigrationTools.Tools.MappingTargetValidationScope, MigrationTools.Clients.TfsObjectModel, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 status: missing XML code comments
 processingTarget: missing XML code comments
 classFile: src/MigrationTools.Clients.TfsObjectModel/Tools/TfsUserMappingTool.cs

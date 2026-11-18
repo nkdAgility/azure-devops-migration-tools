@@ -540,6 +540,11 @@ namespace MigrationTools.ConsoleDataGenerator
                     return dictSchema;
                 }
 
+                if (t.IsEnum)
+                {
+                    return BuildEnumSchema(t, option.Description?.ToString());
+                }
+
                 // Simple
                 if (IsSimpleDotNetType(t))
                 {
@@ -561,6 +566,26 @@ namespace MigrationTools.ConsoleDataGenerator
             };
         }
 
+        /// <summary>
+        /// An enum is written as a string: its name in any case, or its number (for example "1"), which the configuration binder both
+        /// accepts. Anything else, such as a misspelt name, is rejected. JSON Schema has no case-insensitive enum, so names are matched
+        /// by a pattern with a character class per letter. A JSON number is not allowed, as before: JSON Schema cannot tell 1 from 1.0,
+        /// and the binder rejects 1.0.
+        /// </summary>
+        internal static JSchema BuildEnumSchema(Type enumType, string description)
+        {
+            var numbers = Enum.GetValues(enumType).Cast<object>().Select(v => Convert.ToInt64(v, CultureInfo.InvariantCulture)).Distinct();
+            var alternatives = Enum.GetNames(enumType).Select(CaseInsensitivePattern)
+                .Concat(numbers.Select(n => n < 0
+                    ? "-0*" + (-n).ToString(CultureInfo.InvariantCulture)
+                    : "\\+?0*" + n.ToString(CultureInfo.InvariantCulture)));
+            // Enum.Parse ignores surrounding white space, so the pattern does too.
+            return new JSchema { Type = JSchemaType.String, Description = description, Pattern = "^\\s*(?:" + string.Join("|", alternatives) + ")\\s*$" };
+        }
+
+        private static string CaseInsensitivePattern(string name) =>
+            string.Concat(name.Select(c => char.IsLetter(c) ? $"[{char.ToUpperInvariant(c)}{char.ToLowerInvariant(c)}]" : System.Text.RegularExpressions.Regex.Escape(c.ToString())));
+
         private static JSchema BuildSchemaForType(Type t)
         {
             if (Nullable.GetUnderlyingType(t) is Type underlying)
@@ -568,6 +593,10 @@ namespace MigrationTools.ConsoleDataGenerator
                 t = underlying;
             }
 
+            if (t.IsEnum)
+            {
+                return BuildEnumSchema(t, null);
+            }
             if (IsSimpleDotNetType(t))
             {
                 return new JSchema { Type = GetJsonSchemaType(t.Name) };

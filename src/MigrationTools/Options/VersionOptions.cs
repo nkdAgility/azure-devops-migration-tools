@@ -112,6 +112,11 @@ namespace MigrationTools.Options
                 var selectedSchema = configJson["$schema"]?.ToString();
 
                 var schema = LoadConfigurationSchema();
+                if (schema == null)
+                {
+                    Log.Warning("The configuration schema was not found next to the tool, so '{ConfigFile}' was not checked against it.", configFile);
+                    return true;
+                }
                 // Validate the configuration against the schema
                 IList<ValidationError>  validationErrors;
                 bool isValid = configJson.IsValid(schema, out validationErrors);

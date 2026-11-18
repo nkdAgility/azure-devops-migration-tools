@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -45,9 +45,48 @@ namespace MigrationTools.Host
             return desc.Select(s => provider.GetRequiredService(s.ServiceType)).OfType<T>();
         }
 
+        /// <summary>
+        /// The host binds and validates every option when it starts, so a value the binder cannot convert (for example a misspelt
+        /// enum name) would stop the run with an unhandled exception before the execute command checks the file against the schema.
+        /// For execute, the check therefore runs here, before the host is built, and reports what is wrong in the file.
+        /// Other commands (init, upgrade, builder) work on files that may be old or incomplete, so they are not checked here.
+        /// </summary>
+        public static bool IsExecutableConfigSchemaValid(string[] args, string configFile)
+        {
+            // The command is the first argument; a later "execute" may be an option's value.
+            if (!string.Equals((args ?? []).FirstOrDefault(), "execute", StringComparison.OrdinalIgnoreCase)
+                || string.IsNullOrEmpty(configFile) || !File.Exists(configFile))
+            {
+                return true;
+            }
+            var previous = Log.Logger;
+            using var bootstrap = new LoggerConfiguration()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}")
+                .CreateLogger();
+            Log.Logger = bootstrap;
+            try
+            {
+                return VersionOptions.ConfigureOptions.IsConfigSchemaValid(configFile);
+            }
+            catch (Newtonsoft.Json.JsonReaderException ex)
+            {
+                Log.Error("Configuration file '{ConfigFile}' is not valid JSON: {Reason} Correct the file and run again.", configFile, ex.Message);
+                return false;
+            }
+            finally
+            {
+                Log.Logger = previous;
+            }
+        }
+
         public static IHostBuilder CreateDefaultBuilder(string[] args, Action<IConfigurator> extraCommands = null)
         {
             var configFile = CommandSettingsBase.ForceGetConfigFile(args);
+            if (!IsExecutableConfigSchemaValid(args, configFile))
+            {
+                Environment.ExitCode = -1;
+                return null;
+            }
             var mtv = new MigrationToolVersion();
 
             LogLocationService.SetBasePath(CommandSettingsBase.ForceGetLogPath(args));
