@@ -35,6 +35,12 @@ The tool integrates with work item migration processors to ensure content integr
 
 User mentions (`@Display Name` links) in HTML and History fields are re-pointed at the matching identity in the target collection. When the [TFS User Mapping Tool](/docs/reference/tools/tfs-user-mapping-tool/) is enabled, the mentioned name is first looked up in its `UserMappingFile` (matching source display names or account names case-insensitively), using the same lookup as identity fields, including `Display Name <upn>` keys. A `Display Name <upn>` target is matched against target identities by unique name only, so users who share a display name are not confused; a plain target is matched by display name and then by unique name. The dictionary format works by default; an `IdentityMapData` array file is only read when `UseIdentityMapDataFormat` is also set to `true` on the User Mapping Tool. Mentions without a mapping are matched by their original display name exactly, as before, and mentions that cannot be matched are left unchanged.
 
+### HTML Is Normalised by Azure DevOps
+
+Azure DevOps rewrites HTML when a work item is saved, so a Description or other HTML field can be stored differently from what was sent. Seen on Azure DevOps Services (#3273): characters outside the Basic Multilingual Plane (most emoji, Osage, CJK Extension B) are stored as numeric entities such as `&#128512;`, `&#39;` becomes `'`, `&copy;` becomes `©`, a space is added before closing tags, and `style="color:red"` becomes `style="color:red;"`. The same happens with bypass rules on. A migrated value therefore matches the stored source value, but its length is not a reliable check on its own: compare the values. Apart from that, the only differences the migration makes are the intended ones: embedded images point at the target attachment, and work item mentions point at the target organisation, project and id, so the length changes with those names and ids. A mention of a work item that can't be found in the target is replaced by its text, with a warning.
+
+The [String Manipulator Tool](/docs/reference/tools/string-manipulator-tool/) does not change HTML fields: it applies only to plain String fields.
+
 `IdentityFieldsToCheck` only restricts which identity *fields* the User Mapping Tool rewrites; it does not limit mention mapping.
 
 ### Use Cases

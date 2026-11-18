@@ -163,7 +163,6 @@ namespace MigrationTools.Clients
                 {
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
-                    ActivitySourceProvider.FlushTelemetery();
                     throw;
                 }
                 catch (Exception ex)
@@ -171,7 +170,6 @@ namespace MigrationTools.Clients
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     Log.Error(ex, "The project `{ConfiguredProjectName}` does not exist in the collection. Please fix to continue.", Options.Project);
-                    ActivitySourceProvider.FlushTelemetery();
                     throw new MigrationRunStoppedException("The configured project does not exist in the collection.", ex);
                 }
                 return y?.ToProjectData();
@@ -245,15 +243,37 @@ namespace MigrationTools.Clients
                 {
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
-                    Telemetry.TrackException(ex, activity.Tags);
+                    Telemetry.TrackException(ex, activity?.Tags);
                     Log.Error(ex, "Unable to GetWorkItem with id[{id}]", id);
                     if (stopOnError)
                     {
-                        ActivitySourceProvider.FlushTelemetery();
-                        throw new MigrationRunStoppedException("Unable to get work item.");
+                        throw new MigrationRunStoppedException("Unable to get work item.", ex);
                     }
                 }
                 return y?.AsWorkItemData();
+            }
+        }
+
+        /// <summary>
+        /// Gets a work item, or returns null when the server reports that it does not exist or that the
+        /// migration identity cannot read it (TF26198, <see cref="DeniedOrNotExistException"/>).
+        /// Any other error is thrown, so it is not mistaken for a missing work item.
+        /// </summary>
+        public WorkItemData GetWorkItemIfExists(int id)
+        {
+            return GetIfExists(id, i => Store.GetWorkItem(i)?.AsWorkItemData());
+        }
+
+        internal static WorkItemData GetIfExists(int id, Func<int, WorkItemData> load)
+        {
+            try
+            {
+                return load(id);
+            }
+            catch (DeniedOrNotExistException ex)
+            {
+                Log.Debug(ex, "TfsWorkItemMigrationClient::GetWorkItemIfExists({id}): denied or does not exist", id);
+                return null;
             }
         }
 
@@ -395,7 +415,6 @@ namespace MigrationTools.Clients
                     activity?.SetStatus(ActivityStatusCode.Error);
                     Telemetry.TrackException(ex, activity.Tags);
                     Log.Fatal(ex, "Unable to configure store");
-                    ActivitySourceProvider.FlushTelemetery();
                     throw new MigrationRunStoppedException("Unable to configure work item store.");
                 }
                 return store;

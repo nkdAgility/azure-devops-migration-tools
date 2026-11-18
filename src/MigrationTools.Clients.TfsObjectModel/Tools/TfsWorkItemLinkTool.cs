@@ -289,7 +289,7 @@ namespace MigrationTools.Tools
             {
                 try
                 {
-                    wiSourceR = processor.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                    wiSourceR = ((TfsWorkItemMigrationClient)processor.Source.WorkItems).GetWorkItemIfExists(rl.RelatedWorkItemId);
                 }
                 catch (MigrationRunStoppedException)
                 {
@@ -299,6 +299,11 @@ namespace MigrationTools.Tools
                 {
                     Telemetry.TrackException(ex, null);
                     Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                    return;
+                }
+                if (wiSourceR == null)
+                {
+                    Log.LogWarning("  [SKIP] Link of type {LinkType} from source {SourceId} to {RelatedId} not migrated: work item {RelatedId} does not exist in the source or the migration identity cannot read it (TF26198).", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, rl.RelatedWorkItemId, rl.RelatedWorkItemId);
                     return;
                 }
                 try
@@ -472,7 +477,7 @@ namespace MigrationTools.Tools
                     }
                     else if (sourceLink is RelatedLink rl && rl.LinkTypeEnd != null)
                     {
-                        var wiSourceR = processor.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                        var wiSourceR = ((TfsWorkItemMigrationClient)processor.Source.WorkItems).GetWorkItemIfExists(rl.RelatedWorkItemId);
                         var wiTargetR = wiSourceR == null ? null : GetRightHandSideTargetWi(processor, wiSourceR, target);
                         if (wiTargetR != null)
                         {
