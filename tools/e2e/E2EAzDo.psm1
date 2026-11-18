@@ -165,7 +165,7 @@ function New-E2EAttachment([string]$FileName, [byte[]]$Bytes, [string]$Org = $sc
 function Get-E2EAttachmentBytes([string]$Url) {
     $u = [Uri]$Url
     $org = $u.AbsolutePath.Trim('/').Split('/')[0]
-    if ($u.Host -ne "dev.azure.com" -or $script:AllowedOrgs -notcontains $org -or $u.AbsolutePath -notmatch '/_apis/wit/attachments/[0-9a-fA-F-]{36}$') { throw "Not an attachment url in a test organisation: $Url" }
+    if ($u.Scheme -ne "https" -or $u.Host -ne "dev.azure.com" -or $script:AllowedOrgs -notcontains $org -or $u.AbsolutePath -notmatch '/_apis/wit/attachments/[0-9a-fA-F-]{36}$') { throw "Not an attachment url in a test organisation: $Url" }
     if (-not $script:Headers) { Initialize-E2E }
     $sep = if ($u.Query) { "&" } else { "?" }
     $response = Invoke-WebRequest -Uri "$($u.GetLeftPart([UriPartial]::Query))$sep`api-version=7.1" -Headers $script:Headers
