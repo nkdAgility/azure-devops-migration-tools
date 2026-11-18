@@ -26,7 +26,7 @@
       }
     },
     "FilterWorkItemsThatAlreadyExistInTarget": {
-      "description": "This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.\r\n While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.",
+      "description": "Ignored by the work item migration processor, which logs a warning when it is true (#3270). Work items already in\r\n the target are no longer skipped: every run checks their migrated revisions against the source, so revisions saved\r\n with wrong state-stamped values are reported instead of being skipped as migrated.",
       "type": "boolean",
       "default": false
     },
