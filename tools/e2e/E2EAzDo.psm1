@@ -161,10 +161,14 @@ function New-E2EAttachment([string]$FileName, [byte[]]$Bytes, [string]$Org = $sc
 }
 
 # Invoke-RestMethod decodes a binary response as text, so attachment bytes are read with Invoke-WebRequest.
-function Get-E2EAttachmentBytes([string]$Id, [string]$Org = $script:DefaultOrg) {
-    if ($script:AllowedOrgs -notcontains $Org) { throw "Organisation '$Org' is not a test organisation." }
+# Takes the attachment url as it appears in a work item, so the project segment (when present) is part of the request.
+function Get-E2EAttachmentBytes([string]$Url) {
+    $u = [Uri]$Url
+    $org = $u.AbsolutePath.Trim('/').Split('/')[0]
+    if ($u.Host -ne "dev.azure.com" -or $script:AllowedOrgs -notcontains $org -or $u.AbsolutePath -notmatch '/_apis/wit/attachments/[0-9a-fA-F-]{36}$') { throw "Not an attachment url in a test organisation: $Url" }
     if (-not $script:Headers) { Initialize-E2E }
-    $response = Invoke-WebRequest -Uri "https://dev.azure.com/$Org/_apis/wit/attachments/$([Uri]::EscapeDataString($Id))?api-version=7.1" -Headers $script:Headers
+    $sep = if ($u.Query) { "&" } else { "?" }
+    $response = Invoke-WebRequest -Uri "$($u.GetLeftPart([UriPartial]::Query))$sep`api-version=7.1" -Headers $script:Headers
     [byte[]]$response.RawContentStream.ToArray()
 }
 

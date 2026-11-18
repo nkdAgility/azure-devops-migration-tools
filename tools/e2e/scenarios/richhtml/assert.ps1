@@ -31,7 +31,7 @@ $targetImg = [regex]::Match($target, $attachment)
 $imageOk = $false
 $imageEvidence = "target img: $($targetImg.Value)"
 if ($targetImg.Success -and $targetImg.Groups[1].Value -eq 'target') {
-    try { $got = Get-E2EAttachmentBytes $targetImg.Groups['id'].Value -Org nkdagility-adomt-target }
+    try { $got = Get-E2EAttachmentBytes ([System.Net.WebUtility]::HtmlDecode($targetImg.Value)) }
     catch { $got = $null; $imageEvidence += "; download failed: $($_.Exception.Message)" }
     $want = [Convert]::FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
     $imageOk = $null -ne $got -and [Linq.Enumerable]::SequenceEqual([byte[]]$got, [byte[]]$want)
