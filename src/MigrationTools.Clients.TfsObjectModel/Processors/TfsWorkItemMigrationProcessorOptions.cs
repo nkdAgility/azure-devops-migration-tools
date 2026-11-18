@@ -73,8 +73,7 @@ namespace MigrationTools.Processors
         /// such link: if the source URL has changed, the old migration hyperlink is replaced. The exception is decided by location:
         /// a stale migration hyperlink is kept whenever the source work item has a hyperlink at that same URL, whatever its
         /// comment, so the target can then have two. If the target already has a hyperlink to the source URL with a different
-        /// comment, it counts as present and is neither duplicated nor changed; this is how it was built and Martin has not
-        /// approved it yet.
+        /// comment, it counts as present and is neither duplicated nor changed.
         /// </summary>
         /// <default>true</default>
         [DefaultValue(true)]
