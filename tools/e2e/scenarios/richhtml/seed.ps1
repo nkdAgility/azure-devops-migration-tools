@@ -2,8 +2,12 @@
 # richhtml: #3273. A Description with entities, emoji, supplementary-plane letters, links, a work item mention and an
 # embedded image must arrive exactly, apart from the rewrites the migration is meant to make (attachment url,
 # mention id, organisation and project). The body is sent as ASCII-escaped JSON so no character depends on encoding.
-param([string]$Src = "amte2e-3271b-html-src", [string]$Tgt = "amte2e-3271b-html-tgt", [string]$Process = "amte2e-agile")
+param([string]$Process = "amte2e-agile")
 $ErrorActionPreference = "Stop"
+$cfg = Get-Content (Join-Path $PSScriptRoot "config.json") -Raw | ConvertFrom-Json
+# Project names come from the scenario config, so the seed, the migration and the assertions always agree.
+$Src = $cfg.MigrationTools.Endpoints.Source.Project
+$Tgt = $cfg.MigrationTools.Endpoints.Target.Project
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 

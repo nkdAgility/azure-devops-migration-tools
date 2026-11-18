@@ -1,8 +1,12 @@
 #Requires -Version 7.0
 # linkscope assertions: A and B are migrated, A keeps its Related link to B, and the links to X (unreadable, TF26198) and O
 # (outside the query) are skipped. The run log must report both skips; the caller checks it and the exit code.
-param([string]$Src = "amte2e-3271b-lnk-src", [string]$Tgt = "amte2e-3271b-lnk-tgt", [string]$OutFile, [Parameter(Mandatory)][string]$LogDirectory)
+param([string]$OutFile, [Parameter(Mandatory)][string]$LogDirectory)
 $ErrorActionPreference = "Stop"
+$cfg = Get-Content (Join-Path $PSScriptRoot "config.json") -Raw | ConvertFrom-Json
+# Project names come from the scenario config, so the seed, the migration and the assertions always agree.
+$Src = $cfg.MigrationTools.Endpoints.Source.Project
+$Tgt = $cfg.MigrationTools.Endpoints.Target.Project
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force

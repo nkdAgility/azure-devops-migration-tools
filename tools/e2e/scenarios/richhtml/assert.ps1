@@ -1,8 +1,12 @@
 #Requires -Version 7.0
 # richhtml assertions: the target Description equals the source Description character for character, once the
 # rewrites the migration is meant to make are reversed (attachment url, mention id, organisation and project).
-param([string]$Src = "amte2e-3271b-html-src", [string]$Tgt = "amte2e-3271b-html-tgt", [string]$OutFile)
+param([string]$OutFile)
 $ErrorActionPreference = "Stop"
+$cfg = Get-Content (Join-Path $PSScriptRoot "config.json") -Raw | ConvertFrom-Json
+# Project names come from the scenario config, so the seed, the migration and the assertions always agree.
+$Src = $cfg.MigrationTools.Endpoints.Source.Project
+$Tgt = $cfg.MigrationTools.Endpoints.Target.Project
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
@@ -25,12 +29,14 @@ $sourceImg = [regex]::Match($source, $attachment).Value
 $targetImg = [regex]::Match($target, $attachment)
 # The target image must be a target attachment that serves the seeded bytes, not just any url.
 $imageOk = $false
+$imageEvidence = "target img: $($targetImg.Value)"
 if ($targetImg.Success -and $targetImg.Groups[1].Value -eq 'target') {
-    $got = Get-E2EAttachmentBytes $targetImg.Groups['id'].Value -Org nkdagility-adomt-target
+    try { $got = Get-E2EAttachmentBytes $targetImg.Groups['id'].Value -Org nkdagility-adomt-target }
+    catch { $got = $null; $imageEvidence += "; download failed: $($_.Exception.Message)" }
     $want = [Convert]::FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
-    $imageOk = [Linq.Enumerable]::SequenceEqual([byte[]]$got, [byte[]]$want)
+    $imageOk = $null -ne $got -and [Linq.Enumerable]::SequenceEqual([byte[]]$got, [byte[]]$want)
 }
-$r += New-E2EResult "image is a target attachment with the seeded bytes" $imageOk "target img: $($targetImg.Value)"
+$r += New-E2EResult "image is a target attachment with the seeded bytes" $imageOk $imageEvidence
 $mentionUrl = "https://dev.azure.com/nkdagility-adomt-target/$Tgt/_workitems/edit/$($other.id)/"
 $r += New-E2EResult "mention points at the target organisation, project and item" ($target.Contains("href=""$mentionUrl""")) $mentionUrl
 

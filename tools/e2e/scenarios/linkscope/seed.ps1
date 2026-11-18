@@ -4,8 +4,14 @@
 # to X, an item in a project that is then deleted. The link to X stays on A, but loading X fails with TF26198
 # (DeniedOrNotExistException), as it does for a target the migration identity cannot read.
 # Deleting a work item is not enough: Azure DevOps removes its links from the other items.
-param([string]$Src = "amte2e-3271b-lnk-src", [string]$Tgt = "amte2e-3271b-lnk-tgt", [string]$FailTgt = "amte2e-3271b-lnkfail-tgt", [string]$Gone = "amte2e-3271b-lnk-gone", [string]$Process = "amte2e-agile", [string]$NoBugProcess = "amte2e-nobug")
+param([string]$Process = "amte2e-agile", [string]$NoBugProcess = "amte2e-nobug")
 $ErrorActionPreference = "Stop"
+$cfg = Get-Content (Join-Path $PSScriptRoot "config.json") -Raw | ConvertFrom-Json
+# Project names come from the scenario config, so the seed, the migration and the assertions always agree.
+$Src = $cfg.MigrationTools.Endpoints.Source.Project
+$Tgt = $cfg.MigrationTools.Endpoints.Target.Project
+$FailTgt = (Get-Content (Join-Path $PSScriptRoot "config-fail.json") -Raw | ConvertFrom-Json).MigrationTools.Endpoints.Target.Project
+$Gone = $Src -replace '-src$', '-gone'
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 
