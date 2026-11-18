@@ -47,7 +47,7 @@ namespace MigrationTools.Processors
             if (reason.Contains("TF237111") || reason.Contains("TF237165") || reason.Contains("TF401289") || reason.IndexOf("permission", StringComparison.OrdinalIgnoreCase) >= 0)
                 return "grant the migration identity permission to edit work items in the target area and iteration paths, and 'Bypass rules on work item updates'.";
             if (reason.Contains("state-stamped") || reason.Contains("stamped instead of the source"))
-                return "give the migration identity 'Bypass rules on work item updates' in the target project, check no target process rule sets these fields, and migrate the work item again.";
+                return "give the migration identity 'Bypass rules on work item updates' in the target project and check no target process rule sets these fields. If the target work item was saved, delete it and run the migration again: a rerun treats its saved revisions as migrated and does not correct them.";
             return "check the reason above against the target project and process. Run with Serilog MinimumLevel 'Debug' for the full details.";
         }
     }

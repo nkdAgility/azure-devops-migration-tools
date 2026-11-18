@@ -16,30 +16,47 @@ function V($rev, [string]$f) {
     if ($f -like "*Date") { return ([datetime]$v).ToUniversalTime().ToString("o") }
     "$v"
 }
-function K($rev) { ([datetime]$rev.fields.'System.ChangedDate').ToUniversalTime().ToString("o") }
+function T($rev) { ([datetime]$rev.fields.'System.ChangedDate').ToUniversalTime() }
+function K($rev) { (T $rev).ToString("o") }
+function Compare-Rev($sr, $tr, [string[]]$names, [string]$label) {
+    foreach ($f in $names) {
+        $sv = V $sr $f; $tv = V $tr $f
+        # Ordinal, as the processor compares: PowerShell's -ne ignores case.
+        if (-not [string]::Equals($sv, $tv, [StringComparison]::Ordinal)) { "src rev $($sr.rev)/tgt rev $($tr.rev)$label $($f -replace '^.*\.',''): src '$sv' tgt '$tv'" }
+    }
+}
+$stamped = $fields | Where-Object { $_ -notin "System.State", "System.Reason" }
 $r = @()
-foreach ($k in "s1", "s2", "s3", "s4", "s5") {
+# The source kept the seeded identity, so a target showing the migration account cannot pass by matching a source that does too.
+foreach ($k in "s1", "s2", "s3", "s6") {
+    $act = @(Get-E2ERevisions $s.$k -Org nkdagility-adomt-source) | Where-Object { $_.fields.'Microsoft.VSTS.Common.ActivatedBy' } | Select-Object -First 1
+    $by = if ($act) { $act.fields.'Microsoft.VSTS.Common.ActivatedBy'.displayName } else { "" }
+    $r += New-E2EResult "$k source ActivatedBy is the seeded identity" ($by -ceq $s.ghost -or $by -ceq ($s.ghost -replace ' <.*$', '')) "'$by'"
+}
+foreach ($k in "s1", "s2", "s3", "s4", "s5", "s6") {
     $id = $s.$k
     $t = Find-E2ETargetItem $Tgt $id -Org nkdagility-adomt-target
     if (-not $t) { $r += New-E2EResult "$k src #$id migrated" $false "no target item"; continue }
     $sRevs = @(Get-E2ERevisions $id -Org nkdagility-adomt-source)
     $tRevs = @(Get-E2ERevisions $t.id -Org nkdagility-adomt-target)
-    # The first target revision with a ChangedDate is the save that replayed it; a later one with the same date is a fix-up.
-    $tByDate = @{}; foreach ($tr in $tRevs) { if (-not $tByDate.ContainsKey((K $tr))) { $tByDate[(K $tr)] = $tr } }
-    $bad = @()
+    # Match in order, each target revision used once. A type change is replayed as a REST save dated 3 ms before the
+    # source revision, then the object-model save at the source date; both must carry the source's stamped values.
+    $bad = @(); $extra = @(); $typeChange = 0; $i = 0
     foreach ($sr in $sRevs) {
-        $tr = $tByDate[(K $sr)]
-        if (-not $tr) { $bad += "src rev $($sr.rev) $(K $sr): no target revision"; continue }
-        foreach ($f in $fields) {
-            $sv = V $sr $f; $tv = V $tr $f
-            if ($sv -ne $tv) { $bad += "src rev $($sr.rev)/tgt rev $($tr.rev) $($f -replace '^.*\.',''): src '$sv' tgt '$tv'" }
+        while ($i -lt $tRevs.Count -and (T $tRevs[$i]) -lt (T $sr)) {
+            $tr = $tRevs[$i]
+            if (((T $sr) - (T $tr)).TotalMilliseconds -le 10 -and $tr.fields.'System.WorkItemType' -eq $sr.fields.'System.WorkItemType') {
+                $typeChange++; $bad += @(Compare-Rev $sr $tr $stamped " (type change)")
+            } else { $extra += $tr }
+            $i++
         }
+        if ($i -ge $tRevs.Count -or (K $tRevs[$i]) -ne (K $sr)) { $bad += "src rev $($sr.rev) $(K $sr): no target revision"; continue }
+        $bad += @(Compare-Rev $sr $tRevs[$i] $fields ""); $i++
     }
-    $r += New-E2EResult "$k src #$id -> tgt #$($t.id) every revision: state, reason, dates, By fields" ($bad.Count -eq 0) $(if ($bad) { $bad -join "; " } else { "$($sRevs.Count) revisions match" })
-    $sKeys = @($sRevs | ForEach-Object { K $_ })
-    $extra = @($tRevs | Where-Object { $sKeys -notcontains (K $_) -or $tByDate[(K $_)].rev -ne $_.rev })
-    $r += New-E2EResult "$k tgt #$($t.id) no extra (fix-up) revisions" ($extra.Count -eq 0) $(if ($extra) { ($extra | ForEach-Object { "rev $($_.rev) $(K $_)" }) -join "; " } else { "$($tRevs.Count) target = $($sRevs.Count) source" })
-    $r += New-E2EResult "$k final state" ((V $sRevs[-1] "System.State") -eq (V $tRevs[-1] "System.State")) "src '$(V $sRevs[-1] 'System.State')' tgt '$(V $tRevs[-1] 'System.State')'"
+    $extra += @($tRevs | Select-Object -Skip $i)
+    $r += New-E2EResult "$k src #$id -> tgt #$($t.id) every revision: state, reason, dates, By fields" ($bad.Count -eq 0) $(if ($bad) { $bad -join "; " } else { "$($sRevs.Count) revisions match" + $(if ($typeChange) { ", plus $typeChange type-change save(s)" } else { "" }) })
+    $r += New-E2EResult "$k tgt #$($t.id) no extra (fix-up) revisions" ($extra.Count -eq 0 -and $tRevs.Count -eq $sRevs.Count + $typeChange) $(if ($extra) { ($extra | ForEach-Object { "rev $($_.rev) $(K $_)" }) -join "; " } else { "$($tRevs.Count) target = $($sRevs.Count) source + $typeChange type change" })
+    $r += New-E2EResult "$k final state" ((V $sRevs[-1] "System.State") -ceq (V $tRevs[-1] "System.State")) "src '$(V $sRevs[-1] 'System.State')' tgt '$(V $tRevs[-1] 'System.State')'"
 }
 $tgtItems = @(Get-E2EAllWorkItems $Tgt -Org nkdagility-adomt-target)
 $srcItems = @(Get-E2EAllWorkItems $Src -Org nkdagility-adomt-source)

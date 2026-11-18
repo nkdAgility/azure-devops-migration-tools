@@ -58,6 +58,13 @@ Set-PlainState $s4.id "Active"; Set-PlainState $s4.id "Resolved"; Set-PlainState
 $s5 = Set-E2EWorkItem $Src "Bug" -Fields ([ordered]@{ "System.Title" = "3270 S5 server-stamped reactivated" })
 Set-PlainState $s5.id "Active"; Set-PlainState $s5.id "Resolved"; Set-PlainState $s5.id "Closed"; Set-PlainState $s5.id "Active"
 
-Save-E2EState $PSScriptRoot @{ s1 = $s1.id; s2 = $s2.id; s3 = $s3.id; s4 = $s4.id; s5 = $s5.id; ghost = $ghost }
-"seeded statefields3270: S1 $($s1.id) S2 $($s2.id) S3 $($s3.id) S4 $($s4.id) S5 $($s5.id)"
+# S6 (type change): Bug activated by another user, then changed to User Story and closed in the same revision. The target
+# replays that revision with a REST type change first, which must carry the source's stamped values too.
+$s6 = Set-E2EWorkItem $Src "Bug" -Fields ([ordered]@{ "System.Title" = "3270 S6 type change and close" })
+Set-State $s6.id "Active" (& $act "2026-09-15T09:00:00Z")
+$tc = & $clo "2026-09-16T09:00:00Z"; $tc["System.WorkItemType"] = "User Story"
+Set-State $s6.id "Closed" $tc
+
+Save-E2EState $PSScriptRoot @{ s1 = $s1.id; s2 = $s2.id; s3 = $s3.id; s4 = $s4.id; s5 = $s5.id; s6 = $s6.id; ghost = $ghost }
+"seeded statefields3270: S1 $($s1.id) S2 $($s2.id) S3 $($s3.id) S4 $($s4.id) S5 $($s5.id) S6 $($s6.id)"
 

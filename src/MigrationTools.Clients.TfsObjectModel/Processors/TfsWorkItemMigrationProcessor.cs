@@ -1241,7 +1241,21 @@ namespace MigrationTools.Processors
                             Value = currentRevisionWorkItem.Fields["System.ChangedBy"].Value.ToString()
                         }
                         );
+                        // The type change commits the new state, so it must carry the source's state-stamped values too (#3270).
+                        var typeChangeStamps = GetStateStampedTargetValues(currentRevisionWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem());
+                        foreach (var (field, value, _) in typeChangeStamps)
+                        {
+                            patchDocument.Add(new JsonPatchOperation()
+                            {
+                                Operation = Operation.Add,
+                                Path = "/fields/" + field,
+                                // An empty string clears the field; the client refuses a null value.
+                                Value = value is DateTime d ? (object)ObjectModelFieldWriter.ToInternalDate(d) : value ?? ""
+                            });
+                        }
                         var result = workItemTrackingClient.UpdateWorkItemAsync(patchDocument, workItemId, bypassRules: true).Result;
+                        VerifyStateStampedFieldsSaved(result.Rev ?? 0,
+                            f => result.Fields.TryGetValue(f, out var v) ? StateStampedFields.FromRest(v) : null, typeChangeStamps);
                         targetWorkItem = Target.WorkItems.GetWorkItem(workItemId);
                     }
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
@@ -1299,14 +1313,13 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    // Last before the save, after field maps: the save that changes state must carry the source values (#3270).
-                    var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem);
-                    CheckClosedDateIsValid(currentRevisionWorkItem, targetWorkItem);
-
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
+                        // Last before the save, after field maps: the save that changes state must carry the source values (#3270).
+                        var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem);
                         targetWorkItem.SaveToAzureDevOps();
-                        VerifyStateStampedFieldsSaved(currentRevisionWorkItem, targetWorkItem, stampedFields);
+                        var saved = targetWorkItem.ToWorkItem();
+                        VerifyStateStampedFieldsSaved(saved.Rev, f => saved.Fields[f].Value, stampedFields);
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (CommonTools.WorkItemLink.Enabled && CommonTools.WorkItemLink.HasDeferredLinks)
                         {
@@ -1361,61 +1374,86 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Sets every state-stamped date and By field on the target to the source revision's value (By fields through the
-        /// user mapping), immediately before the save (#3270). In a revision that changes state the service would otherwise
-        /// stamp the server clock and the migration identity, and nothing can correct them after the save. A field the
-        /// object model has made read-only for the state change is set below its client-side check
-        /// (<see cref="ObjectModelFieldWriter"/>); the service keeps the value because the store bypasses rules.
-        /// Returns the (target field, expected value) pairs, checked again after the save. Throws, so the work item fails
-        /// clearly, if a value cannot be set.
+        /// The value each state-stamped field on the target must have after saving <paramref name="source"/>: the source
+        /// value (By fields through the user mapping), or empty when the source has none. When the source work item type
+        /// has no such field, a value a field map set in this revision is kept; otherwise the field must be empty, so the
+        /// service cannot leave its own stamp there unnoticed (#3270).
         /// </summary>
-        private List<(string Field, object Expected)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        private List<(string Field, object Expected, bool IsIdentity)> GetStateStampedTargetValues(WorkItem source, WorkItem target)
         {
-            var source = sourceRevision.ToWorkItem();
-            var target = targetWorkItem.ToWorkItem();
-            var pairs = new List<(string TargetField, string SourceField)>();
+            var targetFields = new List<string>();
             var closedTarget = GetClosedDateField(target);
-            if (closedTarget != null)
-            {
-                var closedSource = source.Fields.Contains(closedTarget) ? closedTarget : GetClosedDateField(source);
-                if (closedSource != null) pairs.Add((closedTarget, closedSource));
-            }
-            foreach (var field in StateStampedFields.Fields)
-            {
-                if (target.Fields.Contains(field) && source.Fields.Contains(field)) pairs.Add((field, field));
-            }
+            if (closedTarget != null) targetFields.Add(closedTarget);
+            targetFields.AddRange(StateStampedFields.Fields.Where(f => target.Fields.Contains(f)));
 
-            var expected = new List<(string Field, object Expected)>();
-            foreach (var (targetField, sourceField) in pairs)
+            var values = new List<(string Field, object Expected, bool IsIdentity)>();
+            foreach (var targetField in targetFields)
             {
                 var field = target.Fields[targetField];
-                var value = source.Fields[sourceField].Value;
-                if (field.FieldDefinition.IsIdentity)
+                var isIdentity = field.FieldDefinition.IsIdentity;
+                var sourceField = source.Fields.Contains(targetField) ? targetField
+                    : targetField == closedTarget ? GetClosedDateField(source) : null;
+                object value;
+                if (sourceField == null)
                 {
-                    value = CommonTools.UserMapping.MapUserIdentityValue(targetField, value);
-                }
-                if (StateStampedFields.IsEmpty(value)) value = null;
-                expected.Add((targetField, value));
-                var before = field.Value;
-                if (field.IsEditable)
-                {
-                    if (StateStampedFields.SameValue(value, field.Value)) continue;
-                    try
-                    {
-                        field.Value = value;
-                    }
-                    catch (Exception ex) when (StateStampedFields.IsFieldCannotBeChangedError(ex))
-                    {
-                        ObjectModelFieldWriter.SetBelowClientRules(target, targetField, value);
-                    }
+                    value = field.IsChangedByUser ? field.Value : null;
+                    Log.LogDebug("State-stamped field {Field} is not on source type {SourceType}; the target keeps {Value} ({Origin}).",
+                        targetField, source.Type.Name, value, field.IsChangedByUser ? "set by a field map" : "empty");
                 }
                 else
                 {
-                    // Read-only here means a state change made the object model leave the field to the service, which
-                    // then stamps it even when it looks empty in memory. Setting it explicitly, empty included, stops that.
-                    ObjectModelFieldWriter.SetBelowClientRules(target, targetField, value);
+                    value = source.Fields[sourceField].Value;
+                    if (isIdentity) value = CommonTools.UserMapping.MapUserIdentityValue(targetField, value);
                 }
-                if (!StateStampedFields.SameValue(value, target.Fields[targetField].Value))
+                values.Add((targetField, StateStampedFields.IsEmpty(value) ? null : value, isIdentity));
+            }
+            return values;
+        }
+
+        /// <summary>
+        /// Sets every state-stamped date and By field on the target to the value it must have (see
+        /// <see cref="GetStateStampedTargetValues"/>), immediately before the save (#3270). In a revision that changes
+        /// state the service would otherwise stamp the server clock and the migration identity, and nothing can correct
+        /// them after the save. A field the object model has made read-only for the state change is set below its
+        /// client-side check (<see cref="ObjectModelFieldWriter"/>); the service keeps the value because the store
+        /// bypasses rules. Returns the values, checked again after the save. Throws, so the work item fails clearly, if a
+        /// value cannot be set.
+        /// </summary>
+        private List<(string Field, object Expected, bool IsIdentity)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        {
+            var source = sourceRevision.ToWorkItem();
+            var target = targetWorkItem.ToWorkItem();
+            var expected = GetStateStampedTargetValues(source, target);
+            foreach (var (targetField, value, isIdentity) in expected)
+            {
+                var field = target.Fields[targetField];
+                var before = field.Value;
+                try
+                {
+                    if (field.IsEditable)
+                    {
+                        if (StateStampedFields.SameValue(value, field.Value, isIdentity)) continue;
+                        try
+                        {
+                            field.Value = value;
+                        }
+                        catch (Exception ex) when (StateStampedFields.IsFieldCannotBeChangedError(ex))
+                        {
+                            ObjectModelFieldWriter.SetBelowClientRules(target, targetField, value);
+                        }
+                    }
+                    else
+                    {
+                        // Read-only here means a state change made the object model leave the field to the service, which
+                        // then stamps it even when it looks empty in memory. Setting it explicitly, empty included, stops that.
+                        ObjectModelFieldWriter.SetBelowClientRules(target, targetField, value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"the state-stamped field {targetField} could not be set to the source value '{value}' before the save: {WorkItemMigrationFailedException.ServerReason(ex)}", ex);
+                }
+                if (!StateStampedFields.SameValue(value, target.Fields[targetField].Value, isIdentity))
                 {
                     throw new InvalidOperationException($"the state-stamped field {targetField} could not be set to the source value '{value}' before the save (the object model kept '{target.Fields[targetField].Value}'), so the revision was not saved.");
                 }
@@ -1426,73 +1464,20 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Checks the saved revision kept every state-stamped value from the source (#3270). A mismatch means the service
-        /// stamped its own value; the work item fails with the field, the expected and the saved value, rather than
-        /// carrying on with wrong data.
+        /// Checks the saved revision kept every state-stamped value (#3270). A mismatch means the service stamped its own
+        /// value; the work item fails with the field, the expected and the saved value, rather than carrying on.
         /// </summary>
-        private void VerifyStateStampedFieldsSaved(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<(string Field, object Expected)> expected)
+        private static void VerifyStateStampedFieldsSaved(int revision, Func<string, object> savedValue, List<(string Field, object Expected, bool IsIdentity)> expected)
         {
-            var target = targetWorkItem.ToWorkItem();
-            var wrong = expected.Where(e => !StateStampedFields.SameValue(e.Expected, target.Fields[e.Field].Value))
-                .Select(e => $"{e.Field} saved as '{target.Fields[e.Field].Value}' but the source is '{e.Expected}'")
+            var wrong = expected.Where(e => !StateStampedFields.SameValue(e.Expected, savedValue(e.Field), e.IsIdentity))
+                .Select(e => $"{e.Field} saved as '{savedValue(e.Field)}' but the source is '{e.Expected}'")
                 .ToList();
             if (wrong.Count > 0)
             {
-                throw new InvalidOperationException($"target revision {target.Rev} was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
+                throw new InvalidOperationException($"target revision {revision} was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
             }
+
         }
-
-        private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
-        {
-            var closedDateField = "System.ClosedDate";
-            if (targetWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate"))
-            {
-                closedDateField = "Microsoft.VSTS.Common.ClosedDate";
-            }
-            else if (!targetWorkItem.ToWorkItem().Fields.Contains("System.ClosedDate"))
-            {
-                Log.LogDebug("CheckClosedDateIsValid::ClosedDate field doesn't exist in targetWorkItem: {targetWorkItem} - nothing to validate.", targetWorkItem);
-                return;
-            }
-
-            Log.LogDebug("CheckClosedDateIsValid::ClosedDate field is {closedDateField}", closedDateField);
-            if (targetWorkItem.ToWorkItem().Fields[closedDateField].Value == null && (targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Closed" || targetWorkItem.ToWorkItem().Fields["System.State"].Value.ToString() == "Done"))
-            {
-                Log.LogWarning("The field {closedDateField} is set to Null and will revert to the current date on save! ", closedDateField);
-                if (sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
-                {
-                    Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}]: {sourceClosedDate} ",
-                        sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev,
-                        sourceWorkItem.ToWorkItem().Fields[closedDateField].Value);
-                }
-                else
-                {
-                    Log.LogWarning("Source Closed Date [#{sourceId}][Rev{sourceRev}] is not Available ",
-                        sourceWorkItem.ToWorkItem().Id, sourceWorkItem.ToWorkItem().Rev);
-                }
-            }
-            if (!sourceWorkItem.ToWorkItem().Fields.Contains(closedDateField))
-            {
-                Log.LogWarning("The ClosedDate field {closedDateField} on the Target does not exist in the source! You can fix this with a mapping!", closedDateField);
-                if (sourceWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate"))
-                {
-                    Log.LogWarning("Source ClosedDate Field: ", "Microsoft.VSTS.Common.ClosedDate");
-                }
-                if (sourceWorkItem.ToWorkItem().Fields.Contains("System.ClosedDate"))
-                {
-                    Log.LogWarning("Source ClosedDate Field: ", "System.ClosedDate");
-                }
-                if (targetWorkItem.ToWorkItem().Fields.Contains("Microsoft.VSTS.Common.ClosedDate"))
-                {
-                    Log.LogWarning("Target ClosedDate Field: ", "Microsoft.VSTS.Common.ClosedDate");
-                }
-                if (targetWorkItem.ToWorkItem().Fields.Contains("System.ClosedDate"))
-                {
-                    Log.LogWarning("Target ClosedDate Field: ", "System.ClosedDate");
-                }
-            }
-        }
-
         private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
         {
             if (!Options.SkipRevisionWithInvalidIterationPath)

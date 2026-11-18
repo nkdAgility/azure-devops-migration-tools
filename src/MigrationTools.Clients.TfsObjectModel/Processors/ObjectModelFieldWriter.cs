@@ -34,7 +34,7 @@ namespace MigrationTools.Processors
             }
             catch (TargetInvocationException ex) when (ex.InnerException != null)
             {
-                throw ex.InnerException;
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             }
         }
 

@@ -49,6 +49,74 @@ namespace MigrationTools.Processors
             return string.Equals(Convert.ToString(sourceValue), Convert.ToString(targetValue), StringComparison.Ordinal);
         }
 
+        /// <summary>
+        /// As <see cref="SameValue(object, object)"/>, but for an identity field compares the identity rather than its
+        /// presentation: <c>Display Name &lt;unique name&gt;</c> and the plain display name are the same identity when
+        /// only one side carries the unique name; when both do, the unique names must match (ignoring case), so a
+        /// different account with the same display name is still rejected.
+        /// </summary>
+        public static bool SameValue(object sourceValue, object targetValue, bool isIdentity)
+        {
+            if (!isIdentity) return SameValue(sourceValue, targetValue);
+            var sourceEmpty = IsEmpty(sourceValue);
+            var targetEmpty = IsEmpty(targetValue);
+            if (sourceEmpty || targetEmpty) return sourceEmpty && targetEmpty;
+            var (sourceName, sourceUnique) = SplitIdentity(Convert.ToString(sourceValue));
+            var (targetName, targetUnique) = SplitIdentity(Convert.ToString(targetValue));
+            if (sourceUnique != null && targetUnique != null)
+            {
+                return string.Equals(sourceUnique, targetUnique, StringComparison.OrdinalIgnoreCase);
+            }
+            if (sourceUnique == null && targetUnique == null)
+            {
+                return string.Equals(sourceName, targetName, StringComparison.Ordinal);
+            }
+            // One side is a bare unique name (for example an email in a user mapping) or a display name.
+            var bare = sourceUnique == null ? sourceName : targetName;
+            var (name, unique) = sourceUnique == null ? (targetName, targetUnique) : (sourceName, sourceUnique);
+            return string.Equals(bare, name, StringComparison.Ordinal) || string.Equals(bare, unique, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>Splits <c>Display Name &lt;unique name&gt;</c>; a value without the angle brackets has no unique name.</summary>
+        public static (string DisplayName, string UniqueName) SplitIdentity(string value)
+        {
+            value = (value ?? "").Trim();
+            var open = value.LastIndexOf('<');
+            if (open >= 0 && value.EndsWith(">", StringComparison.Ordinal))
+            {
+                var unique = value.Substring(open + 1, value.Length - open - 2).Trim();
+                if (unique.Length > 0) return (value.Substring(0, open).Trim(), unique);
+            }
+            return (value, null);
+        }
+
+        /// <summary>
+        /// Converts a field value from a REST work item to the form the object model uses: an identity reference becomes
+        /// <c>Display Name &lt;unique name&gt;</c>, and a date string becomes a UTC <see cref="DateTime"/>.
+        /// </summary>
+        public static object FromRest(object value)
+        {
+            if (value == null) return null;
+            if (value is Newtonsoft.Json.Linq.JObject j)
+            {
+                var name = (string)j["displayName"];
+                var unique = (string)j["uniqueName"];
+                return string.IsNullOrEmpty(unique) ? name : $"{name} <{unique}>";
+            }
+            if (value is Microsoft.VisualStudio.Services.WebApi.IdentityRef r)
+            {
+                return string.IsNullOrEmpty(r.UniqueName) ? r.DisplayName : $"{r.DisplayName} <{r.UniqueName}>";
+            }
+            if (value is DateTime d) return d.ToUniversalTime();
+            if (value is string s && DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture,
+                    System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal, out var parsed)
+                && s.Length >= 10 && s[4] == '-')
+            {
+                return DateTime.SpecifyKind(parsed, DateTimeKind.Utc);
+            }
+            return value;
+        }
+
         public static bool IsEmpty(object value)
         {
             return value == null || value is DBNull || (value is string s && s.Length == 0);
