@@ -55,6 +55,22 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Finding (checked 2026-11-16, #3261):** confirmed. Step 2 throws `renderConstrainedEndpointForm is not a function`, the schema reader finds 0 processors and 0 endpoints, and the tool rejects its output (exit -1). The wizard is taken off every environment; the source is kept for a later fix.
 - **Decision:** enforce the rule that every plugin change is agreed by all active CONTROL chats before it is pushed: a check blocks the push until they have agreed. (Prompted by 3d693d8, 24fff0d and 69c4ee9, each announced as it was pushed.)
 
+## 2026-11-17
+
+- **Decision:** CONTROL-ADMT may record its agreement to plugin commits with `Approve-Change.ps1`, which pushes only the agreement note (`refs/notes/control`) and never commits. This holds for all agreements from now on.
+- **Decision (Martin):** the migration hyperlink from each migrated target work item back to its source work item (in addition to the ReflectedWorkItemId field and the migration comment) must have a flag so it can be turned off.
+- **Decision (Martin):** the migration hyperlink is on by default.
+- **Decision (Martin):** only the work item migration processor adds the migration hyperlink; the Test Plans and Suites processor does not.
+- **Decision (Martin):** the migration hyperlink's comment is `Migrated from source`.
+- **Decision (Martin):** when the source URL has changed, a re-run replaces the old migration hyperlink: it removes any hyperlink with the comment `Migrated from source` that points elsewhere and adds the current one, so each item keeps exactly one.
+- **Decision (Martin):** adding or replacing the migration hyperlink must not add any revision beyond the ones the migration already writes. The link goes into a revision that is being replayed anyway (the last one, like the migration comment); a re-run with no new source revisions does not save just to add or fix the link.
+- **Built (to check):** `GenerateMigrationHyperlink` committed on main locally. Choice made while building, approved by Martin on 2026-11-18 (see below): a `Migrated from source` hyperlink that the source work item has itself (copied from a source that was itself migrated) is kept, not replaced. `FilterIfLinkCountMatches` leaves the migration hyperlink out of the target's link count. Live e2e on the test orgs, 2026-11-17: main has no link (5 checks fail, as expected); the change adds exactly one; a re-run adds no revisions; a stale link is left alone until the next source revision and then replaced; with the flag off no link is added. Every run exited with code 0.
+- **Decision (Martin), 2026-11-18:** approved both choices made while building `GenerateMigrationHyperlink` ("approve both"): (1) a `Migrated from source` hyperlink that the source work item has itself is copied and kept; (2) an existing target hyperlink to the source URL with a different comment counts as present and is left unchanged.
+- **Decision (Martin):** the planned tag filter field map (include list of approved tags, plus exclude list) drops tags that do not pass the filter from the target work item, logging each dropped tag rather than keeping it.
+- **Decision (Martin):** tag filter entries match the exact tag name, case-sensitive (tags trimmed); an entry starting with `regex:` is a .NET regex pattern. The same matching applies to the planned tag mapping map.
+- **Decision (Martin):** build two new field maps, a tag filter map and a tag mapping map (renames tags from source → target pairs; unmatched tags pass unchanged). Area path → tag needs no new map: add a worked example to the `FieldValueToTagMap` docs instead.
+- **Decision (Martin):** in the tag filter, the exclude list wins over the include list, and an empty include list lets every tag pass except excluded ones.
+
 ## 2026-11-13
 
 - **Decision:** on PR #3249 (#3241), the two failure paths that can't be forced on the test organisations stay untested live: the read-back of a new field failing after a successful create, and the service rejecting an update to an existing picklist. They are covered by code review and unit tests and listed under "Not covered" in the PR.

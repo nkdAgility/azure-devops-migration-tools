@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools.Processors.Infrastructure;
@@ -63,6 +64,21 @@ namespace MigrationTools.Processors
         /// <default>true</default>
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool GenerateMigrationComment { get; set; } = true;
+
+        /// <summary>
+        /// If enabled, adds a hyperlink with the comment `Migrated from source` from each migrated work item to the web page of
+        /// its source work item, in addition to the reflected work item ID and the migration comment. It never adds a revision:
+        /// on a replay it goes into the last replayed revision, and otherwise into the catch-up save that a later migration run
+        /// makes when it saves the item for another reason (a save made in Azure DevOps does not add it). Re-runs keep exactly one
+        /// such link: if the source URL has changed, the old migration hyperlink is replaced. The exception is decided by location:
+        /// a stale migration hyperlink is kept whenever the source work item has a hyperlink at that same URL, whatever its
+        /// comment, so the target can then have two. If the target already has a hyperlink to the source URL with a different
+        /// comment, it counts as present and is neither duplicated nor changed.
+        /// </summary>
+        /// <default>true</default>
+        [DefaultValue(true)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool GenerateMigrationHyperlink { get; set; } = true;
 
         /// <summary>
         /// A list of work items to import

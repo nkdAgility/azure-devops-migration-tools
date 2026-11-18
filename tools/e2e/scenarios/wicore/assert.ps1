@@ -6,6 +6,14 @@ $s = Read-E2EState $PSScriptRoot
 $r = @()
 foreach ($k in "epic", "feature", "story", "bug", "task") { $r += Test-E2EItemFidelity -SourceId $s.$k -SrcProject $Src -TgtProject $Tgt }
 
+# Migration hyperlink (GenerateMigrationHyperlink, on by default): exactly one, to the source work item's web page.
+foreach ($k in "epic", "feature", "story", "bug", "task") {
+    $t = Find-E2ETargetItem $Tgt $s.$k -Org nkdagility-adomt-target
+    $want = "https://dev.azure.com/nkdagility-adomt-source/$Src/_workitems/edit/$($s.$k)"
+    $hl = @($t.relations | Where-Object { $_.rel -eq "Hyperlink" -and $_.attributes.comment -eq "Migrated from source" })
+    $r += New-E2EResult "src #$($s.$k) migration hyperlink" ($hl.Count -eq 1 -and $hl[0].url -eq $want) "$($hl.Count) link(s): $($hl.url -join ', ')"
+}
+
 $tgtItems = @(Get-E2EAllWorkItems $Tgt -Org nkdagility-adomt-target)
 $r += New-E2EResult "target item count (no duplicates)" ($tgtItems.Count -eq 5) "$($tgtItems.Count) items"
 $titles = $tgtItems | Group-Object { $_.fields.'System.Title' } | Where-Object Count -gt 1
