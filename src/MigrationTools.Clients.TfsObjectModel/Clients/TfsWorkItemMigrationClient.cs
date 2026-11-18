@@ -414,9 +414,9 @@ namespace MigrationTools.Clients
                 {
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
-                    Telemetry.TrackException(ex, activity.Tags);
+                    Telemetry.TrackException(ex, activity?.Tags);
                     Log.Fatal(ex, "Unable to configure store");
-                    throw new MigrationRunStoppedException("Unable to configure work item store.");
+                    throw new MigrationRunStoppedException("Unable to configure work item store.", ex);
                 }
                 return store;
             }

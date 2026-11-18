@@ -32,8 +32,16 @@ Set-E2EWorkItem -Id $a.id -Ops @(
     (Add-E2ELinkOp "System.LinkTypes.Related" $b.id "to B"),
     (Add-E2ELinkOp "System.LinkTypes.Related" $o.id "to O"),
     (Add-E2ELinkOp "System.LinkTypes.Related" $x.id "to X")) | Out-Null
+# R gets a Related link to X that is removed in a later revision, so replaying that revision removes a link to an item
+# the source can't return (TfsWorkItemLinkTool.RemoveLinks).
+$rItem = Set-E2EWorkItem $Src "User Story" -Fields ([ordered]@{ "System.Title" = "in-scope R (link removed)" })
+Start-Sleep -Seconds 2
+# Each link edit also changes a field: a link-only edit does not create a revision that the migration replays.
+Set-E2EWorkItem -Id $rItem.id -Fields ([ordered]@{ "System.Description" = "link to X added" }) -Ops @((Add-E2ELinkOp "System.LinkTypes.Related" $x.id "to X, removed later")) | Out-Null
+Start-Sleep -Seconds 2
+Set-E2EWorkItem -Id $rItem.id -Fields ([ordered]@{ "System.Description" = "link to X removed" }) -Ops @(@{ op = "remove"; path = "/relations/0" }) | Out-Null
 Remove-E2EProject $Gone
 $bug = Set-E2EWorkItem $Src "Bug" -Fields ([ordered]@{ "System.Title" = "fail-scope Bug" })
 
-Save-E2EState $PSScriptRoot @{ a = $a.id; b = $b.id; o = $o.id; x = $x.id; bug = $bug.id }
-"seeded linkscope: A $($a.id) B $($b.id) O $($o.id) (outside the query) X $($x.id) (project deleted)"
+Save-E2EState $PSScriptRoot @{ a = $a.id; b = $b.id; o = $o.id; x = $x.id; r = $rItem.id; bug = $bug.id }
+"seeded linkscope: A $($a.id) B $($b.id) O $($o.id) (outside the query) X $($x.id) (project deleted) R $($rItem.id) (link to X removed)"
