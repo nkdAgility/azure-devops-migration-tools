@@ -41,17 +41,19 @@ foreach ($k in "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8") {
     $tRevs = @(Get-E2ERevisions $t.id -Org nkdagility-adomt-target)
     # Match in order, each target revision used once. A type change is replayed as a REST save dated 3 ms before the
     # source revision, then the object-model save at the source date; both must carry the source's stamped values.
-    $bad = @(); $extra = @(); $typeChange = 0; $i = 0
+    $bad = @(); $extra = @(); $typeChange = 0; $i = 0; $prevType = $null
     foreach ($sr in $sRevs) {
         while ($i -lt $tRevs.Count -and (T $tRevs[$i]) -lt (T $sr)) {
             $tr = $tRevs[$i]
-            if (((T $sr) - (T $tr)).TotalMilliseconds -le 10 -and $tr.fields.'System.WorkItemType' -eq $sr.fields.'System.WorkItemType') {
+            # Only where the source type changes: one REST type-change save, dated just before the source revision.
+            if ($null -ne $prevType -and $prevType -ne $sr.fields.'System.WorkItemType' -and ((T $sr) - (T $tr)).TotalMilliseconds -le 10 -and $tr.fields.'System.WorkItemType' -eq $sr.fields.'System.WorkItemType') {
+                $prevType = $sr.fields.'System.WorkItemType'
                 $typeChange++; $bad += @(Compare-Rev $sr $tr $stamped " (type change)")
             } else { $extra += $tr }
             $i++
         }
         if ($i -ge $tRevs.Count -or (K $tRevs[$i]) -ne (K $sr)) { $bad += "src rev $($sr.rev) $(K $sr): no target revision"; continue }
-        $bad += @(Compare-Rev $sr $tRevs[$i] $fields ""); $i++
+        $bad += @(Compare-Rev $sr $tRevs[$i] $fields ""); $i++; $prevType = $sr.fields.'System.WorkItemType'
     }
     $extra += @($tRevs | Select-Object -Skip $i)
     $r += New-E2EResult "$k src #$id -> tgt #$($t.id) every revision: state, reason, dates, By fields" ($bad.Count -eq 0) $(if ($bad) { $bad -join "; " } else { "$($sRevs.Count) revisions match" + $(if ($typeChange) { ", plus $typeChange type-change save(s)" } else { "" }) })

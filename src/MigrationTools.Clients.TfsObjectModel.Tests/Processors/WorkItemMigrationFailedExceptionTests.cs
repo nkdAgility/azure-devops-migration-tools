@@ -42,6 +42,15 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void PassThroughReplay_StopAndNetworkErrors_AreNotWrapped()
+        {
+            Assert.IsTrue(TfsWorkItemMigrationProcessor.PassThroughReplay(new MigrationTools.Exceptions.MigrationRunStoppedException("stop")));
+            Assert.IsTrue(TfsWorkItemMigrationProcessor.PassThroughReplay(new System.Net.WebException("net")));
+            Assert.IsTrue(TfsWorkItemMigrationProcessor.PassThroughReplay(new AggregateException(new System.Net.WebException("net"))));
+            Assert.IsFalse(TfsWorkItemMigrationProcessor.PassThroughReplay(new InvalidOperationException("save failed")));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Advice_Unknown_PointsAtDebugLogging()
         {
             StringAssert.Contains(WorkItemMigrationFailedException.Advice("something new", "Bug"), "MinimumLevel 'Debug'");

@@ -93,33 +93,6 @@ namespace MigrationTools.Processors
             return (value, null);
         }
 
-        /// <summary>
-        /// Converts a field value from a REST work item to the form the object model uses: an identity reference becomes
-        /// <c>Display Name &lt;unique name&gt;</c>, and a date string becomes a UTC <see cref="DateTime"/>.
-        /// </summary>
-        public static object FromRest(object value)
-        {
-            if (value == null) return null;
-            if (value is Newtonsoft.Json.Linq.JObject j)
-            {
-                var name = (string)j["displayName"];
-                var unique = (string)j["uniqueName"];
-                return string.IsNullOrEmpty(unique) ? name : $"{name} <{unique}>";
-            }
-            if (value is Microsoft.VisualStudio.Services.WebApi.IdentityRef r)
-            {
-                return string.IsNullOrEmpty(r.UniqueName) ? r.DisplayName : $"{r.DisplayName} <{r.UniqueName}>";
-            }
-            if (value is DateTime d) return d.ToUniversalTime();
-            if (value is string s && DateTime.TryParse(s, System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal, out var parsed)
-                && s.Length >= 10 && s[4] == '-')
-            {
-                return DateTime.SpecifyKind(parsed, DateTimeKind.Utc);
-            }
-            return value;
-        }
-
         public static bool IsEmpty(object value)
         {
             return value == null || value is DBNull || (value is string s && s.Length == 0);

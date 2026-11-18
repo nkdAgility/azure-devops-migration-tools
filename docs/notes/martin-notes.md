@@ -77,4 +77,4 @@ These are the facts and decisions Martin has given, so they can be checked. They
 
 ## 2026-11-18
 
-- **Decision (Martin, #3270):** turn off `FilterWorkItemsThatAlreadyExistInTarget`, because with it on a rerun skips an item whose state-stamped values were saved wrong and never reports it. Done as: `false` in the sample `configuration.json` and the e2e scenario configs (the option's default was already `false` and is kept for existing configs). A rerun now also compares every already-migrated target revision's dates, By fields and state with the source and fails that work item clearly if any differ.
+- **Decision (Martin, #3270):** turn off `FilterWorkItemsThatAlreadyExistInTarget`, because with it on a rerun skips an item whose state-stamped values were saved wrong and never reports it. Done as: `false` in the sample `configuration.json` and the e2e scenario configs (the option's default was already `false` and is kept for existing configs). A rerun now also compares every target revision (each matched to the source revision it replays) on dates, By fields and state with the source and fails that work item clearly if any differ.

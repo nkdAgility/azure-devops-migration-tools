@@ -1254,9 +1254,13 @@ namespace MigrationTools.Processors
                             });
                         }
                         var result = workItemTrackingClient.UpdateWorkItemAsync(patchDocument, workItemId, bypassRules: true).Result;
-                        VerifyStateStampedFieldsSaved(result.Rev ?? 0,
-                            f => result.Fields.TryGetValue(f, out var v) ? StateStampedFields.FromRest(v) : null, typeChangeStamps);
                         targetWorkItem = Target.WorkItems.GetWorkItem(workItemId);
+                        // Check the committed revision as the object model reads it, the same form as every other check:
+                        // REST qualifies every identity, the object model only display names that several accounts share.
+                        var typeChanged = targetWorkItem.ToWorkItem();
+                        var committed = typeChanged.Revisions[typeChanged.Revisions.Count - 1];
+                        VerifyStateStampedFieldsSaved(result.Rev ?? typeChanged.Rev,
+                            f => committed.Fields.Contains(f) ? committed.Fields[f].Value : null, typeChangeStamps);
                     }
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
 
@@ -1358,12 +1362,24 @@ namespace MigrationTools.Processors
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
                         Log.LogDebug("{FieldReferenceName} ({FieldName}) | {FieldValue}", f.ReferenceName, f.Name, f.Value);
                 }
+                // A run stop must still stop the run, and a network error must still reach the caller's retry.
+                if (PassThroughReplay(ex)) throw;
                 var type = replaying?.Type ?? sourceWorkItem.Type;
                 throw new WorkItemMigrationFailedException(
                     WorkItemMigrationFailedException.Describe(sourceWorkItem.Id, replaying?.Number, targetWorkItem?.Id, type, ex), ex);
             }
 
             return targetWorkItem;
+        }
+
+        /// <summary>
+        /// True for exceptions the replay must not wrap: a run stop, which ends the run, and a network error, which
+        /// <see cref="ProcessWorkItemAsync"/> retries. Looks inside an <see cref="AggregateException"/> (from <c>.Result</c>).
+        /// </summary>
+        internal static bool PassThroughReplay(Exception ex)
+        {
+            var all = ex is AggregateException agg ? agg.Flatten().InnerExceptions.Concat(new[] { ex }) : new[] { ex };
+            return all.Any(e => e is MigrationRunStoppedException || e is WebException);
         }
 
         private static string GetClosedDateField(WorkItem workItem)
@@ -1468,30 +1484,36 @@ namespace MigrationTools.Processors
         /// value; the work item fails with the field, the expected and the saved value, rather than carrying on.
         /// </summary>
         /// <summary>
-        /// On a rerun, compares every target revision that replayed a source revision (same ChangedDate) with that source
-        /// revision: State, and every state-stamped date and By field (By through the user mapping) (#3270). A target
-        /// migrated wrongly, by an earlier run or an earlier version, fails clearly here instead of being skipped as
-        /// migrated. Fields the source type does not have are not compared: a field map may own them.
+        /// On a rerun, compares every target revision with the source revision it replays (#3270): State, and every
+        /// state-stamped date and By field (By through the user mapping). A target revision replays the source revision
+        /// dated within 10 ms after it (the REST type-change save is dated 3 ms early) or, failing that, the latest source
+        /// revision dated at or before it (a fix-up, a catch-up save, or a revision replayed with an adjusted date). A
+        /// target revision dated before the first source revision is reported. A target migrated wrongly, by an earlier
+        /// run or an earlier version, fails clearly here instead of being skipped as migrated. Fields the source type
+        /// does not have are not compared: a field map may own them.
         /// </summary>
         private void VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             var source = sourceWorkItem.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
-            var byDate = new Dictionary<DateTime, Revision>();
-            foreach (Revision tr in target.Revisions)
-            {
-                var key = ((DateTime)tr.Fields["System.ChangedDate"].Value).ToUniversalTime();
-                if (!byDate.ContainsKey(key)) byDate[key] = tr;
-            }
+            DateTime When(Revision r) => ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
+            var sourceRevisions = source.Revisions.Cast<Revision>().OrderBy(When).ToList();
             var fields = new List<string>();
             var closedTarget = GetClosedDateField(target);
             if (closedTarget != null) fields.Add(closedTarget);
             fields.AddRange(StateStampedFields.Fields.Where(f => target.Fields.Contains(f)));
 
             var wrong = new List<string>();
-            foreach (Revision sr in source.Revisions)
+            foreach (Revision tr in target.Revisions)
             {
-                if (!byDate.TryGetValue(((DateTime)sr.Fields["System.ChangedDate"].Value).ToUniversalTime(), out var tr)) continue;
+                var at = When(tr);
+                var sr = sourceRevisions.FirstOrDefault(r => When(r) >= at && (When(r) - at).TotalMilliseconds <= 10)
+                    ?? sourceRevisions.LastOrDefault(r => When(r) <= at);
+                if (sr == null)
+                {
+                    wrong.Add($"revision {tr.Index + 1} (dated {at:o}) is earlier than every source revision");
+                    continue;
+                }
                 var sourceState = sr.Fields["System.State"].Value as string;
                 var targetState = tr.Fields["System.State"].Value as string;
                 if (!string.Equals(sourceState, targetState, StringComparison.Ordinal))
@@ -1505,7 +1527,7 @@ namespace MigrationTools.Processors
                     var isIdentity = target.Fields[field].FieldDefinition.IsIdentity;
                     var expected = sr.Fields[sourceField].Value;
                     if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
-                    var saved = tr.Fields[field].Value;
+                    var saved = tr.Fields.Contains(field) ? tr.Fields[field].Value : null;
                     if (!StateStampedFields.SameValue(StateStampedFields.IsEmpty(expected) ? null : expected, saved, isIdentity))
                     {
                         wrong.Add($"revision {tr.Index + 1} {field} is '{saved}' but source revision {sr.Index + 1} is '{expected}'");
@@ -1517,6 +1539,7 @@ namespace MigrationTools.Processors
                 throw new InvalidOperationException($"the already migrated target work item does not match the source, stamped instead of the source values: {string.Join("; ", wrong.Take(10))}{(wrong.Count > 10 ? $"; and {wrong.Count - 10} more" : "")}.");
             }
         }
+
 
         private static void VerifyStateStampedFieldsSaved(int revision, Func<string, object> savedValue, List<(string Field, object Expected, bool IsIdentity)> expected)
         {

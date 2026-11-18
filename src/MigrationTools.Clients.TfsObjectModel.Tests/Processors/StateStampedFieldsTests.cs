@@ -94,18 +94,6 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
-        public void FromRest_IdentityAndDate_ConvertToObjectModelForms()
-        {
-            var identity = Newtonsoft.Json.Linq.JObject.Parse("{\"displayName\":\"Ghost Person\",\"uniqueName\":\"ghost@example.invalid\"}");
-            Assert.AreEqual("Ghost Person <ghost@example.invalid>", StateStampedFields.FromRest(identity));
-            var date = (DateTime)StateStampedFields.FromRest("2023-05-17T09:30:00Z");
-            Assert.AreEqual(Closed, date);
-            Assert.AreEqual(DateTimeKind.Utc, date.Kind);
-            Assert.AreEqual("Active", StateStampedFields.FromRest("Active"));
-            Assert.IsNull(StateStampedFields.FromRest(null));
-        }
-
-        [TestMethod, TestCategory("L0")]
         public void IsFieldCannotBeChangedError_TF26194AnywhereInChain_ReturnsTrue()
         {
             var ex = new Exception("save failed", new Exception("TF26194: The value for the field 'Closed Date' cannot be changed."));
