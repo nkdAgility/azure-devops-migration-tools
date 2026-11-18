@@ -111,7 +111,9 @@ namespace MigrationTools.Processors.Infrastructure
                 {
                     Status = ProcessingStatus.Failed;
                     ProcessorActivity.SetStatus(ActivityStatusCode.Error);
-                    Log.LogCritical(ex, "{MigrationContextname} stopped: {Reason}", Name, ex.Message);
+                    // The stop reason is already explained where the run was stopped; the stack trace helps only when debugging.
+                    Log.LogCritical("{MigrationContextname} stopped: {Reason}", Name, ex.Message);
+                    Log.LogDebug(ex, "{MigrationContextname} stop details", Name);
                 }
                 catch (OptionsValidationException ex)
                 {

@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # Writes the usermapping-3272 configs for one side (main or branch). Mapping file paths must be absolute (the harness runs the
 # tool from a temporary folder). The generated config-*.json files are git-ignored.
 #   good-all                 mapping resolves; ValidateMappingTargets All                            -> exit 0

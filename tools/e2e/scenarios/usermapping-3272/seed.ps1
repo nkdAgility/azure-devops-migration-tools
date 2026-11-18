@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # usermapping-3272 (#3272): loading the target identities for ValidateMappingTargets, and the ValidateMappingTargets scope option.
 # The organisations have one real user, so the mapped source identity is an unresolved string "Ghost Person <...>".
 #  K1 - AssignedTo = ghost (mapped in every mapping file).

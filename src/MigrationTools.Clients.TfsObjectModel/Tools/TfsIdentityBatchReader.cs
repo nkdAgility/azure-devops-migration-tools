@@ -56,6 +56,9 @@ namespace MigrationTools.Tools
         /// <summary>Identities that failed in a batch and could not be read on their own either.</summary>
         public List<string> Unreadable { get; } = [];
 
+        /// <summary>Why each identity in <see cref="SkippedNonUsers"/> or <see cref="Unreadable"/> was not read in a batch, by its description.</summary>
+        public Dictionary<string, string> Reasons { get; } = [];
+
         /// <summary>The number of batched reads made, including those repeated after a batch was split.</summary>
         public int BatchReads { get; private set; }
 
@@ -92,7 +95,7 @@ namespace MigrationTools.Tools
                 if (batch.Length == 1)
                 {
                     _log?.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[{identity}] Batched read failed with {error}; reading it on its own", _describe(batch[0]), ex.Message);
-                    ReadFallback(batch[0], users);
+                    ReadFallback(batch[0], users, FirstLine(ex.Message));
                     return;
                 }
                 _log?.LogDebug("TfsUserMappingTool::GetUsersListFromServer A batch of {count} identities failed with {error}; splitting it", batch.Length, ex.Message);
@@ -112,11 +115,14 @@ namespace MigrationTools.Tools
                 else if (kind != FallbackIdentityKind.NotAUser)
                 {
                     _log?.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[{identity}] Not returned by the batched read; reading it on its own", _describe(batch[i]));
-                    ReadFallback(batch[i], users);
+                    ReadFallback(batch[i], users, "the batched read did not return it");
                 }
             }
         }
-        private void ReadFallback(TKey key, List<IdentityItemData> users)
+
+        private static string FirstLine(string message) => (message ?? string.Empty).Split('\n')[0].Trim();
+
+        private void ReadFallback(TKey key, List<IdentityItemData> users, string reason)
         {
             (FallbackIdentityKind Kind, IdentityItemData User) result;
             try
@@ -125,7 +131,8 @@ namespace MigrationTools.Tools
             }
             catch (Exception ex)
             {
-                _log?.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[{identity}] Fallback read failed with {error}", _describe(key), ex.Message);
+                _log?.LogDebug(ex, "TfsUserMappingTool::GetUsersListFromServer::[{identity}] Fallback read failed", _describe(key));
+                reason = $"{reason}; reading it on its own also failed: {FirstLine(ex.Message)}";
                 result = (FallbackIdentityKind.Unreadable, null);
             }
             switch (result.Kind)
@@ -135,9 +142,11 @@ namespace MigrationTools.Tools
                     break;
                 case FallbackIdentityKind.NotAUser:
                     SkippedNonUsers.Add(_describe(key));
+                    Reasons[_describe(key)] = reason;
                     break;
                 default:
                     Unreadable.Add(_describe(key));
+                    Reasons[_describe(key)] = reason;
                     break;
             }
         }

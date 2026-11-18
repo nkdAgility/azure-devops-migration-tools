@@ -592,7 +592,7 @@ namespace MigrationTools.Tools
             var gss = new Lazy<IGroupSecurityService>(() => endpoint.GetService<IGroupSecurityService>());
             var timer = System.Diagnostics.Stopwatch.StartNew();
             var validUsers = ims.ReadIdentity(IdentitySearchFactor.AccountName, Options.ProjectCollectionValidUsersGroupName, MembershipQuery.Expanded, ReadIdentityOptions.None)
-                ?? throw new InvalidOperationException($"The group '{Options.ProjectCollectionValidUsersGroupName}' was not found. Set ProjectCollectionValidUsersGroupName to its name in this collection's language.");
+                ?? throw new MigrationRunStoppedException($"The group '{Options.ProjectCollectionValidUsersGroupName}' was not found in {endpoint.Options.Collection}, so its users cannot be read for user mapping. Set ProjectCollectionValidUsersGroupName to the group's name in this collection's language.");
             var members = validUsers.Members ?? [];
             Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer Found {count} identities (users and groups) in server ({elapsed:0.0}s); reading them in batches of {batchSize}.",
                 members.Length, timer.Elapsed.TotalSeconds, TfsIdentityBatchReader<IdentityDescriptor>.DefaultBatchSize);
@@ -614,7 +614,7 @@ namespace MigrationTools.Tools
                 descriptor => $"{descriptor.IdentityType};{descriptor.Identifier}",
                 Log);
             var foundUsers = reader.ReadUsers(members);
-            ReportReaderOutcome(reader.SkippedNonUsers, reader.Unreadable);
+            ReportReaderOutcome(reader.SkippedNonUsers, reader.Unreadable, reader.Reasons);
             if (isTarget)
             {
                 UnreadableTargetIdentities = reader.Unreadable.ToList();
@@ -626,18 +626,19 @@ namespace MigrationTools.Tools
             return foundUsers;
         }
 
-        internal void ReportReaderOutcome(IReadOnlyCollection<string> skippedNonUsers, IReadOnlyCollection<string> unreadable)
+        internal void ReportReaderOutcome(IReadOnlyCollection<string> skippedNonUsers, IReadOnlyCollection<string> unreadable, IReadOnlyDictionary<string, string> reasons = null)
         {
-            if (skippedNonUsers.Count > 0)
+            string Why(string identity) => reasons != null && reasons.TryGetValue(identity, out var r) ? r : "unknown";
+            foreach (var identity in skippedNonUsers)
             {
-                Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} identities could not be read in a batch (for example groups of "
-                    + "ApplicationGroupSpecialType 5) and are groups, not users, so they are not needed for mapping: {identities}",
-                    skippedNonUsers.Count, string.Join(", ", skippedNonUsers));
+                Log.LogInformation("TfsUserMappingTool: skipped group {identity}: the server could not return it ({reason}). Groups are not used for user "
+                    + "mapping and every user was still read, so no action is needed.", identity, Why(identity));
             }
-            if (unreadable.Count > 0)
+            foreach (var identity in unreadable)
             {
-                Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer {count} identities could not be read, in a batch or on their own, and were skipped. "
-                    + "A user among them will not be in the identity list: {identities}", unreadable.Count, string.Join(", ", unreadable));
+                Log.LogWarning("TfsUserMappingTool: could not read identity {identity} ({reason}). If it is a user, mapping targets that name it cannot be "
+                    + "checked. Grant the migration account read access to identities in the target collection (Project Collection Valid Users), or map "
+                    + "such users with the 'Display Name <domain\\account>' form.", identity, Why(identity));
             }
         }
 

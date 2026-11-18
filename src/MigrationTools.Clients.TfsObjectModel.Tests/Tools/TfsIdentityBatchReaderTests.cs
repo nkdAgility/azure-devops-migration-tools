@@ -78,6 +78,7 @@ namespace MigrationTools.Tests.Tools
             Assert.HasCount(400, users);
             CollectionAssert.AreEquivalent(Enumerable.Range(0, 7).Select(i => $"T{i}").ToList(), fallbackCalls);
             CollectionAssert.AreEquivalent(fallbackCalls, reader.SkippedNonUsers);
+            Assert.IsTrue(reader.SkippedNonUsers.All(k => reader.Reasons[k].Contains("ApplicationGroupSpecialType")), "each skipped group names why");
             Assert.IsEmpty(reader.Unreadable);
             Assert.IsLessThan(427 / 2, reader.BatchReads, $"expected far fewer reads than identities, got {reader.BatchReads}");
         }
