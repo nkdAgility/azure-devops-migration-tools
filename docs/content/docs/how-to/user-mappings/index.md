@@ -27,7 +27,7 @@ When `UseIdentityMapDataFormat` is enabled, the export instead writes a JSON arr
 ## How it works
 
 1. Run `TfsExportUsersForMappingProcessor`. It loads the users from source and target, pairs them, and writes the users whose names differ to `UserMappingFile`. Review and edit the file.
-2. Run `TfsWorkItemMigrationProcessor`. It warns about source users that do not exist in the target and checks that every target value in `UserMappingFile` resolves to exactly one target identity; by default it stops if one does not (see `StopIfMappingTargetsDoNotResolve`). Then, for each identity field listed in `IdentityFieldsToCheck`, it replaces the source value with the mapped target value.
+2. Run `TfsWorkItemMigrationProcessor`. It warns about source users that do not exist in the target and checks that every target value in `UserMappingFile` resolves to exactly one target identity; by default it stops if one does not (see `StopIfMappingTargetsDoNotResolve`; `ValidateMappingTargets` limits the check to the mappings the work items use, or skips it). Then, for each identity field listed in `IdentityFieldsToCheck`, it replaces the source value with the mapped target value.
 
 Users are paired by display name. With `MatchUsersByEmail` enabled they are paired by email address first, then by display name.
 

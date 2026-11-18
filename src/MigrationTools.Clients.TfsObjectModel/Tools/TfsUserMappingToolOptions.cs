@@ -80,6 +80,16 @@ namespace MigrationTools.Tools
         public bool StopIfMappingTargetsDoNotResolve { get; set; } = true;
 
         /// <summary>
+        /// Which targets in the UserMappingFile are resolved against the target identities at startup. All checks every mapping in the
+        /// file; Referenced checks only the mappings whose source user appears in an identity field of the work items being migrated;
+        /// Skip turns the check off. With Skip, a target that does not resolve is saved as plain text and StopIfMappingTargetsDoNotResolve
+        /// has no effect.
+        /// </summary>
+        /// <default>All</default>
+        [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public MappingTargetValidationScope ValidateMappingTargets { get; set; } = MappingTargetValidationScope.All;
+
+        /// <summary>
         /// This is the regionalized "Project Collection Valid Users" group name. Default is "Project Collection Valid Users".
         /// </summary>
         /// <default>Project Collection Valid Users</default>
@@ -94,6 +104,19 @@ namespace MigrationTools.Tools
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool UseIdentityMapDataFormat { get; set; } = false;
 
+    }
+
+    /// <summary>
+    /// Which UserMappingFile targets are resolved against the target identities at startup.
+    /// </summary>
+    public enum MappingTargetValidationScope
+    {
+        /// <summary>Every mapping in the file.</summary>
+        All,
+        /// <summary>Only mappings whose source user appears in the work items being migrated.</summary>
+        Referenced,
+        /// <summary>No mapping is checked.</summary>
+        Skip
     }
 
     public interface ITfsUserMappingToolOptions
