@@ -861,6 +861,8 @@ namespace MigrationTools.Processors
                         }
                         else
                         {
+                            // A rerun never treats a wrongly saved revision as migrated (#3270).
+                            VerifyMigratedRevisions(sourceWorkItem, targetWorkItem);
                             if (revisionsToMigrate.Count == 0)
                             {
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
@@ -1465,6 +1467,57 @@ namespace MigrationTools.Processors
         /// Checks the saved revision kept every state-stamped value (#3270). A mismatch means the service stamped its own
         /// value; the work item fails with the field, the expected and the saved value, rather than carrying on.
         /// </summary>
+        /// <summary>
+        /// On a rerun, compares every target revision that replayed a source revision (same ChangedDate) with that source
+        /// revision: State, and every state-stamped date and By field (By through the user mapping) (#3270). A target
+        /// migrated wrongly, by an earlier run or an earlier version, fails clearly here instead of being skipped as
+        /// migrated. Fields the source type does not have are not compared: a field map may own them.
+        /// </summary>
+        private void VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            var source = sourceWorkItem.ToWorkItem();
+            var target = targetWorkItem.ToWorkItem();
+            var byDate = new Dictionary<DateTime, Revision>();
+            foreach (Revision tr in target.Revisions)
+            {
+                var key = ((DateTime)tr.Fields["System.ChangedDate"].Value).ToUniversalTime();
+                if (!byDate.ContainsKey(key)) byDate[key] = tr;
+            }
+            var fields = new List<string>();
+            var closedTarget = GetClosedDateField(target);
+            if (closedTarget != null) fields.Add(closedTarget);
+            fields.AddRange(StateStampedFields.Fields.Where(f => target.Fields.Contains(f)));
+
+            var wrong = new List<string>();
+            foreach (Revision sr in source.Revisions)
+            {
+                if (!byDate.TryGetValue(((DateTime)sr.Fields["System.ChangedDate"].Value).ToUniversalTime(), out var tr)) continue;
+                var sourceState = sr.Fields["System.State"].Value as string;
+                var targetState = tr.Fields["System.State"].Value as string;
+                if (!string.Equals(sourceState, targetState, StringComparison.Ordinal))
+                {
+                    wrong.Add($"revision {tr.Index + 1} State is '{targetState}' but source revision {sr.Index + 1} is '{sourceState}'");
+                }
+                foreach (var field in fields)
+                {
+                    var sourceField = sr.Fields.Contains(field) ? field : field == closedTarget ? GetClosedDateField(source) : null;
+                    if (sourceField == null || !sr.Fields.Contains(sourceField)) continue;
+                    var isIdentity = target.Fields[field].FieldDefinition.IsIdentity;
+                    var expected = sr.Fields[sourceField].Value;
+                    if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
+                    var saved = tr.Fields[field].Value;
+                    if (!StateStampedFields.SameValue(StateStampedFields.IsEmpty(expected) ? null : expected, saved, isIdentity))
+                    {
+                        wrong.Add($"revision {tr.Index + 1} {field} is '{saved}' but source revision {sr.Index + 1} is '{expected}'");
+                    }
+                }
+            }
+            if (wrong.Count > 0)
+            {
+                throw new InvalidOperationException($"the already migrated target work item does not match the source, stamped instead of the source values: {string.Join("; ", wrong.Take(10))}{(wrong.Count > 10 ? $"; and {wrong.Count - 10} more" : "")}.");
+            }
+        }
+
         private static void VerifyStateStampedFieldsSaved(int revision, Func<string, object> savedValue, List<(string Field, object Expected, bool IsIdentity)> expected)
         {
             var wrong = expected.Where(e => !StateStampedFields.SameValue(e.Expected, savedValue(e.Field), e.IsIdentity))
