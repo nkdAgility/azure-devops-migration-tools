@@ -36,7 +36,7 @@ namespace MigrationTools.Host.Commands
             }
 
             string startupLog = Path.Combine(LogLocationService.GetLogPath(), "startup-failure.log");
-            using (var bootstrap = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.File(startupLog).CreateLogger())
+            using (var bootstrap = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.File(startupLog, shared: true).CreateLogger())
             {
                 bootstrap.Debug(ex, "devopsmigration could not start.");
             }

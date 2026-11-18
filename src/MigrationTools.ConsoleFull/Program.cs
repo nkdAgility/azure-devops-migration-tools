@@ -23,7 +23,16 @@ namespace VstsSyncMigrator.ConsoleApp
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(CommandFailureLog.ReportStartupFailure(ex));
+                string line;
+                try
+                {
+                    line = CommandFailureLog.ReportStartupFailure(ex);
+                }
+                catch (Exception reportFailure)
+                {
+                    line = $"devopsmigration could not start: {CommandFailureLog.Describe(ex)} The full error could not be logged: {CommandFailureLog.Describe(reportFailure)}";
+                }
+                Console.Error.WriteLine(line);
                 return 1;
             }
         }
