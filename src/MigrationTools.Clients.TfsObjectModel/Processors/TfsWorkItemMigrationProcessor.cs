@@ -164,21 +164,9 @@ namespace MigrationTools.Processors
 
                 if (Options.FilterWorkItemsThatAlreadyExistInTarget)
                 {
-                    contextLog.Information(
-                        "[FilterWorkItemsThatAlreadyExistInTarget] is enabled. Searching for {sourceWorkItems} work items that may have already been migrated to the target...",
-                        sourceWorkItems.Count());
-
-                    string targetWIQLQuery = CommonTools.NodeStructure.FixAreaPathAndIterationPathForTargetQuery(Options.WIQLQuery,
-                        Source.WorkItems.Project.Name, Target.WorkItems.Project.Name, contextLog);
-                    // Also replace Project Name
-                    targetWIQLQuery = targetWIQLQuery.Replace(Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
-                    //Then run query
-                    sourceWorkItems = ((TfsWorkItemMigrationClient)Target.WorkItems).FilterExistingWorkItems(
-                        sourceWorkItems, targetWIQLQuery,
-                        (TfsWorkItemMigrationClient)Source.WorkItems);
-                    contextLog.Information(
-                        "!! After removing all found work items there are {SourceWorkItemCount} remaining to be migrated.",
-                        sourceWorkItems.Count());
+                    // Martin's decision (#3270): items already in the target are not skipped, so a rerun checks every
+                    // migrated revision against the source and reports any that were saved with wrong values.
+                    Log.LogWarning("FilterWorkItemsThatAlreadyExistInTarget is set to true but is ignored: work items already in the target are checked against the source on every run, so wrongly migrated revisions are reported. Remove the option or set it to false.");
                 }
 
                 //////////////////////////////////////////////////
@@ -1355,6 +1343,9 @@ namespace MigrationTools.Processors
                         parameters.Add($"{f.ReferenceName} ({f.Name})", f.Value?.ToString());
                 }
                 Telemetry.TrackException(ex, parameters);
+                // A failed save or check still removes the attachment files downloaded for this item.
+                try { CommonTools.Attachment.CleanUpAfterSave(); }
+                catch (Exception cleanUp) { Log.LogDebug(cleanUp, "Attachment clean-up after the failure of source work item {SourceId} failed.", sourceWorkItem.Id); }
                 // The full exception and the field values are for diagnosis only (#3275); the clear message is logged by the caller.
                 Log.LogDebug(ex, "Saving source work item {SourceId} failed. Target field values follow.", sourceWorkItem.Id);
                 if (targetWorkItem != null)
