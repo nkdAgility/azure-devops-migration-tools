@@ -127,6 +127,8 @@ namespace MigrationTools.Processors
 
             WarnOnCurrentUserRules();
 
+            ValidateStateStampedFieldsCanBeSet();
+
             ValidateProject();
 
             CommonTools.NodeStructure.ProcessorExecutionBegin(this);
@@ -437,6 +439,26 @@ namespace MigrationTools.Processors
             catch (Exception ex)
             {
                 Log.LogDebug(ex, "WarnOnCurrentUserRules: unable to read the target process rules; skipping the check.");
+            }
+        }
+
+        /// <summary>
+        /// Stops the run before anything is migrated when the target cannot take the source's state-stamped dates and
+        /// By fields in the save that changes state (#3270). Without BypassRules the service stamps its own clock and the
+        /// migration identity, so every activated, resolved or closed item would be saved with wrong values.
+        /// </summary>
+        private void ValidateStateStampedFieldsCanBeSet()
+        {
+            var store = ((TfsWorkItemMigrationClient)Target.WorkItems).Store;
+            if (!store.BypassRules)
+            {
+                Log.LogError("The target connection does not bypass rules, so Activated/Resolved/Closed Date and By would be saved as the migration time and identity instead of the source values. Give the migration identity 'Bypass rules on work item updates' in the target project, then run again.");
+                throw new MigrationRunStoppedException("Target does not bypass rules: state-stamped dates and By fields cannot keep their source values.");
+            }
+            if (!ObjectModelFieldWriter.IsAvailable)
+            {
+                Log.LogError("The TFS object model in use cannot set state-stamped dates in a revision that changes state, so they would be saved as the migration time.");
+                throw new MigrationRunStoppedException("State-stamped dates cannot be set from the source with this object model.");
             }
         }
 
@@ -827,7 +849,6 @@ namespace MigrationTools.Processors
                             { "sourceWorkItemRev", sourceWorkItem.Rev },
                             { "ReplayRevisions", CommonTools.RevisionManager.ReplayRevisions }}
                             );
-                        var catchUpDateFixUps = new List<(string Field, object SourceValue, object TargetValue)>();
                         List<RevisionItem> revisionsToMigrate =CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                         if (targetWorkItem == null)
                         {
@@ -846,8 +867,6 @@ namespace MigrationTools.Processors
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
-                                // Retries a fix-up that failed after its revision was saved on an earlier run.
-                                catchUpDateFixUps = SetStateStampedDatesFromSource(sourceWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), "on the migrated item");
                                 StampCatchUpSave(targetWorkItem);
                                 TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
@@ -869,7 +888,7 @@ namespace MigrationTools.Processors
                             {
                                 EnsureMigrationHyperlink(sourceWorkItem, targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                             }
-                            SaveCatchUp(sourceWorkItem, targetWorkItem, catchUpDateFixUps);
+                            targetWorkItem.SaveToAzureDevOps();
                         }
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
@@ -1274,13 +1293,14 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    ApplySourceClosedDate(currentRevisionWorkItem, targetWorkItem);
+                    // Last before the save, after field maps: the save that changes state must carry the source values (#3270).
+                    var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem);
                     CheckClosedDateIsValid(currentRevisionWorkItem, targetWorkItem);
 
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
-                        var savedChangedBy = targetWorkItem.ToWorkItem().Fields["System.ChangedBy"].Value?.ToString();
                         targetWorkItem.SaveToAzureDevOps();
+                        VerifyStateStampedFieldsSaved(currentRevisionWorkItem, targetWorkItem, stampedFields);
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (CommonTools.WorkItemLink.Enabled && CommonTools.WorkItemLink.HasDeferredLinks)
                         {
@@ -1288,7 +1308,6 @@ namespace MigrationTools.Processors
                             // The child's conflicting parent is removed by saving the child, as before this change.
                             ProcessWorkItemLinks(currentRevisionWorkItem, targetWorkItem, false);
                         }
-                        EnsureStateStampedDatesAfterSave(currentRevisionWorkItem, targetWorkItem, revisionsToMigrate, revision, savedChangedBy);
                     }
                     TraceWriteLine(LogEventLevel.Information,
                         " Saved TargetWorkItem {TargetWorkItemId}. Replayed revision {RevisionNumber} of {RevisionsToMigrateCount}",
@@ -1334,176 +1353,94 @@ namespace MigrationTools.Processors
             return targetWorkItem;
         }
 
-        /// <summary>
-        /// Saves the catch-up changes on an already migrated item. If the target rejects a corrected state-stamped date with
-        /// TF26194, the dates go back to the target's values and the other changes (attachments, links, field maps) are saved
-        /// without them, so the date correction never fails the work item (#3240).
-        /// </summary>
-        private void SaveCatchUp(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, List<(string Field, object SourceValue, object TargetValue)> dateFixUps)
-        {
-            try
-            {
-                targetWorkItem.SaveToAzureDevOps();
-            }
-            catch (Exception ex) when (dateFixUps.Count > 0 && ClosedDateHelper.IsFieldCannotBeChangedError(ex))
-            {
-                var target = targetWorkItem.ToWorkItem();
-                foreach (var (field, sourceValue, targetValue) in dateFixUps)
-                {
-                    Log.LogWarning(ex, "Could not correct {field} on target #{targetId}: it stays {targetValue}, but source #{sourceId} is {sourceValue}. The work item continues to migrate.",
-                        field, targetWorkItem.Id, targetValue, sourceWorkItem.Id, sourceValue);
-                    target.Fields[field].Value = targetValue;
-                }
-                if (target.IsDirty)
-                {
-                    targetWorkItem.SaveToAzureDevOps();
-                }
-            }
-        }
-
         private static string GetClosedDateField(WorkItem workItem)
         {
-            return ClosedDateHelper.ResolveField(
-                workItem.Fields.Contains(ClosedDateHelper.CommonClosedDate),
-                workItem.Fields.Contains(ClosedDateHelper.SystemClosedDate));
+            return StateStampedFields.ResolveClosedDateField(
+                workItem.Fields.Contains(StateStampedFields.CommonClosedDate),
+                workItem.Fields.Contains(StateStampedFields.SystemClosedDate));
         }
 
         /// <summary>
-        /// Sets the target ClosedDate to the source revision's value when the source revision has one.
-        /// Runs after State/Reason, field copying and field maps. With a BypassRules store the field is
-        /// writable even when the object model reports it as not editable (it is rule-controlled).
-        /// Items whose source revision has no ClosedDate (i.e. not closed) are left untouched.
+        /// Sets every state-stamped date and By field on the target to the source revision's value (By fields through the
+        /// user mapping), immediately before the save (#3270). In a revision that changes state the service would otherwise
+        /// stamp the server clock and the migration identity, and nothing can correct them after the save. A field the
+        /// object model has made read-only for the state change is set below its client-side check
+        /// (<see cref="ObjectModelFieldWriter"/>); the service keeps the value because the store bypasses rules.
+        /// Returns the (target field, expected value) pairs, checked again after the save. Throws, so the work item fails
+        /// clearly, if a value cannot be set.
         /// </summary>
-        private void ApplySourceClosedDate(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        private List<(string Field, object Expected)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem)
         {
             var source = sourceRevision.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
-            var targetField = GetClosedDateField(target);
-            if (targetField == null) return;
-            var sourceField = source.Fields.Contains(targetField) ? targetField : GetClosedDateField(source);
-            if (sourceField == null) return;
+            var pairs = new List<(string TargetField, string SourceField)>();
+            var closedTarget = GetClosedDateField(target);
+            if (closedTarget != null)
+            {
+                var closedSource = source.Fields.Contains(closedTarget) ? closedTarget : GetClosedDateField(source);
+                if (closedSource != null) pairs.Add((closedTarget, closedSource));
+            }
+            foreach (var field in StateStampedFields.Fields)
+            {
+                if (target.Fields.Contains(field) && source.Fields.Contains(field)) pairs.Add((field, field));
+            }
 
-            var sourceValue = source.Fields[sourceField].Value;
-            var targetValue = target.Fields[targetField].Value;
-            if (!ClosedDateHelper.NeedsUpdate(sourceValue, targetValue)) return;
-            try
+            var expected = new List<(string Field, object Expected)>();
+            foreach (var (targetField, sourceField) in pairs)
             {
-                target.Fields[targetField].Value = sourceValue;
-                Log.LogDebug("ApplySourceClosedDate: {field} set to source value {value} (was {old})", targetField, sourceValue, targetValue);
+                var field = target.Fields[targetField];
+                var value = source.Fields[sourceField].Value;
+                if (field.FieldDefinition.IsIdentity)
+                {
+                    value = CommonTools.UserMapping.MapUserIdentityValue(targetField, value);
+                }
+                if (StateStampedFields.IsEmpty(value)) value = null;
+                expected.Add((targetField, value));
+                var before = field.Value;
+                if (field.IsEditable)
+                {
+                    if (StateStampedFields.SameValue(value, field.Value)) continue;
+                    try
+                    {
+                        field.Value = value;
+                    }
+                    catch (Exception ex) when (StateStampedFields.IsFieldCannotBeChangedError(ex))
+                    {
+                        ObjectModelFieldWriter.SetBelowClientRules(target, targetField, value);
+                    }
+                }
+                else
+                {
+                    // Read-only here means a state change made the object model leave the field to the service, which
+                    // then stamps it even when it looks empty in memory. Setting it explicitly, empty included, stops that.
+                    ObjectModelFieldWriter.SetBelowClientRules(target, targetField, value);
+                }
+                if (!StateStampedFields.SameValue(value, target.Fields[targetField].Value))
+                {
+                    throw new InvalidOperationException($"Could not set {targetField} on target #{target.Id} to the source value '{value}' from [#{source.Id}][Rev{source.Rev}] before the save (it is '{target.Fields[targetField].Value}'). The revision was not saved.");
+                }
+                Log.LogDebug("State-stamped field {Field} on target #{TargetId} set to source [#{SourceId}][Rev{SourceRev}] value {Value} (was {Before})",
+                    targetField, target.Id, source.Id, source.Rev, value, before);
             }
-            catch (Exception ex)
-            {
-                Log.LogDebug(ex, "ApplySourceClosedDate: could not set {field} before save; a fix-up save will be attempted.", targetField);
-            }
+            return expected;
         }
 
         /// <summary>
-        /// The server applies the current date to ClosedDate, ActivatedDate and ResolvedDate when a revision changes state,
-        /// even with BypassRules (system rules copyFromServerClock), and the same rules make them read-only in that revision,
-        /// so they cannot be set in the revision that changes state. A mismatch after save is corrected with a single
-        /// fix-up revision. A failed fix-up save is retried here, because a later run treats the revision as migrated and
-        /// could then only correct the latest state, not this revision. The fix-up never fails the work item (#3240): a
-        /// date it cannot correct keeps the target's value and is logged.
+        /// Checks the saved revision kept every state-stamped value from the source (#3270). A mismatch means the service
+        /// stamped its own value; the work item fails with the field, the expected and the saved value, rather than
+        /// carrying on with wrong data.
         /// </summary>
-        private void EnsureStateStampedDatesAfterSave(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<RevisionItem> revisionsToMigrate, RevisionItem revision, string savedChangedBy)
+        private void VerifyStateStampedFieldsSaved(WorkItemData sourceRevision, WorkItemData targetWorkItem, List<(string Field, object Expected)> expected)
         {
-            var source = sourceRevision.ToWorkItem();
-            var fixUpDate = revision.ChangedDate.AddMilliseconds(1);
-            var fixUps = new List<(string Field, object SourceValue, object TargetValue)>();
-            for (var attempt = 0; ; attempt++)
+            var target = targetWorkItem.ToWorkItem();
+            var wrong = expected.Where(e => !StateStampedFields.SameValue(e.Expected, target.Fields[e.Field].Value))
+                .Select(e => $"{e.Field} saved as '{target.Fields[e.Field].Value}' but the source is '{e.Expected}'")
+                .ToList();
+            if (wrong.Count > 0)
             {
-                try
-                {
-                    var target = targetWorkItem.ToWorkItem();
-                    fixUps = SetStateStampedDatesFromSource(source, target, "after save");
-                    if (fixUps.Count == 0)
-                    {
-                        // Nothing to fix, or a failed attempt's save reached the server before it threw.
-                        if (attempt == 0) return;
-                        break;
-                    }
-                    target.Fields["System.ChangedDate"].Value = fixUpDate;
-                    target.Fields["System.ChangedBy"].Value = savedChangedBy ?? revision.Fields["System.ChangedBy"].Value.ToString();
-                    targetWorkItem.SaveToAzureDevOps();
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    // Discard the unsaved fix-up values so the caller's IsDirty save cannot persist them.
-                    targetWorkItem.ToWorkItem().Reset();
-                    if (ClosedDateHelper.IsFieldCannotBeChangedError(ex) || attempt >= Options.WorkItemCreateRetryLimit)
-                    {
-                        foreach (var (field, sourceValue, targetValue) in fixUps)
-                        {
-                            Log.LogWarning(ex, "Could not correct {field} on target #{targetId}: it stays {targetValue}, but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}. The work item continues to migrate.",
-                                field, targetWorkItem.Id, targetValue, source.Id, source.Rev, sourceValue);
-                        }
-                        targetWorkItem.ToWorkItem().SyncToLatest();
-                        targetWorkItem.RefreshWorkItem();
-                        break;
-                    }
-                    Log.LogWarning(ex, "Fix-up save for state-stamped dates on target #{targetId} failed; reloading and retrying ({attempt}/{retryLimit}).",
-                        targetWorkItem.Id, attempt + 1, Options.WorkItemCreateRetryLimit);
-                    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(attempt + 1));
-                    targetWorkItem.ToWorkItem().SyncToLatest();
-                    targetWorkItem.RefreshWorkItem();
-                }
+                var source = sourceRevision.ToWorkItem();
+                throw new InvalidOperationException($"Target #{target.Id} revision {target.Rev} (source [#{source.Id}][Rev{source.Rev}]) was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
             }
-
-            var floor = fixUpDate;
-            for (var i = revisionsToMigrate.IndexOf(revision) + 1; i < revisionsToMigrate.Count && revisionsToMigrate[i].ChangedDate <= floor; i++)
-            {
-                revisionsToMigrate[i].ChangedDate = floor.AddMilliseconds(1);
-                floor = revisionsToMigrate[i].ChangedDate;
-            }
-        }
-
-        /// <summary>
-        /// Sets each state-stamped date that differs from the source and that the target lets this connection write, and
-        /// returns those. A date the target makes read-only (see <see cref="ClosedDateHelper.CanFixUp"/>) is logged and left.
-        /// </summary>
-        private List<(string Field, object SourceValue, object TargetValue)> SetStateStampedDatesFromSource(WorkItem source, WorkItem target, string when)
-        {
-            var candidates = new List<(string Field, object SourceValue, object TargetValue)>();
-            var closedTargetField = GetClosedDateField(target);
-            var closedSourceField = closedTargetField == null ? null
-                : source.Fields.Contains(closedTargetField) ? closedTargetField : GetClosedDateField(source);
-            if (closedSourceField != null)
-            {
-                candidates.Add((closedTargetField, source.Fields[closedSourceField].Value, target.Fields[closedTargetField].Value));
-            }
-            foreach (var field in ClosedDateHelper.StateStampedDateFields)
-            {
-                if (target.Fields.Contains(field) && source.Fields.Contains(field))
-                {
-                    candidates.Add((field, source.Fields[field].Value, target.Fields[field].Value));
-                }
-            }
-            var needed = ClosedDateHelper.FieldsNeedingFixUp(candidates);
-            var applied = new List<(string Field, object SourceValue, object TargetValue)>();
-            foreach (var (field, sourceValue, targetValue) in candidates.Where(c => needed.Contains(c.Field)))
-            {
-                if (!ClosedDateHelper.CanFixUp(target.Fields[field].IsEditable, target.Store.BypassRules))
-                {
-                    Log.LogWarning("Could not correct {field} on target #{targetId}: it is {targetValue} {when}, but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}. The target makes it read-only in a revision that does not change state, and this connection does not bypass rules, so it keeps the target's value. Give the migration identity 'Bypass rules on work item updates' in the target to keep the source dates.",
-                        field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
-                    continue;
-                }
-                try
-                {
-                    target.Fields[field].Value = sourceValue;
-                }
-                catch (Exception ex) when (ClosedDateHelper.IsFieldCannotBeChangedError(ex))
-                {
-                    Log.LogWarning(ex, "Could not correct {field} on target #{targetId}: it is {targetValue} {when}, but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}. The target rejected the change, so it keeps the target's value.",
-                        field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
-                    continue;
-                }
-                Log.LogWarning("{field} on target #{targetId} is {targetValue} {when} but source [#{sourceId}][Rev{sourceRev}] is {sourceValue}; applying fix-up save.",
-                    field, target.Id, targetValue, when, source.Id, source.Rev, sourceValue);
-                applied.Add((field, sourceValue, targetValue));
-            }
-            return applied;
         }
 
         private void CheckClosedDateIsValid(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
