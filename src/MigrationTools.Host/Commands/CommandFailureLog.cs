@@ -32,7 +32,7 @@ namespace MigrationTools.Host.Commands
             {
                 Log.Debug(ex, "devopsmigration could not start.");
                 Log.CloseAndFlush();
-                return $"devopsmigration could not start: {Describe(ex)} Fix the cause (for example the configuration file) and run again.";
+                return $"devopsmigration could not start: {Describe(ex)} Fix the cause (for example the configuration file) and run again; with the Serilog MinimumLevel set to Debug the full error is in the log at {LogLocationService.GetLogPath()}.";
             }
 
             string startupLog = Path.Combine(LogLocationService.GetLogPath(), "startup-failure.log");
