@@ -1497,9 +1497,10 @@ namespace MigrationTools.Processors
             // Source revisions are matched on the dates replay used: EnforceDatesMustBeIncreasing (already applied to
             // sourceWorkItem.Revisions by GetRevisionsToMigrate) moves revisions that share a ChangedDate 1 s apart.
             var replayDates = sourceWorkItem.Revisions.Values.ToDictionary(r => r.Index, r => r.ChangedDate.ToUniversalTime());
-            DateTime When(Revision r) => r.WorkItem.Id == source.Id && replayDates.TryGetValue(r.Index, out var d)
-                ? d : ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
-            var sourceRevisions = source.Revisions.Cast<Revision>().OrderBy(When).ToList();
+            // Separate accessors: source and target items in different organisations can have the same ID.
+            DateTime SourceWhen(Revision r) => replayDates.TryGetValue(r.Index, out var d) ? d : ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
+            DateTime TargetWhen(Revision r) => ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
+            var sourceRevisions = source.Revisions.Cast<Revision>().OrderBy(SourceWhen).ToList();
             var fields = new List<string>();
             var closedTarget = GetClosedDateField(target);
             if (closedTarget != null) fields.Add(closedTarget);
@@ -1508,9 +1509,9 @@ namespace MigrationTools.Processors
             var wrong = new List<string>();
             foreach (Revision tr in target.Revisions)
             {
-                var at = When(tr);
-                var sr = sourceRevisions.FirstOrDefault(r => When(r) >= at && (When(r) - at).TotalMilliseconds <= 10)
-                    ?? sourceRevisions.LastOrDefault(r => When(r) <= at);
+                var at = TargetWhen(tr);
+                var sr = sourceRevisions.FirstOrDefault(r => SourceWhen(r) >= at && (SourceWhen(r) - at).TotalMilliseconds <= 10)
+                    ?? sourceRevisions.LastOrDefault(r => SourceWhen(r) <= at);
                 if (sr == null)
                 {
                     wrong.Add($"revision {tr.Index + 1} (dated {at:o}) is earlier than every source revision");
