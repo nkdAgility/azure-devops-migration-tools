@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # statefields3270 assertions (#3270): for every source revision, the target revision with the same ChangedDate has the
 # same State, Reason, state-stamped dates and By fields; the target has no extra (fix-up) revisions; the final state matches.
 param([string]$Src = "amte2e-3270-src", [string]$Tgt = "amte2e-3270-tgt", [string]$OutFile)

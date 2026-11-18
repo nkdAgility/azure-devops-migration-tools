@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # statefields3270: #3270. Every source revision that changes state carries Activated/Resolved/Closed Date and
 # Activated/Resolved/Closed By values that differ from what the target would stamp at migration time (the server clock
 # and the migration identity). Faults on main: A wrong dates, B closed-then-reactivated item part-migrated in the wrong

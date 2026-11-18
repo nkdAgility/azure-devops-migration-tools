@@ -235,11 +235,15 @@ namespace MigrationTools.Processors
                                 ExceptionDispatchInfo.Capture(stop).Throw();
                             }
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
-                            workItemLog.Error(e, "Could not save migrated work item {WorkItemId}, an exception occurred.", sourceWorkItem.Id);
+                            var failure = (e as AggregateException)?.Flatten().InnerExceptions.OfType<WorkItemMigrationFailedException>().FirstOrDefault()
+                                ?? e as WorkItemMigrationFailedException;
+                            var message = failure?.Message ?? WorkItemMigrationFailedException.Describe(sourceWorkItem.Id.ToString(), null, null, sourceWorkItem.Type?.Name, e);
+                            workItemLog.Error("{FailureMessage}", message);
+                            Log.LogDebug(e, "Details for source work item {WorkItemId}", sourceWorkItem.Id);
 
                             if (Options.StopOnFirstError)
                             {
-                                throw;
+                                throw new MigrationRunStoppedException($"StopOnFirstError is true and source work item {sourceWorkItem.Id} failed: {message}", e);
                             }
 
                             if (ShouldAbortAfterFailure(Options.StopOnFirstError, Options.MaxGracefulFailures, _itemsInError.Count))
@@ -938,9 +942,9 @@ namespace MigrationTools.Processors
                     activity?.Stop();
                     activity?.SetStatus(ActivityStatusCode.Error);
                     activity?.SetTag("http.response.status_code", "502");
-                    Log.LogError(ex, ex.ToString());
+                    Log.LogDebug(ex, "Migrating source work item {SourceId} failed.", sourceWorkItem?.Id);
                     Telemetry.TrackException(ex, activity.Tags);
-                    throw ex;
+                    throw;
                 }
                 activity?.Stop();
                 progressTimer.AddProcessedItem(activity.Duration, retries > 0);
@@ -1124,6 +1128,7 @@ namespace MigrationTools.Processors
 
         private WorkItemData ReplayRevisions(List<RevisionItem> revisionsToMigrate, WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
+            RevisionItem replaying = null;
             try
             {
                 //If work item hasn't been created yet, create a shell
@@ -1165,6 +1170,7 @@ namespace MigrationTools.Processors
 
                 foreach (var revision in revisionsToMigrate)
                 {
+                    replaying = revision;
                     workItemMetrics.RevisionsProcessedCount.Add(1);
                     var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
@@ -1332,22 +1338,16 @@ namespace MigrationTools.Processors
                         parameters.Add($"{f.ReferenceName} ({f.Name})", f.Value?.ToString());
                 }
                 Telemetry.TrackException(ex, parameters);
-                TraceWriteLine(LogEventLevel.Information, "...FAILED to Save");
-                Log.LogInformation("===============================================================");
+                // The full exception and the field values are for diagnosis only (#3275); the clear message is logged by the caller.
+                Log.LogDebug(ex, "Saving source work item {SourceId} failed. Target field values follow.", sourceWorkItem.Id);
                 if (targetWorkItem != null)
                 {
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
-                        TraceWriteLine(LogEventLevel.Information, "{FieldReferenceName} ({FieldName}) | {FieldValue}",
-                            new Dictionary<string, object>()
-                            {
-                                { "FieldReferenceName", f.ReferenceName }, { "FieldName", f.Name },
-                                { "FieldValue", f.Value }
-                            });
+                        Log.LogDebug("{FieldReferenceName} ({FieldName}) | {FieldValue}", f.ReferenceName, f.Name, f.Value);
                 }
-                Log.LogInformation("===============================================================");
-                Log.LogError(ex.ToString(), ex);
-                Log.LogInformation("===============================================================");
-                throw;
+                var type = replaying?.Type ?? sourceWorkItem.Type;
+                throw new WorkItemMigrationFailedException(
+                    WorkItemMigrationFailedException.Describe(sourceWorkItem.Id, replaying?.Number, targetWorkItem?.Id, type, ex), ex);
             }
 
             return targetWorkItem;
@@ -1417,7 +1417,7 @@ namespace MigrationTools.Processors
                 }
                 if (!StateStampedFields.SameValue(value, target.Fields[targetField].Value))
                 {
-                    throw new InvalidOperationException($"Could not set {targetField} on target #{target.Id} to the source value '{value}' from [#{source.Id}][Rev{source.Rev}] before the save (it is '{target.Fields[targetField].Value}'). The revision was not saved.");
+                    throw new InvalidOperationException($"the state-stamped field {targetField} could not be set to the source value '{value}' before the save (the object model kept '{target.Fields[targetField].Value}'), so the revision was not saved.");
                 }
                 Log.LogDebug("State-stamped field {Field} on target #{TargetId} set to source [#{SourceId}][Rev{SourceRev}] value {Value} (was {Before})",
                     targetField, target.Id, source.Id, source.Rev, value, before);
@@ -1438,8 +1438,7 @@ namespace MigrationTools.Processors
                 .ToList();
             if (wrong.Count > 0)
             {
-                var source = sourceRevision.ToWorkItem();
-                throw new InvalidOperationException($"Target #{target.Id} revision {target.Rev} (source [#{source.Id}][Rev{source.Rev}]) was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
+                throw new InvalidOperationException($"target revision {target.Rev} was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
             }
         }
 
