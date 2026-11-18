@@ -902,7 +902,7 @@ namespace MigrationTools.Processors
                             });
                     }
                 }
-                catch (WebException ex)
+                catch (Exception ex) when (IsTransientNetworkError(ex))
                 {
                     Log.LogWarning("Network error while migrating source work item {SourceId}: {Reason}", sourceWorkItem?.Id, WorkItemMigrationFailedException.ServerReason(ex));
                     Log.LogDebug(ex, "Network error details for source work item {SourceId}", sourceWorkItem?.Id);
@@ -1371,13 +1371,28 @@ namespace MigrationTools.Processors
         /// </summary>
         internal static Exception PassThroughReplay(Exception ex)
         {
-            if (ex is MigrationRunStoppedException || ex is WebException) return ex;
+            if (ex is MigrationRunStoppedException || IsTransientNetworkError(ex) && !(ex is AggregateException)) return ex;
             if (ex is AggregateException agg)
             {
                 var inner = agg.Flatten().InnerExceptions;
-                return (Exception)inner.OfType<MigrationRunStoppedException>().FirstOrDefault() ?? inner.OfType<WebException>().FirstOrDefault();
+                return (Exception)inner.OfType<MigrationRunStoppedException>().FirstOrDefault() ?? inner.FirstOrDefault(IsTransientNetworkError);
             }
             return null;
+        }
+
+        /// <summary>
+        /// True when the connection to Azure DevOps failed, so the work item can be tried again: a <see cref="WebException"/>,
+        /// or the object model's <c>TeamFoundationServiceUnavailableException</c> (TF400324) that wraps one, anywhere in the
+        /// exception or inside an <see cref="AggregateException"/>.
+        /// </summary>
+        internal static bool IsTransientNetworkError(Exception ex)
+        {
+            for (var e = ex; e != null; e = e.InnerException)
+            {
+                if (e is WebException || e is Microsoft.TeamFoundation.TeamFoundationServiceUnavailableException) return true;
+                if (e is AggregateException agg && agg.Flatten().InnerExceptions.Any(IsTransientNetworkError)) return true;
+            }
+            return false;
         }
 
         private static string GetClosedDateField(WorkItem workItem)
@@ -1497,9 +1512,10 @@ namespace MigrationTools.Processors
             // Source revisions are matched on the dates replay used: EnforceDatesMustBeIncreasing (already applied to
             // sourceWorkItem.Revisions by GetRevisionsToMigrate) moves revisions that share a ChangedDate 1 s apart.
             var replayDates = sourceWorkItem.Revisions.Values.ToDictionary(r => r.Index, r => r.ChangedDate.ToUniversalTime());
-            DateTime When(Revision r) => r.WorkItem.Id == source.Id && replayDates.TryGetValue(r.Index, out var d)
-                ? d : ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
-            var sourceRevisions = source.Revisions.Cast<Revision>().OrderBy(When).ToList();
+            // Separate accessors: source and target items in different organisations can have the same ID.
+            DateTime SourceWhen(Revision r) => replayDates.TryGetValue(r.Index, out var d) ? d : ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
+            DateTime TargetWhen(Revision r) => ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
+            var sourceRevisions = source.Revisions.Cast<Revision>().OrderBy(SourceWhen).ToList();
             var fields = new List<string>();
             var closedTarget = GetClosedDateField(target);
             if (closedTarget != null) fields.Add(closedTarget);
@@ -1508,9 +1524,9 @@ namespace MigrationTools.Processors
             var wrong = new List<string>();
             foreach (Revision tr in target.Revisions)
             {
-                var at = When(tr);
-                var sr = sourceRevisions.FirstOrDefault(r => When(r) >= at && (When(r) - at).TotalMilliseconds <= 10)
-                    ?? sourceRevisions.LastOrDefault(r => When(r) <= at);
+                var at = TargetWhen(tr);
+                var sr = sourceRevisions.FirstOrDefault(r => SourceWhen(r) >= at && (SourceWhen(r) - at).TotalMilliseconds <= 10)
+                    ?? sourceRevisions.LastOrDefault(r => SourceWhen(r) <= at);
                 if (sr == null)
                 {
                     wrong.Add($"revision {tr.Index + 1} (dated {at:o}) is earlier than every source revision");
