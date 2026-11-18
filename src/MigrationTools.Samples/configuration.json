@@ -132,7 +132,7 @@
       "AttachmentWorkingPath": "c:\\temp\\WorkItemAttachmentWorkingFolder\\",
       "FixHtmlAttachmentLinks": false,
       "WorkItemCreateRetryLimit": 5,
-      "FilterWorkItemsThatAlreadyExistInTarget": true,
+      "FilterWorkItemsThatAlreadyExistInTarget": false,
       "PauseAfterEachWorkItem": false,
       "CollapseRevisions": false
     }

@@ -96,8 +96,9 @@ options:
 - parameterName: FilterWorkItemsThatAlreadyExistInTarget
   type: Boolean
   description: >-
-    This loads all of the work items already saved to the Target and removes them from the Source work item list prior to commencing the run.
-     While this may take some time in large data sets it reduces the time of the overall migration significantly if you need to restart.
+    Ignored by the work item migration processor, which logs a warning when it is true (#3270). Work items already in
+     the target are no longer skipped: every run checks their migrated revisions against the source, so revisions saved
+     with wrong state-stamped values are reported instead of being skipped as migrated.
   defaultValue: false
   isRequired: false
   dotNetType: System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e

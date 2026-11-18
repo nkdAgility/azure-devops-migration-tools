@@ -84,3 +84,8 @@ These are the facts and decisions Martin has given, so they can be checked. They
 ## 2026-11-13
 
 - **Decision:** on PR #3249 (#3241), the two failure paths that can't be forced on the test organisations stay untested live: the read-back of a new field failing after a successful create, and the service rejecting an update to an existing picklist. They are covered by code review and unit tests and listed under "Not covered" in the PR.
+
+## 2026-11-18
+
+- **Decision (Martin, #3270):** turn off `FilterWorkItemsThatAlreadyExistInTarget`, because with it on a rerun skips an item whose state-stamped values were saved wrong and never reports it. Done as: `false` in the sample `configuration.json` and the e2e scenario configs (the option's default was already `false` and is kept for existing configs). A rerun now also compares every target revision (each matched to the source revision it replays) on dates, By fields and state with the source and fails that work item clearly if any differ.
+- **Built (to check):** the work item migration processor now ignores `FilterWorkItemsThatAlreadyExistInTarget` and logs a warning when it is `true`, so a config that still enables it cannot skip the rerun check (follows Martin's "turn that off").

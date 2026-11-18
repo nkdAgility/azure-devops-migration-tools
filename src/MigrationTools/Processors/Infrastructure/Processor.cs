@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -111,7 +111,8 @@ namespace MigrationTools.Processors.Infrastructure
                 {
                     Status = ProcessingStatus.Failed;
                     ProcessorActivity.SetStatus(ActivityStatusCode.Error);
-                    Log.LogCritical(ex, "{MigrationContextname} stopped: {Reason}", Name, ex.Message);
+                    Log.LogCritical("{MigrationContextname} stopped: {Reason}", Name, ex.Message);
+                    Log.LogDebug(ex, "{MigrationContextname} stop details", Name);
                 }
                 catch (OptionsValidationException ex)
                 {
@@ -145,7 +146,8 @@ namespace MigrationTools.Processors.Infrastructure
                 {
                     Status = ProcessingStatus.Failed;
                     ProcessorActivity.SetStatus(ActivityStatusCode.Error);
-                    Log.LogCritical(ex, "Error while running {MigrationContextname}", Name);
+                    Log.LogCritical("Error while running {MigrationContextname}: {Reason} Run with Serilog MinimumLevel 'Debug' for the full details.", Name, ex.GetBaseException().Message);
+                    Log.LogDebug(ex, "Error details for {MigrationContextname}", Name);
                     Telemetry.TrackException(ex, ProcessorActivity.Tags);
                 }
                 finally
