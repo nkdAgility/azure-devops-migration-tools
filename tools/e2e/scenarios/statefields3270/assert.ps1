@@ -28,12 +28,12 @@ function Compare-Rev($sr, $tr, [string[]]$names, [string]$label) {
 $stamped = $fields | Where-Object { $_ -notin "System.State", "System.Reason" }
 $r = @()
 # The source kept the seeded identity, so a target showing the migration account cannot pass by matching a source that does too.
-foreach ($k in "s1", "s2", "s3", "s6") {
+foreach ($k in "s1", "s2", "s3", "s6", "s7", "s8") {
     $act = @(Get-E2ERevisions $s.$k -Org nkdagility-adomt-source) | Where-Object { $_.fields.'Microsoft.VSTS.Common.ActivatedBy' } | Select-Object -First 1
     $by = if ($act) { $act.fields.'Microsoft.VSTS.Common.ActivatedBy'.displayName } else { "" }
     $r += New-E2EResult "$k source ActivatedBy is the seeded identity" ($by -ceq $s.ghost -or $by -ceq ($s.ghost -replace ' <.*$', '')) "'$by'"
 }
-foreach ($k in "s1", "s2", "s3", "s4", "s5", "s6") {
+foreach ($k in "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8") {
     $id = $s.$k
     $t = Find-E2ETargetItem $Tgt $id -Org nkdagility-adomt-target
     if (-not $t) { $r += New-E2EResult "$k src #$id migrated" $false "no target item"; continue }

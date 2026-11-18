@@ -65,6 +65,23 @@ Set-State $s6.id "Active" (& $act "2026-09-15T09:00:00Z")
 $tc = & $clo "2026-09-16T09:00:00Z"; $tc["System.WorkItemType"] = "User Story"
 Set-State $s6.id "Closed" $tc
 
-Save-E2EState $PSScriptRoot @{ s1 = $s1.id; s2 = $s2.id; s3 = $s3.id; s4 = $s4.id; s5 = $s5.id; s6 = $s6.id; ghost = $ghost }
-"seeded statefields3270: S1 $($s1.id) S2 $($s2.id) S3 $($s3.id) S4 $($s4.id) S5 $($s5.id) S6 $($s6.id)"
+# S7 (shape of a customer item, fault C): User Story New -> Closed in ONE revision by another user, so all three dates and
+# all three By fields are stamped in the same save.
+$s7 = Set-E2EWorkItem $Src "User Story" -Fields ([ordered]@{ "System.Title" = "3270 S7 new to closed in one save" })
+$all = [ordered]@{}; foreach ($m in (& $act "2026-09-20T09:00:00Z"), (& $res "2026-09-20T09:00:00Z"), (& $clo "2026-09-20T09:00:00Z")) { foreach ($k in $m.Keys) { $all[$k] = $m[$k] } }
+$all["System.Reason"] = "Acceptance tests pass"
+Set-State $s7.id "Closed" $all
+
+# S8 (shape of a customer item, fault B): Agile Task New -> Active -> New -> Active -> Closed -> Active by another user;
+# Task has no Resolved state. On main the fix-up at the close failed with TF26194 and the reactivation was never written.
+$s8 = Set-E2EWorkItem $Src "Task" -Fields ([ordered]@{ "System.Title" = "3270 S8 task halted, closed and reactivated" })
+$st = & $act "2026-09-21T09:00:00Z"; $st["System.Reason"] = "Work started"; Set-State $s8.id "Active" $st
+Set-State $s8.id "New" ([ordered]@{ "System.Reason" = "Work halted"; "Microsoft.VSTS.Common.ActivatedDate" = ""; "Microsoft.VSTS.Common.ActivatedBy" = "" })
+$st = & $act "2026-09-21T15:00:00Z"; $st["System.Reason"] = "Work started"; Set-State $s8.id "Active" $st
+$cl = & $clo "2026-09-23T09:00:00Z"; $cl["System.Reason"] = "Completed"; Set-State $s8.id "Closed" $cl
+$ra = & $act "2026-09-23T09:05:00Z"; $ra["System.Reason"] = "Reactivated"; $ra["Microsoft.VSTS.Common.ClosedDate"] = ""; $ra["Microsoft.VSTS.Common.ClosedBy"] = ""
+Set-State $s8.id "Active" $ra
+
+Save-E2EState $PSScriptRoot @{ s1 = $s1.id; s2 = $s2.id; s3 = $s3.id; s4 = $s4.id; s5 = $s5.id; s6 = $s6.id; s7 = $s7.id; s8 = $s8.id; ghost = $ghost }
+"seeded statefields3270: S1 $($s1.id) S2 $($s2.id) S3 $($s3.id) S4 $($s4.id) S5 $($s5.id) S6 $($s6.id) S7 $($s7.id) S8 $($s8.id)"
 
