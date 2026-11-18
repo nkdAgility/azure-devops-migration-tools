@@ -44,10 +44,14 @@ namespace MigrationTools.Tests.Processors
         [TestMethod, TestCategory("L0")]
         public void PassThroughReplay_StopAndNetworkErrors_AreNotWrapped()
         {
-            Assert.IsTrue(TfsWorkItemMigrationProcessor.PassThroughReplay(new MigrationTools.Exceptions.MigrationRunStoppedException("stop")));
-            Assert.IsTrue(TfsWorkItemMigrationProcessor.PassThroughReplay(new System.Net.WebException("net")));
-            Assert.IsTrue(TfsWorkItemMigrationProcessor.PassThroughReplay(new AggregateException(new System.Net.WebException("net"))));
-            Assert.IsFalse(TfsWorkItemMigrationProcessor.PassThroughReplay(new InvalidOperationException("save failed")));
+            var stop = new MigrationTools.Exceptions.MigrationRunStoppedException("stop");
+            var net = new System.Net.WebException("net");
+            Assert.AreSame(stop, TfsWorkItemMigrationProcessor.PassThroughReplay(stop));
+            Assert.AreSame(net, TfsWorkItemMigrationProcessor.PassThroughReplay(net));
+            // The caller's retry catches WebException itself, so an aggregated one must come out unwrapped.
+            Assert.AreSame(net, TfsWorkItemMigrationProcessor.PassThroughReplay(new AggregateException(net)));
+            Assert.AreSame(stop, TfsWorkItemMigrationProcessor.PassThroughReplay(new AggregateException(new AggregateException(stop))));
+            Assert.IsNull(TfsWorkItemMigrationProcessor.PassThroughReplay(new InvalidOperationException("save failed")));
         }
 
         [TestMethod, TestCategory("L0")]

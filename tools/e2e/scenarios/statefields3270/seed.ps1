@@ -82,6 +82,14 @@ $cl = & $clo "2026-09-23T09:00:00Z"; $cl["System.Reason"] = "Completed"; Set-Sta
 $ra = & $act "2026-09-23T09:05:00Z"; $ra["System.Reason"] = "Reactivated"; $ra["Microsoft.VSTS.Common.ClosedDate"] = ""; $ra["Microsoft.VSTS.Common.ClosedBy"] = ""
 Set-State $s8.id "Active" $ra
 
-Save-E2EState $PSScriptRoot @{ s1 = $s1.id; s2 = $s2.id; s3 = $s3.id; s4 = $s4.id; s5 = $s5.id; s6 = $s6.id; s7 = $s7.id; s8 = $s8.id; ghost = $ghost }
-"seeded statefields3270: S1 $($s1.id) S2 $($s2.id) S3 $($s3.id) S4 $($s4.id) S5 $($s5.id) S6 $($s6.id) S7 $($s7.id) S8 $($s8.id)"
+# S9 (repeated dates): three state changes that share one ChangedDate, as a source that was itself migrated can have.
+# Replay moves them 1 s apart, so the rerun check must match on those replay dates.
+$s9 = Set-E2EWorkItem $Src "Bug" -BypassRules -Fields ([ordered]@{ "System.Title" = "3270 S9 repeated dates"; "System.CreatedDate" = "2026-09-25T08:00:00Z"; "System.ChangedDate" = "2026-09-25T08:00:00Z" })
+foreach ($step in @(@("Active", (& $act "2026-09-25T09:00:00Z")), @("Resolved", (& $res "2026-09-25T09:00:00Z")), @("Closed", (& $clo "2026-09-25T09:00:00Z")))) {
+    $f = $step[1]; $f["System.ChangedDate"] = "2026-09-25T09:00:00Z"
+    Set-State $s9.id $step[0] $f
+}
+
+Save-E2EState $PSScriptRoot @{ s1 = $s1.id; s2 = $s2.id; s3 = $s3.id; s4 = $s4.id; s5 = $s5.id; s6 = $s6.id; s7 = $s7.id; s8 = $s8.id; s9 = $s9.id; ghost = $ghost }
+"seeded statefields3270: S1 $($s1.id) S2 $($s2.id) S3 $($s3.id) S4 $($s4.id) S5 $($s5.id) S6 $($s6.id) S7 $($s7.id) S8 $($s8.id) S9 $($s9.id)"
 

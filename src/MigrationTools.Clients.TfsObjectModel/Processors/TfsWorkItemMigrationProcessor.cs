@@ -1362,8 +1362,10 @@ namespace MigrationTools.Processors
                     foreach (Field f in targetWorkItem.ToWorkItem().Fields)
                         Log.LogDebug("{FieldReferenceName} ({FieldName}) | {FieldValue}", f.ReferenceName, f.Name, f.Value);
                 }
-                // A run stop must still stop the run, and a network error must still reach the caller's retry.
-                if (PassThroughReplay(ex)) throw;
+                // A run stop must still stop the run, and a network error must still reach the caller's retry, which
+                // catches a WebException itself, so one inside an AggregateException (from .Result) is unwrapped.
+                var passThrough = PassThroughReplay(ex);
+                if (passThrough != null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(passThrough).Throw();
                 var type = replaying?.Type ?? sourceWorkItem.Type;
                 throw new WorkItemMigrationFailedException(
                     WorkItemMigrationFailedException.Describe(sourceWorkItem.Id, replaying?.Number, targetWorkItem?.Id, type, ex), ex);
@@ -1373,13 +1375,18 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// True for exceptions the replay must not wrap: a run stop, which ends the run, and a network error, which
-        /// <see cref="ProcessWorkItemAsync"/> retries. Looks inside an <see cref="AggregateException"/> (from <c>.Result</c>).
+        /// The exception the replay must rethrow unwrapped, or null: a run stop, which ends the run, or a network error,
+        /// which <see cref="ProcessWorkItemAsync"/> retries; taken out of an <see cref="AggregateException"/> (from <c>.Result</c>).
         /// </summary>
-        internal static bool PassThroughReplay(Exception ex)
+        internal static Exception PassThroughReplay(Exception ex)
         {
-            var all = ex is AggregateException agg ? agg.Flatten().InnerExceptions.Concat(new[] { ex }) : new[] { ex };
-            return all.Any(e => e is MigrationRunStoppedException || e is WebException);
+            if (ex is MigrationRunStoppedException || ex is WebException) return ex;
+            if (ex is AggregateException agg)
+            {
+                var inner = agg.Flatten().InnerExceptions;
+                return (Exception)inner.OfType<MigrationRunStoppedException>().FirstOrDefault() ?? inner.OfType<WebException>().FirstOrDefault();
+            }
+            return null;
         }
 
         private static string GetClosedDateField(WorkItem workItem)
@@ -1496,7 +1503,11 @@ namespace MigrationTools.Processors
         {
             var source = sourceWorkItem.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
-            DateTime When(Revision r) => ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
+            // Source revisions are matched on the dates replay used: EnforceDatesMustBeIncreasing (already applied to
+            // sourceWorkItem.Revisions by GetRevisionsToMigrate) moves revisions that share a ChangedDate 1 s apart.
+            var replayDates = sourceWorkItem.Revisions.Values.ToDictionary(r => r.Index, r => r.ChangedDate.ToUniversalTime());
+            DateTime When(Revision r) => r.WorkItem.Id == source.Id && replayDates.TryGetValue(r.Index, out var d)
+                ? d : ((DateTime)r.Fields["System.ChangedDate"].Value).ToUniversalTime();
             var sourceRevisions = source.Revisions.Cast<Revision>().OrderBy(When).ToList();
             var fields = new List<string>();
             var closedTarget = GetClosedDateField(target);

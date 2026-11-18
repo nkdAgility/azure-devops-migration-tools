@@ -28,12 +28,12 @@ function Compare-Rev($sr, $tr, [string[]]$names, [string]$label) {
 $stamped = $fields | Where-Object { $_ -notin "System.State", "System.Reason" }
 $r = @()
 # The source kept the seeded identity, so a target showing the migration account cannot pass by matching a source that does too.
-foreach ($k in "s1", "s2", "s3", "s6", "s7", "s8") {
+foreach ($k in "s1", "s2", "s3", "s6", "s7", "s8", "s9") {
     $act = @(Get-E2ERevisions $s.$k -Org nkdagility-adomt-source) | Where-Object { $_.fields.'Microsoft.VSTS.Common.ActivatedBy' } | Select-Object -First 1
     $by = if ($act) { $act.fields.'Microsoft.VSTS.Common.ActivatedBy'.displayName } else { "" }
     $r += New-E2EResult "$k source ActivatedBy is the seeded identity" ($by -ceq $s.ghost -or $by -ceq ($s.ghost -replace ' <.*$', '')) "'$by'"
 }
-foreach ($k in "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8") {
+foreach ($k in "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9") {
     $id = $s.$k
     $t = Find-E2ETargetItem $Tgt $id -Org nkdagility-adomt-target
     if (-not $t) { $r += New-E2EResult "$k src #$id migrated" $false "no target item"; continue }
@@ -41,18 +41,20 @@ foreach ($k in "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8") {
     $tRevs = @(Get-E2ERevisions $t.id -Org nkdagility-adomt-target)
     # Match in order, each target revision used once. A type change is replayed as a REST save dated 3 ms before the
     # source revision, then the object-model save at the source date; both must carry the source's stamped values.
-    $bad = @(); $extra = @(); $typeChange = 0; $i = 0; $prevType = $null
+    $bad = @(); $extra = @(); $typeChange = 0; $i = 0; $prevType = $null; $last = [datetime]::MinValue
     foreach ($sr in $sRevs) {
-        while ($i -lt $tRevs.Count -and (T $tRevs[$i]) -lt (T $sr)) {
+        # The date replay used: a revision not later than the previous one moves 1 s after it (EnforceDatesMustBeIncreasing).
+        $d = T $sr; if ($d -le $last) { $d = $last.AddSeconds(1) }; $last = $d
+        while ($i -lt $tRevs.Count -and (T $tRevs[$i]) -lt $d) {
             $tr = $tRevs[$i]
             # Only where the source type changes: one REST type-change save, dated just before the source revision.
-            if ($null -ne $prevType -and $prevType -ne $sr.fields.'System.WorkItemType' -and ((T $sr) - (T $tr)).TotalMilliseconds -le 10 -and $tr.fields.'System.WorkItemType' -eq $sr.fields.'System.WorkItemType') {
+            if ($null -ne $prevType -and $prevType -ne $sr.fields.'System.WorkItemType' -and ($d - (T $tr)).TotalMilliseconds -le 10 -and $tr.fields.'System.WorkItemType' -eq $sr.fields.'System.WorkItemType') {
                 $prevType = $sr.fields.'System.WorkItemType'
                 $typeChange++; $bad += @(Compare-Rev $sr $tr $stamped " (type change)")
             } else { $extra += $tr }
             $i++
         }
-        if ($i -ge $tRevs.Count -or (K $tRevs[$i]) -ne (K $sr)) { $bad += "src rev $($sr.rev) $(K $sr): no target revision"; continue }
+        if ($i -ge $tRevs.Count -or (K $tRevs[$i]) -ne $d.ToString("o")) { $bad += "src rev $($sr.rev) $($d.ToString('o')): no target revision"; continue }
         $bad += @(Compare-Rev $sr $tRevs[$i] $fields ""); $i++; $prevType = $sr.fields.'System.WorkItemType'
     }
     $extra += @($tRevs | Select-Object -Skip $i)
