@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 $s = Read-E2EState $PSScriptRoot
 $fields = "System.State", "System.Reason",
-    "Microsoft.VSTS.Common.ActivatedDate", "Microsoft.VSTS.Common.ResolvedDate", "Microsoft.VSTS.Common.ClosedDate",
+    "Microsoft.VSTS.Common.ActivatedDate", "Microsoft.VSTS.Common.ResolvedDate", "Microsoft.VSTS.Common.ClosedDate", "Microsoft.VSTS.Common.StateChangeDate",
     "Microsoft.VSTS.Common.ActivatedBy", "Microsoft.VSTS.Common.ResolvedBy", "Microsoft.VSTS.Common.ClosedBy"
 function V($rev, [string]$f) {
     $v = $rev.fields.$f

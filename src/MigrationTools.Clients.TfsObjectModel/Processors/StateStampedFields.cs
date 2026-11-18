@@ -17,11 +17,13 @@ namespace MigrationTools.Processors
         public const string CommonActivatedBy = "Microsoft.VSTS.Common.ActivatedBy";
         public const string CommonResolvedBy = "Microsoft.VSTS.Common.ResolvedBy";
         public const string CommonClosedBy = "Microsoft.VSTS.Common.ClosedBy";
+        /// <summary>Stamped with the server clock on every state change, and when the work item is created.</summary>
+        public const string CommonStateChangeDate = "Microsoft.VSTS.Common.StateChangeDate";
 
         /// <summary>The state-stamped fields other than ClosedDate, which is resolved per work item type by <see cref="ResolveClosedDateField"/>.</summary>
         public static readonly IReadOnlyList<string> Fields = new[]
         {
-            CommonActivatedDate, CommonResolvedDate, CommonActivatedBy, CommonResolvedBy, CommonClosedBy
+            CommonActivatedDate, CommonResolvedDate, CommonStateChangeDate, CommonActivatedBy, CommonResolvedBy, CommonClosedBy
         };
 
         /// <summary>Returns the ClosedDate field to use, preferring Microsoft.VSTS.Common.ClosedDate, or null if neither exists.</summary>

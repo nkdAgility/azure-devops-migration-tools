@@ -16,7 +16,7 @@ namespace MigrationTools.Tests.Processors
         {
             CollectionAssert.AreEquivalent(new[]
             {
-                StateStampedFields.CommonActivatedDate, StateStampedFields.CommonResolvedDate,
+                StateStampedFields.CommonActivatedDate, StateStampedFields.CommonResolvedDate, StateStampedFields.CommonStateChangeDate,
                 StateStampedFields.CommonActivatedBy, StateStampedFields.CommonResolvedBy, StateStampedFields.CommonClosedBy
             }, StateStampedFields.Fields.ToList());
         }
