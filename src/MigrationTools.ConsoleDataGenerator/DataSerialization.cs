@@ -567,24 +567,17 @@ namespace MigrationTools.ConsoleDataGenerator
         }
 
         /// <summary>
-        /// The configuration binder accepts an enum by name in any case, or by number as a number or a string, so the schema accepts
-        /// all of those and rejects anything else, such as a misspelt name. JSON Schema has no case-insensitive enum, so names are
-        /// matched by a pattern with a character class per letter.
+        /// An enum is written as a string: its name in any case, or its number (for example "1"), which the configuration binder both
+        /// accepts. Anything else, such as a misspelt name, is rejected. JSON Schema has no case-insensitive enum, so names are matched
+        /// by a pattern with a character class per letter. A JSON number is not allowed, as before: JSON Schema cannot tell 1 from 1.0,
+        /// and the binder rejects 1.0.
         /// </summary>
         internal static JSchema BuildEnumSchema(Type enumType, string description)
         {
-            var numbers = Enum.GetValues(enumType).Cast<object>().Select(v => Convert.ToInt64(v, CultureInfo.InvariantCulture)).Distinct().ToList();
+            var numbers = Enum.GetValues(enumType).Cast<object>().Select(v => Convert.ToInt64(v, CultureInfo.InvariantCulture)).Distinct();
             var alternatives = Enum.GetNames(enumType).Select(CaseInsensitivePattern)
                 .Concat(numbers.Select(n => n.ToString(CultureInfo.InvariantCulture)));
-            var schema = new JSchema { Description = description };
-            schema.AnyOf.Add(new JSchema { Type = JSchemaType.String, Pattern = "^(?:" + string.Join("|", alternatives) + ")$" });
-            var integers = new JSchema { Type = JSchemaType.Integer };
-            foreach (var n in numbers)
-            {
-                integers.Enum.Add(new JValue(n));
-            }
-            schema.AnyOf.Add(integers);
-            return schema;
+            return new JSchema { Type = JSchemaType.String, Description = description, Pattern = "^(?:" + string.Join("|", alternatives) + ")$" };
         }
 
         private static string CaseInsensitivePattern(string name) =>
@@ -597,6 +590,10 @@ namespace MigrationTools.ConsoleDataGenerator
                 t = underlying;
             }
 
+            if (t.IsEnum)
+            {
+                return BuildEnumSchema(t, null);
+            }
             if (IsSimpleDotNetType(t))
             {
                 return new JSchema { Type = GetJsonSchemaType(t.Name) };

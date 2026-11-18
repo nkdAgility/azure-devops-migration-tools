@@ -81,21 +81,9 @@
     },
     "ValidateMappingTargets": {
       "description": "Which targets in the UserMappingFile are resolved against the target identities at startup. All checks every mapping in the\r\n file; Referenced checks only the mappings whose source user appears in an identity field of the work items being migrated;\r\n Skip turns the check off. With Skip, a target that does not resolve is saved as plain text and StopIfMappingTargetsDoNotResolve\r\n has no effect.",
+      "type": "string",
       "default": "All",
-      "anyOf": [
-        {
-          "type": "string",
-          "pattern": "^(?:[Aa][Ll][Ll]|[Rr][Ee][Ff][Ee][Rr][Ee][Nn][Cc][Ee][Dd]|[Ss][Kk][Ii][Pp]|0|1|2)$"
-        },
-        {
-          "type": "integer",
-          "enum": [
-            0,
-            1,
-            2
-          ]
-        }
-      ]
+      "pattern": "^(?:[Aa][Ll][Ll]|[Rr][Ee][Ff][Ee][Rr][Ee][Nn][Cc][Ee][Dd]|[Ss][Kk][Ii][Pp]|0|1|2)$"
     }
   }
 }

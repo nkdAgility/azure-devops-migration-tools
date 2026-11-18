@@ -30,21 +30,8 @@
                   },
                   "AuthenticationMode": {
                     "description": "Authentication mode to use when connecting to Azure DevOps: AccessToken (a PAT in AccessToken) or EntraId (a Microsoft Entra ID token from the signed-in identity, such as az login, a managed identity or workload identity federation, with no secret stored in configuration).",
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "pattern": "^(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)$"
-                      },
-                      {
-                        "type": "integer",
-                        "enum": [
-                          0,
-                          1,
-                          2,
-                          3
-                        ]
-                      }
-                    ]
+                    "type": "string",
+                    "pattern": "^(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)$"
                   },
                   "Enabled": {
                     "description": "Will be used if enabled",
@@ -165,7 +152,8 @@
                     ],
                     "properties": {
                       "AuthenticationMode": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)$"
                       },
                       "NetworkCredentials": {
                         "type": [
@@ -252,20 +240,8 @@
                   },
                   "ProductVersion": {
                     "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
-                      },
-                      {
-                        "type": "integer",
-                        "enum": [
-                          0,
-                          1,
-                          2
-                        ]
-                      }
-                    ]
+                    "type": "string",
+                    "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
                   },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
@@ -314,7 +290,8 @@
                     ],
                     "properties": {
                       "AuthenticationMode": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)$"
                       },
                       "NetworkCredentials": {
                         "type": [
@@ -401,20 +378,8 @@
                   },
                   "ProductVersion": {
                     "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
-                      },
-                      {
-                        "type": "integer",
-                        "enum": [
-                          0,
-                          1,
-                          2
-                        ]
-                      }
-                    ]
+                    "type": "string",
+                    "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
                   },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
@@ -462,7 +427,8 @@
                     ],
                     "properties": {
                       "AuthenticationMode": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)$"
                       },
                       "NetworkCredentials": {
                         "type": [
@@ -549,20 +515,8 @@
                   },
                   "ProductVersion": {
                     "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
-                      },
-                      {
-                        "type": "integer",
-                        "enum": [
-                          0,
-                          1,
-                          2
-                        ]
-                      }
-                    ]
+                    "type": "string",
+                    "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
                   },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
@@ -609,7 +563,8 @@
                     ],
                     "properties": {
                       "AuthenticationMode": {
-                        "type": "string"
+                        "type": "string",
+                        "pattern": "^(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)$"
                       },
                       "NetworkCredentials": {
                         "type": [
@@ -696,20 +651,8 @@
                   },
                   "ProductVersion": {
                     "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
-                      },
-                      {
-                        "type": "integer",
-                        "enum": [
-                          0,
-                          1,
-                          2
-                        ]
-                      }
-                    ]
+                    "type": "string",
+                    "pattern": "^(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)$"
                   },
                   "Project": {
                     "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
@@ -2370,20 +2313,9 @@
                           },
                           "parsingFallback": {
                             "description": "Gets or sets the parsing fallback.",
+                            "type": "string",
                             "default": "RaiseError",
-                            "anyOf": [
-                              {
-                                "type": "string",
-                                "pattern": "^(?:[Rr][Aa][Ii][Ss][Ee][Ee][Rr][Rr][Oo][Rr]|[Rr][Ee][Ss][Ee][Tt][Tt][Oo][Zz][Ee][Rr][Oo]|0|1)$"
-                              },
-                              {
-                                "type": "integer",
-                                "enum": [
-                                  0,
-                                  1
-                                ]
-                              }
-                            ]
+                            "pattern": "^(?:[Rr][Aa][Ii][Ss][Ee][Ee][Rr][Rr][Oo][Rr]|[Rr][Ee][Ss][Ee][Tt][Tt][Oo][Zz][Ee][Rr][Oo]|0|1)$"
                           },
                           "targetField": {
                             "description": "Gets or sets the target field reference name where the calculated result will be stored.",
@@ -2558,20 +2490,9 @@
                           },
                           "fieldMapMode": {
                             "description": "Gets or sets the mode of field mapping to be applied during migration. SourceToTarget will get data from the source system and apply it to the target. TargetToTarget will move data between the target fields.",
+                            "type": "string",
                             "default": "SourceToTarget",
-                            "anyOf": [
-                              {
-                                "type": "string",
-                                "pattern": "^(?:[Ss][Oo][Uu][Rr][Cc][Ee][Tt][Oo][Tt][Aa][Rr][Gg][Ee][Tt]|[Tt][Aa][Rr][Gg][Ee][Tt][Tt][Oo][Tt][Aa][Rr][Gg][Ee][Tt]|0|1)$"
-                              },
-                              {
-                                "type": "integer",
-                                "enum": [
-                                  0,
-                                  1
-                                ]
-                              }
-                            ]
+                            "pattern": "^(?:[Ss][Oo][Uu][Rr][Cc][Ee][Tt][Oo][Tt][Aa][Rr][Gg][Ee][Tt]|[Tt][Aa][Rr][Gg][Ee][Tt][Tt][Oo][Tt][Aa][Rr][Gg][Ee][Tt]|0|1)$"
                           },
                           "sourceField": {
                             "description": "Gets or sets the name of the source field to copy data from during migration.",
@@ -3366,21 +3287,9 @@
                 },
                 "ValidateMappingTargets": {
                   "description": "Which targets in the UserMappingFile are resolved against the target identities at startup. All checks every mapping in the\r\n file; Referenced checks only the mappings whose source user appears in an identity field of the work items being migrated;\r\n Skip turns the check off. With Skip, a target that does not resolve is saved as plain text and StopIfMappingTargetsDoNotResolve\r\n has no effect.",
+                  "type": "string",
                   "default": "All",
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "pattern": "^(?:[Aa][Ll][Ll]|[Rr][Ee][Ff][Ee][Rr][Ee][Nn][Cc][Ee][Dd]|[Ss][Kk][Ii][Pp]|0|1|2)$"
-                    },
-                    {
-                      "type": "integer",
-                      "enum": [
-                        0,
-                        1,
-                        2
-                      ]
-                    }
-                  ]
+                  "pattern": "^(?:[Aa][Ll][Ll]|[Rr][Ee][Ff][Ee][Rr][Ee][Nn][Cc][Ee][Dd]|[Ss][Kk][Ii][Pp]|0|1|2)$"
                 }
               }
             },

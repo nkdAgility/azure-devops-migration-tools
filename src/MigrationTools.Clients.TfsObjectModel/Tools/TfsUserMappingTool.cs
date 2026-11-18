@@ -450,7 +450,7 @@ namespace MigrationTools.Tools
             string scope = "All user mapping targets";
             if (Options.ValidateMappingTargets == MappingTargetValidationScope.Referenced)
             {
-                mappings = FilterToReferencedMappings(UserMappings.Value, referencedSourceUsers ?? []);
+                mappings = FilterToReferencedMappings(UserMappings.Value, referencedSourceUsers ?? [], DetectedFormatIsIdentityMapData.Value);
                 Log.LogInformation("Validating::Check that the {count} of {total} user mapping targets referenced by the source work items resolve to one identity in the target",
                     mappings.Count, UserMappings.Value.Count);
                 scope = $"The {mappings.Count} user mapping targets referenced by the source work items (of {UserMappings.Value.Count} in the file)";
@@ -477,10 +477,12 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
-        /// The mapping entries that replay selects for the values in <paramref name="referencedSourceUsers"/>, using the same lookup
-        /// as <see cref="TfsUserIdentityReference.FindMappedTarget"/>.
+        /// The mapping entries that replay selects for the values in <paramref name="referencedSourceUsers"/>. For the dictionary
+        /// format that is <see cref="TfsUserIdentityReference.FindMappedTarget"/>'s lookup. For the detailed format
+        /// (<paramref name="isIdentityMapData"/>), <see cref="FindIdentityMapTarget"/> matches a value exactly against the source display
+        /// name or account name, which are the keys of the flattened map, so only an exact key is selected.
         /// </summary>
-        public static Dictionary<string, string> FilterToReferencedMappings(IDictionary<string, string> userMap, IEnumerable<string> referencedSourceUsers)
+        public static Dictionary<string, string> FilterToReferencedMappings(IDictionary<string, string> userMap, IEnumerable<string> referencedSourceUsers, bool isIdentityMapData = false)
         {
             var result = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
             if (userMap == null)
@@ -489,7 +491,9 @@ namespace MigrationTools.Tools
             }
             foreach (var user in referencedSourceUsers ?? [])
             {
-                var key = TfsUserIdentityReference.FindMappedKey(userMap, user);
+                var key = isIdentityMapData
+                    ? userMap.Keys.FirstOrDefault(k => string.Equals(k, user, StringComparison.OrdinalIgnoreCase))
+                    : TfsUserIdentityReference.FindMappedKey(userMap, user);
                 if (key != null)
                 {
                     result[key] = userMap[key];

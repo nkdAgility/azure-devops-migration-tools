@@ -285,6 +285,15 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void FilterToReferencedMappings_DetailedFormatUsesReplaysExactMatch()
+        {
+            // The flattened IdentityMapData keys are the source display name and account name.
+            var map = new Dictionary<string, string> { ["Alice"] = "A", ["alice@src.example"] = "A" };
+
+            Assert.IsEmpty(TfsUserMappingTool.FilterToReferencedMappings(map, ["Alice <alice@src.example>"], isIdentityMapData: true));
+            CollectionAssert.AreEqual(new[] { "Alice" }, TfsUserMappingTool.FilterToReferencedMappings(map, ["alice"], isIdentityMapData: true).Keys.ToList());
+        }
+        [TestMethod, TestCategory("L0")]
         public void UnreadableTargetIdentities_ZeroMatchIsInconclusiveNotAStop()
         {
             var tool = CreateTool(MappingTargetValidationScope.All);
