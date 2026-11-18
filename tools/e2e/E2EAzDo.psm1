@@ -160,4 +160,12 @@ function New-E2EAttachment([string]$FileName, [byte[]]$Bytes, [string]$Org = $sc
     Invoke-E2ERest "_apis/wit/attachments?fileName=$([Uri]::EscapeDataString($FileName))" -Org $Org -Method POST -Body $Bytes -ContentType "application/octet-stream"
 }
 
+# Invoke-RestMethod decodes a binary response as text, so attachment bytes are read with Invoke-WebRequest.
+function Get-E2EAttachmentBytes([string]$Id, [string]$Org = $script:DefaultOrg) {
+    if ($script:AllowedOrgs -notcontains $Org) { throw "Organisation '$Org' is not a test organisation." }
+    if (-not $script:Headers) { Initialize-E2E }
+    $response = Invoke-WebRequest -Uri "https://dev.azure.com/$Org/_apis/wit/attachments/$([Uri]::EscapeDataString($Id))?api-version=7.1" -Headers $script:Headers
+    [byte[]]$response.RawContentStream.ToArray()
+}
+
 Export-ModuleMember -Function *-E2E*, Initialize-E2E, Assert-E2EName

@@ -36,7 +36,7 @@ The tool integrates with work item migration processors to ensure relationship d
 A Related link is skipped, with a warning naming both work items, when its target can't be migrated in this run:
 
 - **The target can't be read in the source.** It was deleted, or it is in a project the migration identity cannot read, and the source returns TF26198. The warning reads `[SKIP] Link of type ... from source <id> to <id> not migrated: work item <id> does not exist in the source or the migration identity cannot read it (TF26198).`
-- **The target is outside the query and has not been migrated yet.** The warning ends `as target WI has not been migrated`. Migrate the linked items too (widen `WIQLQuery`) and re-run: the link is added when both ends exist in the target.
+- **The target is outside the query and has not been migrated yet.** The warning ends `as target WI has not been migrated`. Migrate the linked items too (widen `WIQLQuery`) and re-run: the link is added when both ends exist in the target. This also holds when the target item has the same id in the target collection as the source item has in the source.
 
 A skipped link is not a work item failure, so on its own it doesn't change the run's exit code. Work items that can't be migrated still make the run exit with code 1.
 

@@ -247,7 +247,8 @@ namespace MigrationTools.Clients
                     Log.Error(ex, "Unable to GetWorkItem with id[{id}]", id);
                     if (stopOnError)
                     {
-                        throw new MigrationRunStoppedException("Unable to get work item.", ex);
+                        // Rethrown as is: the caller decides whether this is an item failure or must stop the run.
+                        throw;
                     }
                 }
                 return y?.AsWorkItemData();

@@ -6,7 +6,7 @@
       "Source": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
-        "Project": "amte2e-3271-html-src",
+        "Project": "amte2e-3271b-html-src",
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "Authentication": { "AuthenticationMode": "EntraId" },
@@ -15,7 +15,7 @@
       "Target": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
-        "Project": "amte2e-3271-html-tgt",
+        "Project": "amte2e-3271b-html-tgt",
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "Authentication": { "AuthenticationMode": "EntraId" },
@@ -25,13 +25,13 @@
     "CommonTools": {
       "TfsNodeStructureTool": {
         "Enabled": true,
-        "Areas": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3271-html-src([\\\\]?.*)$", "Replacement": "amte2e-3271-html-tgt$1" } ] },
-        "Iterations": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3271-html-src([\\\\]?.*)$", "Replacement": "amte2e-3271-html-tgt$1" } ] },
+        "Areas": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3271b-html-src([\\\\]?.*)$", "Replacement": "amte2e-3271b-html-tgt$1" } ] },
+        "Iterations": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3271b-html-src([\\\\]?.*)$", "Replacement": "amte2e-3271b-html-tgt$1" } ] },
         "ShouldCreateMissingRevisionPaths": true,
         "ReplicateAllExistingNodes": true
       },
       "TfsRevisionManagerTool": { "Enabled": true, "ReplayRevisions": true, "MaxRevisions": 0 },
-      "TfsAttachmentTool": { "Enabled": true, "ExportBasePath": "c:\\temp\\amte2e-3271-attachments", "MaxAttachmentSize": 480000000 },
+      "TfsAttachmentTool": { "Enabled": true, "ExportBasePath": "c:\\temp\\amte2e-3271b-attachments", "MaxAttachmentSize": 480000000 },
       "TfsWorkItemLinkTool": { "Enabled": true, "FilterIfLinkCountMatches": true, "SaveAfterEachLinkIsAdded": false },
       "FieldMappingTool": {
         "Enabled": true,

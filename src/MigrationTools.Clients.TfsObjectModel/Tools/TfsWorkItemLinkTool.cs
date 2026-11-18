@@ -343,7 +343,9 @@ namespace MigrationTools.Tools
 
                 if (!IsExisting && !wiTargetR.ToWorkItem().IsAccessDenied)
                 {
-                    if (wiSourceR.Id != wiTargetR.Id)
+                    // GetRightHandSideTargetWi returns the source item itself when no target was found. Ids can't show that:
+                    // the target item can have the same id in another collection.
+                    if (!ReferenceEquals(wiSourceR, wiTargetR))
                     {
                         Log.LogInformation("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                         var client = (TfsWorkItemMigrationClient)processor.Target.WorkItems;
@@ -478,7 +480,12 @@ namespace MigrationTools.Tools
                     else if (sourceLink is RelatedLink rl && rl.LinkTypeEnd != null)
                     {
                         var wiSourceR = ((TfsWorkItemMigrationClient)processor.Source.WorkItems).GetWorkItemIfExists(rl.RelatedWorkItemId);
-                        var wiTargetR = wiSourceR == null ? null : GetRightHandSideTargetWi(processor, wiSourceR, target);
+                        if (wiSourceR == null)
+                        {
+                            Log.LogWarning("  [SKIP] Link of type {LinkType} from source {SourceId} to {RelatedId} not removed from target {TargetId}: work item {RelatedId} does not exist in the source or the migration identity cannot read it (TF26198).", rl.LinkTypeEnd.ImmutableName, sourceWorkItem?.Id, rl.RelatedWorkItemId, target.Id, rl.RelatedWorkItemId);
+                            continue;
+                        }
+                        var wiTargetR = GetRightHandSideTargetWi(processor, wiSourceR, target);
                         if (wiTargetR != null)
                         {
                             match = targetLinks.OfType<RelatedLink>().FirstOrDefault(t =>

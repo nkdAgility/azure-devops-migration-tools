@@ -2,7 +2,7 @@
 # richhtml: #3273. A Description with entities, emoji, supplementary-plane letters, links, a work item mention and an
 # embedded image must arrive exactly, apart from the rewrites the migration is meant to make (attachment url,
 # mention id, organisation and project). The body is sent as ASCII-escaped JSON so no character depends on encoding.
-param([string]$Src = "amte2e-3271-html-src", [string]$Tgt = "amte2e-3271-html-tgt", [string]$Process = "amte2e-agile")
+param([string]$Src = "amte2e-3271b-html-src", [string]$Tgt = "amte2e-3271b-html-tgt", [string]$Process = "amte2e-agile")
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force

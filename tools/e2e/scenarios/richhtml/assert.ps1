@@ -1,7 +1,7 @@
 #Requires -Version 7.0
 # richhtml assertions: the target Description equals the source Description character for character, once the
 # rewrites the migration is meant to make are reversed (attachment url, mention id, organisation and project).
-param([string]$Src = "amte2e-3271-html-src", [string]$Tgt = "amte2e-3271-html-tgt", [string]$OutFile)
+param([string]$Src = "amte2e-3271b-html-src", [string]$Tgt = "amte2e-3271b-html-tgt", [string]$OutFile)
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
@@ -20,15 +20,24 @@ if (-not $wi -or -not $other) { $r += New-E2EResult "items migrated" $false "ite
 $target = $wi.fields.'System.Description'
 
 # The service stores an attachment url with the project id added, so the source url to compare with is read from the source value.
-$attachment = 'https://dev\.azure\.com/nkdagility-adomt-(source|target)/[^"]*?/_apis/wit/attachments/[0-9a-fA-F-]{36}(\?fileName=[^"]*)?'
+$attachment = 'https://dev\.azure\.com/nkdagility-adomt-(source|target)/([^"/]+/)?_apis/wit/attachments/(?<id>[0-9a-fA-F-]{36})(\?fileName=[^"]*)?'
 $sourceImg = [regex]::Match($source, $attachment).Value
-$normalised = [regex]::Replace($target, $attachment, $sourceImg)
-$normalised = $normalised.Replace("nkdagility-adomt-target/$Tgt/_workitems/edit/$($other.id)/", "nkdagility-adomt-source/$Src/_workitems/edit/$($s.other)/").Replace("#$($other.id)<", "#$($s.other)<")
-$imageMoved = $target -notmatch 'nkdagility-adomt-source/[^"]*/_apis/wit/attachments'
-$r += New-E2EResult "image moved to the target" $imageMoved "source attachment url $(if ($imageMoved) { 'replaced' } else { 'still present' })"
-$r += New-E2EResult "mention rewritten to the target item" ($target -match "_workitems/edit/$($other.id)/") "target mention id $($other.id)"
+$targetImg = [regex]::Match($target, $attachment)
+# The target image must be a target attachment that serves the seeded bytes, not just any url.
+$imageOk = $false
+if ($targetImg.Success -and $targetImg.Groups[1].Value -eq 'target') {
+    $got = Get-E2EAttachmentBytes $targetImg.Groups['id'].Value -Org nkdagility-adomt-target
+    $want = [Convert]::FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+    $imageOk = [Linq.Enumerable]::SequenceEqual([byte[]]$got, [byte[]]$want)
+}
+$r += New-E2EResult "image is a target attachment with the seeded bytes" $imageOk "target img: $($targetImg.Value)"
+$mentionUrl = "https://dev.azure.com/nkdagility-adomt-target/$Tgt/_workitems/edit/$($other.id)/"
+$r += New-E2EResult "mention points at the target organisation, project and item" ($target.Contains("href=""$mentionUrl""")) $mentionUrl
 
-$same = $normalised -ceq $source
+$normalised = if ($imageOk) { $target.Replace($targetImg.Value, $sourceImg) } else { $target }
+$normalised = $normalised.Replace($mentionUrl, "https://dev.azure.com/nkdagility-adomt-source/$Src/_workitems/edit/$($s.other)/").Replace("#$($other.id)<", "#$($s.other)<")
+
+$same = [string]::Equals($normalised, $source, [StringComparison]::Ordinal)
 $evidence = "source $($source.Length), target $($target.Length), normalised $($normalised.Length) UTF-16 units"
 if (-not $same) {
     $i = 0; while ($i -lt [Math]::Min($source.Length, $normalised.Length) -and $source[$i] -ceq $normalised[$i]) { $i++ }
