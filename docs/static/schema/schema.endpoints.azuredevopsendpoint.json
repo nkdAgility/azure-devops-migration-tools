@@ -15,7 +15,7 @@
     "AuthenticationMode": {
       "description": "Authentication mode to use when connecting to Azure DevOps: AccessToken (a PAT in AccessToken) or EntraId (a Microsoft Entra ID token from the signed-in identity, such as az login, a managed identity or workload identity federation, with no secret stored in configuration).",
       "type": "string",
-      "pattern": "^\\s*(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)\\s*$"
+      "pattern": "^\\s*(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|\\+?0*0|\\+?0*1|\\+?0*2|\\+?0*3)\\s*$"
     },
     "Enabled": {
       "description": "Will be used if enabled",

@@ -19,7 +19,7 @@
       "properties": {
         "AuthenticationMode": {
           "type": "string",
-          "pattern": "^\\s*(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|0|1|2|3)\\s*$"
+          "pattern": "^\\s*(?:[Aa][Cc][Cc][Ee][Ss][Ss][Tt][Oo][Kk][Ee][Nn]|[Ww][Ii][Nn][Dd][Oo][Ww][Ss]|[Pp][Rr][Oo][Mm][Pp][Tt]|[Ee][Nn][Tt][Rr][Aa][Ii][Dd]|\\+?0*0|\\+?0*1|\\+?0*2|\\+?0*3)\\s*$"
         },
         "NetworkCredentials": {
           "type": [
@@ -107,7 +107,7 @@
     "ProductVersion": {
       "description": "Specifies the TFS product version for compatibility and feature support. Default is OnPremises for TFS 2013+ and Azure DevOps Server.",
       "type": "string",
-      "pattern": "^\\s*(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|0|1|2)\\s*$"
+      "pattern": "^\\s*(?:[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss][Cc][Ll][Aa][Ss][Ss][Ii][Cc]|[Oo][Nn][Pp][Rr][Ee][Mm][Ii][Ss][Ee][Ss]|[Cc][Ll][Oo][Uu][Dd]|\\+?0*0|\\+?0*1|\\+?0*2)\\s*$"
     },
     "Project": {
       "description": "Name of the TFS project within the collection to connect to. This is the project that will be used for migration operations.",
