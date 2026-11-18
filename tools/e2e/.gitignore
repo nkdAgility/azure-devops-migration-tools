@@ -2,3 +2,5 @@ state.local.json
 *.log
 scenarios/users/config*.json
 scenarios/usermapping-3272/config-*.json
+
+*.local.html

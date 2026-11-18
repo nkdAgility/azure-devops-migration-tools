@@ -148,8 +148,8 @@ namespace MigrationTools.Tools
 
             var sourceSharedStepLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
-            var sourceSharedSteps =
-                sourceSharedStepLinks.Select(x => processor.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
+            var sourceSharedSteps = ReadableSourceItems(processor, sourceSharedStepLinks, wiSourceL, wiTargetL, "Shared Steps",
+                "its step reference keeps the source id");
 
             foreach (WorkItemData sourceSharedStep in sourceSharedSteps)
             {
@@ -174,6 +174,23 @@ namespace MigrationTools.Tools
             }
         }
 
+        private List<WorkItemData> ReadableSourceItems(TfsProcessor processor, List<RelatedLink> links, WorkItemData wiSourceL, WorkItemData wiTargetL, string kind, string consequence)
+        {
+            var client = (TfsWorkItemMigrationClient)processor.Source.WorkItems;
+            var items = new List<WorkItemData>();
+            foreach (var link in links)
+            {
+                var item = client.GetWorkItemIfExists(link.RelatedWorkItemId);
+                if (item == null)
+                {
+                    Log.LogWarning("  [SKIP] {Kind} {RelatedId} used by Test Case {SourceId} (target {TargetId}) not remapped: it does not exist in the source or the migration identity cannot read it (TF26198), so {Consequence}. Grant the identity read access to its project, or migrate it, and re-run.", kind, link.RelatedWorkItemId, wiSourceL.Id, wiTargetL.Id, consequence);
+                    continue;
+                }
+                items.Add(item);
+            }
+            return items;
+        }
+
         /// <summary>
         /// Migrates shared parameters for test case work items, updating parameter references in the target work item.
         /// </summary>
@@ -185,8 +202,8 @@ namespace MigrationTools.Tools
             const string microsoftVstsTcmLocalDataSource = "Microsoft.VSTS.TCM.LocalDataSource";
             var sourceSharedParametersLinks = wiSourceL.ToWorkItem().Links.OfType<RelatedLink>()
                 .Where(x => x.LinkTypeEnd.ImmutableName == "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse").ToList();
-            var sourceSharedParameters =
-                sourceSharedParametersLinks.Select(x => processor.Source.WorkItems.GetWorkItem(x.RelatedWorkItemId.ToString()));
+            var sourceSharedParameters = ReadableSourceItems(processor, sourceSharedParametersLinks, wiSourceL, wiTargetL, "Shared Parameter",
+                "its data source reference keeps the source id");
 
             var sourceToTarget = new Dictionary<string, string>();
             foreach (WorkItemData sourceSharedParameter in sourceSharedParameters)
@@ -289,7 +306,7 @@ namespace MigrationTools.Tools
             {
                 try
                 {
-                    wiSourceR = processor.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
+                    wiSourceR = ((TfsWorkItemMigrationClient)processor.Source.WorkItems).GetWorkItemIfExists(rl.RelatedWorkItemId);
                 }
                 catch (MigrationRunStoppedException)
                 {
@@ -299,6 +316,11 @@ namespace MigrationTools.Tools
                 {
                     Telemetry.TrackException(ex, null);
                     Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                    return;
+                }
+                if (wiSourceR == null)
+                {
+                    Log.LogWarning("  [SKIP] Link of type {LinkType} from source {SourceId} to {RelatedId} not migrated: work item {RelatedId} does not exist in the source or the migration identity cannot read it (TF26198).", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, rl.RelatedWorkItemId, rl.RelatedWorkItemId);
                     return;
                 }
                 try
@@ -338,7 +360,9 @@ namespace MigrationTools.Tools
 
                 if (!IsExisting && !wiTargetR.ToWorkItem().IsAccessDenied)
                 {
-                    if (wiSourceR.Id != wiTargetR.Id)
+                    // GetRightHandSideTargetWi returns the source item itself when no target was found. Ids can't show that:
+                    // the target item can have the same id in another collection.
+                    if (!ReferenceEquals(wiSourceR, wiTargetR))
                     {
                         Log.LogInformation("  [CREATE-START] Adding Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
                         var client = (TfsWorkItemMigrationClient)processor.Target.WorkItems;
@@ -472,8 +496,13 @@ namespace MigrationTools.Tools
                     }
                     else if (sourceLink is RelatedLink rl && rl.LinkTypeEnd != null)
                     {
-                        var wiSourceR = processor.Source.WorkItems.GetWorkItem(rl.RelatedWorkItemId.ToString());
-                        var wiTargetR = wiSourceR == null ? null : GetRightHandSideTargetWi(processor, wiSourceR, target);
+                        var wiSourceR = ((TfsWorkItemMigrationClient)processor.Source.WorkItems).GetWorkItemIfExists(rl.RelatedWorkItemId);
+                        if (wiSourceR == null)
+                        {
+                            Log.LogWarning("  [SKIP] Link of type {LinkType} from source {SourceId} to {RelatedId} not removed from target {TargetId}: work item {RelatedId} does not exist in the source or the migration identity cannot read it (TF26198).", rl.LinkTypeEnd.ImmutableName, sourceWorkItem?.Id, rl.RelatedWorkItemId, target.Id, rl.RelatedWorkItemId);
+                            continue;
+                        }
+                        var wiTargetR = GetRightHandSideTargetWi(processor, wiSourceR, target);
                         if (wiTargetR != null)
                         {
                             match = targetLinks.OfType<RelatedLink>().FirstOrDefault(t =>
