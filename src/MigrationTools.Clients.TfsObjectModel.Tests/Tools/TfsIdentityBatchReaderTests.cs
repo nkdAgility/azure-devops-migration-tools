@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.TeamFoundation.Server;
+using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
@@ -20,44 +20,42 @@ namespace MigrationTools.Tests.Tools
         private const string Type5Error = "Server was unable to process request. ---> There was an error generating the XML document. ---> "
             + "Instance validation error: '5' is not a valid value for Microsoft.TeamFoundation.Framework.Server.ApplicationGroupSpecialType.";
 
-        private static Identity User(string sid) => new() { Sid = sid, Type = IdentityType.UnknownIdentityType, AccountName = sid, DisplayName = "User " + sid };
-        private static Identity Group(string sid) => new() { Sid = sid, Type = IdentityType.ApplicationGroup, AccountName = sid, DisplayName = "Group " + sid };
-
-        private static IdentityItemData ToItem(Identity i) => new() { Sid = i.Sid, AccountName = i.AccountName, DisplayName = i.DisplayName };
-
+        // Keys starting "U" are users, "G" groups, "T" groups the batched read cannot serialise.
         private sealed class FakeServer
         {
-            public Dictionary<string, Identity> Identities { get; } = [];
-            public HashSet<string> Type5Groups { get; } = [];
             public List<int> BatchSizes { get; } = [];
 
-            public Identity[] ReadBatch(string[] sids)
+            public IEnumerable<IdentityItemData> ReadUsers(string[] keys)
             {
-                BatchSizes.Add(sids.Length);
-                if (sids.Any(Type5Groups.Contains))
+                BatchSizes.Add(keys.Length);
+                if (keys.Any(k => k.StartsWith("T")))
                 {
                     throw new InvalidOperationException(Type5Error);
                 }
-                return sids.Select(s => Identities.TryGetValue(s, out var i) ? i : null).ToArray();
+                return keys.Where(k => k.StartsWith("U")).Select(k => new IdentityItemData { Sid = k, AccountName = k, DisplayName = "User " + k });
             }
         }
 
-        private static FakeServer CreateServer(int users, int groups, IEnumerable<string> type5)
+        private static List<string> Keys(int users, int groups, int type5)
         {
-            var server = new FakeServer();
-            for (int i = 0; i < users; i++) { server.Identities[$"U{i}"] = User($"U{i}"); }
-            for (int i = 0; i < groups; i++) { server.Identities[$"G{i}"] = Group($"G{i}"); }
-            foreach (var sid in type5) { server.Type5Groups.Add(sid); }
-            return server;
+            var keys = Enumerable.Range(0, users).Select(i => $"U{i}")
+                .Concat(Enumerable.Range(0, groups).Select(i => $"G{i}"))
+                .Concat(Enumerable.Range(0, type5).Select(i => $"T{i}"))
+                .ToList();
+            // Spread the type-5 groups through the list, as they are in a real membership list.
+            return keys.OrderBy(k => (k.GetHashCode() & 0x7fffffff) % 997).ThenBy(k => k).ToList();
         }
+
+        private static TfsIdentityBatchReader<string> Reader(FakeServer server, Func<string, (FallbackIdentityKind, IdentityItemData)> fallback, ILogger log = null) =>
+            new(server.ReadUsers, fallback, k => k, log);
 
         [TestMethod, TestCategory("L0")]
         public void ReadUsers_ReadsInBatchesNotOneAtATime()
         {
-            var server = CreateServer(427, 0, []);
-            var reader = new TfsIdentityBatchReader(server.ReadBatch, _ => throw new AssertFailedException("no fallback expected"), ToItem, null);
+            var server = new FakeServer();
+            var reader = Reader(server, _ => throw new AssertFailedException("no fallback expected"));
 
-            var users = reader.ReadUsers(server.Identities.Keys.ToList());
+            var users = reader.ReadUsers(Keys(427, 0, 0));
 
             Assert.HasCount(427, users);
             Assert.AreEqual(5, reader.Calls);
@@ -65,77 +63,87 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
-        public void ReadUsers_Type5GroupsInBatch_KeepsEveryUserAndReadsGroupsThroughFallback()
+        public void ReadUsers_Type5GroupsInBatches_KeepsEveryUser()
         {
             // The customer's run: 7 groups of ApplicationGroupSpecialType 5 among 427 identities.
-            var type5 = new[] { "T0", "T1", "T2", "T3", "T4", "T5", "T6" };
-            var server = CreateServer(400, 20, type5);
-            var sids = server.Identities.Keys.Concat(type5).OrderBy(s => s.GetHashCode()).ToList();
+            var server = new FakeServer();
             var fallbackCalls = new List<string>();
-            var reader = new TfsIdentityBatchReader(server.ReadBatch,
-                sid => { fallbackCalls.Add(sid); return (FallbackIdentityKind.Group, null); }, ToItem, null);
+            var reader = Reader(server, k => { fallbackCalls.Add(k); return (FallbackIdentityKind.NotAUser, null); });
 
-            var users = reader.ReadUsers(sids);
+            var users = reader.ReadUsers(Keys(400, 20, 7));
 
             Assert.HasCount(400, users);
-            CollectionAssert.AreEquivalent(type5, fallbackCalls);
-            CollectionAssert.AreEquivalent(type5, reader.FallbackGroups);
+            CollectionAssert.AreEquivalent(Enumerable.Range(0, 7).Select(i => $"T{i}").ToList(), fallbackCalls);
+            CollectionAssert.AreEquivalent(fallbackCalls, reader.SkippedNonUsers);
             Assert.IsEmpty(reader.Unreadable);
-            Assert.IsLessThan(sids.Count / 2, reader.Calls, $"expected far fewer calls than identities, got {reader.Calls}");
+            Assert.IsLessThan(427 / 2, reader.Calls, $"expected far fewer calls than identities, got {reader.Calls}");
         }
 
         [TestMethod, TestCategory("L0")]
         public void ReadUsers_FailingIdentityThatIsAUser_IsKeptFromFallback()
         {
-            var server = CreateServer(10, 0, ["X"]);
-            var reader = new TfsIdentityBatchReader(server.ReadBatch,
-                sid => (FallbackIdentityKind.User, new IdentityItemData { Sid = sid, AccountName = "x@example.com", DisplayName = "X" }), ToItem, null);
+            var server = new FakeServer();
+            var reader = Reader(server, k => (FallbackIdentityKind.User, new IdentityItemData { Sid = k, AccountName = "t@example.com", DisplayName = "T" }));
 
-            var users = reader.ReadUsers([.. server.Identities.Keys, "X"]);
+            var users = reader.ReadUsers(Keys(10, 0, 1));
 
             Assert.HasCount(11, users);
-            Assert.IsTrue(users.Any(u => u.AccountName == "x@example.com"));
+            Assert.IsTrue(users.Any(u => u.AccountName == "t@example.com"));
         }
 
         [TestMethod, TestCategory("L0")]
         public void ReadUsers_FallbackFails_IsReportedUnreadableAndOthersKept()
         {
-            var server = CreateServer(10, 0, ["X"]);
-            var reader = new TfsIdentityBatchReader(server.ReadBatch, _ => throw new InvalidOperationException("boom"), ToItem, null);
+            var server = new FakeServer();
+            var reader = Reader(server, _ => throw new InvalidOperationException("boom"));
 
-            var users = reader.ReadUsers([.. server.Identities.Keys, "X"]);
+            var users = reader.ReadUsers(Keys(10, 3, 1));
 
             Assert.HasCount(10, users);
-            CollectionAssert.AreEqual(new[] { "X" }, reader.Unreadable);
+            CollectionAssert.AreEqual(new[] { "T0" }, reader.Unreadable);
         }
 
         [TestMethod, TestCategory("L0")]
-        public void ReadUsers_SkipsGroupsAndNulls()
+        public void ReadUsers_FallbackFindsNothing_IsReportedUnreadable()
         {
-            var server = CreateServer(3, 4, []);
-            var reader = new TfsIdentityBatchReader(server.ReadBatch, _ => (FallbackIdentityKind.Unreadable, null), ToItem, null);
+            var reader = Reader(new FakeServer(), _ => (FallbackIdentityKind.Unreadable, null));
 
-            var users = reader.ReadUsers([.. server.Identities.Keys, "missing"]);
+            reader.ReadUsers(Keys(2, 0, 1));
 
-            Assert.HasCount(3, users);
-            Assert.IsEmpty(reader.Unreadable);
+            CollectionAssert.AreEqual(new[] { "T0" }, reader.Unreadable);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ReadUsers_IgnoresNullResults()
+        {
+            var reader = new TfsIdentityBatchReader<string>(keys => keys.Select(k => k == "U0" ? null : new IdentityItemData { Sid = k }), _ => (FallbackIdentityKind.Unreadable, null), k => k, null);
+
+            var users = reader.ReadUsers(["U0", "U1"]);
+
+            Assert.HasCount(1, users);
         }
 
         [TestMethod, TestCategory("L0")]
         public void ReadUsers_LogsProgressPerBatch()
         {
-            var server = CreateServer(250, 0, []);
             var log = new Mock<ILogger>();
-            var reader = new TfsIdentityBatchReader(server.ReadBatch, _ => (FallbackIdentityKind.Unreadable, null), ToItem, log.Object);
+            var reader = Reader(new FakeServer(), _ => (FallbackIdentityKind.Unreadable, null), log.Object);
 
-            reader.ReadUsers(server.Identities.Keys.ToList());
+            reader.ReadUsers(Keys(250, 0, 0));
 
             log.Verify(l => l.Log(LogLevel.Information, It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, _) => v.ToString().Contains("Read ") && v.ToString().Contains("/250 identities")),
+                It.Is<It.IsAnyType>((v, _) => v.ToString().Contains("/250 identities")),
                 It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Exactly(3));
         }
-    }
 
+        [TestMethod, TestCategory("L0")]
+        public void IsTeamFoundationGroup_TellsGroupsFromEntraUsers()
+        {
+            Assert.IsTrue(TfsUserMappingTool.IsTeamFoundationGroup(new IdentityDescriptor(TfsUserMappingTool.TeamFoundationGroupDescriptorType, "S-1-9-1551374245-1")));
+            Assert.IsFalse(TfsUserMappingTool.IsTeamFoundationGroup(new IdentityDescriptor("Microsoft.IdentityModel.Claims.ClaimsIdentity", "tenant\\user@example.com")));
+            Assert.IsFalse(TfsUserMappingTool.IsTeamFoundationGroup(null));
+        }
+    }
     [TestClass]
     public class TfsUserMappingToolValidationScopeTests
     {
@@ -246,3 +254,4 @@ namespace MigrationTools.Tests.Tools
         }
     }
 }
+

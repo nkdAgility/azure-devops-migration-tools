@@ -582,61 +582,78 @@ namespace MigrationTools.Tools
 
         private List<IdentityItemData> GetUsersListFromServer(TfsTeamProjectEndpoint endpoint)
         {
-            var gss = endpoint.GetService<IGroupSecurityService>();
-            var ims = new Lazy<IIdentityManagementService>(() => endpoint.GetService<IIdentityManagementService>());
-            Identity allIdentities = gss.ReadIdentity(SearchFactor.AccountName, Options.ProjectCollectionValidUsersGroupName, QueryMembership.Expanded);
-            Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer Found {count} identities (users and groups) in server; reading them in batches of {batchSize}.",
-                allIdentities.Members.Length, TfsIdentityBatchReader.DefaultBatchSize);
-
-            var reader = new TfsIdentityBatchReader(
-                sids => gss.ReadIdentities(SearchFactor.Sid, sids, QueryMembership.None),
-                sid => ReadIdentityFallback(ims.Value, sid),
-                _mapper.IdentityToIdentityItemData,
-                Log);
+            // The group security service returns null for every user in a batched read, so batches go through the identity
+            // management service; the group security service is only the single-identity fallback.
+            var ims = endpoint.GetService<IIdentityManagementService>();
+            var gss = new Lazy<IGroupSecurityService>(() => endpoint.GetService<IGroupSecurityService>());
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            var foundUsers = reader.ReadUsers(allIdentities.Members);
-            ReportReaderOutcome(reader);
+            var validUsers = ims.ReadIdentity(IdentitySearchFactor.AccountName, Options.ProjectCollectionValidUsersGroupName, MembershipQuery.Expanded, ReadIdentityOptions.None)
+                ?? throw new InvalidOperationException($"The group '{Options.ProjectCollectionValidUsersGroupName}' was not found. Set ProjectCollectionValidUsersGroupName to its name in this collection's language.");
+            var members = validUsers.Members ?? [];
+            Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer Found {count} identities (users and groups) in server ({elapsed:0.0}s); reading them in batches of {batchSize}.",
+                members.Length, timer.Elapsed.TotalSeconds, TfsIdentityBatchReader<IdentityDescriptor>.DefaultBatchSize);
+
+            var reader = new TfsIdentityBatchReader<IdentityDescriptor>(
+                batch => (ims.ReadIdentities(batch, MembershipQuery.None, ReadIdentityOptions.None) ?? [])
+                    .Where(i => i != null && !i.IsContainer)
+                    .Select(ToIdentityItemData),
+                descriptor => ReadIdentityFallback(gss.Value, descriptor),
+                descriptor => $"{descriptor.IdentityType};{descriptor.Identifier}",
+                Log);
+            var foundUsers = reader.ReadUsers(members);
+            ReportReaderOutcome(reader.SkippedNonUsers, reader.Unreadable);
             foundUsers.Sort((x, y) => string.Compare(x.AccountName, y.AccountName, StringComparison.Ordinal));
             Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} user identities are applicable for mapping ({calls} server calls, {elapsed:0.0}s)",
                 foundUsers.Count, reader.Calls, timer.Elapsed.TotalSeconds);
             return foundUsers;
         }
 
-        internal void ReportReaderOutcome(TfsIdentityBatchReader reader)
+        internal void ReportReaderOutcome(IReadOnlyCollection<string> skippedNonUsers, IReadOnlyCollection<string> unreadable)
         {
-            if (reader.FallbackGroups.Count > 0)
+            if (skippedNonUsers.Count > 0)
             {
-                Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} group identities could not be read by the group security service "
-                    + "(for example ApplicationGroupSpecialType 5) and were read through the identity management service instead. They are groups, not users, "
-                    + "so they are not used for mapping: {sids}", reader.FallbackGroups.Count, string.Join(", ", reader.FallbackGroups));
+                Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} identities could not be read in a batch (for example groups of "
+                    + "ApplicationGroupSpecialType 5) and are groups, not users, so they are not needed for mapping: {identities}",
+                    skippedNonUsers.Count, string.Join(", ", skippedNonUsers));
             }
-            if (reader.Unreadable.Count > 0)
+            if (unreadable.Count > 0)
             {
-                Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer {count} identities could not be read by either service and were skipped. "
-                    + "A user among them will not be found in the identity list: {sids}", reader.Unreadable.Count, string.Join(", ", reader.Unreadable));
+                Log.LogWarning("TfsUserMappingTool::GetUsersListFromServer {count} identities could not be read, in a batch or on their own, and were skipped. "
+                    + "A user among them will not be in the identity list: {identities}", unreadable.Count, string.Join(", ", unreadable));
             }
         }
 
-        private static (FallbackIdentityKind, IdentityItemData) ReadIdentityFallback(IIdentityManagementService ims, string sid)
+        private static IdentityItemData ToIdentityItemData(TeamFoundationIdentity identity) => new()
         {
-            var identity = ims.ReadIdentities(IdentitySearchFactor.Identifier, [sid], MembershipQuery.None, ReadIdentityOptions.ExtendedProperties)?
-                .FirstOrDefault()?.FirstOrDefault();
+            Sid = identity.Descriptor?.Identifier,
+            DisplayName = identity.DisplayName,
+            AccountName = identity.GetAttribute("Account", null),
+            Domain = identity.GetAttribute("Domain", null),
+            MailAddress = identity.GetAttribute("Mail", null)
+        };
+
+        internal const string TeamFoundationGroupDescriptorType = "Microsoft.TeamFoundation.Identity";
+
+        internal static bool IsTeamFoundationGroup(IdentityDescriptor descriptor) =>
+            string.Equals(descriptor?.IdentityType, TeamFoundationGroupDescriptorType, StringComparison.OrdinalIgnoreCase);
+
+        private (FallbackIdentityKind, IdentityItemData) ReadIdentityFallback(IGroupSecurityService gss, IdentityDescriptor descriptor)
+        {
+            if (IsTeamFoundationGroup(descriptor))
+            {
+                return (FallbackIdentityKind.NotAUser, null);
+            }
+            var identity = gss.ReadIdentity(SearchFactor.Sid, descriptor.Identifier, QueryMembership.None);
             if (identity == null)
             {
                 return (FallbackIdentityKind.Unreadable, null);
             }
-            if (identity.IsContainer)
+            // UnknownIdentityType is set for users in Azure Entra ID.
+            if (identity.Type == IdentityType.WindowsUser || identity.Type == IdentityType.UnknownIdentityType)
             {
-                return (FallbackIdentityKind.Group, null);
+                return (FallbackIdentityKind.User, _mapper.IdentityToIdentityItemData(identity));
             }
-            return (FallbackIdentityKind.User, new IdentityItemData
-            {
-                Sid = sid,
-                DisplayName = identity.DisplayName,
-                AccountName = identity.GetAttribute("Account", null),
-                Domain = identity.GetAttribute("Domain", null),
-                MailAddress = identity.GetAttribute("Mail", null)
-            });
+            return (FallbackIdentityKind.NotAUser, null);
         }
 
         /// <summary>
