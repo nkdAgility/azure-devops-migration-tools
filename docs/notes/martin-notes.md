@@ -71,6 +71,16 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Decision (Martin):** build two new field maps, a tag filter map and a tag mapping map (renames tags from source → target pairs; unmatched tags pass unchanged). Area path → tag needs no new map: add a worked example to the `FieldValueToTagMap` docs instead.
 - **Decision (Martin):** in the tag filter, the exclude list wins over the include list, and an empty include list lets every tag pass except excluded ones.
 
+## 2026-11-18 (#3271, #3273)
+
+- **Instruction (Martin):** work #3271 and #3273 together on one branch and one PR, with `amte2e-3271-*` scratch projects only, cleaned up afterwards. Don't touch revision replay or state-stamped dates (#3270) or TfsUserMappingTool (#3272).
+- **Instruction (Martin):** #3271: `FlushTelemetery` must never throw; a link target that is missing or outside the query is reported clearly and skipped; the run gets the correct exit code.
+- **Instruction (Martin):** #3273: the Description must arrive exactly; if the only difference is the service normalising the HTML, prove it and record it on the issue.
+- **Finding (#3271, e2e on the test orgs):** TF26198 is reproduced by a Related link to a work item in a project that is then deleted. Deleting the work item itself is not enough: Azure DevOps removes its links from the other items. Azure DevOps Services does not allow hard-deleting projects (VS800076), so deleted scratch projects stay in the recycle bin and their names can't be reused for 28 days.
+- **Choice made while building (#3271):** a skipped link is a warning, not a work item failure, so on its own it leaves the exit code at 0; failed work items still give exit code 1.
+- **Decision (Martin, 2026-11-18):** PR #3274 "looks good to merge when ready", including the exit-code choice above as described in the PR.
+- **Finding (#3273, e2e on the test orgs):** Azure DevOps normalises HTML on save, with or without bypass rules: non-BMP characters become numeric entities, `&#39;` becomes `'`, `&copy;` becomes `©`, spaces are added before closing tags, `color:red` becomes `color:red;`. A rich Description (604 units sent, 700 stored) migrated to exactly the stored source value apart from the intended rewrites (attachment url, mention organisation, project and id). The 526 to 520 difference has not been reproduced without the customer's values.
+
 ## 2026-11-13
 
 - **Decision:** on PR #3249 (#3241), the two failure paths that can't be forced on the test organisations stay untested live: the read-back of a new field failing after a successful create, and the service rejecting an update to an existing picklist. They are covered by code review and unit tests and listed under "Not covered" in the PR.

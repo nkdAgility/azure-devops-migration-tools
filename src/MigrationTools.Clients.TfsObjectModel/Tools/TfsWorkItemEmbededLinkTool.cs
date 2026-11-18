@@ -172,14 +172,7 @@ namespace MigrationTools.Tools
         // so this avoids GetWorkItem, which logs every failure as an error.
         private WorkItemData FindSourceWorkItem(TfsProcessor processor, int id)
         {
-            try
-            {
-                return ((TfsWorkItemMigrationClient)processor.Source.WorkItems).Store.GetWorkItem(id)?.AsWorkItemData();
-            }
-            catch (DeniedOrNotExistException)
-            {
-                return null;
-            }
+            return ((TfsWorkItemMigrationClient)processor.Source.WorkItems).GetWorkItemIfExists(id);
         }
 
         /// <summary>
