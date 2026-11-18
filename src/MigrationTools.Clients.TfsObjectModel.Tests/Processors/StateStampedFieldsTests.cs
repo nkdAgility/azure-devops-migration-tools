@@ -57,10 +57,20 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
-        public void SameIdentity_QualifiedAndPlainDisplayName_AreSame()
+        public void SameIdentity_BareDisplayNameAgainstQualified_IsNotProvenSame()
         {
-            Assert.IsTrue(StateStampedFields.SameValue("Ghost Person", "Ghost Person <ghost@example.invalid>", true));
-            Assert.IsTrue(StateStampedFields.SameValue("Ghost Person <ghost@example.invalid>", "Ghost Person", true));
+            // The object model qualifies only display names shared by several accounts, so a bare name cannot say which.
+            Assert.IsFalse(StateStampedFields.SameValue("Ghost Person", "Ghost Person <ghost@example.invalid>", true));
+            Assert.IsFalse(StateStampedFields.SameValue("Ghost Person", "Ghost Person <other@example.invalid>", true));
+            Assert.IsFalse(StateStampedFields.SameValue("Ghost Person <ghost@example.invalid>", "Ghost Person", true));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void SameIdentity_SameAccount_MatchesInEveryProvableForm()
+        {
+            Assert.IsTrue(StateStampedFields.SameValue("Ghost Person", "Ghost Person", true));
+            Assert.IsTrue(StateStampedFields.SameValue("Ghost Person <ghost@example.invalid>", "Ghost Person <ghost@example.invalid>", true));
+            Assert.IsTrue(StateStampedFields.SameValue("ghost@example.invalid", "Ghost Person <ghost@example.invalid>", true));
         }
 
         [TestMethod, TestCategory("L0")]

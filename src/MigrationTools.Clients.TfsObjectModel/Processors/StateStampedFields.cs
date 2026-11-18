@@ -51,9 +51,10 @@ namespace MigrationTools.Processors
 
         /// <summary>
         /// As <see cref="SameValue(object, object)"/>, but for an identity field compares the identity rather than its
-        /// presentation: <c>Display Name &lt;unique name&gt;</c> and the plain display name are the same identity when
-        /// only one side carries the unique name; when both do, the unique names must match (ignoring case), so a
-        /// different account with the same display name is still rejected.
+        /// presentation. When both sides carry a unique name (<c>Display Name &lt;unique name&gt;</c>) those must match,
+        /// ignoring case; when neither does, the display names must match. A bare unique name (an email) matches the
+        /// qualified form of the same account. A bare display name never matches a qualified one, because the object
+        /// model qualifies only display names that several accounts share, so the account cannot be proven.
         /// </summary>
         public static bool SameValue(object sourceValue, object targetValue, bool isIdentity)
         {
@@ -71,10 +72,12 @@ namespace MigrationTools.Processors
             {
                 return string.Equals(sourceName, targetName, StringComparison.Ordinal);
             }
-            // One side is a bare unique name (for example an email in a user mapping) or a display name.
+            // One side is bare. A bare unique name (for example an email in a user mapping) identifies the account. A bare
+            // display name does not: the object model qualifies a name only when several accounts share it, so the
+            // account cannot be proven and the values are treated as different (the work item fails clearly).
             var bare = sourceUnique == null ? sourceName : targetName;
-            var (name, unique) = sourceUnique == null ? (targetName, targetUnique) : (sourceName, sourceUnique);
-            return string.Equals(bare, name, StringComparison.Ordinal) || string.Equals(bare, unique, StringComparison.OrdinalIgnoreCase);
+            var unique = sourceUnique ?? targetUnique;
+            return string.Equals(bare, unique, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>Splits <c>Display Name &lt;unique name&gt;</c>; a value without the angle brackets has no unique name.</summary>
