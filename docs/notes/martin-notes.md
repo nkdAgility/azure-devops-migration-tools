@@ -77,7 +77,8 @@ These are the facts and decisions Martin has given, so they can be checked. They
 - **Instruction (Martin):** #3271: `FlushTelemetery` must never throw; a link target that is missing or outside the query is reported clearly and skipped; the run gets the correct exit code.
 - **Instruction (Martin):** #3273: the Description must arrive exactly; if the only difference is the service normalising the HTML, prove it and record it on the issue.
 - **Finding (#3271, e2e on the test orgs):** TF26198 is reproduced by a Related link to a work item in a project that is then deleted. Deleting the work item itself is not enough: Azure DevOps removes its links from the other items. Azure DevOps Services does not allow hard-deleting projects (VS800076), so deleted scratch projects stay in the recycle bin and their names can't be reused for 28 days.
-- **Choice made while building, not yet approved by Martin (#3271):** a skipped link is a warning, not a work item failure, so on its own it leaves the exit code at 0; failed work items still give exit code 1.
+- **Choice made while building (#3271):** a skipped link is a warning, not a work item failure, so on its own it leaves the exit code at 0; failed work items still give exit code 1.
+- **Decision (Martin, 2026-11-18):** PR #3274 "looks good to merge when ready", including the exit-code choice above as described in the PR.
 - **Finding (#3273, e2e on the test orgs):** Azure DevOps normalises HTML on save, with or without bypass rules: non-BMP characters become numeric entities, `&#39;` becomes `'`, `&copy;` becomes `©`, spaces are added before closing tags, `color:red` becomes `color:red;`. A rich Description (604 units sent, 700 stored) migrated to exactly the stored source value apart from the intended rewrites (attachment url, mention organisation, project and id). The 526 to 520 difference has not been reproduced without the customer's values.
 
 ## 2026-11-13
