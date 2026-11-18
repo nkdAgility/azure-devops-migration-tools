@@ -125,23 +125,95 @@ namespace MigrationTools.Tests.Tools
             Assert.IsFalse(new TfsGitRepositoryToolOptions().DropPullRequestLinks);
         }
 
+        private static readonly Uri SourceOrg = new Uri("https://dev.azure.com/src/");
+        private static readonly Uri TargetOrg = new Uri("https://dev.azure.com/tgt/");
+
+        private static PullRequestLinkAction Decide(TfsGitRepositoryTool tool, string uri, string wi, Uri target, IList<GitRepository> repos, out string url, out string comment)
+            => tool.DecidePullRequestLink(uri, wi, SourceOrg, target, repos, out url, out comment);
+
         [TestMethod, TestCategory("L0")]
-        public void KeepOrDropPullRequestLink_Default_KeepsLinkAndCountsOncePerWorkItem()
+        public void DecidePullRequestLink_OtherOrganisation_ConvertsToHyperlinkNamedByTitle()
         {
+            var repo = Repo("My Project", "My Repo");
             var tool = Tool(null);
-            const string pr = "vstfs:///Git/PullRequestId/p%2fr%2f7";
-            Assert.IsFalse(tool.KeepOrDropPullRequestLink(pr, "1"));
-            Assert.IsFalse(tool.KeepOrDropPullRequestLink(pr, "1"));
-            Assert.IsFalse(tool.KeepOrDropPullRequestLink(pr, "2"));
-            Assert.AreEqual(2, tool.PullRequestLinksKept);
+            tool.PullRequestTitleReader = id => "Add login";
+            var action = Decide(tool, $"vstfs:///Git/PullRequestId/{repo.ProjectReference.Id}%2F{repo.Id}%2F7", "1", TargetOrg, new List<GitRepository> { repo }, out var url, out var comment);
+            Assert.AreEqual(PullRequestLinkAction.ConvertToHyperlink, action);
+            Assert.AreEqual("https://dev.azure.com/src/My%20Project/_git/My%20Repo/pullrequest/7", url);
+            Assert.AreEqual("Pull request 7: Add login", comment);
+            Assert.AreEqual(1, tool.PullRequestLinksConverted);
         }
 
         [TestMethod, TestCategory("L0")]
-        public void KeepOrDropPullRequestLink_DropPullRequestLinks_Drops()
+        public void DecidePullRequestLink_RepositoryUnknown_UsesIdsInTheAddress()
+        {
+            var tool = Tool(null);
+            tool.PullRequestTitleReader = id => "t";
+            Decide(tool, "vstfs:///Git/PullRequestId/p1%2fr1%2f7", "1", TargetOrg, new List<GitRepository>(), out var url, out _);
+            Assert.AreEqual("https://dev.azure.com/src/p1/_git/r1/pullrequest/7", url);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void DecidePullRequestLink_TitleUnreadable_NamesByNumberAndReadsOnce()
+        {
+            var tool = Tool(null);
+            int reads = 0;
+            tool.PullRequestTitleReader = id => { reads++; throw new InvalidOperationException("TF401019"); };
+            Decide(tool, "vstfs:///Git/PullRequestId/p%2fr%2f7", "1", TargetOrg, null, out _, out var comment);
+            Decide(tool, "vstfs:///Git/PullRequestId/p%2fr%2f7", "2", TargetOrg, null, out _, out var comment2);
+            Assert.AreEqual("Pull request 7", comment);
+            Assert.AreEqual("Pull request 7", comment2);
+            Assert.AreEqual(1, reads);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void DecidePullRequestLink_SameOrganisation_KeepsAndCountsOncePerWorkItem()
+        {
+            var tool = Tool(null);
+            const string pr = "vstfs:///Git/PullRequestId/p%2fr%2f7";
+            var sameOrgDifferentCase = new Uri("https://DEV.azure.com/src");
+            Assert.AreEqual(PullRequestLinkAction.Keep, Decide(tool, pr, "1", sameOrgDifferentCase, null, out _, out _));
+            Assert.AreEqual(PullRequestLinkAction.Keep, Decide(tool, pr, "1", sameOrgDifferentCase, null, out _, out _));
+            Assert.AreEqual(PullRequestLinkAction.Keep, Decide(tool, pr, "2", sameOrgDifferentCase, null, out _, out _));
+            Assert.AreEqual(2, tool.PullRequestLinksKept);
+            Assert.AreEqual(0, tool.PullRequestLinksConverted);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void DecidePullRequestLink_ConvertedOncePerWorkItemAcrossRevisions()
+        {
+            var tool = Tool(null);
+            tool.PullRequestTitleReader = id => "t";
+            Decide(tool, "vstfs:///Git/PullRequestId/p%2fr%2f7", "1", TargetOrg, null, out _, out _);
+            Decide(tool, "vstfs:///Git/PullRequestId/p%2fr%2f7", "1", TargetOrg, null, out _, out _);
+            Assert.AreEqual(1, tool.PullRequestLinksConverted);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void DecidePullRequestLink_Malformed_LeftUnchanged()
+        {
+            var tool = Tool(null);
+            Assert.AreEqual(PullRequestLinkAction.LeaveUnchanged, Decide(tool, "vstfs:///Git/PullRequestId/garbage", "1", TargetOrg, null, out var url, out _));
+            Assert.IsNull(url);
+            Assert.AreEqual(1, tool.PullRequestLinksUnreadable);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void DecidePullRequestLink_DropPullRequestLinks_Drops()
         {
             var tool = Tool(null, new TfsGitRepositoryToolOptions { DropPullRequestLinks = true });
-            Assert.IsTrue(tool.KeepOrDropPullRequestLink("vstfs:///Git/PullRequestId/p%2fr%2f7", "1"));
-            Assert.AreEqual(0, tool.PullRequestLinksKept);
+            Assert.AreEqual(PullRequestLinkAction.Drop, Decide(tool, "vstfs:///Git/PullRequestId/p%2fr%2f7", "1", TargetOrg, null, out _, out _));
+            Assert.AreEqual(0, tool.PullRequestLinksKept + tool.PullRequestLinksConverted);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void TfsPullRequestLink_TryParse_AcceptsEncodedAndPlainSeparators()
+        {
+            Assert.IsTrue(TfsPullRequestLink.TryParse("vstfs:///Git/PullRequestId/a%2Fb%2F12", out var l1));
+            Assert.AreEqual(("a", "b", 12), (l1.Project, l1.Repository, l1.PullRequestId));
+            Assert.IsTrue(TfsPullRequestLink.TryParse("vstfs:///git/pullrequestid/a/b/12", out var l2));
+            Assert.AreEqual(12, l2.PullRequestId);
+            Assert.IsFalse(TfsPullRequestLink.TryParse("vstfs:///Git/Commit/a%2Fb%2F12", out _));
         }
 
         [TestMethod, TestCategory("L0")]

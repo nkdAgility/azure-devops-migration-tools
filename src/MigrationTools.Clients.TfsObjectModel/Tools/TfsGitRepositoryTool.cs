@@ -96,6 +96,7 @@ namespace MigrationTools.Tools
             Log.LogInformation("GitRepositoryEnricher: Enriching {Id} To fix Git Repo Links", targetWorkItem.Id);
             List<ExternalLink> newEL = new List<ExternalLink>();
             List<ExternalLink> removeEL = new List<ExternalLink>();
+            List<Hyperlink> newHL = new List<Hyperlink>();
             int count = 0;
             SetupRepoBits();
             if (sourceRepoService == null)
@@ -112,6 +113,24 @@ namespace MigrationTools.Tools
                     {
                         Log.LogDebug("Dropping changeset {Id}", el.LinkedArtifactUri);
                         removeEL.Add(el);
+                    }
+                    else if (el.ArtifactLinkType.Name == "Pull Request")
+                    {
+                        var action = DecidePullRequestLink(el.LinkedArtifactUri, sourceWorkItem.Id, _processor.Source.Options.Collection, _processor.Target.Options.Collection, allSourceRepos, out string webUrl, out string comment);
+                        if (action == PullRequestLinkAction.Drop)
+                        {
+                            removeEL.Add(el);
+                        }
+                        else if (action == PullRequestLinkAction.ConvertToHyperlink)
+                        {
+                            bool exists = targetWorkItem.ToWorkItem().Links.OfType<Hyperlink>().Any(h => string.Equals(h.Location, webUrl, StringComparison.OrdinalIgnoreCase))
+                                || newHL.Any(h => string.Equals(h.Location, webUrl, StringComparison.OrdinalIgnoreCase));
+                            if (!exists)
+                            {
+                                newHL.Add(new Hyperlink(webUrl) { Comment = comment });
+                            }
+                            removeEL.Add(el);
+                        }
                     }
                     else
                     {
@@ -157,6 +176,11 @@ namespace MigrationTools.Tools
                 {
                     // eat exception as sometimes TFS thinks this is an attachment
                 }
+            }
+            foreach (Hyperlink hl in newHL)
+            {
+                Log.LogDebug("GitRepositoryEnricher: Adding hyperlink {Location}", hl.Location);
+                targetWorkItem.ToWorkItem().Links.Add(hl);
             }
             foreach (ExternalLink elr in removeEL)
             {
@@ -242,28 +266,89 @@ namespace MigrationTools.Tools
 
         private readonly HashSet<string> _reportedPullRequests = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>Number of pull request links left pointing at the source.</summary>
+        private readonly Dictionary<int, string> _pullRequestTitles = new Dictionary<int, string>();
+
+        /// <summary>Pull request links kept as artifact links because the target is the source organisation.</summary>
         public int PullRequestLinksKept { get; private set; }
 
+        /// <summary>Pull request links replaced by a hyperlink to the source pull request.</summary>
+        public int PullRequestLinksConverted { get; private set; }
+
+        /// <summary>Pull request links that could not be read and were left unchanged.</summary>
+        public int PullRequestLinksUnreadable { get; private set; }
+
+        /// <summary>Reads a source pull request's title by id; replaceable for tests.</summary>
+        public Func<int, string> PullRequestTitleReader { get; set; }
+
         /// <summary>
-        /// Decides what happens to a pull request link. Returns true when it should be removed (<see cref="TfsGitRepositoryToolOptions.DropPullRequestLinks"/>);
-        /// otherwise logs a warning naming the work item and pull request and the link is left pointing at the source.
+        /// Decides what happens to a pull request link (#3286). A vstfs pull request link resolves only in the organisation
+        /// that holds the repository, so on any other target it becomes a hyperlink to the source pull request's web page.
+        /// Each link is logged and counted once per work item, as revision replay enriches every revision.
         /// </summary>
-        public bool KeepOrDropPullRequestLink(string sourceLinkUri, string sourceWorkItemId)
+        public PullRequestLinkAction DecidePullRequestLink(string sourceLinkUri, string sourceWorkItemId, Uri sourceCollection, Uri targetCollection,
+            IList<GitRepository> sourceRepositories, out string webUrl, out string comment)
         {
+            webUrl = null;
+            comment = null;
             if (Options.DropPullRequestLinks)
             {
                 Log.LogDebug("GitRepositoryEnricher: Source work item {SourceWorkItemId}: dropping pull request link {SourceLink}", sourceWorkItemId, sourceLinkUri);
-                return true;
+                return PullRequestLinkAction.Drop;
             }
-            // Revision replay enriches every revision, so each link is reported once per work item.
-            if (_reportedPullRequests.Add($"{sourceWorkItemId}|{sourceLinkUri}"))
+            bool firstTime = _reportedPullRequests.Add($"{sourceWorkItemId}|{sourceLinkUri}");
+            if (TfsPullRequestLink.SameCollection(sourceCollection, targetCollection))
             {
-                Log.LogWarning("GitRepositoryEnricher: Source work item {SourceWorkItemId}: pull requests are not migrated; leaving link {SourceLink} pointing at the source pull request.",
-                    sourceWorkItemId, sourceLinkUri);
-                PullRequestLinksKept++;
+                if (firstTime)
+                {
+                    PullRequestLinksKept++;
+                }
+                return PullRequestLinkAction.Keep;
             }
-            return false;
+            if (!TfsPullRequestLink.TryParse(sourceLinkUri, out var link))
+            {
+                if (firstTime)
+                {
+                    Log.LogWarning("GitRepositoryEnricher: Source work item {SourceWorkItemId}: pull request link {SourceLink} is not in the expected vstfs:///Git/PullRequestId/project/repository/id form, so it was left unchanged and will not open on the target. Fix or remove the link in the source and run again, or set DropPullRequestLinks to remove pull request links.",
+                        sourceWorkItemId, sourceLinkUri);
+                    PullRequestLinksUnreadable++;
+                }
+                return PullRequestLinkAction.LeaveUnchanged;
+            }
+            var repo = sourceRepositories?.FirstOrDefault(r => string.Equals(r.Id.ToString(), link.Repository, StringComparison.OrdinalIgnoreCase)
+                                                             || string.Equals(r.Name, link.Repository, StringComparison.OrdinalIgnoreCase)
+                                                                && (string.Equals(r.ProjectReference?.Name, link.Project, StringComparison.OrdinalIgnoreCase) || string.Equals(r.ProjectReference?.Id.ToString(), link.Project, StringComparison.OrdinalIgnoreCase)));
+            // Azure DevOps also accepts project and repository ids in the web address, so a link to a deleted or unreadable repository still gets a hyperlink.
+            webUrl = TfsPullRequestLink.WebUrl(sourceCollection, repo?.ProjectReference?.Name ?? link.Project, repo?.Name ?? link.Repository, link.PullRequestId);
+            comment = TfsPullRequestLink.Comment(link.PullRequestId, ReadPullRequestTitle(link.PullRequestId));
+            if (firstTime)
+            {
+                Log.LogInformation("GitRepositoryEnricher: Source work item {SourceWorkItemId}: pull request link {SourceLink} replaced by a hyperlink to {WebUrl}, as the target organisation cannot open the source pull request.",
+                    sourceWorkItemId, sourceLinkUri, webUrl);
+                PullRequestLinksConverted++;
+            }
+            return PullRequestLinkAction.ConvertToHyperlink;
+        }
+
+        private string ReadPullRequestTitle(int pullRequestId)
+        {
+            if (_pullRequestTitles.TryGetValue(pullRequestId, out string title))
+            {
+                return title;
+            }
+            try
+            {
+                var reader = PullRequestTitleReader ?? (id => _processor.Source.GetClient<GitHttpClient>().GetPullRequestByIdAsync(id).GetAwaiter().GetResult().Title);
+                title = reader(pullRequestId);
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning("GitRepositoryEnricher: Could not read the title of source pull request {PullRequestId} ({Reason}); its hyperlink is named by number only. Give the source identity read access to the repository to include the title.",
+                    pullRequestId, (ex.InnerException ?? ex).Message);
+                Log.LogDebug(ex, "GitRepositoryEnricher: reading source pull request {PullRequestId} failed", pullRequestId);
+                title = null;
+            }
+            _pullRequestTitles[pullRequestId] = title;
+            return title;
         }
 
         private string MapGitLinkToTargetUri(ExternalLink el, string sourceProjectName, out bool dropLink, out string linkTypeId, bool report = true, string sourceWorkItemId = null)
@@ -271,10 +356,9 @@ namespace MigrationTools.Tools
             bool verifyTarget = report && Options.VerifyTargetExists;
             dropLink = false;
             linkTypeId = null;
-            // Pull request ids are not preserved by a git push, so there is no target equivalent to rewrite to (#3215).
+            // Pull request ids are not preserved by a git push, so there is no target artifact to rewrite to; Enrich handles them (#3286).
             if (el.ArtifactLinkType.Name == "Pull Request")
             {
-                dropLink = report && KeepOrDropPullRequestLink(el.LinkedArtifactUri, sourceWorkItemId);
                 return null;
             }
             var changeSetMappings = Services.GetRequiredService<TfsChangeSetMappingTool>();
@@ -395,9 +479,17 @@ namespace MigrationTools.Tools
         /// <summary>Logs one line per unresolved repository with its link count. Call once at the end of a run.</summary>
         public void LogUnresolvedSummary()
         {
+            if (PullRequestLinksConverted > 0)
+            {
+                Log.LogInformation("GitRepositoryEnricher: {LinkCount} pull request link(s) replaced by hyperlinks to the source pull request; set DropPullRequestLinks to remove them instead.", PullRequestLinksConverted);
+            }
             if (PullRequestLinksKept > 0)
             {
-                Log.LogWarning("GitRepositoryEnricher: {LinkCount} pull request link(s) were left pointing at the source; set DropPullRequestLinks to remove them instead.", PullRequestLinksKept);
+                Log.LogInformation("GitRepositoryEnricher: {LinkCount} pull request link(s) kept, as the target is the source organisation.", PullRequestLinksKept);
+            }
+            if (PullRequestLinksUnreadable > 0)
+            {
+                Log.LogWarning("GitRepositoryEnricher: {LinkCount} pull request link(s) could not be read and were left unchanged; see the warnings above.", PullRequestLinksUnreadable);
             }
             if (_linksLeftOnSource.Count > 0)
             {
