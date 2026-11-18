@@ -26,23 +26,24 @@ namespace MigrationTools.Tools
     {
         public const int DefaultBatchSize = 100;
 
-        private readonly Func<TKey[], IEnumerable<IdentityItemData>> _readUsers;
+        private readonly Func<TKey[], IReadOnlyList<(FallbackIdentityKind Kind, IdentityItemData User)>> _readBatch;
         private readonly Func<TKey, (FallbackIdentityKind Kind, IdentityItemData User)> _readFallback;
         private readonly Func<TKey, string> _describe;
         private readonly ILogger _log;
         private readonly int _batchSize;
 
-        /// <param name="readUsers">Reads a batch and returns the users in it; throws when the server cannot return the batch.</param>
+        /// <param name="readBatch">Reads a batch and returns one result per key, in order; throws when the server cannot return the batch.
+        /// A key whose result is Unreadable (for example one the server returned as null) is read again on its own.</param>
         /// <param name="readFallback">Reads one identity that failed in a batch.</param>
         /// <param name="describe">Names an identity in the log.</param>
         public TfsIdentityBatchReader(
-            Func<TKey[], IEnumerable<IdentityItemData>> readUsers,
+            Func<TKey[], IReadOnlyList<(FallbackIdentityKind Kind, IdentityItemData User)>> readBatch,
             Func<TKey, (FallbackIdentityKind Kind, IdentityItemData User)> readFallback,
             Func<TKey, string> describe,
             ILogger log,
             int batchSize = DefaultBatchSize)
         {
-            _readUsers = readUsers ?? throw new ArgumentNullException(nameof(readUsers));
+            _readBatch = readBatch ?? throw new ArgumentNullException(nameof(readBatch));
             _readFallback = readFallback ?? throw new ArgumentNullException(nameof(readFallback));
             _describe = describe ?? (k => k?.ToString());
             _log = log;
@@ -55,8 +56,8 @@ namespace MigrationTools.Tools
         /// <summary>Identities that failed in a batch and could not be read on their own either.</summary>
         public List<string> Unreadable { get; } = [];
 
-        /// <summary>The number of server calls made, batched and fallback.</summary>
-        public int Calls { get; private set; }
+        /// <summary>The number of batched reads made, including those repeated after a batch was split.</summary>
+        public int BatchReads { get; private set; }
 
         public List<IdentityItemData> ReadUsers(IReadOnlyList<TKey> keys)
         {
@@ -76,11 +77,15 @@ namespace MigrationTools.Tools
 
         private void ReadBatch(TKey[] batch, List<IdentityItemData> users)
         {
-            List<IdentityItemData> read;
+            IReadOnlyList<(FallbackIdentityKind Kind, IdentityItemData User)> results;
             try
             {
-                Calls++;
-                read = (_readUsers(batch) ?? []).Where(u => u != null).ToList();
+                BatchReads++;
+                results = _readBatch(batch);
+                if (results == null || results.Count != batch.Length)
+                {
+                    throw new InvalidOperationException($"The batched read returned {results?.Count ?? 0} results for {batch.Length} identities.");
+                }
             }
             catch (Exception ex)
             {
@@ -96,15 +101,26 @@ namespace MigrationTools.Tools
                 ReadBatch(batch.Skip(half).ToArray(), users);
                 return;
             }
-            users.AddRange(read);
-        }
 
+            for (int i = 0; i < batch.Length; i++)
+            {
+                var (kind, user) = results[i];
+                if (kind == FallbackIdentityKind.User && user != null)
+                {
+                    users.Add(user);
+                }
+                else if (kind != FallbackIdentityKind.NotAUser)
+                {
+                    _log?.LogDebug("TfsUserMappingTool::GetUsersListFromServer::[{identity}] Not returned by the batched read; reading it on its own", _describe(batch[i]));
+                    ReadFallback(batch[i], users);
+                }
+            }
+        }
         private void ReadFallback(TKey key, List<IdentityItemData> users)
         {
             (FallbackIdentityKind Kind, IdentityItemData User) result;
             try
             {
-                Calls++;
                 result = _readFallback(key);
             }
             catch (Exception ex)

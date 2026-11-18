@@ -460,7 +460,7 @@ namespace MigrationTools.Processors
                 }
             }
             var userMapping = CommonTools.UserMapping;
-            var referencedUsers = userMapping.Options.ValidateMappingTargets == MappingTargetValidationScope.Referenced
+            var referencedUsers = userMapping.Options.Enabled && userMapping.Options.ValidateMappingTargets == MappingTargetValidationScope.Referenced
                 ? TfsUserMappingTool.GetUsersFromWorkItems(sourceWorkItems, userMapping.IdentityFieldsToCheck)
                 : null;
             userMapping.ValidateMappingTargets(this, usersToMap?.TargetUsers, referencedUsers);

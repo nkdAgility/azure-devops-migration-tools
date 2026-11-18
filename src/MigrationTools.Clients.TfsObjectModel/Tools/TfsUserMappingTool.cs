@@ -418,7 +418,7 @@ namespace MigrationTools.Tools
         /// <exception cref="MigrationRunStoppedException">Thrown when a target does not resolve and StopIfMappingTargetsDoNotResolve is true.</exception>
         public void ValidateMappingTargets(TfsProcessor processor, List<IdentityItemData> targetUsers = null, ICollection<string> referencedSourceUsers = null)
         {
-            ValidateMappingTargets(() => GetUsersListFromServer(processor.Target), targetUsers, referencedSourceUsers);
+            ValidateMappingTargets(() => GetUsersListFromServer(processor.Target, isTarget: true), targetUsers, referencedSourceUsers);
         }
 
         internal void ValidateMappingTargets(Func<List<IdentityItemData>> loadTargetUsers, List<IdentityItemData> targetUsers, ICollection<string> referencedSourceUsers)
@@ -447,11 +447,13 @@ namespace MigrationTools.Tools
                 return;
             }
             IDictionary<string, string> mappings = UserMappings.Value;
+            string scope = "All user mapping targets";
             if (Options.ValidateMappingTargets == MappingTargetValidationScope.Referenced)
             {
                 mappings = FilterToReferencedMappings(UserMappings.Value, referencedSourceUsers ?? []);
                 Log.LogInformation("Validating::Check that the {count} of {total} user mapping targets referenced by the source work items resolve to one identity in the target",
                     mappings.Count, UserMappings.Value.Count);
+                scope = $"The {mappings.Count} user mapping targets referenced by the source work items (of {UserMappings.Value.Count} in the file)";
                 if (mappings.Count == 0)
                 {
                     return;
@@ -471,47 +473,49 @@ namespace MigrationTools.Tools
                     + "but an Entra B2B guest given this way can be saved as plain text. If this is a guest, map it to '{suggestion}'.",
                     mapping.Key, mapping.Value, FormatUnambiguous(identity));
             }
-            ReportUnresolvedMappingTargets(FindUnresolvedMappingTargets(mappings, targetUsers));
+            ReportUnresolvedMappingTargets(FindUnresolvedMappingTargets(mappings, targetUsers), scope);
         }
 
         /// <summary>
-        /// The mappings that a work item value in <paramref name="referencedSourceUsers"/> can use: the exact key, or a
-        /// <c>Display Name &lt;unique&gt;</c> key whose display name or unique part matches. Leans towards keeping a mapping.
+        /// The mapping entries that replay selects for the values in <paramref name="referencedSourceUsers"/>, using the same lookup
+        /// as <see cref="TfsUserIdentityReference.FindMappedTarget"/>.
         /// </summary>
         public static Dictionary<string, string> FilterToReferencedMappings(IDictionary<string, string> userMap, IEnumerable<string> referencedSourceUsers)
         {
-            var users = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var result = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+            if (userMap == null)
+            {
+                return result;
+            }
             foreach (var user in referencedSourceUsers ?? [])
             {
-                if (string.IsNullOrWhiteSpace(user))
+                var key = TfsUserIdentityReference.FindMappedKey(userMap, user);
+                if (key != null)
                 {
-                    continue;
-                }
-                users.Add(user.Trim());
-                if (TfsUserIdentityReference.TryParse(user, out var name, out var unique))
-                {
-                    users.Add(name);
-                    users.Add(unique);
-                }
-            }
-            var result = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
-            foreach (var mapping in userMap ?? new Dictionary<string, string>())
-            {
-                var referenced = users.Contains(mapping.Key.Trim())
-                    || (TfsUserIdentityReference.TryParse(mapping.Key, out var name, out var unique) && (users.Contains(name) || users.Contains(unique)));
-                if (referenced)
-                {
-                    result[mapping.Key] = mapping.Value;
+                    result[key] = userMap[key];
                 }
             }
             return result;
         }
 
-        internal void ReportUnresolvedMappingTargets(List<UnresolvedUserMapping> unresolved)
+        /// <summary>
+        /// The target identities that could not be read the last time the target was loaded. While any remain, a target that
+        /// matched one identity might also match an unreadable one, so a clean result is reported as inconclusive.
+        /// </summary>
+        internal IReadOnlyList<string> UnreadableTargetIdentities { get; set; } = [];
+
+        internal void ReportUnresolvedMappingTargets(List<UnresolvedUserMapping> unresolved, string scope = "All user mapping targets")
         {
             if (unresolved.Count == 0)
             {
-                Log.LogInformation("Validating::All user mapping targets resolve to an identity in the target.");
+                if (UnreadableTargetIdentities.Count > 0)
+                {
+                    Log.LogWarning("Validating::Inconclusive. {scope} resolve to one identity in the target, but {count} target identities could not be read, "
+                        + "so a target that matched one identity might also match one of them. Check those mappings against these identities, or grant the "
+                        + "migration account permission to read them: {identities}", scope, UnreadableTargetIdentities.Count, string.Join(", ", UnreadableTargetIdentities));
+                    return;
+                }
+                Log.LogInformation("Validating::{scope} resolve to an identity in the target.", scope);
                 return;
             }
             foreach (var item in unresolved)
@@ -580,7 +584,7 @@ namespace MigrationTools.Tools
             return isIdentityMapDataFormat;
         }
 
-        private List<IdentityItemData> GetUsersListFromServer(TfsTeamProjectEndpoint endpoint)
+        private List<IdentityItemData> GetUsersListFromServer(TfsTeamProjectEndpoint endpoint, bool isTarget)
         {
             // The group security service returns null for every user in a batched read, so batches go through the identity
             // management service; the group security service is only the single-identity fallback.
@@ -593,18 +597,32 @@ namespace MigrationTools.Tools
             Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer Found {count} identities (users and groups) in server ({elapsed:0.0}s); reading them in batches of {batchSize}.",
                 members.Length, timer.Elapsed.TotalSeconds, TfsIdentityBatchReader<IdentityDescriptor>.DefaultBatchSize);
 
+            int singleReads = 0;
             var reader = new TfsIdentityBatchReader<IdentityDescriptor>(
                 batch => (ims.ReadIdentities(batch, MembershipQuery.None, ReadIdentityOptions.None) ?? [])
-                    .Where(i => i != null && !i.IsContainer)
-                    .Select(ToIdentityItemData),
-                descriptor => ReadIdentityFallback(gss.Value, descriptor),
+                    .Select(ClassifyIdentity)
+                    .ToList(),
+                descriptor =>
+                {
+                    if (IsTeamFoundationGroup(descriptor))
+                    {
+                        return (FallbackIdentityKind.NotAUser, null);
+                    }
+                    singleReads++;
+                    return ReadIdentityFallback(gss.Value, descriptor);
+                },
                 descriptor => $"{descriptor.IdentityType};{descriptor.Identifier}",
                 Log);
             var foundUsers = reader.ReadUsers(members);
             ReportReaderOutcome(reader.SkippedNonUsers, reader.Unreadable);
+            if (isTarget)
+            {
+                UnreadableTargetIdentities = reader.Unreadable.ToList();
+            }
             foundUsers.Sort((x, y) => string.Compare(x.AccountName, y.AccountName, StringComparison.Ordinal));
-            Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} user identities are applicable for mapping ({calls} server calls, {elapsed:0.0}s)",
-                foundUsers.Count, reader.Calls, timer.Elapsed.TotalSeconds);
+            Log.LogInformation("TfsUserMappingTool::GetUsersListFromServer {count} user identities are applicable for mapping "
+                + "(1 membership read, {batchReads} batched reads, {singleReads} single reads, {elapsed:0.0}s)",
+                foundUsers.Count, reader.BatchReads, singleReads, timer.Elapsed.TotalSeconds);
             return foundUsers;
         }
 
@@ -637,12 +655,16 @@ namespace MigrationTools.Tools
         internal static bool IsTeamFoundationGroup(IdentityDescriptor descriptor) =>
             string.Equals(descriptor?.IdentityType, TeamFoundationGroupDescriptorType, StringComparison.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// One batched result per requested descriptor: a null (not returned) is Unreadable so the reader retries it on its own.
+        /// </summary>
+        internal static (FallbackIdentityKind, IdentityItemData) ClassifyIdentity(TeamFoundationIdentity identity) =>
+            identity == null ? (FallbackIdentityKind.Unreadable, null)
+            : identity.IsContainer ? (FallbackIdentityKind.NotAUser, null)
+            : (FallbackIdentityKind.User, ToIdentityItemData(identity));
+
         private (FallbackIdentityKind, IdentityItemData) ReadIdentityFallback(IGroupSecurityService gss, IdentityDescriptor descriptor)
         {
-            if (IsTeamFoundationGroup(descriptor))
-            {
-                return (FallbackIdentityKind.NotAUser, null);
-            }
             var identity = gss.ReadIdentity(SearchFactor.Sid, descriptor.Identifier, QueryMembership.None);
             if (identity == null)
             {
@@ -698,9 +720,9 @@ namespace MigrationTools.Tools
             if (Options.Enabled)
             {
                 Log.LogInformation($"TfsUserMappingTool::GetUsersInSourceMappedToTarget Loading identities from source server");
-                var sourceUsers = GetUsersListFromServer(processor.Source);
+                var sourceUsers = GetUsersListFromServer(processor.Source, isTarget: false);
                 Log.LogInformation($"TfsUserMappingTool::GetUsersInSourceMappedToTarget Loading identities from target server");
-                var targetUsers = GetUsersListFromServer(processor.Target);
+                var targetUsers = GetUsersListFromServer(processor.Target, isTarget: true);
 
                 if (Options.MatchUsersByEmail)
                 {

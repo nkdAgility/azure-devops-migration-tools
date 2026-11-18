@@ -25,14 +25,17 @@ namespace MigrationTools.Tests.Tools
         {
             public List<int> BatchSizes { get; } = [];
 
-            public IEnumerable<IdentityItemData> ReadUsers(string[] keys)
+            public IReadOnlyList<(FallbackIdentityKind, IdentityItemData)> ReadUsers(string[] keys)
             {
                 BatchSizes.Add(keys.Length);
                 if (keys.Any(k => k.StartsWith("T")))
                 {
                     throw new InvalidOperationException(Type5Error);
                 }
-                return keys.Where(k => k.StartsWith("U")).Select(k => new IdentityItemData { Sid = k, AccountName = k, DisplayName = "User " + k });
+                return keys.Select(k => k.StartsWith("U")
+                    ? (FallbackIdentityKind.User, new IdentityItemData { Sid = k, AccountName = k, DisplayName = "User " + k })
+                    : k.StartsWith("N") ? (FallbackIdentityKind.Unreadable, (IdentityItemData)null)
+                    : (FallbackIdentityKind.NotAUser, (IdentityItemData)null)).ToList();
             }
         }
 
@@ -58,7 +61,7 @@ namespace MigrationTools.Tests.Tools
             var users = reader.ReadUsers(Keys(427, 0, 0));
 
             Assert.HasCount(427, users);
-            Assert.AreEqual(5, reader.Calls);
+            Assert.AreEqual(5, reader.BatchReads);
             CollectionAssert.AreEqual(new[] { 100, 100, 100, 100, 27 }, server.BatchSizes);
         }
 
@@ -76,7 +79,7 @@ namespace MigrationTools.Tests.Tools
             CollectionAssert.AreEquivalent(Enumerable.Range(0, 7).Select(i => $"T{i}").ToList(), fallbackCalls);
             CollectionAssert.AreEquivalent(fallbackCalls, reader.SkippedNonUsers);
             Assert.IsEmpty(reader.Unreadable);
-            Assert.IsLessThan(427 / 2, reader.Calls, $"expected far fewer calls than identities, got {reader.Calls}");
+            Assert.IsLessThan(427 / 2, reader.BatchReads, $"expected far fewer reads than identities, got {reader.BatchReads}");
         }
 
         [TestMethod, TestCategory("L0")]
@@ -114,13 +117,29 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
-        public void ReadUsers_IgnoresNullResults()
+        public void ReadUsers_NullResult_IsReadOnItsOwn()
         {
-            var reader = new TfsIdentityBatchReader<string>(keys => keys.Select(k => k == "U0" ? null : new IdentityItemData { Sid = k }), _ => (FallbackIdentityKind.Unreadable, null), k => k, null);
+            // A member the batched read returns as null is not silently dropped: it is read on its own.
+            var fallback = new List<string>();
+            var reader = Reader(new FakeServer(), k => { fallback.Add(k); return (FallbackIdentityKind.User, new IdentityItemData { Sid = k }); });
 
-            var users = reader.ReadUsers(["U0", "U1"]);
+            var users = reader.ReadUsers(["U0", "N0", "G0"]);
 
-            Assert.HasCount(1, users);
+            Assert.HasCount(2, users);
+            CollectionAssert.AreEqual(new[] { "N0" }, fallback);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ReadUsers_ShortBatchResult_IsSplitNotTrusted()
+        {
+            var reads = 0;
+            var reader = new TfsIdentityBatchReader<string>(
+                keys => { reads++; return keys.Length > 1 ? [] : [(FallbackIdentityKind.User, new IdentityItemData { Sid = keys[0] })]; },
+                _ => (FallbackIdentityKind.Unreadable, null), k => k, null);
+
+            var users = reader.ReadUsers(["U0", "U1", "U2"]);
+
+            Assert.HasCount(3, users);
         }
 
         [TestMethod, TestCategory("L0")]
@@ -239,6 +258,29 @@ namespace MigrationTools.Tests.Tools
             var byName = TfsUserMappingTool.FilterToReferencedMappings(map, ["alice", "Bob <bob@src.com>"]);
 
             CollectionAssert.AreEquivalent(new[] { "Alice <alice@src.com>", "Bob" }, byName.Keys.ToList());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FilterToReferencedMappings_DoesNotSelectQualifiedKeysOnDisplayNameAlone()
+        {
+            var map = new Dictionary<string, string>
+            {
+                ["Alex <alex.one>"] = "One",
+                ["Alex <alex.two>"] = "Two",
+            };
+
+            var selected = TfsUserMappingTool.FilterToReferencedMappings(map, ["Alex <alex.one@src.example>", "Alex"]);
+
+            Assert.IsEmpty(selected);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void UnreadableTargetIdentities_MakeACleanResultInconclusiveNotAStop()
+        {
+            var tool = CreateTool(MappingTargetValidationScope.Referenced);
+            tool.UnreadableTargetIdentities = ["Microsoft.IdentityModel.Claims.ClaimsIdentity;x"];
+
+            tool.ValidateMappingTargets(() => Targets, null, ["Alice Source"]);
         }
 
         [TestMethod, TestCategory("L1")]

@@ -154,6 +154,10 @@ namespace MigrationTools.ConsoleDataGenerator
                 return null;
             }
 
+            if (propertySchema?.Enum.Count > 0)
+            {
+                return propertySchema.Enum.FirstOrDefault(e => string.Equals(e.ToString(), text, StringComparison.Ordinal))?.DeepClone();
+            }
             var type = propertySchema?.Type ?? JSchemaType.String;
             if (type.HasFlag(JSchemaType.Boolean))
             {
@@ -540,6 +544,11 @@ namespace MigrationTools.ConsoleDataGenerator
                     return dictSchema;
                 }
 
+                if (t.IsEnum)
+                {
+                    return BuildEnumSchema(t, option.Description?.ToString());
+                }
+
                 // Simple
                 if (IsSimpleDotNetType(t))
                 {
@@ -559,6 +568,24 @@ namespace MigrationTools.ConsoleDataGenerator
                 Type = GetJsonSchemaType(option.Type.ToString()),
                 Description = option.Description?.ToString()
             };
+        }
+
+        /// <summary>
+        /// The configuration binder accepts an enum by name (any case) or by number, so both are allowed; anything else, such as a
+        /// misspelt name, is rejected.
+        /// </summary>
+        internal static JSchema BuildEnumSchema(Type enumType, string description)
+        {
+            var schema = new JSchema { Type = JSchemaType.String | JSchemaType.Integer, Description = description };
+            foreach (var name in Enum.GetNames(enumType))
+            {
+                schema.Enum.Add(new JValue(name));
+            }
+            foreach (var value in Enum.GetValues(enumType))
+            {
+                schema.Enum.Add(new JValue(Convert.ToInt64(value, CultureInfo.InvariantCulture)));
+            }
+            return schema;
         }
 
         private static JSchema BuildSchemaForType(Type t)

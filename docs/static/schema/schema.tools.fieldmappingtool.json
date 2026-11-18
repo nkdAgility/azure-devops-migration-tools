@@ -54,8 +54,17 @@
               },
               "parsingFallback": {
                 "description": "Gets or sets the parsing fallback.",
-                "type": "string",
-                "default": "RaiseError"
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "default": "RaiseError",
+                "enum": [
+                  "RaiseError",
+                  "ResetToZero",
+                  0,
+                  1
+                ]
               },
               "targetField": {
                 "description": "Gets or sets the target field reference name where the calculated result will be stored.",
@@ -230,8 +239,17 @@
               },
               "fieldMapMode": {
                 "description": "Gets or sets the mode of field mapping to be applied during migration. SourceToTarget will get data from the source system and apply it to the target. TargetToTarget will move data between the target fields.",
-                "type": "string",
-                "default": "SourceToTarget"
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "default": "SourceToTarget",
+                "enum": [
+                  "SourceToTarget",
+                  "TargetToTarget",
+                  0,
+                  1
+                ]
               },
               "sourceField": {
                 "description": "Gets or sets the name of the source field to copy data from during migration.",

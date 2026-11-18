@@ -39,8 +39,17 @@
     },
     "parsingFallback": {
       "description": "Gets or sets the parsing fallback.",
-      "type": "string",
-      "default": "RaiseError"
+      "type": [
+        "string",
+        "integer"
+      ],
+      "default": "RaiseError",
+      "enum": [
+        "RaiseError",
+        "ResetToZero",
+        0,
+        1
+      ]
     },
     "targetField": {
       "description": "Gets or sets the target field reference name where the calculated result will be stored.",

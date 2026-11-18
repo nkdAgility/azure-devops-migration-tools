@@ -57,18 +57,27 @@ namespace MigrationTools.Tools
         /// </summary>
         public static string FindMappedTarget(IDictionary<string, string> userMap, string sourceValue)
         {
+            var key = FindMappedKey(userMap, sourceValue);
+            return key == null ? null : userMap[key];
+        }
+
+        /// <summary>
+        /// The mapping key that <see cref="FindMappedTarget"/> uses for <paramref name="sourceValue"/>, or null when none applies.
+        /// </summary>
+        public static string FindMappedKey(IDictionary<string, string> userMap, string sourceValue)
+        {
             if (userMap == null || string.IsNullOrEmpty(sourceValue))
             {
                 return null;
             }
-            if (userMap.TryGetValue(sourceValue, out var exact))
+            if (userMap.ContainsKey(sourceValue))
             {
-                return exact;
+                return userMap.Keys.First(k => KeysEqual(userMap, k, sourceValue));
             }
 
             var sourceIsQualified = TryParse(sourceValue, out var sourceName, out var sourceUnique);
-            var qualifiedKeys = userMap
-                .Select(kvp => TryParse(kvp.Key, out var name, out var unique) ? new { Name = name, Unique = unique, kvp.Value } : null)
+            var qualifiedKeys = userMap.Keys
+                .Select(key => TryParse(key, out var name, out var unique) ? new { Key = key, Name = name, Unique = unique } : null)
                 .Where(k => k != null)
                 .ToList();
 
@@ -77,15 +86,19 @@ namespace MigrationTools.Tools
                 var byUnique = qualifiedKeys.Where(k => string.Equals(k.Unique, sourceUnique, StringComparison.OrdinalIgnoreCase)).Take(2).ToList();
                 if (byUnique.Count == 1)
                 {
-                    return byUnique[0].Value;
+                    return byUnique[0].Key;
                 }
                 // A qualified source names one user, so a qualified key with another unique name must not match it.
-                return userMap.TryGetValue(sourceName, out var byPlainName) ? byPlainName : null;
+                return userMap.ContainsKey(sourceName) ? userMap.Keys.First(k => KeysEqual(userMap, k, sourceName)) : null;
             }
 
             var byName = qualifiedKeys.Where(k => string.Equals(k.Name, sourceValue, StringComparison.OrdinalIgnoreCase)).Take(2).ToList();
-            return byName.Count == 1 ? byName[0].Value : null;
+            return byName.Count == 1 ? byName[0].Key : null;
         }
+
+        // The dictionary decides key equality (it is case-insensitive), so the stored key is the one it would look up.
+        private static bool KeysEqual(IDictionary<string, string> userMap, string storedKey, string lookup) =>
+            userMap is Dictionary<string, string> d ? d.Comparer.Equals(storedKey, lookup) : string.Equals(storedKey, lookup, StringComparison.Ordinal);
 
         /// <summary>
         /// Returns true when a plain display name matches more than one <c>Display Name &lt;upn&gt;</c> key and no other key.
