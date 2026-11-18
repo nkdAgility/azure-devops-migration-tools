@@ -1,3 +1,5 @@
 state.local.json
 *.log
 scenarios/users/config*.json
+
+*.local.html
