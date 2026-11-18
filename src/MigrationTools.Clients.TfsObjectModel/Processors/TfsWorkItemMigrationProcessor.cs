@@ -902,7 +902,7 @@ namespace MigrationTools.Processors
                             });
                     }
                 }
-                catch (WebException ex)
+                catch (Exception ex) when (IsTransientNetworkError(ex))
                 {
                     Log.LogWarning("Network error while migrating source work item {SourceId}: {Reason}", sourceWorkItem?.Id, WorkItemMigrationFailedException.ServerReason(ex));
                     Log.LogDebug(ex, "Network error details for source work item {SourceId}", sourceWorkItem?.Id);
@@ -1371,13 +1371,28 @@ namespace MigrationTools.Processors
         /// </summary>
         internal static Exception PassThroughReplay(Exception ex)
         {
-            if (ex is MigrationRunStoppedException || ex is WebException) return ex;
+            if (ex is MigrationRunStoppedException || IsTransientNetworkError(ex) && !(ex is AggregateException)) return ex;
             if (ex is AggregateException agg)
             {
                 var inner = agg.Flatten().InnerExceptions;
-                return (Exception)inner.OfType<MigrationRunStoppedException>().FirstOrDefault() ?? inner.OfType<WebException>().FirstOrDefault();
+                return (Exception)inner.OfType<MigrationRunStoppedException>().FirstOrDefault() ?? inner.FirstOrDefault(IsTransientNetworkError);
             }
             return null;
+        }
+
+        /// <summary>
+        /// True when the connection to Azure DevOps failed, so the work item can be tried again: a <see cref="WebException"/>,
+        /// or the object model's <c>TeamFoundationServiceUnavailableException</c> (TF400324) that wraps one, anywhere in the
+        /// exception or inside an <see cref="AggregateException"/>.
+        /// </summary>
+        internal static bool IsTransientNetworkError(Exception ex)
+        {
+            for (var e = ex; e != null; e = e.InnerException)
+            {
+                if (e is WebException || e is Microsoft.TeamFoundation.TeamFoundationServiceUnavailableException) return true;
+                if (e is AggregateException agg && agg.Flatten().InnerExceptions.Any(IsTransientNetworkError)) return true;
+            }
+            return false;
         }
 
         private static string GetClosedDateField(WorkItem workItem)

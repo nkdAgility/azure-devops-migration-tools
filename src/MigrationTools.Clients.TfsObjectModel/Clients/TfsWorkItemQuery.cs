@@ -96,14 +96,16 @@ namespace MigrationTools.Clients
                 catch (ValidationException ex)
                 {
                     activity?.SetTag("http.response.status_code", "500");
-                    Log.Error(ex, " Error running query");
+                    Log.Error("Error running the work item query: {Reason}", ex.Message);
+                    Log.Debug(ex, "Work item query error details");
                     throw new MigrationRunStoppedException("Error running work item query.");
                 }
                 catch (Exception ex)
                 {
                     activity?.SetTag("http.response.status_code", "500");
                     Telemetry.TrackException(ex, activity.Tags);
-                    Log.Error(ex, " Error running query");
+                    // The caller reports the failure in one line; the details are for diagnosis only (#3275).
+                    Log.Debug(ex, "Error running the work item query");
                     throw;
                 }
                 return results;
