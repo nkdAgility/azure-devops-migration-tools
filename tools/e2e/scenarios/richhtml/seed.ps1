@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # richhtml: #3273. A Description with entities, emoji, supplementary-plane letters, links, a work item mention and an
 # embedded image must arrive exactly, apart from the rewrites the migration is meant to make (attachment url,
 # mention id, organisation and project). The body is sent as ASCII-escaped JSON so no character depends on encoding.

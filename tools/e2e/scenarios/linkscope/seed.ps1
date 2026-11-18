@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # linkscope: #3271. Related links whose target the run cannot migrate.
 # A (in the query) links to B (in the query, the control: that link must arrive), to O (exists, outside the query) and
 # to X, an item in a project that is then deleted. The link to X stays on A, but loading X fails with TF26198

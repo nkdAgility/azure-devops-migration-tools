@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # linkscope assertions: A and B are migrated, A keeps its Related link to B, and the links to X (unreadable, TF26198) and O
 # (outside the query) are skipped. The run log must report both skips; the caller checks it and the exit code.
 param([string]$Src = "amte2e-3271-lnk-src", [string]$Tgt = "amte2e-3271-lnk-tgt", [string]$OutFile, [string]$LogDirectory)

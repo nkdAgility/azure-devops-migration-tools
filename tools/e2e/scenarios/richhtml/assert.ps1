@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 # richhtml assertions: the target Description equals the source Description character for character, once the
 # rewrites the migration is meant to make are reversed (attachment url, mention id, organisation and project).
 param([string]$Src = "amte2e-3271-html-src", [string]$Tgt = "amte2e-3271-html-tgt", [string]$OutFile)
