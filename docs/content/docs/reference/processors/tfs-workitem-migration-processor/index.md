@@ -101,6 +101,7 @@ The file is JSON Lines: one JSON object per line, with these fields.
 | `category` | What kind of problem it is (below). |
 | `reason` | The message, as in the log. |
 | `action` | What to do about it. |
+| `migration` | The source and target collection and project, so re-runs only read entries for the same migration. |
 
 | Category | When it is written |
 |---|---|
@@ -123,7 +124,7 @@ The same problem for the same item is written once per run.
 
 **End of the run.** The log gives the number of entries by category, and each follow-up file with its row count. It also writes `work-items-to-review-latest.jsonl`, the latest entry for each item across this run and the earlier runs. You do not need it: the per-run files are complete without it.
 
-**Re-runs.** Each run writes its own file. A run reads the review files of earlier runs in the same `logs` folder. When an item they listed now migrates with no problems, it gets a `resolved` entry. A re-run that replays no revision of an item does not check the problems that are only found while replaying a revision (`failed`, `part-migrated`, `field-not-mapped`, `user-not-mapped`, `path-not-mapped`, `type-changed`), so such an item stays in the latest view with its earlier entry until a revision is replayed. Run from the same folder, or pass the same `--logPath`, for earlier runs to be found.
+**Re-runs.** Each run writes its own file. A run reads the review files of earlier runs in the same `logs` folder, but only the entries written for the same source and target collection and project (the `migration` field), because work item ids are only unique within one migration. When an item they listed now migrates with no problems, it gets a `resolved` entry. Problems that are only found while replaying a revision (`failed`, `part-migrated`, `field-not-mapped`, `user-not-mapped`, `path-not-mapped`, `type-changed`) count as checked again only when the revision they were found on is replayed in this run. Otherwise the item stays in the latest view with its earlier entry. Run from the same folder, or pass the same `--logPath`, for earlier runs to be found.
 
 Field map faults are not yet written to the review log; they are still logged as `Field map fault`.
 

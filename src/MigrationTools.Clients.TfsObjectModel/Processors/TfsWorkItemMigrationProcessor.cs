@@ -146,7 +146,7 @@ namespace MigrationTools.Processors
 
             _itemsInError = new List<string>();
             contextLog.Information("Work items that need review are written as they are found to {ReviewLogPath}", _reviewLog.FilePath);
-            _reviewLog.LoadEarlierRuns();
+            _reviewLog.LoadEarlierRuns($"{Source.Options.Collection}{Source.Options.Project} -> {Target.Options.Collection}{Target.Options.Project}");
 
             try
             {
@@ -1215,7 +1215,7 @@ namespace MigrationTools.Processors
                 {
                     replaying = revision;
                     _reviewLog.SetCurrentItem(revision: revision.Number);
-                    _reviewLog.MarkRevisionsReplayed();
+                    _reviewLog.MarkRevisionReplayed(revision.Number);
                     workItemMetrics.RevisionsProcessedCount.Add(1);
                     var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 

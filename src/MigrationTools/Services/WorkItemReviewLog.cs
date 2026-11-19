@@ -67,6 +67,7 @@ namespace MigrationTools.Services
         [JsonProperty("category")] public string Category { get; set; }
         [JsonProperty("reason")] public string Reason { get; set; }
         [JsonProperty("action")] public string Action { get; set; }
+        [JsonProperty("migration")] public string Migration { get; set; }
     }
 
     /// <summary>
@@ -94,7 +95,8 @@ namespace MigrationTools.Services
         private readonly Dictionary<string, int> _categoryCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _seen = new HashSet<string>(StringComparer.Ordinal);
         private readonly Dictionary<string, WorkItemReviewEntry> _latest = new Dictionary<string, WorkItemReviewEntry>(StringComparer.Ordinal);
-        private readonly Dictionary<string, Dictionary<string, WorkItemReviewEntry>> _openFromEarlierRuns = new Dictionary<string, Dictionary<string, WorkItemReviewEntry>>(StringComparer.Ordinal);
+        private readonly Dictionary<string, List<WorkItemReviewEntry>> _openFromEarlierRuns = new Dictionary<string, List<WorkItemReviewEntry>>(StringComparer.Ordinal);
+        private string _migration;
         private readonly AsyncLocal<ItemScope> _current = new AsyncLocal<ItemScope>();
         private bool _earlierRunsLoaded;
 
@@ -120,10 +122,13 @@ namespace MigrationTools.Services
 
         /// <summary>
         /// Reads the review logs of earlier runs in sibling folders of this run's log folder, so that an item
-        /// that needed review before and now migrates cleanly gets a <c>resolved</c> entry.
+        /// that needed review before and now migrates cleanly gets a <c>resolved</c> entry. Only entries written
+        /// for the same <paramref name="migration"/> (source and target endpoints) are read, because work item ids
+        /// are only unique within one migration. Every entry this run writes carries it.
         /// </summary>
-        public void LoadEarlierRuns()
+        public void LoadEarlierRuns(string migration)
         {
+            _migration = migration;
             lock (_gate)
             {
                 if (_earlierRunsLoaded)
@@ -146,7 +151,7 @@ namespace MigrationTools.Services
                 {
                     foreach (var entry in ReadEntries(file))
                     {
-                        if (string.IsNullOrEmpty(entry.SourceId))
+                        if (string.IsNullOrEmpty(entry.SourceId) || !string.Equals(entry.Migration, migration, StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
@@ -158,10 +163,10 @@ namespace MigrationTools.Services
                         }
                         if (!_openFromEarlierRuns.TryGetValue(entry.SourceId, out var open))
                         {
-                            open = new Dictionary<string, WorkItemReviewEntry>(StringComparer.Ordinal);
+                            open = new List<WorkItemReviewEntry>();
                             _openFromEarlierRuns[entry.SourceId] = open;
                         }
-                        open[entry.Category] = entry;
+                        open.Add(entry);
                     }
                 }
             }
@@ -271,23 +276,20 @@ namespace MigrationTools.Services
         }
 
         /// <summary>
-        /// Records that revisions of the current item were replayed in this run, so problems that are only found
-        /// while replaying a revision were checked again.
+        /// Records that a source revision of the current item was replayed in this run, so problems found while
+        /// replaying that revision were checked again.
         /// </summary>
-        public void MarkRevisionsReplayed()
+        public void MarkRevisionReplayed(int revision)
         {
-            var scope = _current.Value;
-            if (scope != null)
-            {
-                scope.RevisionsReplayed = true;
-            }
+            _current.Value?.ReplayedRevisions.Add(revision);
         }
 
         /// <summary>
         /// Marks the current item as migrated without failing. If nothing was recorded for it in this run and an
-        /// earlier run left it needing review, a <c>resolved</c> entry is written. When no revision was replayed,
-        /// an earlier problem that is only found while replaying (<see cref="WorkItemReviewCategory.FoundOnlyWhileReplaying"/>)
-        /// was not checked again, so the item stays open.
+        /// earlier run left it needing review, a <c>resolved</c> entry is written. A problem that is only found
+        /// while replaying a revision (<see cref="WorkItemReviewCategory.FoundOnlyWhileReplaying"/>) counts as
+        /// checked again only when the revision it was found on was replayed in this run; otherwise the item
+        /// stays open.
         /// </summary>
         public void CompleteCurrentItem()
         {
@@ -296,19 +298,21 @@ namespace MigrationTools.Services
             {
                 return;
             }
-            List<string> openCategories;
+            List<WorkItemReviewEntry> open;
             lock (_gate)
             {
-                if (!_openFromEarlierRuns.TryGetValue(scope.SourceId, out var open))
+                if (!_openFromEarlierRuns.TryGetValue(scope.SourceId, out var entries))
                 {
                     return;
                 }
-                openCategories = open.Keys.OrderBy(k => k, StringComparer.Ordinal).ToList();
+                open = entries.ToList();
             }
-            if (!scope.RevisionsReplayed && openCategories.Any(WorkItemReviewCategory.FoundOnlyWhileReplaying.Contains))
+            if (open.Any(e => WorkItemReviewCategory.FoundOnlyWhileReplaying.Contains(e.Category)
+                && !(e.Revision.HasValue && scope.ReplayedRevisions.Contains(e.Revision.Value))))
             {
                 return;
             }
+            var openCategories = open.Select(e => e.Category).Distinct().OrderBy(k => k, StringComparer.Ordinal);
             Record(WorkItemReviewCategory.Resolved,
                 $"Migrated without the problems an earlier run reported: {string.Join(", ", openCategories)}.",
                 "None.");
@@ -331,6 +335,7 @@ namespace MigrationTools.Services
                 Category = category,
                 Reason = reason,
                 Action = action,
+                Migration = _migration,
             };
             if (scope != null && (sourceId == null || sourceId == scope.SourceId) && category != WorkItemReviewCategory.Resolved)
             {
@@ -470,7 +475,7 @@ namespace MigrationTools.Services
             public string TargetId { get; set; }
             public string WorkItemType { get; set; }
             public int? Revision { get; set; }
-            public bool RevisionsReplayed { get; set; }
+            public HashSet<int> ReplayedRevisions { get; } = new HashSet<int>();
             public HashSet<string> Categories { get; } = new HashSet<string>(StringComparer.Ordinal);
 
             public void Dispose()

@@ -25,12 +25,21 @@ namespace MigrationTools.Tests.Services
             Directory.Delete(Path.GetDirectoryName(_logsRoot), true);
         }
 
+        private const string M = "src -> tgt";
+
+        private static WorkItemReviewLog Earlier(string folder)
+        {
+            var log = new WorkItemReviewLog(folder);
+            log.LoadEarlierRuns(M);
+            return log;
+        }
+
         private string RunFolder(string timestamp) => Path.Combine(_logsRoot, timestamp);
 
         [TestMethod, TestCategory("L0")]
         public void Record_WritesEachEntryToDiskBeforeDispose()
         {
-            var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            var log = Earlier(RunFolder("20260101000000"));
             using (log.BeginItem("12", "Bug", 3))
             {
                 log.SetCurrentItem(targetId: "99");
@@ -65,7 +74,7 @@ namespace MigrationTools.Tests.Services
         [TestMethod, TestCategory("L0")]
         public void Record_SameProblemTwice_WritesOnce()
         {
-            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using var log = Earlier(RunFolder("20260101000000"));
             using (log.BeginItem("5", "Bug"))
             {
                 log.Record(WorkItemReviewCategory.FieldNotMapped, "field X missing", "add it", revision: 1);
@@ -78,7 +87,7 @@ namespace MigrationTools.Tests.Services
         [TestMethod, TestCategory("L0")]
         public void Record_FollowUpCategory_AlsoWritesFollowUpFile()
         {
-            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using var log = Earlier(RunFolder("20260101000000"));
             log.Record(WorkItemReviewCategory.UserNotMapped, "user", "map", sourceId: "1");
             log.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "2");
 
@@ -103,18 +112,18 @@ namespace MigrationTools.Tests.Services
         [TestMethod, TestCategory("L0")]
         public void CompleteCurrentItem_ItemOpenInEarlierRun_WritesResolved()
         {
-            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            using (var first = Earlier(RunFolder("20260101000000")))
             {
-                first.Record(WorkItemReviewCategory.PartMigrated, "boom", "fix", sourceId: "7");
+                first.Record(WorkItemReviewCategory.PartMigrated, "boom", "fix", sourceId: "7", revision: 1);
                 first.Record(WorkItemReviewCategory.Failed, "other", "fix", sourceId: "8");
             }
 
-            using var second = new WorkItemReviewLog(RunFolder("20260102000000"));
-            second.LoadEarlierRuns();
+            using var second = Earlier(RunFolder("20260102000000"));
+            second.LoadEarlierRuns(M);
             using (second.BeginItem("7", "Bug"))
             {
                 second.SetCurrentItem(targetId: "70");
-                second.MarkRevisionsReplayed();
+                second.MarkRevisionReplayed(1);
                 second.CompleteCurrentItem();
             }
             using (second.BeginItem("8", "Bug"))
@@ -134,13 +143,13 @@ namespace MigrationTools.Tests.Services
         [TestMethod, TestCategory("L0")]
         public void CompleteCurrentItem_NoRevisionReplayed_DoesNotResolveReplayOnlyProblem()
         {
-            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            using (var first = Earlier(RunFolder("20260101000000")))
             {
                 first.Record(WorkItemReviewCategory.FieldNotMapped, "field X", "add it", sourceId: "7");
                 first.Record(WorkItemReviewCategory.LinkSkipped, "link", "migrate it", sourceId: "8");
             }
-            using var second = new WorkItemReviewLog(RunFolder("20260102000000"));
-            second.LoadEarlierRuns();
+            using var second = Earlier(RunFolder("20260102000000"));
+            second.LoadEarlierRuns(M);
             using (second.BeginItem("7", "Task")) { second.CompleteCurrentItem(); }
             using (second.BeginItem("8", "Task")) { second.CompleteCurrentItem(); }
 
@@ -154,46 +163,46 @@ namespace MigrationTools.Tests.Services
         [TestMethod, TestCategory("L0")]
         public void CompleteCurrentItem_AlreadyResolved_DoesNotResolveAgain()
         {
-            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            using (var first = Earlier(RunFolder("20260101000000")))
             {
-                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
             }
-            using (var second = new WorkItemReviewLog(RunFolder("20260102000000")))
+            using (var second = Earlier(RunFolder("20260102000000")))
             {
-                second.LoadEarlierRuns();
-                using (second.BeginItem("7", "Bug")) { second.MarkRevisionsReplayed(); second.CompleteCurrentItem(); }
+                second.LoadEarlierRuns(M);
+                using (second.BeginItem("7", "Bug")) { second.MarkRevisionReplayed(1); second.CompleteCurrentItem(); }
                 Assert.IsTrue(File.Exists(second.FilePath));
             }
-            using var third = new WorkItemReviewLog(RunFolder("20260103000000"));
-            third.LoadEarlierRuns();
-            using (third.BeginItem("7", "Bug")) { third.MarkRevisionsReplayed(); third.CompleteCurrentItem(); }
+            using var third = Earlier(RunFolder("20260103000000"));
+            third.LoadEarlierRuns(M);
+            using (third.BeginItem("7", "Bug")) { third.MarkRevisionReplayed(1); third.CompleteCurrentItem(); }
             Assert.IsFalse(File.Exists(third.FilePath));
         }
 
         [TestMethod, TestCategory("L0")]
         public void LoadEarlierRuns_IgnoresLaterRuns()
         {
-            using (var later = new WorkItemReviewLog(RunFolder("20260105000000")))
+            using (var later = Earlier(RunFolder("20260105000000")))
             {
-                later.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+                later.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
             }
-            using var run = new WorkItemReviewLog(RunFolder("20260102000000"));
-            run.LoadEarlierRuns();
-            using (run.BeginItem("7", "Bug")) { run.MarkRevisionsReplayed(); run.CompleteCurrentItem(); }
+            using var run = Earlier(RunFolder("20260102000000"));
+            run.LoadEarlierRuns(M);
+            using (run.BeginItem("7", "Bug")) { run.MarkRevisionReplayed(1); run.CompleteCurrentItem(); }
             Assert.IsFalse(File.Exists(run.FilePath));
         }
 
         [TestMethod, TestCategory("L0")]
         public void WriteLatestView_KeepsLatestEntryPerItem()
         {
-            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            using (var first = Earlier(RunFolder("20260101000000")))
             {
-                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
                 first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "9");
             }
-            using var second = new WorkItemReviewLog(RunFolder("20260102000000"));
-            second.LoadEarlierRuns();
-            using (second.BeginItem("7", "Bug")) { second.MarkRevisionsReplayed(); second.CompleteCurrentItem(); }
+            using var second = Earlier(RunFolder("20260102000000"));
+            second.LoadEarlierRuns(M);
+            using (second.BeginItem("7", "Bug")) { second.MarkRevisionReplayed(1); second.CompleteCurrentItem(); }
             var path = second.WriteLatestView();
 
             var latest = WorkItemReviewLog.ReadEntries(path).ToList();
@@ -205,7 +214,7 @@ namespace MigrationTools.Tests.Services
         [TestMethod, TestCategory("L0")]
         public void CurrentItemHas_TracksCategoriesOfCurrentItemOnly()
         {
-            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using var log = Earlier(RunFolder("20260101000000"));
             using (log.BeginItem("1", "Bug"))
             {
                 log.Record(WorkItemReviewCategory.RerunMismatch, "x", "y");
@@ -218,9 +227,43 @@ namespace MigrationTools.Tests.Services
         }
 
         [TestMethod, TestCategory("L0")]
+        public void LoadEarlierRuns_OtherMigration_IsIgnored()
+        {
+            using (var other = new WorkItemReviewLog(RunFolder("20260101000000")))
+            {
+                other.LoadEarlierRuns("other-src -> other-tgt");
+                other.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
+            }
+            using var run = Earlier(RunFolder("20260102000000"));
+            using (run.BeginItem("7", "Bug")) { run.MarkRevisionReplayed(1); run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath));
+            Assert.IsNull(run.WriteLatestView());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_OtherRevisionReplayed_DoesNotResolve()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.FieldNotMapped, "field X", "add it", sourceId: "7", revision: 2);
+            }
+            using var second = Earlier(RunFolder("20260102000000"));
+            using (second.BeginItem("7", "Task")) { second.MarkRevisionReplayed(5); second.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(second.FilePath), "revision 2, where the field was dropped, was not replayed");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Record_CarriesTheMigration()
+        {
+            using var log = Earlier(RunFolder("20260101000000"));
+            log.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "1");
+            Assert.AreEqual(M, WorkItemReviewLog.ReadEntries(log.FilePath).Single().Migration);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void IsMigratedLater_TrueUntilTheItemIsStarted()
         {
-            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using var log = Earlier(RunFolder("20260101000000"));
             log.SetItemsToMigrate(new[] { "1", "2" });
             Assert.IsTrue(log.IsMigratedLater("2"));
             using (log.BeginItem("2", "Task")) { }
@@ -232,7 +275,7 @@ namespace MigrationTools.Tests.Services
         [TestMethod, TestCategory("L0")]
         public void LogSummary_DoesNotThrowWithOrWithoutEntries()
         {
-            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using var log = Earlier(RunFolder("20260101000000"));
             log.LogSummary(NullLogger.Instance);
             log.Record(WorkItemReviewCategory.LinkSkipped, "x", "y", sourceId: "1");
             log.LogSummary(NullLogger.Instance);
