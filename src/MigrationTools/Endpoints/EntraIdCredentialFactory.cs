@@ -21,6 +21,10 @@ namespace MigrationTools.Endpoints
 
         public static TokenCredential Create(EntraIdOptions options, string endpointName)
         {
+            if (IsExperimental(options.CredentialType))
+            {
+                Log.Warning("Endpoint '{EndpointName}': the {Credential} Entra ID credential is experimental and has not yet been validated in a full migration. Try it on a test project first.", endpointName, options.CredentialType);
+            }
             switch (options.CredentialType)
             {
                 case EntraIdCredentialType.Default:
@@ -42,6 +46,10 @@ namespace MigrationTools.Endpoints
                     throw new MigrationRunStoppedException($"Endpoint '{endpointName}': Entra ID Credential '{options.CredentialType}' is not known.");
             }
         }
+
+        /// <summary>The app identities, which are built and unit-tested but not yet validated in a full migration.</summary>
+        public static bool IsExperimental(EntraIdCredentialType type) =>
+            type == EntraIdCredentialType.Certificate || type == EntraIdCredentialType.ClientSecret || type == EntraIdCredentialType.ManagedIdentity;
 
         internal static X509Certificate2 LoadCertificate(EntraIdOptions options, string endpointName)
         {

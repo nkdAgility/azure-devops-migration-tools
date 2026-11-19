@@ -21,8 +21,11 @@ Each endpoint (Source, Target, or any REST endpoint) has its own sign-in, its ow
 ### Use Cases
 
 - You are signed in with `az login` and want no PAT: use the one-line configuration below.
-- An unattended or scheduled run: use an app registration with a certificate, or a managed identity.
-- Source and Target in different tenants, or a user on one side and an app on the other.
+- You want to sign in as a specific user, in a browser or with a device code.
+- Source and Target in different tenants, each with its own user.
+- Experimental, needs validation: an unattended run as an app (certificate, client secret or managed identity).
+
+> **Experimental:** `Certificate`, `ClientSecret` and `ManagedIdentity` are built and unit-tested, and their failure messages have been checked, but no full migration has yet been validated with an app identity. The run logs a warning when you use one. Try them on a test project first, and please report what you find.
 
 ## Configuration Structure
 
@@ -46,7 +49,7 @@ Add an `EntraId` block only to choose a specific credential:
 
 | Setting | Used by | Notes |
 |---|---|---|
-| `Credential` | all | `Default` (the first sign-in found, as above), `AzureCli`, `Interactive`, `DeviceCode`, `Certificate`, `ClientSecret`, `ManagedIdentity` |
+| `Credential` | all | `Default` (the first sign-in found, as above), `AzureCli`, `Interactive`, `DeviceCode`; experimental: `Certificate`, `ClientSecret`, `ManagedIdentity` |
 | `TenantId` | AzureCli, Interactive, DeviceCode (optional); Certificate, ClientSecret (required) | GUID or domain |
 | `ClientId` | Certificate, ClientSecret (required); ManagedIdentity (user-assigned); Interactive, DeviceCode (your own public client app, optional) | GUID |
 | `CertificateThumbprint` | Certificate | in `CurrentUser\My` or `LocalMachine\My`, with its private key |
@@ -59,7 +62,7 @@ A setting the chosen credential does not use stops the run before it starts, so 
 
 ### Complex Examples
 
-An app registration with a certificate on Target, and the signed-in user on Source:
+An app registration with a certificate on Target (experimental), and the signed-in user on Source:
 
 ```json
 "Source": {
@@ -101,14 +104,16 @@ The first run opens the browser (`Interactive`) or prints a code to enter at the
 - The refresh token is kept in the operating system's protected store: DPAPI for the current user on Windows, Keychain on macOS, libsecret on Linux. It is never written unencrypted.
 - Later runs sign in silently and renew for as long as they run. A run never opens a browser part way through; if the saved sign-in has expired or been revoked, it stops and tells you which file to delete.
 
-### Run unattended with an app registration
+### Run unattended with an app registration (experimental)
+
+Not yet validated in a full migration; see the note at the top.
 
 1. Create an app registration in Microsoft Entra ID and add a certificate (preferred) or a client secret.
 2. In Azure DevOps, **Organization settings > Users > Add users**, add the app's service principal with a **Basic** access level.
 3. Add it to the project with the permissions the migration needs. On the Target, for the TFS Object Model endpoints, make it a **Project Collection Administrator** or grant **Bypass rules on work item updates**, so revisions keep their original dates and authors.
 4. Set `Credential` to `Certificate` or `ClientSecret` with `TenantId` and `ClientId`.
 
-### Run on an Azure VM or container
+### Run on an Azure VM or container (experimental)
 
 Use `"Credential": "ManagedIdentity"`, with `ClientId` for a user-assigned identity. Add the identity to the organisation as above.
 

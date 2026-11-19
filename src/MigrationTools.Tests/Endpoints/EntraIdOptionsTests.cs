@@ -16,6 +16,16 @@ namespace MigrationTools.Endpoints.Tests
         private const string Client = "22222222-2222-2222-2222-222222222222";
 
         [TestMethod, TestCategory("L0")]
+        public void IsExperimental_IsTrueOnlyForTheAppIdentities()
+        {
+            var experimental = Enum.GetValues(typeof(EntraIdCredentialType)).Cast<EntraIdCredentialType>()
+                .Where(EntraIdCredentialFactory.IsExperimental).ToArray();
+            CollectionAssert.AreEquivalent(
+                new[] { EntraIdCredentialType.Certificate, EntraIdCredentialType.ClientSecret, EntraIdCredentialType.ManagedIdentity },
+                experimental);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Validate_AcceptsEveryCredentialWithItsRequiredSettings()
         {
             var valid = new[]
