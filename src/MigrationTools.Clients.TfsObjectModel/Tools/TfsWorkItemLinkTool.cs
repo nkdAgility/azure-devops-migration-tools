@@ -32,6 +32,11 @@ namespace MigrationTools.Tools
         public bool HasDeferredLinks { get; private set; }
 
         /// <summary>
+        /// How many other work items the last <see cref="Enrich"/> saved, such as a child moved under this item (#3299).
+        /// </summary>
+        public int OtherWorkItemsSaved { get; internal set; }
+
+        /// <summary>
         /// Initializes a new instance of the TfsWorkItemLinkTool class.
         /// </summary>
         /// <param name="options">Configuration options for the work item link tool</param>
@@ -69,6 +74,7 @@ namespace MigrationTools.Tools
             }
             _inline = inline;
             HasDeferredLinks = false;
+            OtherWorkItemsSaved = 0;
             if (targetWorkItemLinkStart.Id == "0" && !inline)
             {
                 Log.LogWarning("TfsWorkItemLinkTool::Enrich: Target work item must be saved before you can add a link: exiting Link Migration");
@@ -471,6 +477,7 @@ namespace MigrationTools.Tools
                             try
                             {
                                 wiTargetR.SaveToAzureDevOps();
+                                OtherWorkItemsSaved++;
                             }
                             catch
                             {

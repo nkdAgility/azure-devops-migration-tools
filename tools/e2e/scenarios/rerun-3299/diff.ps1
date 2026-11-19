@@ -15,7 +15,7 @@ function StoryId([int]$f, [int]$s) { $stories[($f - 1) * 9 + ($s - 1)] }
 
 Set-E2EOrg nkdagility-adomt-source
 $revisionItem = StoryId 1 2
-Set-E2EWorkItem -Id $revisionItem -Fields ([ordered]@{ "System.Description" = "changed after the first migration (#3299)" }) | Out-Null
+Set-E2EWorkItem -Id $revisionItem -Fields ([ordered]@{ "System.Description" = "changed after the first migration (#3299) at $(Get-Date -Format o)" }) | Out-Null
 
 Set-E2EOrg nkdagility-adomt-target
 $linkItem = StoryId 2 3

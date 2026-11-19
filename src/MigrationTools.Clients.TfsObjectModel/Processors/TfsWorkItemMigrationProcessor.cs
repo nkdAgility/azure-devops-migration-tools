@@ -884,6 +884,7 @@ namespace MigrationTools.Processors
                                 TraceWriteLine(LogEventLevel.Information, "Work item exists with no revisions to sync, but the target differs: {Difference}",
                                     new Dictionary<string, object>() { { "Difference", difference } });
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                                CommonTools.WorkItemLink.OtherWorkItemsSaved = 0;
                                 ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
@@ -891,7 +892,7 @@ namespace MigrationTools.Processors
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                                 StampCatchUpSave(targetWorkItem);
-                                if (!targetWorkItem.ToWorkItem().IsDirty)
+                                if (!targetWorkItem.ToWorkItem().IsDirty && CommonTools.WorkItemLink.OtherWorkItemsSaved == 0)
                                 {
                                     _rerunCounts.Set(RerunCounts.Outcome.Checked);
                                 }
