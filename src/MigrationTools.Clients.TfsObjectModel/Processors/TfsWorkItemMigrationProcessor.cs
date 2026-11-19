@@ -897,6 +897,7 @@ namespace MigrationTools.Processors
                             {
                                 var corrected = targetWorkItem.ToWorkItem();
                                 VerifyStateStampedFieldsSaved(corrected.Rev, f => corrected.Fields[f].Value, stampCorrection);
+                                VerifyStateStampedValuesStored(targetWorkItem, new List<(int, int, List<(string Field, object Expected, bool IsIdentity)>)> { (corrected.Rev, sourceWorkItem.Rev, stampCorrection) });
                                 Log.LogInformation("Target work item {TargetId}: current state-stamped values set to the source values.", corrected.Id);
                             }
                         }
@@ -1173,6 +1174,7 @@ namespace MigrationTools.Processors
                 }
                 var lastRevision = revisionsToMigrate.Last();
                 var sourceStamps = ReadSourceStateStampedValues(sourceWorkItem);
+                var savedStamps = new List<(int TargetRevision, int SourceRevision, List<(string Field, object Expected, bool IsIdentity)> Expected)>();
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -1267,6 +1269,7 @@ namespace MigrationTools.Processors
                         var committed = typeChanged.Revisions[typeChanged.Revisions.Count - 1];
                         VerifyStateStampedFieldsSaved(result.Rev ?? typeChanged.Rev,
                             f => committed.Fields.Contains(f) ? committed.Fields[f].Value : null, typeChangeStamps);
+                        savedStamps.Add((result.Rev ?? typeChanged.Rev, revision.Number, typeChangeStamps));
                     }
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
 
@@ -1330,6 +1333,7 @@ namespace MigrationTools.Processors
                         targetWorkItem.SaveToAzureDevOps();
                         var saved = targetWorkItem.ToWorkItem();
                         VerifyStateStampedFieldsSaved(saved.Rev, f => saved.Fields[f].Value, stampedFields);
+                        savedStamps.Add((saved.Rev, revision.Number, stampedFields));
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (CommonTools.WorkItemLink.Enabled && CommonTools.WorkItemLink.HasDeferredLinks)
                         {
@@ -1347,6 +1351,9 @@ namespace MigrationTools.Processors
                            });
                 }
 
+                // The checks after each save read the object model's copy of the saved revision; this reads what Azure
+                // DevOps stored (#3305).
+                VerifyStateStampedValuesStored(targetWorkItem, savedStamps);
                 // Attachments, links and the migration comment were saved with the replayed revisions (#3192),
                 // so there is no extra save here with a ChangedBy/ChangedDate later than the source history.
                 CommonTools.Attachment.CleanUpAfterSave();
@@ -1420,12 +1427,15 @@ namespace MigrationTools.Processors
         /// </summary>
         private SourceStateStampedValues ReadSourceStateStampedValues(WorkItemData sourceWorkItem)
         {
-            var id = int.Parse(sourceWorkItem.Id);
+            return ReadRevisionsOverRest(Source.GetClient<WorkItemTrackingHttpClient>(), int.Parse(sourceWorkItem.Id), "source");
+        }
+
+        private SourceStateStampedValues ReadRevisionsOverRest(WorkItemTrackingHttpClient client, int id, string side)
+        {
             var revisions = new List<(int Rev, IDictionary<string, object> Fields)>();
             const int page = 200;
             try
             {
-                var client = Source.GetClient<WorkItemTrackingHttpClient>();
                 for (var skip = 0; ; skip += page)
                 {
                     var batch = client.GetRevisionsAsync(id, page, skip).GetAwaiter().GetResult();
@@ -1435,10 +1445,39 @@ namespace MigrationTools.Processors
             }
             catch (Exception ex) when (!(ex is MigrationRunStoppedException) && !IsTransientNetworkError(ex))
             {
-                throw new InvalidOperationException($"the source revisions could not be read from Azure DevOps to check the state-stamped values: {WorkItemMigrationFailedException.ServerReason(ex)}", ex);
+                throw new InvalidOperationException($"the {side} revisions could not be read from Azure DevOps to check the state-stamped values: {WorkItemMigrationFailedException.ServerReason(ex)}", ex);
             }
-            Log.LogDebug("Read {Count} revisions of source work item {SourceId} to check its state-stamped values.", revisions.Count, id);
+            Log.LogDebug("Read {Count} revisions of {Side} work item {Id} to check its state-stamped values.", revisions.Count, side, id);
             return SourceStateStampedValues.From(id, revisions);
+        }
+
+        /// <summary>
+        /// Reads the target work item's revisions over REST after the replay and checks each revision saved in it holds
+        /// the state-stamped values it was saved with (#3305). The check after each save reads the object model's copy,
+        /// which keeps a value it sent even if Azure DevOps did not store it. Fails the work item with the revision, the
+        /// field and both values; a re-run then sets the current values (see <see cref="VerifyMigratedRevisions"/>).
+        /// </summary>
+        private void VerifyStateStampedValuesStored(WorkItemData targetWorkItem, List<(int TargetRevision, int SourceRevision, List<(string Field, object Expected, bool IsIdentity)> Expected)> saved)
+        {
+            if (saved.Count == 0) return;
+            var stored = ReadRevisionsOverRest(Target.GetClient<WorkItemTrackingHttpClient>(), int.Parse(targetWorkItem.Id), "target");
+            var wrong = new List<string>();
+            foreach (var (targetRevision, sourceRevision, expected) in saved)
+            {
+                foreach (var (field, value, isIdentity) in expected)
+                {
+                    var actual = stored.Value(targetRevision, field);
+                    if (!SourceStateStampedValues.SameStoredValue(value, actual, isIdentity))
+                    {
+                        wrong.Add($"revision {targetRevision} (source revision {sourceRevision}) {field} is '{actual}' in Azure DevOps but the source is '{value}'");
+                    }
+                }
+            }
+            if (wrong.Count > 0)
+            {
+                throw new InvalidOperationException($"the target was not stored with the source's state-stamped values: {string.Join("; ", wrong.Take(10))}{(wrong.Count > 10 ? $"; and {wrong.Count - 10} more" : "")}.");
+            }
+            Log.LogDebug("Target work item {TargetId}: {Count} saved revisions hold the source's state-stamped values in Azure DevOps.", targetWorkItem.Id, saved.Count);
         }
 
         private static string GetClosedDateField(WorkItem workItem)

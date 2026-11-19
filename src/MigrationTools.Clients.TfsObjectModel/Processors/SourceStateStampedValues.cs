@@ -98,6 +98,16 @@ namespace MigrationTools.Processors
             return restValue;
         }
 
+        /// <summary>
+        /// True when the value Azure DevOps stored (read over REST, normalised) is the value that was saved. An identity
+        /// saved as a bare display name is stored qualified, so the same display name matches.
+        /// </summary>
+        public static bool SameStoredValue(object savedValue, object storedValue, bool isIdentity)
+        {
+            if (StateStampedFields.SameValue(savedValue, storedValue, isIdentity)) return true;
+            return isIdentity && !StateStampedFields.IsEmpty(savedValue) && !StateStampedFields.IsEmpty(storedValue) && SameDisplayName(savedValue, storedValue);
+        }
+
         private static bool SameDisplayName(object a, object b)
         {
             var (an, au) = StateStampedFields.SplitIdentity(Convert.ToString(a));

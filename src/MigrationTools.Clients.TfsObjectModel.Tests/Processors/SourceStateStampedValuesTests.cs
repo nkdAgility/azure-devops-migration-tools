@@ -116,6 +116,29 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void SameStoredValue_ValueSavedButStoredEmpty_IsNotTheSame()
+        {
+            Assert.IsFalse(SourceStateStampedValues.SameStoredValue(Changed, null, false));
+            Assert.IsFalse(SourceStateStampedValues.SameStoredValue("Ghost Person", null, true));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void SameStoredValue_SameDateOrQualifiedFormOfABareName_IsTheSame()
+        {
+            Assert.IsTrue(SourceStateStampedValues.SameStoredValue(Changed.ToLocalTime(), Changed, false));
+            Assert.IsTrue(SourceStateStampedValues.SameStoredValue("Ghost Person", "Ghost Person <ghost@example.invalid>", true));
+            Assert.IsTrue(SourceStateStampedValues.SameStoredValue(null, null, true));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void SameStoredValue_AnotherIdentityOrDate_IsNotTheSame()
+        {
+            Assert.IsFalse(SourceStateStampedValues.SameStoredValue("Ghost Person", "Migration Account <migration@example.invalid>", true));
+            Assert.IsFalse(SourceStateStampedValues.SameStoredValue(Changed, Changed.AddSeconds(1), false));
+            Assert.IsFalse(SourceStateStampedValues.SameStoredValue(null, Changed, false));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void FormatIdentity_UsesWhatIsSet()
         {
             Assert.AreEqual("Ghost Person <ghost@example.invalid>", SourceStateStampedValues.FormatIdentity("Ghost Person", "ghost@example.invalid"));
