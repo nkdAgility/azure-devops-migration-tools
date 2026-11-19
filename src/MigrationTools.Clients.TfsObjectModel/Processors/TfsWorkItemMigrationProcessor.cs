@@ -1022,7 +1022,28 @@ namespace MigrationTools.Processors
                     return "missing attachment " + missingAttachment;
                 }
             }
-            return null;
+            return FieldMapsChangeTarget(sourceWorkItem, targetWorkItem);
+        }
+
+        /// <summary>
+        /// Runs the field maps on the loaded target in memory, so a target counts as in sync only when it already holds
+        /// the values the current field maps give it (#3299). A field map added or changed since the first run is applied.
+        /// </summary>
+        /// <returns>The fields the field maps would change, or null when they change nothing.</returns>
+        private string FieldMapsChangeTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            var target = targetWorkItem.ToWorkItem();
+            CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+            SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
+            if (!target.IsDirty)
+            {
+                return null;
+            }
+            // The object model marks ChangedBy and ChangedDate on every edit.
+            var changed = target.Fields.Cast<Field>()
+                .Where(f => f.IsDirty && f.ReferenceName != "System.ChangedBy" && f.ReferenceName != "System.ChangedDate")
+                .Select(f => f.ReferenceName).ToList();
+            return "field maps change " + (changed.Count > 0 ? string.Join(", ", changed) : "the work item");
         }
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
