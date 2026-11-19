@@ -457,14 +457,10 @@ namespace MigrationTools.Tools
                         Log.LogWarning(
                                   "  [SKIP] Unable to migrate link where Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} as target WI has not been migrated",
                                   rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
-                        var reviewLog = Services.GetService<WorkItemReviewLog>();
-                        if (reviewLog != null && !reviewLog.IsMigratedLater(wiSourceR.Id.ToString()))
-                        {
-                            reviewLog.Record(WorkItemReviewCategory.LinkSkipped,
-                                $"{rl.LinkTypeEnd.ImmutableName} link to source work item {wiSourceR.Id} not migrated: that item has not been migrated to the target.",
-                                "Migrate the related work item, then re-run to add the link.",
-                                sourceId: wiSourceL.Id.ToString());
-                        }
+                        Services.GetService<WorkItemReviewLog>()?.RecordUnlessMigratedLater(wiSourceR.Id.ToString(), WorkItemReviewCategory.LinkSkipped,
+                            $"{rl.LinkTypeEnd.ImmutableName} link to source work item {wiSourceR.Id} not migrated: that item has not been migrated to the target.",
+                            "Migrate the related work item, then re-run to add the link.",
+                            sourceId: wiSourceL.Id.ToString());
                     }
                 }
                 else
@@ -609,6 +605,9 @@ namespace MigrationTools.Tools
             if (string.IsNullOrEmpty(sourceLinkAbsoluteUri))
             {
                 Log.LogWarning("  [SKIP] Unable to create a hyperlink to [{0}]", sourceLink.Location);
+                Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                    $"Hyperlink {sourceLink.Location} not migrated: it is not a valid URL.",
+                    "Add the link by hand in a form the target accepts.");
                 return;
             }
             if (!IsValidHyperlink(sourceLinkAbsoluteUri))

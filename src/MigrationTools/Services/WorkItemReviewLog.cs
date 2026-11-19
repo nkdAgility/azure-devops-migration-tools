@@ -104,12 +104,14 @@ namespace MigrationTools.Services
         private readonly Dictionary<string, FileStream> _streams = new Dictionary<string, FileStream>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, int> _rowCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, int> _categoryCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        private readonly HashSet<string> _seen = new HashSet<string>(StringComparer.Ordinal);
+        private readonly HashSet<string> _written = new HashSet<string>(StringComparer.Ordinal);
         private readonly Dictionary<string, WorkItemReviewEntry> _latest = new Dictionary<string, WorkItemReviewEntry>(StringComparer.Ordinal);
         private readonly Dictionary<string, List<WorkItemReviewEntry>> _openFromEarlierRuns = new Dictionary<string, List<WorkItemReviewEntry>>(StringComparer.Ordinal);
-        private string _migration;
+        private readonly HashSet<string> _loadedMigrations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _comingLater = new HashSet<string>(StringComparer.Ordinal);
+        private readonly Dictionary<string, List<WorkItemReviewEntry>> _waitingOnItem = new Dictionary<string, List<WorkItemReviewEntry>>(StringComparer.Ordinal);
         private readonly AsyncLocal<ItemScope> _current = new AsyncLocal<ItemScope>();
-        private bool _earlierRunsLoaded;
+        private string _migration;
 
         public WorkItemReviewLog(string folder, ILogger<WorkItemReviewLog> logger = null)
         {
@@ -131,51 +133,85 @@ namespace MigrationTools.Services
             get { lock (_gate) { return new Dictionary<string, int>(_rowCounts); } }
         }
 
+        // Work item ids are only unique within one migration, so all per-item state is keyed by both.
+        private static string ItemKey(string migration, string sourceId) => (migration ?? string.Empty) + "|" + sourceId;
+
         /// <summary>
-        /// Reads the review logs of earlier runs in sibling folders of this run's log folder, so that an item
-        /// that needed review before and now migrates cleanly gets a <c>resolved</c> entry. Only entries written
-        /// for the same <paramref name="migration"/> (source and target endpoints) are read, because work item ids
-        /// are only unique within one migration. Every entry this run writes carries it.
+        /// Starts recording for one migration (source and target endpoints) and reads the review logs of earlier
+        /// runs in sibling folders of this run's log folder, so that an item that needed review before and now
+        /// migrates cleanly gets a <c>resolved</c> entry. Only entries written for the same
+        /// <paramref name="migration"/> are read. Every entry recorded after this call carries it. Each processor
+        /// in a run calls it for its own endpoints.
         /// </summary>
         public void LoadEarlierRuns(string migration)
         {
-            _migration = migration;
             lock (_gate)
             {
-                if (_earlierRunsLoaded)
+                _migration = migration;
+                if (!_loadedMigrations.Add(migration ?? string.Empty))
                 {
                     return;
                 }
-                _earlierRunsLoaded = true;
-                var root = Directory.GetParent(Path.GetFullPath(_folder))?.FullName;
+                string root;
+                string ownName;
+                try
+                {
+                    root = Directory.GetParent(Path.GetFullPath(_folder))?.FullName;
+                    ownName = Path.GetFileName(Path.GetFullPath(_folder).TrimEnd(Path.DirectorySeparatorChar));
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException || ex is NotSupportedException)
+                {
+                    _logger.LogWarning(ex, "Could not find earlier work item review logs; no resolved entries will be written in this run.");
+                    return;
+                }
                 if (root == null || !Directory.Exists(root))
                 {
                     return;
                 }
-                var ownName = Path.GetFileName(Path.GetFullPath(_folder).TrimEnd(Path.DirectorySeparatorChar));
-                var earlier = Directory.GetDirectories(root)
-                    .Where(d => string.CompareOrdinal(Path.GetFileName(d), ownName) < 0)
-                    .OrderBy(d => Path.GetFileName(d), StringComparer.Ordinal)
-                    .Select(d => Path.Combine(d, FileName))
-                    .Where(File.Exists);
+                IEnumerable<string> earlier;
+                try
+                {
+                    earlier = Directory.GetDirectories(root)
+                        .Where(d => string.CompareOrdinal(Path.GetFileName(d), ownName) < 0)
+                        .OrderBy(d => Path.GetFileName(d), StringComparer.Ordinal)
+                        .Select(d => Path.Combine(d, FileName))
+                        .Where(File.Exists)
+                        .ToList();
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                {
+                    _logger.LogWarning(ex, "Could not list earlier work item review logs in {LogsFolder}; no resolved entries will be written in this run.", root);
+                    return;
+                }
                 foreach (var file in earlier)
                 {
-                    foreach (var entry in ReadEntries(file))
+                    List<WorkItemReviewEntry> entries;
+                    try
+                    {
+                        entries = ReadEntries(file).ToList();
+                    }
+                    catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                    {
+                        _logger.LogWarning(ex, "Could not read the earlier work item review log {ReviewLogPath}; items it lists are not resolved in this run.", file);
+                        continue;
+                    }
+                    foreach (var entry in entries)
                     {
                         if (string.IsNullOrEmpty(entry.SourceId) || !string.Equals(entry.Migration, migration, StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
-                        _latest[entry.SourceId] = entry;
+                        var key = ItemKey(migration, entry.SourceId);
+                        _latest[key] = entry;
                         if (entry.Category == WorkItemReviewCategory.Resolved)
                         {
-                            _openFromEarlierRuns.Remove(entry.SourceId);
+                            _openFromEarlierRuns.Remove(key);
                             continue;
                         }
-                        if (!_openFromEarlierRuns.TryGetValue(entry.SourceId, out var open))
+                        if (!_openFromEarlierRuns.TryGetValue(key, out var open))
                         {
                             open = new List<WorkItemReviewEntry>();
-                            _openFromEarlierRuns[entry.SourceId] = open;
+                            _openFromEarlierRuns[key] = open;
                         }
                         open.Add(entry);
                     }
@@ -211,11 +247,9 @@ namespace MigrationTools.Services
             }
         }
 
-        private readonly HashSet<string> _comingLater = new HashSet<string>(StringComparer.Ordinal);
-
         /// <summary>
         /// Sets the source ids this run will migrate. A link to one of them that has not been reached yet is added
-        /// from that item's side when it is migrated, so it is not a problem to review.
+        /// from that item's side when it is migrated; see <see cref="RecordUnlessMigratedLater"/>.
         /// </summary>
         public void SetItemsToMigrate(IEnumerable<string> sourceIds)
         {
@@ -237,6 +271,70 @@ namespace MigrationTools.Services
             lock (_gate)
             {
                 return sourceId != null && _comingLater.Contains(sourceId);
+            }
+        }
+
+        /// <summary>
+        /// Records a problem that goes away if <paramref name="relatedSourceId"/> migrates later in this run (a link
+        /// to it is then added from its side). While that item is still to come, the entry is held; it is written
+        /// if that item fails (<see cref="ItemNotMigrated"/>) or is never reached (<see cref="FlushHeldEntries"/>),
+        /// and dropped if it migrates.
+        /// </summary>
+        public void RecordUnlessMigratedLater(string relatedSourceId, string category, string reason, string action, string sourceId = null, string targetId = null)
+        {
+            var entry = NewEntry(category, reason, action, sourceId, targetId, null, null);
+            lock (_gate)
+            {
+                if (relatedSourceId != null && _comingLater.Contains(relatedSourceId))
+                {
+                    if (!_waitingOnItem.TryGetValue(relatedSourceId, out var held))
+                    {
+                        held = new List<WorkItemReviewEntry>();
+                        _waitingOnItem[relatedSourceId] = held;
+                    }
+                    held.Add(entry);
+                    return;
+                }
+            }
+            AddToScope(entry, sourceId);
+            Write(entry);
+        }
+
+        /// <summary>
+        /// Writes the entries held for links to <paramref name="sourceId"/>, because it was not migrated.
+        /// </summary>
+        public void ItemNotMigrated(string sourceId)
+        {
+            List<WorkItemReviewEntry> held;
+            lock (_gate)
+            {
+                if (sourceId == null || !_waitingOnItem.TryGetValue(sourceId, out held))
+                {
+                    return;
+                }
+                _waitingOnItem.Remove(sourceId);
+            }
+            foreach (var entry in held)
+            {
+                entry.Time = DateTimeOffset.Now;
+                entry.Reason += $" Source work item {sourceId} was not migrated in this run.";
+                Write(entry);
+            }
+        }
+
+        /// <summary>
+        /// Writes every entry still held at the end of the run: the items they wait for were never reached.
+        /// </summary>
+        public void FlushHeldEntries()
+        {
+            List<string> ids;
+            lock (_gate)
+            {
+                ids = _waitingOnItem.Keys.ToList();
+            }
+            foreach (var id in ids)
+            {
+                ItemNotMigrated(id);
             }
         }
 
@@ -277,6 +375,8 @@ namespace MigrationTools.Services
 
         public string CurrentTargetId => _current.Value?.TargetId;
 
+        public string CurrentSourceId => _current.Value?.SourceId;
+
         /// <summary>
         /// True when the current item already has an entry in this category in this run.
         /// </summary>
@@ -296,30 +396,49 @@ namespace MigrationTools.Services
         }
 
         /// <summary>
+        /// Records that the check behind <paramref name="category"/> ran for the current item in this run (for
+        /// example the attachment tool processed its attachments). A problem in a category that was not checked
+        /// again, because the tool was disabled or skipped, is not resolved.
+        /// </summary>
+        public void MarkChecked(string category)
+        {
+            _current.Value?.Checked.Add(category);
+        }
+
+        /// <summary>
         /// Marks the current item as migrated without failing. If nothing was recorded for it in this run and an
-        /// earlier run left it needing review, a <c>resolved</c> entry is written. A problem that is only found
-        /// while replaying a revision (<see cref="WorkItemReviewCategory.FoundOnlyWhileReplaying"/>) counts as
-        /// checked again only when the revision it was found on was replayed in this run; otherwise the item
-        /// stays open.
+        /// earlier run left it needing review, a <c>resolved</c> entry is written, but only when every earlier
+        /// problem was checked again: a problem found while replaying a revision
+        /// (<see cref="WorkItemReviewCategory.FoundOnlyWhileReplaying"/>) needs the revision it was found on to be
+        /// replayed in this run, and any other problem needs its check to have run (<see cref="MarkChecked"/>).
+        /// A missing area or iteration path found by validation has no revision; reaching the item means
+        /// validation passed.
         /// </summary>
         public void CompleteCurrentItem()
         {
             var scope = _current.Value;
-            if (scope == null || string.IsNullOrEmpty(scope.SourceId) || scope.Categories.Count > 0)
+            if (scope == null || string.IsNullOrEmpty(scope.SourceId))
+            {
+                return;
+            }
+            lock (_gate)
+            {
+                _waitingOnItem.Remove(scope.SourceId);
+            }
+            if (scope.Categories.Count > 0)
             {
                 return;
             }
             List<WorkItemReviewEntry> open;
             lock (_gate)
             {
-                if (!_openFromEarlierRuns.TryGetValue(scope.SourceId, out var entries))
+                if (!_openFromEarlierRuns.TryGetValue(ItemKey(_migration, scope.SourceId), out var entries))
                 {
                     return;
                 }
                 open = entries.ToList();
             }
-            if (open.Any(e => WorkItemReviewCategory.FoundOnlyWhileReplaying.Contains(e.Category)
-                && !(e.Revision.HasValue && scope.ReplayedRevisions.Contains(e.Revision.Value))))
+            if (!open.All(e => WasCheckedAgain(e, scope)))
             {
                 return;
             }
@@ -329,14 +448,34 @@ namespace MigrationTools.Services
                 "None.");
         }
 
+        private static bool WasCheckedAgain(WorkItemReviewEntry entry, ItemScope scope)
+        {
+            if (entry.Category == WorkItemReviewCategory.PathNotMapped && !entry.Revision.HasValue)
+            {
+                return true;
+            }
+            if (WorkItemReviewCategory.FoundOnlyWhileReplaying.Contains(entry.Category))
+            {
+                return entry.Revision.HasValue && scope.ReplayedRevisions.Contains(entry.Revision.Value);
+            }
+            return scope.Checked.Contains(entry.Category);
+        }
+
         /// <summary>
         /// Appends an entry and flushes it to disk. Ids not given come from the current item. The same
         /// category, item and reason is written once per run.
         /// </summary>
         public void Record(string category, string reason, string action, string sourceId = null, string targetId = null, string workItemType = null, int? revision = null)
         {
+            var entry = NewEntry(category, reason, action, sourceId, targetId, workItemType, revision);
+            AddToScope(entry, sourceId);
+            Write(entry);
+        }
+
+        private WorkItemReviewEntry NewEntry(string category, string reason, string action, string sourceId, string targetId, string workItemType, int? revision)
+        {
             var scope = _current.Value;
-            var entry = new WorkItemReviewEntry
+            return new WorkItemReviewEntry
             {
                 Time = DateTimeOffset.Now,
                 SourceId = sourceId ?? scope?.SourceId,
@@ -348,45 +487,60 @@ namespace MigrationTools.Services
                 Action = action,
                 Migration = _migration,
             };
-            if (scope != null && (sourceId == null || sourceId == scope.SourceId) && category != WorkItemReviewCategory.Resolved)
-            {
-                scope.Categories.Add(category);
-            }
-            Write(entry);
         }
 
+        private void AddToScope(WorkItemReviewEntry entry, string explicitSourceId)
+        {
+            var scope = _current.Value;
+            if (scope != null && (explicitSourceId == null || explicitSourceId == scope.SourceId) && entry.Category != WorkItemReviewCategory.Resolved)
+            {
+                scope.Categories.Add(entry.Category);
+            }
+        }
+
+        // Each output file is tracked on its own, so a write that failed is tried again the next time the same
+        // problem is recorded, without writing a row twice to a file that already has it.
         private void Write(WorkItemReviewEntry entry)
         {
-            var key = entry.Category + "|" + entry.SourceId + "|" + entry.Reason;
-            var line = JsonConvert.SerializeObject(entry, JsonSettings) + "\n";
-            var bytes = Encoding.UTF8.GetBytes(line);
+            var key = entry.Migration + "|" + entry.Category + "|" + entry.SourceId + "|" + entry.Reason;
+            var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(entry, JsonSettings) + "\n");
             lock (_gate)
             {
-                if (!_seen.Add(key))
+                var files = new List<string> { FileName };
+                if (WorkItemReviewCategory.FollowUpFiles.TryGetValue(entry.Category, out var followUp))
                 {
-                    return;
+                    files.Add(followUp);
                 }
-                try
+                foreach (var file in files)
                 {
-                    Append(FileName, bytes);
-                    if (WorkItemReviewCategory.FollowUpFiles.TryGetValue(entry.Category, out var followUp))
+                    var fileKey = file + "|" + key;
+                    if (_written.Contains(fileKey))
                     {
-                        Append(followUp, bytes);
+                        continue;
                     }
-                }
-                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
-                {
-                    _logger.LogWarning(ex, "Could not write to the work item review log {ReviewLogPath}", FilePath);
-                    return;
-                }
-                _categoryCounts.TryGetValue(entry.Category, out var count);
-                _categoryCounts[entry.Category] = count + 1;
-                if (!string.IsNullOrEmpty(entry.SourceId))
-                {
-                    _latest[entry.SourceId] = entry;
-                    if (entry.Category == WorkItemReviewCategory.Resolved)
+                    try
                     {
-                        _openFromEarlierRuns.Remove(entry.SourceId);
+                        Append(file, bytes);
+                    }
+                    catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                    {
+                        _logger.LogWarning(ex, "Could not write to the work item review file {ReviewFilePath}", Path.Combine(_folder, file));
+                        continue;
+                    }
+                    _written.Add(fileKey);
+                    if (file == FileName)
+                    {
+                        _categoryCounts.TryGetValue(entry.Category, out var count);
+                        _categoryCounts[entry.Category] = count + 1;
+                        if (!string.IsNullOrEmpty(entry.SourceId))
+                        {
+                            var itemKey = ItemKey(entry.Migration, entry.SourceId);
+                            _latest[itemKey] = entry;
+                            if (entry.Category == WorkItemReviewCategory.Resolved)
+                            {
+                                _openFromEarlierRuns.Remove(itemKey);
+                            }
+                        }
                     }
                 }
             }
@@ -408,7 +562,8 @@ namespace MigrationTools.Services
 
         /// <summary>
         /// Writes the combined view: the latest entry per item across this run and the earlier runs read by
-        /// <see cref="LoadEarlierRuns"/>. Not needed for the review log to be correct.
+        /// <see cref="LoadEarlierRuns"/>. Not needed for the review log to be correct, so a failure to write it
+        /// is logged and does not change the run's result.
         /// </summary>
         public string WriteLatestView()
         {
@@ -419,12 +574,21 @@ namespace MigrationTools.Services
                     return null;
                 }
                 var path = Path.Combine(_folder, LatestFileName);
-                Directory.CreateDirectory(_folder);
-                var lines = _latest.Values
-                    .OrderBy(e => int.TryParse(e.SourceId, out var id) ? id : int.MaxValue)
-                    .ThenBy(e => e.SourceId, StringComparer.Ordinal)
-                    .Select(e => JsonConvert.SerializeObject(e, JsonSettings));
-                File.WriteAllText(path, string.Join("\n", lines) + "\n", new UTF8Encoding(false));
+                try
+                {
+                    Directory.CreateDirectory(_folder);
+                    var lines = _latest.Values
+                        .OrderBy(e => e.Migration, StringComparer.OrdinalIgnoreCase)
+                        .ThenBy(e => int.TryParse(e.SourceId, out var id) ? id : int.MaxValue)
+                        .ThenBy(e => e.SourceId, StringComparer.Ordinal)
+                        .Select(e => JsonConvert.SerializeObject(e, JsonSettings));
+                    File.WriteAllText(path, string.Join("\n", lines) + "\n", new UTF8Encoding(false));
+                }
+                catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                {
+                    _logger.LogWarning(ex, "Could not write the combined work item review view {ReviewLatestPath}; the per-run review log is complete without it.", path);
+                    return null;
+                }
                 return path;
             }
         }
@@ -487,6 +651,7 @@ namespace MigrationTools.Services
             public string WorkItemType { get; set; }
             public int? Revision { get; set; }
             public HashSet<int> ReplayedRevisions { get; } = new HashSet<int>();
+            public HashSet<string> Checked { get; } = new HashSet<string>(StringComparer.Ordinal);
             public HashSet<string> Categories { get; } = new HashSet<string>(StringComparer.Ordinal);
 
             public void Dispose()

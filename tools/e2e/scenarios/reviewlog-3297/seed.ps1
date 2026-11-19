@@ -9,6 +9,8 @@
 #  long     - Task with a 200-character Integration Build; the config sets MaxStringLength to 150 (field-truncated). Only
 #             String fields go through StringManipulatorTool, and the title is copied onto the shell before it, so it is not used.
 #  (legacy also gets field-map-failed: the config has a RegexFieldMap with an invalid pattern for User Story.)
+#  rerun-mismatch: after the first run, set State to Active on the target copy of "related" with bypassRules, then run
+#             again; the re-run check reports that the target revision does not match the source.
 #  fillers  - 12 Tasks, each with an oversized attachment and 4 revisions, so the kill test has entries to cut through.
 param([int]$Fillers = 12)
 $ErrorActionPreference = "Stop"

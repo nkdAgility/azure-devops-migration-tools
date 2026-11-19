@@ -151,7 +151,7 @@ namespace MigrationTools.Tests.Services
             using var second = Earlier(RunFolder("20260102000000"));
             second.LoadEarlierRuns(M);
             using (second.BeginItem("7", "Task")) { second.CompleteCurrentItem(); }
-            using (second.BeginItem("8", "Task")) { second.CompleteCurrentItem(); }
+            using (second.BeginItem("8", "Task")) { second.MarkChecked(WorkItemReviewCategory.LinkSkipped); second.CompleteCurrentItem(); }
 
             var resolved = WorkItemReviewLog.ReadEntries(second.FilePath).Where(e => e.Category == WorkItemReviewCategory.Resolved).ToList();
             Assert.AreEqual(1, resolved.Count, "only the link problem is checked again without a replayed revision");
@@ -270,6 +270,102 @@ namespace MigrationTools.Tests.Services
             Assert.IsFalse(log.IsMigratedLater("2"));
             Assert.IsTrue(log.IsMigratedLater("1"));
             Assert.IsFalse(log.IsMigratedLater("3"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_CheckDidNotRun_DoesNotResolve()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.AttachmentNotMigrated, "too big", "re-upload", sourceId: "7");
+            }
+            using var second = Earlier(RunFolder("20260102000000"));
+            using (second.BeginItem("7", "Task")) { second.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(second.FilePath), "the attachment tool did not run, so the problem was not checked again");
+            using (second.BeginItem("7", "Task")) { second.MarkChecked(WorkItemReviewCategory.AttachmentNotMigrated); second.CompleteCurrentItem(); }
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(second.FilePath).Single().Category);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_PathFromValidation_ResolvesWhenTheItemIsReached()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.PathNotMapped, "missing path", "map it", sourceId: "7");
+            }
+            using var second = Earlier(RunFolder("20260102000000"));
+            using (second.BeginItem("7", "Task")) { second.CompleteCurrentItem(); }
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(second.FilePath).Single().Category);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void LoadEarlierRuns_SecondMigrationInTheSameRun_ReadsItsOwnHistory()
+        {
+            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            {
+                first.LoadEarlierRuns("a -> b");
+                first.Record(WorkItemReviewCategory.LinkSkipped, "link", "migrate", sourceId: "7");
+            }
+            using var run = new WorkItemReviewLog(RunFolder("20260102000000"));
+            run.LoadEarlierRuns("x -> y");
+            using (run.BeginItem("7", "Task")) { run.MarkChecked(WorkItemReviewCategory.LinkSkipped); run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath), "item 7 of another migration must not be resolved");
+            run.LoadEarlierRuns("a -> b");
+            using (run.BeginItem("7", "Task")) { run.MarkChecked(WorkItemReviewCategory.LinkSkipped); run.CompleteCurrentItem(); }
+            var resolved = WorkItemReviewLog.ReadEntries(run.FilePath).Single();
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, resolved.Category);
+            Assert.AreEqual("a -> b", resolved.Migration);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void LoadEarlierRuns_UnreadableFile_DoesNotThrow()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
+            }
+            using (new FileStream(Path.Combine(RunFolder("20260101000000"), WorkItemReviewLog.FileName), FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                using var run = Earlier(RunFolder("20260102000000"));
+                using (run.BeginItem("7", "Bug")) { run.MarkRevisionReplayed(1); run.CompleteCurrentItem(); }
+                Assert.IsFalse(File.Exists(run.FilePath));
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void RecordUnlessMigratedLater_RelatedItemMigrates_EntryIsDropped()
+        {
+            using var log = Earlier(RunFolder("20260101000000"));
+            log.SetItemsToMigrate(new[] { "1", "2" });
+            using (log.BeginItem("1", "Task")) { log.RecordUnlessMigratedLater("2", WorkItemReviewCategory.LinkSkipped, "link to 2", "migrate 2"); }
+            using (log.BeginItem("2", "Task")) { log.CompleteCurrentItem(); }
+            log.FlushHeldEntries();
+            Assert.IsFalse(File.Exists(log.FilePath));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void RecordUnlessMigratedLater_RelatedItemFails_EntryIsWrittenForTheWaitingItem()
+        {
+            using var log = Earlier(RunFolder("20260101000000"));
+            log.SetItemsToMigrate(new[] { "1", "2" });
+            using (log.BeginItem("1", "Task")) { log.SetCurrentItem(targetId: "10"); log.RecordUnlessMigratedLater("2", WorkItemReviewCategory.LinkSkipped, "link to 2.", "migrate 2"); }
+            using (log.BeginItem("2", "Bug")) { log.ItemNotMigrated("2"); log.Record(WorkItemReviewCategory.Failed, "boom", "fix"); }
+            var entries = WorkItemReviewLog.ReadEntries(log.FilePath).ToList();
+            var link = entries.Single(e => e.Category == WorkItemReviewCategory.LinkSkipped);
+            Assert.AreEqual("1", link.SourceId);
+            Assert.AreEqual("10", link.TargetId);
+            StringAssert.Contains(link.Reason, "2 was not migrated");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void FlushHeldEntries_RelatedItemNeverReached_EntryIsWritten()
+        {
+            using var log = Earlier(RunFolder("20260101000000"));
+            log.SetItemsToMigrate(new[] { "1", "2" });
+            using (log.BeginItem("1", "Task")) { log.RecordUnlessMigratedLater("2", WorkItemReviewCategory.LinkSkipped, "link to 2.", "migrate 2"); }
+            Assert.IsFalse(File.Exists(log.FilePath));
+            log.FlushHeldEntries();
+            Assert.AreEqual("1", WorkItemReviewLog.ReadEntries(log.FilePath).Single().SourceId);
         }
 
         [TestMethod, TestCategory("L0")]

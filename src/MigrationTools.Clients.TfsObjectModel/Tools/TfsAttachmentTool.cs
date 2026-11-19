@@ -147,6 +147,9 @@ namespace MigrationTools.Tools
                 {
                     Log.LogError(ex, "Exception downloading attachements");
                     Telemetry.TrackException(ex, null);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.AttachmentNotMigrated,
+                        $"Attachment '{wia.Name}' could not be downloaded from the source: {ex.Message}",
+                        "Download the attachment from the source work item and attach it to the target work item, or re-run.");
                     return null;
                 }
             }

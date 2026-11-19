@@ -619,6 +619,11 @@ namespace MigrationTools.Tools
                         }
                         else
                         {
+                            missingItem.workItems = workItems.SelectMany(x => x.Revisions.Values)
+                                .Where(x => x.Fields[fieldName].Value.ToString() == missingItem.sourcePath)
+                                .Select(x => x.WorkItemId)
+                                .Distinct()
+                                .ToList();
                             missingPaths.Add(missingItem);
                             Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:CheckTarget::LOG-ONLY::{@missingItem}", missingItem);
                         }

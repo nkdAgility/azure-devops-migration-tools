@@ -258,6 +258,7 @@ namespace MigrationTools.Processors
                 CommonTools.ExportWorkItemMapping.SaveMappings();
                 CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
                 CommonTools.GitRepository?.LogUnresolvedSummary();
+                _reviewLog.FlushHeldEntries();
                 _reviewLog.LogSummary(Log);
                 _reviewLog.WriteLatestView();
 
@@ -482,7 +483,7 @@ namespace MigrationTools.Processors
                         + "in the target. This will not cause any errors, but may result in disconnected users that could have "
                         + "been mapped. Use the ExportUsersForMapping processor to create a list of mappable users.",
                         usersToMap.IdentityMap.Count);
-                    CommonTools.UserMapping.SetUsersMissingInTarget(usersToMap.IdentityMap.Select(m => m.Source));
+                    CommonTools.UserMapping.SetUsersMissingInTarget(usersToMap.IdentityMap);
                 }
             }
             var userMapping = CommonTools.UserMapping;
@@ -659,6 +660,7 @@ namespace MigrationTools.Processors
         /// </summary>
         private void RecordItemFailure(string message)
         {
+            _reviewLog.ItemNotMigrated(_reviewLog.CurrentSourceId);
             if (_reviewLog.CurrentItemHas(WorkItemReviewCategory.RerunMismatch))
             {
                 return;
@@ -781,7 +783,7 @@ namespace MigrationTools.Processors
                     {
                         case FieldType.String:
                             string oldValue = sourceFieldValue?.ToString();
-                            string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
+                            string newValue = CommonTools.StringManipulator.ProcessString(oldValue, f.ReferenceName);
                             newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
                         default:
@@ -882,6 +884,8 @@ namespace MigrationTools.Processors
                         List<RevisionItem> revisionsToMigrate =CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                         if (targetWorkItem == null)
                         {
+                            // A new target has no earlier revisions that could differ from the source.
+                            _reviewLog.MarkChecked(WorkItemReviewCategory.RerunMismatch);
                             targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
                             activity?.SetTag("Revisions", revisionsToMigrate.Count);
 
@@ -893,6 +897,7 @@ namespace MigrationTools.Processors
                             try
                             {
                                 VerifyMigratedRevisions(sourceWorkItem, targetWorkItem);
+                                _reviewLog.MarkChecked(WorkItemReviewCategory.RerunMismatch);
                             }
                             catch (InvalidOperationException mismatch)
                             {
@@ -1007,6 +1012,10 @@ namespace MigrationTools.Processors
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {
+            if (targetWorkItem != null && CommonTools.Attachment.Enabled)
+            {
+                _reviewLog.MarkChecked(WorkItemReviewCategory.AttachmentNotMigrated);
+            }
             if (targetWorkItem != null && CommonTools.Attachment.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", CommonTools.Attachment.Enabled } });
@@ -1151,6 +1160,14 @@ namespace MigrationTools.Processors
 
         private void ProcessWorkItemLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool inline = false)
         {
+            if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled)
+            {
+                _reviewLog.MarkChecked(WorkItemReviewCategory.LinkSkipped);
+                if (CommonTools.GitRepository.Enabled)
+                {
+                    _reviewLog.MarkChecked(WorkItemReviewCategory.LinkLeftOnSource);
+                }
+            }
             if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", CommonTools.WorkItemLink.Enabled } });

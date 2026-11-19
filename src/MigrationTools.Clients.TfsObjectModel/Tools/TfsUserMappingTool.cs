@@ -244,13 +244,13 @@ namespace MigrationTools.Tools
         private HashSet<string> _usersMissingInTarget = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Source users found by validation that do not exist in the target; a field value for one of them that
-        /// is not mapped is written to the work item review log.
+        /// Source users that validation could not match to a target user; a field value for one of them that is
+        /// not mapped is written to the work item review log.
         /// </summary>
-        public void SetUsersMissingInTarget(IEnumerable<IdentityItemData> users)
+        public void SetUsersMissingInTarget(IEnumerable<IdentityMapData> validation)
         {
             _usersMissingInTarget = new HashSet<string>(
-                (users ?? Enumerable.Empty<IdentityItemData>()).Select(u => u?.DisplayName).Where(n => !string.IsNullOrWhiteSpace(n)),
+                (validation ?? Enumerable.Empty<IdentityMapData>()).Where(m => m?.Target == null).Select(m => m?.Source?.DisplayName).Where(n => !string.IsNullOrWhiteSpace(n)),
                 StringComparer.OrdinalIgnoreCase);
         }
 
