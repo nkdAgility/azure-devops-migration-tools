@@ -23,7 +23,7 @@ namespace MigrationTools.Endpoints
         {
             if (IsExperimental(options.CredentialType))
             {
-                Log.Warning("Endpoint '{EndpointName}': the {Credential} Entra ID credential is experimental and has not yet been validated in a full migration. Try it on a test project first.", endpointName, options.CredentialType);
+                Log.Warning("Endpoint '{EndpointName}': the {Credential} Entra ID credential is currently untested in a full migration. Try it on a test project first.", endpointName, options.CredentialType);
             }
             switch (options.CredentialType)
             {

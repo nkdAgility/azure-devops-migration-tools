@@ -21,7 +21,7 @@ The Azure DevOps Endpoint serves several key purposes in migration scenarios:
 - **Source and Target Connectivity**: Acts as both source and destination endpoint for migrating data between Azure DevOps organizations
 - **Work Item Migration**: Enables the transfer of work items, including their history, attachments, and relationships
 - **Project-Level Operations**: Provides access to project-specific configurations and settings
-- **Authentication Management**: Handles secure authentication using Personal Access Tokens (PAT)
+- **Authentication Management**: Signs in with Microsoft Entra ID as you (recommended), or with a Personal Access Token (PAT)
 - **API Integration**: Offers a standardized interface for interacting with Azure DevOps REST APIs
 
 ## Options
@@ -41,7 +41,7 @@ The Azure DevOps Endpoint exhibits the following key behaviors:
 
 When configuring and using the Azure DevOps Endpoint, consider these best practices:
 
-- **Security**: Use Personal Access Tokens with minimal required permissions
+- **Security**: Prefer `"AuthenticationMode": "EntraId"` so no token is kept in the configuration; if you use a PAT, give it the minimum permissions needed
 - **Organization URLs**: Always include the full organization URL (e.g., `https://dev.azure.com/myorganization/`)
 - **Project Scope**: Ensure the specified project exists and is accessible with the provided credentials
 - **Custom Fields**: Configure the ReflectedWorkItemIdField to match your organization's custom field setup
