@@ -21,6 +21,7 @@ namespace MigrationTools.Tools
     public class TfsWorkItemLinkTool : Tool<TfsWorkItemLinkToolOptions>
     {
         private bool _inline;
+        private readonly HashSet<string> _skippedChildLinks = new HashSet<string>();
 
         private bool SaveAfterEachLink => Options.SaveAfterEachLinkIsAdded && !_inline;
 
@@ -366,6 +367,7 @@ namespace MigrationTools.Tools
                         List<RelatedLink> childParentLinks = new List<RelatedLink>();
                         if (linkTypeEnd.ImmutableName == HierarchyForward)
                         {
+                            RefreshLinks(wiTargetR);
                             childParentLinks = ParentLinks(wiTargetR);
                             var action = ChildLinkDecision.Decide(
                                 int.Parse(wiTargetL.Id),
@@ -379,7 +381,9 @@ namespace MigrationTools.Tools
                                     Log.LogInformation("  [SKIP] Child {ChildTargetId} is already under {ParentTargetId}.", wiTargetR.Id, wiTargetL.Id);
                                     return;
                                 case ChildLinkAction.SkipChildHasFinalParentElsewhere:
-                                    Log.LogWarning("  [SKIP] Child link from source {SourceId} to {ChildSourceId} not added to target {TargetId}: child {ChildTargetId} is already under {CurrentParentIds}, the parent it has in the source now, and a work item can have only one parent. The child keeps that parent.",
+                                    // Every replayed revision that still holds the link meets it again: warn once.
+                                    var level = _skippedChildLinks.Add($"{wiSourceL.Id}>{wiSourceR.Id}") ? LogLevel.Warning : LogLevel.Debug;
+                                    Log.Log(level,"  [SKIP] Child link from source {SourceId} to {ChildSourceId} not added to target {TargetId}: child {ChildTargetId} is already under {CurrentParentIds}, the parent it has in the source now, and a work item can have only one parent. The child keeps that parent.",
                                         wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id, string.Join(", ", childParentLinks.Select(l => l.RelatedWorkItemId)));
                                     return;
                                 case ChildLinkAction.DeferUntilParentSaved:
@@ -565,6 +569,22 @@ namespace MigrationTools.Tools
 
         private const string HierarchyForward = "System.LinkTypes.Hierarchy-Forward";
         private const string HierarchyReverse = "System.LinkTypes.Hierarchy-Reverse";
+
+        // The target child usually comes from the reflected-item cache, so a parent link added since (from the parent's
+        // side) is missing until it is synced. An item with unsaved changes is left as it is: those links count too.
+        private void RefreshLinks(WorkItemData workItem)
+        {
+            var wi = workItem.ToWorkItem();
+            if (wi.Id == 0 || wi.IsDirty) return;
+            try
+            {
+                wi.SyncToLatest();
+            }
+            catch (Exception ex)
+            {
+                Log.LogDebug(ex, "Refreshing the links on {TargetId}", workItem.Id);
+            }
+        }
 
         private static List<RelatedLink> ParentLinks(WorkItemData workItem)
         {
