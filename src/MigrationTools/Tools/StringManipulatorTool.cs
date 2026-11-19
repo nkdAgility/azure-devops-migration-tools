@@ -64,7 +64,7 @@ namespace MigrationTools.Tools
                 {
                     var what = fieldName == null ? "A string value" : "Field '" + fieldName + "'";
                     Services?.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.FieldTruncated,
-                        $"{what} of {result.Length} characters was cut to MaxStringLength ({Options.MaxStringLength}).",
+                        $"{what} was cut to MaxStringLength ({Options.MaxStringLength} characters).",
                         "Copy the full value from the source work item, or raise StringManipulatorTool MaxStringLength and re-run.");
                     result = result.Substring(0, Options.MaxStringLength);
                 }
