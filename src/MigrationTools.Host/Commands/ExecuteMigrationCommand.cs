@@ -83,7 +83,7 @@ namespace MigrationTools.Host.Commands
             {
                 CommandActivity.RecordException(ex);
                 Telemetery.TrackException(ex, null);
-                _logger.LogError(ex, "Unhandled exception!");
+                _logger.LogCommandFailure(context.Name, ex);
 
                 _exitCode = 1;
             }

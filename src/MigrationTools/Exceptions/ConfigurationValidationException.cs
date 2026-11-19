@@ -28,6 +28,9 @@ namespace MigrationTools.Exceptions
             ValidationResult = validationResult;
         }
 
+        public override string Message =>
+            $"The configuration entry at '{ConfigrationSectionPath}' did not pass validation: {string.Join("; ", ValidationResult?.Failures ?? Array.Empty<string>())}";
+
         public override string ToString()
         {
             return $"The configuration entry at '{ConfigrationSectionPath}' did not pass validation!\n Please check the following failures:\n -{string.Join("\n-", ValidationResult.Failures)}";
