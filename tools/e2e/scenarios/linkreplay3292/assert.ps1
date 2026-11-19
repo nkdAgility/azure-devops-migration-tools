@@ -35,7 +35,7 @@ if ($Log) {
         if ($line.StartsWith("[") -or $events.Count -eq 0) { $events.Add($line) } else { $events[$events.Count - 1] += "`n$line" }
     }
     $kept = @($events | Where-Object { $_ -notmatch '^\[[^\]]* DBG\]' })
-    $ex = @($kept | Where-Object { $_ -match 'Exception|\n   at |\[ERR\]|\[ERROR\]' })
+    $ex = @($kept | Where-Object { $_ -match 'Exception|\n   at |^\[[^\]]* (ERR|FTL)\]' })
     $skips = @($kept | Where-Object { $_ -match 'WRN\].*\[SKIP\] Child link' })
     "Log: $($ex.Count) exception/error events outside Debug, $($skips.Count) skipped child-link warnings"
     $ex | Select-Object -First 10 | ForEach-Object { "  " + ($_ -split "`n")[0] }

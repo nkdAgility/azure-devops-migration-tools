@@ -250,19 +250,14 @@ namespace MigrationTools.Tools
                     catch (Exception ex)
                     {
                         Telemetry.TrackException(ex, null);
-                        // Ignore this link because the TFS server didn't recognize its type (There's no point in crashing the rest of the migration due to a link)
-                        if (ex.Message.Contains("Unrecognized Resource link"))
+                        // A rejected link must not stay pending, or every later save of this target fails with it.
+                        target.ToWorkItem().Links.Remove(el);
+                        if (!ex.Message.Contains("Unrecognized Resource link"))
                         {
-
-                            Log.LogError(ex, "[{ExceptionType}] Failed to save link {SourceLinkType} on {TargetId}", ex.GetType().Name, sourceLink.GetType().Name, target.Id);
-                            // Remove the link from the target so it doesn't cause problems downstream
-                            target.ToWorkItem().Links.Remove(el);
-                        }
-                        else
-                        {
-                            //pass along the exception since we don't know what went wrong
                             throw;
                         }
+                        Log.LogWarning("  [SKIP] {SourceLinkType} on target {TargetId} not migrated: the target does not recognise its link type ({Reason}).", sourceLink.GetType().Name, target.Id, ex.Message);
+                        Log.LogDebug(ex, "Saving {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
                     }
                 }
             }
@@ -420,10 +415,12 @@ namespace MigrationTools.Tools
                         }
                         else
                         {
+                            var removedParents = new List<RelatedLink>();
                             if (linkTypeEnd.ImmutableName == HierarchyReverse)
                             {
                                 // TF201065: a work item can have only one parent, so this item's own history decides: drop every earlier one.
-                                foreach (var conflict in ParentLinks(wiTargetL))
+                                removedParents = ParentLinks(wiTargetL);
+                                foreach (var conflict in removedParents)
                                 {
                                     wiTargetL.ToWorkItem().Links.Remove(conflict);
                                 }
@@ -435,7 +432,15 @@ namespace MigrationTools.Tools
                             // wiTargetL.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
                             if (SaveAfterEachLink)
                             {
-                                wiTargetL.SaveToAzureDevOps();
+                                SaveOrUndo(wiTargetL, () =>
+                                {
+                                    var links = wiTargetL.ToWorkItem().Links;
+                                    links.Remove(newRl);
+                                    foreach (var parent in removedParents)
+                                    {
+                                        links.Add(new RelatedLink(parent.LinkTypeEnd, parent.RelatedWorkItemId));
+                                    }
+                                });
                             }
                         }
                         Log.LogInformation(
@@ -576,7 +581,21 @@ namespace MigrationTools.Tools
             return wiTargetR;
         }
 
-        private const string HierarchyForward = "System.LinkTypes.Hierarchy-Forward";
+        // A link the server rejects must not stay pending on the target, or every later save of it fails too.
+        private static void SaveOrUndo(WorkItemData target, Action undo)
+        {
+            try
+            {
+                target.SaveToAzureDevOps();
+            }
+            catch
+            {
+                undo();
+                throw;
+            }
+        }
+
+        private const string HierarchyForward ="System.LinkTypes.Hierarchy-Forward";
         private const string HierarchyReverse = "System.LinkTypes.Hierarchy-Reverse";
 
         // The target child usually comes from the reflected-item cache, so a parent link added since (from the parent's
@@ -643,7 +662,7 @@ namespace MigrationTools.Tools
             // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
             if (SaveAfterEachLink)
             {
-                target.SaveToAzureDevOps();
+                SaveOrUndo(target, () => target.ToWorkItem().Links.Remove(hl));
             }
         }
 
