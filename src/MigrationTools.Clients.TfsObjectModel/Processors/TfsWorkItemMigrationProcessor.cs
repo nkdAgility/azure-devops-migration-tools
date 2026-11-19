@@ -871,7 +871,8 @@ namespace MigrationTools.Processors
                         {
                             // A rerun never treats a wrongly saved revision as migrated (#3270), and corrects the
                             // current values of a target an earlier run saved with empty state-stamped values (#3305).
-                            var sourceStamps = ReadSourceStateStampedValues(sourceWorkItem);
+                            // The source is read again only when a value needs a second read, so an in-sync re-run stays fast (#3299).
+                            var sourceStamps = new Lazy<SourceStateStampedValues>(() => ReadSourceStateStampedValues(sourceWorkItem));
                             var correctStamps = VerifyMigratedRevisions(sourceWorkItem, targetWorkItem, sourceStamps);
                             var difference = revisionsToMigrate.Count == 0 ? FindReRunDifference(sourceWorkItem, targetWorkItem) : null;
                             if (revisionsToMigrate.Count == 0 && correctStamps)
@@ -892,7 +893,7 @@ namespace MigrationTools.Processors
                                     new Dictionary<string, object>() { { "Difference", difference } });
                                 if (correctStamps)
                                 {
-                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps);
+                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps.Value);
                                 }
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                                 CommonTools.WorkItemLink.OtherWorkItemsSaved = 0;
@@ -1741,7 +1742,7 @@ namespace MigrationTools.Processors
         /// save. Azure DevOps cannot rewrite saved revisions, so the earlier revisions keep the empty value; they are
         /// listed in a warning and no longer fail the item.
         /// </returns>
-        private bool VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, SourceStateStampedValues sourceValues)
+        private bool VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, Lazy<SourceStateStampedValues> sourceValues)
         {
             var source = sourceWorkItem.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
@@ -1783,11 +1784,14 @@ namespace MigrationTools.Processors
                     var sourceField = sr.Fields.Contains(field) ? field : field == closedTarget ? GetClosedDateField(source) : null;
                     if (sourceField == null || !sr.Fields.Contains(sourceField)) continue;
                     var isIdentity = target.Fields[field].FieldDefinition.IsIdentity;
-                    // What Azure DevOps holds for the source revision, not only what the object model read (#3305).
-                    var expected = SourceStateStampedValues.Reconcile(sr.Fields[sourceField].Value,
-                        sourceValues.Value((int)sr.Fields["System.Rev"].Value, sourceField), isIdentity, out _);
-                    if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
                     var saved = tr.Fields.Contains(field) ? tr.Fields[field].Value : null;
+                    var firstRead = sr.Fields[sourceField].Value;
+                    // A second read of the source revision (#3305), only when the first read and the target disagree on
+                    // whether there is a value: both empty or both set needs nothing more, so an in-sync re-run stays fast.
+                    var expected = StateStampedFields.IsEmpty(firstRead) == StateStampedFields.IsEmpty(saved)
+                        ? firstRead
+                        : SourceStateStampedValues.Reconcile(firstRead, sourceValues.Value.Value((int)sr.Fields["System.Rev"].Value, sourceField), isIdentity, out _);
+                    if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
                     expected = StateStampedFields.IsEmpty(expected) ? null : expected;
                     var match = isIdentity
                         ? StateStampedFields.CompareIdentity(expected, saved, TargetAccountsNamed)
