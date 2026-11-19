@@ -16,6 +16,10 @@ namespace VstsSyncMigrator.ConsoleApp
     {
         public static async Task<int> Main(string[] args)
         {
+            if (TryRunFromLongPath(args, out int longPathExitCode))
+            {
+                return longPathExitCode;
+            }
             try
             {
                 await RunAsync(args);
@@ -36,6 +40,40 @@ namespace VstsSyncMigrator.ConsoleApp
                 return 1;
             }
         }
+
+        /// <summary>
+        /// Started through an 8.3 short path, the runtime looks for a configuration file named after the short path, which does not exist,
+        /// so every binding redirect in devopsmigration.exe.config is lost. Run the tool again in a new application domain from its long path, with its real configuration file.
+        /// Uses framework types only, so it runs before any dependency that needs a binding redirect is loaded.
+        /// </summary>
+        private static bool TryRunFromLongPath(string[] args, out int exitCode)
+        {
+            exitCode = 0;
+            string exePath = Assembly.GetEntryAssembly()?.Location;
+            if (string.IsNullOrEmpty(exePath) || File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile))
+            {
+                return false;
+            }
+            string longExePath = ToLongPath(exePath);
+            string longConfigFile = longExePath + ".config";
+            if (string.Equals(longExePath, exePath, StringComparison.OrdinalIgnoreCase) || !File.Exists(longConfigFile))
+            {
+                return false;
+            }
+            var setup = new AppDomainSetup { ApplicationBase = Path.GetDirectoryName(longExePath) + Path.DirectorySeparatorChar, ConfigurationFile = longConfigFile };
+            var domain = AppDomain.CreateDomain(AppDomain.CurrentDomain.FriendlyName, null, setup);
+            exitCode = domain.ExecuteAssembly(longExePath, args);
+            return true;
+        }
+
+        private static string ToLongPath(string path)
+        {
+            var buffer = new System.Text.StringBuilder(32767);
+            return GetLongPathName(path, buffer, buffer.Capacity) > 0 ? buffer.ToString() : path;
+        }
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        private static extern int GetLongPathName(string shortPath, System.Text.StringBuilder longPath, int bufferLength);
 
         private static async Task RunAsync(string[] args)
         {
