@@ -77,17 +77,23 @@ namespace MigrationTools.Endpoints
             }
 
             var thumbprint = new string(options.CertificateThumbprint.Where(Uri.IsHexDigit).ToArray());
+            // A store can hold the public certificate only (imported from a .cer); keep looking for one with its key.
+            string withoutKey = null;
             foreach (var location in new[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine })
             {
                 using (var store = new X509Store(StoreName.My, location))
                 {
                     store.Open(OpenFlags.ReadOnly);
-                    var found = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, validOnly: false);
-                    if (found.Count > 0)
+                    foreach (var certificate in store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, validOnly: false))
                     {
-                        return RequirePrivateKey(found[0], endpointName, $"{location}\\My");
+                        if (certificate.HasPrivateKey) { return certificate; }
+                        withoutKey = withoutKey ?? $"{location}\\My";
                     }
                 }
+            }
+            if (withoutKey != null)
+            {
+                throw new MigrationRunStoppedException($"Endpoint '{endpointName}': the certificate {thumbprint} in {withoutKey} has no private key, and no copy with its key is in CurrentUser\\My or LocalMachine\\My, so it cannot sign in. Import it from a PFX that includes the key.");
             }
             throw new MigrationRunStoppedException($"Endpoint '{endpointName}': no certificate with thumbprint {thumbprint} is in CurrentUser\\My or LocalMachine\\My. Import the certificate with its private key, or check CertificateThumbprint.");
         }

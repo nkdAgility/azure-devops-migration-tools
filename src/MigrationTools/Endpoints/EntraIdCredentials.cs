@@ -270,6 +270,10 @@ namespace MigrationTools.Endpoints
                     // server just rejected; a new instance starts with an empty cache. The user sign-ins (Azure CLI,
                     // browser, device code) use a shared cache that the credential refreshes itself.
                     if (EntraIdCredentialFactory.IsExperimental(_options.CredentialType)) { _credential = null; }
+                    // The cached token is the one the server rejected: drop it, and give this fetch its own
+                    // generation so only its result is cached, whatever its expiry, and no earlier fetch overwrites it.
+                    _cached = null;
+                    _generation++;
                     var started = FetchAndCacheAsync(Current, _generation);
                     _inFlight = started;
                     fetch = started;
@@ -316,7 +320,7 @@ namespace MigrationTools.Endpoints
             }
             lock (_cacheLock)
             {
-                if (generation == _generation && (!(_cached is AccessToken current) || fresh.ExpiresOn >= current.ExpiresOn))
+                if (generation == _generation)
                 {
                     _cached = fresh;
                 }

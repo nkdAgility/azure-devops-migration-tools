@@ -84,6 +84,28 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_CachesTheReplacementEvenWhenItExpiresSooner()
+        {
+            var tokens = new SequenceTokenCredential(
+                new AccessToken("rejected", DateTimeOffset.UtcNow.AddHours(2)),
+                new AccessToken("replacement", DateTimeOffset.UtcNow.AddMinutes(30)));
+            _sut = Using(tokens);
+
+            Assert.AreEqual("rejected", _sut.GetAccessToken());
+            Assert.AreEqual("replacement", await _sut.GetFreshAccessTokenAsync());
+
+            Assert.AreEqual("replacement", _sut.GetAccessToken(), "The rejected token must not be sent again.");
+        }
+
+        private sealed class SequenceTokenCredential : TokenCredential
+        {
+            private readonly System.Collections.Generic.Queue<AccessToken> _tokens;
+            public SequenceTokenCredential(params AccessToken[] tokens) { _tokens = new System.Collections.Generic.Queue<AccessToken>(tokens); }
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) => _tokens.Dequeue();
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken) => new ValueTask<AccessToken>(_tokens.Dequeue());
+        }
+
+        [TestMethod, TestCategory("L0")]
         public async Task GetFreshAccessTokenAsync_UsesANewAppCredentialSoItsCachedTokenIsNotReused()
         {
             var built = 0;
