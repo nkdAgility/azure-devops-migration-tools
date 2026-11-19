@@ -333,6 +333,25 @@ namespace MigrationTools.Tests.Services
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_OneEarlierLogUnreadable_DoesNotResolve()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
+            }
+            using (var second = Earlier(RunFolder("20260102000000")))
+            {
+                second.Record(WorkItemReviewCategory.FieldNotMapped, "field X", "add it", sourceId: "7", revision: 2);
+            }
+            using (new FileStream(Path.Combine(RunFolder("20260102000000"), WorkItemReviewLog.FileName), FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                using var run = Earlier(RunFolder("20260103000000"));
+                using (run.BeginItem("7", "Bug")) { run.MarkRevisionReplayed(1); run.CompleteCurrentItem(); }
+                Assert.IsFalse(File.Exists(run.FilePath), "the unreadable log may hold a problem on a revision that was not replayed");
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void RecordUnlessMigratedLater_RelatedItemMigrates_EntryIsDropped()
         {
             using var log = Earlier(RunFolder("20260101000000"));

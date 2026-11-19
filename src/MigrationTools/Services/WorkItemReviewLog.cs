@@ -108,6 +108,9 @@ namespace MigrationTools.Services
         private readonly Dictionary<string, WorkItemReviewEntry> _latest = new Dictionary<string, WorkItemReviewEntry>(StringComparer.Ordinal);
         private readonly Dictionary<string, List<WorkItemReviewEntry>> _openFromEarlierRuns = new Dictionary<string, List<WorkItemReviewEntry>>(StringComparer.Ordinal);
         private readonly HashSet<string> _loadedMigrations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        // Migrations whose earlier history could not be read in full; nothing is resolved for them, because an
+        // unread entry could name a problem that was not checked again.
+        private readonly HashSet<string> _incompleteHistory = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _comingLater = new HashSet<string>(StringComparer.Ordinal);
         private readonly Dictionary<string, List<WorkItemReviewEntry>> _waitingOnItem = new Dictionary<string, List<WorkItemReviewEntry>>(StringComparer.Ordinal);
         private readonly AsyncLocal<ItemScope> _current = new AsyncLocal<ItemScope>();
@@ -162,6 +165,7 @@ namespace MigrationTools.Services
                 catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException || ex is NotSupportedException)
                 {
                     _logger.LogWarning(ex, "Could not find earlier work item review logs; no resolved entries will be written in this run.");
+                    _incompleteHistory.Add(migration ?? string.Empty);
                     return;
                 }
                 if (root == null || !Directory.Exists(root))
@@ -181,6 +185,7 @@ namespace MigrationTools.Services
                 catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
                 {
                     _logger.LogWarning(ex, "Could not list earlier work item review logs in {LogsFolder}; no resolved entries will be written in this run.", root);
+                    _incompleteHistory.Add(migration ?? string.Empty);
                     return;
                 }
                 foreach (var file in earlier)
@@ -192,7 +197,8 @@ namespace MigrationTools.Services
                     }
                     catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
                     {
-                        _logger.LogWarning(ex, "Could not read the earlier work item review log {ReviewLogPath}; items it lists are not resolved in this run.", file);
+                        _logger.LogWarning(ex, "Could not read the earlier work item review log {ReviewLogPath}; no resolved entries will be written in this run, because it may list problems that were not checked again.", file);
+                        _incompleteHistory.Add(migration ?? string.Empty);
                         continue;
                     }
                     foreach (var entry in entries)
@@ -432,7 +438,8 @@ namespace MigrationTools.Services
             List<WorkItemReviewEntry> open;
             lock (_gate)
             {
-                if (!_openFromEarlierRuns.TryGetValue(ItemKey(_migration, scope.SourceId), out var entries))
+                if (_incompleteHistory.Contains(_migration ?? string.Empty)
+                    || !_openFromEarlierRuns.TryGetValue(ItemKey(_migration, scope.SourceId), out var entries))
                 {
                     return;
                 }
