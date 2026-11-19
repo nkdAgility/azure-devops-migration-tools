@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Shadows;
@@ -244,10 +244,41 @@ namespace MigrationTools.ProcessorEnrichers.Tests
             Assert.AreEqual(expected, newValue);
         }
 
-        private static StringManipulatorTool GetStringManipulatorTool(StringManipulatorToolOptions options)
+        [TestMethod(), TestCategory("L1")]
+        public void StringManipulatorTool_TruncatedValue_IsWrittenToTheReviewLog()
+        {
+            var folder = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "amt-trunc-" + System.Guid.NewGuid().ToString("N"));
+            var reviewLog = new MigrationTools.Services.WorkItemReviewLog(folder);
+            try
+            {
+                var tool = GetStringManipulatorTool(new StringManipulatorToolOptions { Enabled = true, MaxStringLength = 5, Manipulators = new List<RegexStringManipulator>() }, reviewLog);
+                using (reviewLog.BeginItem("42", "Task", 3))
+                {
+                    Assert.AreEqual("abcde", tool.ProcessString("abcdefgh", "System.Title"));
+                    reviewLog.SetCurrentItem(revision: 4);
+                    tool.ProcessString("abcdefghij", "System.Title");
+                }
+                // The same field cut again at another length, on a later revision, is the same problem.
+                var entry = System.Linq.Enumerable.Single(MigrationTools.Services.WorkItemReviewLog.ReadEntries(reviewLog.FilePath));
+                Assert.AreEqual("field-truncated", entry.Category);
+                Assert.AreEqual("42", entry.SourceId);
+                Assert.AreEqual(3, entry.Revision);
+            }
+            finally
+            {
+                reviewLog.Dispose();
+                System.IO.Directory.Delete(folder, true);
+            }
+        }
+
+        private static StringManipulatorTool GetStringManipulatorTool(StringManipulatorToolOptions options, MigrationTools.Services.WorkItemReviewLog reviewLog = null)
         {
             var services = new ServiceCollection();
             services.AddMigrationToolServicesForUnitTests();
+            if (reviewLog != null)
+            {
+                services.AddSingleton(reviewLog);
+            }
             services.AddSingleton<StringManipulatorTool>();
             services.Configure<StringManipulatorToolOptions>(o =>
             {

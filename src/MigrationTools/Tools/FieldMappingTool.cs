@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools.DataContracts;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -46,6 +47,10 @@ namespace MigrationTools.Tools
                     }
                     IFieldMap fm = (IFieldMap)Services.GetRequiredService(type);
                     fm.Configure(fieldmapConfig);
+                    if (fm is IRecordsWorkItemReview recorder)
+                    {
+                        recorder.ReviewLog = Services.GetService<WorkItemReviewLog>();
+                    }
                     foreach (string workItemTypeName in fieldmapConfig.ApplyTo)
                     {
                         AddFieldMap(workItemTypeName, fm);

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -23,7 +25,9 @@ namespace MigrationTools.Tools
         {
         }
 
-        public string? ProcessString(string? value)
+        public string? ProcessString(string? value) => ProcessString(value, null);
+
+        public string? ProcessString(string? value, string? fieldName)
         {
             const string logPrefix = nameof(StringManipulatorTool) + "::" + nameof(ProcessString);
             Log.LogDebug(logPrefix);
@@ -58,6 +62,10 @@ namespace MigrationTools.Tools
 
                 if (IsStringTooLong(result))
                 {
+                    var what = fieldName == null ? "A string value" : "Field '" + fieldName + "'";
+                    Services?.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.FieldTruncated,
+                        $"{what} was cut to MaxStringLength ({Options.MaxStringLength} characters).",
+                        "Copy the full value from the source work item, or raise StringManipulatorTool MaxStringLength and re-run.");
                     result = result.Substring(0, Options.MaxStringLength);
                 }
             }
