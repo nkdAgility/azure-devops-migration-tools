@@ -448,6 +448,29 @@ namespace MigrationTools.Tests.Services
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_UpdateFailed_ResolvesWithoutReplay()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.UpdateFailed, "attachments failed", "re-run", sourceId: "7", revision: 4);
+            }
+            using var run = Earlier(RunFolder("20260102000000"));
+            using (run.BeginItem("7", "Task")) { run.CompleteCurrentItem(); }
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(run.FilePath).Single().Category);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CurrentItemReplayedRevisions_TrueOnlyAfterAReplay()
+        {
+            using var log = Earlier(RunFolder("20260101000000"));
+            using (log.BeginItem("1", "Task"))
+            {
+                Assert.IsFalse(log.CurrentItemReplayedRevisions);
+                log.MarkRevisionReplayed(2);
+                Assert.IsTrue(log.CurrentItemReplayedRevisions);
+            }
+        }
+        [TestMethod, TestCategory("L0")]
         public void CompleteCurrentItem_LinkStillHeld_DoesNotResolve()
         {
             using (var first = Earlier(RunFolder("20260101000000")))

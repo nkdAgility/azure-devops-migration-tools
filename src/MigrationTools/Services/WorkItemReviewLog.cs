@@ -17,6 +17,7 @@ namespace MigrationTools.Services
     {
         public const string Failed = "failed";
         public const string PartMigrated = "part-migrated";
+        public const string UpdateFailed = "update-failed";
         public const string RerunMismatch = "rerun-mismatch";
         public const string LinkSkipped = "link-skipped";
         public const string LinkLeftOnSource = "link-left-on-source";
@@ -396,6 +397,11 @@ namespace MigrationTools.Services
         public string CurrentSourceId => _current.Value?.SourceId;
 
         /// <summary>
+        /// True when at least one revision of the current item was replayed in this run.
+        /// </summary>
+        public bool CurrentItemReplayedRevisions => _current.Value?.ReplayedRevisions.Count > 0;
+
+        /// <summary>
         /// True when the current item already has an entry in this category in this run.
         /// </summary>
         public bool CurrentItemHas(string category)
@@ -472,6 +478,12 @@ namespace MigrationTools.Services
 
         private static bool WasCheckedAgain(WorkItemReviewEntry entry, ItemScope scope)
         {
+            // A failure after the revisions were migrated (attachments, links, the catch-up save) is checked again by
+            // the whole item completing, whether or not a revision is replayed.
+            if (entry.Category == WorkItemReviewCategory.UpdateFailed)
+            {
+                return true;
+            }
             if (entry.Category == WorkItemReviewCategory.PathNotMapped && !entry.Revision.HasValue)
             {
                 return true;

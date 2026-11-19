@@ -673,10 +673,15 @@ namespace MigrationTools.Processors
                 _reviewLog.Record(WorkItemReviewCategory.Failed, message,
                     "Fix the cause given in the reason, then re-run; the item was not created in the target.");
             }
-            else
+            else if (_reviewLog.CurrentItemReplayedRevisions)
             {
                 _reviewLog.Record(WorkItemReviewCategory.PartMigrated, message,
                     "Fix the cause given in the reason, then re-run; the target item exists but is missing the revisions from the one that failed.");
+            }
+            else
+            {
+                _reviewLog.Record(WorkItemReviewCategory.UpdateFailed, message,
+                    "Fix the cause given in the reason, then re-run; the target item has every revision, but its attachments, links or other updates may be incomplete.");
             }
         }
 

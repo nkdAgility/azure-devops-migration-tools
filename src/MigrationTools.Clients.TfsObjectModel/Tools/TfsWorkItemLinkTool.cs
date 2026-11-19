@@ -116,6 +116,10 @@ namespace MigrationTools.Tools
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
                         Log.LogWarning("  [SKIP] A {LinkType} on source {SourceId} could not be added to target {TargetId} and was skipped: {Reason} Check the link in the source; the rest of the work item carries on migrating.", item.GetType().Name, sourceWorkItemLinkStart.Id, targetWorkItemLinkStart.Id, ex.Message);
                         Log.LogDebug(ex, "Adding a link for source {SourceId}", sourceWorkItemLinkStart.Id);
+                        Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                            $"A {item.GetType().Name} could not be added to the target: {ex.Message}",
+                            "Check the link in the source, then re-run or add it by hand.",
+                            sourceId: sourceWorkItemLinkStart.Id.ToString(), targetId: targetWorkItemLinkStart.Id.ToString());
                     }
                 }
             }
@@ -265,6 +269,10 @@ namespace MigrationTools.Tools
                         }
                         Log.LogWarning("  [SKIP] {SourceLinkType} on target {TargetId} not migrated: the target does not recognise its link type ({Reason}).", sourceLink.GetType().Name, target.Id, ex.Message);
                         Log.LogDebug(ex, "Saving {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
+                        Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                            $"A {sourceLink.GetType().Name} was not migrated: the target does not recognise its link type ({ex.Message}).",
+                            "Add the link by hand in a form the target accepts.",
+                            targetId: target.Id.ToString());
                     }
                 }
             }
@@ -309,6 +317,10 @@ namespace MigrationTools.Tools
                     Telemetry.TrackException(ex, null);
                     Log.LogWarning("  [SKIP] Link of type {LinkType} on source {SourceId} not added to target {TargetId}: the linked work item {RelatedId} could not be found ({Reason}).", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id, rl.RelatedWorkItemId, ex.Message);
                     Log.LogDebug(ex, "Finding linked work item {RelatedId}", rl.RelatedWorkItemId);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                        $"{rl.LinkTypeEnd.ImmutableName} link to {rl.RelatedWorkItemId} not added: the linked work item could not be found ({ex.Message}).",
+                        "Migrate the linked work item or check access to it, then re-run.",
+                        sourceId: wiSourceL.Id.ToString(), targetId: wiTargetL.Id.ToString());
                     return;
                 }
                 if (wiSourceR == null)
@@ -333,6 +345,10 @@ namespace MigrationTools.Tools
                     Telemetry.TrackException(ex, null);
                     Log.LogWarning("  [SKIP] Link of type {LinkType} on source {SourceId} not added to target {TargetId}: the linked work item {RelatedId} could not be found ({Reason}).", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id, rl.RelatedWorkItemId, ex.Message);
                     Log.LogDebug(ex, "Finding linked work item {RelatedId}", rl.RelatedWorkItemId);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                        $"{rl.LinkTypeEnd.ImmutableName} link to {rl.RelatedWorkItemId} not added: the linked work item could not be found ({ex.Message}).",
+                        "Migrate the linked work item or check access to it, then re-run.",
+                        sourceId: wiSourceL.Id.ToString(), targetId: wiTargetL.Id.ToString());
                     return;
                 }
             }

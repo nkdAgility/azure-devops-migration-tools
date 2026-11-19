@@ -107,6 +107,7 @@ The file is JSON Lines: one JSON object per line, with these fields.
 |---|---|
 | `failed` | The work item could not be created in the target. |
 | `part-migrated` | The target work item exists but a later revision could not be saved. |
+| `update-failed` | The target item has every revision, but a later step for it failed (attachments, links or the catch-up save). It resolves when the item next completes. |
 | `rerun-mismatch` | On a re-run, a revision already in the target does not match the source. |
 | `link-skipped` | A link was not migrated: the related item was not migrated (a link to an item that migrates later in the run is added from its side, so it is held and written only if that item fails or the run ends without reaching it; a killed run loses it), cannot be read, or its link type does not exist in the target; or a hyperlink is not valid. |
 | `link-left-on-source` | A git commit, branch or pull request link could not be rewritten and still points at the source. |
@@ -122,7 +123,7 @@ The file is JSON Lines: one JSON object per line, with these fields.
 
 The same problem for the same item is written once per run.
 
-**Follow-up files.** Problems that someone must deal with after the migration are also written, in the same way, to one file per concern in the same folder: `follow-up-links.jsonl`, `follow-up-users-not-mapped.jsonl`, `follow-up-attachments.jsonl`, `follow-up-fields.jsonl`, `follow-up-area-iteration-paths.jsonl` and `follow-up-skipped.jsonl`. A file with no rows is not created. Item failures, part-migrations, re-run mismatches and type changes have no follow-up file, so check `work-items-to-review.jsonl` and the category counts at the end of the run, not only the follow-up files, to know whether anything is left to do.
+**Follow-up files.** Problems that someone must deal with after the migration are also written, in the same way, to one file per concern in the same folder: `follow-up-links.jsonl`, `follow-up-users-not-mapped.jsonl`, `follow-up-attachments.jsonl`, `follow-up-fields.jsonl`, `follow-up-area-iteration-paths.jsonl` and `follow-up-skipped.jsonl`. A file with no rows is not created. Item failures, part-migrations, update failures, re-run mismatches and type changes have no follow-up file, so check `work-items-to-review.jsonl` and the category counts at the end of the run, not only the follow-up files, to know whether anything is left to do.
 
 **End of the run.** The log gives the number of entries by category, and each follow-up file with its row count. It also writes `work-items-to-review-latest.jsonl`, the latest entry for each item across this run and the earlier runs. It is a summary only: it holds one entry per item, so an item with several open problems shows only the most recent one. Use the per-run files for the full list.
 
