@@ -21,6 +21,7 @@ namespace MigrationTools.Tools
     public class TfsWorkItemLinkTool : Tool<TfsWorkItemLinkToolOptions>
     {
         private bool _inline;
+        private readonly HashSet<string> _skippedChildLinks = new HashSet<string>();
 
         private bool SaveAfterEachLink => Options.SaveAfterEachLinkIsAdded && !_inline;
 
@@ -106,23 +107,12 @@ namespace MigrationTools.Tools
                             throw ex;
                         }
                     }
-                    catch (WorkItemLinkValidationException ex)
+                    catch (Exception ex) when (ex is WorkItemLinkValidationException || ex is FormatException || ex is UnexpectedErrorException || ex is InvalidOperationException || ex is ValidationException)
                     {
+                        // The target is not reset: that would also drop the links added before this one.
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
-                        if (!_inline) targetWorkItemLinkStart.ToWorkItem().Reset(); // inline: keep the revision's pending changes
-                        Log.LogError(ex, "[WorkItemLinkValidationException] Adding link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
-                    }
-                    catch (FormatException ex)
-                    {
-                        sourceWorkItemLinkStart.ToWorkItem().Reset();
-                        if (!_inline) targetWorkItemLinkStart.ToWorkItem().Reset(); // inline: keep the revision's pending changes
-                        Log.LogError(ex, "[CREATE-FAIL] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
-                    }
-                    catch (UnexpectedErrorException ex)
-                    {
-                        sourceWorkItemLinkStart.ToWorkItem().Reset();
-                        if (!_inline) targetWorkItemLinkStart.ToWorkItem().Reset(); // inline: keep the revision's pending changes
-                        Log.LogError(ex, "[UnexpectedErrorException] Adding Link for wiSourceL={sourceWorkItemLinkStartId}", sourceWorkItemLinkStart.Id);
+                        Log.LogWarning("  [SKIP] A {LinkType} on source {SourceId} could not be added to target {TargetId} and was skipped: {Reason} Check the link in the source; the rest of the work item carries on migrating.", item.GetType().Name, sourceWorkItemLinkStart.Id, targetWorkItemLinkStart.Id, ex.Message);
+                        Log.LogDebug(ex, "Adding a link for source {SourceId}", sourceWorkItemLinkStart.Id);
                     }
                 }
             }
@@ -238,7 +228,7 @@ namespace MigrationTools.Tools
         {
             var exist = (from Link l in target.ToWorkItem().Links
                          where l is ExternalLink && ((ExternalLink)l).LinkedArtifactUri == sourceLink.LinkedArtifactUri
-                         select (ExternalLink)l).SingleOrDefault();
+                         select (ExternalLink)l).FirstOrDefault();
             if (exist == null)
             {
                 Log.LogInformation("Creating new {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
@@ -260,19 +250,14 @@ namespace MigrationTools.Tools
                     catch (Exception ex)
                     {
                         Telemetry.TrackException(ex, null);
-                        // Ignore this link because the TFS server didn't recognize its type (There's no point in crashing the rest of the migration due to a link)
-                        if (ex.Message.Contains("Unrecognized Resource link"))
+                        // A rejected link must not stay pending, or every later save of this target fails with it.
+                        target.ToWorkItem().Links.Remove(el);
+                        if (!ex.Message.Contains("Unrecognized Resource link"))
                         {
-
-                            Log.LogError(ex, "[{ExceptionType}] Failed to save link {SourceLinkType} on {TargetId}", ex.GetType().Name, sourceLink.GetType().Name, target.Id);
-                            // Remove the link from the target so it doesn't cause problems downstream
-                            target.ToWorkItem().Links.Remove(el);
-                        }
-                        else
-                        {
-                            //pass along the exception since we don't know what went wrong
                             throw;
                         }
+                        Log.LogWarning("  [SKIP] {SourceLinkType} on target {TargetId} not migrated: the target does not recognise its link type ({Reason}).", sourceLink.GetType().Name, target.Id, ex.Message);
+                        Log.LogDebug(ex, "Saving {SourceLinkType} on {TargetId}", sourceLink.GetType().Name, target.Id);
                     }
                 }
             }
@@ -315,7 +300,8 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Telemetry.TrackException(ex, null);
-                    Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                    Log.LogWarning("  [SKIP] Link of type {LinkType} on source {SourceId} not added to target {TargetId}: the linked work item {RelatedId} could not be found ({Reason}).", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id, rl.RelatedWorkItemId, ex.Message);
+                    Log.LogDebug(ex, "Finding linked work item {RelatedId}", rl.RelatedWorkItemId);
                     return;
                 }
                 if (wiSourceR == null)
@@ -334,7 +320,8 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Telemetry.TrackException(ex, null);
-                    Log.LogError(ex, "  [FIND-FAIL] Adding Link of type {0} where wiSourceL={1}, wiTargetL={2} ", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id);
+                    Log.LogWarning("  [SKIP] Link of type {LinkType} on source {SourceId} not added to target {TargetId}: the linked work item {RelatedId} could not be found ({Reason}).", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiTargetL.Id, rl.RelatedWorkItemId, ex.Message);
+                    Log.LogDebug(ex, "Finding linked work item {RelatedId}", rl.RelatedWorkItemId);
                     return;
                 }
             }
@@ -344,17 +331,15 @@ namespace MigrationTools.Tools
                 bool IsExisting = false;
                 try
                 {
-                    var exist = (
-                        from Link l in wiTargetL.ToWorkItem().Links
-                        where l is RelatedLink
-                            && ((RelatedLink)l).RelatedWorkItemId.ToString() == wiTargetR.Id
-                            && ((RelatedLink)l).LinkTypeEnd.ImmutableName == item.LinkTypeEnd.ImmutableName
-                        select (RelatedLink)l).SingleOrDefault();
-                    IsExisting = exist != null;
+                    IsExisting = wiTargetL.ToWorkItem().Links.OfType<RelatedLink>().Any(l =>
+                        l.RelatedWorkItemId.ToString() == wiTargetR.Id
+                        && l.LinkTypeEnd != null
+                        && l.LinkTypeEnd.ImmutableName == item.LinkTypeEnd.ImmutableName);
                 }
                 catch (Exception ex)
                 {
-                    Log.LogWarning(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL != null ? wiSourceL.Id.ToString() : "NotFound", wiSourceR != null ? wiSourceR.Id.ToString() : "NotFound", wiTargetL != null ? wiTargetL.Id.ToString() : "NotFound");
+                    Log.LogWarning("  [SKIP] Link of type {LinkType} from source {SourceId} to {RelatedId} not migrated: the existing links on target {TargetId} could not be read ({Reason}).", item.LinkTypeEnd?.ImmutableName, wiSourceL?.Id, wiSourceR?.Id, wiTargetL?.Id, ex.Message);
+                    Log.LogDebug(ex, "Reading the links on target {TargetId}", wiTargetL?.Id);
                     return;
                 }
 
@@ -374,51 +359,70 @@ namespace MigrationTools.Tools
 
                         WorkItemLinkTypeEnd linkTypeEnd = client.Store.WorkItemLinkTypes.LinkTypeEnds[rl.LinkTypeEnd.ImmutableName];
                         RelatedLink newRl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetR.Id));
-                        RelatedLink childParentLink = null;
-                        if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward")
+                        List<RelatedLink> childParentLinks = new List<RelatedLink>();
+                        if (linkTypeEnd.ImmutableName == HierarchyForward)
                         {
-                            childParentLink = ( // TF201036: You cannot add a Child link between work items xxx and xxx because a work item can have only one Parent link.
-                                    from Link l in wiTargetR.ToWorkItem().Links
-                                    where l is RelatedLink
-                                        && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
-                                    select (RelatedLink)l).SingleOrDefault();
-                            if (_inline && childParentLink != null && wiTargetL.Id == "0")
+                            RefreshLinks(wiTargetR);
+                            childParentLinks = ParentLinks(wiTargetR);
+                            var action = ChildLinkDecision.Decide(
+                                int.Parse(wiTargetL.Id),
+                                childParentLinks.Select(l => l.RelatedWorkItemId),
+                                int.Parse(wiSourceL.Id),
+                                ParentLinks(wiSourceR).Select(l => l.RelatedWorkItemId),
+                                _inline);
+                            switch (action)
                             {
-                                Log.LogWarning("  [DEFER] Child {wiTargetR} already has another parent and {wiSourceL} is not saved yet; the link will be added after this revision is saved.", wiTargetR.Id, wiSourceL.Id);
-                                HasDeferredLinks = true;
-                                return;
+                                case ChildLinkAction.AlreadyLinked:
+                                    Log.LogInformation("  [SKIP] Child {ChildTargetId} is already under {ParentTargetId}.", wiTargetR.Id, wiTargetL.Id);
+                                    return;
+                                case ChildLinkAction.SkipChildHasFinalParentElsewhere:
+                                    // Every replayed revision that still holds the link meets it again: warn once.
+                                    var level = _skippedChildLinks.Add($"{wiSourceL.Id}>{wiSourceR.Id}") ? LogLevel.Warning : LogLevel.Debug;
+                                    Log.Log(level, "  [SKIP] Child link from source {SourceId} to {ChildSourceId} not added to target {TargetId}: the child has since moved to another parent in the source, and a work item can have only one parent. Target child {ChildTargetId} keeps its parent {CurrentParentIds}.",
+                                        wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id, string.Join(", ", childParentLinks.Select(l => l.RelatedWorkItemId)));
+                                    return;
+                                case ChildLinkAction.DeferUntilParentSaved:
+                                    Log.LogInformation("  [DEFER] Child {wiTargetR} already has another parent and {wiSourceL} is not saved yet; the link will be added after this revision is saved.", wiTargetR.Id, wiSourceL.Id);
+                                    HasDeferredLinks = true;
+                                    return;
                             }
                         }
-                        if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Forward" && (!_inline || childParentLink != null))
+                        if (linkTypeEnd.ImmutableName == HierarchyForward && (!_inline || childParentLinks.Count > 0))
                         {
                             // Saving the child creates a revision on it dated now, so during replay this is only
-                            // done when the child already has another parent that must be removed first.
-                            var potentialParentConflictLink = childParentLink;
-                            if (potentialParentConflictLink != null)
+                            // done when the child must move here from a parent it no longer has in the source.
+                            foreach (var conflict in childParentLinks)
                             {
-                                wiTargetR.ToWorkItem().Links.Remove(potentialParentConflictLink);
+                                wiTargetR.ToWorkItem().Links.Remove(conflict);
                             }
-                            linkTypeEnd = ((TfsWorkItemMigrationClient)processor.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds["System.LinkTypes.Hierarchy-Reverse"];
+                            linkTypeEnd = ((TfsWorkItemMigrationClient)processor.Target.WorkItems).Store.WorkItemLinkTypes.LinkTypeEnds[HierarchyReverse];
                             RelatedLink newLl = new RelatedLink(linkTypeEnd, int.Parse(wiTargetL.Id));
                             wiTargetR.ToWorkItem().Links.Add(newLl);
 
                             // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                             // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                             // wiTargetR.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-                            wiTargetR.SaveToAzureDevOps();
+                            try
+                            {
+                                wiTargetR.SaveToAzureDevOps();
+                            }
+                            catch
+                            {
+                                // Keep only the child's saved parent, so a later read does not see the unsaved move.
+                                wiTargetR.ToWorkItem().Reset();
+                                throw;
+                            }
                         }
                         else
                         {
-                            if (linkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse")
+                            var removedParents = new List<RelatedLink>();
+                            if (linkTypeEnd.ImmutableName == HierarchyReverse)
                             {
-                                var potentialParentConflictLink = ( // TF201065: You can not add a Parent link to this work item because a work item can have only one link of this type.
-                                    from Link l in wiTargetL.ToWorkItem().Links
-                                    where l is RelatedLink
-                                        && ((RelatedLink)l).LinkTypeEnd.ImmutableName == "System.LinkTypes.Hierarchy-Reverse"
-                                    select (RelatedLink)l).SingleOrDefault();
-                                if (potentialParentConflictLink != null)
+                                // TF201065: a work item can have only one parent, so this item's own history decides: drop every earlier one.
+                                removedParents = ParentLinks(wiTargetL);
+                                foreach (var conflict in removedParents)
                                 {
-                                    wiTargetL.ToWorkItem().Links.Remove(potentialParentConflictLink);
+                                    wiTargetL.ToWorkItem().Links.Remove(conflict);
                                 }
                             }
                             wiTargetL.ToWorkItem().Links.Add(newRl);
@@ -428,7 +432,15 @@ namespace MigrationTools.Tools
                             // wiTargetL.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
                             if (SaveAfterEachLink)
                             {
-                                wiTargetL.SaveToAzureDevOps();
+                                SaveOrUndo(wiTargetL, () =>
+                                {
+                                    var links = wiTargetL.ToWorkItem().Links;
+                                    links.Remove(newRl);
+                                    foreach (var parent in removedParents)
+                                    {
+                                        links.Add(new RelatedLink(parent.LinkTypeEnd, parent.RelatedWorkItemId));
+                                    }
+                                });
                             }
                         }
                         Log.LogInformation(
@@ -569,6 +581,46 @@ namespace MigrationTools.Tools
             return wiTargetR;
         }
 
+        // A link the server rejects must not stay pending on the target, or every later save of it fails too.
+        private static void SaveOrUndo(WorkItemData target, Action undo)
+        {
+            try
+            {
+                target.SaveToAzureDevOps();
+            }
+            catch
+            {
+                undo();
+                throw;
+            }
+        }
+
+        private const string HierarchyForward ="System.LinkTypes.Hierarchy-Forward";
+        private const string HierarchyReverse = "System.LinkTypes.Hierarchy-Reverse";
+
+        // The target child usually comes from the reflected-item cache, so a parent link added since (from the parent's
+        // side) is missing until it is synced. An item with unsaved changes is left as it is: those links count too.
+        private void RefreshLinks(WorkItemData workItem)
+        {
+            var wi = workItem.ToWorkItem();
+            if (wi.Id == 0 || wi.IsDirty) return;
+            try
+            {
+                wi.SyncToLatest();
+            }
+            catch (Exception ex)
+            {
+                Log.LogDebug(ex, "Refreshing the links on {TargetId}", workItem.Id);
+            }
+        }
+
+        private static List<RelatedLink> ParentLinks(WorkItemData workItem)
+        {
+            return workItem.ToWorkItem().Links.OfType<RelatedLink>()
+                .Where(l => l.LinkTypeEnd != null && l.LinkTypeEnd.ImmutableName == HierarchyReverse)
+                .ToList();
+        }
+
         private bool IsRelatedLink(Link item)
         {
             return item is RelatedLink;
@@ -610,7 +662,7 @@ namespace MigrationTools.Tools
             // target.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
             if (SaveAfterEachLink)
             {
-                target.SaveToAzureDevOps();
+                SaveOrUndo(target, () => target.ToWorkItem().Links.Remove(hl));
             }
         }
 
