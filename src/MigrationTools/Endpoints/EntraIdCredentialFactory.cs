@@ -169,7 +169,7 @@ namespace MigrationTools.Endpoints
             }
             catch (Exception ex) when (ex is AuthenticationFailedException || ex is OperationCanceledException)
             {
-                throw new MigrationRunStoppedException($"Endpoint '{endpointName}': {type} sign-in was cancelled, timed out or failed ({FirstLine(ex.Message)}). Run again and complete the sign-in.", ex);
+                throw new MigrationRunStoppedException($"Endpoint '{endpointName}': {type} sign-in was cancelled, timed out or failed ({Reason(ex)}). Run again and complete the sign-in.", ex);
             }
         }
 
@@ -204,6 +204,17 @@ namespace MigrationTools.Endpoints
             {
                 record.Serialize(stream);
             }
+        }
+
+        /// <summary>
+        /// The reason for an Azure.Identity failure, in one line without a final full stop. Several credentials say only
+        /// "authentication failed:" and carry the AADSTS reason in the MSAL inner exception, so that is added.
+        /// </summary>
+        internal static string Reason(Exception ex)
+        {
+            var reason = FirstLine(ex.Message);
+            if (reason.EndsWith(":") && ex.InnerException != null) { reason += " " + FirstLine(ex.InnerException.Message); }
+            return reason.TrimEnd('.');
         }
 
         /// <summary>

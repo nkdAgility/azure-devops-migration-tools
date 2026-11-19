@@ -125,10 +125,7 @@ namespace MigrationTools.Endpoints
 
         internal MigrationTools.Exceptions.MigrationRunStoppedException CredentialFailure(Exception ex)
         {
-            var reason = EntraIdCredentialFactory.FirstLine(ex.Message);
-            // ClientSecretCredential and ClientCertificateCredential say only "authentication failed:" and carry the AADSTS reason in the MSAL inner exception.
-            if (reason.EndsWith(":") && ex.InnerException != null) { reason += " " + EntraIdCredentialFactory.FirstLine(ex.InnerException.Message); }
-            reason = reason.TrimEnd('.');
+            var reason = EntraIdCredentialFactory.Reason(ex);
             var prefix = $"Endpoint '{EndpointName}': could not get a Microsoft Entra ID token with {_options.CredentialType}";
             string message;
             switch (_options.CredentialType)

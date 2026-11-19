@@ -103,6 +103,15 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void Reason_AddsTheInnerReasonWhenTheMessageOnlyIntroducesIt()
+        {
+            var ex = new AuthenticationFailedException("DeviceCodeCredential authentication failed:",
+                new InvalidOperationException("AADSTS90002: Tenant 'x' not found. Trace ID: 1"));
+            Assert.AreEqual("DeviceCodeCredential authentication failed: AADSTS90002: Tenant 'x' not found", EntraIdCredentialFactory.Reason(ex));
+            Assert.AreEqual("Plain reason", EntraIdCredentialFactory.Reason(new AuthenticationFailedException("Plain reason.")));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void FirstLine_JoinsAnIntroductionToTheReasonThatFollowsIt()
         {
             Assert.AreEqual("ClientSecretCredential authentication failed: AADSTS700016: Application not found.",
