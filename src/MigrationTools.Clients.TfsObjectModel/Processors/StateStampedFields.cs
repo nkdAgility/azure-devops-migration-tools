@@ -105,18 +105,14 @@ namespace MigrationTools.Processors
             if (IsEmpty(expected) || IsEmpty(saved)) return IdentityMatch.Different;
             var (expectedName, expectedUnique) = SplitIdentity(Convert.ToString(expected));
             var (savedName, savedUnique) = SplitIdentity(Convert.ToString(saved));
+            // A bare account (an email or domain\account) names the account as a qualified value does.
+            expectedUnique ??= LooksLikeAccount(expectedName) ? expectedName : null;
+            savedUnique ??= LooksLikeAccount(savedName) ? savedName : null;
             if (expectedUnique != null && savedUnique != null)
             {
                 return SameUniqueName(expectedUnique, savedUnique) ? IdentityMatch.Same : IdentityMatch.Different;
             }
-            if (expectedUnique == null && savedUnique == null)
-            {
-                // A bare account (an email or domain\account) names the account; the other bare value is a display name.
-                var expectedIsAccount = LooksLikeAccount(expectedName);
-                if (expectedIsAccount == LooksLikeAccount(savedName)) return IdentityMatch.Different;
-                expectedUnique = expectedIsAccount ? expectedName : null;
-                savedUnique = expectedIsAccount ? null : savedName;
-            }
+            if (expectedUnique == null && savedUnique == null) return IdentityMatch.Different;
             var bareName = expectedUnique == null ? expectedName : savedName;
             var unique = expectedUnique ?? savedUnique;
             var accounts = accountsNamed?.Invoke(bareName);

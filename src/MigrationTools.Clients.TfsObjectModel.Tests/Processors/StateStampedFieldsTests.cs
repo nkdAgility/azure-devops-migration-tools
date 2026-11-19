@@ -88,6 +88,17 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_AccountsOnBothSides_CompareWithoutALookup()
+        {
+            Func<string, System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyCollection<string>>> noLookup =
+                name => throw new AssertFailedException("no lookup expected");
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B <person-b@example.invalid>", noLookup));
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person A <TENANT\\person-a@example.invalid>", noLookup));
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("TENANT\\person-a@example.invalid", "PERSON-A@example.invalid", noLookup));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid", noLookup));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void CompareIdentity_TwoDifferentBareDisplayNames_IsDifferentWithoutALookup()
         {
             Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("Person A", "Person B",
