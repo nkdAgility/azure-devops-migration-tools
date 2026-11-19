@@ -34,7 +34,8 @@ namespace MigrationTools.Endpoints
         private readonly object _cacheLock = new object();
         private TokenCredential _credential;
         private AccessToken? _cached;
-        private Task<AccessToken> _inFlight;
+        // Running renewals, one per claims challenge ("" for none), so callers asking for the same claims share one fetch.
+        private readonly System.Collections.Generic.Dictionary<string, Task<AccessToken>> _inFlight = new System.Collections.Generic.Dictionary<string, Task<AccessToken>>(StringComparer.Ordinal);
         // Bumped by Reset(), so a fetch started before it cannot publish its token.
         private int _generation;
 
@@ -183,7 +184,7 @@ namespace MigrationTools.Endpoints
                 // A fetch already running belongs to the discarded credential: stop new callers joining it and
                 // stop it publishing its token when it completes.
                 _generation++;
-                _inFlight = null;
+                _inFlight.Clear();
             }
         }
 
@@ -272,11 +273,10 @@ namespace MigrationTools.Endpoints
             Task<AccessToken> fetch;
             lock (_cacheLock)
             {
-                fetch = _inFlight;
                 // Join a running fetch only when it asks for the same claims; a token got without them would fail the
-                // same policy again, so a caller with a different challenge starts its own.
-                if (fetch != null && !string.Equals(_inFlightClaims, claims, StringComparison.Ordinal)) { fetch = null; }
-                if (fetch == null)
+                // same policy again, so a caller with a different challenge gets its own.
+                var key = claims ?? string.Empty;
+                if (!_inFlight.TryGetValue(key, out fetch))
                 {
                     // An app credential keeps its tokens in an in-memory MSAL cache and would hand back the token the
                     // server just rejected; a new instance starts with an empty cache. Default is rebuilt too, because
@@ -292,8 +292,7 @@ namespace MigrationTools.Endpoints
                     _cached = null;
                     _generation++;
                     var started = FetchAndCacheAsync(Current, _generation, rejectedToken, claims);
-                    _inFlight = started;
-                    _inFlightClaims = claims;
+                    _inFlight[key] = started;
                     fetch = started;
                     // Cleared when the fetch itself finishes (success or failure), never when a caller stops
                     // waiting, so a cancelled caller cannot let a second fetch start alongside the first.
@@ -301,7 +300,7 @@ namespace MigrationTools.Endpoints
                     {
                         lock (_cacheLock)
                         {
-                            if (ReferenceEquals(_inFlight, started)) { _inFlight = null; }
+                            if (_inFlight.TryGetValue(key, out var current) && ReferenceEquals(current, started)) { _inFlight.Remove(key); }
                         }
                     }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
                 }
@@ -314,8 +313,6 @@ namespace MigrationTools.Endpoints
             }
             return token.Token;
         }
-
-        private string _inFlightClaims;
 
         // The shared fetch ignores any one caller's cancellation (that would fail every waiter); each caller can
         // still stop waiting on its own token.

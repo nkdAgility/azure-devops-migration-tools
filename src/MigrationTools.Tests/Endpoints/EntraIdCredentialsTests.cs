@@ -112,6 +112,21 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_CallersWithTheSameClaimsShareAFetchWhileAnotherRuns()
+        {
+            var gated = new GatedClaimsCredential();
+            _sut = Using(gated);
+
+            var a1 = _sut.GetFreshAccessTokenAsync("A", "{\"a\":1}");
+            var b = _sut.GetFreshAccessTokenAsync("A", "{\"b\":1}");
+            var a2 = _sut.GetFreshAccessTokenAsync("A", "{\"a\":1}");
+            gated.Release.SetResult(true);
+            await Task.WhenAll(a1, b, a2);
+
+            CollectionAssert.AreEquivalent(new[] { "{\"a\":1}", "{\"b\":1}" }, gated.ClaimsSeen.ToArray(), "A, B, A makes two fetches: the second A joins the first.");
+        }
+
+        [TestMethod, TestCategory("L0")]
         public async Task GetFreshAccessTokenAsync_AJoiningCallerStopsWhenTheSharedResultIsTheTokenItRejected()
         {
             var gated = new GatedClaimsCredential { Next = "B" };
