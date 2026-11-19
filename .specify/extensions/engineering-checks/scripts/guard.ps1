@@ -12,7 +12,7 @@ $inputs = $call.tool_input
 $text = @($inputs.command, $inputs.file_path, $inputs.path) -join ' '
 
 # Each command in a chain is checked on its own; git global options (git -C dir push) may come before push.
-$pushBlocked = foreach ($seg in ($text -split '[|;&]+')) {
+$pushBlocked = foreach ($seg in ($text -split '[|;&\r\n]+')) {
     $m = [regex]::Match($seg, '\bgit(\s+-\S+(\s+(?!push\b)[^\s-]\S*)?)*\s+push\b(?<rest>.*)$')
     if (-not $m.Success) { continue }
     $pa = @($m.Groups['rest'].Value.Trim() -split '\s+' | Where-Object { $_ } | ForEach-Object { $_.Trim('''"') })

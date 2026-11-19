@@ -3,6 +3,7 @@
 # Writes .specify/reviews/outcome-checks.md only when every check passes.
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+Remove-Item .specify/reviews/outcome-checks.md -ErrorAction SilentlyContinue
 $cfg = Get-WorkflowConfig
 $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
 $item = & (Get-BoardAdapter $cfg).GetItem $id

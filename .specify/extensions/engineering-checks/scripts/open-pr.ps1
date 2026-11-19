@@ -4,7 +4,8 @@ $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
 $title = (gh issue view $id --json title | ConvertFrom-Json).title
 $body = "Closes #$id`n`n"
 if (Test-Path .specify/reviews/completion-report.md) { $body += Get-Content .specify/reviews/completion-report.md -Raw }
-$existing = gh pr view --json number 2>$null | ConvertFrom-Json
+$existing = gh pr view --json number,body 2>$null | ConvertFrom-Json
 if (-not $existing) { gh pr create --title $title --body $body; if ($LASTEXITCODE -ne 0) { exit 1 } }
+elseif ("$($existing.body)" -notmatch "(?i)\b(closes|fixes|resolves)\s+#$id\b") { Write-Error "PR #$($existing.number) on this branch does not close #$id; it was left unchanged."; exit 1 }
 else { gh pr edit $existing.number --body $body | Out-Null; if ($LASTEXITCODE -ne 0) { exit 1 } }
 exit 0

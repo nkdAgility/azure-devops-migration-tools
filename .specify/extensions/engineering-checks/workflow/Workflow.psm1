@@ -156,7 +156,8 @@ function Get-ItemEvidence {
 
 function Get-Section([string]$Text, [string]$Name) {
     # The evidence is the body, then comments, then the WKR, so the last section with the name is the current one.
-    $m = [regex]::Matches($Text, "(?ms)^#{2,4}\s*$([regex]::Escape($Name))\s*\n(.*?)(?=^#{1,4}\s|\z)") | Select-Object -Last 1
+    # A section ends only at a heading of its own level or higher, so its sub-headings stay inside it.
+    $m = @(foreach ($n in 2..4) { [regex]::Matches($Text, "(?ms)^#{$n}[ \t]*$([regex]::Escape($Name))[ \t]*\n(.*?)(?=^#{1,$n}\s|\z)") }) | Sort-Object Index | Select-Object -Last 1
     if ($m) { $m.Groups[1].Value.Trim() } else { $null }
 }
 

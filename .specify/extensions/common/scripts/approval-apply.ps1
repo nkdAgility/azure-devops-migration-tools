@@ -5,9 +5,12 @@ $ErrorActionPreference = 'Stop'
 & (Join-Path $PSScriptRoot 'approval-check.ps1') -Path $Staged -Record $Record
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $recordPath = [IO.Path]::GetFullPath($Record)
-$snapshot = @(Get-ChildItem $Staged -Recurse -File -Force | Where-Object FullName -ne $recordPath | Sort-Object FullName | ForEach-Object {
+$isDir = Test-Path $Staged -PathType Container
+$items = if ($isDir) { Get-ChildItem $Staged -Recurse -File -Force | Where-Object FullName -ne $recordPath | Sort-Object FullName } else { Get-Item $Staged }
+$snapshot = @($items | ForEach-Object {
     $bytes = [IO.File]::ReadAllBytes($_.FullName)
-    @{ rel = [IO.Path]::GetRelativePath((Resolve-Path $Staged), $_.FullName); bytes = $bytes; hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)) }
+    $rel = if ($isDir) { [IO.Path]::GetRelativePath((Resolve-Path $Staged), $_.FullName) } else { $_.Name }
+    @{ rel = $rel; bytes = $bytes; hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)) }
 })
 $fp = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes((($snapshot | ForEach-Object { "$($_.rel) $($_.hash)" }) -join "`n"))))
 if ($fp -ne (Get-Content $Record -Raw | ConvertFrom-Json).fingerprint) { Write-Error "Changed since approval: $Staged. Approve it again."; exit 1 }
