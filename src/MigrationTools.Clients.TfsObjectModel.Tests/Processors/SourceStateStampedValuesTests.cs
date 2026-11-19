@@ -90,6 +90,21 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void StoredDiffers_SameAccountWithAndWithoutDomain_IsNotDifferent()
+        {
+            Assert.IsFalse(SourceStateStampedValues.StoredDiffers(@"Person A <TENANT\person-a@example.invalid>", "Person A <person-a@example.invalid>", true, name => null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void StoredDiffers_EmptyReadBackOrAnotherAccount_IsDifferent()
+        {
+            Assert.IsTrue(SourceStateStampedValues.StoredDiffers(@"Person A <TENANT\person-a@example.invalid>", null, true, name => null));
+            Assert.IsTrue(SourceStateStampedValues.StoredDiffers("Person A <person-a@example.invalid>", "Person B <person-b@example.invalid>", true, name => null));
+            Assert.IsTrue(SourceStateStampedValues.StoredDiffers(Changed, null, false, name => null));
+            Assert.IsFalse(SourceStateStampedValues.StoredDiffers(Changed, Changed.ToLocalTime(), false, name => null));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void SameStoredValue_AnotherIdentityOrDate_IsNotTheSame()
         {
             Assert.IsFalse(SourceStateStampedValues.SameStoredValue("Ghost Person", "Migration Account <migration@example.invalid>", true));

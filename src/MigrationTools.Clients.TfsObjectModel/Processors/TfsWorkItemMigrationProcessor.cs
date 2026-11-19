@@ -1597,7 +1597,8 @@ namespace MigrationTools.Processors
                 foreach (var (field, value, isIdentity) in expected)
                 {
                     var actual = stored.Value(targetRevision, field);
-                    if (!SourceStateStampedValues.SameStoredValue(value, actual, isIdentity))
+                    // Identities compare as accounts, as on a re-run (#3290): the same account can read back in another form.
+                    if (SourceStateStampedValues.StoredDiffers(value, actual, isIdentity, TargetAccountsNamed))
                     {
                         wrong.Add($"revision {targetRevision} (source revision {sourceRevision}) {field} reads back from the server as '{actual}' but the source is '{value}'");
                     }

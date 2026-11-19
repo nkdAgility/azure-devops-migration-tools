@@ -71,6 +71,18 @@ namespace MigrationTools.Processors
             return isIdentity && !StateStampedFields.IsEmpty(savedValue) && !StateStampedFields.IsEmpty(storedValue) && SameDisplayName(savedValue, storedValue);
         }
 
+        /// <summary>
+        /// True when the value read back is not the value saved. Identities compare as accounts, as on a re-run (#3290):
+        /// <c>Name &lt;DOMAIN\user@x&gt;</c> saved can read back as <c>Name &lt;user@x&gt;</c>. An identity that cannot be
+        /// proven either way is not reported as different.
+        /// </summary>
+        public static bool StoredDiffers(object savedValue, object storedValue, bool isIdentity, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
+        {
+            if (SameStoredValue(savedValue, storedValue, isIdentity)) return false;
+            if (!isIdentity) return true;
+            return StateStampedFields.CompareIdentity(savedValue, storedValue, accountsNamed) == IdentityMatch.Different;
+        }
+
         private static bool SameDisplayName(object a, object b)
         {
             var (an, au) = StateStampedFields.SplitIdentity(Convert.ToString(a));
