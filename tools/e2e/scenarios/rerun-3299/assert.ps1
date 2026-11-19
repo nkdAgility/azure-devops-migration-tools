@@ -16,7 +16,9 @@ $revisionTarget = TargetOf $state.diff.revisionItem
 if ($revisionTarget.fields.'System.Description' -notmatch 'changed after the first migration') { $failures += "missing revision not replayed on $($revisionTarget.id)" }
 
 $linkTarget = TargetOf $state.diff.linkItem
-$previousTarget = TargetOf ($stories[[array]::IndexOf($stories, [int]$state.diff.linkItem) - 1])
+# State values come back as Int64, so find the index by value rather than with [array]::IndexOf.
+$linkIndex = @(0..($stories.Count - 1) | Where-Object { [long]$stories[$_] -eq [long]$state.diff.linkItem })[0]
+$previousTarget = TargetOf $stories[$linkIndex - 1]
 if ((RelatedIds $linkTarget "System.LinkTypes.Related") -notcontains $previousTarget.id) { $failures += "deleted Related link not restored on $($linkTarget.id)" }
 
 $parentTarget = TargetOf $state.diff.parentItem
@@ -33,4 +35,4 @@ foreach ($wi in Get-E2EAllWorkItems $Tgt) {
 if ($touched) { $failures += "in-sync items got new revisions: $($touched -join '; ')" }
 
 if ($failures) { $failures | ForEach-Object { "FAIL: $_" }; exit 1 }
-"PASS: missing revision replayed, deleted link restored, child moved back under $($rightParent.id); no other item has a new revision ($(@($state.diff.revs.Keys).Count) items checked)"
+"PASS: missing revision replayed, deleted link restored, child moved back under $($rightParent.id); no other item has a new revision ($(@($state.diff.revs.PSObject.Properties).Count) items checked)"
