@@ -15,4 +15,4 @@ Attack the idea itself. For the current spec, find:
 
 $ARGUMENTS
 
-Write `.specify/reviews/challenge.md`, one finding per heading, each with what would settle it. End with `Open findings: N`.
+Write `.specify/reviews/challenge.md`, one finding per heading in the form `### F<n> <title>` (F1, F2, …), each with what would settle it. End with `Open findings: N`.

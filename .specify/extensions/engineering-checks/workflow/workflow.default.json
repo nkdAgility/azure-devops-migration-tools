@@ -1,4 +1,5 @@
 {
+  "specRoot": "docs/specs",
   "$comment": "The approved engineering Definition of Workflow (spec/definition-of-workflow-engineering.md) as data. A repo copies this to .specify/memory/workflow.json and changes only the settings marked per repo. WIP limits and stuckAfterMinutes are placeholders until Martin sets them.",
   "validatingBeforeMerge": true,
   "usesPackage": false,
@@ -293,8 +294,9 @@
       "checks": [
         {
           "type": "pattern",
-          "pattern": "(?m)^Spec agreed:\\s*\\S",
-          "message": "no 'Spec agreed:' line with Martin's words"
+          "source": "wkr",
+          "pattern": "(?m)^Spec agreed:[ \\t]*(?!approved by Martin at the review gate)\\S.{2,}$",
+          "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
         },
         {
           "type": "noOpen",
@@ -328,7 +330,7 @@
         {
           "type": "script",
           "run": "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1",
-          "message": "the docs are not reconciled into docs/specs/"
+          "message": "the docs are not reconciled into the spec root"
         }
       ]
     },
@@ -353,7 +355,7 @@
         {
           "type": "script",
           "run": "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1",
-          "message": "the docs are not reconciled into docs/specs/"
+          "message": "the docs are not reconciled into the spec root"
         }
       ]
     },

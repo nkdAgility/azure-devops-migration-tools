@@ -190,6 +190,10 @@ function Get-LastActivity($Item, [string]$Root = '.') {
 function Test-Check {
     param($Check, $Item, [string]$Evidence, $Adapter, [string]$Root = '.', [switch]$SkipScripts, $Config)
     if ($Check.ContainsKey('types') -and $Check.types -and ($Item.type -notin $Check.types)) { return $null }
+    if ($Check.ContainsKey('source') -and $Check.source -eq 'wkr') {
+        $wkr = Join-Path $Root ".specify/wkr/$($Item.id).md"
+        $Evidence = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
+    }
     $ok = switch ($Check.type) {
         'pattern'         { [regex]::IsMatch($Evidence, $Check.pattern) }
         'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b') }
