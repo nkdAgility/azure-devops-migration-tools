@@ -313,6 +313,20 @@ namespace MigrationTools.Tests.Tools
             Assert.AreEqual("New Name", TfsUserMappingTool.FindIdentityMapTarget(result, "old name"));
         }
 
+        [TestMethod, TestCategory("L0")]
+        public void IsMissingInTarget_MatchesDisplayNameAndAccountName_OnlyForUnmatchedUsers()
+        {
+            var tool = CreateTool(null, useIdentityMapDataFormat: false);
+            tool.SetUsersMissingInTarget(new[]
+            {
+                new IdentityMapData { Source = new IdentityItemData { DisplayName = "Ghost One", AccountName = "ghost1" } },
+                new IdentityMapData { Source = new IdentityItemData { DisplayName = "Real Two", AccountName = "real2" }, Target = new IdentityItemData { DisplayName = "Real Two" } },
+            });
+            Assert.IsTrue(tool.IsMissingInTarget("Ghost One <ghost1@example.invalid>"));
+            Assert.IsTrue(tool.IsMissingInTarget("ghost1"));
+            Assert.IsFalse(tool.IsMissingInTarget("Real Two"));
+            Assert.IsFalse(tool.IsMissingInTarget("real2"));
+        }
         private TfsUserMappingTool CreateTool(string userMappingFile, bool useIdentityMapDataFormat)
         {
             var options = new TfsUserMappingToolOptions

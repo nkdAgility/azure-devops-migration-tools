@@ -450,7 +450,10 @@ namespace MigrationTools.Services
             List<WorkItemReviewEntry> open;
             lock (_gate)
             {
-                if (_incompleteHistory.Contains(_migration ?? string.Empty)
+                // A link from this item is held until the item it points to is migrated, so it may still be missing.
+                var linkStillHeld = _waitingOnItem.Values.Any(held => held.Any(e => e.SourceId == scope.SourceId && e.Migration == _migration));
+                if (linkStillHeld
+                    || _incompleteHistory.Contains(_migration ?? string.Empty)
                     || !_openFromEarlierRuns.TryGetValue(ItemKey(_migration, scope.SourceId), out var entries))
                 {
                     return;

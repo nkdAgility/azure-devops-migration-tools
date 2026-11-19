@@ -448,6 +448,23 @@ namespace MigrationTools.Tests.Services
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_LinkStillHeld_DoesNotResolve()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.LinkSkipped, "link to 2", "migrate 2", sourceId: "1");
+            }
+            using var run = Earlier(RunFolder("20260102000000"));
+            run.SetItemsToMigrate(new[] { "1", "2" });
+            using (run.BeginItem("1", "Task"))
+            {
+                run.MarkChecked(WorkItemReviewCategory.LinkSkipped);
+                run.RecordUnlessMigratedLater("2", WorkItemReviewCategory.LinkSkipped, "link to 2.", "migrate 2");
+                run.CompleteCurrentItem();
+            }
+            Assert.IsFalse(File.Exists(run.FilePath), "the link to 2 is still missing until 2 migrates");
+        }
+        [TestMethod, TestCategory("L0")]
         public void FlushHeldEntries_RelatedItemNeverReached_EntryIsWritten()
         {
             using var log = Earlier(RunFolder("20260101000000"));

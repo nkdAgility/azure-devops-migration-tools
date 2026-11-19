@@ -1162,7 +1162,11 @@ namespace MigrationTools.Processors
         {
             if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled)
             {
-                _reviewLog.MarkChecked(WorkItemReviewCategory.LinkSkipped);
+                if (sourceWorkItem.ToWorkItem().Links.Count == 0)
+                {
+                    // No source links left, so no link can still be missing; otherwise the link tool marks the check.
+                    _reviewLog.MarkChecked(WorkItemReviewCategory.LinkSkipped);
+                }
                 if (CommonTools.GitRepository.Enabled)
                 {
                     _reviewLog.MarkChecked(WorkItemReviewCategory.LinkLeftOnSource);

@@ -87,7 +87,7 @@ Each source revision is replayed as one target revision, with the source revisio
 
 ## Work items that need review
 
-Every run writes the work items that need a person to look at them to `work-items-to-review.jsonl` in the run's log folder (`logs\<timestamp>`). The path is logged at the start of the run, before any work item is migrated. Each entry is appended and flushed to disk as soon as the problem is found, so the file is correct up to the last problem even if the run crashes, is stopped or the process is killed. A run with no problems creates no file.
+Every run writes the work items that need a person to look at them to `work-items-to-review.jsonl` in the run's log folder (`logs\<timestamp>`). The path is logged at the start of the run, before any work item is migrated. Each entry is appended and flushed to disk as soon as the problem is found, so the file is correct up to the last problem even if the run crashes, is stopped or the process is killed. The one exception is a link to an item that is migrated later in the same run: that entry is held in memory and written only if that item fails or the run ends without reaching it, so it is lost if the process is killed before then. A re-run adds the link once both items are in the target. A run with no problems creates no file.
 
 The file is JSON Lines: one JSON object per line, with these fields.
 
@@ -108,7 +108,7 @@ The file is JSON Lines: one JSON object per line, with these fields.
 | `failed` | The work item could not be created in the target. |
 | `part-migrated` | The target work item exists but a later revision could not be saved. |
 | `rerun-mismatch` | On a re-run, a revision already in the target does not match the source. |
-| `link-skipped` | A link was not migrated: the related item was not migrated (a link to an item that migrates later in the run is added from its side, so it is only written if that item fails or is not reached), cannot be read, or its link type does not exist in the target; or a hyperlink is not valid. |
+| `link-skipped` | A link was not migrated: the related item was not migrated (a link to an item that migrates later in the run is added from its side, so it is held and written only if that item fails or the run ends without reaching it; a killed run loses it), cannot be read, or its link type does not exist in the target; or a hyperlink is not valid. |
 | `link-left-on-source` | A git commit, branch or pull request link could not be rewritten and still points at the source. |
 | `field-not-mapped` | A source field has a value but does not exist on the target work item type, so the value was dropped. |
 | `field-truncated` | A string value was cut to `StringManipulatorTool` `MaxStringLength`. |

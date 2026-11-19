@@ -77,6 +77,8 @@ namespace MigrationTools.Tools
 
             if (ShouldCopyLinks(processor, sourceWorkItemLinkStart, targetWorkItemLinkStart))
             {
+                // Only here is every source link checked again; the count filter above can skip them all.
+                Services.GetService<WorkItemReviewLog>()?.MarkChecked(WorkItemReviewCategory.LinkSkipped);
                 Log.LogTrace("Links = '{@sourceWorkItemLinkStartLinks}", sourceWorkItemLinkStart.Links);
                 foreach (Link item in sourceWorkItemLinkStart.ToWorkItem().Links)
                 {

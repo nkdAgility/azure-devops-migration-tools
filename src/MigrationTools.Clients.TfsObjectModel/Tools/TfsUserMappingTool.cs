@@ -250,7 +250,9 @@ namespace MigrationTools.Tools
         public void SetUsersMissingInTarget(IEnumerable<IdentityMapData> validation)
         {
             _usersMissingInTarget = new HashSet<string>(
-                (validation ?? Enumerable.Empty<IdentityMapData>()).Where(m => m?.Target == null).Select(m => m?.Source?.DisplayName).Where(n => !string.IsNullOrWhiteSpace(n)),
+                (validation ?? Enumerable.Empty<IdentityMapData>()).Where(m => m?.Target == null && m.Source != null)
+                    .SelectMany(m => new[] { m.Source.DisplayName, m.Source.AccountName })
+                    .Where(n => !string.IsNullOrWhiteSpace(n)),
                 StringComparer.OrdinalIgnoreCase);
         }
 
