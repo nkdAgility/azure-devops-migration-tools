@@ -287,13 +287,16 @@ namespace MigrationTools.Tests.Services
         }
 
         [TestMethod, TestCategory("L0")]
-        public void CompleteCurrentItem_PathFromValidation_ResolvesWhenTheItemIsReached()
+        public void CompleteCurrentItem_PathFromValidation_ResolvesOnlyAfterValidationPassed()
         {
             using (var first = Earlier(RunFolder("20260101000000")))
             {
                 first.Record(WorkItemReviewCategory.PathNotMapped, "missing path", "map it", sourceId: "7");
             }
             using var second = Earlier(RunFolder("20260102000000"));
+            using (second.BeginItem("7", "Task")) { second.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(second.FilePath), "path validation did not run (TfsNodeStructureTool disabled)");
+            second.MarkPathsValidated();
             using (second.BeginItem("7", "Task")) { second.CompleteCurrentItem(); }
             Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(second.FilePath).Single().Category);
         }
@@ -469,6 +472,36 @@ namespace MigrationTools.Tests.Services
                 log.MarkRevisionReplayed(2);
                 Assert.IsTrue(log.CurrentItemReplayedRevisions);
             }
+        }
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_LastLinkPassSkipped_DoesNotResolve()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.LinkSkipped, "link", "migrate", sourceId: "7");
+            }
+            using var run = Earlier(RunFolder("20260102000000"));
+            using (run.BeginItem("7", "Task"))
+            {
+                run.MarkChecked(WorkItemReviewCategory.LinkSkipped);
+                run.ClearChecked(WorkItemReviewCategory.LinkSkipped);
+                run.CompleteCurrentItem();
+            }
+            Assert.IsFalse(File.Exists(run.FilePath), "the final revision's links were skipped by the count filter");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_EmbeddedImagesNotChecked_DoesNotResolveImageProblem()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.EmbeddedImageNotMigrated, "image", "re-upload", sourceId: "7");
+            }
+            using var run = Earlier(RunFolder("20260102000000"));
+            using (run.BeginItem("7", "Task")) { run.MarkChecked(WorkItemReviewCategory.AttachmentNotMigrated); run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath), "FixHtmlAttachmentLinks was off, so the image was not checked");
+            using (run.BeginItem("7", "Task")) { run.MarkChecked(WorkItemReviewCategory.EmbeddedImageNotMigrated); run.CompleteCurrentItem(); }
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(run.FilePath).Single().Category);
         }
         [TestMethod, TestCategory("L0")]
         public void CompleteCurrentItem_LinkStillHeld_DoesNotResolve()

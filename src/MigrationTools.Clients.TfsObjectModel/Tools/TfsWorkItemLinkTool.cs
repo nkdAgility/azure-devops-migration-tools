@@ -123,6 +123,11 @@ namespace MigrationTools.Tools
                     }
                 }
             }
+            else
+            {
+                // The last link pass decides: a later revision whose links the count filter skips was not checked.
+                Services.GetService<WorkItemReviewLog>()?.ClearChecked(WorkItemReviewCategory.LinkSkipped);
+            }
             if (sourceWorkItemLinkStart.Type == "Test Case")
             {
                 MigrateSharedSteps(processor, sourceWorkItemLinkStart, targetWorkItemLinkStart);

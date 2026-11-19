@@ -26,6 +26,7 @@ namespace MigrationTools.Services
         public const string FieldTruncated = "field-truncated";
         public const string UserNotMapped = "user-not-mapped";
         public const string AttachmentNotMigrated = "attachment-not-migrated";
+        public const string EmbeddedImageNotMigrated = "embedded-image-not-migrated";
         public const string PathNotMapped = "path-not-mapped";
         public const string TypeChanged = "type-changed";
         public const string Skipped = "skipped";
@@ -49,6 +50,7 @@ namespace MigrationTools.Services
             [LinkLeftOnSource] = "follow-up-links.jsonl",
             [UserNotMapped] = "follow-up-users-not-mapped.jsonl",
             [AttachmentNotMigrated] = "follow-up-attachments.jsonl",
+            [EmbeddedImageNotMigrated] = "follow-up-attachments.jsonl",
             [FieldNotMapped] = "follow-up-fields.jsonl",
             [FieldMapFailed] = "follow-up-fields.jsonl",
             [FieldTruncated] = "follow-up-fields.jsonl",
@@ -112,6 +114,7 @@ namespace MigrationTools.Services
         // Migrations whose earlier history could not be read in full; nothing is resolved for them, because an
         // unread entry could name a problem that was not checked again.
         private readonly HashSet<string> _incompleteHistory = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _pathsValidated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _comingLater = new HashSet<string>(StringComparer.Ordinal);
         private readonly Dictionary<string, List<WorkItemReviewEntry>> _waitingOnItem = new Dictionary<string, List<WorkItemReviewEntry>>(StringComparer.Ordinal);
         private readonly AsyncLocal<ItemScope> _current = new AsyncLocal<ItemScope>();
@@ -430,6 +433,27 @@ namespace MigrationTools.Services
         }
 
         /// <summary>
+        /// Records that the last pass of the check behind <paramref name="category"/> was skipped for the current
+        /// item, so an earlier pass in this run does not count.
+        /// </summary>
+        public void ClearChecked(string category)
+        {
+            _current.Value?.Checked.Remove(category);
+        }
+
+        /// <summary>
+        /// Records that area and iteration path validation ran and passed for the current migration, so a missing
+        /// path found by an earlier run's validation was checked again.
+        /// </summary>
+        public void MarkPathsValidated()
+        {
+            lock (_gate)
+            {
+                _pathsValidated.Add(_migration ?? string.Empty);
+            }
+        }
+
+        /// <summary>
         /// Marks the current item as migrated without failing. If nothing was recorded for it in this run and an
         /// earlier run left it needing review, a <c>resolved</c> entry is written, but only when every earlier
         /// problem was checked again: a problem found while replaying a revision
@@ -466,7 +490,12 @@ namespace MigrationTools.Services
                 }
                 open = entries.ToList();
             }
-            if (!open.All(e => WasCheckedAgain(e, scope)))
+            bool pathsValidated;
+            lock (_gate)
+            {
+                pathsValidated = _pathsValidated.Contains(_migration ?? string.Empty);
+            }
+            if (!open.All(e => WasCheckedAgain(e, scope, pathsValidated)))
             {
                 return;
             }
@@ -476,7 +505,7 @@ namespace MigrationTools.Services
                 "None.");
         }
 
-        private static bool WasCheckedAgain(WorkItemReviewEntry entry, ItemScope scope)
+        private static bool WasCheckedAgain(WorkItemReviewEntry entry, ItemScope scope, bool pathsValidated)
         {
             // A failure after the revisions were migrated (attachments, links, the catch-up save) is checked again by
             // the whole item completing, whether or not a revision is replayed.
@@ -486,7 +515,7 @@ namespace MigrationTools.Services
             }
             if (entry.Category == WorkItemReviewCategory.PathNotMapped && !entry.Revision.HasValue)
             {
-                return true;
+                return pathsValidated;
             }
             if (WorkItemReviewCategory.FoundOnlyWhileReplaying.Contains(entry.Category))
             {

@@ -162,6 +162,11 @@ namespace MigrationTools.Processors
 
                 //////////////////////////////////////////////////
                 CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
+                if (CommonTools.NodeStructure.Enabled)
+                {
+                    // Validation stops the run when a path is missing, so reaching here means every path was found.
+                    _reviewLog.MarkPathsValidated();
+                }
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
 
@@ -848,6 +853,7 @@ namespace MigrationTools.Processors
         {
             if (targetWorkItem != null && Options.FixHtmlAttachmentLinks)
             {
+                _reviewLog.MarkChecked(WorkItemReviewCategory.EmbeddedImageNotMigrated);
                 CommonTools.EmbededImages.FixEmbededImages(this, targetWorkItem);
             }
         }
@@ -959,6 +965,7 @@ namespace MigrationTools.Processors
                         _reviewLog.Record(WorkItemReviewCategory.Skipped,
                             $"{sourceWorkItem.Type} work items are not migrated by the work item processor.",
                             "Migrate it with TfsTestPlansAndSuitesMigrationProcessor after all Test Cases are migrated.");
+                        _reviewLog.ItemNotMigrated(sourceWorkItem.Id);
                         TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ",
                             new Dictionary<string, object>() {
                             {"sourceWorkItemTypeName", sourceWorkItem.Type },
