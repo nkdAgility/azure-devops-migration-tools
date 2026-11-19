@@ -101,7 +101,7 @@ namespace MigrationTools.Services
         private readonly object _gate = new object();
         private readonly string _folder;
         private readonly ILogger _logger;
-        private readonly Dictionary<string, FileStream> _streams = new Dictionary<string, FileStream>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Stream> _streams = new Dictionary<string, Stream>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, int> _rowCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, int> _categoryCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _written = new HashSet<string>(StringComparer.Ordinal);
@@ -114,12 +114,20 @@ namespace MigrationTools.Services
         private readonly HashSet<string> _comingLater = new HashSet<string>(StringComparer.Ordinal);
         private readonly Dictionary<string, List<WorkItemReviewEntry>> _waitingOnItem = new Dictionary<string, List<WorkItemReviewEntry>>(StringComparer.Ordinal);
         private readonly AsyncLocal<ItemScope> _current = new AsyncLocal<ItemScope>();
+        private readonly HashSet<string> _interrupted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Func<string, Stream> _openStream;
         private string _migration;
 
         public WorkItemReviewLog(string folder, ILogger<WorkItemReviewLog> logger = null)
+            : this(folder, logger, null)
+        {
+        }
+
+        internal WorkItemReviewLog(string folder, ILogger<WorkItemReviewLog> logger, Func<string, Stream> openStream)
         {
             _folder = folder ?? throw new ArgumentNullException(nameof(folder));
             _logger = (ILogger)logger ?? NullLogger.Instance;
+            _openStream = openStream ?? (path => new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
         }
 
         public string FilePath => Path.Combine(_folder, FileName);
@@ -179,7 +187,6 @@ namespace MigrationTools.Services
                         .Where(d => string.CompareOrdinal(Path.GetFileName(d), ownName) < 0)
                         .OrderBy(d => Path.GetFileName(d), StringComparer.Ordinal)
                         .Select(d => Path.Combine(d, FileName))
-                        .Where(File.Exists)
                         .ToList();
                 }
                 catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
@@ -191,9 +198,14 @@ namespace MigrationTools.Services
                 foreach (var file in earlier)
                 {
                     List<WorkItemReviewEntry> entries;
+                    // Opened directly rather than checked with File.Exists, which returns false when access is denied.
                     try
                     {
                         entries = ReadEntries(file).ToList();
+                    }
+                    catch (Exception ex) when (ex is FileNotFoundException || ex is DirectoryNotFoundException)
+                    {
+                        continue;
                     }
                     catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
                     {
@@ -553,19 +565,46 @@ namespace MigrationTools.Services
             }
         }
 
+        // After a failed write the file may end in part of a line, so the stream is reopened and the next row starts
+        // on a new line; the reader skips the broken line. A row whose flush failed may have reached the disk anyway,
+        // so the retry can leave it twice: a duplicate is preferred to a lost row.
         private void Append(string fileName, byte[] bytes)
         {
             if (!_streams.TryGetValue(fileName, out var stream))
             {
                 Directory.CreateDirectory(_folder);
-                stream = new FileStream(Path.Combine(_folder, fileName), FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough);
+                stream = _openStream(Path.Combine(_folder, fileName));
                 _streams[fileName] = stream;
             }
-            stream.Write(bytes, 0, bytes.Length);
-            stream.Flush(true);
+            try
+            {
+                if (_interrupted.Contains(fileName))
+                {
+                    stream.Write(NewLine, 0, NewLine.Length);
+                }
+                stream.Write(bytes, 0, bytes.Length);
+                if (stream is FileStream fileStream)
+                {
+                    fileStream.Flush(true);
+                }
+                else
+                {
+                    stream.Flush();
+                }
+            }
+            catch
+            {
+                _interrupted.Add(fileName);
+                _streams.Remove(fileName);
+                try { stream.Dispose(); } catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException) { }
+                throw;
+            }
+            _interrupted.Remove(fileName);
             _rowCounts.TryGetValue(fileName, out var rows);
             _rowCounts[fileName] = rows + 1;
         }
+
+        private static readonly byte[] NewLine = { (byte)'\n' };
 
         /// <summary>
         /// Writes the combined view: the latest entry per item across this run and the earlier runs read by

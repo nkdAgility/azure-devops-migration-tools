@@ -352,6 +352,77 @@ namespace MigrationTools.Tests.Services
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_EarlierLogAccessDenied_DoesNotResolve()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
+            }
+            // A directory where the log should be cannot be opened as a file, as when access to the file is denied.
+            Directory.CreateDirectory(Path.Combine(RunFolder("20260102000000"), WorkItemReviewLog.FileName));
+            using var run = Earlier(RunFolder("20260103000000"));
+            using (run.BeginItem("7", "Bug")) { run.MarkRevisionReplayed(1); run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_EarlierRunWithoutReviewLog_StillResolves()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7", revision: 1);
+            }
+            Directory.CreateDirectory(RunFolder("20260102000000"));
+            using var run = Earlier(RunFolder("20260103000000"));
+            using (run.BeginItem("7", "Bug")) { run.MarkRevisionReplayed(1); run.CompleteCurrentItem(); }
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(run.FilePath).Single().Category);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Record_FlushFails_RetryLeavesValidLinesAndCountsOnce()
+        {
+            var folder = RunFolder("20260101000000");
+            var opened = 0;
+            using var log = new WorkItemReviewLog(folder, null, path =>
+            {
+                opened++;
+                var file = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                return opened == 1 ? new FailingFlushStream(file) : file;
+            });
+            log.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+            Assert.AreEqual(0, log.CategoryCounts.Count, "a row whose flush failed is not counted");
+            log.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+            log.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+
+            string text; using (var reader = new StreamReader(new FileStream(log.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))) { text = reader.ReadToEnd(); }
+            var lines = text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Assert.IsTrue(lines.Length >= 1 && lines.Length <= 2, $"expected the row once, or twice after the failed flush; got {lines.Length}");
+            foreach (var line in lines)
+            {
+                Assert.AreEqual("7", Newtonsoft.Json.JsonConvert.DeserializeObject<WorkItemReviewEntry>(line).SourceId);
+            }
+            Assert.AreEqual(1, log.CategoryCounts[WorkItemReviewCategory.Failed]);
+            Assert.AreEqual(1, log.FileRowCounts[WorkItemReviewLog.FileName]);
+        }
+
+        private sealed class FailingFlushStream : Stream
+        {
+            private readonly Stream _inner;
+            public FailingFlushStream(Stream inner) { _inner = inner; }
+            public override bool CanRead => false;
+            public override bool CanSeek => false;
+            public override bool CanWrite => true;
+            public override long Length => _inner.Length;
+            public override long Position { get => _inner.Position; set => throw new NotSupportedException(); }
+            public override void Flush() => throw new IOException("disk full");
+            public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+            public override void SetLength(long value) => throw new NotSupportedException();
+            public override void Write(byte[] buffer, int offset, int count) => _inner.Write(buffer, offset, count);
+            protected override void Dispose(bool disposing) { if (disposing) _inner.Dispose(); base.Dispose(disposing); }
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void RecordUnlessMigratedLater_RelatedItemMigrates_EntryIsDropped()
         {
             using var log = Earlier(RunFolder("20260101000000"));
