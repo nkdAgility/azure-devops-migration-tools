@@ -92,10 +92,21 @@ namespace MigrationTools.Tests.Processors
         {
             Func<string, System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyCollection<string>>> noLookup =
                 name => throw new AssertFailedException("no lookup expected");
-            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B <person-b@example.invalid>", noLookup));
             Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person A <TENANT\\person-a@example.invalid>", noLookup));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("DOMAINA\\person <DOMAINA\\person>", "Person <DOMAINB\\person>", noLookup));
             Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("TENANT\\person-a@example.invalid", "PERSON-A@example.invalid", noLookup));
             Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid", noLookup));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_EmailShapedValueAgainstAnotherAccount_IsResolvedThroughTheLookup()
+        {
+            // An account-shaped value may be a display name, so a difference is checked before it is reported.
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("Person A <person-a@example.invalid>", "alias@example.invalid",
+                name => name == "alias@example.invalid" ? Accounts(new[] { "person-a@example.invalid" }) : null));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("Person A <person-a@example.invalid>", "person-b@example.invalid", name => Accounts()));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B <person-b@example.invalid>", name => Accounts()));
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B <person-b@example.invalid>", name => null));
         }
 
         [TestMethod, TestCategory("L0")]

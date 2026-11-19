@@ -105,18 +105,26 @@ namespace MigrationTools.Processors
             if (IsEmpty(expected) || IsEmpty(saved)) return IdentityMatch.Different;
             var (expectedName, expectedUnique) = SplitIdentity(Convert.ToString(expected));
             var (savedName, savedUnique) = SplitIdentity(Convert.ToString(saved));
-            // A bare account (an email or domain\account) names the account as a qualified value does.
+            var expectedExplicit = expectedUnique != null;
+            var savedExplicit = savedUnique != null;
+            // A bare account (an email or domain\account) is taken as the account, but it may also be a display name, so
+            // unless both unique names were written explicitly a difference is checked through the lookup.
             expectedUnique ??= LooksLikeAccount(expectedName) ? expectedName : null;
             savedUnique ??= LooksLikeAccount(savedName) ? savedName : null;
             if (expectedUnique != null && savedUnique != null)
             {
-                return SameUniqueName(expectedUnique, savedUnique) ? IdentityMatch.Same : IdentityMatch.Different;
+                if (SameUniqueName(expectedUnique, savedUnique)) return IdentityMatch.Same;
+                if (expectedExplicit == savedExplicit) return IdentityMatch.Different;
             }
-            if (expectedUnique == null && savedUnique == null) return IdentityMatch.Different;
-            var bareName = expectedUnique == null ? expectedName : savedName;
-            var unique = expectedUnique ?? savedUnique;
+            else if (expectedUnique == null && savedUnique == null) return IdentityMatch.Different;
+            var savedIsBare = !savedExplicit && (expectedExplicit || savedUnique == null);
+            var bareName = savedIsBare ? savedName : expectedName;
+            var unique = savedIsBare ? expectedUnique : savedUnique;
+            var bareLooksLikeAccount = savedIsBare ? savedUnique != null : expectedUnique != null && !expectedExplicit;
             var accounts = accountsNamed?.Invoke(bareName);
-            if (accounts == null || accounts.Count == 0) return IdentityMatch.Unproven;
+            // An account-shaped value that names no display name is the account itself, and it is not this one.
+            if (accounts == null) return IdentityMatch.Unproven;
+            if (accounts.Count == 0) return bareLooksLikeAccount ? IdentityMatch.Different : IdentityMatch.Unproven;
             var carrying = accounts.Count(a => a != null && a.Any(u => SameUniqueName(u, unique)));
             if (carrying == accounts.Count) return IdentityMatch.Same;
             return carrying == 0 ? IdentityMatch.Different : IdentityMatch.Unproven;
