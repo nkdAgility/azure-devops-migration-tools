@@ -22,7 +22,7 @@ AzureDevOpsMigrationTools/16.2.1 (run 3f2a9c41d0b7; wave-1; +https://devopsmigra
 ### How It Works
 
 - **Run id:** generated once each time the tool starts, and written near the top of the log as `Run Id: 3f2a9c41d0b7`, followed by the full `User Agent:`. Use it to match what the server recorded to a run log.
-- **TFS object model:** the value is added to the front of the client library's own user agent before the first connection is opened, so it covers work items, attachments, test plans, queries and every other object model call.
+- **TFS object model:** set before the first connection is opened, so it covers work items, attachments, test plans, queries and every other object model call. The object model's REST calls send it in front of the client library's own value. Its SOAP calls (the work item store and attachments) send it on its own, because the Usage page names SOAP traffic after the library's part when that part is present.
 - **REST endpoints:** the value is added to the HTTP client of every `AzureDevOpsEndpoint` request.
 - **Embedded images:** the value is added to the image downloads made by the `TfsEmbededImagesTool`.
 
@@ -30,8 +30,8 @@ The user agent never contains customer, project or user names, URLs or tokens. T
 
 ### Use Cases
 
-- Telling migration traffic apart from other traffic on the organisation's **Usage** page (**Organization settings > Usage**), where rate limiting is shown.
-- Giving Microsoft support the run id and version when you raise a rate limiting or throttling case.
+- Telling migration traffic apart from other traffic on the organisation's **Usage** page (**Organization settings > Usage**), where rate limiting is shown. The page shows the tool as `AzureDevOpsMigrationTools`.
+- Giving Microsoft support the version and run id when you raise a rate limiting or throttling case, so the requests can be matched to your run log.
 - Telling several migration runs apart, for example one label for each wave.
 
 ## Configuration Structure
@@ -68,4 +68,4 @@ You can also set it without changing the file, through the environment variable 
 ## Troubleshooting
 
 - **The label is not what I set:** characters other than letters, digits, `-`, `.` and `_` are removed, and spaces become `-`. Check the `User Agent:` line near the top of the log for the value that was sent.
-- **The Usage page does not show the whole value:** the Usage page shows the user agent as Azure DevOps recorded it, which may be shortened. The tool name, version and run id come first, so they are the part most likely to be shown.
+- **The Usage page shows only `AzureDevOpsMigrationTools`:** the **User agent** column of the Usage page shows the product name only, not the version, the run id or the label. Filter or group by it to see the tool's share of the usage and any delayed requests; to tie usage to one run, match the time range on the Usage page to the start and end times in that run's log. Versions before this change show as `devopsmigration` for most requests, or with no user agent at all for the REST endpoints.

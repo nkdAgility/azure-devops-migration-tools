@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,12 +24,12 @@ namespace MigrationTools.Clients.TfsObjectModel.Tests.Clients
         }
 
         [TestMethod, TestCategory("L0")]
-        public void Install_Soap_PutsTheToolBeforeTheLibraryValue()
+        public void Install_Soap_SendsOnlyTheToolValue()
         {
             TfsUserAgent.Install();
 
-            StringAssert.StartsWith(TfsConnection.ApplicationName, MigrationUserAgent.Value + " ");
-            Assert.IsTrue(TfsConnection.ApplicationName.Length > MigrationUserAgent.Value.Length + 1, "the library's SOAP user agent should stay after ours");
+            Assert.AreEqual(MigrationUserAgent.Value, TfsConnection.ApplicationName);
+            Assert.IsFalse(TfsConnection.ApplicationName.Contains("Team Foundation ("), "the Usage page would name SOAP traffic after the library's part");
         }
 
         [TestMethod, TestCategory("L0")]
@@ -42,7 +41,7 @@ namespace MigrationTools.Clients.TfsObjectModel.Tests.Clients
             var rest = VssClientHttpRequestSettings.Default.UserAgent;
             Assert.AreEqual(1, rest.Count(p => p.Product?.Name == MigrationUserAgent.ProductName));
             Assert.AreEqual(1, rest.Count(p => p.Comment != null && p.Comment.Contains(MigrationUserAgent.InfoUrl)));
-            Assert.AreEqual(1, Regex.Matches(TfsUserAgent.Soap, Regex.Escape(MigrationUserAgent.ProductName + "/")).Count);
+            Assert.AreEqual(MigrationUserAgent.Value, TfsUserAgent.Soap);
         }
 
         [TestMethod, TestCategory("L0")]

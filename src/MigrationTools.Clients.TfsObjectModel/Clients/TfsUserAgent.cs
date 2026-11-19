@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Net.Http.Headers;
 using Microsoft.TeamFoundation.Client;
@@ -12,6 +11,9 @@ namespace MigrationTools.Clients
     /// VssClientHttpRequestSettings.Default when a connection is created, and the SOAP services (work item store,
     /// attachments, version control) send TfsConnection.ApplicationName. Both are set here, before the first
     /// connection is opened.
+    /// The SOAP value replaces the library's "Team Foundation (devopsmigration.exe, ...)" rather than going in front
+    /// of it: the organisation's Usage page names SOAP traffic after that part when it is present, so keeping it
+    /// would hide the tool's name there.
     /// </summary>
     public static class TfsUserAgent
     {
@@ -25,8 +27,7 @@ namespace MigrationTools.Clients
                 rest.RemoveAll(IsOurs);
                 rest.InsertRange(0, MigrationUserAgent.ProductValues);
 
-                var soap = WithoutOurs(TfsConnection.ApplicationName);
-                TfsConnection.ApplicationName = string.IsNullOrEmpty(soap) ? MigrationUserAgent.Value : $"{MigrationUserAgent.Value} {soap}";
+                TfsConnection.ApplicationName = MigrationUserAgent.Value;
             }
         }
 
@@ -36,16 +37,5 @@ namespace MigrationTools.Clients
 
         private static bool IsOurs(ProductInfoHeaderValue p) =>
             p.Product?.Name == MigrationUserAgent.ProductName || (p.Comment != null && p.Comment.Contains(MigrationUserAgent.InfoUrl));
-
-        private static string WithoutOurs(string userAgent)
-        {
-            userAgent = userAgent ?? string.Empty;
-            if (!userAgent.StartsWith(MigrationUserAgent.ProductName + "/", StringComparison.Ordinal))
-            {
-                return userAgent;
-            }
-            var end = userAgent.IndexOf(MigrationUserAgent.InfoUrl + ")", StringComparison.Ordinal);
-            return end < 0 ? string.Empty : userAgent.Substring(end + MigrationUserAgent.InfoUrl.Length + 1).TrimStart();
-        }
     }
 }
