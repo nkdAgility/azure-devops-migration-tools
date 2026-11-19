@@ -493,6 +493,16 @@ namespace MigrationTools.Tools
                                 match = targetLinks.OfType<ExternalLink>().FirstOrDefault(t => RevisionArtifactDiff.ExternalLinkKey(t.LinkedArtifactUri) == mappedKey);
                             }
                         }
+                        if (match == null)
+                        {
+                            // Pull request links are converted to a hyperlink to the source pull request (#3286).
+                            var url = Services.GetRequiredService<TfsGitRepositoryTool>().GetPullRequestHyperlinkUrl(processor, el);
+                            if (url != null)
+                            {
+                                var hlKey = RevisionArtifactDiff.HyperlinkKey(url);
+                                match = targetLinks.OfType<Hyperlink>().FirstOrDefault(t => RevisionArtifactDiff.HyperlinkKey(t.Location) == hlKey);
+                            }
+                        }
                     }
                     else if (sourceLink is RelatedLink rl && rl.LinkTypeEnd != null)
                     {

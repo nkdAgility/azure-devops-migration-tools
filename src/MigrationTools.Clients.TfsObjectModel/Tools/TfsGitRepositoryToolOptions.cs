@@ -32,7 +32,7 @@ namespace MigrationTools.Tools
         public bool VerifyTargetExists { get; set; } = true;
 
         /// <summary>
-        /// Pull requests are not carried by a git push, so a pull request link cannot be rewritten to the target. By default the link is kept pointing at the source pull request and a warning names the work item and pull request. Set to true to remove pull request links instead.
+        /// Pull requests are not carried by a git push, so a pull request link cannot be rewritten to the target, and a pull request artifact link opens only inside the organisation that holds the repository. By default, when the target is a different organisation, each pull request link is replaced by a Hyperlink to the source pull request's web page, with the comment "Pull request {id}: {title}"; re-runs do not duplicate it, and target items migrated earlier with the unopenable artifact link have it replaced. When the target is the source organisation, the artifact link is kept. The run summary counts the links replaced and kept. Set to true to remove pull request links instead.
         /// </summary>
         /// <default>false</default>
         public bool DropPullRequestLinks { get; set; }
