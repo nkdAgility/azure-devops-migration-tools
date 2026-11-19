@@ -244,7 +244,7 @@ namespace MigrationTools.ConsoleDataGenerator
                 {
                     Type = JSchemaType.String,
                     MaximumLength = MigrationTools.Services.MigrationUserAgent.MaxLabelLength,
-                    Description = "Optional name for this migration, added to the user agent of every request sent to Azure DevOps so the run can be told apart on the organisation's Usage page. Only letters, digits, '-', '.' and '_' are kept; spaces become '-'. Never put customer, project or user names here."
+                    Description = "Optional name for this migration, added after the run id in the user agent of every request sent to Azure DevOps, for matching requests to a run log or a support case. The organisation's Usage page does not show it. Only letters, digits, '-', '.' and '_' are kept; spaces become '-'. It is sent as written otherwise, so never put customer, project or user names here."
                 });
 
                 // Add endpoints section

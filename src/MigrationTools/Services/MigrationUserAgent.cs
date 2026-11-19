@@ -10,8 +10,9 @@ namespace MigrationTools.Services
     /// <summary>
     /// The user agent that identifies the tool, its version and the run on every request sent to Azure DevOps,
     /// for example <c>AzureDevOpsMigrationTools/16.2.1 (run 3f2a9c41d0b7; wave-1; +https://devopsmigration.io)</c>.
-    /// It never carries customer, project or user names, URLs or tokens: the only free text is the sanitised
-    /// <c>UserAgentLabel</c> from the configuration.
+    /// The tool adds no organisation, project or user names, URLs or tokens. The only free text is the
+    /// <c>UserAgentLabel</c> from the configuration; sanitising limits its characters and length but cannot tell
+    /// whether it holds a name, so keeping it non-sensitive is up to whoever sets it.
     /// </summary>
     public static class MigrationUserAgent
     {

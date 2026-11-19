@@ -26,13 +26,13 @@ AzureDevOpsMigrationTools/16.2.1 (run 3f2a9c41d0b7; wave-1; +https://devopsmigra
 - **REST endpoints:** the value is added to the HTTP client of every `AzureDevOpsEndpoint` request.
 - **Embedded images:** the value is added to the image downloads made by the `TfsEmbededImagesTool`.
 
-The user agent never contains customer, project or user names, URLs or tokens. The only free text is the label, and only you set it.
+The tool adds nothing about your organisation, projects or users to the user agent: no names, URLs or tokens. The only free text is the label, which is sent as you wrote it once the characters listed below are removed. Removing characters does not remove names, so keep the label free of anything sensitive.
 
 ### Use Cases
 
 - Telling migration traffic apart from other traffic on the organisation's **Usage** page (**Organization settings > Usage**), where rate limiting is shown. The page shows the tool as `AzureDevOpsMigrationTools`.
 - Giving Microsoft support the version and run id when you raise a rate limiting or throttling case, so the requests can be matched to your run log.
-- Telling several migration runs apart, for example one label for each wave.
+- Telling several migration runs apart in the requests a server or support engineer sees, for example one label for each wave. The label does not appear on the Usage page.
 
 ## Configuration Structure
 
