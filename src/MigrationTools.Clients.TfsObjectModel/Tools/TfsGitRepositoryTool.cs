@@ -14,6 +14,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Enrichers;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -102,8 +103,10 @@ namespace MigrationTools.Tools
             if (sourceRepoService == null)
             {
                 Log.LogWarning("Unable to configure connection to git!");
+                Services.GetService<WorkItemReviewLog>()?.ClearChecked(WorkItemReviewCategory.LinkLeftOnSource);
                 return -1;
             }
+            Services.GetService<WorkItemReviewLog>()?.MarkChecked(WorkItemReviewCategory.LinkLeftOnSource);
             foreach (Link l in targetWorkItem.ToWorkItem().Links)
             {
                 if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))
@@ -262,6 +265,10 @@ namespace MigrationTools.Tools
                 string artifact = isBranch ? $"branch {TfsGitTargetArtifactCache.BranchNameFromRefId(commitOrRefId) ?? commitOrRefId}" : $"commit {commitOrRefId}";
                 Log.LogWarning("GitRepositoryEnricher: Source work item {SourceWorkItemId}: {Artifact} not found in target repo {TargetRepo}; leaving link {SourceLink} pointing at the source.",
                     sourceWorkItemId, artifact, repoName, sourceLinkUri);
+                Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkLeftOnSource,
+                    $"{artifact} not found in target repo {repoName}; the link {sourceLinkUri} still points at the source.",
+                    "Push the commit or branch to the target repo, then re-run to rewrite the link; or fix the link by hand.",
+                    sourceId: sourceWorkItemId?.ToString());
                 _linksLeftOnSource.TryGetValue(repoName, out int seen);
                 _linksLeftOnSource[repoName] = seen + 1;
             }
@@ -514,6 +521,9 @@ namespace MigrationTools.Tools
             key = $"{key} ({reason})";
             _unresolvedRepos.TryGetValue(key, out int seen);
             _unresolvedRepos[key] = seen + 1;
+            Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkLeftOnSource,
+                $"Could not rewrite a git link - {key}; the link still points at the source.",
+                $"{advice} to rewrite the link, then re-run.");
             if (seen == 0)
             {
                 Log.LogWarning("GitRepositoryEnricher: Could not rewrite git links - {RepoReference}. {Advice} to rewrite these links. Further links to this repo are logged at Debug.", key, advice);

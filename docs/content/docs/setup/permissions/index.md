@@ -21,9 +21,9 @@ _Note: According to the Azure DevOps product team, the Object Model API only wor
 The current minimum required permissions for running the tools are:
 
 - Membership in the "Project Collection Administrator" group – This will override any 'denied' permissions, ensuring a smooth migration.
-- A PAT (Personal Access Token) with "full access."
+- A sign-in as yourself with Microsoft Entra ID (recommended; see [Authenticate with Microsoft Entra ID]({{< ref "docs/how-to/authenticate-with-entra-id" >}})), or a PAT (Personal Access Token) with "full access."
 
-_Note: Although we do not write data to the source system, we still require a PAT with full access._
+_Note: Although we do not write data to the source system, a PAT must still have full access._
 
 ## Target Permissions
 
@@ -31,7 +31,7 @@ The current minimum required permissions for running the tools are:
 
 - Membership in the "Project Collection Administrator" group – This overrides any 'denied' permissions and allows the tools to bypass the Work Item rules engine.
 - Membership in the "Project Collection Automation" group – This grants the "Make requests on behalf of others" permission.
-- A PAT with "full access."
+- A sign-in as yourself with Microsoft Entra ID (recommended), or a PAT with "full access."
 
 ### Unsupported Permissions for Scoped PATs
 

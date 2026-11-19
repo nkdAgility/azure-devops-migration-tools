@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Framework.Client;
@@ -12,6 +13,7 @@ using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -239,6 +241,47 @@ namespace MigrationTools.Tools
         /// <param name="referenceName">The field reference name</param>
         /// <param name="value">The (source) field value</param>
         /// <returns>The mapped target value, or the original value when no mapping applies</returns>
+        private HashSet<string> _usersMissingInTarget = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> _missingUniqueNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> _matchedDisplayNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Source users that validation could not match to a target user; a field value for one of them that is
+        /// not mapped is written to the work item review log.
+        /// </summary>
+        public void SetUsersMissingInTarget(IEnumerable<IdentityMapData> validation)
+        {
+            var all = (validation ?? Enumerable.Empty<IdentityMapData>()).Where(m => m?.Source != null).ToList();
+            var missing = all.Where(m => m.Target == null).ToList();
+            _usersMissingInTarget = new HashSet<string>(
+                missing.SelectMany(m => new[] { m.Source.DisplayName, m.Source.AccountName }).Where(n => !string.IsNullOrWhiteSpace(n)),
+                StringComparer.OrdinalIgnoreCase);
+            _missingUniqueNames = new HashSet<string>(
+                missing.SelectMany(m => new[] { m.Source.MailAddress, m.Source.AccountName }).Where(n => !string.IsNullOrWhiteSpace(n)),
+                StringComparer.OrdinalIgnoreCase);
+            _matchedDisplayNames = new HashSet<string>(
+                all.Where(m => m.Target != null).Select(m => m.Source.DisplayName).Where(n => !string.IsNullOrWhiteSpace(n)),
+                StringComparer.OrdinalIgnoreCase);
+        }
+
+        internal bool IsMissingInTarget(string sourceValue)
+        {
+            if (_usersMissingInTarget.Count == 0 || string.IsNullOrWhiteSpace(sourceValue))
+            {
+                return false;
+            }
+            // "Display Name <unique>" is matched on the unique part, so two accounts with the same display name are
+            // told apart; a bare display name counts only when no matched account has the same name.
+            var bracket = sourceValue.IndexOf(" <", StringComparison.Ordinal);
+            if (bracket > 0 && sourceValue.EndsWith(">", StringComparison.Ordinal))
+            {
+                var unique = sourceValue.Substring(bracket + 2, sourceValue.Length - bracket - 3).Trim();
+                return _missingUniqueNames.Contains(unique);
+            }
+            var name = sourceValue.Trim();
+            return _usersMissingInTarget.Contains(name) && !_matchedDisplayNames.Contains(name);
+        }
+
         public object MapUserIdentityValue(string referenceName, object value)
         {
             if (!Options.Enabled || referenceName == null
@@ -261,6 +304,15 @@ namespace MigrationTools.Tools
                 if (!DetectedFormatIsIdentityMapData.Value && TfsUserIdentityReference.IsAmbiguous(UserMappings.Value, sourceValue))
                 {
                     Log.LogWarning("TfsUserMappingTool::MapUserIdentityValue '{sourceValue}' matches more than one 'Display Name <upn>' entry in the mapping file and was not mapped.", sourceValue);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.UserNotMapped,
+                        $"Field {referenceName}: '{sourceValue}' matches more than one entry in the mapping file and was not mapped.",
+                        "Make the entry for this user unique in the UserMappingFile, then re-run.");
+                }
+                else if (IsMissingInTarget(sourceValue))
+                {
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.UserNotMapped,
+                        $"Field {referenceName}: '{sourceValue}' does not exist in the target and is not in the mapping file, so it was saved as text.",
+                        "Add the user to the target or to the UserMappingFile, then re-run.");
                 }
                 return value;
             }

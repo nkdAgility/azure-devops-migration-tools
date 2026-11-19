@@ -35,7 +35,9 @@ namespace MigrationTools.Tests
             => UseEntraId ? MigrationTools.Endpoints.AuthenticationMode.EntraId : MigrationTools.Endpoints.AuthenticationMode.AccessToken;
 
         /// <summary>The token to send to Azure DevOps for whichever mode is configured.</summary>
-        public static string ResolveAccessToken() => UseEntraId ? MigrationTools.Endpoints.EntraIdCredentials.GetAccessToken() : AccessToken;
+        private static readonly MigrationTools.Endpoints.EntraIdCredentials EntraIdCredentials = new MigrationTools.Endpoints.EntraIdCredentials(null, "Tests");
+
+        public static string ResolveAccessToken() => UseEntraId ? EntraIdCredentials.GetAccessToken() : AccessToken;
 
         /// <summary>Which setting supplied the credential (never its value), for diagnosing failures.</summary>
         public static string CredentialSource

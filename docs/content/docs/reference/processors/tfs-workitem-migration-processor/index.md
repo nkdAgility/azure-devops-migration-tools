@@ -89,6 +89,50 @@ Each source revision is replayed as one target revision, with the source revisio
 - **A source that was itself migrated with back-dated history** has the same problem in its revision view: removals are not visible at the revision where they happened. The last replayed revision is compared with the source work item's current attachments and links, so the final state always matches the source, but such removals are shown at the last revision.
 - **"Copy current user" rules overwrite identity fields.** Azure DevOps applies inherited process rules such as *"When State is Done, copy the current user to Assigned To"* on every save, even with `BypassRules` and even when the field value is sent. The migrated revision then shows the account running the migration. Disable these rules in the target process while you migrate, and turn them back on afterwards. The processor logs a warning at start-up for each rule of this kind it finds on the target work item types.
 
+## Work items that need review
+
+Every run writes the work items that need a person to look at them to `work-items-to-review.jsonl` in the run's log folder (`logs\<timestamp>`). The path is logged at the start of the run, before any work item is migrated. Each entry is appended and flushed to disk as soon as the problem is found, so the file is correct up to the last problem even if the run crashes, is stopped or the process is killed. The one exception is a link to an item that is migrated later in the same run: that entry is held in memory and written only if that item fails or the run ends without reaching it, so it is lost if the process is killed before then. A re-run adds the link once both items are in the target. If a row cannot be written (for example the disk is full or access is denied), the run logs `Could not write to the work item review file` and carries on; the row is written only if the same problem is found again later in the run. If that warning appears, treat the review files for that run as incomplete. A later run that finds a line it cannot read in the middle of an earlier review file writes no `resolved` entries. A run with no problems creates no file.
+
+The file is JSON Lines: one JSON object per line, with these fields.
+
+| Field | Meaning |
+|---|---|
+| `time` | When the problem was found. |
+| `sourceId` | The source work item id. |
+| `targetId` | The target work item id. Blank if the target item was not created, or the problem was found before its first save. |
+| `workItemType` | The source work item type. |
+| `revision` | The source revision being migrated when the problem was found. |
+| `category` | What kind of problem it is (below). |
+| `reason` | The message, as in the log. |
+| `action` | What to do about it. |
+| `migration` | The source and target collection and project, so re-runs only read entries for the same migration. |
+
+| Category | When it is written |
+|---|---|
+| `failed` | The work item could not be created in the target. |
+| `part-migrated` | The target work item exists but a later revision could not be saved. |
+| `update-failed` | The target item has every revision, but a later step for it failed (attachments, links or the catch-up save). It resolves when the item next completes. |
+| `rerun-mismatch` | On a re-run, a revision already in the target does not match the source. |
+| `link-skipped` | A link was not migrated: the related item was not migrated (a link to an item that migrates later in the run is added from its side, so it is held and written only if that item fails or the run ends without reaching it; a killed run loses it), cannot be read, or its link type does not exist in the target; or a hyperlink is not valid. |
+| `link-left-on-source` | A git commit, branch or pull request link could not be rewritten and still points at the source. |
+| `field-not-mapped` | A source field has a value but does not exist on the target work item type, so the value was dropped. |
+| `field-truncated` | A string value was cut to `StringManipulatorTool` `MaxStringLength`. |
+| `field-map-failed` | A field map threw an error (logged as `Field map fault`), so its value was not set. The entry names the map and a short hash of its configuration; it resolves only when that same map, with the same configuration, runs cleanly. If you change the map's configuration to fix it, the old entry stays open in the latest view: the review log cannot tell a corrected map from a different one. |
+| `user-not-mapped` | An identity value matches more than one entry in the user mapping file, or is a source user that does not exist in the target and is not mapped. |
+| `attachment-not-migrated` | An attachment is bigger than `MaxAttachmentSize`, could not be downloaded, or failed. |
+| `embedded-image-not-migrated` | An image embedded in an HTML or Markdown field could not be downloaded or fixed, so it still points at the source. |
+| `path-not-mapped` | An area or iteration path does not exist in the target and is not mapped, or a revision was not saved because of it (`SkipRevisionWithInvalidAreaPath`/`SkipRevisionWithInvalidIterationPath`). |
+| `type-changed` | The item was created, or a revision kept, as another type because its type does not exist or is disabled in the target. |
+| `skipped` | A Test Plan or Test Suite, which this processor does not migrate. |
+| `resolved` | On a re-run, an item that an earlier run listed migrated without those problems. |
+
+The same problem for the same item is written once per run.
+
+**Follow-up files.** Problems that someone must deal with after the migration are also written, in the same way, to one file per concern in the same folder: `follow-up-links.jsonl`, `follow-up-users-not-mapped.jsonl`, `follow-up-attachments.jsonl`, `follow-up-fields.jsonl`, `follow-up-area-iteration-paths.jsonl` and `follow-up-skipped.jsonl`. A file with no rows is not created. Item failures, part-migrations, update failures, re-run mismatches and type changes have no follow-up file, so check `work-items-to-review.jsonl` and the category counts at the end of the run, not only the follow-up files, to know whether anything is left to do.
+
+**End of the run.** The log gives the number of entries by category, and each follow-up file with its row count. It also writes `work-items-to-review-latest.jsonl`, the latest entry for each item across this run and the earlier runs. It is a summary only: it holds one entry per item, so an item with several open problems shows only the most recent one. Use the per-run files for the full list.
+
+**Re-runs.** Each run writes its own file. A run reads the review files of earlier runs in the same `logs` folder, but only the entries written for the same source and target collection and project (the `migration` field), because work item ids are only unique within one migration. When an item they listed now migrates with no problems, it gets a `resolved` entry. Problems that are only found while replaying a revision (`failed`, `part-migrated`, `field-not-mapped`, `field-map-failed`, `field-truncated`, `user-not-mapped`, `path-not-mapped`, `type-changed`) count as checked again only when the revision they were found on is replayed in this run; a missing path found by validation counts as checked when validation runs and passes (it does not run when `TfsNodeStructureTool` is disabled). Every other problem counts as checked again only when its check ran for the item in this run: a disabled attachment or link tool does not resolve an attachment or link problem. No `resolved` entry is written until every earlier problem has been checked again. A newer problem can replace the earlier entry in the latest view, so check the per-run files for the full list. If an earlier review log cannot be read, the run logs a warning and writes no `resolved` entries for that migration, because the unread log may list a problem that was not checked again. Run from the same folder, or pass the same `--logPath`, for earlier runs to be found.
 ---
 
 ## WIQL Query

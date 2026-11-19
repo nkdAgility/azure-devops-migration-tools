@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\GlobalUsings.cs" Link="GlobalUsings.cs" />
+    <InternalsVisibleTo Include="MigrationTools.Clients.AzureDevops.Rest.Tests" />
   </ItemGroup>
 
   <ItemGroup>
