@@ -16,12 +16,12 @@ namespace VstsSyncMigrator.ConsoleApp
     {
         public static async Task<int> Main(string[] args)
         {
-            if (TryRunFromLongPath(args, out int longPathExitCode))
-            {
-                return longPathExitCode;
-            }
             try
             {
+                if (TryRunFromLongPath(args, out int longPathExitCode))
+                {
+                    return longPathExitCode;
+                }
                 await RunAsync(args);
                 return Environment.ExitCode;
             }
