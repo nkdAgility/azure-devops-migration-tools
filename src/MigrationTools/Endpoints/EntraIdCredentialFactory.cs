@@ -168,7 +168,7 @@ namespace MigrationTools.Endpoints
                 {
                     throw new MigrationRunStoppedException($"Endpoint '{endpointName}': {options.CredentialType} sign-in completed as {record.Username}, but LoginHint is {options.LoginHint}. Run again and sign in as {options.LoginHint}, or change LoginHint.");
                 }
-                SaveRecord(record, recordPath);
+                SaveRecord(record, recordPath, endpointName);
                 Log.Information("Endpoint '{EndpointName}': signed in as {Account}; sign-in saved to {RecordPath}.", endpointName, record.Username, recordPath);
             }
             return credential;
@@ -213,12 +213,20 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        private static void SaveRecord(AuthenticationRecord record, string path)
+        private static void SaveRecord(AuthenticationRecord record, string path, string endpointName)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
-            using (var stream = File.Create(path))
+            try
             {
-                record.Serialize(stream);
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
+                using (var stream = File.Create(path))
+                {
+                    record.Serialize(stream);
+                }
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is ArgumentException || ex is NotSupportedException)
+            {
+                // Without the record the next run would sign in again, and this run could not prove which account it used.
+                throw new MigrationRunStoppedException($"Endpoint '{endpointName}': signed in, but the sign-in could not be saved to '{path}' ({ex.Message.Trim()}). Check the folder exists and you can write to it, or set AuthenticationRecordPath to a writable file.", ex);
             }
         }
 

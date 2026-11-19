@@ -98,13 +98,14 @@ namespace MigrationTools.Endpoints
         /// <summary>A token valid for at least a few more minutes, from the cache when possible.</summary>
         public string GetAccessToken(CancellationToken cancellationToken = default)
         {
-            var credential = Current;
             lock (_cacheLock)
             {
                 if (_cached is AccessToken cached && cached.ExpiresOn - RefreshMargin > DateTimeOffset.UtcNow)
                 {
                     return cached.Token;
                 }
+                // Chosen inside the lock, so a renewal after a 401 cannot discard this credential between choosing and using it.
+                var credential = Current;
                 AccessToken fresh;
                 try
                 {
@@ -267,9 +268,14 @@ namespace MigrationTools.Endpoints
                 if (fetch == null)
                 {
                     // An app credential keeps its tokens in an in-memory MSAL cache and would hand back the token the
-                    // server just rejected; a new instance starts with an empty cache. The user sign-ins (Azure CLI,
-                    // browser, device code) use a shared cache that the credential refreshes itself.
-                    if (EntraIdCredentialFactory.IsExperimental(_options.CredentialType)) { _credential = null; }
+                    // server just rejected; a new instance starts with an empty cache. Default is rebuilt too, because
+                    // it can select an app credential (EnvironmentCredential, ManagedIdentityCredential). The explicit
+                    // user sign-ins (Azure CLI, browser, device code) use a shared cache that refreshes itself.
+                    if (IsDefault || EntraIdCredentialFactory.IsExperimental(_options.CredentialType))
+                    {
+                        _credential = null;
+                        if (IsDefault) { SelectionListener.Clear(); }
+                    }
                     // The cached token is the one the server rejected: drop it, and give this fetch its own
                     // generation so only its result is cached, whatever its expiry, and no earlier fetch overwrites it.
                     _cached = null;

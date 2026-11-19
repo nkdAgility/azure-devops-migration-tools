@@ -117,8 +117,11 @@ namespace MigrationTools.Endpoints.Tests
             await app.GetFreshAccessTokenAsync();
             user.GetAccessToken();
             await user.GetFreshAccessTokenAsync();
+            var chain = new EntraIdCredentials(new EntraIdOptions { Credential = nameof(EntraIdCredentialType.Default) }, "Source", (o, n) => { built += 1000; return new CountingTokenCredential(); });
+            chain.GetAccessToken();
+            await chain.GetFreshAccessTokenAsync();
 
-            Assert.AreEqual(3 + 100, built, "Each renewal after a 401 builds a new app credential; a user credential is built once.");
+            Assert.AreEqual(3 + 100 + 2000, built, "Each renewal after a 401 builds a new app or Default credential, since Default can select an app; an explicit user credential is built once.");
         }
 
         [TestMethod, TestCategory("L0")]
