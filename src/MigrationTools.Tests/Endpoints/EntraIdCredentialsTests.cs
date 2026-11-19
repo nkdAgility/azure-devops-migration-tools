@@ -247,6 +247,27 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void GetAccessToken_StopsReadablyWhenTheCredentialCannotBeBuilt()
+        {
+            var saved = Environment.GetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable);
+            try
+            {
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, "NotACredential");
+                // The real factory: DefaultAzureCredential throws from its constructor for an unsupported value.
+                var sut = new EntraIdCredentials(null, "Source");
+
+                var ex = Assert.ThrowsExactly<MigrationTools.Exceptions.MigrationRunStoppedException>(() => sut.GetAccessToken());
+
+                StringAssert.Contains(ex.Message, "Endpoint 'Source'");
+                StringAssert.Contains(ex.Message, "AZURE_TOKEN_CREDENTIALS is set to 'NotACredential'");
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, saved);
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void CredentialFailure_NamesThePinnedCredential()
         {
             var saved = Environment.GetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable);

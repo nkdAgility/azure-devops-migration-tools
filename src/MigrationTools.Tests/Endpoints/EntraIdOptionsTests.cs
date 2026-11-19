@@ -155,6 +155,25 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public void Factory_StopsTheRunWithAConversionHintForAPemFile()
+        {
+            var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"amt-{Guid.NewGuid():N}.pem");
+            System.IO.File.WriteAllText(path, "-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----\n");
+            try
+            {
+                var ex = Assert.ThrowsExactly<MigrationRunStoppedException>(() => EntraIdCredentialFactory.Create(
+                    new EntraIdOptions { Credential = nameof(EntraIdCredentialType.Certificate), TenantId = Tenant, ClientId = Client, CertificatePath = path }, "Target"));
+
+                StringAssert.Contains(ex.Message, "is PEM, which is not supported");
+                StringAssert.Contains(ex.Message, "openssl pkcs12 -export");
+            }
+            finally
+            {
+                System.IO.File.Delete(path);
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void AuthenticationRecordPath_IsPerEndpointCredentialAndTenant()
         {
             var source = EntraIdCredentialFactory.AuthenticationRecordPath(new EntraIdOptions { Credential = nameof(EntraIdCredentialType.Interactive) }, "Source");

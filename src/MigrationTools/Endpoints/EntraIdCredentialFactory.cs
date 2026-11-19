@@ -59,6 +59,11 @@ namespace MigrationTools.Endpoints
                 {
                     throw new MigrationRunStoppedException($"Endpoint '{endpointName}': the certificate file '{options.CertificatePath}' does not exist. Check CertificatePath.");
                 }
+                // The X509Certificate2 file constructor does not import a PEM private key on .NET Framework, so only PFX is supported.
+                if (File.ReadAllText(options.CertificatePath).Contains("-----BEGIN"))
+                {
+                    throw new MigrationRunStoppedException($"Endpoint '{endpointName}': the certificate file '{options.CertificatePath}' is PEM, which is not supported. Convert it to a PFX with its private key (openssl pkcs12 -export) and set CertificatePath to that file.");
+                }
                 X509Certificate2 fromFile;
                 try
                 {

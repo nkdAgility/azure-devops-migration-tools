@@ -75,7 +75,15 @@ namespace MigrationTools.Endpoints
                     if (_credential == null)
                     {
                         if (IsDefault) { SelectionListener.Ensure(); }
-                        _credential = _factory(_options, EndpointName);
+                        try
+                        {
+                            _credential = _factory(_options, EndpointName);
+                        }
+                        catch (Exception ex) when (IsCredentialFailure(ex))
+                        {
+                            // DefaultAzureCredential rejects an unsupported AZURE_TOKEN_CREDENTIALS when it is built, not when it is asked for a token.
+                            throw CredentialFailure(ex);
+                        }
                     }
                     return _credential;
                 }

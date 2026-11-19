@@ -55,7 +55,7 @@ Add an `EntraId` block only to choose a specific credential:
 | `TenantId` | AzureCli, Interactive, DeviceCode (optional); Certificate, ClientSecret (required) | GUID or domain |
 | `ClientId` | Certificate, ClientSecret (required); ManagedIdentity (user-assigned); Interactive, DeviceCode (your own public client app, optional) | GUID |
 | `CertificateThumbprint` | Certificate | in `CurrentUser\My` or `LocalMachine\My`, with its private key |
-| `CertificatePath`, `CertificatePassword` | Certificate | a PFX/PEM file instead of the store |
+| `CertificatePath`, `CertificatePassword` | Certificate | a PFX (`.pfx` or `.p12`) file with the private key, instead of the store. PEM is not supported; convert it with `openssl pkcs12 -export` |
 | `ClientSecret` | ClientSecret | |
 | `LoginHint` | Interactive, DeviceCode | the account to sign in as |
 | `AuthenticationRecordPath` | Interactive, DeviceCode | where the saved sign-in is kept |

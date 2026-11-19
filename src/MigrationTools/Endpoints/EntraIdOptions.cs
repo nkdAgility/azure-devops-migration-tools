@@ -73,7 +73,7 @@ namespace MigrationTools.Endpoints
         public string CertificateThumbprint { get; set; }
 
         /// <summary>
-        /// Certificate credential: path to a PFX or PEM file holding the certificate and private key. Set this or CertificateThumbprint.
+        /// Certificate credential: path to a PFX (.pfx or .p12) file holding the certificate and private key. Set this or CertificateThumbprint.
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string CertificatePath { get; set; }
