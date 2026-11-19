@@ -33,6 +33,11 @@ namespace MigrationTools.Tools
         public bool HasDeferredLinks { get; private set; }
 
         /// <summary>
+        /// How many other work items the last <see cref="Enrich"/> saved, such as a child moved under this item (#3299).
+        /// </summary>
+        public int OtherWorkItemsSaved { get; internal set; }
+
+        /// <summary>
         /// Initializes a new instance of the TfsWorkItemLinkTool class.
         /// </summary>
         /// <param name="options">Configuration options for the work item link tool</param>
@@ -70,6 +75,7 @@ namespace MigrationTools.Tools
             }
             _inline = inline;
             HasDeferredLinks = false;
+            OtherWorkItemsSaved = 0;
             if (targetWorkItemLinkStart.Id == "0" && !inline)
             {
                 Log.LogWarning("TfsWorkItemLinkTool::Enrich: Target work item must be saved before you can add a link: exiting Link Migration");
@@ -134,6 +140,78 @@ namespace MigrationTools.Tools
                 MigrateSharedParameters(processor, sourceWorkItemLinkStart, targetWorkItemLinkStart);
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Says, from the loaded items and the source → target id map only, which link of the source the target lacks (#3299).
+        /// A link to a work item that is not in the target is not counted: the link migration could not add it either.
+        /// </summary>
+        /// <returns>A description of the first missing link, or null when the target has every link of the source.</returns>
+        public string FindMissingLink(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, ReflectedWorkItemIdMap map)
+        {
+            var source = sourceWorkItem.ToWorkItem();
+            var targetLinks = targetWorkItem.ToWorkItem().Links.Cast<Link>().ToList();
+            var targetRelated = new HashSet<string>(
+                targetLinks.OfType<RelatedLink>().Where(t => t.LinkTypeEnd != null)
+                    .Select(t => RevisionArtifactDiff.RelatedLinkKey(t.LinkTypeEnd.ImmutableName, t.RelatedWorkItemId)),
+                StringComparer.OrdinalIgnoreCase);
+            var targetHyperlinks = new HashSet<string>(
+                targetLinks.OfType<Hyperlink>().Select(t => RevisionArtifactDiff.HyperlinkKey(GetAbsoluteUri(t) ?? t.Location)),
+                StringComparer.OrdinalIgnoreCase);
+            var targetExternal = new HashSet<string>(
+                targetLinks.OfType<ExternalLink>().Select(t => RevisionArtifactDiff.ExternalLinkKey(t.LinkedArtifactUri)),
+                StringComparer.OrdinalIgnoreCase);
+            var sourceCollection = source.Store.TeamProjectCollection.Uri;
+
+            foreach (Link sourceLink in source.Links)
+            {
+                switch (sourceLink)
+                {
+                    case Hyperlink hl:
+                        var uri = GetAbsoluteUri(hl);
+                        if (!string.IsNullOrEmpty(uri) && IsValidHyperlink(uri) && !targetHyperlinks.Contains(RevisionArtifactDiff.HyperlinkKey(uri)))
+                        {
+                            return $"hyperlink {uri}";
+                        }
+                        break;
+                    case RelatedLink rl when rl.LinkTypeEnd != null:
+                        if (map.MustQuery(sourceCollection, rl.RelatedWorkItemId))
+                        {
+                            return $"{rl.LinkTypeEnd.ImmutableName} link to source {rl.RelatedWorkItemId}, which the map cannot resolve (more than one target item, or an incomplete map)";
+                        }
+                        if (map.TryGetTargetId(sourceCollection, rl.RelatedWorkItemId, out var relatedTargetId)
+                            && !targetRelated.Contains(RevisionArtifactDiff.RelatedLinkKey(rl.LinkTypeEnd.ImmutableName, relatedTargetId)))
+                        {
+                            return $"{rl.LinkTypeEnd.ImmutableName} link to source {rl.RelatedWorkItemId} (target {relatedTargetId})";
+                        }
+                        break;
+                    case ExternalLink el when !IsBuildLink(el):
+                        if (!HasExternalLink(processor, sourceWorkItem, el, targetExternal, targetHyperlinks))
+                        {
+                            return $"external link {el.LinkedArtifactUri}";
+                        }
+                        break;
+                }
+            }
+            return null;
+        }
+
+        private bool HasExternalLink(TfsProcessor processor, WorkItemData sourceWorkItem, ExternalLink el, HashSet<string> targetExternal, HashSet<string> targetHyperlinks)
+        {
+            var git = Services.GetRequiredService<TfsGitRepositoryTool>();
+            var targetUri = git.GetTargetUri(processor, sourceWorkItem, el);
+            if (targetUri != null)
+            {
+                // A link the migration rewrites must be the rewritten one. A raw source link kept because the target
+                // commit was missing goes through the link migration, which decides again whether it can be rewritten now.
+                return targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(targetUri));
+            }
+            if (targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri)))
+            {
+                return true;
+            }
+            var url = git.GetPullRequestHyperlinkUrl(processor, el);
+            return url != null && targetHyperlinks.Contains(RevisionArtifactDiff.HyperlinkKey(url));
         }
 
         /// <summary>
@@ -445,6 +523,7 @@ namespace MigrationTools.Tools
                             try
                             {
                                 wiTargetR.SaveToAzureDevOps();
+                                OtherWorkItemsSaved++;
                             }
                             catch
                             {
