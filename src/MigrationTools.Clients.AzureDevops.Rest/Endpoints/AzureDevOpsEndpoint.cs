@@ -102,6 +102,7 @@ namespace MigrationTools.Endpoints
             };
             client.DefaultRequestHeaders.Add("Accept", $"application/json; {versionParameter}");
             MigrationUserAgent.Apply(client);
+            Log.LogTrace("User agent (REST endpoint {Endpoint}): {UserAgent}", Options.Name, client.DefaultRequestHeaders.UserAgent);
             return client;
         }
 
