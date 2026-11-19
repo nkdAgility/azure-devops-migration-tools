@@ -15,6 +15,9 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
     {
         public WorkItemReviewLog ReviewLog { protected get; set; }
 
+        // The map's identity in the review log: a failure resolves only when this same map runs cleanly again.
+        private string ReviewKey => $"Field map {Name} ({MappingDisplayName})";
+
         protected IFieldMapOptions _Config;
         protected ITelemetryLogger Telemetry;
 
@@ -41,6 +44,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
                 {
                     InternalExecute(source.ToWorkItem(), target.ToWorkItem());
                 }
+                ReviewLog?.MarkFieldMapRan(ReviewKey);
             }
             catch (Exception ex)
             {
@@ -52,7 +56,7 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
                 Telemetry.TrackException(ex, null);
                 // On a catch-up save (no revision replayed) the map ran on the current values, not on a revision.
                 ReviewLog?.Record(WorkItemReviewCategory.FieldMapFailed, withoutRevision: ReviewLog.CurrentItemReplayedRevisions != true, reason:
-                    $"Field map {Name} ({MappingDisplayName}) failed: {ex.Message}",
+                    $"{ReviewKey} failed: {ex.Message}",
                     action: "Fix the field map configuration or the source value, then re-run.");
             }
         }

@@ -452,6 +452,16 @@ namespace MigrationTools.Services
         }
 
         /// <summary>
+        /// Records that the field map <paramref name="mapKey"/> ran without failing for the current item.
+        /// </summary>
+        public void MarkFieldMapRan(string mapKey)
+        {
+            _current.Value?.Checked.Add(FieldMapCheckPrefix + mapKey);
+        }
+
+        private const string FieldMapCheckPrefix = WorkItemReviewCategory.FieldMapFailed + ":";
+
+        /// <summary>
         /// Records that the last pass of the check behind <paramref name="category"/> was skipped for the current
         /// item, so an earlier pass in this run does not count.
         /// </summary>
@@ -538,7 +548,10 @@ namespace MigrationTools.Services
             }
             if (entry.Category == WorkItemReviewCategory.FieldMapFailed && !entry.Revision.HasValue)
             {
-                return scope.Checked.Contains(entry.Category);
+                // The same map must have run cleanly; a map removed from the configuration never checks it again.
+                return scope.Checked.Any(k => k.StartsWith(FieldMapCheckPrefix, StringComparison.Ordinal)
+                    && entry.Reason != null
+                    && entry.Reason.StartsWith(k.Substring(FieldMapCheckPrefix.Length) + " failed", StringComparison.Ordinal));
             }
             if (WorkItemReviewCategory.FoundOnlyWhileReplaying.Contains(entry.Category))
             {

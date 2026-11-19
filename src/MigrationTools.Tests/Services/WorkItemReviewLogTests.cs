@@ -538,13 +538,15 @@ namespace MigrationTools.Tests.Services
         {
             using (var first = Earlier(RunFolder("20260101000000")))
             {
-                using (first.BeginItem("7", "Task", 5)) { first.Record(WorkItemReviewCategory.FieldMapFailed, true, "map failed", "fix"); }
+                using (first.BeginItem("7", "Task", 5)) { first.Record(WorkItemReviewCategory.FieldMapFailed, true, "Field map M (a b) failed: boom", "fix"); }
             }
             Assert.IsNull(WorkItemReviewLog.ReadEntries(Path.Combine(RunFolder("20260101000000"), WorkItemReviewLog.FileName)).Single().Revision);
             using var run = Earlier(RunFolder("20260102000000"));
             using (run.BeginItem("7", "Task")) { run.CompleteCurrentItem(); }
             Assert.IsFalse(File.Exists(run.FilePath), "the maps did not run");
-            using (run.BeginItem("7", "Task")) { run.MarkChecked(WorkItemReviewCategory.FieldMapFailed); run.CompleteCurrentItem(); }
+            using (run.BeginItem("7", "Task")) { run.MarkFieldMapRan("Field map Other (x y)"); run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath), "another map ran; the failed map may have been removed from the configuration");
+            using (run.BeginItem("7", "Task")) { run.MarkFieldMapRan("Field map M (a b)"); run.CompleteCurrentItem(); }
             Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(run.FilePath).Single().Category);
         }
         [TestMethod, TestCategory("L0")]
