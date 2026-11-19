@@ -29,7 +29,26 @@ namespace MigrationTools.Endpoints
         /// </summary>
         public string ResolveAccessToken()
         {
-            return AuthenticationMode == AuthenticationMode.EntraId ? EntraIdCredentials.GetAccessToken() : AccessToken;
+            return AuthenticationMode == AuthenticationMode.EntraId ? GetEntraIdCredentials().GetAccessToken() : AccessToken;
+        }
+
+        /// <summary>
+        /// The Microsoft Entra ID identity to sign in with when AuthenticationMode is EntraId. Leave it out to use the first sign-in found on the machine, for example 'az login'.
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public EntraIdOptions EntraId { get; set; }
+
+        private EntraIdCredentials _entraIdCredentials;
+        private readonly object _entraIdLock = new object();
+
+        /// <summary>This endpoint's own Entra ID credentials, created on first use.</summary>
+        public EntraIdCredentials GetEntraIdCredentials()
+        {
+            lock (_entraIdLock)
+            {
+                _entraIdCredentials = _entraIdCredentials ?? new EntraIdCredentials(EntraId, Name);
+                return _entraIdCredentials.NameEndpoint(Name);
+            }
         }
 
         /// <summary>
@@ -67,7 +86,8 @@ namespace MigrationTools.Endpoints
                     }
                     return ValidateOptionsResult.Success;
                 case AuthenticationMode.EntraId:
-                    return ValidateOptionsResult.Success;
+                    var errors = options.EntraId?.Validate(name, "EntraId");
+                    return errors != null && errors.Count > 0 ? ValidateOptionsResult.Fail(errors) : ValidateOptionsResult.Success;
                 default:
                     return ValidateOptionsResult.Fail($"The AuthenticationMode '{options.AuthenticationMode}' is not supported by the Azure DevOps REST endpoint. Use 'AccessToken' or 'EntraId'.");
             }

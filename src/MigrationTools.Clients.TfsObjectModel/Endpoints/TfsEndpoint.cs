@@ -86,7 +86,7 @@ namespace MigrationTools.Endpoints
 
                             case AuthenticationMode.EntraId:
                                 Log.LogDebug("TfsWorkItemEndPoint::GetTfsCollection: Connecting Using Microsoft Entra ID Authentication ", Options.Collection);
-                                _Collection = new TfsTeamProjectCollection(Options.Collection, EntraIdCredentials.CreateVssCredentials());
+                                _Collection = new TfsTeamProjectCollection(Options.Collection, Options.Authentication.GetEntraIdCredentials(Options.Name).CreateVssCredentials());
                                 break;
 
                             case AuthenticationMode.Prompt:

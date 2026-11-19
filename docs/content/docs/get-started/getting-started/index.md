@@ -53,16 +53,25 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 
 1. Adjust the value of the `Collection` attribute for Source and Target
 2. Adjust the value of the `Project` attribute for Source and Target
-3. Set the `AuthenticationMode` (`Prompt`, `AccessToken` or `EntraId`) for Source and Target
+3. Set the `AuthenticationMode` for Source and Target. We recommend signing in as yourself with Microsoft Entra ID:
 
-   If you set Authentication mode to `AccessToken`, enter a valid PAT as value
-   for the `PersonalAccessToken` attribute, or set the
-   `PersonalAccessTokenVariableName` to the name of an environment variable containing your PAT.
+   ```json
+   "Authentication": { "AuthenticationMode": "EntraId" }
+   ```
 
-   If you set Authentication mode to `EntraId`, no token goes in the configuration. The tool signs in as
-   the identity you are already signed in with: `az login`, Visual Studio, a managed identity, or
-   workload identity federation in CI. That identity must be a member of the organisation, and for the
-   TFS Object Model endpoints a Project Collection Administrator.
+   No token goes in the configuration. Run `az login` first (or be signed in to Visual Studio), and the
+   tool signs in as you and renews the token for as long as the migration runs. Your account must be a
+   member of the organisation, and for the TFS Object Model endpoints a Project Collection Administrator.
+
+   The other modes are:
+
+   - `EntraId` with an `EntraId` block, to choose a sign-in: `AzureCli`, a browser (`Interactive`) or a
+     `DeviceCode`, with a different account or tenant on Source and Target if you need one.
+   - `AccessToken`: put a PAT in `Authentication:AccessToken`, or better, in the environment variable
+     `MigrationTools__Endpoints__Source__Authentication__AccessToken` (and `...Target...`).
+   - `Prompt`: sign in in a dialog when the tool connects.
+   - `EntraId` as an app (`Certificate`, `ClientSecret` or `ManagedIdentity`): **currently untested** in a
+     full migration. It is built and the run warns when you use it; try it on a test project first.
 
    At startup the log shows which credential supplied the token (for example `AzureCliCredential`) and
    the identity, tenant and validity window it is for; the token itself is never logged. If the first
@@ -74,6 +83,9 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
    credential name before running the tool, for example `AzureCliCredential` to use only your `az login`,
    or `ManagedIdentityCredential` on an Azure VM. `dev` and `prod` limit the chain to developer tools or
    deployed-service credentials. This is recommended for unattended runs. The log shows the value in use.
+
+   For every option, see
+   [Authenticate with Microsoft Entra ID]({{< ref "docs/how-to/authenticate-with-entra-id" >}}).
 
 4. Adjust the value of the `ReflectedWorkItemIdField` attribute (field name of the migration tracking field) for Source and Target
 

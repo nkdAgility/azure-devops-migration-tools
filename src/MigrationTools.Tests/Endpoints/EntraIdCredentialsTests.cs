@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MigrationTools.Endpoints.Tests
 {
     [TestClass]
+    [DoNotParallelize] // Changes the process-wide AZURE_TOKEN_CREDENTIALS variable.
     public class EntraIdCredentialsTests
     {
         private sealed class CountingTokenCredential : TokenCredential
@@ -39,29 +40,30 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         private CountingTokenCredential _fake;
+        private EntraIdCredentials _sut;
+
+        private static EntraIdCredentials Using(TokenCredential credential, EntraIdCredentialType type = EntraIdCredentialType.AzureCli)
+            => new EntraIdCredentials(new EntraIdOptions { Credential = type.ToString() }, "Source", (o, n) => credential);
 
         [TestInitialize]
         public void Setup()
         {
             _fake = new CountingTokenCredential();
-            EntraIdCredentials.TokenCredential = _fake;
+            _sut = Using(_fake);
         }
-
-        [TestCleanup]
-        public void Cleanup() => EntraIdCredentials.TokenCredential = null;
 
         [TestMethod, TestCategory("L0")]
         public void GetAccessToken_RequestsTheAzureDevOpsScope()
         {
-            Assert.AreEqual("token-1", EntraIdCredentials.GetAccessToken());
+            Assert.AreEqual("token-1", _sut.GetAccessToken());
             CollectionAssert.AreEqual(new[] { EntraIdCredentials.AzureDevOpsScope }, _fake.Scopes[0]);
         }
 
         [TestMethod, TestCategory("L0")]
         public void GetAccessToken_ReusesAnUnexpiredToken()
         {
-            EntraIdCredentials.GetAccessToken();
-            Assert.AreEqual("token-1", EntraIdCredentials.GetAccessToken());
+            _sut.GetAccessToken();
+            Assert.AreEqual("token-1", _sut.GetAccessToken());
             Assert.AreEqual(1, _fake.Calls);
         }
 
@@ -81,14 +83,160 @@ namespace MigrationTools.Endpoints.Tests
             }
         }
 
+        private sealed class GatedClaimsCredential : TokenCredential
+        {
+            public readonly TaskCompletionSource<bool> Release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            public readonly System.Collections.Concurrent.ConcurrentQueue<string> ClaimsSeen = new System.Collections.Concurrent.ConcurrentQueue<string>();
+            public string Next = "B";
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) => throw new NotSupportedException();
+            public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+            {
+                ClaimsSeen.Enqueue(requestContext.Claims);
+                await Release.Task;
+                return new AccessToken(Next, DateTimeOffset.UtcNow.AddHours(1));
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_ACallerWithDifferentClaimsDoesNotJoinARunningFetch()
+        {
+            var gated = new GatedClaimsCredential();
+            _sut = Using(gated);
+
+            var withoutClaims = _sut.GetFreshAccessTokenAsync("A", null);
+            var withClaims = _sut.GetFreshAccessTokenAsync("A", "{\"c\":1}");
+            gated.Release.SetResult(true);
+            await Task.WhenAll(withoutClaims, withClaims);
+
+            CollectionAssert.AreEquivalent(new string[] { null, "{\"c\":1}" }, gated.ClaimsSeen.ToArray(), "The claims caller got its own fetch.");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_CallersWithTheSameClaimsShareAFetchWhileAnotherRuns()
+        {
+            var gated = new GatedClaimsCredential();
+            _sut = Using(gated);
+
+            var a1 = _sut.GetFreshAccessTokenAsync("A", "{\"a\":1}");
+            var b = _sut.GetFreshAccessTokenAsync("A", "{\"b\":1}");
+            var a2 = _sut.GetFreshAccessTokenAsync("A", "{\"a\":1}");
+            gated.Release.SetResult(true);
+            await Task.WhenAll(a1, b, a2);
+
+            CollectionAssert.AreEquivalent(new[] { "{\"a\":1}", "{\"b\":1}" }, gated.ClaimsSeen.ToArray(), "A, B, A makes two fetches: the second A joins the first.");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_AJoiningCallerStopsWhenTheSharedResultIsTheTokenItRejected()
+        {
+            var gated = new GatedClaimsCredential { Next = "B" };
+            _sut = Using(gated);
+
+            var rejectedA = _sut.GetFreshAccessTokenAsync("A", null);
+            var rejectedB = _sut.GetFreshAccessTokenAsync("B", null);
+            gated.Release.SetResult(true);
+
+            Assert.AreEqual("B", await rejectedA, "B is a new token for the caller that rejected A.");
+            await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => rejectedB, "B must not be resent by the caller it was rejected for.");
+            Assert.AreEqual(1, gated.ClaimsSeen.Count, "Equivalent callers still share one fetch.");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task TfsRenewal_UsesTheClaimsTheLast401AskedForOnce()
+        {
+            var seen = new System.Collections.Generic.List<string>();
+            var sut = new EntraIdCredentials(new EntraIdOptions { Credential = "AzureCli" }, "Source", (o, n) => new ClaimsRecordingCredential(seen));
+            var provider = new EntraIdCredentials.EntraIdTokenProvider(new Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessTokenCredential("unused"), sut, new Uri("https://dev.azure.com/org"));
+
+            sut.NoteChallenge("Bearer error=\"insufficient_claims\", claims=\"eyJhIjoxfQ==\"");
+            var first = await GetTokenFrom(provider, "rejected-1");
+            var second = await GetTokenFrom(provider, "rejected-2");
+
+            CollectionAssert.AreEqual(new[] { "{\"a\":1}", null }, seen, "The claims are used for the next renewal only.");
+            Assert.AreNotEqual(first, second);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task TfsRenewal_StopsWhenRenewalReturnsTheRejectedToken()
+        {
+            var sut = Using(new SequenceTokenCredential(new AccessToken("same", DateTimeOffset.UtcNow.AddHours(1))), EntraIdCredentialType.DeviceCode);
+            var provider = new EntraIdCredentials.EntraIdTokenProvider(new Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessTokenCredential("unused"), sut, new Uri("https://dev.azure.com/org"));
+
+            var ex = await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => GetTokenFrom(provider, "same"));
+
+            StringAssert.Contains(ex.Message, "rejected the Microsoft Entra ID token before it expired");
+            StringAssert.Contains(ex.Message, "and run again to sign in.");
+        }
+
+        private static async Task<string> GetTokenFrom(EntraIdCredentials.EntraIdTokenProvider provider, string rejected)
+        {
+            var method = typeof(EntraIdCredentials.EntraIdTokenProvider).GetMethod("OnGetTokenAsync", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            try
+            {
+                var token = await (Task<Microsoft.VisualStudio.Services.Common.IssuedToken>)method.Invoke(provider, new object[] { new Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessToken(rejected), CancellationToken.None });
+                return ((Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessToken)token).Value;
+            }
+            catch (System.Reflection.TargetInvocationException ex) { throw ex.InnerException; }
+        }
+
+        private sealed class ClaimsRecordingCredential : TokenCredential
+        {
+            private readonly System.Collections.Generic.List<string> _seen;
+            public ClaimsRecordingCredential(System.Collections.Generic.List<string> seen) { _seen = seen; }
+            private AccessToken Next(TokenRequestContext context) { _seen.Add(context.Claims); return new AccessToken("token-" + _seen.Count, DateTimeOffset.UtcNow.AddHours(1)); }
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) => Next(requestContext);
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken) => new ValueTask<AccessToken>(Next(requestContext));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_CachesTheReplacementEvenWhenItExpiresSooner()
+        {
+            var tokens = new SequenceTokenCredential(
+                new AccessToken("rejected", DateTimeOffset.UtcNow.AddHours(2)),
+                new AccessToken("replacement", DateTimeOffset.UtcNow.AddMinutes(30)));
+            _sut = Using(tokens);
+
+            Assert.AreEqual("rejected", _sut.GetAccessToken());
+            Assert.AreEqual("replacement", await _sut.GetFreshAccessTokenAsync());
+
+            Assert.AreEqual("replacement", _sut.GetAccessToken(), "The rejected token must not be sent again.");
+        }
+
+        private sealed class SequenceTokenCredential : TokenCredential
+        {
+            private readonly System.Collections.Generic.Queue<AccessToken> _tokens;
+            public SequenceTokenCredential(params AccessToken[] tokens) { _tokens = new System.Collections.Generic.Queue<AccessToken>(tokens); }
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) => _tokens.Dequeue();
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken) => new ValueTask<AccessToken>(_tokens.Dequeue());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_UsesANewAppCredentialSoItsCachedTokenIsNotReused()
+        {
+            var built = 0;
+            var app = new EntraIdCredentials(new EntraIdOptions { Credential = nameof(EntraIdCredentialType.ClientSecret) }, "Target", (o, n) => { built++; return new CountingTokenCredential(); });
+            var user = new EntraIdCredentials(new EntraIdOptions { Credential = nameof(EntraIdCredentialType.AzureCli) }, "Source", (o, n) => { built += 100; return new CountingTokenCredential(); });
+
+            app.GetAccessToken();
+            await app.GetFreshAccessTokenAsync();
+            await app.GetFreshAccessTokenAsync();
+            user.GetAccessToken();
+            await user.GetFreshAccessTokenAsync();
+            var chain = new EntraIdCredentials(new EntraIdOptions { Credential = nameof(EntraIdCredentialType.Default) }, "Source", (o, n) => { built += 1000; return new CountingTokenCredential(); });
+            chain.GetAccessToken();
+            await chain.GetFreshAccessTokenAsync();
+
+            Assert.AreEqual(3 + 100 + 2000, built, "Each renewal after a 401 builds a new app or Default credential, since Default can select an app; an explicit user credential is built once.");
+        }
+
         [TestMethod, TestCategory("L0")]
         public async Task GetFreshAccessTokenAsync_ConcurrentCallersShareOneFetch()
         {
             var slow = new SlowTokenCredential();
-            EntraIdCredentials.TokenCredential = slow;
+            _sut = Using(slow);
 
-            var first = EntraIdCredentials.GetFreshAccessTokenAsync();
-            var second = EntraIdCredentials.GetFreshAccessTokenAsync();
+            var first = _sut.GetFreshAccessTokenAsync();
+            var second = _sut.GetFreshAccessTokenAsync();
             slow.Release.SetResult(true);
 
             CollectionAssert.AreEqual(new[] { "slow-1", "slow-1" }, await Task.WhenAll(first, second));
@@ -99,16 +247,16 @@ namespace MigrationTools.Endpoints.Tests
         public async Task GetFreshAccessTokenAsync_CallerCanStopWaitingWithoutCancellingOthers()
         {
             var slow = new SlowTokenCredential();
-            EntraIdCredentials.TokenCredential = slow;
+            _sut = Using(slow);
             using (var cts = new CancellationTokenSource())
             {
-                var cancelledCaller = EntraIdCredentials.GetFreshAccessTokenAsync(cts.Token);
-                var patientCaller = EntraIdCredentials.GetFreshAccessTokenAsync();
+                var cancelledCaller = _sut.GetFreshAccessTokenAsync(cts.Token);
+                var patientCaller = _sut.GetFreshAccessTokenAsync();
                 cts.Cancel();
 
                 await Assert.ThrowsExactlyAsync<OperationCanceledException>(() => cancelledCaller);
                 // Arrives after a caller gave up but before the fetch finishes: must join it, not start another.
-                var lateCaller = EntraIdCredentials.GetFreshAccessTokenAsync();
+                var lateCaller = _sut.GetFreshAccessTokenAsync();
                 slow.Release.SetResult(true);
                 Assert.AreEqual("slow-1", await patientCaller);
                 Assert.AreEqual("slow-1", await lateCaller);
@@ -119,7 +267,7 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L0")]
         public void FederatedCredential_TreatsUnauthorizedAsAChallenge()
         {
-            var credential = new EntraIdCredentials.EntraIdFederatedCredential();
+            var credential = new EntraIdCredentials.EntraIdFederatedCredential(_sut);
 
             Assert.IsTrue(credential.IsAuthenticationChallenge(new FakeResponse(HttpStatusCode.Unauthorized)));
             Assert.IsFalse(credential.IsAuthenticationChallenge(new FakeResponse(HttpStatusCode.OK)));
@@ -129,11 +277,11 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L0")]
         public async Task TokenProvider_FetchesAFreshTokenAfterTheServerRejectsTheCurrentOne()
         {
-            var credential = new EntraIdCredentials.EntraIdFederatedCredential();
+            var credential = new EntraIdCredentials.EntraIdFederatedCredential(_sut);
             Assert.AreEqual(1, _fake.Calls, "The credential starts with one token.");
             var initial = new VssOAuthAccessToken("token-1");
 
-            var provider = new EntraIdCredentials.EntraIdTokenProvider(credential, new Uri("https://dev.azure.com/example/"));
+            var provider = new EntraIdCredentials.EntraIdTokenProvider(credential, _sut, new Uri("https://dev.azure.com/example/"));
             Assert.IsFalse(provider.GetTokenIsInteractive);
 
             // Simulates the client library reacting to a 401 for the expired token.
@@ -187,11 +335,11 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L0")]
         public void GetAccessToken_StopsTheRunWithAReadableReasonWhenNoCredentialIsAvailable()
         {
-            EntraIdCredentials.TokenCredential = new UnavailableTokenCredential();
+            _sut = Using(new UnavailableTokenCredential());
 
-            var ex = Assert.ThrowsExactly<MigrationTools.Exceptions.MigrationRunStoppedException>(() => EntraIdCredentials.GetAccessToken());
+            var ex = Assert.ThrowsExactly<MigrationTools.Exceptions.MigrationRunStoppedException>(() => _sut.GetAccessToken());
 
-            StringAssert.StartsWith(ex.Message, "Could not get a Microsoft Entra ID token: No credential is signed in.");
+            StringAssert.StartsWith(ex.Message, "Endpoint 'Source': could not get a Microsoft Entra ID token with AzureCli: the Azure CLI is not signed in or not installed (No credential is signed in)");
             StringAssert.Contains(ex.Message, "az login");
             Assert.IsInstanceOfType(ex.InnerException, typeof(Azure.Identity.CredentialUnavailableException));
         }
@@ -199,9 +347,9 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L0")]
         public async Task GetFreshAccessTokenAsync_StopsTheRunWithAReadableReasonWhenNoCredentialIsAvailable()
         {
-            EntraIdCredentials.TokenCredential = new UnavailableTokenCredential();
+            _sut = Using(new UnavailableTokenCredential());
 
-            await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => EntraIdCredentials.GetFreshAccessTokenAsync());
+            await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => _sut.GetFreshAccessTokenAsync());
         }
 
         private sealed class BuggyTokenCredential : TokenCredential
@@ -216,28 +364,49 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L0")]
         public void GetAccessToken_DoesNotTurnUnrelatedErrorsIntoASignInStop()
         {
-            EntraIdCredentials.TokenCredential = new BuggyTokenCredential();
+            _sut = Using(new BuggyTokenCredential());
 
-            Assert.ThrowsExactly<InvalidOperationException>(() => EntraIdCredentials.GetAccessToken());
+            Assert.ThrowsExactly<InvalidOperationException>(() => _sut.GetAccessToken());
         }
 
         [TestMethod, TestCategory("L0")]
         public void IsCredentialFailure_AcceptsOnlyTheTokenCredentialsVariableRejection()
         {
             var saved = Environment.GetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable);
+            _sut = Using(_fake, EntraIdCredentialType.Default);
             try
             {
-                EntraIdCredentials.TokenCredential = null;
                 var rejected = new InvalidOperationException("Invalid value for environment variable AZURE_TOKEN_CREDENTIALS: notacredential.");
                 var unrelated = new InvalidOperationException("Collection was modified.");
 
                 Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, null);
-                Assert.IsFalse(EntraIdCredentials.IsCredentialFailure(rejected), "Not a pinning failure when the variable is unset.");
+                Assert.IsFalse(_sut.IsCredentialFailure(rejected), "Not a pinning failure when the variable is unset.");
 
                 Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, "NotACredential");
-                Assert.IsTrue(EntraIdCredentials.IsCredentialFailure(rejected));
-                Assert.IsFalse(EntraIdCredentials.IsCredentialFailure(unrelated));
-                Assert.IsTrue(EntraIdCredentials.IsCredentialFailure(new Azure.Identity.CredentialUnavailableException("none")));
+                Assert.IsTrue(_sut.IsCredentialFailure(rejected));
+                Assert.IsFalse(_sut.IsCredentialFailure(unrelated));
+                Assert.IsTrue(_sut.IsCredentialFailure(new Azure.Identity.CredentialUnavailableException("none")));
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, saved);
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void GetAccessToken_StopsReadablyWhenTheCredentialCannotBeBuilt()
+        {
+            var saved = Environment.GetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable);
+            try
+            {
+                Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, "NotACredential");
+                // The real factory: DefaultAzureCredential throws from its constructor for an unsupported value.
+                var sut = new EntraIdCredentials(null, "Source");
+
+                var ex = Assert.ThrowsExactly<MigrationTools.Exceptions.MigrationRunStoppedException>(() => sut.GetAccessToken());
+
+                StringAssert.Contains(ex.Message, "Endpoint 'Source'");
+                StringAssert.Contains(ex.Message, "AZURE_TOKEN_CREDENTIALS is set to 'NotACredential'");
             }
             finally
             {
@@ -249,12 +418,12 @@ namespace MigrationTools.Endpoints.Tests
         public void CredentialFailure_NamesThePinnedCredential()
         {
             var saved = Environment.GetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable);
+            _sut = Using(_fake, EntraIdCredentialType.Default);
             try
             {
-                EntraIdCredentials.TokenCredential = null;
                 Environment.SetEnvironmentVariable(EntraIdCredentials.TokenCredentialsVariable, "NotACredential");
 
-                var ex = EntraIdCredentials.CredentialFailure(new InvalidOperationException("Invalid value for environment variable AZURE_TOKEN_CREDENTIALS: notacredential."));
+                var ex = _sut.CredentialFailure(new InvalidOperationException("Invalid value for environment variable AZURE_TOKEN_CREDENTIALS: notacredential."));
 
                 StringAssert.Contains(ex.Message, "AZURE_TOKEN_CREDENTIALS is set to 'NotACredential'");
             }
@@ -276,12 +445,12 @@ namespace MigrationTools.Endpoints.Tests
         [TestMethod, TestCategory("L0")]
         public void Reset_MakesTheNextRequestAskTheCredentialAgain()
         {
-            Assert.AreEqual("token-1", EntraIdCredentials.GetAccessToken());
-            Assert.AreEqual("token-1", EntraIdCredentials.GetAccessToken());
+            Assert.AreEqual("token-1", _sut.GetAccessToken());
+            Assert.AreEqual("token-1", _sut.GetAccessToken());
 
-            EntraIdCredentials.Reset();
+            _sut.Reset();
 
-            Assert.AreEqual("token-2", EntraIdCredentials.GetAccessToken());
+            Assert.AreEqual("token-2", _sut.GetAccessToken());
         }
 
         private sealed class GatedTokenCredential : TokenCredential
@@ -300,14 +469,14 @@ namespace MigrationTools.Endpoints.Tests
         public async Task Reset_StopsAFetchStartedBeforeItFromPublishingItsToken()
         {
             var gated = new GatedTokenCredential();
-            EntraIdCredentials.TokenCredential = gated;
+            _sut = Using(gated);
 
-            var stale = EntraIdCredentials.GetFreshAccessTokenAsync();
-            EntraIdCredentials.Reset();
+            var stale = _sut.GetFreshAccessTokenAsync();
+            _sut.Reset();
             gated.Gate.SetResult(new AccessToken("stale", DateTimeOffset.UtcNow.AddHours(2)));
             Assert.AreEqual("stale", await stale, "The caller that started the fetch still gets its result.");
 
-            Assert.AreEqual("sync-1", EntraIdCredentials.GetAccessToken(), "The pre-reset token must not be cached.");
+            Assert.AreEqual("sync-1", _sut.GetAccessToken(), "The pre-reset token must not be cached.");
         }
 
         [TestMethod, TestCategory("L0")]
@@ -317,9 +486,9 @@ namespace MigrationTools.Endpoints.Tests
             var waits = new List<TimeSpan>();
             var retried = new List<int>();
 
-            var result = EntraIdCredentials.ConnectWithRetry(() =>
+            var result = _sut.ConnectWithRetry(() =>
             {
-                attempts.Add(EntraIdCredentials.GetAccessToken());
+                attempts.Add(_sut.GetAccessToken());
                 if (attempts.Count == 1) { throw new UnauthorizedAccessException("401"); }
                 return "connected";
             }, ex => ex is UnauthorizedAccessException, 2, TimeSpan.FromSeconds(3), (ex, attempt, wait) => retried.Add(attempt), waits.Add);
@@ -336,7 +505,7 @@ namespace MigrationTools.Endpoints.Tests
             var calls = 0;
             var waits = new List<TimeSpan>();
 
-            Assert.ThrowsExactly<UnauthorizedAccessException>(() => EntraIdCredentials.ConnectWithRetry<string>(() =>
+            Assert.ThrowsExactly<UnauthorizedAccessException>(() => _sut.ConnectWithRetry<string>(() =>
             {
                 calls++;
                 throw new UnauthorizedAccessException("401");
@@ -351,7 +520,7 @@ namespace MigrationTools.Endpoints.Tests
         {
             var calls = 0;
 
-            Assert.ThrowsExactly<InvalidOperationException>(() => EntraIdCredentials.ConnectWithRetry<string>(() =>
+            Assert.ThrowsExactly<InvalidOperationException>(() => _sut.ConnectWithRetry<string>(() =>
             {
                 calls++;
                 throw new InvalidOperationException("not an auth failure");
