@@ -77,7 +77,7 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 
    To sign in with a browser or device code, as an app registration (certificate or secret), or as a
    different identity on Source and Target, add an `EntraId` block to the endpoint. See
-   [Authenticate with Microsoft Entra ID](/docs/how-to/authenticate-with-entra-id/).
+   [Authenticate with Microsoft Entra ID]({{< ref "docs/how-to/authenticate-with-entra-id" >}}).
 
 4. Adjust the value of the `ReflectedWorkItemIdField` attribute (field name of the migration tracking field) for Source and Target
 
