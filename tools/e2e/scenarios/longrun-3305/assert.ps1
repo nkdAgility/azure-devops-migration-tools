@@ -2,7 +2,9 @@
 # longrun-3305 assertions (#3305): for every source item, the target item exists, and every source revision has a target
 # revision with the same ChangedDate whose State and every state-stamped field match the source, over REST. Reports each
 # item whose target has an empty value where the source has one, in migration order, so the point where it starts shows.
-param([string]$Src = "amt3305-long-src", [string]$Tgt = "amt3305-long-tgt", [string]$OutFile)
+param([string]$Src = "amt3305-long-src", [string]$Tgt = "amt3305-long-tgt", [string]$OutFile,
+    # The migration order of the config's query: config.json orders by ChangedDate descending, config-chain.json by Id.
+    [ValidateSet("ChangedDateDesc", "Id")][string]$Order = "ChangedDateDesc")
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 $fields = "System.State", "Microsoft.VSTS.Common.StateChangeDate",
@@ -22,8 +24,7 @@ $srcItems = @(Get-E2EAllWorkItems $Src -Org nkdagility-adomt-source)
 $tgtItems = @(Get-E2EAllWorkItems $Tgt -Org nkdagility-adomt-target)
 $byReflected = @{}
 foreach ($t in $tgtItems) { if ($t.fields.'Custom.ReflectedWorkItemId' -match '/_workitems/edit/(\d+)$') { $byReflected[[int]$Matches[1]] = $t } }
-# The processor's query orders by ChangedDate descending, so that is the migration order.
-$ordered = @($srcItems | Sort-Object { [datetime]$_.fields.'System.ChangedDate' } -Descending)
+$ordered = if ($Order -eq "Id") { @($srcItems | Sort-Object { [int]$_.id }) } else { @($srcItems | Sort-Object { [datetime]$_.fields.'System.ChangedDate' } -Descending) }
 $r = @(); $empty = @(); $mismatch = @(); $revCount = 0; $missing = @()
 for ($n = 0; $n -lt $ordered.Count; $n++) {
     $s = $ordered[$n]
