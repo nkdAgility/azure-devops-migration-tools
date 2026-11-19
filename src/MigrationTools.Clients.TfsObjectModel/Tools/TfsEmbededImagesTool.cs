@@ -1,4 +1,5 @@
-﻿using System;
+using MigrationTools.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -171,6 +172,7 @@ namespace MigrationTools.Tools
             {
                 using (var httpClient = new HttpClient(_httpClientHandler, false))
                 {
+                    MigrationUserAgent.Apply(httpClient);
                     if (!string.IsNullOrEmpty(sourcePersonalAccessToken))
                     {
                         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", sourcePersonalAccessToken);
