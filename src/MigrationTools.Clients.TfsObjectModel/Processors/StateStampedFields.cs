@@ -114,7 +114,8 @@ namespace MigrationTools.Processors
             if (expectedUnique != null && savedUnique != null)
             {
                 if (SameUniqueName(expectedUnique, savedUnique)) return IdentityMatch.Same;
-                if (expectedExplicit == savedExplicit) return IdentityMatch.Different;
+                if (expectedExplicit && savedExplicit) return IdentityMatch.Different;
+                if (!expectedExplicit && !savedExplicit) return CompareBareAccounts(expectedName, savedName, accountsNamed);
             }
             else if (expectedUnique == null && savedUnique == null) return IdentityMatch.Different;
             var savedIsBare = !savedExplicit && (expectedExplicit || savedUnique == null);
@@ -144,6 +145,24 @@ namespace MigrationTools.Processors
             var upnA = AfterDomain(a);
             var upnB = AfterDomain(b);
             return upnA.Contains("@") && string.Equals(upnA, upnB, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Two different account-shaped bare values: either may be a display name, so each is looked up in turn against
+        /// the other. Different only when neither names a display name; unproven when a lookup cannot be read.
+        /// </summary>
+        private static IdentityMatch CompareBareAccounts(string expected, string saved, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
+        {
+            foreach (var (name, other) in new[] { (saved, expected), (expected, saved) })
+            {
+                var accounts = accountsNamed?.Invoke(name);
+                if (accounts == null) return IdentityMatch.Unproven;
+                if (accounts.Count == 0) continue;
+                var carrying = accounts.Count(a => a != null && a.Any(u => SameUniqueName(u, other)));
+                if (carrying == accounts.Count) return IdentityMatch.Same;
+                return carrying == 0 ? IdentityMatch.Different : IdentityMatch.Unproven;
+            }
+            return IdentityMatch.Different;
         }
 
         private static bool LooksLikeAccount(string value) =>

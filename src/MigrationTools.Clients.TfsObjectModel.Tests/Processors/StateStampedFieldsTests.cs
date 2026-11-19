@@ -95,7 +95,17 @@ namespace MigrationTools.Tests.Processors
             Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person A <TENANT\\person-a@example.invalid>", noLookup));
             Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("DOMAINA\\person <DOMAINA\\person>", "Person <DOMAINB\\person>", noLookup));
             Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("TENANT\\person-a@example.invalid", "PERSON-A@example.invalid", noLookup));
-            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid", noLookup));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_TwoDifferentBareAccounts_AreResolvedThroughTheLookup()
+        {
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "alias@example.invalid",
+                name => name == "alias@example.invalid" ? Accounts(new[] { "person-a@example.invalid" }) : Accounts()));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid", name => Accounts()));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid",
+                name => name == "person-b@example.invalid" ? Accounts(new[] { "person-b@example.invalid" }) : Accounts()));
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid", name => null));
         }
 
         [TestMethod, TestCategory("L0")]
