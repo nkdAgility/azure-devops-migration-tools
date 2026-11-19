@@ -1,0 +1,1 @@
+../../../.specify/extensions/engineering-checks/.specify-dev/agent-commands/claude/speckit-engineering-checks-define-outcome-checks/SKILL.md

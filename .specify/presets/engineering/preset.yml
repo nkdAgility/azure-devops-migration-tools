@@ -1,0 +1,29 @@
+schema_version: "1.0"
+
+preset:
+  id: "engineering"
+  name: "nkda engineering"
+  version: "0.1.0"
+  description: "Adds the Definition of Ready to specify and the Definition of Done to implement. Wraps the stock prompts; never replaces them."
+  author: "nkdAgility"
+  repository: "https://github.com/nkdAgility/nkda-speckit"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=1.4,<2.0"
+
+provides:
+  templates:
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      description: "Stock specify, plus the Definition of Ready"
+      strategy: "wrap"
+    - type: "command"
+      name: "speckit.implement"
+      file: "commands/speckit.implement.md"
+      description: "Stock implement, plus the Definition of Done"
+      strategy: "wrap"
+
+tags:
+  - "engineering"

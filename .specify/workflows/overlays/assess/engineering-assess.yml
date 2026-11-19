@@ -1,0 +1,24 @@
+id: engineering-assess
+extends: assess
+priority: 10
+edits:
+- insert_before: intake
+  step:
+    id: nkda-intake
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/intake.ps1
+      -Text '{{ inputs.idea }}'
+- insert_after: shape
+  step:
+    id: nkda-challenge
+    type: prompt
+    integration: '{{ inputs.integration }}'
+    timeout: 1800
+    prompt: 'Follow the instructions in .specify/extensions/engineering-checks/commands/challenge.md
+      exactly. Arguments: '
+- insert_after: shape
+  step:
+    id: nkda-challenge-clean
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/open-findings.ps1
+      -File .specify/reviews/challenge.md

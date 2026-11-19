@@ -1,0 +1,116 @@
+id: engineering-bugfix
+extends: bugfix
+priority: 10
+edits:
+- insert_before: assess
+  step:
+    id: nkda-intake
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/intake.ps1
+      -Text '{{ inputs.report }}'
+- insert_after: assess
+  step:
+    id: nkda-bug-to-item
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/bug-to-item.ps1
+- insert_after: assess
+  step:
+    id: nkda-define-outcome-checks
+    type: prompt
+    integration: '{{ inputs.integration }}'
+    timeout: 1800
+    prompt: 'Follow the instructions in .specify/extensions/engineering-checks/commands/define-outcome-checks.md
+      exactly. Arguments: '
+- insert_after: assess
+  step:
+    id: nkda-specified
+    type: shell
+    run: 'pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1
+      -To Specified -Reason ''bug assessed: reproduction, cause and proposed fix written'''
+- insert_before: fix
+  step:
+    id: nkda-spec-agreed
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/spec-agreed.ps1
+- insert_before: fix
+  step:
+    id: nkda-ready
+    type: shell
+    run: 'pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1
+      -To Building -Reason ''Definition of Ready: spec agreed by Martin'''
+- insert_after: test
+  step:
+    id: nkda-done-checks
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/done-checks.ps1
+    timeout: 3600
+- insert_after: test
+  step:
+    id: nkda-docs-check
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1
+- insert_after: test
+  step:
+    id: nkda-blind-review
+    type: prompt
+    integration: '{{ inputs.integration }}'
+    timeout: 1800
+    prompt: 'Follow the instructions in .specify/extensions/common/commands/blind-review.md
+      exactly. Arguments: '
+- insert_after: test
+  step:
+    id: nkda-blind-review-clean
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/open-findings.ps1
+      -File .specify/reviews/blind-review.md
+- insert_after: test
+  step:
+    id: nkda-output-confidence
+    type: prompt
+    integration: '{{ inputs.integration }}'
+    timeout: 1800
+    prompt: 'Follow the instructions in .specify/extensions/common/commands/confidence.md
+      exactly. Arguments: '
+- insert_after: test
+  step:
+    id: nkda-output-done
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/gate-done.ps1
+      -Gate output
+    timeout: 3600
+- insert_after: test
+  step:
+    id: nkdaorder
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/order.ps1
+    output_format: json
+- insert_after: test
+  step:
+    id: nkda-outcome-before-merge
+    type: if
+    condition: '{{ steps.nkdaorder.output.data.beforeMerge }}'
+    then:
+    - id: nkda-outcome-checks
+      type: shell
+      run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/outcome-checks.ps1
+      timeout: 7200
+    - id: nkda-outcome-confidence
+      type: prompt
+      integration: '{{ inputs.integration }}'
+      timeout: 1800
+      prompt: 'Follow the instructions in .specify/extensions/common/commands/confidence.md
+        exactly. Arguments: gate=outcome'
+    - id: nkda-outcome-done
+      type: shell
+      run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/gate-done.ps1
+        -Gate outcome
+- insert_after: test
+  step:
+    id: nkda-open-pr
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/open-pr.ps1
+- insert_after: test
+  step:
+    id: nkda-merge-queue
+    type: shell
+    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/merge.ps1

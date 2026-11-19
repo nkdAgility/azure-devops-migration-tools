@@ -1,0 +1,66 @@
+schema_version: "1.0"
+
+extension:
+  id: engineering-checks
+  name: "nkda engineering checks"
+  version: "0.1.0"
+  description: "Adversarial challenge, architecture check, board state and the guards for engineering work"
+  author: nkdAgility
+  repository: https://github.com/nkdAgility/nkda-speckit
+  license: MIT
+
+requires:
+  speckit_version: ">=1.4,<2.0"
+  tools:
+    - name: pwsh
+      required: true
+    - name: gh
+      required: false
+
+provides:
+  commands:
+    - name: speckit.engineering-checks.challenge
+      file: commands/challenge.md
+      description: "Attack the idea itself: wrong assumptions, missing failure modes, unstated risks"
+    - name: speckit.engineering-checks.arch-check
+      file: commands/arch-check.md
+      description: "Check the plan against the repository's architecture rules"
+    - name: speckit.engineering-checks.refine
+      file: commands/refine.md
+      description: "Refining: gather what is needed to understand the item before any spec is written"
+    - name: speckit.engineering-checks.define-outcome-checks
+      file: commands/define-outcome-checks.md
+      description: "Define the item's outcome checks so a machine can run them against the real system"
+    - name: speckit.engineering-checks.mcp-story
+      file: commands/mcp-story.md
+      description: "Spec bar for a Product Backlog Item: MCP story"
+    - name: speckit.engineering-checks.personas
+      file: commands/personas.md
+      description: "Spec bar for a Product Backlog Item: Personas"
+    - name: speckit.engineering-checks.refactor-assessment
+      file: commands/refactor-assessment.md
+      description: "Spec bar for a Product Backlog Item: Refactor assessment"
+    - name: speckit.engineering-checks.api-story
+      file: commands/api-story.md
+      description: "Spec bar for a Product Backlog Item: API story"
+    - name: speckit.engineering-checks.rubber-duck
+      file: commands/rubber-duck.md
+      description: "Spec bar for a Product Backlog Item: Rubber duck"
+    - name: speckit.engineering-checks.assess-feedback
+      file: commands/assess-feedback.md
+      description: "Assess a Feedback item and recommend what it becomes"
+    - name: speckit.engineering-checks.adopt-docs
+      file: commands/adopt-docs.md
+      description: "Adoption: plan the move of this repo's source-of-truth docs into docs/specs/"
+    - name: speckit.engineering-checks.guard
+      file: commands/guard.md
+      description: "Blocks pushes to main and hand edits to run state"
+
+events:
+  pre_tool_use:
+    command: speckit.engineering-checks.guard
+    timeout: 30
+
+tags:
+  - "engineering"
+  - "board"

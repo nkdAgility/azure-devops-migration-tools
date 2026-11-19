@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "presets": {
+    "engineering": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:9aa9829d0edada2d12fd69c317a0cdec034721323246ba54ae0c9b73443471b8",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.specify",
+          "speckit.implement"
+        ]
+      },
+      "registered_skills": {
+        "claude": [
+          "speckit-specify",
+          "speckit-implement"
+        ]
+      },
+      "installed_at": "2026-11-19T16:29:52.752381+00:00"
+    }
+  }
+}

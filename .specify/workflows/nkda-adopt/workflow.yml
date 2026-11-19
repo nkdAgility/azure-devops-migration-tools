@@ -1,0 +1,57 @@
+schema_version: "1.0"
+workflow:
+  id: "nkda-adopt"
+  name: "Adopt a repo"
+  version: "0.1.0"
+  author: "nkdAgility"
+  description: "Moves a repo onto the workflow: board set-up, docs conversion, reconcile of work in flight, carry-over and a final check. Stops for Martin's approval of the docs plan and of the reconcile."
+requires:
+  speckit_version: ">=1.4,<2.0"
+inputs:
+  repo:
+    type: string
+    default: ""
+    prompt: "GitHub repo (owner/name); empty uses the current one"
+  integration:
+    type: string
+    default: "auto"
+    prompt: "Integration to use ('auto' uses the project's initialized integration)"
+steps:
+  - id: board
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-board.ps1 -Repo '{{ inputs.repo }}'"
+    timeout: 600
+  - id: docs-plan
+    type: prompt
+    integration: "{{ inputs.integration }}"
+    timeout: 3600
+    prompt: "Follow the instructions in .specify/extensions/engineering-checks/commands/adopt-docs.md exactly. Arguments: none"
+  - id: approve-docs
+    type: gate
+    message: "Read .specify/adopt/docs-plan.md. Approve to run its git mv lines (history is kept); reject to stop."
+    options: [approve, reject]
+    on_reject: abort
+  - id: docs-apply
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-docs-apply.ps1"
+  - id: reconcile-plan
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-plan.ps1"
+    timeout: 600
+  - id: approve-reconcile
+    type: gate
+    message: "Read .specify/adopt/reconcile.md: each open item, its old state, its new state, and why. Approve to apply it exactly as shown; reject to stop."
+    options: [approve, reject]
+    on_reject: abort
+  - id: reconcile-apply
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-apply.ps1"
+    timeout: 1800
+  - id: carry-over
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-carry.ps1"
+    timeout: 600
+  - id: check
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-check.ps1"
+    timeout: 600

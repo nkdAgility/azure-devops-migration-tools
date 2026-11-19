@@ -1,0 +1,6 @@
+installed:
+- common
+- engineering-checks
+settings:
+  auto_execute_hooks: true
+hooks: {}

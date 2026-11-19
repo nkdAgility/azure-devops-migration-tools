@@ -1,0 +1,5 @@
+{
+  "build": "dotnet build MigrationTools.sln",
+  "test": "dotnet test MigrationTools.sln --no-build --filter \"(TestCategory=L0|TestCategory=L1)\"",
+  "proof": "pwsh -NoProfile -File .specify/memory/proof.ps1"
+}
