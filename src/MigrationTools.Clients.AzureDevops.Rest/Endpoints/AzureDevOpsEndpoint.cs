@@ -1,3 +1,4 @@
+using MigrationTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,7 +101,8 @@ namespace MigrationTools.Endpoints
                 BaseAddress = new Uri(url)
             };
             client.DefaultRequestHeaders.Add("Accept", $"application/json; {versionParameter}");
-            //client.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)"); #1784
+            MigrationUserAgent.Apply(client);
+            Log.LogTrace("User agent (REST endpoint {Endpoint}): {UserAgent}", Options.Name, client.DefaultRequestHeaders.UserAgent);
             return client;
         }
 

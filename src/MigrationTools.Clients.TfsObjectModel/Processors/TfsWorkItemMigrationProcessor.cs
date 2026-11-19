@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Common;
+using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Common;
@@ -1591,6 +1593,7 @@ namespace MigrationTools.Processors
             fields.AddRange(StateStampedFields.Fields.Where(f => target.Fields.Contains(f)));
 
             var wrong = new List<string>();
+            var unproven = new List<string>();
             foreach (Revision tr in target.Revisions)
             {
                 var at = TargetWhen(tr);
@@ -1615,11 +1618,24 @@ namespace MigrationTools.Processors
                     var expected = sr.Fields[sourceField].Value;
                     if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
                     var saved = tr.Fields.Contains(field) ? tr.Fields[field].Value : null;
-                    if (!StateStampedFields.SameValue(StateStampedFields.IsEmpty(expected) ? null : expected, saved, isIdentity))
+                    expected = StateStampedFields.IsEmpty(expected) ? null : expected;
+                    var match = isIdentity
+                        ? StateStampedFields.CompareIdentity(expected, saved, TargetAccountsNamed)
+                        : StateStampedFields.SameValue(expected, saved) ? IdentityMatch.Same : IdentityMatch.Different;
+                    if (match == IdentityMatch.Different)
                     {
                         wrong.Add($"revision {tr.Index + 1} {field} is '{saved}' but source revision {sr.Index + 1} is '{expected}'");
                     }
+                    else if (match == IdentityMatch.Unproven)
+                    {
+                        unproven.Add($"revision {tr.Index + 1} {field} '{saved}' against '{expected}'");
+                    }
                 }
+            }
+            if (unproven.Count > 0)
+            {
+                Log.LogWarning("Target work item {TargetId} (source {SourceId}): could not confirm that {Count} identity value(s) are the account the source and user mapping give, because the account behind the target display name could not be read or the name is shared: {Values}. The item is treated as migrated; check these values in the target if they matter.",
+                    target.Id, source.Id, unproven.Count, string.Join("; ", unproven.Distinct().Take(10)));
             }
             if (wrong.Count > 0)
             {
@@ -1628,16 +1644,65 @@ namespace MigrationTools.Processors
         }
 
 
-        private static void VerifyStateStampedFieldsSaved(int revision, Func<string, object> savedValue, List<(string Field, object Expected, bool IsIdentity)> expected)
+        private void VerifyStateStampedFieldsSaved(int revision, Func<string, object> savedValue, List<(string Field, object Expected, bool IsIdentity)> expected)
         {
-            var wrong = expected.Where(e => !StateStampedFields.SameValue(e.Expected, savedValue(e.Field), e.IsIdentity))
-                .Select(e => $"{e.Field} saved as '{savedValue(e.Field)}' but the source is '{e.Expected}'")
+            IdentityMatch Compare((string Field, object Expected, bool IsIdentity) e) => e.IsIdentity
+                ? StateStampedFields.CompareIdentity(e.Expected, savedValue(e.Field), TargetAccountsNamed)
+                : StateStampedFields.SameValue(e.Expected, savedValue(e.Field)) ? IdentityMatch.Same : IdentityMatch.Different;
+            var results = expected.Select(e => (e, Match: Compare(e))).ToList();
+            foreach (var (e, _) in results.Where(r => r.Match == IdentityMatch.Unproven))
+            {
+                Log.LogWarning("Target revision {Revision}: could not confirm that {Field} saved as '{Saved}' is the account '{Expected}', because the account behind the display name could not be read or the name is shared.",
+                    revision, e.Field, savedValue(e.Field), e.Expected);
+            }
+            var wrong = results.Where(r => r.Match == IdentityMatch.Different)
+                .Select(r => $"{r.e.Field} saved as '{savedValue(r.e.Field)}' but the source is '{r.e.Expected}'")
                 .ToList();
             if (wrong.Count > 0)
             {
                 throw new InvalidOperationException($"target revision {revision} was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
             }
+        }
 
+        private readonly Dictionary<string, IReadOnlyList<IReadOnlyCollection<string>>> _targetAccountsByDisplayName = new(StringComparer.OrdinalIgnoreCase);
+        private IIdentityManagementService _targetIdentities;
+
+        /// <summary>
+        /// The unique names of every target account with this display name (#3290), or null when the target identity
+        /// service cannot be read. Cached for the run; a failed read is cached too, so it is reported once.
+        /// </summary>
+        private IReadOnlyList<IReadOnlyCollection<string>> TargetAccountsNamed(string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(displayName)) return null;
+            if (_targetAccountsByDisplayName.TryGetValue(displayName, out var cached)) return cached;
+            IReadOnlyList<IReadOnlyCollection<string>> accounts = null;
+            try
+            {
+                _targetIdentities ??= Target.GetService<IIdentityManagementService>();
+                var found = _targetIdentities.ReadIdentities(IdentitySearchFactor.DisplayName, new[] { displayName }, MembershipQuery.None, ReadIdentityOptions.None);
+                accounts = (found?.FirstOrDefault() ?? Array.Empty<TeamFoundationIdentity>())
+                    .Where(i => i != null && !i.IsContainer)
+                    .Select(UniqueNamesOf)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning("The target account named '{DisplayName}' could not be read from the target identity service ({Reason}), so identity values with that name cannot be confirmed.",
+                    displayName, WorkItemMigrationFailedException.ServerReason(ex));
+                Log.LogDebug(ex, "Reading the target identity '{DisplayName}' failed.", displayName);
+            }
+            _targetAccountsByDisplayName[displayName] = accounts;
+            return accounts;
+        }
+
+        private static IReadOnlyCollection<string> UniqueNamesOf(TeamFoundationIdentity identity)
+        {
+            var account = identity.GetAttribute("Account", null);
+            var domain = identity.GetAttribute("Domain", null);
+            return new[] { identity.UniqueName, account, identity.GetAttribute("Mail", null), string.IsNullOrEmpty(domain) || string.IsNullOrEmpty(account) ? null : $"{domain}\\{account}" }
+                .Where(u => !string.IsNullOrWhiteSpace(u))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
         }
         private bool SkipRevisionWithInvalidIterationPath(WorkItemData targetWorkItemData)
         {
