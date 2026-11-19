@@ -113,7 +113,7 @@ The file is JSON Lines: one JSON object per line, with these fields.
 | `link-left-on-source` | A git commit, branch or pull request link could not be rewritten and still points at the source. |
 | `field-not-mapped` | A source field has a value but does not exist on the target work item type, so the value was dropped. |
 | `field-truncated` | A string value was cut to `StringManipulatorTool` `MaxStringLength`. |
-| `field-map-failed` | A field map threw an error (logged as `Field map fault`), so its value was not set. |
+| `field-map-failed` | A field map threw an error (logged as `Field map fault`), so its value was not set. The entry names the map and a short hash of its configuration; it resolves only when that same map, with the same configuration, runs cleanly. If you change the map's configuration to fix it, the old entry stays open in the latest view: the review log cannot tell a corrected map from a different one. |
 | `user-not-mapped` | An identity value matches more than one entry in the user mapping file, or is a source user that does not exist in the target and is not mapped. |
 | `attachment-not-migrated` | An attachment is bigger than `MaxAttachmentSize`, could not be downloaded, or failed. |
 | `embedded-image-not-migrated` | An image embedded in an HTML or Markdown field could not be downloaded or fixed, so it still points at the source. |
