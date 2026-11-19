@@ -22,6 +22,7 @@ namespace MigrationTools.Services
         public const string LinkLeftOnSource = "link-left-on-source";
         public const string FieldNotMapped = "field-not-mapped";
         public const string FieldMapFailed = "field-map-failed";
+        public const string FieldTruncated = "field-truncated";
         public const string UserNotMapped = "user-not-mapped";
         public const string AttachmentNotMigrated = "attachment-not-migrated";
         public const string PathNotMapped = "path-not-mapped";
@@ -35,7 +36,7 @@ namespace MigrationTools.Services
         /// </summary>
         public static readonly ISet<string> FoundOnlyWhileReplaying = new HashSet<string>(StringComparer.Ordinal)
         {
-            Failed, PartMigrated, FieldNotMapped, FieldMapFailed, UserNotMapped, PathNotMapped, TypeChanged,
+            Failed, PartMigrated, FieldNotMapped, FieldMapFailed, FieldTruncated, UserNotMapped, PathNotMapped, TypeChanged,
         };
 
         /// <summary>
@@ -49,9 +50,19 @@ namespace MigrationTools.Services
             [AttachmentNotMigrated] = "follow-up-attachments.jsonl",
             [FieldNotMapped] = "follow-up-fields.jsonl",
             [FieldMapFailed] = "follow-up-fields.jsonl",
+            [FieldTruncated] = "follow-up-fields.jsonl",
             [PathNotMapped] = "follow-up-area-iteration-paths.jsonl",
             [Skipped] = "follow-up-skipped.jsonl",
         };
+    }
+
+    /// <summary>
+    /// Implemented by components created outside the tool container (field maps) that write to the review log;
+    /// the creator sets <see cref="ReviewLog"/>.
+    /// </summary>
+    public interface IRecordsWorkItemReview
+    {
+        WorkItemReviewLog ReviewLog { set; }
     }
 
     /// <summary>

@@ -5,13 +5,16 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.Configuration;
 using MigrationTools._EngineV1.Containers;
 using MigrationTools.DataContracts;
+using MigrationTools.Services;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
 {
-    public abstract class FieldMapBase : IFieldMap
+    public abstract class FieldMapBase : IFieldMap, IRecordsWorkItemReview
     {
+        public WorkItemReviewLog ReviewLog { protected get; set; }
+
         protected IFieldMapOptions _Config;
         protected ITelemetryLogger Telemetry;
 
@@ -47,6 +50,9 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
                             { "Target",  target.ToWorkItem().Id.ToString()}
                        });
                 Telemetry.TrackException(ex, null);
+                ReviewLog?.Record(WorkItemReviewCategory.FieldMapFailed,
+                    $"Field map {Name} ({MappingDisplayName}) failed: {ex.Message}",
+                    "Fix the field map configuration or the source value, then re-run so the revision is replayed with the map.");
             }
         }
 

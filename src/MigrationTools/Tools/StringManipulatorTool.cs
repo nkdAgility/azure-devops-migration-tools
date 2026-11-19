@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 using MigrationTools.Tools.Interfaces;
 
@@ -58,6 +60,9 @@ namespace MigrationTools.Tools
 
                 if (IsStringTooLong(result))
                 {
+                    Services?.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.FieldTruncated,
+                        $"A string value of {result.Length} characters was cut to MaxStringLength ({Options.MaxStringLength}).",
+                        "Copy the full value from the source work item, or raise StringManipulatorTool MaxStringLength and re-run.");
                     result = result.Substring(0, Options.MaxStringLength);
                 }
             }

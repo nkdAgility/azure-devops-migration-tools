@@ -111,6 +111,8 @@ The file is JSON Lines: one JSON object per line, with these fields.
 | `link-skipped` | A link was not migrated: the related item was not migrated (and is not migrated later in the run), cannot be read, or its link type does not exist in the target; or a hyperlink is not valid. |
 | `link-left-on-source` | A git commit, branch or pull request link could not be rewritten and still points at the source. |
 | `field-not-mapped` | A source field has a value but does not exist on the target work item type, so the value was dropped. |
+| `field-truncated` | A string value was cut to `StringManipulatorTool` `MaxStringLength`. |
+| `field-map-failed` | A field map threw an error (logged as `Field map fault`), so its value was not set. |
 | `user-not-mapped` | An identity value matches more than one entry in the user mapping file, or is a source user that does not exist in the target and is not mapped. |
 | `attachment-not-migrated` | An attachment is bigger than `MaxAttachmentSize` or failed, or an embedded image could not be downloaded or fixed. |
 | `path-not-mapped` | An area or iteration path does not exist in the target and is not mapped, or a revision was not saved because of it (`SkipRevisionWithInvalidAreaPath`/`SkipRevisionWithInvalidIterationPath`). |
@@ -124,10 +126,7 @@ The same problem for the same item is written once per run.
 
 **End of the run.** The log gives the number of entries by category, and each follow-up file with its row count. It also writes `work-items-to-review-latest.jsonl`, the latest entry for each item across this run and the earlier runs. You do not need it: the per-run files are complete without it.
 
-**Re-runs.** Each run writes its own file. A run reads the review files of earlier runs in the same `logs` folder, but only the entries written for the same source and target collection and project (the `migration` field), because work item ids are only unique within one migration. When an item they listed now migrates with no problems, it gets a `resolved` entry. Problems that are only found while replaying a revision (`failed`, `part-migrated`, `field-not-mapped`, `user-not-mapped`, `path-not-mapped`, `type-changed`) count as checked again only when the revision they were found on is replayed in this run. Otherwise the item stays in the latest view with its earlier entry. Run from the same folder, or pass the same `--logPath`, for earlier runs to be found.
-
-Field map faults are not yet written to the review log; they are still logged as `Field map fault`.
-
+**Re-runs.** Each run writes its own file. A run reads the review files of earlier runs in the same `logs` folder, but only the entries written for the same source and target collection and project (the `migration` field), because work item ids are only unique within one migration. When an item they listed now migrates with no problems, it gets a `resolved` entry. Problems that are only found while replaying a revision (`failed`, `part-migrated`, `field-not-mapped`, `field-map-failed`, `field-truncated`, `user-not-mapped`, `path-not-mapped`, `type-changed`) count as checked again only when the revision they were found on is replayed in this run. Otherwise the item stays in the latest view with its earlier entry. Run from the same folder, or pass the same `--logPath`, for earlier runs to be found.
 ---
 
 ## WIQL Query

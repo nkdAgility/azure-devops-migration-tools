@@ -6,6 +6,9 @@
 #  ghost    - Task assigned to "Ghost Reviewer", which matches two entries in the mapping file (user-not-mapped). The orgs have one
 #             real user, so an identity missing from the target cannot be seeded; the ambiguous mapping is the case that can.
 #  legacy   - User Story moved from a project whose process has Custom.amte2e3297Legacy (field-not-mapped).
+#  long     - Task with a 200-character Integration Build; the config sets MaxStringLength to 150 (field-truncated). Only
+#             String fields go through StringManipulatorTool, and the title is copied onto the shell before it, so it is not used.
+#  (legacy also gets field-map-failed: the config has a RegexFieldMap with an invalid pattern for User Story.)
 #  fillers  - 12 Tasks, each with an oversized attachment and 4 revisions, so the kill test has entries to cut through.
 param([int]$Fillers = 12)
 $ErrorActionPreference = "Stop"
@@ -48,6 +51,9 @@ Set-E2EWorkItem -Id $ghostItem.id -BypassRules -Fields ([ordered]@{ "System.Assi
 $legacy = Set-E2EWorkItem $old "User Story" -Fields ([ordered]@{ "System.Title" = "3297 legacy (moved)"; $legacyRef = "legacy-value" })
 Set-E2EWorkItem -Id $legacy.id -Fields ([ordered]@{ "System.TeamProject" = $src; "System.AreaPath" = $src; "System.IterationPath" = $src }) | Out-Null
 
+$long = Set-E2EWorkItem $src "Task" -Fields ([ordered]@{ "System.Title" = "3297 long value" })
+Set-E2EWorkItem -Id $long.id -Fields ([ordered]@{ "Microsoft.VSTS.Build.IntegrationBuild" = "build-" + ("x" * 194) }) | Out-Null
+
 $fill = @()
 for ($i = 1; $i -le $Fillers; $i++) {
     $f = Set-E2EWorkItem $src "Task" -Fields ([ordered]@{ "System.Title" = "3297 filler $i" })
@@ -57,5 +63,5 @@ for ($i = 1; $i -le $Fillers; $i++) {
     $fill += $f.id
 }
 
-Save-E2EState $PSScriptRoot @{ bug = $bug.id; related = $related.id; attach = $attach.id; commit = $commit.id; ghost = $ghostItem.id; legacy = $legacy.id; fillers = $fill; legacyRef = $legacyRef; targetProcess = $tp }
-"seeded 3297: bug $($bug.id) related $($related.id) attach $($attach.id) commit $($commit.id) ghost $($ghostItem.id) legacy $($legacy.id) fillers $($fill -join ',')"
+Save-E2EState $PSScriptRoot @{ bug = $bug.id; related = $related.id; attach = $attach.id; commit = $commit.id; ghost = $ghostItem.id; legacy = $legacy.id; long = $long.id; fillers = $fill; legacyRef = $legacyRef; targetProcess = $tp }
+"seeded 3297: bug $($bug.id) related $($related.id) attach $($attach.id) commit $($commit.id) ghost $($ghostItem.id) legacy $($legacy.id) long $($long.id) fillers $($fill -join ',')"
