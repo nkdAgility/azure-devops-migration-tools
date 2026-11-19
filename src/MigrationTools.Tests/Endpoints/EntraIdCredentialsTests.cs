@@ -83,6 +83,49 @@ namespace MigrationTools.Endpoints.Tests
             }
         }
 
+        private sealed class GatedClaimsCredential : TokenCredential
+        {
+            public readonly TaskCompletionSource<bool> Release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            public readonly System.Collections.Concurrent.ConcurrentQueue<string> ClaimsSeen = new System.Collections.Concurrent.ConcurrentQueue<string>();
+            public string Next = "B";
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) => throw new NotSupportedException();
+            public override async ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken)
+            {
+                ClaimsSeen.Enqueue(requestContext.Claims);
+                await Release.Task;
+                return new AccessToken(Next, DateTimeOffset.UtcNow.AddHours(1));
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_ACallerWithDifferentClaimsDoesNotJoinARunningFetch()
+        {
+            var gated = new GatedClaimsCredential();
+            _sut = Using(gated);
+
+            var withoutClaims = _sut.GetFreshAccessTokenAsync("A", null);
+            var withClaims = _sut.GetFreshAccessTokenAsync("A", "{\"c\":1}");
+            gated.Release.SetResult(true);
+            await Task.WhenAll(withoutClaims, withClaims);
+
+            CollectionAssert.AreEquivalent(new string[] { null, "{\"c\":1}" }, gated.ClaimsSeen.ToArray(), "The claims caller got its own fetch.");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_AJoiningCallerStopsWhenTheSharedResultIsTheTokenItRejected()
+        {
+            var gated = new GatedClaimsCredential { Next = "B" };
+            _sut = Using(gated);
+
+            var rejectedA = _sut.GetFreshAccessTokenAsync("A", null);
+            var rejectedB = _sut.GetFreshAccessTokenAsync("B", null);
+            gated.Release.SetResult(true);
+
+            Assert.AreEqual("B", await rejectedA, "B is a new token for the caller that rejected A.");
+            await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => rejectedB, "B must not be resent by the caller it was rejected for.");
+            Assert.AreEqual(1, gated.ClaimsSeen.Count, "Equivalent callers still share one fetch.");
+        }
+
         [TestMethod, TestCategory("L0")]
         public async Task TfsRenewal_UsesTheClaimsTheLast401AskedForOnce()
         {

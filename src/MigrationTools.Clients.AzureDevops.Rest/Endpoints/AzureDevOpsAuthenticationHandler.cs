@@ -46,7 +46,13 @@ namespace MigrationTools.Endpoints
             // The token expired, was revoked, or no longer meets a policy (a continuous access evaluation challenge
             // carries the claims the new token needs): renew once and resend. Renewal stops the run rather than
             // return the token that was just rejected. A second 401 is an access problem, so it goes back to the caller.
-            var rejected = request.Headers.Authorization.Parameter;
+            // A redirect clears Authorization before following it; a 401 from the redirect target is not a rejection of
+            // our token, and the credential must not be re-sent to a host it was taken off for.
+            var rejected = request.Headers.Authorization?.Parameter;
+            if (string.IsNullOrEmpty(rejected))
+            {
+                return response;
+            }
             string claims = null;
             foreach (var challenge in response.Headers.WwwAuthenticate)
             {

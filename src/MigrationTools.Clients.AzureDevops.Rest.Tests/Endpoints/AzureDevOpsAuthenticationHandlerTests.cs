@@ -121,6 +121,33 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(1, renewals.Count);
         }
 
+        private sealed class RedirectingServer : HttpMessageHandler
+        {
+            public int Calls;
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                Calls++;
+                // As the redirect handler does before following a redirect to another host.
+                request.Headers.Authorization = null;
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized));
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task EntraId_DoesNotRenewWhenARedirectRemovedTheToken()
+        {
+            var server = new RedirectingServer();
+            var renewals = new List<string>();
+            var client = new HttpClient(new AzureDevOpsAuthenticationHandler(() => "current", AuthenticationMode.EntraId,
+                (rejected, claims, ct) => { renewals.Add(rejected); return Task.FromResult("renewed"); }, server));
+
+            var response = await client.GetAsync("https://dev.azure.com/org/_apis/x");
+
+            Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.AreEqual(1, server.Calls);
+            Assert.AreEqual(0, renewals.Count, "The 401 came from the redirect target, not from our token.");
+        }
+
         [TestMethod, TestCategory("L0")]
         public async Task AccessToken_NeverRetries()
         {

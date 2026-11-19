@@ -273,6 +273,9 @@ namespace MigrationTools.Endpoints
             lock (_cacheLock)
             {
                 fetch = _inFlight;
+                // Join a running fetch only when it asks for the same claims; a token got without them would fail the
+                // same policy again, so a caller with a different challenge starts its own.
+                if (fetch != null && !string.Equals(_inFlightClaims, claims, StringComparison.Ordinal)) { fetch = null; }
                 if (fetch == null)
                 {
                     // An app credential keeps its tokens in an in-memory MSAL cache and would hand back the token the
@@ -290,6 +293,7 @@ namespace MigrationTools.Endpoints
                     _generation++;
                     var started = FetchAndCacheAsync(Current, _generation, rejectedToken, claims);
                     _inFlight = started;
+                    _inFlightClaims = claims;
                     fetch = started;
                     // Cleared when the fetch itself finishes (success or failure), never when a caller stops
                     // waiting, so a cancelled caller cannot let a second fetch start alongside the first.
@@ -302,8 +306,16 @@ namespace MigrationTools.Endpoints
                     }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
                 }
             }
-            return (await WaitAsync(fetch, cancellationToken).ConfigureAwait(false)).Token;
+            var token = await WaitAsync(fetch, cancellationToken).ConfigureAwait(false);
+            // A caller that joined someone else's fetch checks the result against the token it had rejected.
+            if (!string.IsNullOrEmpty(rejectedToken) && string.Equals(token.Token, rejectedToken, StringComparison.Ordinal))
+            {
+                throw RejectedTokenFailure(token);
+            }
+            return token.Token;
         }
+
+        private string _inFlightClaims;
 
         // The shared fetch ignores any one caller's cancellation (that would fail every waiter); each caller can
         // still stop waiting on its own token.
