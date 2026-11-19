@@ -51,7 +51,7 @@ provides:
       description: "Assess a Feedback item and recommend what it becomes"
     - name: speckit.engineering-checks.adopt-docs
       file: commands/adopt-docs.md
-      description: "Adoption: plan the move of this repo's source-of-truth docs into docs/specs/"
+      description: "Adoption: plan the move of this repo's source-of-truth docs into the repo's spec root (specRoot in .specify/memory/workflow.json, default docs/specs/)"
     - name: speckit.engineering-checks.guard
       file: commands/guard.md
       description: "Blocks pushes to main and hand edits to run state"

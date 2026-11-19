@@ -4,7 +4,7 @@ description: "Assess a Feedback item and recommend what it becomes"
 
 # Assess feedback
 
-For the Feedback item in `.specify/items/current.json`: find whether it is real, what is behind it, and what already exists (`docs/specs/`, open items, the code).
+For the Feedback item in `.specify/items/current.json`: find whether it is real, what is behind it, and what already exists (the spec root, `specRoot` in `.specify/memory/workflow.json`, default `docs/specs/`, open items, the code).
 
 $ARGUMENTS
 

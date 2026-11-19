@@ -6,7 +6,7 @@ description: "Refining: gather what is needed to understand the item before any 
 
 For the item in `.specify/items/current.json`:
 
-1. Read the source-of-truth docs for the area it touches (`docs/specs/`, by the repo's list of systems and their paths).
+1. Read the source-of-truth docs for the area it touches (the spec root, `specRoot` in `.specify/memory/workflow.json`, default `docs/specs/`, by the repo's list of systems and their paths).
 2. Work out the paths it will touch and what is out of scope.
 3. For a Bug, reproduce it on `main` and record the exact steps and the result.
 
