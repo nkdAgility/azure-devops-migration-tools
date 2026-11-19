@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Clients;
 using MigrationTools.Processors;
@@ -97,8 +98,17 @@ namespace MigrationTools.Tests.Processors
             map.MarkIncomplete();
 
             Assert.IsFalse(map.IsComplete);
-            Assert.IsFalse(map.MustQuery(Source, 1), "an item found in the map is still known");
+            Assert.IsTrue(map.MustQuery(Source, 1), "an incomplete map may lack a second target item, so a hit is not trusted");
             Assert.IsTrue(map.MustQuery(Source, 3));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IdRanges_CoverEveryIdOnceWithinTheWidth()
+        {
+            var ranges = ReflectedWorkItemIdMap.IdRanges(32000, 15000).ToList();
+            CollectionAssert.AreEqual(new[] { (1, 15000), (15001, 30000), (30001, 32000) }, ranges);
+            CollectionAssert.AreEqual(new[] { (1, 7) }, ReflectedWorkItemIdMap.IdRanges(7, 15000).ToList());
+            Assert.IsEmpty(ReflectedWorkItemIdMap.IdRanges(0, 15000).ToList());
         }
 
         [TestMethod, TestCategory("L0")]

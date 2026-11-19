@@ -28,10 +28,26 @@ namespace MigrationTools.Clients
 
         public void MarkIncomplete() => IsComplete = false;
 
-        /// <summary>True when the map cannot say whether a source item is in the target: ambiguous, or missing from an incomplete map.</summary>
+        /// <summary>
+        /// True when the map cannot say whether, or where, a source item is in the target: it is ambiguous, or the map is
+        /// incomplete. An incomplete map may hold one of two target items for a source item, so even a hit is not trusted.
+        /// </summary>
         public bool MustQuery(string reflectedWorkItemId)
         {
-            return IsAmbiguous(reflectedWorkItemId) || (!IsComplete && !TryGetTargetId(reflectedWorkItemId, out _));
+            return !IsComplete || IsAmbiguous(reflectedWorkItemId);
+        }
+
+        /// <summary>Consecutive id ranges of at most <paramref name="width"/> ids that cover 1 to <paramref name="maxId"/>.</summary>
+        public static IEnumerable<(int From, int To)> IdRanges(int maxId, int width)
+        {
+            if (width <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(width));
+            }
+            for (long from = 1; from <= maxId; from += width)
+            {
+                yield return ((int)from, (int)Math.Min(maxId, from + width - 1));
+            }
         }
 
         public bool MustQuery(Uri sourceCollection, int sourceId) => MustQuery(Format(sourceCollection, sourceId));
