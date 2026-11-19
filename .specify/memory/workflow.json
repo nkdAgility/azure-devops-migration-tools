@@ -489,5 +489,6 @@
       "Duplicate": "Removed",
       "In review": "In review"
     }
-  }
+  },
+  "sharedSource": "../nkda-speckit"
 }
