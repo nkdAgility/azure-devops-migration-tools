@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MigrationTools.Endpoints.Tests
 {
     [TestClass]
+    [DoNotParallelize] // Changes the process-wide AZURE_TOKEN_CREDENTIALS variable.
     public class EntraIdCredentialsTests
     {
         private sealed class CountingTokenCredential : TokenCredential

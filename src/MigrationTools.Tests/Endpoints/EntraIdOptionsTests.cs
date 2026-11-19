@@ -10,6 +10,7 @@ using MigrationTools.Exceptions;
 namespace MigrationTools.Endpoints.Tests
 {
     [TestClass]
+    [DoNotParallelize] // Builds DefaultAzureCredential, which reads AZURE_TOKEN_CREDENTIALS; EntraIdCredentialsTests changes it.
     public class EntraIdOptionsTests
     {
         private const string Tenant = "11111111-1111-1111-1111-111111111111";
