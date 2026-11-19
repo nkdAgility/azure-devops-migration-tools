@@ -1,4 +1,5 @@
 {
+  "mergeMinConfidence": 90,
   "specRoot": "platform/specs",
   "$comment": "The approved engineering Definition of Workflow (spec/definition-of-workflow-engineering.md) as data. A repo copies this to .specify/memory/workflow.json and changes only the settings marked per repo. WIP limits and stuckAfterMinutes are placeholders until Martin sets them.",
   "validatingBeforeMerge": true,
