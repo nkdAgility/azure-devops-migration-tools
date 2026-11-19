@@ -11,7 +11,16 @@ try {
 $inputs = $call.tool_input
 $text = @($inputs.command, $inputs.file_path, $inputs.path) -join ' '
 
-if ($text -match 'git\s+push\b[^|;&]*\b(origin\s+)?(main|master)\b' -or $text -match 'git\s+push\b.*--force') {
+# Each command in a chain is checked on its own; git global options (git -C dir push) may come before push.
+$pushBlocked = foreach ($seg in ($text -split '[|;&]+')) {
+    $m = [regex]::Match($seg, '\bgit(\s+-\S+(\s+(?!push\b)[^\s-]\S*)?)*\s+push\b(?<rest>.*)$')
+    if (-not $m.Success) { continue }
+    $pa = @($m.Groups['rest'].Value.Trim() -split '\s+' | Where-Object { $_ } | ForEach-Object { $_.Trim('''"') })
+    $force = $pa | Where-Object { $_ -match '^(--force(-with-lease)?(=.*)?|-[a-zA-Z]*f[a-zA-Z]*|\+.+)$' }
+    $toMain = $pa | Where-Object { $_ -match '^(\+?(refs/heads/)?(main|master)|.*:(refs/heads/)?(main|master))$' }
+    if ($force -or $toMain) { $true }
+}
+if ($pushBlocked) {
     [Console]::Error.WriteLine('guard: pushing to main or force-pushing is blocked. Merge through a PR and the merge queue.')
     exit 2
 }

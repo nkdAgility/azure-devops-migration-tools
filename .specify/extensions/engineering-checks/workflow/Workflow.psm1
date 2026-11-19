@@ -77,6 +77,7 @@ function New-GitHubBoardAdapter {
             type      = if ($i.PSObject.Properties['issueType'] -and $i.issueType) { $i.issueType.name } else { $null }
             state     = if ($state) { $state } elseif ($i.state -eq 'CLOSED') { 'Closed' } else { 'Proposed' }
             oldStatus = if ($state) { $null } else { $status }
+            stateSet  = [bool]$state -or $i.state -eq 'CLOSED'
             tags      = @($i.labels | ForEach-Object { $_.name })
             createdAt = $i.createdAt
             body      = $i.body
@@ -88,7 +89,9 @@ function New-GitHubBoardAdapter {
     @{
         Name       = 'github'
         GetItems   = {
-            $list = @(gh issue list @r --state open --limit 500 --json $fields | ConvertFrom-Json)
+            $list = @(gh issue list @r --state open --limit 5000 --json $fields | ConvertFrom-Json)
+            if ($LASTEXITCODE -ne 0) { throw 'gh issue list failed' }
+            if ($list.Count -ge 5000) { throw 'more than 5000 open issues; the inventory would be incomplete' }
             $st = if ($list) { & $statusOf @($list | ForEach-Object { [int]$_.number }) } else { @{} }
             $list | ForEach-Object { & $toItem $_ $st[[int]$_.number] }
         }.GetNewClosure()
@@ -110,18 +113,18 @@ function New-GitHubBoardAdapter {
                 $oid = @($f.options | Where-Object { $_.name -eq $state } | ForEach-Object { $_.id }) | Select-Object -First 1
                 if (-not $oid) { throw "'$StateField' has no option named '$state'" }
                 $fr = gh api graphql -f query="mutation{setIssueFieldValue(input:{issueId:`"$($q.data.repository.issue.id)`",issueFields:[{fieldId:`"$($f.id)`",singleSelectOptionId:`"$oid`"}]}){clientMutationId}}"
-                if ("$fr" -match '"errors"') { throw "$fr" }
+                if ($LASTEXITCODE -ne 0 -or "$fr" -match '"errors"') { throw "setting $StateField failed: $fr" }
             }
             $sid = @($q.data.repository.planningStatuses.nodes | Where-Object { $_.name -eq $want } | ForEach-Object { $_.id }) | Select-Object -First 1
             if (-not $sid) { throw "the repo has no Status named '$want'; add it in the repo's settings" }
             $res = gh api graphql -f query="mutation{setIssueStatus(input:{issueId:`"$($q.data.repository.issue.id)`",statusId:`"$sid`"}){clientMutationId}}"
-            if ("$res" -match '"errors"') { throw "$res" }
-            if ($state -eq 'Closed') { gh issue close $item.id @r --reason completed | Out-Null }
-            if ($state -eq 'Removed') { gh issue close $item.id @r --reason 'not planned' | Out-Null }
+            if ($LASTEXITCODE -ne 0 -or "$res" -match '"errors"') { throw "setting Status failed: $res" }
+            if ($state -eq 'Closed') { gh issue close $item.id @r --reason completed | Out-Null; if ($LASTEXITCODE -ne 0) { throw "closing #$($item.id) failed" } }
+            if ($state -eq 'Removed') { gh issue close $item.id @r --reason 'not planned' | Out-Null; if ($LASTEXITCODE -ne 0) { throw "closing #$($item.id) failed" } }
         }.GetNewClosure()
         GetStatuses = { (gh api graphql -f query="{repository(owner:`"$owner`",name:`"$name`"){planningStatuses(first:50){nodes{name}}}}" | ConvertFrom-Json).data.repository.planningStatuses.nodes.name }.GetNewClosure()
         ToStatus   = $toStatus
-        AddComment = { param($item, $text) gh issue comment $item.id @r --body $text | Out-Null }.GetNewClosure()
+        AddComment = { param($item, $text) gh issue comment $item.id @r --body $text | Out-Null; if ($LASTEXITCODE -ne 0) { throw "commenting on #$($item.id) failed" } }.GetNewClosure()
         SetTag     = { param($item, $tag, [bool]$on) gh label create $tag @r --force | Out-Null; if ($on) { gh issue edit $item.id @r --add-label $tag | Out-Null } else { gh issue edit $item.id @r --remove-label $tag | Out-Null } }.GetNewClosure()
         GetPrState = { param($item) $pr = gh pr list @r --state all --search "$($item.id) in:body" --json number,state --limit 1 | ConvertFrom-Json; if ($pr) { $pr[0].state } else { $null } }.GetNewClosure()
     }
@@ -152,8 +155,9 @@ function Get-ItemEvidence {
 }
 
 function Get-Section([string]$Text, [string]$Name) {
-    $m = [regex]::Match($Text, "(?ms)^#{2,4}\s*$([regex]::Escape($Name))\s*\n(.*?)(?=^#{1,4}\s|\z)")
-    if ($m.Success) { $m.Groups[1].Value.Trim() } else { $null }
+    # The evidence is the body, then comments, then the WKR, so the last section with the name is the current one.
+    $m = [regex]::Matches($Text, "(?ms)^#{2,4}\s*$([regex]::Escape($Name))\s*\n(.*?)(?=^#{1,4}\s|\z)") | Select-Object -Last 1
+    if ($m) { $m.Groups[1].Value.Trim() } else { $null }
 }
 
 function Get-ItemMoves($Item) {
@@ -189,7 +193,7 @@ function Test-Check {
         'pattern'         { [regex]::IsMatch($Evidence, $Check.pattern) }
         'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b') }
         'noOpen'          { $s = Get-Section $Evidence $Check.name; $null -eq $s -or -not [regex]::IsMatch($s, '(?i)\bopen\b') }
-        'noOpenQuestions' { $s = Get-Section $Evidence 'Questions'; $null -eq $s -or -not [regex]::IsMatch($s, '(?im)^.*\bQ-\d+\b.*\bopen\b') }
+        'noOpenQuestions' { @(Get-OpenQuestions $Evidence).Count -eq 0 }
         'confidence'      {
             $s = Get-Section $Evidence $Check.name
             $min = if ($Check.ContainsKey('min')) { $Check.min } elseif ($Config -and $Config.ContainsKey('minConfidence')) { $Config.minConfidence } else { 85 }
@@ -314,7 +318,8 @@ function Sync-ItemWatch {
             }
         }
     }
-    Set-Content $wkr $wkrText -NoNewline -Encoding utf8
+    # Write only when an answer was recorded, so an unchanged poll does not count as activity on the WKR.
+    if ($changes.answered.Count) { Set-Content $wkr $wkrText -NoNewline -Encoding utf8 }
 
     $item = & $Adapter.GetItem $Id
     $open = @(Get-OpenQuestions (Get-ItemEvidence $item $Root))
@@ -324,7 +329,8 @@ function Sync-ItemWatch {
     if (-not $open.Count -and $isBlocked) { & $Adapter.SetTag $item $tag $false }
     $changes.blocked = [bool]$open.Count
     $item = & $Adapter.GetItem $Id
-    @{ comments = @($item.comments).Count; state = $item.state; tags = @($item.tags) } | ConvertTo-Json | Set-Content $seenPath -Encoding utf8
+    # The cursor is the snapshot this pass processed, so a reply that arrived meanwhile is read next time.
+    @{ comments = $comments.Count; state = $item.state; tags = @($item.tags) } | ConvertTo-Json | Set-Content $seenPath -Encoding utf8
     $changes
 }
 
@@ -402,11 +408,12 @@ function Invoke-WorkflowManager {
         $def = Get-StateDef $Config $item.state
         $parentReady = (Test-IsParent $item) -and $item.state -eq 'Refined'
         if (($def.kind -notin 'work', 'wait-children' -and -not $parentReady) -or $item.tags -contains $blocked) { continue }
-        $iorder = Get-ItemOrder $Config $item
+        $full = & $Adapter.GetItem $item.id
+        $iorder = Get-ItemOrder $Config $full
         $i = $iorder.IndexOf($item.state); if ($i -lt 0 -or $i -ge $iorder.Count - 1) { continue }
         $to = $iorder[$i + 1]
         $all = @(& $Adapter.GetItems)
-        $t = Test-Move -Config $Config -Item $item -To $to -Adapter $Adapter -Root $Root -AllItems $all -SkipScripts
+        $t = Test-Move -Config $Config -Item $full -To $to -Adapter $Adapter -Root $Root -AllItems $all -SkipScripts
         if ($t.ok) {
             $r = Move-WorkItem -Config $Config -Id $item.id -To $to -Reason "its $($t.shift.name) policy passed" -Adapter $Adapter -Root $Root -WhatIf:$WhatIf
             if ($r.ok) { $report.moves += @{ id = $item.id; from = $item.state; to = $to; shift = $t.shift.name } }
@@ -441,12 +448,11 @@ function Invoke-WorkflowManager {
         $waited = [math]::Round(($Now - $since.ToUniversalTime()).TotalHours, 1)
         if ($item.tags -contains $blocked) { $report.attention += @{ kind = 'blocked'; id = $item.id; state = $item.state; waitedHours = $waited } }
         elseif ($def.kind -eq 'wait-martin' -or ((Test-IsParent $item) -and $item.state -eq 'Refined')) { $report.attention += @{ kind = 'decision'; id = $item.id; state = $item.state; waitedHours = $waited } }
-        $q = Get-Section (Get-ItemEvidence $item $Root) 'Questions'
-        if ($q) { foreach ($m in [regex]::Matches($q, '(?im)^.*\b(Q-\d+)\b.*\bopen\b.*$')) { $report.attention += @{ kind = 'question'; id = $item.id; question = $m.Groups[1].Value; state = $item.state } } }
+        foreach ($oq in @(Get-OpenQuestions (Get-ItemEvidence $item $Root))) { $report.attention += @{ kind = 'question'; id = $item.id; question = $oq.id; state = $item.state } }
         if ($def.kind -eq 'work' -and $def.stuckAfterMinutes -and $item.tags -notcontains $blocked) {
             $idle = ($Now - (Get-LastActivity $item $Root)).TotalMinutes
             if ($idle -gt $def.stuckAfterMinutes) {
-                $restarts = @(Get-ItemMoves $item | Where-Object { $_.restart }).Count
+                $restarts = @(Get-ItemMoves $item | Where-Object { $_['restart'] }).Count
                 $s = @{ id = $item.id; state = $item.state; idleMinutes = [math]::Round($idle) }
                 $report.stuck += $s
                 if ($restarts -eq 0) { $report.actions += @{ action = 'restart-step'; id = $item.id; state = $item.state } }

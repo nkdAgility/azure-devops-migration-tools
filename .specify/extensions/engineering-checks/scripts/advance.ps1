@@ -6,8 +6,11 @@ $cfg = Get-WorkflowConfig
 $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
 if (-not $To) {
     $adapter = Get-BoardAdapter $cfg
-    $state = (& $adapter.GetItem $id).state
-    $To = $cfg.order[$cfg.order.IndexOf($state) + 1]
+    $item = & $adapter.GetItem $id
+    $order = Get-ItemOrder $cfg $item
+    $i = $order.IndexOf($item.state)
+    if ($i -lt 0 -or $i -ge $order.Count - 1) { Write-Error "#$id is in $($item.state), which has no next state on its route."; exit 1 }
+    $To = $order[$i + 1]
 }
 & (Join-Path $PSScriptRoot 'move-state.ps1') -Id $id -To $To -Reason $Reason
 exit $LASTEXITCODE

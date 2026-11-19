@@ -10,9 +10,11 @@ $section = Get-Section (Get-ItemEvidence $item) 'Outcome checks'
 if (-not $section) { Write-Error "#$id has no 'Outcome checks' section."; exit 1 }
 $checks = [regex]::Matches($section, '(?m)^\s*-\s*(.+?):\s*`([^`]+)`')
 if ($checks.Count -eq 0) { Write-Error "'Outcome checks' lists no runnable check (- <what>: ``command``)."; exit 1 }
+$malformed = @($section -split "`n" | Where-Object { $_ -match '^\s*-\s' -and $_ -notmatch '^\s*-\s*(.+?):\s*`([^`]+)`' })
+if ($malformed) { Write-Error "'Outcome checks' has entries that are not runnable checks (- <what>: ``command``): $($malformed.Trim() -join ' | ')"; exit 1 }
 $results = foreach ($c in $checks) {
     $name = $c.Groups[1].Value; $cmd = $c.Groups[2].Value
-    pwsh -NoProfile -Command $cmd
+    pwsh -NoProfile -Command $cmd | Out-Host
     $code = $LASTEXITCODE
     [pscustomobject]@{ name = $name; command = $cmd; exit = $code }
 }

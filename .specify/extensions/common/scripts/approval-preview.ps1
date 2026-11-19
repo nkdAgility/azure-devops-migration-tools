@@ -3,10 +3,10 @@
 param([Parameter(Mandatory)][string]$Staged, [string]$Target = '.')
 $ErrorActionPreference = 'Stop'
 if (-not (Test-Path $Staged)) { Write-Error "Nothing staged at $Staged"; exit 1 }
-Get-ChildItem $Staged -Recurse -File | ForEach-Object {
+Get-ChildItem $Staged -Recurse -File -Force | ForEach-Object {
     $rel = [IO.Path]::GetRelativePath((Resolve-Path $Staged), $_.FullName)
     $dest = Join-Path $Target $rel
     if (Test-Path $dest) { "CHANGE $rel"; git --no-pager diff --no-index -- $dest $_.FullName }
-    else { "NEW    $rel" }
+    else { "NEW    $rel"; Get-Content $_.FullName | ForEach-Object { "+$_" } }
 }
 exit 0

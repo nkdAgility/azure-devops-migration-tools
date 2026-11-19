@@ -5,7 +5,7 @@ $cfg = Get-WorkflowConfig
 $ad = Get-BoardAdapter $cfg
 $items = @(& $ad.GetItems)
 $names = @($cfg.states | ForEach-Object { $_.name })
-$bad = @($items | Where-Object { $_.state -notin $names })
+$bad = @($items | Where-Object { $_.state -notin $names -or ($_.ContainsKey('stateSet') -and -not $_.stateSet) })
 $over = foreach ($s in $cfg.states) { $n = @($items | Where-Object state -eq $s.name).Count; if ($s.wipLimit -and $n -gt $s.wipLimit) { "$($s.name): $n of $($s.wipLimit)" } }
 $report = Invoke-WorkflowManager -Config $cfg -Adapter $ad -WhatIf
 New-Item -ItemType Directory -Force .specify/manager | Out-Null

@@ -15,6 +15,7 @@ if (-not (Test-Path $cfgPath)) {
 $cfg = Get-WorkflowConfig
 $nwo = if ($cfg.board['repo']) { $cfg.board.repo } else { (gh repo view --json nameWithOwner | ConvertFrom-Json).nameWithOwner }
 $r = if ($cfg.board['repo']) { @('-R', $cfg.board.repo) } else { @() }
+if ($cfg.board.adapter -ne 'github') { Write-Error "adopt-board sets up a GitHub board; board.adapter is '$($cfg.board.adapter)'."; exit 1 }
 $ad = Get-BoardAdapter $cfg
 $statuses = @(& $ad.GetStatuses)
 $needStatus = if ($cfg.board['stateField']) { @($cfg.board.categoryStatus.Values) } else { @($cfg.states | ForEach-Object { & $ad.ToStatus $_.name }) }
@@ -25,7 +26,7 @@ if ($cfg.board['stateField']) {
     if (-not $opts) { "the issue field '$($cfg.board.stateField)' is missing or is not single-select; add it in Organization settings > Planning > Issue fields"; exit 1 }
     if ($missingOptions) { "'$($cfg.board.stateField)' is missing options: $($missingOptions -join ', ')"; exit 1 }
 }
-foreach ($t in @($cfg.tags.expedite, $cfg.tags.blocked, 'class-c-approved', 'evidence-waived')) { gh label create $t @r --force | Out-Null }
+foreach ($t in @($cfg.tags.expedite, $cfg.tags.blocked, 'class-c-approved', 'evidence-waived')) { gh label create $t @r --force | Out-Null; if ($LASTEXITCODE -ne 0) { Write-Error "could not create the tag '$t'."; exit 1 } }
 "tags set; Status options missing: $(if ($missingStatus) { $missingStatus -join ', ' } else { 'none' })"
 $nwo = if ($cfg.board['repo']) { $cfg.board.repo } else { (gh repo view --json nameWithOwner | ConvertFrom-Json).nameWithOwner }
 $owner, $name = $nwo -split '/'

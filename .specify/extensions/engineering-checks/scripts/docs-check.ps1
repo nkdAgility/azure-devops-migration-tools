@@ -10,7 +10,12 @@ $failures = [Collections.Generic.List[string]]::new()
 $root = 'docs/specs'
 $cfgPath = '.specify/memory/workflow.json'
 if (Test-Path $cfgPath) { $c = Get-Content $cfgPath -Raw | ConvertFrom-Json; if ($c.PSObject.Properties['specRoot'] -and $c.specRoot) { $root = $c.specRoot.TrimEnd('/') } }
-$changed = @(git diff --name-only "$Base...HEAD") + @(git diff --name-only) + @(git diff --name-only --cached) | Where-Object { $_ } | Sort-Object -Unique
+$changed = foreach ($d in @(@('--name-only', "$Base...HEAD"), @('--name-only'), @('--name-only', '--cached'))) {
+    $out = @(git diff @d)
+    if ($LASTEXITCODE -ne 0) { Write-Error "git diff $($d -join ' ') failed; the changed files are not known."; exit 1 }
+    $out
+}
+$changed = @($changed | Where-Object { $_ } | Sort-Object -Unique)
 
 if (-not (Test-Path "$root/systems.md")) { $failures.Add("$root/systems.md is missing: the repo has not listed its systems") }
 else {

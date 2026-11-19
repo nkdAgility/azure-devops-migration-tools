@@ -4,11 +4,17 @@ param([Parameter(Mandatory)][string]$Staged, [string]$Target = '.', [Parameter(M
 $ErrorActionPreference = 'Stop'
 & (Join-Path $PSScriptRoot 'approval-check.ps1') -Path $Staged -Record $Record
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-Get-ChildItem $Staged -Recurse -File | ForEach-Object {
-    $rel = [IO.Path]::GetRelativePath((Resolve-Path $Staged), $_.FullName)
-    $dest = Join-Path $Target $rel
+$recordPath = [IO.Path]::GetFullPath($Record)
+$snapshot = @(Get-ChildItem $Staged -Recurse -File -Force | Where-Object FullName -ne $recordPath | Sort-Object FullName | ForEach-Object {
+    $bytes = [IO.File]::ReadAllBytes($_.FullName)
+    @{ rel = [IO.Path]::GetRelativePath((Resolve-Path $Staged), $_.FullName); bytes = $bytes; hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)) }
+})
+$fp = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes((($snapshot | ForEach-Object { "$($_.rel) $($_.hash)" }) -join "`n"))))
+if ($fp -ne (Get-Content $Record -Raw | ConvertFrom-Json).fingerprint) { Write-Error "Changed since approval: $Staged. Approve it again."; exit 1 }
+foreach ($f in $snapshot) {
+    $dest = Join-Path $Target $f.rel
     New-Item -ItemType Directory -Force (Split-Path $dest) | Out-Null
-    Copy-Item $_.FullName $dest -Force
-    "WROTE $rel"
+    [IO.File]::WriteAllBytes([IO.Path]::GetFullPath($dest), $f.bytes)
+    "WROTE $($f.rel)"
 }
 exit 0

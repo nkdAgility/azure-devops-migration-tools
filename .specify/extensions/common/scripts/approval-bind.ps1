@@ -2,7 +2,7 @@
 param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Record, [string]$ApprovedBy = 'Martin')
 $ErrorActionPreference = 'Stop'
 function Get-Fingerprint([string]$p) {
-    $files = if (Test-Path $p -PathType Container) { Get-ChildItem $p -Recurse -File | Sort-Object FullName } else { Get-Item $p }
+    $files = if (Test-Path $p -PathType Container) { Get-ChildItem $p -Recurse -File -Force | Where-Object FullName -ne ([IO.Path]::GetFullPath($Record)) | Sort-Object FullName } else { Get-Item $p }
     $lines = foreach ($f in $files) {
         $rel = if (Test-Path $p -PathType Container) { [IO.Path]::GetRelativePath((Resolve-Path $p), $f.FullName) } else { $f.Name }
         "$rel $((Get-FileHash $f.FullName -Algorithm SHA256).Hash)"
