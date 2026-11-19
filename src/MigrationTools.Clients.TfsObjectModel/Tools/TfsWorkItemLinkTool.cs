@@ -135,6 +135,72 @@ namespace MigrationTools.Tools
         }
 
         /// <summary>
+        /// Says, from the loaded items and the source → target id map only, which link of the source the target lacks (#3299).
+        /// A link to a work item that is not in the target is not counted: the link migration could not add it either.
+        /// </summary>
+        /// <returns>A description of the first missing link, or null when the target has every link of the source.</returns>
+        public string FindMissingLink(TfsProcessor processor, WorkItemData sourceWorkItem, WorkItemData targetWorkItem, ReflectedWorkItemIdMap map)
+        {
+            var source = sourceWorkItem.ToWorkItem();
+            var targetLinks = targetWorkItem.ToWorkItem().Links.Cast<Link>().ToList();
+            var targetRelated = new HashSet<string>(
+                targetLinks.OfType<RelatedLink>().Where(t => t.LinkTypeEnd != null)
+                    .Select(t => RevisionArtifactDiff.RelatedLinkKey(t.LinkTypeEnd.ImmutableName, t.RelatedWorkItemId)),
+                StringComparer.OrdinalIgnoreCase);
+            var targetHyperlinks = new HashSet<string>(
+                targetLinks.OfType<Hyperlink>().Select(t => RevisionArtifactDiff.HyperlinkKey(GetAbsoluteUri(t) ?? t.Location)),
+                StringComparer.OrdinalIgnoreCase);
+            var targetExternal = new HashSet<string>(
+                targetLinks.OfType<ExternalLink>().Select(t => RevisionArtifactDiff.ExternalLinkKey(t.LinkedArtifactUri)),
+                StringComparer.OrdinalIgnoreCase);
+            var sourceCollection = source.Store.TeamProjectCollection.Uri;
+
+            foreach (Link sourceLink in source.Links)
+            {
+                switch (sourceLink)
+                {
+                    case Hyperlink hl:
+                        var uri = GetAbsoluteUri(hl);
+                        if (!string.IsNullOrEmpty(uri) && IsValidHyperlink(uri) && !targetHyperlinks.Contains(RevisionArtifactDiff.HyperlinkKey(uri)))
+                        {
+                            return $"hyperlink {uri}";
+                        }
+                        break;
+                    case RelatedLink rl when rl.LinkTypeEnd != null:
+                        if (map.TryGetTargetId(sourceCollection, rl.RelatedWorkItemId, out var relatedTargetId)
+                            && !targetRelated.Contains(RevisionArtifactDiff.RelatedLinkKey(rl.LinkTypeEnd.ImmutableName, relatedTargetId)))
+                        {
+                            return $"{rl.LinkTypeEnd.ImmutableName} link to source {rl.RelatedWorkItemId} (target {relatedTargetId})";
+                        }
+                        break;
+                    case ExternalLink el when !IsBuildLink(el):
+                        if (!HasExternalLink(processor, sourceWorkItem, el, targetExternal, targetHyperlinks))
+                        {
+                            return $"external link {el.LinkedArtifactUri}";
+                        }
+                        break;
+                }
+            }
+            return null;
+        }
+
+        private bool HasExternalLink(TfsProcessor processor, WorkItemData sourceWorkItem, ExternalLink el, HashSet<string> targetExternal, HashSet<string> targetHyperlinks)
+        {
+            if (targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri)))
+            {
+                return true;
+            }
+            var git = Services.GetRequiredService<TfsGitRepositoryTool>();
+            var targetUri = git.GetTargetUri(processor, sourceWorkItem, el);
+            if (targetUri != null && targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(targetUri)))
+            {
+                return true;
+            }
+            var url = git.GetPullRequestHyperlinkUrl(processor, el);
+            return url != null && targetHyperlinks.Contains(RevisionArtifactDiff.HyperlinkKey(url));
+        }
+
+        /// <summary>
         /// Migrates shared steps for test case work items, updating step references in the target work item.
         /// </summary>
         /// <param name="processor">The TFS processor performing the migration</param>

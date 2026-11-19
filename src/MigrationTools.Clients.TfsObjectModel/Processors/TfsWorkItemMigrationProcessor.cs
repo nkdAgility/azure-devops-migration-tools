@@ -100,6 +100,10 @@ namespace MigrationTools.Processors
 
         new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
 
+        private TfsWorkItemMigrationClient TargetClient => (TfsWorkItemMigrationClient)Target.WorkItems;
+
+        private readonly RerunCounts _rerunCounts = new RerunCounts();
+
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
             if (properties != null)
@@ -176,6 +180,10 @@ namespace MigrationTools.Processors
                 // After filtering, so the scan only covers (and only stops for) items that will be migrated.
                 ValidateRevisionHistoryFields(sourceWorkItems);
 
+                var reflectedIdMap = TargetClient.LoadReflectedWorkItemIdMap();
+                contextLog.Information("Found {MigratedCount} work items already migrated to the target ({AmbiguousCount} source items with more than one target item are looked up one by one).",
+                    reflectedIdMap.Count, reflectedIdMap.AmbiguousCount);
+
                 _current = 1;
                 _count = sourceWorkItems.Count;
                 _totalWorkItem = sourceWorkItems.Count;
@@ -197,7 +205,9 @@ namespace MigrationTools.Processors
                     {
                         try
                         {
+                            _rerunCounts.Begin();
                             ProcessWorkItemAsync(sourceWorkItemData, progressTimer, Options.WorkItemCreateRetryLimit).Wait();
+                            _rerunCounts.Succeeded();
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
@@ -223,6 +233,7 @@ namespace MigrationTools.Processors
                                 ExceptionDispatchInfo.Capture(stop).Throw();
                             }
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
+                            _rerunCounts.Fail();
                             var failure = (e as AggregateException)?.Flatten().InnerExceptions.OfType<WorkItemMigrationFailedException>().FirstOrDefault()
                                 ?? e as WorkItemMigrationFailedException;
                             var message = failure?.Message ?? WorkItemMigrationFailedException.Describe(sourceWorkItem.Id.ToString(), null, null, sourceWorkItem.Type?.Name, e);
@@ -246,6 +257,7 @@ namespace MigrationTools.Processors
             finally
             {
                 LogMissingTargetFieldSummary();
+                contextLog.Information("Work items: {RunSummary}.", _rerunCounts.ToString());
                 CommonTools.ExportWorkItemMapping.SaveMappings();
                 CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
                 CommonTools.GitRepository?.LogUnresolvedSummary();
@@ -847,6 +859,7 @@ namespace MigrationTools.Processors
                         List<RevisionItem> revisionsToMigrate =CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                         if (targetWorkItem == null)
                         {
+                            _rerunCounts.Set(RerunCounts.Outcome.Created);
                             targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
                             activity?.SetTag("Revisions", revisionsToMigrate.Count);
 
@@ -855,8 +868,19 @@ namespace MigrationTools.Processors
                         {
                             // A rerun never treats a wrongly saved revision as migrated (#3270).
                             VerifyMigratedRevisions(sourceWorkItem, targetWorkItem);
-                            if (revisionsToMigrate.Count == 0)
+                            var difference = revisionsToMigrate.Count == 0 ? FindReRunDifference(sourceWorkItem, targetWorkItem) : null;
+                            if (revisionsToMigrate.Count == 0 && difference == null)
                             {
+                                // In sync (#3299): no enrichers, link lookups, field maps or save.
+                                _rerunCounts.Set(RerunCounts.Outcome.InSync);
+                                TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and is in sync: revisions, fields and links match the source");
+                                activity?.SetTag("Revisions", 0);
+                            }
+                            else if (revisionsToMigrate.Count == 0)
+                            {
+                                _rerunCounts.Set(RerunCounts.Outcome.Updated);
+                                TraceWriteLine(LogEventLevel.Information, "Work item exists with no revisions to sync, but the target differs: {Difference}",
+                                    new Dictionary<string, object>() { { "Difference", difference } });
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                                 ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
@@ -865,11 +889,11 @@ namespace MigrationTools.Processors
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                                 StampCatchUpSave(targetWorkItem);
-                                TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
                                 activity?.SetTag("Revisions", 0);
                             }
                             else
                             {
+                                _rerunCounts.Set(RerunCounts.Outcome.Updated);
                                 TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisions detected",
                                     new Dictionary<string, object>(){
                                     { "revisionsToMigrateCount", revisionsToMigrate.Count }
@@ -890,7 +914,12 @@ namespace MigrationTools.Processors
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
                         {
-                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);                            targetWorkItem.ToWorkItem().Close();
+                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
+                            if (int.TryParse(targetWorkItem.Id, out var savedTargetId) && savedTargetId > 0)
+                            {
+                                TargetClient.RecordReflectedWorkItem(Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString(), savedTargetId);
+                            }
+                            targetWorkItem.ToWorkItem().Close();
                         }
                         if (sourceWorkItem != null)
                         {
@@ -955,6 +984,38 @@ namespace MigrationTools.Processors
                 _current++;
                 _count--;
             }
+        }
+
+        /// <summary>
+        /// What an already migrated target with no revisions to replay lacks, from the loaded items only (#3299).
+        /// </summary>
+        /// <returns>A description of the difference, or null when the target is in sync and needs no work.</returns>
+        private string FindReRunDifference(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            if (sourceWorkItem.Type == "Test Case")
+            {
+                return "test case shared steps and parameters are always checked";
+            }
+            var source = sourceWorkItem.ToWorkItem();
+            if (CommonTools.WorkItemLink.Enabled && source.Links.Count > 0)
+            {
+                var missingLink = CommonTools.WorkItemLink.FindMissingLink(this, sourceWorkItem, targetWorkItem, TargetClient.ReflectedIdMap);
+                if (missingLink != null)
+                {
+                    return "missing " + missingLink;
+                }
+            }
+            if (CommonTools.Attachment.Enabled && source.Attachments.Count > 0)
+            {
+                var missingAttachment = AttachmentDiff.FirstMissing(
+                    source.Attachments.Cast<Attachment>().Select(a => (a.Name, a.Length)),
+                    targetWorkItem.ToWorkItem().Attachments.Cast<Attachment>().Select(a => (a.Name, a.Length)));
+                if (missingAttachment != null)
+                {
+                    return "missing attachment " + missingAttachment;
+                }
+            }
+            return null;
         }
 
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
