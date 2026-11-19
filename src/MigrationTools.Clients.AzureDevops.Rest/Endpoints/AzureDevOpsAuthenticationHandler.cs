@@ -15,11 +15,11 @@ namespace MigrationTools.Endpoints
     internal sealed class AzureDevOpsAuthenticationHandler : DelegatingHandler
     {
         private readonly Func<string> _resolveToken;
-        private readonly Func<CancellationToken, Task<string>> _renewToken;
+        private readonly Func<string, string, CancellationToken, Task<string>> _renewToken;
         private readonly AuthenticationMode _authenticationMode;
 
-        /// <param name="renewToken">EntraId mode: gets a new token after the server rejected the current one.</param>
-        public AzureDevOpsAuthenticationHandler(Func<string> resolveToken, AuthenticationMode authenticationMode, Func<CancellationToken, Task<string>> renewToken = null, HttpMessageHandler inner = null)
+        /// <param name="renewToken">EntraId mode: gets a new token after the server rejected the current one, given the rejected token and any claims challenge from the 401.</param>
+        public AzureDevOpsAuthenticationHandler(Func<string> resolveToken, AuthenticationMode authenticationMode, Func<string, string, CancellationToken, Task<string>> renewToken = null, HttpMessageHandler inner = null)
             : base(inner ?? new HttpClientHandler())
         {
             _resolveToken = resolveToken;
@@ -43,10 +43,17 @@ namespace MigrationTools.Endpoints
                 return response;
             }
 
-            // The token expired or was revoked between the margin check and the server: renew once and resend.
-            // A second 401 is an access problem, not an expired token, so it goes back to the caller.
+            // The token expired, was revoked, or no longer meets a policy (a continuous access evaluation challenge
+            // carries the claims the new token needs): renew once and resend. Renewal stops the run rather than
+            // return the token that was just rejected. A second 401 is an access problem, so it goes back to the caller.
+            var rejected = request.Headers.Authorization.Parameter;
+            string claims = null;
+            foreach (var challenge in response.Headers.WwwAuthenticate)
+            {
+                claims = claims ?? EntraIdCredentials.ClaimsFromChallenge(challenge.ToString());
+            }
             var retry = Clone(request, content);
-            retry.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await _renewToken(cancellationToken).ConfigureAwait(false));
+            retry.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await _renewToken(rejected, claims, cancellationToken).ConfigureAwait(false));
             response.Dispose();
             return await base.SendAsync(retry, cancellationToken).ConfigureAwait(false);
         }

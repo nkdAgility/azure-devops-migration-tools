@@ -84,6 +84,53 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public async Task TfsRenewal_UsesTheClaimsTheLast401AskedForOnce()
+        {
+            var seen = new System.Collections.Generic.List<string>();
+            var sut = new EntraIdCredentials(new EntraIdOptions { Credential = "AzureCli" }, "Source", (o, n) => new ClaimsRecordingCredential(seen));
+            var provider = new EntraIdCredentials.EntraIdTokenProvider(new Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessTokenCredential("unused"), sut, new Uri("https://dev.azure.com/org"));
+
+            sut.NoteChallenge("Bearer error=\"insufficient_claims\", claims=\"eyJhIjoxfQ==\"");
+            var first = await GetTokenFrom(provider, "rejected-1");
+            var second = await GetTokenFrom(provider, "rejected-2");
+
+            CollectionAssert.AreEqual(new[] { "{\"a\":1}", null }, seen, "The claims are used for the next renewal only.");
+            Assert.AreNotEqual(first, second);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public async Task TfsRenewal_StopsWhenRenewalReturnsTheRejectedToken()
+        {
+            var sut = Using(new SequenceTokenCredential(new AccessToken("same", DateTimeOffset.UtcNow.AddHours(1))), EntraIdCredentialType.DeviceCode);
+            var provider = new EntraIdCredentials.EntraIdTokenProvider(new Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessTokenCredential("unused"), sut, new Uri("https://dev.azure.com/org"));
+
+            var ex = await Assert.ThrowsExactlyAsync<MigrationTools.Exceptions.MigrationRunStoppedException>(() => GetTokenFrom(provider, "same"));
+
+            StringAssert.Contains(ex.Message, "rejected the Microsoft Entra ID token before it expired");
+            StringAssert.Contains(ex.Message, "and run again to sign in.");
+        }
+
+        private static async Task<string> GetTokenFrom(EntraIdCredentials.EntraIdTokenProvider provider, string rejected)
+        {
+            var method = typeof(EntraIdCredentials.EntraIdTokenProvider).GetMethod("OnGetTokenAsync", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            try
+            {
+                var token = await (Task<Microsoft.VisualStudio.Services.Common.IssuedToken>)method.Invoke(provider, new object[] { new Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessToken(rejected), CancellationToken.None });
+                return ((Microsoft.VisualStudio.Services.OAuth.VssOAuthAccessToken)token).Value;
+            }
+            catch (System.Reflection.TargetInvocationException ex) { throw ex.InnerException; }
+        }
+
+        private sealed class ClaimsRecordingCredential : TokenCredential
+        {
+            private readonly System.Collections.Generic.List<string> _seen;
+            public ClaimsRecordingCredential(System.Collections.Generic.List<string> seen) { _seen = seen; }
+            private AccessToken Next(TokenRequestContext context) { _seen.Add(context.Claims); return new AccessToken("token-" + _seen.Count, DateTimeOffset.UtcNow.AddHours(1)); }
+            public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken) => Next(requestContext);
+            public override ValueTask<AccessToken> GetTokenAsync(TokenRequestContext requestContext, CancellationToken cancellationToken) => new ValueTask<AccessToken>(Next(requestContext));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public async Task GetFreshAccessTokenAsync_CachesTheReplacementEvenWhenItExpiresSooner()
         {
             var tokens = new SequenceTokenCredential(

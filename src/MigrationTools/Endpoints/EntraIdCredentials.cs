@@ -259,7 +259,15 @@ namespace MigrationTools.Endpoints
         /// Asks the credential for a new token; used after the server rejected the current one. Concurrent callers
         /// (many requests failing with 401 at once) share a single fetch rather than each starting one.
         /// </summary>
-        public async Task<string> GetFreshAccessTokenAsync(CancellationToken cancellationToken = default)
+        public Task<string> GetFreshAccessTokenAsync(CancellationToken cancellationToken = default)
+            => GetFreshAccessTokenAsync(null, null, cancellationToken);
+
+        /// <param name="rejectedToken">The token the server just rejected. When renewal returns this same token (a revoked
+        /// sign-in, or a policy the cached token no longer meets), the run stops and says to sign in again, rather than
+        /// resending a token that cannot work.</param>
+        /// <param name="claims">The claims challenge from the 401's WWW-Authenticate header (continuous access evaluation);
+        /// requesting with it makes the credential get a new token instead of returning its cached one.</param>
+        public async Task<string> GetFreshAccessTokenAsync(string rejectedToken, string claims, CancellationToken cancellationToken = default)
         {
             Task<AccessToken> fetch;
             lock (_cacheLock)
@@ -280,7 +288,7 @@ namespace MigrationTools.Endpoints
                     // generation so only its result is cached, whatever its expiry, and no earlier fetch overwrites it.
                     _cached = null;
                     _generation++;
-                    var started = FetchAndCacheAsync(Current, _generation);
+                    var started = FetchAndCacheAsync(Current, _generation, rejectedToken, claims);
                     _inFlight = started;
                     fetch = started;
                     // Cleared when the fetch itself finishes (success or failure), never when a caller stops
@@ -313,16 +321,23 @@ namespace MigrationTools.Endpoints
             return await fetch.ConfigureAwait(false);
         }
 
-        private async Task<AccessToken> FetchAndCacheAsync(TokenCredential credential, int generation)
+        private async Task<AccessToken> FetchAndCacheAsync(TokenCredential credential, int generation, string rejectedToken, string claims)
         {
             AccessToken fresh;
             try
             {
-                fresh = await credential.GetTokenAsync(RequestContext, CancellationToken.None).ConfigureAwait(false);
+                var context = string.IsNullOrEmpty(claims)
+                    ? RequestContext
+                    : new TokenRequestContext(new[] { AzureDevOpsScope }, claims: claims);
+                fresh = await credential.GetTokenAsync(context, CancellationToken.None).ConfigureAwait(false);
             }
             catch (Exception ex) when (IsCredentialFailure(ex))
             {
                 throw CredentialFailure(ex);
+            }
+            if (!string.IsNullOrEmpty(rejectedToken) && string.Equals(fresh.Token, rejectedToken, StringComparison.Ordinal))
+            {
+                throw RejectedTokenFailure(fresh);
             }
             lock (_cacheLock)
             {
@@ -333,6 +348,71 @@ namespace MigrationTools.Endpoints
             }
             Serilog.Log.Debug("Endpoint '{EndpointName}' Entra ID token renewed after a rejected request: {TokenDescription}", EndpointName, Describe(fresh));
             return fresh;
+        }
+
+        internal MigrationTools.Exceptions.MigrationRunStoppedException RejectedTokenFailure(AccessToken token)
+        {
+            string signInAgain;
+            switch (_options.CredentialType)
+            {
+                case EntraIdCredentialType.AzureCli:
+                    signInAgain = $"Run 'az login'{(string.IsNullOrWhiteSpace(_options.TenantId) ? "" : $" --tenant {_options.TenantId}")} and run again.";
+                    break;
+                case EntraIdCredentialType.Interactive:
+                case EntraIdCredentialType.DeviceCode:
+                    signInAgain = $"Delete {EntraIdCredentialFactory.AuthenticationRecordPath(_options, EndpointName)} and run again to sign in.";
+                    break;
+                case EntraIdCredentialType.Default:
+                    signInAgain = "Sign in again with the tool the log shows it used (for example 'az login'), and run again.";
+                    break;
+                default:
+                    signInAgain = "Check the app registration still exists, its certificate or secret is valid, and it still has access to the organisation.";
+                    break;
+            }
+            return new MigrationTools.Exceptions.MigrationRunStoppedException(
+                $"Endpoint '{EndpointName}': Azure DevOps rejected the Microsoft Entra ID token before it expired, and getting a new one returned the same token ({Describe(token)}). The sign-in has probably been revoked, or a conditional access policy no longer allows it. {signInAgain}");
+        }
+
+        /// <summary>
+        /// The claims a continuous access evaluation challenge asks for, from a WWW-Authenticate header such as
+        /// <c>Bearer error="insufficient_claims", claims="eyJ..."</c>; null when the header carries none.
+        /// </summary>
+        public static string ClaimsFromChallenge(string wwwAuthenticate)
+        {
+            if (string.IsNullOrEmpty(wwwAuthenticate)) { return null; }
+            var match = System.Text.RegularExpressions.Regex.Match(wwwAuthenticate, "claims=\"([^\"]+)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (!match.Success) { return null; }
+            var value = match.Groups[1].Value;
+            try
+            {
+                var padded = value.Replace('-', '+').Replace('_', '/');
+                padded = padded.PadRight(padded.Length + (4 - padded.Length % 4) % 4, '=');
+                return System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(padded));
+            }
+            catch (FormatException)
+            {
+                // Some servers send the JSON itself rather than base64.
+                return value;
+            }
+        }
+
+        // The latest claims challenge the TFS client libraries saw, consumed by the next renewal.
+        private string _pendingClaims;
+
+        internal void NoteChallenge(string wwwAuthenticate)
+        {
+            var claims = ClaimsFromChallenge(wwwAuthenticate);
+            if (claims != null) { lock (_cacheLock) { _pendingClaims = claims; } }
+        }
+
+        internal string TakePendingClaims()
+        {
+            lock (_cacheLock)
+            {
+                var claims = _pendingClaims;
+                _pendingClaims = null;
+                return claims;
+            }
         }
 
         /// <summary>
@@ -354,7 +434,14 @@ namespace MigrationTools.Endpoints
             public override VssCredentialsType CredentialType => VssCredentialsType.OAuth;
 
             public override bool IsAuthenticationChallenge(IHttpResponse webResponse)
-                => webResponse != null && (webResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized || webResponse.StatusCode == System.Net.HttpStatusCode.Found);
+            {
+                var challenge = webResponse != null && (webResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized || webResponse.StatusCode == System.Net.HttpStatusCode.Found);
+                if (challenge && webResponse.Headers != null && webResponse.Headers.TryGetValues("WWW-Authenticate", out var values))
+                {
+                    foreach (var value in values) { _owner.NoteChallenge(value); }
+                }
+                return challenge;
+            }
 
             protected override IssuedTokenProvider OnCreateTokenProvider(Uri serverUrl, IHttpResponse response)
                 => new EntraIdTokenProvider(this, _owner, serverUrl);
@@ -372,7 +459,10 @@ namespace MigrationTools.Endpoints
             public override bool GetTokenIsInteractive => false;
 
             protected override async Task<IssuedToken> OnGetTokenAsync(IssuedToken failedToken, CancellationToken cancellationToken)
-                => new VssOAuthAccessToken(await _owner.GetFreshAccessTokenAsync(cancellationToken).ConfigureAwait(false));
+            {
+                var rejected = (failedToken as VssOAuthAccessToken)?.Value;
+                return new VssOAuthAccessToken(await _owner.GetFreshAccessTokenAsync(rejected, _owner.TakePendingClaims(), cancellationToken).ConfigureAwait(false));
+            }
         }
 
         // DefaultAzureCredential reports the credential it settled on only through Azure.Identity's process-wide
