@@ -24,7 +24,6 @@
   <Folder Name="/Modern/">
     <Project Path="src/MigrationTools.Clients.AzureDevops.Rest/MigrationTools.Clients.AzureDevops.Rest.csproj" />
     <Project Path="src/MigrationTools.Clients.FileSystem/MigrationTools.Clients.FileSystem.csproj" />
-    <Project Path="src/MigrationTools.ConsoleCore/MigrationTools.ConsoleCore.csproj" />
     <Project Path="src/MigrationTools.ConsoleDataGenerator/MigrationTools.ConsoleDataGenerator.csproj" />
     <Project Path="src/MigrationTools.Host/MigrationTools.Host.csproj" />
     <Project Path="src/MigrationTools.Telemetery/MigrationTools.Telemetery.csproj" />
