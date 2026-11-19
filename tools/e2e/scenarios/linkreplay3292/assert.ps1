@@ -9,14 +9,16 @@ $final = [ordered]@{ K1 = "B1"; K2 = "C2"; K3 = "Q3"; E1 = "M4"; E2 = "M4"; E3 =
 $fail = 0
 $targets = @{}
 foreach ($p in $s.PSObject.Properties) {
-    $srcRevs = @(Get-E2ERevisions $p.Value -Org nkdagility-adomt-source).Count
+    $srcDates = @(Get-E2ERevisions $p.Value -Org nkdagility-adomt-source | ForEach-Object { ([datetime]$_.fields.'System.ChangedDate').ToUniversalTime().ToString("o") })
     $t = Find-E2ETargetItem $Tgt $p.Value
     if (-not $t) { "FAIL $($p.Name) ($($p.Value)) not in target"; $fail++; continue }
     $targets[$p.Name] = $t
-    $tgtRevs = @(Get-E2ERevisions $t.id -Org nkdagility-adomt-target).Count
-    $ok = $tgtRevs -ge $srcRevs
+    # Each source revision is replayed with its ChangedDate; extra target revisions (a child moved to its parent) are allowed.
+    $tgtDates = @(Get-E2ERevisions $t.id -Org nkdagility-adomt-target | ForEach-Object { ([datetime]$_.fields.'System.ChangedDate').ToUniversalTime().ToString("o") })
+    $missing = @($srcDates | Where-Object { $tgtDates -notcontains $_ })
+    $ok = $missing.Count -eq 0
     if (-not $ok) { $fail++ }
-    "{0} {1} {2} -> {3}: source revisions {4}, target revisions {5}" -f ($ok ? "PASS" : "FAIL"), $p.Name, $p.Value, $t.id, $srcRevs, $tgtRevs
+    "{0} {1} {2} -> {3}: {4} source revisions, {5} target revisions, missing: {6}" -f ($ok ? "PASS" : "FAIL"), $p.Name, $p.Value, $t.id, $srcDates.Count, $tgtDates.Count, ($missing -join ", ")
 }
 foreach ($c in $final.Keys) {
     $t = $targets[$c]; $want = $targets[$final[$c]]
@@ -27,11 +29,17 @@ foreach ($c in $final.Keys) {
     "{0} {1} parent {2} (want {3} = {4})" -f ($ok ? "PASS" : "FAIL"), $c, ($parents -join ","), $final[$c], $want.id
 }
 if ($Log) {
-    $text = Get-ChildItem $Log -Recurse -File | Get-Content
-    $ex = @($text | Select-String -Pattern 'Exception|   at |\[ERR\]|\[ERROR\]' | Where-Object { $_ -notmatch '\[DBG\]' })
-    $skips = @($text | Select-String -Pattern '\[SKIP\] Child link')
-    "Log: $($ex.Count) exception/error lines outside Debug, $($skips.Count) skipped child-link warnings"
-    $ex | Select-Object -First 10 | ForEach-Object { "  $_" }
+    # A log event is its header line plus the exception lines after it; only the header carries the level.
+    $events = [System.Collections.Generic.List[string]]::new()
+    foreach ($line in (Get-ChildItem $Log -Recurse -File | Get-Content)) {
+        if ($line.StartsWith("[") -or $events.Count -eq 0) { $events.Add($line) } else { $events[$events.Count - 1] += "`n$line" }
+    }
+    $kept = @($events | Where-Object { $_ -notmatch '^\[[^\]]* DBG\]' })
+    $ex = @($kept | Where-Object { $_ -match 'Exception|\n   at |\[ERR\]|\[ERROR\]' })
+    $skips = @($kept | Where-Object { $_ -match 'WRN\].*\[SKIP\] Child link' })
+    "Log: $($ex.Count) exception/error events outside Debug, $($skips.Count) skipped child-link warnings"
+    $ex | Select-Object -First 10 | ForEach-Object { "  " + ($_ -split "`n")[0] }
     if ($ex.Count) { $fail++ }
 }
 "RESULT: $(if ($fail) { "FAIL ($fail)" } else { "PASS" })"
+if ($fail) { exit 1 }

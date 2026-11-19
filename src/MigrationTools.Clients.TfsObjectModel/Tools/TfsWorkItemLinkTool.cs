@@ -109,8 +109,8 @@ namespace MigrationTools.Tools
                     }
                     catch (Exception ex) when (ex is WorkItemLinkValidationException || ex is FormatException || ex is UnexpectedErrorException || ex is InvalidOperationException || ex is ValidationException)
                     {
+                        // The target is not reset: that would also drop the links added before this one.
                         sourceWorkItemLinkStart.ToWorkItem().Reset();
-                        if (!_inline) targetWorkItemLinkStart.ToWorkItem().Reset(); // inline: keep the revision's pending changes
                         Log.LogWarning("  [SKIP] A {LinkType} on source {SourceId} could not be added to target {TargetId} and was skipped: {Reason} Check the link in the source; the rest of the work item carries on migrating.", item.GetType().Name, sourceWorkItemLinkStart.Id, targetWorkItemLinkStart.Id, ex.Message);
                         Log.LogDebug(ex, "Adding a link for source {SourceId}", sourceWorkItemLinkStart.Id);
                     }
@@ -407,7 +407,16 @@ namespace MigrationTools.Tools
                             // DevOps doesn't seem to take impersonation very nicely here - as of 13.05.22 the following line would get you an error:
                             // System.FormatException: The string 'Microsoft.TeamFoundation.WorkItemTracking.Common.ServerDefaultFieldValue' is not a valid AllXsd value.
                             // wiTargetR.ToWorkItem().Fields["System.ModifiedBy"].Value = "Migration";
-                            wiTargetR.SaveToAzureDevOps();
+                            try
+                            {
+                                wiTargetR.SaveToAzureDevOps();
+                            }
+                            catch
+                            {
+                                // Keep only the child's saved parent, so a later read does not see the unsaved move.
+                                wiTargetR.ToWorkItem().Reset();
+                                throw;
+                            }
                         }
                         else
                         {

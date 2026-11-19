@@ -46,7 +46,11 @@ A work item can have only one parent, and a child ends under the parent it has i
 
 `[SKIP] Child link from source <id> to <id> not added to target <id>: the child has since moved to another parent in the source, and a work item can have only one parent. Target child <id> keeps its parent <id>.`
 
-The child is not moved, and the parent's revision is still saved. When the child moves to the parent it has in the source now, any other parent link is removed first, saved or not. A link that can't be added for any other reason is skipped with one warning, and the full exception is logged at Debug.
+The child is not moved, and the parent's revision is still saved. When the child moves to the parent it has in the source now, any other parent link is removed first, saved or not.
+
+If the parent the child has in the source now is not part of the migration, the child keeps whichever parent it already has in the target. Include that parent in `WIQLQuery` and re-run to move the child.
+
+A link the target rejects while it is being added (a link validation, format or unexpected server error) is skipped with one warning, and the full exception is logged at Debug. A failure when the revision itself is saved still fails the work item.
 
 A skipped link is not a work item failure, so on its own it doesn't change the run's exit code. Work items that can't be migrated still make the run exit with code 1.
 
