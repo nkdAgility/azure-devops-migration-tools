@@ -6,7 +6,9 @@
     "reportedLabel": "triage",
     "statusMarker": "<!-- nkda-status -->",
     "adoptPrefix": "I'm working on this",
-    "adoptAuthor": "MrHinsh"
+    "adoptAuthor": "MrHinsh",
+    "stateFrom": "status",
+    "statusField": { "reported": "Backlog", "fixing": "In progress", "in-review": "In review", "closed": "Done" }
   },
   "initialState": "reported",
   "inProgress": ["fixing", "in-review"],
