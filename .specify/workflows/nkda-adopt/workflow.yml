@@ -16,6 +16,14 @@ inputs:
     type: string
     default: "auto"
     prompt: "Integration to use ('auto' uses the project's initialized integration)"
+  docs_verdict:
+    type: string
+    default: ""
+    prompt: "Martin's verdict on the docs plan (approve or reject), for a non-interactive resume"
+  reconcile_verdict:
+    type: string
+    default: ""
+    prompt: "Martin's verdict on the reconcile dry run (approve or reject), for a non-interactive resume"
 steps:
   - id: board
     type: shell
@@ -31,6 +39,7 @@ steps:
     message: "Read .specify/adopt/docs-plan.md. Approve to run its git mv lines (history is kept); reject to stop."
     options: [approve, reject]
     on_reject: abort
+    verdict_input: docs_verdict
   - id: docs-apply
     type: shell
     run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-docs-apply.ps1"
@@ -43,6 +52,7 @@ steps:
     message: "Read .specify/adopt/reconcile.md: each open item, its old state, its new state, and why. Approve to apply it exactly as shown; reject to stop."
     options: [approve, reject]
     on_reject: abort
+    verdict_input: reconcile_verdict
   - id: reconcile-apply
     type: shell
     run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/adopt-apply.ps1"

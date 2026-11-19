@@ -1,3 +1,5 @@
+> **Replaced by the nkda-speckit engineering Definition of Workflow.** Kept until this repo meets every intent, then retired.
+
 # Definition of Workflow
 
 This is how work is done on the Azure DevOps Migration Tools. The machine-readable part sits beside
@@ -57,3 +59,4 @@ Not yet set.
 The manager or CONTROL session proposes a change to Martin, who approves its exact wording. A change
 to the plugin, or to how this repository uses it, is first worked through with every active
 CONTROL session. An approved change applies from each issue's next move.
+

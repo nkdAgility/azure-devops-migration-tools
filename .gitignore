@@ -168,3 +168,6 @@ logs/
 /public/
 /docs/public/
 /docs/data/generated
+# Spec Kit run state and manager output (local)
+.specify/workflows/runs/
+.specify/manager/
