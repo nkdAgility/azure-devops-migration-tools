@@ -188,6 +188,8 @@ namespace MigrationTools.Host.Commands
             _logger.LogInformation("OSVersion: {OSVersion}", Environment.OSVersion.ToString());
             _logger.LogInformation("Version (Assembly): {Version}", _MigrationToolVersion.GetRunningVersion().versionString);
             _logger.LogInformation("Logpath: {LogPath}", LogLocationService.GetLogPath());
+            _logger.LogInformation("Run Id: {RunId}", MigrationUserAgent.RunId);
+            _logger.LogInformation("User Agent: {UserAgent}", MigrationUserAgent.Value);
         }
 
 

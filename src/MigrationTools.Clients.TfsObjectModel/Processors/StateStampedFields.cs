@@ -1,8 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MigrationTools.Processors
 {
+    public enum IdentityMatch
+    {
+        Same,
+        Different,
+        /// <summary>The accounts behind the values could not be read, or a display name is shared, so neither can be proven.</summary>
+        Unproven
+    }
+
     /// <summary>
     /// The fields Azure DevOps stamps with the server clock and the current identity when a revision changes state
     /// (#3270). Each must carry the source revision's value in the same save that changes the state: there is no way to
@@ -80,6 +89,91 @@ namespace MigrationTools.Processors
             var bare = sourceUnique == null ? sourceName : targetName;
             var unique = sourceUnique ?? targetUnique;
             return string.Equals(bare, unique, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Compares an expected identity with a saved one as accounts (#3290). Where <see cref="SameValue(object, object, bool)"/>
+        /// cannot prove a match because one side is a bare display name and the other is qualified (for example a user
+        /// mapping value <c>Display &lt;domain\upn&gt;</c> read back from the object model as <c>Display</c>), the bare name is
+        /// resolved with <paramref name="accountsNamed"/>: the unique names of every account with that display name, or
+        /// null when they cannot be read. The values are the same only when every such account carries the qualified
+        /// unique name, and different only when none does; otherwise the result is <see cref="IdentityMatch.Unproven"/>.
+        /// </summary>
+        public static IdentityMatch CompareIdentity(object expected, object saved, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
+        {
+            if (SameValue(expected, saved, isIdentity: true)) return IdentityMatch.Same;
+            if (IsEmpty(expected) || IsEmpty(saved)) return IdentityMatch.Different;
+            var (expectedName, expectedUnique) = SplitIdentity(Convert.ToString(expected));
+            var (savedName, savedUnique) = SplitIdentity(Convert.ToString(saved));
+            var expectedExplicit = expectedUnique != null;
+            var savedExplicit = savedUnique != null;
+            // A bare account (an email or domain\account) is taken as the account, but it may also be a display name, so
+            // unless both unique names were written explicitly a difference is checked through the lookup.
+            expectedUnique ??= LooksLikeAccount(expectedName) ? expectedName : null;
+            savedUnique ??= LooksLikeAccount(savedName) ? savedName : null;
+            if (expectedUnique != null && savedUnique != null)
+            {
+                if (SameUniqueName(expectedUnique, savedUnique)) return IdentityMatch.Same;
+                if (expectedExplicit && savedExplicit) return IdentityMatch.Different;
+                if (!expectedExplicit && !savedExplicit) return CompareBareAccounts(expectedName, savedName, accountsNamed);
+            }
+            else if (expectedUnique == null && savedUnique == null) return IdentityMatch.Different;
+            var savedIsBare = !savedExplicit && (expectedExplicit || savedUnique == null);
+            var bareName = savedIsBare ? savedName : expectedName;
+            var unique = savedIsBare ? expectedUnique : savedUnique;
+            var bareLooksLikeAccount = savedIsBare ? savedUnique != null : expectedUnique != null && !expectedExplicit;
+            var accounts = accountsNamed?.Invoke(bareName);
+            // An account-shaped value that names no display name is the account itself, and it is not this one.
+            if (accounts == null) return IdentityMatch.Unproven;
+            if (accounts.Count == 0) return bareLooksLikeAccount ? IdentityMatch.Different : IdentityMatch.Unproven;
+            var carrying = accounts.Count(a => a != null && a.Any(u => SameUniqueName(u, unique)));
+            if (carrying == accounts.Count) return IdentityMatch.Same;
+            return carrying == 0 ? IdentityMatch.Different : IdentityMatch.Unproven;
+        }
+
+        /// <summary>
+        /// True when two unique names name the same account, ignoring case. A <c>domain\upn</c> form matches the bare
+        /// <c>upn</c> when the upn is an email, which is unique on its own; the domain part of an Entra ID identity is the
+        /// tenant, which the identity service does not always return in the same form.
+        /// </summary>
+        public static bool SameUniqueName(string a, string b)
+        {
+            if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b)) return false;
+            a = a.Trim();
+            b = b.Trim();
+            if (string.Equals(a, b, StringComparison.OrdinalIgnoreCase)) return true;
+            var upnA = AfterDomain(a);
+            var upnB = AfterDomain(b);
+            return upnA.Contains("@") && string.Equals(upnA, upnB, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Two different account-shaped bare values: either may be a display name, so each is looked up in turn against
+        /// the other. Different only when neither names a display name; unproven when a lookup cannot be read.
+        /// </summary>
+        private static IdentityMatch CompareBareAccounts(string expected, string saved, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
+        {
+            var results = new List<IdentityMatch>();
+            foreach (var (name, other) in new[] { (saved, expected), (expected, saved) })
+            {
+                var accounts = accountsNamed?.Invoke(name);
+                if (accounts == null) return IdentityMatch.Unproven;
+                if (accounts.Count == 0) continue;
+                var carrying = accounts.Count(a => a != null && a.Any(u => SameUniqueName(u, other)));
+                results.Add(carrying == accounts.Count ? IdentityMatch.Same : carrying == 0 ? IdentityMatch.Different : IdentityMatch.Unproven);
+            }
+            // Different only when every reading of the two values says so; readings that disagree prove nothing.
+            if (results.Count == 0 || results.All(r => r == IdentityMatch.Different)) return IdentityMatch.Different;
+            return results.All(r => r == IdentityMatch.Same) ? IdentityMatch.Same : IdentityMatch.Unproven;
+        }
+
+        private static bool LooksLikeAccount(string value) =>
+            !string.IsNullOrEmpty(value) && !value.Contains(" ") && (value.Contains("@") || value.Contains("\\"));
+
+        private static string AfterDomain(string unique)
+        {
+            var slash = unique.LastIndexOf('\\');
+            return slash >= 0 ? unique.Substring(slash + 1) : unique;
         }
 
         /// <summary>Splits <c>Display Name &lt;unique name&gt;</c>; a value without the angle brackets has no unique name.</summary>

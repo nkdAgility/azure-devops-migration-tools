@@ -1,4 +1,5 @@
-﻿using System;
+using MigrationTools.Clients;
+using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -103,6 +104,8 @@ namespace MigrationTools.Endpoints
                         _Collection.EnsureAuthenticated();
 
                         Log.LogInformation("TfsWorkItemEndPoint::GetTfsCollection: Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, _Collection.AuthorizedIdentity.DisplayName, _Collection.AuthorizedIdentity.UniqueName);
+                        Log.LogDebug("User agent (TFS object model REST): {UserAgent}", TfsUserAgent.Rest);
+                        Log.LogDebug("User agent (TFS object model SOAP): {UserAgent}", TfsUserAgent.Soap);
                         activity?.Stop();
                         activity?.SetStatus(ActivityStatusCode.Ok);
                         activity?.SetTag("http.response.status_code", "200");

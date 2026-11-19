@@ -47,7 +47,9 @@ namespace MigrationTools.Processors
             if (reason.Contains("TF237111") || reason.Contains("TF237165") || reason.Contains("TF401289") || reason.IndexOf("permission", StringComparison.OrdinalIgnoreCase) >= 0)
                 return "grant the migration identity permission to edit work items in the target area and iteration paths, and 'Bypass rules on work item updates'.";
             if (reason.Contains("could not be read from Azure DevOps"))
-                return "check the migration identity can read work items in the source project and the source is reachable, then run the migration again; nothing was saved for this revision.";
+                return "check the migration identity can read work items in the source and target projects and both are reachable, then run the migration again.";
+            if (reason.Contains("already migrated target work item does not match"))
+                return "open the target work item's history and compare the listed revisions with the source. Where an identity differs, check the user mapping names the account you expect: a migration replays the mapping, so deleting the item and migrating it again gives the same values until the mapping is right. Where the target holds the service's own date or the migration identity, give the migration identity 'Bypass rules on work item updates' in the target project, check no target process rule sets these fields, then delete the target work item and migrate it again: saved revisions are not corrected after the fact.";
             if (reason.Contains("state-stamped") || reason.Contains("stamped instead of the source"))
                 return "give the migration identity 'Bypass rules on work item updates' in the target project and check no target process rule sets these fields. Then delete the target work item and migrate it again: saved revisions are not corrected after the fact, and every rerun reports this item until it is migrated again.";
             return "check the reason above against the target project and process. Run with Serilog MinimumLevel 'Debug' for the full details.";

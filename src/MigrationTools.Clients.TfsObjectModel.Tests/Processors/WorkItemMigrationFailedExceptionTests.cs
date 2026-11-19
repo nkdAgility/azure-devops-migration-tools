@@ -46,6 +46,15 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void Advice_RerunMismatch_PointsAtTheUserMappingBeforeMigratingAgain()
+        {
+            // Migrating again replays the same mapping, so the advice must not stop at "delete and migrate again" (#3290).
+            var advice = WorkItemMigrationFailedException.Advice("the already migrated target work item does not match the source, stamped instead of the source values: revision 7 Microsoft.VSTS.Common.ActivatedBy is 'A' but source revision 7 is 'B'.", "User Story");
+            StringAssert.Contains(advice, "user mapping");
+            StringAssert.Contains(advice, "gives the same values until the mapping is right");
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Advice_TF26194_PointsAtBypassRules()
         {
             StringAssert.Contains(WorkItemMigrationFailedException.Advice("TF26194: The value for the field 'Closed Date' cannot be changed.", "Bug"), "Bypass rules on work item updates");
