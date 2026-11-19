@@ -505,11 +505,9 @@ namespace MigrationTools.Processors
             IRequirementTestSuite targetSuiteChild;
             try
             {
-                string token = Target.Options.Authentication.ResolveAccessToken();
                 string project = Target.Options.Project;
                 Uri collectionUri = Target.Options.Collection;
-                VssConnection connection = new VssConnection(collectionUri, new VssClientCredentials());
-                if (!string.IsNullOrEmpty(token)) connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
+                VssConnection connection = new VssConnection(collectionUri, Target.Options.Authentication.CreateRestCredentials() ?? new VssClientCredentials());
                 TestPlanHttpClient testPlanHttpClient = connection.GetClient<TestPlanHttpClient>();
                 WorkItemData sourceSuite = Source.WorkItems.GetWorkItem(source.Parent.Id);
                 WorkItemData targetSuite = Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSuite);

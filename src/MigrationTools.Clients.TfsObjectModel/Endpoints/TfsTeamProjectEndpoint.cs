@@ -178,10 +178,11 @@ namespace MigrationTools.Clients
         // identity and validity so a persistent failure shows which account was used.
         private TfsTeamProjectCollection ConnectWithEntraId()
         {
-            return EntraIdCredentials.ConnectWithRetry(() =>
+            var entraId = Options.Authentication.GetEntraIdCredentials(Options.Name);
+            return entraId.ConnectWithRetry(() =>
             {
-                _vssCredentials = EntraIdCredentials.CreateVssCredentials();
-                Log.LogInformation("Microsoft Entra ID token: {TokenDescription}", EntraIdCredentials.DescribeCurrentToken());
+                _vssCredentials = entraId.CreateVssCredentials();
+                Log.LogInformation("Endpoint '{EndpointName}' Microsoft Entra ID: {TokenDescription}", entraId.EndpointName, entraId.DescribeCurrentToken());
                 var collection = new TfsTeamProjectCollection(Options.Collection, _vssCredentials);
                 try
                 {

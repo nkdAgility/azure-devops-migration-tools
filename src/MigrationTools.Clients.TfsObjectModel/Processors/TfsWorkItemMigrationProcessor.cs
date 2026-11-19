@@ -389,7 +389,7 @@ namespace MigrationTools.Processors
             }
             try
             {
-                var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token));
+                var connection = new VssConnection(Target.Options.Collection, Target.Options.Authentication.CreateRestCredentials());
                 var project = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
                     .GetProject(Target.Options.Project).Result;
                 var properties = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
@@ -511,7 +511,7 @@ namespace MigrationTools.Processors
                 // Test that
                 if (token.IsNullOrEmpty())
                 {
-                    Log.LogError("When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
+                    Log.LogError("When you are migrating to Azure DevOps you MUST use a PAT or Microsoft Entra ID (AuthenticationMode EntraId) on the Target so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
                     throw new MigrationRunStoppedException("Missing PersonalAccessToken from Target.");
                 }
             }
@@ -543,7 +543,7 @@ namespace MigrationTools.Processors
                     string token = Target.Options.Authentication?.ResolveAccessToken();
                     if (!string.IsNullOrEmpty(token))
                     {
-                        using (var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token)))
+                        using (var connection = new VssConnection(Target.Options.Collection, Target.Options.Authentication.CreateRestCredentials()))
                         using (var client = connection.GetClient<WorkItemTrackingHttpClient>())
                         {
                             var wit = client.GetWorkItemTypeAsync(Target.Options.Project, typeName).GetAwaiter().GetResult();
@@ -1187,8 +1187,7 @@ namespace MigrationTools.Processors
                     {
                         ValidatePatTokenRequirement();
                         Uri collectionUri = Target.Options.Collection;
-                        string token = Target.Options.Authentication.ResolveAccessToken();
-                        VssConnection connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
+                        VssConnection connection = new VssConnection(collectionUri, Target.Options.Authentication.CreateRestCredentials());
                         WorkItemTrackingHttpClient workItemTrackingClient = connection.GetClient<WorkItemTrackingHttpClient>();
                         JsonPatchDocument patchDocument = new JsonPatchDocument();
                         DateTime changedDate = ((DateTime)currentRevisionWorkItem.Fields["System.ChangedDate"].Value).AddMilliseconds(-3);

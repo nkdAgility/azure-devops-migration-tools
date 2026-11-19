@@ -10,64 +10,87 @@ using Microsoft.VisualStudio.Services.OAuth;
 namespace MigrationTools.Endpoints
 {
     /// <summary>
-    /// Gets Microsoft Entra ID access tokens for Azure DevOps from the ambient identity, so no PAT has to be
-    /// stored. DefaultAzureCredential tries, in order: environment service principal (AZURE_CLIENT_ID etc.),
-    /// workload identity, managed identity, Visual Studio, Azure CLI, Azure PowerShell and azd logins.
-    /// Set AZURE_TOKEN_CREDENTIALS (for example to AzureCliCredential) to use only that credential.
+    /// Gets Microsoft Entra ID access tokens for Azure DevOps for one endpoint, so no PAT has to be stored. Each
+    /// endpoint has its own instance (credential, cached token and in-flight fetch), so Source and Target can sign
+    /// in as different identities or in different tenants. The credential comes from the endpoint's
+    /// <see cref="EntraIdOptions"/>; with none, DefaultAzureCredential uses the first sign-in found on the machine.
     /// </summary>
-    public static class EntraIdCredentials
+    public sealed class EntraIdCredentials
     {
         /// <summary>The well-known Azure DevOps resource id; tokens are requested for its default scope.</summary>
         public const string AzureDevOpsScope = "499b84ac-1321-427f-aa17-267ca6975798/.default";
 
-        private static Lazy<TokenCredential> _default = NewDefault();
-
-        private static Lazy<TokenCredential> NewDefault() => new Lazy<TokenCredential>(() =>
-        {
-            EnsureSelectionListener();
-            return new DefaultAzureCredential();
-        });
-
-        // DefaultAzureCredential reports the credential it settled on only through its event source (#3225).
-        private static AzureEventSourceListener _selectionListener;
-        private static string _selectedCredential;
-
-        /// <summary>The credential DefaultAzureCredential selected, when known (for example "AzureCliCredential").</summary>
-        public static string SelectedCredential => _tokenCredential != null ? _tokenCredential.GetType().Name : _selectedCredential;
-
-        private static void EnsureSelectionListener()
-        {
-            if (_selectionListener != null) { return; }
-            _selectionListener = new AzureEventSourceListener((e, message) =>
-            {
-                if (e.EventName == "DefaultAzureCredentialCredentialSelected" && e.Payload != null && e.Payload.Count > 0)
-                {
-                    var name = e.Payload[0]?.ToString();
-                    _selectedCredential = name?.Substring(name.LastIndexOf('.') + 1);
-                }
-            }, System.Diagnostics.Tracing.EventLevel.Informational);
-        }
+        /// <summary>
+        /// Azure.Identity's variable for limiting DefaultAzureCredential to one credential (for example
+        /// "AzureCliCredential") or to "dev"/"prod" credentials, so an unattended run cannot pick another sign-in (#3225).
+        /// </summary>
+        public const string TokenCredentialsVariable = "AZURE_TOKEN_CREDENTIALS";
 
         // Some credentials (Azure CLI) start a process per call, so a token is reused until close to expiry.
         private static readonly TimeSpan RefreshMargin = TimeSpan.FromMinutes(5);
-        private static readonly object _cacheLock = new object();
-        private static AccessToken? _cached;
-        private static TokenCredential _tokenCredential;
 
-        /// <summary>Overridable for tests; defaults to a shared DefaultAzureCredential.</summary>
-        public static TokenCredential TokenCredential
+        private readonly EntraIdOptions _options;
+        private readonly Func<EntraIdOptions, string, TokenCredential> _factory;
+        private readonly object _cacheLock = new object();
+        private TokenCredential _credential;
+        private AccessToken? _cached;
+        private Task<AccessToken> _inFlight;
+        // Bumped by Reset(), so a fetch started before it cannot publish its token.
+        private int _generation;
+
+        public EntraIdCredentials(EntraIdOptions options, string endpointName, Func<EntraIdOptions, string, TokenCredential> factory = null)
         {
-            get => _tokenCredential;
-            set { lock (_cacheLock) { _tokenCredential = value; _cached = null; _generation++; _inFlight = null; } }
+            _options = options ?? new EntraIdOptions();
+            _factory = factory ?? EntraIdCredentialFactory.Create;
+            NameEndpoint(endpointName);
         }
 
-        private static TokenCredential Current => _tokenCredential ?? _default.Value;
+        public string EndpointName { get; private set; } = UnnamedEndpoint;
+
+        private const string UnnamedEndpoint = "endpoint";
+
+        /// <summary>
+        /// Sets the endpoint name used in messages, once: options are bound before the endpoint knows its name, so
+        /// the first caller that knows it (the endpoint connecting) names the instance.
+        /// </summary>
+        public EntraIdCredentials NameEndpoint(string endpointName)
+        {
+            lock (_cacheLock)
+            {
+                if (EndpointName == UnnamedEndpoint && !string.IsNullOrWhiteSpace(endpointName)) { EndpointName = endpointName; }
+            }
+            return this;
+        }
+
+        public EntraIdCredentialType CredentialType => _options.Credential;
+
+        private bool IsDefault => _options.Credential == EntraIdCredentialType.Default;
+
+        private TokenCredential Current
+        {
+            get
+            {
+                lock (_cacheLock)
+                {
+                    if (_credential == null)
+                    {
+                        if (IsDefault) { SelectionListener.Ensure(); }
+                        _credential = _factory(_options, EndpointName);
+                    }
+                    return _credential;
+                }
+            }
+        }
+
+        /// <summary>The credential in use, for example "AzureCliCredential". For Default, the one DefaultAzureCredential selected, when known.</summary>
+        public string SelectedCredential => IsDefault ? SelectionListener.Selected : _options.Credential.ToString();
 
         private static TokenRequestContext RequestContext => new TokenRequestContext(new[] { AzureDevOpsScope });
 
         /// <summary>A token valid for at least a few more minutes, from the cache when possible.</summary>
-        public static string GetAccessToken(CancellationToken cancellationToken = default)
+        public string GetAccessToken(CancellationToken cancellationToken = default)
         {
+            var credential = Current;
             lock (_cacheLock)
             {
                 if (_cached is AccessToken cached && cached.ExpiresOn - RefreshMargin > DateTimeOffset.UtcNow)
@@ -77,47 +100,77 @@ namespace MigrationTools.Endpoints
                 AccessToken fresh;
                 try
                 {
-                    fresh = Current.GetToken(RequestContext, cancellationToken);
+                    fresh = credential.GetToken(RequestContext, cancellationToken);
                 }
                 catch (Exception ex) when (IsCredentialFailure(ex))
                 {
                     throw CredentialFailure(ex);
                 }
                 _cached = fresh;
+                Serilog.Log.Debug("Endpoint '{EndpointName}' Entra ID token renewed: {TokenDescription}", EndpointName, Describe(fresh));
                 return fresh.Token;
             }
         }
 
-        // No usable sign-in (none available, or AZURE_TOKEN_CREDENTIALS names an unknown or unavailable credential):
-        // the run cannot continue, so stop it with a readable reason rather than a processor crash.
+        // No usable sign-in: the run cannot continue, so stop it with a readable reason rather than a processor crash.
         // Any other InvalidOperationException is a genuine bug and must surface as such, not as a sign-in hint.
-        internal static bool IsCredentialFailure(Exception ex) =>
+        internal bool IsCredentialFailure(Exception ex) =>
             ex is AuthenticationFailedException
+            || ex is CredentialUnavailableException
+            || ex is AuthenticationRequiredException
             || (ex is InvalidOperationException
-                && _tokenCredential == null
+                && IsDefault
                 && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(TokenCredentialsVariable))
                 && ex.Message.IndexOf(TokenCredentialsVariable, StringComparison.OrdinalIgnoreCase) >= 0);
 
-        internal static MigrationTools.Exceptions.MigrationRunStoppedException CredentialFailure(Exception ex)
+        internal MigrationTools.Exceptions.MigrationRunStoppedException CredentialFailure(Exception ex)
         {
-            var pinned = _tokenCredential == null ? Environment.GetEnvironmentVariable(TokenCredentialsVariable) : null;
-            var hint = string.IsNullOrEmpty(pinned)
-                ? " Sign in first (for example 'az login'), or set " + TokenCredentialsVariable + " to the credential to use."
-                : $" {TokenCredentialsVariable} is set to '{pinned}': check that value, and that this credential is signed in on this machine.";
-            return new MigrationTools.Exceptions.MigrationRunStoppedException("Could not get a Microsoft Entra ID token: " + ex.Message.Split('\n')[0].Trim() + hint, ex);
+            var reason = EntraIdCredentialFactory.FirstLine(ex.Message).TrimEnd('.');
+            var prefix = $"Endpoint '{EndpointName}': could not get a Microsoft Entra ID token with {_options.Credential}";
+            string message;
+            switch (_options.Credential)
+            {
+                case EntraIdCredentialType.AzureCli:
+                    message = $"{prefix}: the Azure CLI is not signed in or not installed ({reason}). Run 'az login'{(string.IsNullOrWhiteSpace(_options.TenantId) ? "" : $" --tenant {_options.TenantId}")}.";
+                    break;
+                case EntraIdCredentialType.Interactive:
+                case EntraIdCredentialType.DeviceCode:
+                    message = ex is AuthenticationRequiredException
+                        ? $"{prefix}: the saved sign-in has expired or been revoked, and a run never prompts part way through. Delete {EntraIdCredentialFactory.AuthenticationRecordPath(_options, EndpointName)} and run again to sign in."
+                        : $"{prefix}: {reason}. Delete {EntraIdCredentialFactory.AuthenticationRecordPath(_options, EndpointName)} and run again to sign in.";
+                    break;
+                case EntraIdCredentialType.Certificate:
+                case EntraIdCredentialType.ClientSecret:
+                    message = $"{prefix}: {reason}. Check TenantId, ClientId and that this {(_options.Credential == EntraIdCredentialType.Certificate ? "certificate" : "secret")} is registered on the app and has not expired.";
+                    break;
+                case EntraIdCredentialType.ManagedIdentity:
+                    message = $"{prefix}: no managed identity is available on this machine ({reason}). Run on an Azure resource with a managed identity, or choose another Credential.";
+                    break;
+                default:
+                    var pinned = Environment.GetEnvironmentVariable(TokenCredentialsVariable);
+                    var hint = string.IsNullOrEmpty(pinned)
+                        ? " Sign in first (for example 'az login'), or set " + TokenCredentialsVariable + " to the credential to use."
+                        : $" {TokenCredentialsVariable} is set to '{pinned}': check that value, and that this credential is signed in on this machine.";
+                    message = $"{prefix}: {reason}.{hint}";
+                    break;
+            }
+            return new MigrationTools.Exceptions.MigrationRunStoppedException(message, ex);
         }
 
         /// <summary>
-        /// Drops the cached token and, unless a credential was set explicitly, the DefaultAzureCredential instance,
-        /// so the next request probes the credential chain again. Used before retrying a rejected first connection.
+        /// Drops the cached token and, for Default, the DefaultAzureCredential instance, so the next request probes
+        /// the credential chain again. Used before retrying a rejected first connection.
         /// </summary>
-        public static void Reset()
+        public void Reset()
         {
             lock (_cacheLock)
             {
                 _cached = null;
-                _selectedCredential = null;
-                if (_tokenCredential == null) { _default = NewDefault(); }
+                if (IsDefault)
+                {
+                    _credential = null;
+                    SelectionListener.Clear();
+                }
                 // A fetch already running belongs to the discarded credential: stop new callers joining it and
                 // stop it publishing its token when it completes.
                 _generation++;
@@ -131,7 +184,7 @@ namespace MigrationTools.Endpoints
         /// reset and the caller waits <paramref name="delay"/> times the attempt number. Any other failure, or the
         /// last rejection, is thrown unchanged.
         /// </summary>
-        public static T ConnectWithRetry<T>(Func<T> connect, Func<Exception, bool> isRejected, int retries, TimeSpan delay,
+        public T ConnectWithRetry<T>(Func<T> connect, Func<Exception, bool> isRejected, int retries, TimeSpan delay,
             Action<Exception, int, TimeSpan> onRetry, Action<TimeSpan> sleep = null)
         {
             sleep = sleep ?? Thread.Sleep;
@@ -154,20 +207,18 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Who the current token is for and when it is valid, for diagnostics. Never contains the token itself.
         /// </summary>
-        public static string DescribeCurrentToken()
+        public string DescribeCurrentToken()
         {
             AccessToken? cached;
             lock (_cacheLock) { cached = _cached; }
-            if (!(cached is AccessToken token)) { return "no token acquired"; }
-            var pinned = _tokenCredential == null ? Environment.GetEnvironmentVariable(TokenCredentialsVariable) : null;
-            return DescribeToken(token.Token, token.ExpiresOn, SelectedCredential, pinned);
+            return cached is AccessToken token ? Describe(token) : "no token acquired";
         }
 
-        /// <summary>
-        /// Azure.Identity's variable for limiting DefaultAzureCredential to one credential (for example
-        /// "AzureCliCredential") or to "dev"/"prod" credentials, so an unattended run cannot pick another sign-in (#3225).
-        /// </summary>
-        public const string TokenCredentialsVariable = "AZURE_TOKEN_CREDENTIALS";
+        private string Describe(AccessToken token)
+        {
+            var pinned = IsDefault ? Environment.GetEnvironmentVariable(TokenCredentialsVariable) : null;
+            return DescribeToken(token.Token, token.ExpiresOn, SelectedCredential, pinned);
+        }
 
         internal static string DescribeToken(string jwt, DateTimeOffset expiresOn, string credential, string pinnedTo = null)
         {
@@ -195,21 +246,20 @@ namespace MigrationTools.Endpoints
             catch (Exception) { return null; }
         }
 
-        private static Task<AccessToken> _inFlight;
-
         /// <summary>
         /// Asks the credential for a new token; used after the server rejected the current one. Concurrent callers
         /// (many requests failing with 401 at once) share a single fetch rather than each starting one.
         /// </summary>
-        public static async Task<string> GetFreshAccessTokenAsync(CancellationToken cancellationToken = default)
+        public async Task<string> GetFreshAccessTokenAsync(CancellationToken cancellationToken = default)
         {
+            var credential = Current;
             Task<AccessToken> fetch;
             lock (_cacheLock)
             {
                 fetch = _inFlight;
                 if (fetch == null)
                 {
-                    var started = FetchAndCacheAsync(Current, _generation);
+                    var started = FetchAndCacheAsync(credential, _generation);
                     _inFlight = started;
                     fetch = started;
                     // Cleared when the fetch itself finishes (success or failure), never when a caller stops
@@ -242,10 +292,7 @@ namespace MigrationTools.Endpoints
             return await fetch.ConfigureAwait(false);
         }
 
-        // Bumped by Reset() and by setting TokenCredential, so a fetch started before either cannot publish its token.
-        private static int _generation;
-
-        private static async Task<AccessToken> FetchAndCacheAsync(TokenCredential credential, int generation)
+        private async Task<AccessToken> FetchAndCacheAsync(TokenCredential credential, int generation)
         {
             AccessToken fresh;
             try
@@ -263,6 +310,7 @@ namespace MigrationTools.Endpoints
                     _cached = fresh;
                 }
             }
+            Serilog.Log.Debug("Endpoint '{EndpointName}' Entra ID token renewed after a rejected request: {TokenDescription}", EndpointName, Describe(fresh));
             return fresh;
         }
 
@@ -270,12 +318,17 @@ namespace MigrationTools.Endpoints
         /// VssCredentials for the Azure DevOps client libraries. The token is refreshed when the server
         /// rejects it, so long-running migrations survive the roughly one hour token lifetime.
         /// </summary>
-        public static VssCredentials CreateVssCredentials()
-            => new VssCredentials(new EntraIdFederatedCredential());
+        public VssCredentials CreateVssCredentials()
+            => new VssCredentials(new EntraIdFederatedCredential(this));
 
         internal sealed class EntraIdFederatedCredential : FederatedCredential
         {
-            public EntraIdFederatedCredential() : base(new VssOAuthAccessToken(GetAccessToken())) { }
+            private readonly EntraIdCredentials _owner;
+
+            public EntraIdFederatedCredential(EntraIdCredentials owner) : base(new VssOAuthAccessToken(owner.GetAccessToken()))
+            {
+                _owner = owner;
+            }
 
             public override VssCredentialsType CredentialType => VssCredentialsType.OAuth;
 
@@ -283,17 +336,50 @@ namespace MigrationTools.Endpoints
                 => webResponse != null && (webResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized || webResponse.StatusCode == System.Net.HttpStatusCode.Found);
 
             protected override IssuedTokenProvider OnCreateTokenProvider(Uri serverUrl, IHttpResponse response)
-                => new EntraIdTokenProvider(this, serverUrl);
+                => new EntraIdTokenProvider(this, _owner, serverUrl);
         }
 
         internal sealed class EntraIdTokenProvider : IssuedTokenProvider
         {
-            public EntraIdTokenProvider(IssuedTokenCredential credential, Uri serverUrl) : base(credential, serverUrl, serverUrl) { }
+            private readonly EntraIdCredentials _owner;
+
+            public EntraIdTokenProvider(IssuedTokenCredential credential, EntraIdCredentials owner, Uri serverUrl) : base(credential, serverUrl, serverUrl)
+            {
+                _owner = owner;
+            }
 
             public override bool GetTokenIsInteractive => false;
 
             protected override async Task<IssuedToken> OnGetTokenAsync(IssuedToken failedToken, CancellationToken cancellationToken)
-                => new VssOAuthAccessToken(await GetFreshAccessTokenAsync(cancellationToken).ConfigureAwait(false));
+                => new VssOAuthAccessToken(await _owner.GetFreshAccessTokenAsync(cancellationToken).ConfigureAwait(false));
+        }
+
+        // DefaultAzureCredential reports the credential it settled on only through Azure.Identity's process-wide
+        // event source (#3225), so with Default on more than one endpoint the name may belong to either.
+        private static class SelectionListener
+        {
+            private static readonly object Lock = new object();
+            private static AzureEventSourceListener _listener;
+
+            public static string Selected { get; private set; }
+
+            public static void Clear() => Selected = null;
+
+            public static void Ensure()
+            {
+                lock (Lock)
+                {
+                    if (_listener != null) { return; }
+                    _listener = new AzureEventSourceListener((e, message) =>
+                    {
+                        if (e.EventName == "DefaultAzureCredentialCredentialSelected" && e.Payload != null && e.Payload.Count > 0)
+                        {
+                            var name = e.Payload[0]?.ToString();
+                            Selected = name?.Substring(name.LastIndexOf('.') + 1);
+                        }
+                    }, System.Diagnostics.Tracing.EventLevel.Informational);
+                }
+            }
         }
     }
 }
