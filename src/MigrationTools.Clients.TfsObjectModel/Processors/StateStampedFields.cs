@@ -153,16 +153,18 @@ namespace MigrationTools.Processors
         /// </summary>
         private static IdentityMatch CompareBareAccounts(string expected, string saved, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
         {
+            var results = new List<IdentityMatch>();
             foreach (var (name, other) in new[] { (saved, expected), (expected, saved) })
             {
                 var accounts = accountsNamed?.Invoke(name);
                 if (accounts == null) return IdentityMatch.Unproven;
                 if (accounts.Count == 0) continue;
                 var carrying = accounts.Count(a => a != null && a.Any(u => SameUniqueName(u, other)));
-                if (carrying == accounts.Count) return IdentityMatch.Same;
-                return carrying == 0 ? IdentityMatch.Different : IdentityMatch.Unproven;
+                results.Add(carrying == accounts.Count ? IdentityMatch.Same : carrying == 0 ? IdentityMatch.Different : IdentityMatch.Unproven);
             }
-            return IdentityMatch.Different;
+            // Different only when every reading of the two values says so; readings that disagree prove nothing.
+            if (results.Count == 0 || results.All(r => r == IdentityMatch.Different)) return IdentityMatch.Different;
+            return results.All(r => r == IdentityMatch.Same) ? IdentityMatch.Same : IdentityMatch.Unproven;
         }
 
         private static bool LooksLikeAccount(string value) =>

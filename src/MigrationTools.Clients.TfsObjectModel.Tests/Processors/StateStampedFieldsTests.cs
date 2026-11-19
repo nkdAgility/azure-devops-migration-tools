@@ -109,6 +109,16 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareAccountsWhoseLookupsDisagree_IsUnproven()
+        {
+            // The saved value is also another account's display name, the expected value a display name of the saved account.
+            var match = StateStampedFields.CompareIdentity("alias@example.invalid", "person-a@example.invalid",
+                name => name == "person-a@example.invalid" ? Accounts(new[] { "person-b@example.invalid" })
+                    : name == "alias@example.invalid" ? Accounts(new[] { "person-a@example.invalid" }) : Accounts());
+            Assert.AreEqual(IdentityMatch.Unproven, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void CompareIdentity_EmailShapedValueAgainstAnotherAccount_IsResolvedThroughTheLookup()
         {
             // An account-shaped value may be a display name, so a difference is checked before it is reported.
