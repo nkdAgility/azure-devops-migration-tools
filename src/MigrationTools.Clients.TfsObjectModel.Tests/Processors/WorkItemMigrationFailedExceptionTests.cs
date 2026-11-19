@@ -36,6 +36,13 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void Advice_ReadBackMismatch_SaysAReRunCorrectsEmptyValues()
+        {
+            var advice = WorkItemMigrationFailedException.Advice("the target was not stored with the source's state-stamped values: revision 3 (source revision 3) Microsoft.VSTS.Common.StateChangeDate reads back from the server as '' but the source is 'x'.", "User Story");
+            StringAssert.Contains(advice, "the re-run sets its current values from the source with no delete");
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void Advice_SourceRevisionsUnreadable_SaysToRunAgain()
         {
             var reason = WorkItemMigrationFailedException.ServerReason(new InvalidOperationException(

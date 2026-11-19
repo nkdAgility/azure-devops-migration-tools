@@ -33,6 +33,9 @@ foreach ($s in $stories) {
         if ($id) { Set-E2EWorkItem -Id $id -Fields $f -BypassRules -Org nkdagility-adomt-target | Out-Null }
         else { $id = (Set-E2EWorkItem $Tgt "User Story" -Fields $f -BypassRules -Org nkdagility-adomt-target).id }
     }
+    # The service must have kept the empty value on every revision, or the fixture is not what it claims.
+    $kept = @(Get-E2ERevisions $id -Org nkdagility-adomt-target | Where-Object { $_.fields.'Microsoft.VSTS.Common.StateChangeDate' })
+    if ($kept.Count -gt 0) { throw "target $id revision(s) $(($kept | ForEach-Object rev) -join ', ') kept a State Change Date; the fixture is not an empty-value target." }
     $made += [pscustomobject]@{ source = $s.id; target = $id; revisions = $revs.Count }
 }
 $stateDir = Join-Path $PSScriptRoot $Tgt

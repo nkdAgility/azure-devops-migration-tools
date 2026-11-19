@@ -90,18 +90,31 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
-        public void StoredDiffers_SameAccountWithAndWithoutDomain_IsNotDifferent()
+        public void CompareStored_SameAccountWithAndWithoutDomain_IsSame()
         {
-            Assert.IsFalse(SourceStateStampedValues.StoredDiffers(@"Person A <TENANT\person-a@example.invalid>", "Person A <person-a@example.invalid>", true, name => null));
+            Assert.AreEqual(IdentityMatch.Same, SourceStateStampedValues.CompareStored(@"Person A <TENANT\person-a@example.invalid>", "Person A <person-a@example.invalid>", true, name => null));
         }
 
         [TestMethod, TestCategory("L0")]
-        public void StoredDiffers_EmptyReadBackOrAnotherAccount_IsDifferent()
+        public void CompareStored_BareAccountReadBackAsItsDisplayName_IsSame()
         {
-            Assert.IsTrue(SourceStateStampedValues.StoredDiffers(@"Person A <TENANT\person-a@example.invalid>", null, true, name => null));
-            Assert.IsTrue(SourceStateStampedValues.StoredDiffers("Person A <person-a@example.invalid>", "Person B <person-b@example.invalid>", true, name => null));
-            Assert.IsTrue(SourceStateStampedValues.StoredDiffers(Changed, null, false, name => null));
-            Assert.IsFalse(SourceStateStampedValues.StoredDiffers(Changed, Changed.ToLocalTime(), false, name => null));
+            Assert.AreEqual(IdentityMatch.Same, SourceStateStampedValues.CompareStored("person-a@example.invalid", "Person A", true,
+                name => name == "Person A" ? new List<IReadOnlyCollection<string>> { new[] { "person-a@example.invalid" } } : null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareStored_BareDisplayNameThatCannotBeResolved_IsUnproven()
+        {
+            Assert.AreEqual(IdentityMatch.Unproven, SourceStateStampedValues.CompareStored("person-a@example.invalid", "Person A", true, name => null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareStored_EmptyReadBackOrAnotherAccount_IsDifferent()
+        {
+            Assert.AreEqual(IdentityMatch.Different, SourceStateStampedValues.CompareStored(@"Person A <TENANT\person-a@example.invalid>", null, true, name => null));
+            Assert.AreEqual(IdentityMatch.Different, SourceStateStampedValues.CompareStored("Person A <person-a@example.invalid>", "Person B <person-b@example.invalid>", true, name => null));
+            Assert.AreEqual(IdentityMatch.Different, SourceStateStampedValues.CompareStored(Changed, null, false, name => null));
+            Assert.AreEqual(IdentityMatch.Same, SourceStateStampedValues.CompareStored(Changed, Changed.ToLocalTime(), false, name => null));
         }
 
         [TestMethod, TestCategory("L0")]

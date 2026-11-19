@@ -25,7 +25,7 @@ $tgtItems = @(Get-E2EAllWorkItems $Tgt -Org nkdagility-adomt-target)
 $byReflected = @{}
 foreach ($t in $tgtItems) { if ($t.fields.'Custom.ReflectedWorkItemId' -match '/_workitems/edit/(\d+)$') { $byReflected[[int]$Matches[1]] = $t } }
 $ordered = if ($Order -eq "Id") { @($srcItems | Sort-Object { [int]$_.id }) } else { @($srcItems | Sort-Object { [datetime]$_.fields.'System.ChangedDate' } -Descending) }
-$r = @(); $empty = @(); $mismatch = @(); $revCount = 0; $missing = @()
+$r = @(); $empty = @(); $mismatch = @(); $current = @(); $revCount = 0; $missing = @()
 for ($n = 0; $n -lt $ordered.Count; $n++) {
     $s = $ordered[$n]
     $t = $byReflected[[int]$s.id]
@@ -44,12 +44,19 @@ for ($n = 0; $n -lt $ordered.Count; $n++) {
             if ($tv -eq "" -and $sv -ne "") { $empty += $line } else { $mismatch += $line }
         }
     }
+    # The current values too: a later target revision (a catch-up save) is never paired with a source revision.
+    foreach ($f in $fields) {
+        $sv = V $sRevs[-1] $f; $tv = V $tRevs[-1] $f
+        if (-not [string]::Equals($sv, $tv, [StringComparison]::Ordinal)) { $current += "src #$($s.id) -> tgt #$($t.id) current $($f -replace '^.*\.',''): src '$sv' tgt '$tv'" }
+    }
 }
 $emptyItems = @($empty | ForEach-Object { if ($_ -match 'src #(\d+)') { $Matches[1] } } | Select-Object -Unique)
 $first = if ($empty) { $empty[0] -replace ' rev .*$', '' } else { "none" }
 "Compared $($ordered.Count) source items and $revCount source revisions."
+$r += New-E2EResult "the fixture has work items and revisions to compare" ($srcItems.Count -gt 0 -and $revCount -gt 0) "$($srcItems.Count) source items, $revCount revisions compared"
 $r += New-E2EResult "every source item migrated" ($missing.Count -eq 0) $(if ($missing) { "missing: $($missing -join ', ')" } else { "$($ordered.Count) items" })
 $r += New-E2EResult "target item count equals source (no duplicates)" ($tgtItems.Count -eq $srcItems.Count) "$($tgtItems.Count) target, $($srcItems.Count) source"
 $r += New-E2EResult "no empty state-stamped value where the source has one" ($empty.Count -eq 0) $(if ($empty) { "$($empty.Count) values on $($emptyItems.Count) items, first at $first; " + (($empty | Select-Object -First 20) -join "; ") } else { "$revCount revisions" })
 $r += New-E2EResult "every state-stamped value matches the source" ($mismatch.Count -eq 0) $(if ($mismatch) { "$($mismatch.Count): " + (($mismatch | Select-Object -First 20) -join "; ") } else { "$revCount revisions" })
+$r += New-E2EResult "every current target value matches the current source value" ($current.Count -eq 0) $(if ($current) { "$($current.Count): " + (($current | Select-Object -First 20) -join "; ") } else { "$($ordered.Count - $missing.Count) items" })
 exit (Write-E2EResults $r $OutFile)

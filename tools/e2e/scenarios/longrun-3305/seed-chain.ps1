@@ -29,6 +29,8 @@ for ($f = 1; $f -le $FeatureCount; $f++) {
         $previous = $story.id
     }
 }
-Save-E2EState (Join-Path $PSScriptRoot "chain") @{ features = $featureIds; stories = $storyIds }
+$stateDir = Join-Path $PSScriptRoot "chain"
+New-Item -ItemType Directory -Force $stateDir | Out-Null
+Save-E2EState $stateDir @{ features = $featureIds; stories = $storyIds }
 "seeded longrun-3305 chain: $($featureIds.Count) features, $($storyIds.Count) stories in $Src"
 

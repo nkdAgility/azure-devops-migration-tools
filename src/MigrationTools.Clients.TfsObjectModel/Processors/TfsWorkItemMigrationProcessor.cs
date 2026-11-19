@@ -953,10 +953,6 @@ namespace MigrationTools.Processors
                                 _rerunCounts.Set(RerunCounts.Outcome.Updated);
                                 TraceWriteLine(LogEventLevel.Information, "Work item exists with no revisions to sync, but the target differs: {Difference}",
                                     new Dictionary<string, object>() { { "Difference", difference } });
-                                if (correctStamps)
-                                {
-                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps.Value);
-                                }
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                                 CommonTools.WorkItemLink.OtherWorkItemsSaved = 0;
                                 ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
@@ -969,6 +965,11 @@ namespace MigrationTools.Processors
                                 }
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
+                                // After field maps and enrichers, as in revision replay, so nothing can overwrite the correction (#3305).
+                                if (correctStamps)
+                                {
+                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps.Value);
+                                }
                                 StampCatchUpSave(targetWorkItem);
                                 if (!targetWorkItem.ToWorkItem().IsDirty && CommonTools.WorkItemLink.OtherWorkItemsSaved == 0)
                                 {
@@ -1672,7 +1673,9 @@ namespace MigrationTools.Processors
             }
             catch (Exception ex) when (!(ex is MigrationRunStoppedException) && !IsTransientNetworkError(ex))
             {
-                throw new InvalidOperationException($"the {side} revisions could not be read from Azure DevOps to check the state-stamped values: {WorkItemMigrationFailedException.ServerReason(ex)}", ex);
+                // No inner exception: the reported reason is the innermost message, and this one says what failed (#3305).
+                Log.LogDebug(ex, "Reading {Side} work item {Id} again failed.", side, id);
+                throw new InvalidOperationException($"the {side} revisions could not be read from Azure DevOps to check the state-stamped values: {WorkItemMigrationFailedException.ServerReason(ex)}");
             }
             Log.LogDebug("Read {Count} revisions of {Side} work item {Id} again to check its state-stamped values.", revisions.Count, side, id);
             return SourceStateStampedValues.From(id, revisions);
@@ -1689,17 +1692,29 @@ namespace MigrationTools.Processors
             if (saved.Count == 0) return;
             var stored = ReadRevisionsAgain(Target.WorkItems, int.Parse(targetWorkItem.Id), "target");
             var wrong = new List<string>();
+            var unproven = new List<string>();
             foreach (var (targetRevision, sourceRevision, expected) in saved)
             {
                 foreach (var (field, value, isIdentity) in expected)
                 {
                     var actual = stored.Value(targetRevision, field);
                     // Identities compare as accounts, as on a re-run (#3290): the same account can read back in another form.
-                    if (SourceStateStampedValues.StoredDiffers(value, actual, isIdentity, TargetAccountsNamed))
+                    var match = SourceStateStampedValues.CompareStored(value, actual, isIdentity, TargetAccountsNamed);
+                    if (match == IdentityMatch.Different)
                     {
                         wrong.Add($"revision {targetRevision} (source revision {sourceRevision}) {field} reads back from the server as '{actual}' but the source is '{value}'");
                     }
+                    else if (match == IdentityMatch.Unproven)
+                    {
+                        unproven.Add($"revision {targetRevision} {field} '{actual}' against '{value}'");
+                    }
                 }
+            }
+            if (unproven.Count > 0)
+            {
+                // As after each save and on a re-run: an identity that cannot be proven either way is named, not failed.
+                Log.LogWarning("Target work item {TargetId}: could not confirm that {Count} identity value(s) read back from the server are the account the source and user mapping give, because the account behind the display name could not be read or the name is shared: {Values}. Check these values in the target if they matter.",
+                    targetWorkItem.Id, unproven.Count, string.Join("; ", unproven.Distinct().Take(10)));
             }
             if (wrong.Count > 0)
             {
@@ -1754,7 +1769,7 @@ namespace MigrationTools.Processors
                     }
                     catch (InvalidOperationException ex)
                     {
-                        throw new InvalidOperationException($"the state-stamped field {sourceField} could not be read reliably: {ex.Message}.", ex);
+                        throw new InvalidOperationException($"the state-stamped field {sourceField} could not be read reliably: {ex.Message}.");
                     }
                     if (problem != null)
                     {

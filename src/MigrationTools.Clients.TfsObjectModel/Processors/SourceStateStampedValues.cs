@@ -72,15 +72,16 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// True when the value read back is not the value saved. Identities compare as accounts, as on a re-run (#3290):
-        /// <c>Name &lt;DOMAIN\user@x&gt;</c> saved can read back as <c>Name &lt;user@x&gt;</c>. An identity that cannot be
-        /// proven either way is not reported as different.
+        /// Compares the value read back with the value saved. Identities compare as accounts, as on a re-run (#3290):
+        /// <c>Name &lt;DOMAIN\user@x&gt;</c> saved can read back as <c>Name &lt;user@x&gt;</c>, and a bare account read back
+        /// as its display name is resolved. <see cref="IdentityMatch.Unproven"/> when an identity cannot be proven either
+        /// way; the caller names it in a warning.
         /// </summary>
-        public static bool StoredDiffers(object savedValue, object storedValue, bool isIdentity, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
+        public static IdentityMatch CompareStored(object savedValue, object storedValue, bool isIdentity, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
         {
-            if (SameStoredValue(savedValue, storedValue, isIdentity)) return false;
-            if (!isIdentity) return true;
-            return StateStampedFields.CompareIdentity(savedValue, storedValue, accountsNamed) == IdentityMatch.Different;
+            if (SameStoredValue(savedValue, storedValue, isIdentity)) return IdentityMatch.Same;
+            if (!isIdentity) return IdentityMatch.Different;
+            return StateStampedFields.CompareIdentity(savedValue, storedValue, accountsNamed);
         }
 
         private static bool SameDisplayName(object a, object b)
