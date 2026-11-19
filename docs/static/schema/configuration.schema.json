@@ -12,6 +12,11 @@
           "description": "Version of the migration tools configuration format",
           "type": "string"
         },
+        "UserAgentLabel": {
+          "description": "Optional name for this migration, added after the run id in the user agent of every request sent to Azure DevOps, for matching requests to a run log or a support case. The organisation's Usage page does not show it. Only letters, digits, '-', '.' and '_' are kept; spaces become '-'. It is sent as written otherwise, so never put customer, project or user names here.",
+          "type": "string",
+          "maxLength": 32
+        },
         "Endpoints": {
           "type": "object",
           "additionalProperties": {

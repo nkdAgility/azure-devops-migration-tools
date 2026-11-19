@@ -133,6 +133,8 @@ namespace MigrationTools.Clients
                     activity?.SetStatus(ActivityStatusCode.Ok);
                     activity?.SetTag("http.response.status_code", "200");
                     Log.LogInformation("Access granted to {CollectionUrl} for {Name} ({Account})", Options.Collection, y.AuthorizedIdentity.DisplayName, y.AuthorizedIdentity.UniqueName);
+                    Log.LogDebug("User agent (TFS object model REST): {UserAgent}", TfsUserAgent.Rest);
+                    Log.LogDebug("User agent (TFS object model SOAP): {UserAgent}", TfsUserAgent.Soap);
                 }
                 catch (MigrationRunStoppedException)
                 {

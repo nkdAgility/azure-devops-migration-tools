@@ -21,6 +21,142 @@ namespace MigrationTools.Tests.Processors
             }, StateStampedFields.Fields.ToList());
         }
 
+        private const string Mapped = "Person A <TENANT\\person-a@example.invalid>";
+
+        private static System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyCollection<string>> Accounts(params string[][] uniqueNames) => uniqueNames;
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_MappedValueAgainstBareDisplayNameOfTheSameAccount_IsSame()
+        {
+            // #3290: the mapping file gives 'Display <tenant\upn>'; the object model reads the target back as 'Display'.
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A",
+                name => name == "Person A" ? Accounts(new[] { "person-a@example.invalid" }) : null);
+            Assert.AreEqual(IdentityMatch.Same, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareDisplayNameOfADifferentAccount_IsDifferent()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person B",
+                name => Accounts(new[] { "person-b@example.invalid", "TENANT\\person-b@example.invalid" }));
+            Assert.AreEqual(IdentityMatch.Different, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_SameDisplayNameButAnotherAccount_IsDifferent()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A", name => Accounts(new[] { "someone-else@example.invalid" }));
+            Assert.AreEqual(IdentityMatch.Different, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_AccountCannotBeRead_IsUnproven()
+        {
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity(Mapped, "Person A", name => null));
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity(Mapped, "Person A", name => Accounts()));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_DisplayNameSharedByTheMappedAccountAndAnother_IsUnproven()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A",
+                name => Accounts(new[] { "person-a@example.invalid" }, new[] { "other@example.invalid" }));
+            Assert.AreEqual(IdentityMatch.Unproven, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BothQualifiedWithDifferentAccounts_IsDifferentWithoutALookup()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A <TENANT\\other@example.invalid>",
+                name => throw new AssertFailedException("no lookup expected"));
+            Assert.AreEqual(IdentityMatch.Different, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BothQualifiedSameUpnWithAndWithoutDomain_IsSame()
+        {
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity(Mapped, "Person A <person-a@example.invalid>", name => null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareAccountAgainstBareDisplayName_ResolvesTheDisplayName()
+        {
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person A",
+                name => name == "Person A" ? Accounts(new[] { "person-a@example.invalid" }) : null));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B",
+                name => Accounts(new[] { "person-b@example.invalid" })));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_AccountsOnBothSides_CompareWithoutALookup()
+        {
+            Func<string, System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyCollection<string>>> noLookup =
+                name => throw new AssertFailedException("no lookup expected");
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person A <TENANT\\person-a@example.invalid>", noLookup));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("DOMAINA\\person <DOMAINA\\person>", "Person <DOMAINB\\person>", noLookup));
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("TENANT\\person-a@example.invalid", "PERSON-A@example.invalid", noLookup));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_TwoDifferentBareAccounts_AreResolvedThroughTheLookup()
+        {
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "alias@example.invalid",
+                name => name == "alias@example.invalid" ? Accounts(new[] { "person-a@example.invalid" }) : Accounts()));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid", name => Accounts()));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid",
+                name => name == "person-b@example.invalid" ? Accounts(new[] { "person-b@example.invalid" }) : Accounts()));
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity("person-a@example.invalid", "person-b@example.invalid", name => null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareAccountsWhoseLookupsDisagree_IsUnproven()
+        {
+            // The saved value is also another account's display name, the expected value a display name of the saved account.
+            var match = StateStampedFields.CompareIdentity("alias@example.invalid", "person-a@example.invalid",
+                name => name == "person-a@example.invalid" ? Accounts(new[] { "person-b@example.invalid" })
+                    : name == "alias@example.invalid" ? Accounts(new[] { "person-a@example.invalid" }) : Accounts());
+            Assert.AreEqual(IdentityMatch.Unproven, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareAccountsWithTheSecondLookupUnavailable_IsUnproven()
+        {
+            var match = StateStampedFields.CompareIdentity("alias@example.invalid", "person@example.invalid",
+                name => name == "person@example.invalid" ? Accounts(new[] { "other@example.invalid" }) : null);
+            Assert.AreEqual(IdentityMatch.Unproven, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_EmailShapedValueAgainstAnotherAccount_IsResolvedThroughTheLookup()
+        {
+            // An account-shaped value may be a display name, so a difference is checked before it is reported.
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("Person A <person-a@example.invalid>", "alias@example.invalid",
+                name => name == "alias@example.invalid" ? Accounts(new[] { "person-a@example.invalid" }) : null));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("Person A <person-a@example.invalid>", "person-b@example.invalid", name => Accounts()));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B <person-b@example.invalid>", name => Accounts()));
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B <person-b@example.invalid>", name => null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_TwoDifferentBareDisplayNames_IsDifferentWithoutALookup()
+        {
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("Person A", "Person B",
+                name => throw new AssertFailedException("no lookup expected")));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_SourceEmptyTargetSet_IsDifferent()
+        {
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity(null, "Person A", name => Accounts(new[] { "x@example.invalid" })));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void SameUniqueName_DomainQualifiedUpnMatchesBareUpn_ButNotBareAccounts()
+        {
+            Assert.IsTrue(StateStampedFields.SameUniqueName("TENANT\\person-a@example.invalid", "PERSON-A@example.invalid"));
+            Assert.IsFalse(StateStampedFields.SameUniqueName("DOMAINA\\person", "DOMAINB\\person"));
+        }
+
         [TestMethod, TestCategory("L0")]
         public void SameValue_SameInstantInAnotherKind_IsSame()
         {

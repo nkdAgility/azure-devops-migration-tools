@@ -240,6 +240,13 @@ namespace MigrationTools.ConsoleDataGenerator
                 });
                 migrationToolsSchema.Required.Add("Version");
 
+                migrationToolsSchema.Properties.Add("UserAgentLabel", new JSchema
+                {
+                    Type = JSchemaType.String,
+                    MaximumLength = MigrationTools.Services.MigrationUserAgent.MaxLabelLength,
+                    Description = "Optional name for this migration, added after the run id in the user agent of every request sent to Azure DevOps, for matching requests to a run log or a support case. The organisation's Usage page does not show it. Only letters, digits, '-', '.' and '_' are kept; spaces become '-'. It is sent as written otherwise, so never put customer, project or user names here."
+                });
+
                 // Add endpoints section
                 var endpointsSchema = new JSchema { Type = JSchemaType.Object };
                 var endpointClasses = allClassData.Where(cd => cd.TypeName.Equals("Endpoints", StringComparison.OrdinalIgnoreCase)).ToList();

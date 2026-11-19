@@ -133,6 +133,7 @@ namespace MigrationTools.Host
             {
 
                services.AddOptions();
+               MigrationUserAgent.Configure(mtv.GetRunningVersion().versionString, context.Configuration[MigrationUserAgent.LabelConfigurationKey]);
 
                 //// Services
                 services.AddTransient<IDetectOnlineService, DetectOnlineService>();
