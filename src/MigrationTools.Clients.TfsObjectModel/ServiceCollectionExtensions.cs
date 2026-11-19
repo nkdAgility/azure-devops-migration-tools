@@ -53,6 +53,8 @@ namespace MigrationTools
 
         public static void AddMigrationToolServicesForClientAzureDevOpsObjectModel(this IServiceCollection context, IConfiguration configuration)
         {
+            TfsUserAgent.Install();
+
             //Processors
             context.AddTransient<TfsTeamSettingsProcessor>();
             context.AddTransient<TfsSharedQueryProcessor>();
