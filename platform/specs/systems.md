@@ -11,6 +11,6 @@ Each system and the source paths that belong to it. The docs check uses this to 
 - telemetry: src/MigrationTools.Telemetery/
 - packaging: src/MigrationTools.Chocolatey/ src/MigrationTools.WinGet/ src/MigrationTools.Extension/ build/ .github/workflows/
 - e2e-harness: tools/e2e/
-- docs-site: docs/content/ docs/layouts/
+- docs-site: docs/content/ docs/layouts/ docs/data/ docs/static/ docs/hugo.yaml docs/hugo.canary.yaml docs/hugo.local.yaml docs/hugo.preview.yaml docs/hugo.production.yaml
 - config-wizard: docs/_site-docs/
 

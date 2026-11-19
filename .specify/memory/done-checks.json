@@ -1,5 +1,5 @@
 {
   "build": "dotnet build MigrationTools.sln",
-  "test": "dotnet test MigrationTools.sln --no-build --filter \"(TestCategory=L0|TestCategory=L1)\"",
+  "test": "$env:MigrationTools__Tests__UseEntraId='true'; $env:MigrationTools__Tests__SourceCollection='https://dev.azure.com/nkdagility-adomt-source'; $env:MigrationTools__Tests__TargetCollection='https://dev.azure.com/nkdagility-adomt-target'; dotnet test MigrationTools.sln --no-build",
   "proof": "pwsh -NoProfile -File .specify/memory/proof.ps1"
 }

@@ -32,6 +32,7 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
 }
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
 "scratch projects left for clean-up: $($scratch -join ', ')"
+if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"; exit 1 }
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', ')"; exit 1 }
 "all covered scenarios passed; results in $work"
 exit 0
