@@ -9,6 +9,9 @@ $Src = $cfg.MigrationTools.Endpoints.Source.Project
 $Tgt = $cfg.MigrationTools.Endpoints.Target.Project
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
+# Before any remote item is created, so a failure here never leaves a fixture behind to be seeded twice.
+$stateDir = Join-Path $PSScriptRoot "chain"
+New-Item -ItemType Directory -Force $stateDir -ErrorAction Stop | Out-Null
 
 Set-E2EOrg nkdagility-adomt-target
 New-E2EProject -Name $Tgt -Process $Process | Out-Null
@@ -29,8 +32,6 @@ for ($f = 1; $f -le $FeatureCount; $f++) {
         $previous = $story.id
     }
 }
-$stateDir = Join-Path $PSScriptRoot "chain"
-New-Item -ItemType Directory -Force $stateDir | Out-Null
 Save-E2EState $stateDir @{ features = $featureIds; stories = $storyIds }
 "seeded longrun-3305 chain: $($featureIds.Count) features, $($storyIds.Count) stories in $Src"
 
