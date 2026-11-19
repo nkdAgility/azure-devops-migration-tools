@@ -101,6 +101,17 @@ namespace MigrationTools.Endpoints.Tests
             Assert.AreEqual(EntraIdCredentialType.Default, new EntraIdOptions { Credential = null }.CredentialType);
             Assert.AreEqual(EntraIdCredentialType.Unknown, new EntraIdOptions { Credential = "3" }.CredentialType, "A number is not a credential name.");
             Assert.AreEqual(EntraIdCredentialType.Unknown, new EntraIdOptions { Credential = "Unknown" }.CredentialType);
+            Assert.AreEqual(EntraIdCredentialType.Interactive, new EntraIdOptions { Credential = " Interactive " }.CredentialType);
+            Assert.AreEqual(EntraIdCredentialType.Unknown, new EntraIdOptions { Credential = "AzureCli, Interactive" }.CredentialType, "Two names are not one credential.");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Validate_NamesTheSettingWhereTheEndpointReadsIt()
+        {
+            var options = new EntraIdOptions { Credential = nameof(EntraIdCredentialType.ClientSecret), TenantId = Tenant, ClientSecret = "s" };
+
+            StringAssert.Contains(options.Validate("Source").Single(), "Set MigrationTools:Endpoints:Source:Authentication:EntraId:ClientId.");
+            StringAssert.Contains(options.Validate("Rest", "EntraId").Single(), "Set MigrationTools:Endpoints:Rest:EntraId:ClientId.");
         }
 
         [TestMethod, TestCategory("L0")]

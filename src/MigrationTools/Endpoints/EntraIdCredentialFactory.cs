@@ -157,6 +157,11 @@ namespace MigrationTools.Endpoints
             {
                 Log.Information("Endpoint '{EndpointName}': signing in to Microsoft Entra ID with {Credential}. This is needed once; later runs reuse the saved sign-in.", endpointName, options.CredentialType);
                 record = SignIn(credential, endpointName, options.CredentialType);
+                // The device-code page does not receive LoginHint, so anyone can complete it; never run, or save, as someone else.
+                if (!string.IsNullOrWhiteSpace(options.LoginHint) && !string.Equals(record.Username, options.LoginHint, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new MigrationRunStoppedException($"Endpoint '{endpointName}': {options.CredentialType} sign-in completed as {record.Username}, but LoginHint is {options.LoginHint}. Run again and sign in as {options.LoginHint}, or change LoginHint.");
+                }
                 SaveRecord(record, recordPath);
                 Log.Information("Endpoint '{EndpointName}': signed in as {Account}; sign-in saved to {RecordPath}.", endpointName, record.Username, recordPath);
             }

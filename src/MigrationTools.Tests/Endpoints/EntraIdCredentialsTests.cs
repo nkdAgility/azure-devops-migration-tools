@@ -84,6 +84,22 @@ namespace MigrationTools.Endpoints.Tests
         }
 
         [TestMethod, TestCategory("L0")]
+        public async Task GetFreshAccessTokenAsync_UsesANewAppCredentialSoItsCachedTokenIsNotReused()
+        {
+            var built = 0;
+            var app = new EntraIdCredentials(new EntraIdOptions { Credential = nameof(EntraIdCredentialType.ClientSecret) }, "Target", (o, n) => { built++; return new CountingTokenCredential(); });
+            var user = new EntraIdCredentials(new EntraIdOptions { Credential = nameof(EntraIdCredentialType.AzureCli) }, "Source", (o, n) => { built += 100; return new CountingTokenCredential(); });
+
+            app.GetAccessToken();
+            await app.GetFreshAccessTokenAsync();
+            await app.GetFreshAccessTokenAsync();
+            user.GetAccessToken();
+            await user.GetFreshAccessTokenAsync();
+
+            Assert.AreEqual(3 + 100, built, "Each renewal after a 401 builds a new app credential; a user credential is built once.");
+        }
+
+        [TestMethod, TestCategory("L0")]
         public async Task GetFreshAccessTokenAsync_ConcurrentCallersShareOneFetch()
         {
             var slow = new SlowTokenCredential();

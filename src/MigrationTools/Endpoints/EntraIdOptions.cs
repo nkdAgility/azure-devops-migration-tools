@@ -47,12 +47,17 @@ namespace MigrationTools.Endpoints
         /// than the enum so a mistyped name reaches Validate and gets its message instead of failing the schema or binding.
         /// </summary>
         [JsonIgnore]
-        public EntraIdCredentialType CredentialType =>
-            string.IsNullOrWhiteSpace(Credential)
-                ? EntraIdCredentialType.Default
-                : Enum.TryParse(Credential.Trim(), true, out EntraIdCredentialType parsed) && !int.TryParse(Credential, out _) && parsed != EntraIdCredentialType.Unknown
-                    ? parsed
-                    : EntraIdCredentialType.Unknown;
+        public EntraIdCredentialType CredentialType
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(Credential)) { return EntraIdCredentialType.Default; }
+                // Match one name exactly: Enum.TryParse would also accept numbers and combine "A, B" into another value.
+                var name = Enum.GetNames(typeof(EntraIdCredentialType))
+                    .FirstOrDefault(n => n != nameof(EntraIdCredentialType.Unknown) && string.Equals(n, Credential.Trim(), StringComparison.OrdinalIgnoreCase));
+                return name == null ? EntraIdCredentialType.Unknown : (EntraIdCredentialType)Enum.Parse(typeof(EntraIdCredentialType), name);
+            }
+        }
 
         /// <summary>
         /// The Microsoft Entra tenant (GUID or domain). Required for Certificate and ClientSecret; optional for AzureCli, Interactive and DeviceCode.
@@ -107,10 +112,12 @@ namespace MigrationTools.Endpoints
         /// <summary>
         /// Every problem with the settings for the chosen credential, each as one message naming the endpoint, the setting and what to do.
         /// </summary>
-        public IReadOnlyList<string> Validate(string endpointName)
+        /// <param name="endpointName">The endpoint's name, as in MigrationTools:Endpoints:{name}.</param>
+        /// <param name="section">Where the EntraId block sits under the endpoint: "Authentication:EntraId" on the TFS endpoints, "EntraId" on the REST endpoint.</param>
+        public IReadOnlyList<string> Validate(string endpointName, string section = "Authentication:EntraId")
         {
             var errors = new List<string>();
-            var setting = $"MigrationTools:Endpoints:{endpointName}:Authentication:EntraId";
+            var setting = $"MigrationTools:Endpoints:{endpointName}:{section}";
             void Need(string name, string value)
             {
                 if (string.IsNullOrWhiteSpace(value)) { errors.Add($"Endpoint '{endpointName}': the {CredentialType} Entra ID credential needs {name}. Set {setting}:{name}."); }

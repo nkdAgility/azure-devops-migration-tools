@@ -260,14 +260,17 @@ namespace MigrationTools.Endpoints
         /// </summary>
         public async Task<string> GetFreshAccessTokenAsync(CancellationToken cancellationToken = default)
         {
-            var credential = Current;
             Task<AccessToken> fetch;
             lock (_cacheLock)
             {
                 fetch = _inFlight;
                 if (fetch == null)
                 {
-                    var started = FetchAndCacheAsync(credential, _generation);
+                    // An app credential keeps its tokens in an in-memory MSAL cache and would hand back the token the
+                    // server just rejected; a new instance starts with an empty cache. The user sign-ins (Azure CLI,
+                    // browser, device code) use a shared cache that the credential refreshes itself.
+                    if (EntraIdCredentialFactory.IsExperimental(_options.CredentialType)) { _credential = null; }
+                    var started = FetchAndCacheAsync(Current, _generation);
                     _inFlight = started;
                     fetch = started;
                     // Cleared when the fetch itself finishes (success or failure), never when a caller stops

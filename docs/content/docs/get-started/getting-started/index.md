@@ -67,8 +67,8 @@ The default [TfsWorkItemMigrationProcesor]({{< ref "docs/reference/processors/tf
 
    - `EntraId` with an `EntraId` block, to choose a sign-in: `AzureCli`, a browser (`Interactive`) or a
      `DeviceCode`, with a different account or tenant on Source and Target if you need one.
-   - `AccessToken`: enter a PAT as the `PersonalAccessToken` value, or set
-     `PersonalAccessTokenVariableName` to the name of an environment variable holding it.
+   - `AccessToken`: put a PAT in `Authentication:AccessToken`, or better, in the environment variable
+     `MigrationTools__Endpoints__Source__Authentication__AccessToken` (and `...Target...`).
    - `Prompt`: sign in in a dialog when the tool connects.
    - `EntraId` as an app (`Certificate`, `ClientSecret` or `ManagedIdentity`): **currently untested** in a
      full migration. It is built and the run warns when you use it; try it on a test project first.

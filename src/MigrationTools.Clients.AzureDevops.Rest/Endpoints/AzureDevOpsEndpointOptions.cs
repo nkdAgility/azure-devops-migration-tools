@@ -86,7 +86,7 @@ namespace MigrationTools.Endpoints
                     }
                     return ValidateOptionsResult.Success;
                 case AuthenticationMode.EntraId:
-                    var errors = options.EntraId?.Validate(name);
+                    var errors = options.EntraId?.Validate(name, "EntraId");
                     return errors != null && errors.Count > 0 ? ValidateOptionsResult.Fail(errors) : ValidateOptionsResult.Success;
                 default:
                     return ValidateOptionsResult.Fail($"The AuthenticationMode '{options.AuthenticationMode}' is not supported by the Azure DevOps REST endpoint. Use 'AccessToken' or 'EntraId'.");
