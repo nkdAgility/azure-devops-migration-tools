@@ -127,13 +127,15 @@ namespace MigrationTools.Tests.Processors
             counts.Begin(); counts.Set(RerunCounts.Outcome.Updated); counts.Succeeded();
             counts.Begin(); counts.Set(RerunCounts.Outcome.Created); counts.Succeeded();
             counts.Begin(); counts.Set(RerunCounts.Outcome.Updated); counts.Fail();
+            counts.Begin(); counts.Set(RerunCounts.Outcome.Updated); counts.Set(RerunCounts.Outcome.Checked); counts.Succeeded();
             counts.Begin(); counts.Succeeded();
 
             Assert.AreEqual(2, counts.InSync);
+            Assert.AreEqual(1, counts.Checked);
             Assert.AreEqual(1, counts.Updated);
             Assert.AreEqual(1, counts.Created);
             Assert.AreEqual(1, counts.Failed);
-            Assert.AreEqual("2 in sync and untouched, 1 updated, 1 created, 1 failed", counts.ToString());
+            Assert.AreEqual("2 in sync and untouched, 1 checked with nothing to change, 1 updated, 1 created, 1 failed", counts.ToString());
         }
     }
 }

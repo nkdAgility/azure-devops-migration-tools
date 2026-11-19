@@ -889,6 +889,10 @@ namespace MigrationTools.Processors
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                                 StampCatchUpSave(targetWorkItem);
+                                if (!targetWorkItem.ToWorkItem().IsDirty)
+                                {
+                                    _rerunCounts.Set(RerunCounts.Outcome.Checked);
+                                }
                                 activity?.SetTag("Revisions", 0);
                             }
                             else

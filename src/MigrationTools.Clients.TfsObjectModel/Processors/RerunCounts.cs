@@ -12,6 +12,7 @@ namespace MigrationTools.Processors
             Created,
             Updated,
             InSync,
+            Checked,
         }
 
         private Outcome _pending;
@@ -19,6 +20,7 @@ namespace MigrationTools.Processors
         public int Created { get; private set; }
         public int Updated { get; private set; }
         public int InSync { get; private set; }
+        public int Checked { get; private set; }
         public int Failed { get; private set; }
 
         public void Begin() => _pending = Outcome.None;
@@ -32,6 +34,7 @@ namespace MigrationTools.Processors
                 case Outcome.Created: Created++; break;
                 case Outcome.Updated: Updated++; break;
                 case Outcome.InSync: InSync++; break;
+                case Outcome.Checked: Checked++; break;
             }
             _pending = Outcome.None;
         }
@@ -43,6 +46,6 @@ namespace MigrationTools.Processors
         }
 
         public override string ToString() =>
-            $"{InSync} in sync and untouched, {Updated} updated, {Created} created, {Failed} failed";
+            $"{InSync} in sync and untouched, {Checked} checked with nothing to change, {Updated} updated, {Created} created, {Failed} failed";
     }
 }
