@@ -29,6 +29,6 @@ for ($f = 1; $f -le $FeatureCount; $f++) {
         $previous = $story.id
     }
 }
-Save-E2EState $PSScriptRoot @{ features = $featureIds; stories = $storyIds }
+Save-E2EState $PSScriptRoot @{ features = $featureIds; stories = $storyIds; storiesPerFeature = $StoriesPerFeature }
 "seeded rerun-3299: $($featureIds.Count) features, $($storyIds.Count) stories in $Src"
 

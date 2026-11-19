@@ -13,7 +13,7 @@ function TargetOf([int]$sourceId) { Find-E2ETargetItem $Tgt $sourceId }
 function RelatedIds($wi, [string]$rel) { @($wi.relations | Where-Object rel -eq $rel | ForEach-Object { [int]($_.url -split '/')[-1] }) }
 
 $revisionTarget = TargetOf $state.diff.revisionItem
-if ($revisionTarget.fields.'System.Description' -notmatch 'changed after the first migration') { $failures += "missing revision not replayed on $($revisionTarget.id)" }
+if ($revisionTarget.fields.'System.Description' -ne $state.diff.description) { $failures += "missing revision not replayed on $($revisionTarget.id): Description is '$($revisionTarget.fields.'System.Description')'" }
 
 $linkTarget = TargetOf $state.diff.linkItem
 # State values come back as Int64, so find the index by value rather than with [array]::IndexOf.

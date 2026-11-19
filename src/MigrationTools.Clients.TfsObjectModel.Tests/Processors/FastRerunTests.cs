@@ -77,6 +77,31 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void MustQuery_CompleteMap_OnlyAmbiguousItems()
+        {
+            var map = new ReflectedWorkItemIdMap();
+            map.Add("https://dev.azure.com/source-org/P/_workitems/edit/1", 101);
+            map.Add("https://dev.azure.com/source-org/P/_workitems/edit/2", 102);
+            map.Add("https://dev.azure.com/source-org/P/_workitems/edit/2", 202);
+
+            Assert.IsFalse(map.MustQuery(Source, 1));
+            Assert.IsTrue(map.MustQuery(Source, 2));
+            Assert.IsFalse(map.MustQuery(Source, 3), "a complete map knows an absent item is not in the target");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void MustQuery_IncompleteMap_AbsentItemsAreQueried()
+        {
+            var map = new ReflectedWorkItemIdMap();
+            map.Add("https://dev.azure.com/source-org/P/_workitems/edit/1", 101);
+            map.MarkIncomplete();
+
+            Assert.IsFalse(map.IsComplete);
+            Assert.IsFalse(map.MustQuery(Source, 1), "an item found in the map is still known");
+            Assert.IsTrue(map.MustQuery(Source, 3));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void TryGetTargetId_IgnoresCase()
         {
             var map = new ReflectedWorkItemIdMap();

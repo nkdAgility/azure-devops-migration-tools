@@ -959,7 +959,16 @@ namespace MigrationTools.Processors
                             {"Retrys", retries },
                             {"RetryLimit", retryLimit }
                             });
-                        await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
+                        // The failed attempt may have saved a target item the map does not know about, so query for it.
+                        TargetClient.MapMissesAreAuthoritative = false;
+                        try
+                        {
+                            await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
+                        }
+                        finally
+                        {
+                            TargetClient.MapMissesAreAuthoritative = true;
+                        }
                     }
                     else
                     {
@@ -1420,6 +1429,11 @@ namespace MigrationTools.Processors
                                {"RevisionNumber", revision.Number },
                                {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
                            });
+                    // As soon as the target exists, so a retry after a later revision fails resumes it instead of creating another.
+                    if (int.TryParse(targetWorkItem.Id, out var savedId) && savedId > 0)
+                    {
+                        TargetClient.RecordReflectedWorkItem(Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString(), savedId);
+                    }
                 }
 
                 // Attachments, links and the migration comment were saved with the replayed revisions (#3192),

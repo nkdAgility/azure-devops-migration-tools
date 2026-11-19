@@ -115,7 +115,14 @@ namespace MigrationTools.Clients
                 query.Append(" AND ").Append(extraCondition);
             }
             Log.Debug("LoadReflectedWorkItemIdMap: {Query}", query);
-            foreach (WorkItem wi in Store.Query(query.ToString(), parameters))
+            var items = Store.Query(query.ToString(), parameters);
+            if (items.Count >= IncompleteMapThreshold)
+            {
+                // Azure DevOps truncates a query at 20,000 items without an error, so the map may lack items.
+                map.MarkIncomplete();
+                Log.Warning("{Count} target work items have a value in {Field}, close to the 20,000 item query limit: work items not found in the loaded map are looked up one by one.", items.Count, field);
+            }
+            foreach (WorkItem wi in items)
             {
                 if (wi.Fields.Contains(field))
                 {
@@ -123,6 +130,15 @@ namespace MigrationTools.Clients
                 }
             }
         }
+
+        /// <summary>A load query returning this many items may have been truncated at the 20,000 item limit.</summary>
+        public const int IncompleteMapThreshold = 19000;
+
+        /// <summary>
+        /// When false, a source item missing from the map is queried instead of being taken as not in the target. Set
+        /// while retrying a work item, whose earlier attempt may have saved a target item before failing.
+        /// </summary>
+        public bool MapMissesAreAuthoritative { get; set; } = true;
 
         /// <summary>Adds a target item created or found during the run to the map.</summary>
         public void RecordReflectedWorkItem(string reflectedWorkItemId, int targetId)
@@ -137,7 +153,11 @@ namespace MigrationTools.Clients
         private bool TryFindInMap(string refId, out WorkItemData found)
         {
             found = null;
-            if (_reflectedIdMap is null || _reflectedIdMap.IsAmbiguous(refId))
+            if (_reflectedIdMap is null || _reflectedIdMap.MustQuery(refId))
+            {
+                return false;
+            }
+            if (!_reflectedIdMap.TryGetTargetId(refId, out _) && !MapMissesAreAuthoritative)
             {
                 return false;
             }

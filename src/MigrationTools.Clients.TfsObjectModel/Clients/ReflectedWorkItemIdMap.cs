@@ -20,6 +20,22 @@ namespace MigrationTools.Clients
 
         public int AmbiguousCount => _ambiguous.Count;
 
+        /// <summary>
+        /// False when the map may lack target items, for example because a load query came close to the 20,000 item
+        /// query limit. Then a source item missing from the map may still be in the target, so it must be queried.
+        /// </summary>
+        public bool IsComplete { get; private set; } = true;
+
+        public void MarkIncomplete() => IsComplete = false;
+
+        /// <summary>True when the map cannot say whether a source item is in the target: ambiguous, or missing from an incomplete map.</summary>
+        public bool MustQuery(string reflectedWorkItemId)
+        {
+            return IsAmbiguous(reflectedWorkItemId) || (!IsComplete && !TryGetTargetId(reflectedWorkItemId, out _));
+        }
+
+        public bool MustQuery(Uri sourceCollection, int sourceId) => MustQuery(Format(sourceCollection, sourceId));
+
         /// <summary>Records a target item; values that are not a reflected work item ID are ignored.</summary>
         public void Add(string reflectedWorkItemId, int targetId)
         {

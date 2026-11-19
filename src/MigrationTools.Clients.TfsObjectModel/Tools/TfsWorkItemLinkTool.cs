@@ -163,6 +163,10 @@ namespace MigrationTools.Tools
                         }
                         break;
                     case RelatedLink rl when rl.LinkTypeEnd != null:
+                        if (map.MustQuery(sourceCollection, rl.RelatedWorkItemId))
+                        {
+                            return $"{rl.LinkTypeEnd.ImmutableName} link to source {rl.RelatedWorkItemId}, which the map cannot resolve (more than one target item, or an incomplete map)";
+                        }
                         if (map.TryGetTargetId(sourceCollection, rl.RelatedWorkItemId, out var relatedTargetId)
                             && !targetRelated.Contains(RevisionArtifactDiff.RelatedLinkKey(rl.LinkTypeEnd.ImmutableName, relatedTargetId)))
                         {
@@ -182,13 +186,15 @@ namespace MigrationTools.Tools
 
         private bool HasExternalLink(TfsProcessor processor, WorkItemData sourceWorkItem, ExternalLink el, HashSet<string> targetExternal, HashSet<string> targetHyperlinks)
         {
-            if (targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri)))
-            {
-                return true;
-            }
             var git = Services.GetRequiredService<TfsGitRepositoryTool>();
             var targetUri = git.GetTargetUri(processor, sourceWorkItem, el);
-            if (targetUri != null && targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(targetUri)))
+            if (targetUri != null)
+            {
+                // A link the migration rewrites must be the rewritten one. A raw source link kept because the target
+                // commit was missing goes through the link migration, which decides again whether it can be rewritten now.
+                return targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(targetUri));
+            }
+            if (targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri)))
             {
                 return true;
             }
