@@ -11,6 +11,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
+using MigrationTools.Processors;
 using MigrationTools.Services;
 using Serilog;
 
@@ -86,14 +87,24 @@ namespace MigrationTools.Clients
             using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("LoadReflectedWorkItemIdMap", ActivityKind.Client))
             {
                 var map = new ReflectedWorkItemIdMap();
-                if (CollectionHasConfiguredField)
+                try
                 {
-                    AddToMap(map, Options.ReflectedWorkItemIdField, null);
+                    if (CollectionHasConfiguredField)
+                    {
+                        AddToMap(map, Options.ReflectedWorkItemIdField, null);
+                    }
+                    if (!string.Equals(Options.ReflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var types = string.Join(", ", NonCustomisableWorkItemTypes.Types.Select(t => "'" + t.Replace("'", "''") + "'"));
+                        AddToMap(map, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, $"[System.WorkItemType] IN ({types})");
+                    }
                 }
-                if (!string.Equals(Options.ReflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, StringComparison.OrdinalIgnoreCase))
+                catch (Exception ex) when (ex is not MigrationRunStoppedException)
                 {
-                    var types = string.Join(", ", NonCustomisableWorkItemTypes.Types.Select(t => "'" + t.Replace("'", "''") + "'"));
-                    AddToMap(map, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, $"[System.WorkItemType] IN ({types})");
+                    // The map only saves queries, so a failure to load it must not stop the run.
+                    map.MarkIncomplete();
+                    Log.Warning("The map of migrated work items could not be loaded, so every work item is looked up one by one: {Reason}", WorkItemMigrationFailedException.ServerReason(ex));
+                    Log.Debug(ex, "LoadReflectedWorkItemIdMap failed");
                 }
                 _reflectedIdMap = map;
                 activity?.SetTag("ReflectedWorkItemIds", map.Count);
@@ -114,22 +125,46 @@ namespace MigrationTools.Clients
             {
                 query.Append(" AND ").Append(extraCondition);
             }
+            // Azure DevOps truncates a query at 20,000 items without an error, so the load is split into id ranges that
+            // can never hold that many. The highest id comes first in a descending query, even a truncated one.
             Log.Debug("LoadReflectedWorkItemIdMap: {Query}", query);
-            var items = Store.Query(query.ToString(), parameters);
-            if (items.Count >= IncompleteMapThreshold)
+            var newest = Store.Query(query + " ORDER BY [System.Id] DESC", parameters);
+            if (newest.Count == 0)
             {
-                // Azure DevOps truncates a query at 20,000 items without an error, so the map may lack items.
-                map.MarkIncomplete();
-                Log.Warning("{Count} target work items have a value in {Field}, close to the 20,000 item query limit: work items not found in the loaded map are looked up one by one.", items.Count, field);
+                return;
             }
-            foreach (WorkItem wi in items)
+            foreach (var (from, to) in ReflectedWorkItemIdMap.IdRanges(newest[0].Id, IdRangeWidth))
             {
-                if (wi.Fields.Contains(field))
+                var items = Store.Query($"{query} AND [System.Id] >= {from} AND [System.Id] <= {to}", parameters);
+                if (items.Count >= IncompleteMapThreshold)
                 {
-                    map.Add(wi.Fields[field].Value?.ToString(), wi.Id);
+                    map.MarkIncomplete();
+                    Log.Warning("{Count} target work items with a value in {Field} between ids {From} and {To}, close to the 20,000 item query limit: every work item is looked up one by one.", items.Count, field, from, to);
+                }
+                foreach (WorkItem wi in items)
+                {
+                    try
+                    {
+                        if (wi.Fields.Contains(field))
+                        {
+                            map.Add(wi.Fields[field].Value?.ToString(), wi.Id);
+                        }
+                    }
+                    catch (Exception ex) when (ex is not MigrationRunStoppedException)
+                    {
+                        // For example TF201077 for an item in a project that is being deleted: the map cannot vouch for it.
+                        if (map.IsComplete)
+                        {
+                            Log.Warning("Target work item {Id} could not be read while loading the map of migrated work items, so every work item is looked up one by one: {Reason}", wi.Id, WorkItemMigrationFailedException.ServerReason(ex));
+                        }
+                        map.MarkIncomplete();
+                    }
                 }
             }
         }
+
+        /// <summary>Ids per map load query: fewer than the 20,000 item query limit, since ids are unique in a collection.</summary>
+        public const int IdRangeWidth = 15000;
 
         /// <summary>A load query returning this many items may have been truncated at the 20,000 item limit.</summary>
         public const int IncompleteMapThreshold = 19000;
