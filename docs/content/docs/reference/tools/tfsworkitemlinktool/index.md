@@ -42,7 +42,7 @@ A Test Case whose Shared Steps or Shared Parameter can't be read in the source (
 
 ### Children That Changed Parent
 
-A work item can have only one parent, and a child ends under the parent it has in the source now. While a parent's history is replayed, an earlier child link is skipped, with one warning, when the child has since moved to another parent:
+A work item can have only one parent, and when that parent is part of the migration, a child ends under the parent it has in the source now. While a parent's history is replayed, an earlier child link is skipped, with one warning, when the child has since moved to another parent:
 
 `[SKIP] Child link from source <id> to <id> not added to target <id>: the child has since moved to another parent in the source, and a work item can have only one parent. Target child <id> keeps its parent <id>.`
 
