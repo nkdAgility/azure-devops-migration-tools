@@ -1,8 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MigrationTools.Processors
 {
+    public enum IdentityMatch
+    {
+        Same,
+        Different,
+        /// <summary>The accounts behind the values could not be read, or a display name is shared, so neither can be proven.</summary>
+        Unproven
+    }
+
     /// <summary>
     /// The fields Azure DevOps stamps with the server clock and the current identity when a revision changes state
     /// (#3270). Each must carry the source revision's value in the same save that changes the state: there is no way to
@@ -80,6 +89,52 @@ namespace MigrationTools.Processors
             var bare = sourceUnique == null ? sourceName : targetName;
             var unique = sourceUnique ?? targetUnique;
             return string.Equals(bare, unique, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Compares an expected identity with a saved one as accounts (#3290). Where <see cref="SameValue(object, object, bool)"/>
+        /// cannot prove a match because one side is a bare display name and the other is qualified (for example a user
+        /// mapping value <c>Display &lt;domain\upn&gt;</c> read back from the object model as <c>Display</c>), the bare name is
+        /// resolved with <paramref name="accountsNamed"/>: the unique names of every account with that display name, or
+        /// null when they cannot be read. The values are the same only when every such account carries the qualified
+        /// unique name, and different only when none does; otherwise the result is <see cref="IdentityMatch.Unproven"/>.
+        /// </summary>
+        public static IdentityMatch CompareIdentity(object expected, object saved, Func<string, IReadOnlyList<IReadOnlyCollection<string>>> accountsNamed)
+        {
+            if (SameValue(expected, saved, isIdentity: true)) return IdentityMatch.Same;
+            if (IsEmpty(expected) || IsEmpty(saved)) return IdentityMatch.Different;
+            var (expectedName, expectedUnique) = SplitIdentity(Convert.ToString(expected));
+            var (savedName, savedUnique) = SplitIdentity(Convert.ToString(saved));
+            if ((expectedUnique == null) == (savedUnique == null)) return IdentityMatch.Different;
+            var bareName = expectedUnique == null ? expectedName : savedName;
+            var unique = expectedUnique ?? savedUnique;
+            var accounts = accountsNamed?.Invoke(bareName);
+            if (accounts == null || accounts.Count == 0) return IdentityMatch.Unproven;
+            var carrying = accounts.Count(a => a != null && a.Any(u => SameUniqueName(u, unique)));
+            if (carrying == accounts.Count) return IdentityMatch.Same;
+            return carrying == 0 ? IdentityMatch.Different : IdentityMatch.Unproven;
+        }
+
+        /// <summary>
+        /// True when two unique names name the same account, ignoring case. A <c>domain\upn</c> form matches the bare
+        /// <c>upn</c> when the upn is an email, which is unique on its own; the domain part of an Entra ID identity is the
+        /// tenant, which the identity service does not always return in the same form.
+        /// </summary>
+        public static bool SameUniqueName(string a, string b)
+        {
+            if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b)) return false;
+            a = a.Trim();
+            b = b.Trim();
+            if (string.Equals(a, b, StringComparison.OrdinalIgnoreCase)) return true;
+            var upnA = AfterDomain(a);
+            var upnB = AfterDomain(b);
+            return upnA.Contains("@") && string.Equals(upnA, upnB, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string AfterDomain(string unique)
+        {
+            var slash = unique.LastIndexOf('\\');
+            return slash >= 0 ? unique.Substring(slash + 1) : unique;
         }
 
         /// <summary>Splits <c>Display Name &lt;unique name&gt;</c>; a value without the angle brackets has no unique name.</summary>

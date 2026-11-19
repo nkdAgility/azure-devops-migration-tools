@@ -21,6 +21,70 @@ namespace MigrationTools.Tests.Processors
             }, StateStampedFields.Fields.ToList());
         }
 
+        private const string Mapped = "Person A <TENANT\\person-a@example.invalid>";
+
+        private static System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyCollection<string>> Accounts(params string[][] uniqueNames) => uniqueNames;
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_MappedValueAgainstBareDisplayNameOfTheSameAccount_IsSame()
+        {
+            // #3290: the mapping file gives 'Display <tenant\upn>'; the object model reads the target back as 'Display'.
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A",
+                name => name == "Person A" ? Accounts(new[] { "person-a@example.invalid" }) : null);
+            Assert.AreEqual(IdentityMatch.Same, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareDisplayNameOfADifferentAccount_IsDifferent()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person B",
+                name => Accounts(new[] { "person-b@example.invalid", "TENANT\\person-b@example.invalid" }));
+            Assert.AreEqual(IdentityMatch.Different, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_SameDisplayNameButAnotherAccount_IsDifferent()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A", name => Accounts(new[] { "someone-else@example.invalid" }));
+            Assert.AreEqual(IdentityMatch.Different, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_AccountCannotBeRead_IsUnproven()
+        {
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity(Mapped, "Person A", name => null));
+            Assert.AreEqual(IdentityMatch.Unproven, StateStampedFields.CompareIdentity(Mapped, "Person A", name => Accounts()));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_DisplayNameSharedByTheMappedAccountAndAnother_IsUnproven()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A",
+                name => Accounts(new[] { "person-a@example.invalid" }, new[] { "other@example.invalid" }));
+            Assert.AreEqual(IdentityMatch.Unproven, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BothQualifiedWithDifferentAccounts_IsDifferentWithoutALookup()
+        {
+            var match = StateStampedFields.CompareIdentity(Mapped, "Person A <TENANT\\other@example.invalid>",
+                name => throw new AssertFailedException("no lookup expected"));
+            Assert.AreEqual(IdentityMatch.Different, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_SourceEmptyTargetSet_IsDifferent()
+        {
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity(null, "Person A", name => Accounts(new[] { "x@example.invalid" })));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void SameUniqueName_DomainQualifiedUpnMatchesBareUpn_ButNotBareAccounts()
+        {
+            Assert.IsTrue(StateStampedFields.SameUniqueName("TENANT\\person-a@example.invalid", "PERSON-A@example.invalid"));
+            Assert.IsFalse(StateStampedFields.SameUniqueName("DOMAINA\\person", "DOMAINB\\person"));
+        }
+
         [TestMethod, TestCategory("L0")]
         public void SameValue_SameInstantInAnotherKind_IsSame()
         {
