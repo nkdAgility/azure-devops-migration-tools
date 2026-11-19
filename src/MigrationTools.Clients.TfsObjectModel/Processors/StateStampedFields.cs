@@ -105,7 +105,18 @@ namespace MigrationTools.Processors
             if (IsEmpty(expected) || IsEmpty(saved)) return IdentityMatch.Different;
             var (expectedName, expectedUnique) = SplitIdentity(Convert.ToString(expected));
             var (savedName, savedUnique) = SplitIdentity(Convert.ToString(saved));
-            if ((expectedUnique == null) == (savedUnique == null)) return IdentityMatch.Different;
+            if (expectedUnique != null && savedUnique != null)
+            {
+                return SameUniqueName(expectedUnique, savedUnique) ? IdentityMatch.Same : IdentityMatch.Different;
+            }
+            if (expectedUnique == null && savedUnique == null)
+            {
+                // A bare account (an email or domain\account) names the account; the other bare value is a display name.
+                var expectedIsAccount = LooksLikeAccount(expectedName);
+                if (expectedIsAccount == LooksLikeAccount(savedName)) return IdentityMatch.Different;
+                expectedUnique = expectedIsAccount ? expectedName : null;
+                savedUnique = expectedIsAccount ? null : savedName;
+            }
             var bareName = expectedUnique == null ? expectedName : savedName;
             var unique = expectedUnique ?? savedUnique;
             var accounts = accountsNamed?.Invoke(bareName);
@@ -130,6 +141,9 @@ namespace MigrationTools.Processors
             var upnB = AfterDomain(b);
             return upnA.Contains("@") && string.Equals(upnA, upnB, StringComparison.OrdinalIgnoreCase);
         }
+
+        private static bool LooksLikeAccount(string value) =>
+            !string.IsNullOrEmpty(value) && !value.Contains(" ") && (value.Contains("@") || value.Contains("\\"));
 
         private static string AfterDomain(string unique)
         {

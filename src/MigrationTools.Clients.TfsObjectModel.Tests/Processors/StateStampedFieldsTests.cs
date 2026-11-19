@@ -73,6 +73,28 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BothQualifiedSameUpnWithAndWithoutDomain_IsSame()
+        {
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity(Mapped, "Person A <person-a@example.invalid>", name => null));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareAccountAgainstBareDisplayName_ResolvesTheDisplayName()
+        {
+            Assert.AreEqual(IdentityMatch.Same, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person A",
+                name => name == "Person A" ? Accounts(new[] { "person-a@example.invalid" }) : null));
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("person-a@example.invalid", "Person B",
+                name => Accounts(new[] { "person-b@example.invalid" })));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_TwoDifferentBareDisplayNames_IsDifferentWithoutALookup()
+        {
+            Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity("Person A", "Person B",
+                name => throw new AssertFailedException("no lookup expected")));
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void CompareIdentity_SourceEmptyTargetSet_IsDifferent()
         {
             Assert.AreEqual(IdentityMatch.Different, StateStampedFields.CompareIdentity(null, "Person A", name => Accounts(new[] { "x@example.invalid" })));
