@@ -119,6 +119,14 @@ namespace MigrationTools.Tests.Processors
         }
 
         [TestMethod, TestCategory("L0")]
+        public void CompareIdentity_BareAccountsWithTheSecondLookupUnavailable_IsUnproven()
+        {
+            var match = StateStampedFields.CompareIdentity("alias@example.invalid", "person@example.invalid",
+                name => name == "person@example.invalid" ? Accounts(new[] { "other@example.invalid" }) : null);
+            Assert.AreEqual(IdentityMatch.Unproven, match);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void CompareIdentity_EmailShapedValueAgainstAnotherAccount_IsResolvedThroughTheLookup()
         {
             // An account-shaped value may be a display name, so a difference is checked before it is reported.
