@@ -72,9 +72,110 @@ namespace MigrationTools.Clients
             }
         }
 
+        private ReflectedWorkItemIdMap _reflectedIdMap;
+
+        /// <summary>The map loaded by <see cref="LoadReflectedWorkItemIdMap"/>, or null when it has not been loaded.</summary>
+        public ReflectedWorkItemIdMap ReflectedIdMap => _reflectedIdMap;
+
+        /// <summary>
+        /// Reads the reflected work item ID of every target work item with one WIQL query per field (#3299). From then on a
+        /// reflected item is loaded by id and an item missing from the map is known not to be in the target, with no query.
+        /// </summary>
+        public ReflectedWorkItemIdMap LoadReflectedWorkItemIdMap()
+        {
+            using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("LoadReflectedWorkItemIdMap", ActivityKind.Client))
+            {
+                var map = new ReflectedWorkItemIdMap();
+                if (CollectionHasConfiguredField)
+                {
+                    AddToMap(map, Options.ReflectedWorkItemIdField, null);
+                }
+                if (!string.Equals(Options.ReflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, StringComparison.OrdinalIgnoreCase))
+                {
+                    var types = string.Join(", ", NonCustomisableWorkItemTypes.Types.Select(t => "'" + t.Replace("'", "''") + "'"));
+                    AddToMap(map, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, $"[System.WorkItemType] IN ({types})");
+                }
+                _reflectedIdMap = map;
+                activity?.SetTag("ReflectedWorkItemIds", map.Count);
+                return map;
+            }
+        }
+
+        private void AddToMap(ReflectedWorkItemIdMap map, string field, string extraCondition)
+        {
+            var query = new StringBuilder($"SELECT [System.Id], [{field}] FROM WorkItems WHERE [{field}] <> ''");
+            var parameters = new Dictionary<string, string>();
+            if (!Options.AllowCrossProjectLinking)
+            {
+                query.Append(" AND [System.TeamProject] = @TeamProject");
+                parameters["TeamProject"] = Options.Project;
+            }
+            if (extraCondition != null)
+            {
+                query.Append(" AND ").Append(extraCondition);
+            }
+            Log.Debug("LoadReflectedWorkItemIdMap: {Query}", query);
+            var items = Store.Query(query.ToString(), parameters);
+            if (items.Count >= IncompleteMapThreshold)
+            {
+                // Azure DevOps truncates a query at 20,000 items without an error, so the map may lack items.
+                map.MarkIncomplete();
+                Log.Warning("{Count} target work items have a value in {Field}, close to the 20,000 item query limit: work items not found in the loaded map are looked up one by one.", items.Count, field);
+            }
+            foreach (WorkItem wi in items)
+            {
+                if (wi.Fields.Contains(field))
+                {
+                    map.Add(wi.Fields[field].Value?.ToString(), wi.Id);
+                }
+            }
+        }
+
+        /// <summary>A load query returning this many items may have been truncated at the 20,000 item limit.</summary>
+        public const int IncompleteMapThreshold = 19000;
+
+        /// <summary>
+        /// When false, a source item missing from the map is queried instead of being taken as not in the target. Set
+        /// while retrying a work item, whose earlier attempt may have saved a target item before failing.
+        /// </summary>
+        public bool MapMissesAreAuthoritative { get; set; } = true;
+
+        /// <summary>Adds a target item created or found during the run to the map.</summary>
+        public void RecordReflectedWorkItem(string reflectedWorkItemId, int targetId)
+        {
+            _reflectedIdMap?.Add(reflectedWorkItemId, targetId);
+        }
+
+        /// <summary>
+        /// Answers a lookup from the map: the target item loaded by id, or null when the map shows it is not in the target.
+        /// Returns false when there is no map or it cannot say, so the caller queries as before.
+        /// </summary>
+        private bool TryFindInMap(string refId, out WorkItemData found)
+        {
+            found = null;
+            if (_reflectedIdMap is null || _reflectedIdMap.MustQuery(refId))
+            {
+                return false;
+            }
+            if (!_reflectedIdMap.TryGetTargetId(refId, out _) && !MapMissesAreAuthoritative)
+            {
+                return false;
+            }
+            if (_reflectedIdMap.TryGetTargetId(refId, out var targetId))
+            {
+                found = GetWorkItemIfExists(targetId);
+                return found is not null;
+            }
+            return true;
+        }
+
         public override WorkItemData FindReflectedWorkItem(WorkItemData workItemToReflect, bool cache)
         {
             TfsReflectedWorkItemId ReflectedWorkItemId = new TfsReflectedWorkItemId(workItemToReflect);
+            if (TryFindInMap(ReflectedWorkItemId.ToString(), out var mapped))
+            {
+                return mapped;
+            }
             WorkItem found = GetFromCache(ReflectedWorkItemId)?.ToWorkItem();
             if (found == null)
             {
@@ -94,6 +195,10 @@ namespace MigrationTools.Clients
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
+            if (TryFindInMap(refId, out var mapped))
+            {
+                return mapped;
+            }
             if (!CollectionHasConfiguredField)
             {
                 return FindInNonCustomisableTypes(refId);
@@ -334,6 +439,10 @@ namespace MigrationTools.Clients
             {
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("ReflectedWorkItemId", refId);
+                if (TryFindInMap(refId.ToString(), out var mapped))
+                {
+                    return mapped;
+                }
                 var foundWorkItem = GetFromCache(refId);
                 if (foundWorkItem is null)
                 {
