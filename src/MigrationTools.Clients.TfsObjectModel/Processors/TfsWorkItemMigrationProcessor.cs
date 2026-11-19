@@ -1423,38 +1423,52 @@ namespace MigrationTools.Processors
         }
 
         /// <summary>
-        /// Reads every revision of the source work item over REST, once per work item, so each state-stamped value the
-        /// object model reads can be checked against what Azure DevOps holds (#3305). If they cannot be read, the work
+        /// Reads every revision of the source work item again through the object model, once per work item, so each
+        /// state-stamped value read for a revision can be checked against a second read of it (#3305). If they cannot be read, the work
         /// item fails with the reason rather than being saved with values that cannot be checked.
         /// </summary>
         private SourceStateStampedValues ReadSourceStateStampedValues(WorkItemData sourceWorkItem)
         {
-            return ReadRevisionsOverRest(Source.GetClient<WorkItemTrackingHttpClient>(), int.Parse(sourceWorkItem.Id), "source");
+            return ReadRevisionsAgain(Source.WorkItems, int.Parse(sourceWorkItem.Id), "source");
         }
 
-        private SourceStateStampedValues ReadRevisionsOverRest(WorkItemTrackingHttpClient client, int id, string side)
+        /// <summary>
+        /// Loads the work item again from the server through the object model and returns the state-stamped values of each
+        /// of its revisions: a read independent of the one being checked. Only the object model is used, so this works
+        /// against servers without a REST API.
+        /// </summary>
+        private SourceStateStampedValues ReadRevisionsAgain(IWorkItemMigrationClient client, int id, string side)
         {
             var revisions = new List<(int Rev, IDictionary<string, object> Fields)>();
-            const int page = 200;
+            var names = new List<string> { StateStampedFields.CommonClosedDate, StateStampedFields.SystemClosedDate };
+            names.AddRange(StateStampedFields.Fields);
             try
             {
-                for (var skip = 0; ; skip += page)
+                var workItem = client.GetWorkItem(id).ToWorkItem();
+                try
                 {
-                    var batch = client.GetRevisionsAsync(id, page, skip).GetAwaiter().GetResult();
-                    revisions.AddRange(batch.Select(r => (r.Rev ?? 0, r.Fields)));
-                    if (batch.Count < page) break;
+                    foreach (Revision r in workItem.Revisions)
+                    {
+                        var fields = new Dictionary<string, object>();
+                        foreach (var name in names)
+                        {
+                            if (r.Fields.Contains(name)) fields[name] = r.Fields[name].Value;
+                        }
+                        revisions.Add(((int)r.Fields["System.Rev"].Value, fields));
+                    }
                 }
+                finally { workItem.Close(); }
             }
             catch (Exception ex) when (!(ex is MigrationRunStoppedException) && !IsTransientNetworkError(ex))
             {
                 throw new InvalidOperationException($"the {side} revisions could not be read from Azure DevOps to check the state-stamped values: {WorkItemMigrationFailedException.ServerReason(ex)}", ex);
             }
-            Log.LogDebug("Read {Count} revisions of {Side} work item {Id} to check its state-stamped values.", revisions.Count, side, id);
+            Log.LogDebug("Read {Count} revisions of {Side} work item {Id} again to check its state-stamped values.", revisions.Count, side, id);
             return SourceStateStampedValues.From(id, revisions);
         }
 
         /// <summary>
-        /// Reads the target work item's revisions over REST after the replay and checks each revision saved in it holds
+        /// Loads the target work item again from the server after the replay and checks each revision saved in it holds
         /// the state-stamped values it was saved with (#3305). The check after each save reads the object model's copy,
         /// which keeps a value it sent even if Azure DevOps did not store it. Fails the work item with the revision, the
         /// field and both values; a re-run then sets the current values (see <see cref="VerifyMigratedRevisions"/>).
@@ -1462,7 +1476,7 @@ namespace MigrationTools.Processors
         private void VerifyStateStampedValuesStored(WorkItemData targetWorkItem, List<(int TargetRevision, int SourceRevision, List<(string Field, object Expected, bool IsIdentity)> Expected)> saved)
         {
             if (saved.Count == 0) return;
-            var stored = ReadRevisionsOverRest(Target.GetClient<WorkItemTrackingHttpClient>(), int.Parse(targetWorkItem.Id), "target");
+            var stored = ReadRevisionsAgain(Target.WorkItems, int.Parse(targetWorkItem.Id), "target");
             var wrong = new List<string>();
             foreach (var (targetRevision, sourceRevision, expected) in saved)
             {
@@ -1471,7 +1485,7 @@ namespace MigrationTools.Processors
                     var actual = stored.Value(targetRevision, field);
                     if (!SourceStateStampedValues.SameStoredValue(value, actual, isIdentity))
                     {
-                        wrong.Add($"revision {targetRevision} (source revision {sourceRevision}) {field} is '{actual}' in Azure DevOps but the source is '{value}'");
+                        wrong.Add($"revision {targetRevision} (source revision {sourceRevision}) {field} reads back from the server as '{actual}' but the source is '{value}'");
                     }
                 }
             }
@@ -1518,14 +1532,22 @@ namespace MigrationTools.Processors
                 }
                 else
                 {
-                    // Checked against what Azure DevOps holds for this revision: the object model could read a value as
-                    // empty part-way through a long run, and the empty value was saved (#3305).
-                    value = SourceStateStampedValues.Reconcile(source.Fields[sourceField].Value,
-                        sourceValues.Value(source.Rev, sourceField), isIdentity, out var problem);
+                    // Checked against a second read of this revision: a value could be read as empty part-way through
+                    // a long run, and the empty value was saved (#3305).
+                    string problem;
+                    try
+                    {
+                        value = SourceStateStampedValues.Reconcile(source.Fields[sourceField].Value,
+                            sourceValues.Value(source.Rev, sourceField), isIdentity, out problem);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        throw new InvalidOperationException($"the state-stamped field {sourceField} could not be read reliably: {ex.Message}.", ex);
+                    }
                     if (problem != null)
                     {
-                        Log.LogWarning("Source work item {SourceId} revision {Revision} {Field}: {Problem}. Using the Azure DevOps value.",
-                            source.Id, source.Rev, sourceField, problem);
+                        Log.LogWarning("Source work item {SourceId} revision {Revision} {Field}: {Problem}. Using '{Value}'.",
+                            source.Id, source.Rev, sourceField, problem, value);
                     }
                     if (isIdentity) value = CommonTools.UserMapping.MapUserIdentityValue(targetField, value);
                 }
