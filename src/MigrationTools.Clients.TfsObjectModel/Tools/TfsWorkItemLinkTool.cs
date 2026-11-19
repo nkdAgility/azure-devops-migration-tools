@@ -11,6 +11,7 @@ using MigrationTools.Enrichers;
 using MigrationTools.Exceptions;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -184,6 +185,10 @@ namespace MigrationTools.Tools
                 if (item == null)
                 {
                     Log.LogWarning("  [SKIP] {Kind} {RelatedId} used by Test Case {SourceId} (target {TargetId}) not remapped: it does not exist in the source or the migration identity cannot read it (TF26198), so {Consequence}. Grant the identity read access to its project, or migrate it, and re-run.", kind, link.RelatedWorkItemId, wiSourceL.Id, wiTargetL.Id, consequence);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                        $"{kind} {link.RelatedWorkItemId} used by this Test Case was not remapped: it does not exist in the source or cannot be read (TF26198), so {consequence}.",
+                        "Grant the migration identity read access to its project, or migrate it, and re-run.",
+                        sourceId: wiSourceL.Id.ToString(), targetId: wiTargetL.Id.ToString());
                     continue;
                 }
                 items.Add(item);
@@ -321,6 +326,10 @@ namespace MigrationTools.Tools
                 if (wiSourceR == null)
                 {
                     Log.LogWarning("  [SKIP] Link of type {LinkType} from source {SourceId} to {RelatedId} not migrated: work item {RelatedId} does not exist in the source or the migration identity cannot read it (TF26198).", rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, rl.RelatedWorkItemId, rl.RelatedWorkItemId);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                        $"{rl.LinkTypeEnd.ImmutableName} link to {rl.RelatedWorkItemId} not migrated: it does not exist in the source or cannot be read (TF26198).",
+                        "Grant the migration identity read access to the related item's project and re-run, or add the link by hand.",
+                        sourceId: wiSourceL.Id.ToString(), targetId: wiTargetL.Id.ToString());
                     return;
                 }
                 try
@@ -355,6 +364,10 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogWarning(ex, "  [SKIP] Unable to migrate links where wiSourceL={0}, wiSourceR={1}, wiTargetL={2}", wiSourceL != null ? wiSourceL.Id.ToString() : "NotFound", wiSourceR != null ? wiSourceR.Id.ToString() : "NotFound", wiTargetL != null ? wiTargetL.Id.ToString() : "NotFound");
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                        $"Link to {(wiSourceR != null ? wiSourceR.Id.ToString() : rl.RelatedWorkItemId.ToString())} not migrated: {ex.Message}",
+                        "Migrate the related work item, then re-run to add the link.",
+                        sourceId: wiSourceL?.Id.ToString(), targetId: wiTargetL?.Id.ToString());
                     return;
                 }
 
@@ -369,6 +382,10 @@ namespace MigrationTools.Tools
                         if (!client.Store.WorkItemLinkTypes.LinkTypeEnds.Contains(rl.LinkTypeEnd.ImmutableName))
                         {
                             Log.LogWarning($"  [SKIP] Unable to migrate Link because type {rl.LinkTypeEnd.ImmutableName} does not exist in the target project.");
+                            Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                                $"Link type {rl.LinkTypeEnd.ImmutableName} to {rl.RelatedWorkItemId} not migrated: the link type does not exist in the target.",
+                                "Add the link type to the target collection, then re-run.",
+                                sourceId: wiSourceL?.Id.ToString(), targetId: wiTargetL?.Id.ToString());
                             return;
                         }
 
@@ -440,6 +457,14 @@ namespace MigrationTools.Tools
                         Log.LogWarning(
                                   "  [SKIP] Unable to migrate link where Link of type {0} where wiSourceL={1}, wiSourceR={2}, wiTargetL={3}, wiTargetR={4} as target WI has not been migrated",
                                   rl.LinkTypeEnd.ImmutableName, wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id);
+                        var reviewLog = Services.GetService<WorkItemReviewLog>();
+                        if (reviewLog != null && !reviewLog.IsMigratedLater(wiSourceR.Id.ToString()))
+                        {
+                            reviewLog.Record(WorkItemReviewCategory.LinkSkipped,
+                                $"{rl.LinkTypeEnd.ImmutableName} link to source work item {wiSourceR.Id} not migrated: that item has not been migrated to the target.",
+                                "Migrate the related work item, then re-run to add the link.",
+                                sourceId: wiSourceL.Id.ToString());
+                        }
                     }
                 }
                 else
@@ -457,6 +482,10 @@ namespace MigrationTools.Tools
             else
             {
                 Log.LogWarning("[SKIP] [LINK_CAPTURE_RELATED] [{RegisteredLinkType}] target not found. wiSourceL={wiSourceL}, wiSourceR={wiSourceR}, wiTargetL={wiTargetL}", rl.ArtifactLinkType.GetType().Name, wiSourceL == null ? "null" : wiSourceL.Id, wiSourceR == null ? "null" : wiSourceR.Id, wiTargetL == null ? "null" : wiTargetL.Id);
+                Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                    $"Related link to source work item {(wiSourceR == null ? rl.RelatedWorkItemId.ToString() : wiSourceR.Id.ToString())} not migrated: that item has not been migrated to the target.",
+                    "Migrate the related work item, then re-run to add the link.",
+                    sourceId: wiSourceL?.Id.ToString(), targetId: wiTargetL?.Id.ToString());
             }
         }
 
@@ -585,6 +614,9 @@ namespace MigrationTools.Tools
             if (!IsValidHyperlink(sourceLinkAbsoluteUri))
             {
                 Log.LogWarning("  [SKIP] Unable to create a hyperlink to [{0}] <-- protocall no longer allowed or url format is invalid", sourceLink.Location);
+                Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.LinkSkipped,
+                    $"Hyperlink {sourceLink.Location} not migrated: the protocol is not allowed or the URL is not valid.",
+                    "Add the link by hand in a form the target accepts.");
                 return;
             }
 

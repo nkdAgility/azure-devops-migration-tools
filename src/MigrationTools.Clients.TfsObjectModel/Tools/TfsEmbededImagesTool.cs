@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Client;
@@ -14,6 +15,7 @@ using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
 using MigrationTools.Options;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -148,6 +150,10 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "EmbededImagesRepairEnricher: Unable to fix HTML or Markdown field attachments for work item {wiId} from {oldTfsurl} to {newTfsurl}", wi.Id, oldTfsurl, newTfsurl);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.AttachmentNotMigrated,
+                        $"Embedded images could not be migrated: {ex.Message}",
+                        "Re-upload the images in the HTML and Markdown fields of the target work item; they still point at the source.",
+                        targetId: wi.Id.ToString());
                     Telemetry.TrackException(ex, null);
                 }
             }
@@ -189,6 +195,10 @@ namespace MigrationTools.Tools
                             // Provide more detailed error information for non-404 failures
                             Log.LogWarning("EmbededImagesRepairEnricher: Failed to download image {MatchValue} from WorkItem {WorkItemId}, Field {FieldName}. Status: {StatusCode} ({ReasonPhrase})",
                                 requestUri, targetWorkItem.Id, sourceFieldName, (int)result.StatusCode, result.ReasonPhrase);
+                            Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.AttachmentNotMigrated,
+                                $"Embedded image {requestUri} in field {sourceFieldName} could not be downloaded: {(int)result.StatusCode} {result.ReasonPhrase}.",
+                                "Re-upload the image to the field on the target work item; it still points at the source.",
+                                targetId: targetWorkItem.Id.ToString());
                             
                             result.EnsureSuccessStatusCode();
                         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TeamFoundation.Framework.Client;
@@ -12,6 +13,7 @@ using MigrationTools.Clients;
 using MigrationTools.DataContracts;
 using MigrationTools.Exceptions;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -239,6 +241,30 @@ namespace MigrationTools.Tools
         /// <param name="referenceName">The field reference name</param>
         /// <param name="value">The (source) field value</param>
         /// <returns>The mapped target value, or the original value when no mapping applies</returns>
+        private HashSet<string> _usersMissingInTarget = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Source users found by validation that do not exist in the target; a field value for one of them that
+        /// is not mapped is written to the work item review log.
+        /// </summary>
+        public void SetUsersMissingInTarget(IEnumerable<IdentityItemData> users)
+        {
+            _usersMissingInTarget = new HashSet<string>(
+                (users ?? Enumerable.Empty<IdentityItemData>()).Select(u => u?.DisplayName).Where(n => !string.IsNullOrWhiteSpace(n)),
+                StringComparer.OrdinalIgnoreCase);
+        }
+
+        internal bool IsMissingInTarget(string sourceValue)
+        {
+            if (_usersMissingInTarget.Count == 0 || string.IsNullOrWhiteSpace(sourceValue))
+            {
+                return false;
+            }
+            var bracket = sourceValue.IndexOf(" <", StringComparison.Ordinal);
+            var displayName = bracket > 0 ? sourceValue.Substring(0, bracket) : sourceValue;
+            return _usersMissingInTarget.Contains(displayName.Trim());
+        }
+
         public object MapUserIdentityValue(string referenceName, object value)
         {
             if (!Options.Enabled || referenceName == null
@@ -261,6 +287,15 @@ namespace MigrationTools.Tools
                 if (!DetectedFormatIsIdentityMapData.Value && TfsUserIdentityReference.IsAmbiguous(UserMappings.Value, sourceValue))
                 {
                     Log.LogWarning("TfsUserMappingTool::MapUserIdentityValue '{sourceValue}' matches more than one 'Display Name <upn>' entry in the mapping file and was not mapped.", sourceValue);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.UserNotMapped,
+                        $"Field {referenceName}: '{sourceValue}' matches more than one entry in the mapping file and was not mapped.",
+                        "Make the entry for this user unique in the UserMappingFile, then re-run.");
+                }
+                else if (IsMissingInTarget(sourceValue))
+                {
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.UserNotMapped,
+                        $"Field {referenceName}: '{sourceValue}' does not exist in the target and is not in the mapping file, so it was saved as text.",
+                        "Add the user to the target or to the UserMappingFile, then re-run.");
                 }
                 return value;
             }

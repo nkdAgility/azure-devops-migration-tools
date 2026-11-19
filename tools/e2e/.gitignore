@@ -4,3 +4,4 @@ scenarios/users/config*.json
 scenarios/usermapping-3272/config-*.json
 
 *.local.html
+scenarios/reviewlog-3297/config.json

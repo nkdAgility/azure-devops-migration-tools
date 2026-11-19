@@ -81,6 +81,8 @@ namespace MigrationTools.Processors
 
         public WorkItemMetrics workItemMetrics { get; private set; }
 
+        private readonly WorkItemReviewLog _reviewLog;
+
         public TfsWorkItemMigrationProcessor(
             IOptions<TfsWorkItemMigrationProcessorOptions> options,
             TfsCommonTools tfsCommonTools,
@@ -92,6 +94,7 @@ namespace MigrationTools.Processors
         {
             contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
             workItemMetrics = services.GetRequiredService<WorkItemMetrics>();
+            _reviewLog = services.GetService<WorkItemReviewLog>() ?? new WorkItemReviewLog(LogLocationService.GetLogPath());
         }
 
         new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
@@ -142,6 +145,8 @@ namespace MigrationTools.Processors
             }
 
             _itemsInError = new List<string>();
+            contextLog.Information("Work items that need review are written as they are found to {ReviewLogPath}", _reviewLog.FilePath);
+            _reviewLog.LoadEarlierRuns();
 
             try
             {
@@ -172,6 +177,7 @@ namespace MigrationTools.Processors
                 //////////////////////////////////////////////////
 
                 sourceWorkItems = SharedItemsFirst(sourceWorkItems);
+                _reviewLog.SetItemsToMigrate(sourceWorkItems.Select(w => w.Id));
 
                 // After filtering, so the scan only covers (and only stops for) items that will be migrated.
                 ValidateRevisionHistoryFields(sourceWorkItems);
@@ -194,10 +200,12 @@ namespace MigrationTools.Processors
                     using (LogContext.PushProperty("sourceWorkItemId", sourceWorkItem.Id))
                     using (LogContext.PushProperty("sourceRevisionInt", sourceWorkItem.Revision))
                     using (LogContext.PushProperty("targetWorkItemId", null))
+                    using (_reviewLog.BeginItem(sourceWorkItem.Id.ToString(), sourceWorkItem.Type?.Name, sourceWorkItem.Revision))
                     {
                         try
                         {
                             ProcessWorkItemAsync(sourceWorkItemData, progressTimer, Options.WorkItemCreateRetryLimit).Wait();
+                            _reviewLog.CompleteCurrentItem();
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
@@ -227,6 +235,7 @@ namespace MigrationTools.Processors
                                 ?? e as WorkItemMigrationFailedException;
                             var message = failure?.Message ?? WorkItemMigrationFailedException.Describe(sourceWorkItem.Id.ToString(), null, null, sourceWorkItem.Type?.Name, e);
                             workItemLog.Error("{FailureMessage}", message);
+                            RecordItemFailure(message);
                             Log.LogDebug(e, "Details for source work item {WorkItemId}", sourceWorkItem.Id);
 
                             if (Options.StopOnFirstError)
@@ -249,6 +258,8 @@ namespace MigrationTools.Processors
                 CommonTools.ExportWorkItemMapping.SaveMappings();
                 CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
                 CommonTools.GitRepository?.LogUnresolvedSummary();
+                _reviewLog.LogSummary(Log);
+                _reviewLog.WriteLatestView();
 
                 if (_itemsInError.Count > 0)
                 {
@@ -471,6 +482,7 @@ namespace MigrationTools.Processors
                         + "in the target. This will not cause any errors, but may result in disconnected users that could have "
                         + "been mapped. Use the ExportUsersForMapping processor to create a list of mappable users.",
                         usersToMap.IdentityMap.Count);
+                    CommonTools.UserMapping.SetUsersMissingInTarget(usersToMap.IdentityMap.Select(m => m.Source));
                 }
             }
             var userMapping = CommonTools.UserMapping;
@@ -645,6 +657,25 @@ namespace MigrationTools.Processors
         /// in historical revisions (e.g. items moved from another project or process) are not caught up front (#3173).
         /// The first occurrence is logged prominently and a summary is produced at the end of the run.
         /// </summary>
+        private void RecordItemFailure(string message)
+        {
+            if (_reviewLog.CurrentItemHas(WorkItemReviewCategory.RerunMismatch))
+            {
+                return;
+            }
+            var targetId = _reviewLog.CurrentTargetId;
+            if (string.IsNullOrEmpty(targetId) || targetId == "0")
+            {
+                _reviewLog.Record(WorkItemReviewCategory.Failed, message,
+                    "Fix the cause given in the reason, then re-run; the item was not created in the target.");
+            }
+            else
+            {
+                _reviewLog.Record(WorkItemReviewCategory.PartMigrated, message,
+                    "Fix the cause given in the reason, then re-run; the target item exists but is missing the revisions from the one that failed.");
+            }
+        }
+
         private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision)
         {
             // Field maps are applied later in the revision replay; a field they consume is not dropped.
@@ -652,6 +683,10 @@ namespace MigrationTools.Processors
             {
                 return;
             }
+            _reviewLog.Record(WorkItemReviewCategory.FieldNotMapped,
+                $"Field '{fieldReferenceName}' has data on source type '{sourceType}' but does not exist on target type '{targetType}'; the value was not migrated.",
+                $"Add '{fieldReferenceName}' to '{targetType}' in the target process, or map it with a field map, then re-run.",
+                sourceId: sourceWorkItemId);
             if (_missingTargetFields.Record(sourceType, targetType, fieldReferenceName, sourceWorkItemId, sourceRevision))
             {
                 Log.LogWarning("Field '{MissingField}' has data in source revisions of type '{SourceType}' but does not exist on target type '{TargetType}'. "
@@ -854,7 +889,17 @@ namespace MigrationTools.Processors
                         else
                         {
                             // A rerun never treats a wrongly saved revision as migrated (#3270).
-                            VerifyMigratedRevisions(sourceWorkItem, targetWorkItem);
+                            _reviewLog.SetCurrentItem(targetId: targetWorkItem.Id);
+                            try
+                            {
+                                VerifyMigratedRevisions(sourceWorkItem, targetWorkItem);
+                            }
+                            catch (InvalidOperationException mismatch)
+                            {
+                                _reviewLog.Record(WorkItemReviewCategory.RerunMismatch, mismatch.Message,
+                                    "Compare the target work item with the source, correct or delete the target item, then re-run.");
+                                throw;
+                            }
                             if (revisionsToMigrate.Count == 0)
                             {
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
@@ -899,6 +944,9 @@ namespace MigrationTools.Processors
                     }
                     else
                     {
+                        _reviewLog.Record(WorkItemReviewCategory.Skipped,
+                            $"{sourceWorkItem.Type} work items are not migrated by the work item processor.",
+                            "Migrate it with TfsTestPlansAndSuitesMigrationProcessor after all Test Cases are migrated.");
                         TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ",
                             new Dictionary<string, object>() {
                             {"sourceWorkItemTypeName", sourceWorkItem.Type },
@@ -1139,6 +1187,9 @@ namespace MigrationTools.Processors
                     {
                         Log.LogWarning("Source work item {SourceId} changed type from '{FirstType}' to '{FinalType}'. Target type '{FirstTargetType}' does not exist or is disabled in the target project, so the work item will be created as '{ShellType}' instead.",
                             sourceWorkItem.Id, firstSourceType, finalSourceType, selection.FirstType, selection.ShellType);
+                        _reviewLog.Record(WorkItemReviewCategory.TypeChanged,
+                            $"Created as '{selection.ShellType}' because target type '{selection.FirstType}' (from '{firstSourceType}') does not exist or is disabled.",
+                            "Check the work item type on the target; enable or add the type, or map it, if it should differ.");
                     }
                     targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, selection.ShellType);
                 }
@@ -1163,6 +1214,8 @@ namespace MigrationTools.Processors
                 foreach (var revision in revisionsToMigrate)
                 {
                     replaying = revision;
+                    _reviewLog.SetCurrentItem(revision: revision.Number);
+                    _reviewLog.MarkRevisionsReplayed();
                     workItemMetrics.RevisionsProcessedCount.Add(1);
                     var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
@@ -1178,6 +1231,9 @@ namespace MigrationTools.Processors
                     {
                         Log.LogWarning("Source work item {SourceId} revision {RevisionNumber} has type '{RevisionType}', which does not exist or is disabled in the target; keeping '{CurrentType}'.",
                             sourceWorkItem.Id, revision.Number, revisionType, targetWorkItem.Type);
+                        _reviewLog.Record(WorkItemReviewCategory.TypeChanged,
+                            $"Revision type '{revisionType}' does not exist or is disabled in the target; kept '{targetWorkItem.Type}'.",
+                            "Check the work item type on the target; enable or add the type, or map it, if it should differ.");
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 
@@ -1309,12 +1365,22 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    if (!skipIterationRevision && !skipAreaRevision)
+                    if (skipIterationRevision || skipAreaRevision)
+                    {
+                        var path = skipIterationRevision ? "iteration" : "area";
+                        Log.LogWarning("Revision {RevisionNumber} of source work item {SourceId} was not saved because its {PathKind} path does not exist in the target.",
+                            revision.Number, sourceWorkItem.Id, path);
+                        _reviewLog.Record(WorkItemReviewCategory.PathNotMapped,
+                            $"Revision {revision.Number} was not saved: its {path} path does not exist in the target.",
+                            "Create or map the path in the target (TfsNodeStructureTool), then re-run to add the revision.");
+                    }
+                    else
                     {
                         // Last before the save, after field maps: the save that changes state must carry the source values (#3270).
                         var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem);
                         targetWorkItem.SaveToAzureDevOps();
                         var saved = targetWorkItem.ToWorkItem();
+                        _reviewLog.SetCurrentItem(targetId: targetWorkItem.Id);
                         VerifyStateStampedFieldsSaved(saved.Rev, f => saved.Fields[f].Value, stampedFields);
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (CommonTools.WorkItemLink.Enabled && CommonTools.WorkItemLink.HasDeferredLinks)

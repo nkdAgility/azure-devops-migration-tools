@@ -1,12 +1,14 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MigrationTools.EndpointEnrichers;
 using MigrationTools.Enrichers;
 using MigrationTools.Options;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools;
 using MigrationTools.Tools.Interfaces;
 
@@ -60,6 +62,7 @@ namespace MigrationTools
             context.AddSingleton<IFieldMappingTool, FieldMappingTool>().AddSingleton<IConfigureOptions<FieldMappingToolOptions>, FieldMappingToolOptions.ConfigureOptions>();
             context.AddSingleton<VersionOptions>().AddSingleton<IConfigureOptions<VersionOptions>, VersionOptions.ConfigureOptions>();
             context.AddSingleton<CommonTools>();
+            context.AddSingleton(sp => new WorkItemReviewLog(LogLocationService.GetLogPath(), sp.GetService<ILogger<WorkItemReviewLog>>()));
 
             //context.AddTransient<WorkItemAttachmentEnricher>();
             //context.AddTransient<WorkItemCreatedEnricher>();

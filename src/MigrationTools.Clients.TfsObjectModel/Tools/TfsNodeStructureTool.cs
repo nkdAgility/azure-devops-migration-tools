@@ -695,6 +695,14 @@ namespace MigrationTools.Tools
                     else
                     {
                         Log.LogWarning("MISSING {nodeType}: sourcePath={sourcePath}, targetPath={targetPath}, anchored={anchored}, IDs={workItems}", missingItem.nodeType, missingItem.sourcePath, missingItem.targetPath, missingItem.anchored, workItemList);
+                        var reviewLog = Services.GetService<WorkItemReviewLog>();
+                        foreach (var id in missingItem.workItems ?? Enumerable.Empty<int>())
+                        {
+                            reviewLog?.Record(WorkItemReviewCategory.PathNotMapped,
+                                $"{missingItem.nodeType} path '{missingItem.sourcePath}' (target '{missingItem.targetPath}') does not exist in the target and is not mapped.",
+                                "Create the path in the target, or add a mapping in TfsNodeStructureTool, then re-run.",
+                                sourceId: id.ToString());
+                        }
                     }
                 }
 

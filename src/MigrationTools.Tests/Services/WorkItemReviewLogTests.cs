@@ -1,0 +1,242 @@
+using System;
+using System.IO;
+using System.Linq;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MigrationTools.Services;
+
+namespace MigrationTools.Tests.Services
+{
+    [TestClass]
+    public class WorkItemReviewLogTests
+    {
+        private string _logsRoot;
+
+        [TestInitialize]
+        public void Setup()
+        {
+            _logsRoot = Path.Combine(Path.GetTempPath(), "amt-reviewlog-" + Guid.NewGuid().ToString("N").Substring(0, 8), "logs");
+            Directory.CreateDirectory(_logsRoot);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Directory.Delete(Path.GetDirectoryName(_logsRoot), true);
+        }
+
+        private string RunFolder(string timestamp) => Path.Combine(_logsRoot, timestamp);
+
+        [TestMethod, TestCategory("L0")]
+        public void Record_WritesEachEntryToDiskBeforeDispose()
+        {
+            var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using (log.BeginItem("12", "Bug", 3))
+            {
+                log.SetCurrentItem(targetId: "99");
+                log.Record(WorkItemReviewCategory.Failed, "boom", "fix it");
+            }
+
+            // Read while the stream is still open, as after a kill the process never disposes it.
+            var entries = WorkItemReviewLog.ReadEntries(log.FilePath).ToList();
+            Assert.AreEqual(1, entries.Count);
+            Assert.AreEqual("12", entries[0].SourceId);
+            Assert.AreEqual("99", entries[0].TargetId);
+            Assert.AreEqual("Bug", entries[0].WorkItemType);
+            Assert.AreEqual(3, entries[0].Revision);
+            Assert.AreEqual("failed", entries[0].Category);
+            Assert.AreEqual("boom", entries[0].Reason);
+            Assert.AreEqual("fix it", entries[0].Action);
+            log.Dispose();
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Record_NoEntries_CreatesNoFiles()
+        {
+            var folder = RunFolder("20260101000000");
+            using var log = new WorkItemReviewLog(folder);
+            using (log.BeginItem("1", "Task"))
+            {
+                log.CompleteCurrentItem();
+            }
+            Assert.IsFalse(Directory.Exists(folder) && Directory.GetFiles(folder).Any());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Record_SameProblemTwice_WritesOnce()
+        {
+            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using (log.BeginItem("5", "Bug"))
+            {
+                log.Record(WorkItemReviewCategory.FieldNotMapped, "field X missing", "add it", revision: 1);
+                log.Record(WorkItemReviewCategory.FieldNotMapped, "field X missing", "add it", revision: 2);
+            }
+            Assert.AreEqual(1, WorkItemReviewLog.ReadEntries(log.FilePath).Count());
+            Assert.AreEqual(1, log.CategoryCounts[WorkItemReviewCategory.FieldNotMapped]);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Record_FollowUpCategory_AlsoWritesFollowUpFile()
+        {
+            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            log.Record(WorkItemReviewCategory.UserNotMapped, "user", "map", sourceId: "1");
+            log.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "2");
+
+            var followUp = Path.Combine(log.Folder, "follow-up-users-not-mapped.jsonl");
+            Assert.AreEqual(1, WorkItemReviewLog.ReadEntries(followUp).Count());
+            Assert.AreEqual(2, WorkItemReviewLog.ReadEntries(log.FilePath).Count());
+            Assert.AreEqual(2, Directory.GetFiles(log.Folder).Length, "failed has no follow-up file");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ReadEntries_TruncatedLastLine_IsSkipped()
+        {
+            var folder = RunFolder("20260101000000");
+            using (var log = new WorkItemReviewLog(folder))
+            {
+                log.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "1");
+            }
+            File.AppendAllText(Path.Combine(folder, WorkItemReviewLog.FileName), "{\"time\":\"2026-01-01T00:00");
+            Assert.AreEqual(1, WorkItemReviewLog.ReadEntries(Path.Combine(folder, WorkItemReviewLog.FileName)).Count());
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_ItemOpenInEarlierRun_WritesResolved()
+        {
+            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.PartMigrated, "boom", "fix", sourceId: "7");
+                first.Record(WorkItemReviewCategory.Failed, "other", "fix", sourceId: "8");
+            }
+
+            using var second = new WorkItemReviewLog(RunFolder("20260102000000"));
+            second.LoadEarlierRuns();
+            using (second.BeginItem("7", "Bug"))
+            {
+                second.SetCurrentItem(targetId: "70");
+                second.MarkRevisionsReplayed();
+                second.CompleteCurrentItem();
+            }
+            using (second.BeginItem("8", "Bug"))
+            {
+                second.Record(WorkItemReviewCategory.Failed, "other", "fix");
+                second.CompleteCurrentItem();
+            }
+
+            var entries = WorkItemReviewLog.ReadEntries(second.FilePath).ToList();
+            var resolved = entries.Single(e => e.Category == WorkItemReviewCategory.Resolved);
+            Assert.AreEqual("7", resolved.SourceId);
+            Assert.AreEqual("70", resolved.TargetId);
+            StringAssert.Contains(resolved.Reason, "part-migrated");
+            Assert.IsFalse(entries.Any(e => e.SourceId == "8" && e.Category == WorkItemReviewCategory.Resolved));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_NoRevisionReplayed_DoesNotResolveReplayOnlyProblem()
+        {
+            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.FieldNotMapped, "field X", "add it", sourceId: "7");
+                first.Record(WorkItemReviewCategory.LinkSkipped, "link", "migrate it", sourceId: "8");
+            }
+            using var second = new WorkItemReviewLog(RunFolder("20260102000000"));
+            second.LoadEarlierRuns();
+            using (second.BeginItem("7", "Task")) { second.CompleteCurrentItem(); }
+            using (second.BeginItem("8", "Task")) { second.CompleteCurrentItem(); }
+
+            var resolved = WorkItemReviewLog.ReadEntries(second.FilePath).Where(e => e.Category == WorkItemReviewCategory.Resolved).ToList();
+            Assert.AreEqual(1, resolved.Count, "only the link problem is checked again without a replayed revision");
+            Assert.AreEqual("8", resolved[0].SourceId);
+            var latest = WorkItemReviewLog.ReadEntries(second.WriteLatestView()).ToList();
+            Assert.AreEqual(WorkItemReviewCategory.FieldNotMapped, latest.Single(e => e.SourceId == "7").Category);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_AlreadyResolved_DoesNotResolveAgain()
+        {
+            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+            }
+            using (var second = new WorkItemReviewLog(RunFolder("20260102000000")))
+            {
+                second.LoadEarlierRuns();
+                using (second.BeginItem("7", "Bug")) { second.MarkRevisionsReplayed(); second.CompleteCurrentItem(); }
+                Assert.IsTrue(File.Exists(second.FilePath));
+            }
+            using var third = new WorkItemReviewLog(RunFolder("20260103000000"));
+            third.LoadEarlierRuns();
+            using (third.BeginItem("7", "Bug")) { third.MarkRevisionsReplayed(); third.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(third.FilePath));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void LoadEarlierRuns_IgnoresLaterRuns()
+        {
+            using (var later = new WorkItemReviewLog(RunFolder("20260105000000")))
+            {
+                later.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+            }
+            using var run = new WorkItemReviewLog(RunFolder("20260102000000"));
+            run.LoadEarlierRuns();
+            using (run.BeginItem("7", "Bug")) { run.MarkRevisionsReplayed(); run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void WriteLatestView_KeepsLatestEntryPerItem()
+        {
+            using (var first = new WorkItemReviewLog(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "9");
+            }
+            using var second = new WorkItemReviewLog(RunFolder("20260102000000"));
+            second.LoadEarlierRuns();
+            using (second.BeginItem("7", "Bug")) { second.MarkRevisionsReplayed(); second.CompleteCurrentItem(); }
+            var path = second.WriteLatestView();
+
+            var latest = WorkItemReviewLog.ReadEntries(path).ToList();
+            Assert.AreEqual(2, latest.Count);
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, latest.Single(e => e.SourceId == "7").Category);
+            Assert.AreEqual(WorkItemReviewCategory.Failed, latest.Single(e => e.SourceId == "9").Category);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CurrentItemHas_TracksCategoriesOfCurrentItemOnly()
+        {
+            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            using (log.BeginItem("1", "Bug"))
+            {
+                log.Record(WorkItemReviewCategory.RerunMismatch, "x", "y");
+                Assert.IsTrue(log.CurrentItemHas(WorkItemReviewCategory.RerunMismatch));
+            }
+            using (log.BeginItem("2", "Bug"))
+            {
+                Assert.IsFalse(log.CurrentItemHas(WorkItemReviewCategory.RerunMismatch));
+            }
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsMigratedLater_TrueUntilTheItemIsStarted()
+        {
+            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            log.SetItemsToMigrate(new[] { "1", "2" });
+            Assert.IsTrue(log.IsMigratedLater("2"));
+            using (log.BeginItem("2", "Task")) { }
+            Assert.IsFalse(log.IsMigratedLater("2"));
+            Assert.IsTrue(log.IsMigratedLater("1"));
+            Assert.IsFalse(log.IsMigratedLater("3"));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void LogSummary_DoesNotThrowWithOrWithoutEntries()
+        {
+            using var log = new WorkItemReviewLog(RunFolder("20260101000000"));
+            log.LogSummary(NullLogger.Instance);
+            log.Record(WorkItemReviewCategory.LinkSkipped, "x", "y", sourceId: "1");
+            log.LogSummary(NullLogger.Instance);
+            Assert.AreEqual(1, log.FileRowCounts["follow-up-links.jsonl"]);
+        }
+    }
+}

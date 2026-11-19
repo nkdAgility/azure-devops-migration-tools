@@ -85,6 +85,48 @@ Each source revision is replayed as one target revision, with the source revisio
 - **A source that was itself migrated with back-dated history** has the same problem in its revision view: removals are not visible at the revision where they happened. The last replayed revision is compared with the source work item's current attachments and links, so the final state always matches the source, but such removals are shown at the last revision.
 - **"Copy current user" rules overwrite identity fields.** Azure DevOps applies inherited process rules such as *"When State is Done, copy the current user to Assigned To"* on every save, even with `BypassRules` and even when the field value is sent. The migrated revision then shows the account running the migration. Disable these rules in the target process while you migrate, and turn them back on afterwards. The processor logs a warning at start-up for each rule of this kind it finds on the target work item types.
 
+## Work items that need review
+
+Every run writes the work items that need a person to look at them to `work-items-to-review.jsonl` in the run's log folder (`logs\<timestamp>`). The path is logged at the start of the run, before any work item is migrated. Each entry is appended and flushed to disk as soon as the problem is found, so the file is correct up to the last problem even if the run crashes, is stopped or the process is killed. A run with no problems creates no file.
+
+The file is JSON Lines: one JSON object per line, with these fields.
+
+| Field | Meaning |
+|---|---|
+| `time` | When the problem was found. |
+| `sourceId` | The source work item id. |
+| `targetId` | The target work item id. Blank if the target item was not created, or the problem was found before its first save. |
+| `workItemType` | The source work item type. |
+| `revision` | The source revision being migrated when the problem was found. |
+| `category` | What kind of problem it is (below). |
+| `reason` | The message, as in the log. |
+| `action` | What to do about it. |
+
+| Category | When it is written |
+|---|---|
+| `failed` | The work item could not be created in the target. |
+| `part-migrated` | The target work item exists but a later revision could not be saved. |
+| `rerun-mismatch` | On a re-run, a revision already in the target does not match the source. |
+| `link-skipped` | A link was not migrated: the related item was not migrated (and is not migrated later in the run), cannot be read, or its link type does not exist in the target; or a hyperlink is not valid. |
+| `link-left-on-source` | A git commit, branch or pull request link could not be rewritten and still points at the source. |
+| `field-not-mapped` | A source field has a value but does not exist on the target work item type, so the value was dropped. |
+| `user-not-mapped` | An identity value matches more than one entry in the user mapping file, or is a source user that does not exist in the target and is not mapped. |
+| `attachment-not-migrated` | An attachment is bigger than `MaxAttachmentSize` or failed, or an embedded image could not be downloaded or fixed. |
+| `path-not-mapped` | An area or iteration path does not exist in the target and is not mapped, or a revision was not saved because of it (`SkipRevisionWithInvalidAreaPath`/`SkipRevisionWithInvalidIterationPath`). |
+| `type-changed` | The item was created, or a revision kept, as another type because its type does not exist or is disabled in the target. |
+| `skipped` | A Test Plan or Test Suite, which this processor does not migrate. |
+| `resolved` | On a re-run, an item that an earlier run listed migrated without those problems. |
+
+The same problem for the same item is written once per run.
+
+**Follow-up files.** Problems that someone must deal with after the migration are also written, in the same way, to one file per concern in the same folder: `follow-up-links.jsonl`, `follow-up-users-not-mapped.jsonl`, `follow-up-attachments.jsonl`, `follow-up-fields.jsonl`, `follow-up-area-iteration-paths.jsonl` and `follow-up-skipped.jsonl`. A file with no rows is not created, so a folder with none of them means nothing is left to do.
+
+**End of the run.** The log gives the number of entries by category, and each follow-up file with its row count. It also writes `work-items-to-review-latest.jsonl`, the latest entry for each item across this run and the earlier runs. You do not need it: the per-run files are complete without it.
+
+**Re-runs.** Each run writes its own file. A run reads the review files of earlier runs in the same `logs` folder. When an item they listed now migrates with no problems, it gets a `resolved` entry. A re-run that replays no revision of an item does not check the problems that are only found while replaying a revision (`failed`, `part-migrated`, `field-not-mapped`, `user-not-mapped`, `path-not-mapped`, `type-changed`), so such an item stays in the latest view with its earlier entry until a revision is replayed. Run from the same folder, or pass the same `--logPath`, for earlier runs to be found.
+
+Field map faults are not yet written to the review log; they are still logged as `Field map fault`.
+
 ---
 
 ## WIQL Query

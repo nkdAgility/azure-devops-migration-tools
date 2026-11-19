@@ -88,7 +88,7 @@ There is no dry-run or `-validate` option: `execute` always migrates. The work i
 
 ### Where the logs are written
 
-Each run writes `migration*.log` and `migration-errors*.log` to `logs\<timestamp>` under the folder you run the tool from, not the folder the tool is installed in. The full path is printed at the start of the run as `Logpath:` and again at the end as `Check the logs for errors:`. To write them somewhere else, pass `--logPath <folder>`; the `logs\<timestamp>` folder is created inside it. If the folder cannot be written to, the logs go to `%LOCALAPPDATA%\MigrationTools\logs\<timestamp>` instead.
+Each run writes `migration*.log` and `migration-errors*.log` to `logs\<timestamp>` under the folder you run the tool from, not the folder the tool is installed in. The full path is printed at the start of the run as `Logpath:` and again at the end as `Check the logs for errors:`. To write them somewhere else, pass `--logPath <folder>`; the `logs\<timestamp>` folder is created inside it. If the folder cannot be written to, the logs go to `%LOCALAPPDATA%\MigrationTools\logs\<timestamp>` instead. The work item migration also writes `work-items-to-review.jsonl` there as it goes, listing every work item that needs a person to look at it; see [Work items that need review](../../reference/processors/tfs-workitem-migration-processor/#work-items-that-need-review).
 
 ### Common Issue: Work Item Type Validation Failures
 
