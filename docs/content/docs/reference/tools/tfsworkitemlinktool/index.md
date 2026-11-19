@@ -40,6 +40,14 @@ A Related link is skipped, with a warning naming both work items, when its targe
 
 A Test Case whose Shared Steps or Shared Parameter can't be read in the source (TF26198) is still migrated. The warning names the Test Case and the item: `[SKIP] Shared Steps <id> used by Test Case <id> ... not remapped`, and that reference keeps the source id. Grant the migration identity read access to the item's project, or migrate the item, and re-run.
 
+### Children That Changed Parent
+
+A work item can have only one parent, and a child ends under the parent it has in the source now. While a parent's history is replayed, an earlier child link is skipped, with one warning, when the child has since moved to another parent:
+
+`[SKIP] Child link from source <id> to <id> not added to target <id>: the child has since moved to another parent in the source, and a work item can have only one parent. Target child <id> keeps its parent <id>.`
+
+The child is not moved, and the parent's revision is still saved. When the child moves to the parent it has in the source now, any other parent link is removed first, saved or not. A link that can't be added for any other reason is skipped with one warning, and the full exception is logged at Debug.
+
 A skipped link is not a work item failure, so on its own it doesn't change the run's exit code. Work items that can't be migrated still make the run exit with code 1.
 
 ### Use Cases

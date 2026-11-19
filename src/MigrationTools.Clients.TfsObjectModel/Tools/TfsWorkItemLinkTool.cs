@@ -383,7 +383,7 @@ namespace MigrationTools.Tools
                                 case ChildLinkAction.SkipChildHasFinalParentElsewhere:
                                     // Every replayed revision that still holds the link meets it again: warn once.
                                     var level = _skippedChildLinks.Add($"{wiSourceL.Id}>{wiSourceR.Id}") ? LogLevel.Warning : LogLevel.Debug;
-                                    Log.Log(level,"  [SKIP] Child link from source {SourceId} to {ChildSourceId} not added to target {TargetId}: child {ChildTargetId} is already under {CurrentParentIds}, the parent it has in the source now, and a work item can have only one parent. The child keeps that parent.",
+                                    Log.Log(level, "  [SKIP] Child link from source {SourceId} to {ChildSourceId} not added to target {TargetId}: the child has since moved to another parent in the source, and a work item can have only one parent. Target child {ChildTargetId} keeps its parent {CurrentParentIds}.",
                                         wiSourceL.Id, wiSourceR.Id, wiTargetL.Id, wiTargetR.Id, string.Join(", ", childParentLinks.Select(l => l.RelatedWorkItemId)));
                                     return;
                                 case ChildLinkAction.DeferUntilParentSaved:
