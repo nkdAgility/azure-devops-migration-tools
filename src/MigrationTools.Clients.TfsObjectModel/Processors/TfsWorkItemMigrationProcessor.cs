@@ -888,7 +888,11 @@ namespace MigrationTools.Processors
                                 ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
-                                CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                // The in-sync check may already have applied them; a field map is not always safe to run twice.
+                                if (!_fieldMapsAppliedToTarget)
+                                {
+                                    CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                }
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                                 StampCatchUpSave(targetWorkItem);
@@ -1008,6 +1012,7 @@ namespace MigrationTools.Processors
         /// <returns>A description of the difference, or null when the target is in sync and needs no work.</returns>
         private string FindReRunDifference(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
+            _fieldMapsAppliedToTarget = false;
             if (sourceWorkItem.Type == "Test Case")
             {
                 return "test case shared steps and parameters are always checked";
@@ -1039,10 +1044,13 @@ namespace MigrationTools.Processors
         /// the values the current field maps give it (#3299). A field map added or changed since the first run is applied.
         /// </summary>
         /// <returns>The fields the field maps would change, or null when they change nothing.</returns>
+        private bool _fieldMapsAppliedToTarget;
+
         private string FieldMapsChangeTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
         {
             var target = targetWorkItem.ToWorkItem();
             CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+            _fieldMapsAppliedToTarget = true;
             SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
             if (!target.IsDirty)
             {
