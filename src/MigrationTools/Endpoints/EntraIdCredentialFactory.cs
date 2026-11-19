@@ -21,7 +21,7 @@ namespace MigrationTools.Endpoints
 
         public static TokenCredential Create(EntraIdOptions options, string endpointName)
         {
-            switch (options.Credential)
+            switch (options.CredentialType)
             {
                 case EntraIdCredentialType.Default:
                     return new DefaultAzureCredential();
@@ -39,7 +39,7 @@ namespace MigrationTools.Endpoints
                         ? new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned)
                         : new ManagedIdentityCredential(ManagedIdentityId.FromUserAssignedClientId(options.ClientId));
                 default:
-                    throw new MigrationRunStoppedException($"Endpoint '{endpointName}': Entra ID Credential '{options.Credential}' is not known.");
+                    throw new MigrationRunStoppedException($"Endpoint '{endpointName}': Entra ID Credential '{options.CredentialType}' is not known.");
             }
         }
 
@@ -96,7 +96,7 @@ namespace MigrationTools.Endpoints
         {
             if (!string.IsNullOrWhiteSpace(options.AuthenticationRecordPath)) { return options.AuthenticationRecordPath; }
             var tenant = string.IsNullOrWhiteSpace(options.TenantId) ? "organizations" : options.TenantId;
-            var name = $"{endpointName}-{options.Credential}-{tenant}";
+            var name = $"{endpointName}-{options.CredentialType}-{tenant}";
             name = new string(name.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
             var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MigrationTools", "auth");
             return Path.Combine(folder, name + ".json");
@@ -109,7 +109,7 @@ namespace MigrationTools.Endpoints
             var cache = new TokenCachePersistenceOptions { Name = TokenCacheName };
 
             TokenCredential credential;
-            if (options.Credential == EntraIdCredentialType.Interactive)
+            if (options.CredentialType == EntraIdCredentialType.Interactive)
             {
                 var interactive = new InteractiveBrowserCredentialOptions
                 {
@@ -142,8 +142,8 @@ namespace MigrationTools.Endpoints
 
             if (record == null)
             {
-                Log.Information("Endpoint '{EndpointName}': signing in to Microsoft Entra ID with {Credential}. This is needed once; later runs reuse the saved sign-in.", endpointName, options.Credential);
-                record = SignIn(credential, endpointName, options.Credential);
+                Log.Information("Endpoint '{EndpointName}': signing in to Microsoft Entra ID with {Credential}. This is needed once; later runs reuse the saved sign-in.", endpointName, options.CredentialType);
+                record = SignIn(credential, endpointName, options.CredentialType);
                 SaveRecord(record, recordPath);
                 Log.Information("Endpoint '{EndpointName}': signed in as {Account}; sign-in saved to {RecordPath}.", endpointName, record.Username, recordPath);
             }
@@ -198,6 +198,18 @@ namespace MigrationTools.Endpoints
             }
         }
 
-        internal static string FirstLine(string message) => (message ?? string.Empty).Split('\n')[0].Trim();
+        /// <summary>
+        /// The first line of an Azure.Identity message, joined to the next one when it only introduces it
+        /// ("ClientSecretCredential authentication failed:" followed by the AADSTS reason).
+        /// </summary>
+        internal static string FirstLine(string message)
+        {
+            var lines = (message ?? string.Empty).Split('\n').Select(l => l.Trim()).Where(l => l.Length > 0).ToArray();
+            if (lines.Length == 0) { return string.Empty; }
+            var line = lines[0].EndsWith(":") && lines.Length > 1 ? lines[0] + " " + lines[1] : lines[0];
+            // Entra appends request ids to the reason; they help support, not the reader of a one-line message.
+            var ids = line.IndexOf(" Trace ID:", StringComparison.Ordinal);
+            return ids > 0 ? line.Substring(0, ids).Trim() : line;
+        }
     }
 }

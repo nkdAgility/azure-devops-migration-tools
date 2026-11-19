@@ -411,6 +411,13 @@ namespace MigrationTools.Clients
                     }
 
                 }
+                catch (MigrationRunStoppedException)
+                {
+                    // Already a readable reason (for example a sign-in failure); wrapping it would bury it under a stack trace.
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     activity?.Stop();

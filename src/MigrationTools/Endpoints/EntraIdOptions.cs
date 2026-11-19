@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MigrationTools.Options.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -12,6 +13,8 @@ namespace MigrationTools.Endpoints
     [JsonConverter(typeof(StringEnumConverter))]
     public enum EntraIdCredentialType
     {
+        /// <summary>A Credential value in the configuration that is not one of the credentials below; reported by validation.</summary>
+        Unknown = -1,
         /// <summary>The first sign-in found on the machine: environment service principal, workload identity, managed identity, Visual Studio, Azure CLI, Azure PowerShell or azd. AZURE_TOKEN_CREDENTIALS limits it to one of them.</summary>
         Default = 0,
         /// <summary>The account signed in with 'az login'.</summary>
@@ -37,8 +40,19 @@ namespace MigrationTools.Endpoints
         /// The credential to sign in with: Default, AzureCli, Interactive, DeviceCode, Certificate, ClientSecret or ManagedIdentity.
         /// </summary>
         /// <default>Default</default>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public EntraIdCredentialType Credential { get; set; } = EntraIdCredentialType.Default;
+        public string Credential { get; set; } = nameof(EntraIdCredentialType.Default);
+
+        /// <summary>
+        /// Credential as a type; Unknown when it is not one of the credential names. Credential is a string rather
+        /// than the enum so a mistyped name reaches Validate and gets its message instead of failing the schema or binding.
+        /// </summary>
+        [JsonIgnore]
+        public EntraIdCredentialType CredentialType =>
+            string.IsNullOrWhiteSpace(Credential)
+                ? EntraIdCredentialType.Default
+                : Enum.TryParse(Credential.Trim(), true, out EntraIdCredentialType parsed) && !int.TryParse(Credential, out _) && parsed != EntraIdCredentialType.Unknown
+                    ? parsed
+                    : EntraIdCredentialType.Unknown;
 
         /// <summary>
         /// The Microsoft Entra tenant (GUID or domain). Required for Certificate and ClientSecret; optional for AzureCli, Interactive and DeviceCode.
@@ -88,7 +102,7 @@ namespace MigrationTools.Endpoints
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string AuthenticationRecordPath { get; set; }
 
-        private bool IsUserSignIn => Credential == EntraIdCredentialType.Interactive || Credential == EntraIdCredentialType.DeviceCode;
+        private bool IsUserSignIn => CredentialType == EntraIdCredentialType.Interactive || CredentialType == EntraIdCredentialType.DeviceCode;
 
         /// <summary>
         /// Every problem with the settings for the chosen credential, each as one message naming the endpoint, the setting and what to do.
@@ -99,11 +113,11 @@ namespace MigrationTools.Endpoints
             var setting = $"MigrationTools:Endpoints:{endpointName}:Authentication:EntraId";
             void Need(string name, string value)
             {
-                if (string.IsNullOrWhiteSpace(value)) { errors.Add($"Endpoint '{endpointName}': the {Credential} Entra ID credential needs {name}. Set {setting}:{name}."); }
+                if (string.IsNullOrWhiteSpace(value)) { errors.Add($"Endpoint '{endpointName}': the {CredentialType} Entra ID credential needs {name}. Set {setting}:{name}."); }
             }
             void Unused(string name, string value)
             {
-                if (!string.IsNullOrWhiteSpace(value)) { errors.Add($"Endpoint '{endpointName}': the {Credential} Entra ID credential does not use {name}. Remove {setting}:{name}, or change Credential."); }
+                if (!string.IsNullOrWhiteSpace(value)) { errors.Add($"Endpoint '{endpointName}': the {CredentialType} Entra ID credential does not use {name}. Remove {setting}:{name}, or change Credential."); }
             }
             void Guid(string name, string value, bool allowDomain)
             {
@@ -112,13 +126,14 @@ namespace MigrationTools.Endpoints
                 errors.Add($"Endpoint '{endpointName}': {name} '{value}' is not a {(allowDomain ? "tenant ID (GUID) or domain name" : "GUID")}. Copy it from the app registration's Overview page.");
             }
 
-            if (!Enum.IsDefined(typeof(EntraIdCredentialType), Credential))
+            if (CredentialType == EntraIdCredentialType.Unknown)
             {
-                errors.Add($"Endpoint '{endpointName}': Entra ID Credential '{Credential}' is not known. Use one of {string.Join(", ", Enum.GetNames(typeof(EntraIdCredentialType)))}.");
+                var known = Enum.GetNames(typeof(EntraIdCredentialType)).Where(n => n != nameof(EntraIdCredentialType.Unknown));
+                errors.Add($"Endpoint '{endpointName}': {setting}:Credential '{Credential}' is not a known Entra ID credential. Use one of {string.Join(", ", known)}.");
                 return errors;
             }
 
-            switch (Credential)
+            switch (CredentialType)
             {
                 case EntraIdCredentialType.Default:
                     Unused(nameof(TenantId), TenantId);
@@ -152,13 +167,13 @@ namespace MigrationTools.Endpoints
                     break;
             }
 
-            if (Credential != EntraIdCredentialType.Certificate)
+            if (CredentialType != EntraIdCredentialType.Certificate)
             {
                 Unused(nameof(CertificateThumbprint), CertificateThumbprint);
                 Unused(nameof(CertificatePath), CertificatePath);
                 Unused(nameof(CertificatePassword), CertificatePassword);
             }
-            if (Credential != EntraIdCredentialType.ClientSecret && Credential != EntraIdCredentialType.Certificate)
+            if (CredentialType != EntraIdCredentialType.ClientSecret && CredentialType != EntraIdCredentialType.Certificate)
             {
                 Unused(nameof(ClientSecret), ClientSecret);
             }

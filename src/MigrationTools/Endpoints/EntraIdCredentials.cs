@@ -62,9 +62,9 @@ namespace MigrationTools.Endpoints
             return this;
         }
 
-        public EntraIdCredentialType CredentialType => _options.Credential;
+        public EntraIdCredentialType CredentialType => _options.CredentialType;
 
-        private bool IsDefault => _options.Credential == EntraIdCredentialType.Default;
+        private bool IsDefault => _options.CredentialType == EntraIdCredentialType.Default;
 
         private TokenCredential Current
         {
@@ -83,7 +83,7 @@ namespace MigrationTools.Endpoints
         }
 
         /// <summary>The credential in use, for example "AzureCliCredential". For Default, the one DefaultAzureCredential selected, when known.</summary>
-        public string SelectedCredential => IsDefault ? SelectionListener.Selected : _options.Credential.ToString();
+        public string SelectedCredential => IsDefault ? SelectionListener.Selected : _options.CredentialType.ToString();
 
         private static TokenRequestContext RequestContext => new TokenRequestContext(new[] { AzureDevOpsScope });
 
@@ -125,10 +125,13 @@ namespace MigrationTools.Endpoints
 
         internal MigrationTools.Exceptions.MigrationRunStoppedException CredentialFailure(Exception ex)
         {
-            var reason = EntraIdCredentialFactory.FirstLine(ex.Message).TrimEnd('.');
-            var prefix = $"Endpoint '{EndpointName}': could not get a Microsoft Entra ID token with {_options.Credential}";
+            var reason = EntraIdCredentialFactory.FirstLine(ex.Message);
+            // ClientSecretCredential and ClientCertificateCredential say only "authentication failed:" and carry the AADSTS reason in the MSAL inner exception.
+            if (reason.EndsWith(":") && ex.InnerException != null) { reason += " " + EntraIdCredentialFactory.FirstLine(ex.InnerException.Message); }
+            reason = reason.TrimEnd('.');
+            var prefix = $"Endpoint '{EndpointName}': could not get a Microsoft Entra ID token with {_options.CredentialType}";
             string message;
-            switch (_options.Credential)
+            switch (_options.CredentialType)
             {
                 case EntraIdCredentialType.AzureCli:
                     message = $"{prefix}: the Azure CLI is not signed in or not installed ({reason}). Run 'az login'{(string.IsNullOrWhiteSpace(_options.TenantId) ? "" : $" --tenant {_options.TenantId}")}.";
@@ -141,7 +144,7 @@ namespace MigrationTools.Endpoints
                     break;
                 case EntraIdCredentialType.Certificate:
                 case EntraIdCredentialType.ClientSecret:
-                    message = $"{prefix}: {reason}. Check TenantId, ClientId and that this {(_options.Credential == EntraIdCredentialType.Certificate ? "certificate" : "secret")} is registered on the app and has not expired.";
+                    message = $"{prefix}: {reason}. Check TenantId, ClientId and that this {(_options.CredentialType == EntraIdCredentialType.Certificate ? "certificate" : "secret")} is registered on the app and has not expired.";
                     break;
                 case EntraIdCredentialType.ManagedIdentity:
                     message = $"{prefix}: no managed identity is available on this machine ({reason}). Run on an Azure resource with a managed identity, or choose another Credential.";

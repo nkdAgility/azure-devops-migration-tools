@@ -136,6 +136,8 @@ namespace MigrationTools.Endpoints
             }
             else
             {
+                // The authentication options are bound without the endpoint name; this is the first place that has it.
+                options.Authentication.GetEntraIdCredentials(name);
                 ValidateOptionsResult lmr = options.Authentication.Validate(name, options.Authentication);
                 if (lmr != ValidateOptionsResult.Success)
                 {

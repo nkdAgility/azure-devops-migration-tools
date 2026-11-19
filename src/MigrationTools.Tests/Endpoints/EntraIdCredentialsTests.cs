@@ -42,7 +42,7 @@ namespace MigrationTools.Endpoints.Tests
         private EntraIdCredentials _sut;
 
         private static EntraIdCredentials Using(TokenCredential credential, EntraIdCredentialType type = EntraIdCredentialType.AzureCli)
-            => new EntraIdCredentials(new EntraIdOptions { Credential = type }, "Source", (o, n) => credential);
+            => new EntraIdCredentials(new EntraIdOptions { Credential = type.ToString() }, "Source", (o, n) => credential);
 
         [TestInitialize]
         public void Setup()

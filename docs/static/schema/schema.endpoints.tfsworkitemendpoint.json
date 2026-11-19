@@ -59,8 +59,10 @@
           ],
           "properties": {
             "Credential": {
-              "type": "string",
-              "pattern": "^\\s*(?:[Dd][Ee][Ff][Aa][Uu][Ll][Tt]|[Aa][Zz][Uu][Rr][Ee][Cc][Ll][Ii]|[Ii][Nn][Tt][Ee][Rr][Aa][Cc][Tt][Ii][Vv][Ee]|[Dd][Ee][Vv][Ii][Cc][Ee][Cc][Oo][Dd][Ee]|[Cc][Ee][Rr][Tt][Ii][Ff][Ii][Cc][Aa][Tt][Ee]|[Cc][Ll][Ii][Ee][Nn][Tt][Ss][Ee][Cc][Rr][Ee][Tt]|[Mm][Aa][Nn][Aa][Gg][Ee][Dd][Ii][Dd][Ee][Nn][Tt][Ii][Tt][Yy]|\\+?0*0|\\+?0*1|\\+?0*2|\\+?0*3|\\+?0*4|\\+?0*5|\\+?0*6)\\s*$"
+              "type": [
+                "string",
+                "null"
+              ]
             },
             "TenantId": {
               "type": [
