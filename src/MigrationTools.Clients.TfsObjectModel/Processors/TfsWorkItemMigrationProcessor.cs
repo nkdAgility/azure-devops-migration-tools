@@ -925,6 +925,7 @@ namespace MigrationTools.Processors
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
                                 CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                _reviewLog.MarkChecked(WorkItemReviewCategory.FieldMapFailed);
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                                 StampCatchUpSave(targetWorkItem);
@@ -1178,11 +1179,9 @@ namespace MigrationTools.Processors
             {
                 if (sourceWorkItem.ToWorkItem().Links.Count == 0)
                 {
-                    // No source links left, so no link can still be missing; otherwise the link tool marks the check.
+                    // No source links left, so no link can still be missing; otherwise the link and git tools mark
+                    // the check when they run.
                     _reviewLog.MarkChecked(WorkItemReviewCategory.LinkSkipped);
-                }
-                if (CommonTools.GitRepository.Enabled)
-                {
                     _reviewLog.MarkChecked(WorkItemReviewCategory.LinkLeftOnSource);
                 }
             }

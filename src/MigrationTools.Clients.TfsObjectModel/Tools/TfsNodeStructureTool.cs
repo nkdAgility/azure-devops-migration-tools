@@ -556,6 +556,10 @@ namespace MigrationTools.Tools
             return fieldName;
         }
 
+        private static bool IsSameOrChildPath(string path, string parent) =>
+            string.Equals(path, parent, StringComparison.OrdinalIgnoreCase)
+            || path.StartsWith(parent + "\\", StringComparison.OrdinalIgnoreCase);
+
         public List<NodeStructureItem> CheckForMissingPaths(TfsProcessor processor, List<WorkItemData> workItems, TfsNodeStructureType nodeType)
         {
             EntryForProcessorType(processor);
@@ -590,7 +594,7 @@ namespace MigrationTools.Tools
                     Log.LogTrace("TfsNodeStructureTool:CheckForMissingPaths:NodePathNotAnchoredException::{@missingItem}", missingItem);
                     missingItem.anchored = false;
                     List<int> workItemsNotAncored = workItems.SelectMany(x => x.Revisions.Values)
-                        .Where(x => x.Fields[fieldName].Value.ToString().Contains(missingItem.sourcePath))
+                        .Where(x => IsSameOrChildPath(x.Fields[fieldName].Value.ToString(), missingItem.sourcePath))
                         .Select(x => x.WorkItemId)
                         .Distinct()
                         .ToList();

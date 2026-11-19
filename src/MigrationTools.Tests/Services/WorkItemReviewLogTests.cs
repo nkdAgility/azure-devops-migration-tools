@@ -504,6 +504,50 @@ namespace MigrationTools.Tests.Services
             Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(run.FilePath).Single().Category);
         }
         [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_EarlierLogHasBrokenMiddleLine_DoesNotResolve()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.LinkSkipped, "link", "migrate", sourceId: "7");
+            }
+            var file = Path.Combine(RunFolder("20260101000000"), WorkItemReviewLog.FileName);
+            var text = File.ReadAllText(file);
+            File.WriteAllText(file, "{\"sourceId\":\"7\",\"categ\n" + text);
+            WorkItemReviewLog.ReadEntries(file, out var skipped);
+            Assert.IsTrue(skipped);
+            using var run = Earlier(RunFolder("20260102000000"));
+            using (run.BeginItem("7", "Task")) { run.MarkChecked(WorkItemReviewCategory.LinkSkipped); run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath), "the broken line may be a problem that was not checked again");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void ReadEntries_OnlyLastLineBroken_IsNotReportedAsSkippedEarlierLine()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                first.Record(WorkItemReviewCategory.Failed, "boom", "fix", sourceId: "7");
+            }
+            var file = Path.Combine(RunFolder("20260101000000"), WorkItemReviewLog.FileName);
+            File.AppendAllText(file, "{\"sourceId\":\"8\",\"cat");
+            Assert.AreEqual(1, WorkItemReviewLog.ReadEntries(file, out var skipped).Count);
+            Assert.IsFalse(skipped);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void CompleteCurrentItem_CatchUpFieldMapFailure_ResolvesWhenMapsRunAgain()
+        {
+            using (var first = Earlier(RunFolder("20260101000000")))
+            {
+                using (first.BeginItem("7", "Task", 5)) { first.Record(WorkItemReviewCategory.FieldMapFailed, true, "map failed", "fix"); }
+            }
+            Assert.IsNull(WorkItemReviewLog.ReadEntries(Path.Combine(RunFolder("20260101000000"), WorkItemReviewLog.FileName)).Single().Revision);
+            using var run = Earlier(RunFolder("20260102000000"));
+            using (run.BeginItem("7", "Task")) { run.CompleteCurrentItem(); }
+            Assert.IsFalse(File.Exists(run.FilePath), "the maps did not run");
+            using (run.BeginItem("7", "Task")) { run.MarkChecked(WorkItemReviewCategory.FieldMapFailed); run.CompleteCurrentItem(); }
+            Assert.AreEqual(WorkItemReviewCategory.Resolved, WorkItemReviewLog.ReadEntries(run.FilePath).Single().Category);
+        }
+        [TestMethod, TestCategory("L0")]
         public void CompleteCurrentItem_LinkStillHeld_DoesNotResolve()
         {
             using (var first = Earlier(RunFolder("20260101000000")))

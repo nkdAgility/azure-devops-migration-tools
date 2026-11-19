@@ -242,6 +242,8 @@ namespace MigrationTools.Tools
         /// <param name="value">The (source) field value</param>
         /// <returns>The mapped target value, or the original value when no mapping applies</returns>
         private HashSet<string> _usersMissingInTarget = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> _missingUniqueNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> _matchedDisplayNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Source users that validation could not match to a target user; a field value for one of them that is
@@ -249,10 +251,16 @@ namespace MigrationTools.Tools
         /// </summary>
         public void SetUsersMissingInTarget(IEnumerable<IdentityMapData> validation)
         {
+            var all = (validation ?? Enumerable.Empty<IdentityMapData>()).Where(m => m?.Source != null).ToList();
+            var missing = all.Where(m => m.Target == null).ToList();
             _usersMissingInTarget = new HashSet<string>(
-                (validation ?? Enumerable.Empty<IdentityMapData>()).Where(m => m?.Target == null && m.Source != null)
-                    .SelectMany(m => new[] { m.Source.DisplayName, m.Source.AccountName })
-                    .Where(n => !string.IsNullOrWhiteSpace(n)),
+                missing.SelectMany(m => new[] { m.Source.DisplayName, m.Source.AccountName }).Where(n => !string.IsNullOrWhiteSpace(n)),
+                StringComparer.OrdinalIgnoreCase);
+            _missingUniqueNames = new HashSet<string>(
+                missing.SelectMany(m => new[] { m.Source.MailAddress, m.Source.AccountName }).Where(n => !string.IsNullOrWhiteSpace(n)),
+                StringComparer.OrdinalIgnoreCase);
+            _matchedDisplayNames = new HashSet<string>(
+                all.Where(m => m.Target != null).Select(m => m.Source.DisplayName).Where(n => !string.IsNullOrWhiteSpace(n)),
                 StringComparer.OrdinalIgnoreCase);
         }
 
@@ -262,9 +270,16 @@ namespace MigrationTools.Tools
             {
                 return false;
             }
+            // "Display Name <unique>" is matched on the unique part, so two accounts with the same display name are
+            // told apart; a bare display name counts only when no matched account has the same name.
             var bracket = sourceValue.IndexOf(" <", StringComparison.Ordinal);
-            var displayName = bracket > 0 ? sourceValue.Substring(0, bracket) : sourceValue;
-            return _usersMissingInTarget.Contains(displayName.Trim());
+            if (bracket > 0 && sourceValue.EndsWith(">", StringComparison.Ordinal))
+            {
+                var unique = sourceValue.Substring(bracket + 2, sourceValue.Length - bracket - 3).Trim();
+                return _missingUniqueNames.Contains(unique);
+            }
+            var name = sourceValue.Trim();
+            return _usersMissingInTarget.Contains(name) && !_matchedDisplayNames.Contains(name);
         }
 
         public object MapUserIdentityValue(string referenceName, object value)

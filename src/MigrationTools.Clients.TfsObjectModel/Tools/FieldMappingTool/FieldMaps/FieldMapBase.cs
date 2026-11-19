@@ -50,9 +50,10 @@ namespace MigrationTools.FieldMaps.AzureDevops.ObjectModel
                             { "Target",  target.ToWorkItem().Id.ToString()}
                        });
                 Telemetry.TrackException(ex, null);
-                ReviewLog?.Record(WorkItemReviewCategory.FieldMapFailed,
+                // On a catch-up save (no revision replayed) the map ran on the current values, not on a revision.
+                ReviewLog?.Record(WorkItemReviewCategory.FieldMapFailed, withoutRevision: ReviewLog.CurrentItemReplayedRevisions != true, reason:
                     $"Field map {Name} ({MappingDisplayName}) failed: {ex.Message}",
-                    "Fix the field map configuration or the source value, then re-run so the revision is replayed with the map.");
+                    action: "Fix the field map configuration or the source value, then re-run.");
             }
         }
 

@@ -103,8 +103,10 @@ namespace MigrationTools.Tools
             if (sourceRepoService == null)
             {
                 Log.LogWarning("Unable to configure connection to git!");
+                Services.GetService<WorkItemReviewLog>()?.ClearChecked(WorkItemReviewCategory.LinkLeftOnSource);
                 return -1;
             }
+            Services.GetService<WorkItemReviewLog>()?.MarkChecked(WorkItemReviewCategory.LinkLeftOnSource);
             foreach (Link l in targetWorkItem.ToWorkItem().Links)
             {
                 if (l is ExternalLink && gitWits.Contains(l.ArtifactLinkType.Name))

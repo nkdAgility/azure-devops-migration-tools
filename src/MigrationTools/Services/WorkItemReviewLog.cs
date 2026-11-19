@@ -205,7 +205,12 @@ namespace MigrationTools.Services
                     // Opened directly rather than checked with File.Exists, which returns false when access is denied.
                     try
                     {
-                        entries = ReadEntries(file).ToList();
+                        entries = ReadEntries(file, out var skippedEarlierLine);
+                        if (skippedEarlierLine)
+                        {
+                            _logger.LogWarning("The earlier work item review log {ReviewLogPath} has a line that could not be read; no resolved entries will be written in this run, because it may be a problem that was not checked again.", file);
+                            _incompleteHistory.Add(migration ?? string.Empty);
+                        }
                     }
                     catch (Exception ex) when (ex is FileNotFoundException || ex is DirectoryNotFoundException)
                     {
@@ -242,31 +247,45 @@ namespace MigrationTools.Services
         }
 
         /// <summary>
-        /// Reads a review log, skipping a last line cut short by a killed process.
+        /// Reads a review log, skipping any line that is not a complete entry (such as a last line cut short by a
+        /// killed process).
         /// </summary>
-        public static IEnumerable<WorkItemReviewEntry> ReadEntries(string file)
+        public static IEnumerable<WorkItemReviewEntry> ReadEntries(string file) => ReadEntries(file, out _);
+
+        /// <summary>
+        /// Reads a review log. <paramref name="skippedEarlierLine"/> is true when a line other than the last could
+        /// not be read: an entry may be missing from the middle of the file, not only cut short at the end.
+        /// </summary>
+        public static List<WorkItemReviewEntry> ReadEntries(string file, out bool skippedEarlierLine)
         {
+            skippedEarlierLine = false;
+            var result = new List<WorkItemReviewEntry>();
             string[] lines;
             using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
                 lines = reader.ReadToEnd().Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             }
-            foreach (var line in lines)
+            for (var i = 0; i < lines.Length; i++)
             {
                 WorkItemReviewEntry entry = null;
                 try
                 {
-                    entry = JsonConvert.DeserializeObject<WorkItemReviewEntry>(line.TrimEnd('\r'), JsonSettings);
+                    entry = JsonConvert.DeserializeObject<WorkItemReviewEntry>(lines[i].TrimEnd('\r'), JsonSettings);
                 }
                 catch (JsonException)
                 {
                 }
                 if (entry != null)
                 {
-                    yield return entry;
+                    result.Add(entry);
+                }
+                else if (i < lines.Length - 1 && lines[i].Trim().Length > 0)
+                {
+                    skippedEarlierLine = true;
                 }
             }
+            return result;
         }
 
         /// <summary>
@@ -517,6 +536,10 @@ namespace MigrationTools.Services
             {
                 return pathsValidated;
             }
+            if (entry.Category == WorkItemReviewCategory.FieldMapFailed && !entry.Revision.HasValue)
+            {
+                return scope.Checked.Contains(entry.Category);
+            }
             if (WorkItemReviewCategory.FoundOnlyWhileReplaying.Contains(entry.Category))
             {
                 return entry.Revision.HasValue && scope.ReplayedRevisions.Contains(entry.Revision.Value);
@@ -530,7 +553,20 @@ namespace MigrationTools.Services
         /// </summary>
         public void Record(string category, string reason, string action, string sourceId = null, string targetId = null, string workItemType = null, int? revision = null)
         {
+            Record(category, false, reason, action, sourceId, targetId, workItemType, revision);
+        }
+
+        /// <summary>
+        /// As <see cref="Record(string, string, string, string, string, string, int?)"/>; with
+        /// <paramref name="withoutRevision"/> the entry has no revision, for a problem found outside revision replay.
+        /// </summary>
+        public void Record(string category, bool withoutRevision, string reason, string action, string sourceId = null, string targetId = null, string workItemType = null, int? revision = null)
+        {
             var entry = NewEntry(category, reason, action, sourceId, targetId, workItemType, revision);
+            if (withoutRevision)
+            {
+                entry.Revision = null;
+            }
             AddToScope(entry, sourceId);
             Write(entry);
         }
