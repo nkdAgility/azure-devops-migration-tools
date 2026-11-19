@@ -46,6 +46,8 @@ namespace MigrationTools.Processors
                 return "some fields are not valid on the target. Run with Serilog MinimumLevel 'Debug' to list them, then fix the process or add field maps.";
             if (reason.Contains("TF237111") || reason.Contains("TF237165") || reason.Contains("TF401289") || reason.IndexOf("permission", StringComparison.OrdinalIgnoreCase) >= 0)
                 return "grant the migration identity permission to edit work items in the target area and iteration paths, and 'Bypass rules on work item updates'.";
+            if (reason.Contains("could not be read from Azure DevOps"))
+                return "check the migration identity can read work items in the source project and the source is reachable, then run the migration again; nothing was saved for this revision.";
             if (reason.Contains("state-stamped") || reason.Contains("stamped instead of the source"))
                 return "give the migration identity 'Bypass rules on work item updates' in the target project and check no target process rule sets these fields. Then delete the target work item and migrate it again: saved revisions are not corrected after the fact, and every rerun reports this item until it is migrated again.";
             return "check the reason above against the target project and process. Run with Serilog MinimumLevel 'Debug' for the full details.";

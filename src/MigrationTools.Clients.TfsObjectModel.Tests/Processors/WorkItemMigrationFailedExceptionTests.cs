@@ -31,8 +31,18 @@ namespace MigrationTools.Tests.Processors
         public void Advice_StateStampedMismatch_PointsAtBypassRules()
         {
             var reason = WorkItemMigrationFailedException.ServerReason(new InvalidOperationException(
-                "target revision 3 was saved with values the service stamped instead of the source values: ClosedDate saved as 'a' but the source is 'b'."));
+                "target revision 3 was not saved with the source's state-stamped values: ClosedDate saved as 'a' but the source is 'b'."));
             StringAssert.Contains(WorkItemMigrationFailedException.Advice(reason, "User Story"), "Bypass rules on work item updates");
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void Advice_SourceRevisionsUnreadable_SaysToRunAgain()
+        {
+            var reason = WorkItemMigrationFailedException.ServerReason(new InvalidOperationException(
+                "the source revisions could not be read from Azure DevOps to check the state-stamped values: VS30063: You are not authorized"));
+            var advice = WorkItemMigrationFailedException.Advice(reason, "User Story");
+            StringAssert.Contains(advice, "run the migration again");
+            Assert.IsFalse(advice.Contains("delete the target"), advice);
         }
 
         [TestMethod, TestCategory("L0")]

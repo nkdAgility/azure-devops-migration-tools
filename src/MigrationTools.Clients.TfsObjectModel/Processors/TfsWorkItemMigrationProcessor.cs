@@ -836,6 +836,7 @@ namespace MigrationTools.Processors
                 {
                     if (sourceWorkItem.Type != "Test Plan" && sourceWorkItem.Type != "Test Suite")
                     {
+                        List<(string Field, object Expected, bool IsIdentity)> stampCorrection = null;
                         workItemMetrics.RevisionsPerWorkItem.Record(sourceWorkItem.Rev);
                         var targetWorkItem = Target.WorkItems.FindReflectedWorkItem(sourceWorkItem, false);
                         ///////////////////////////////////////////////
@@ -853,10 +854,16 @@ namespace MigrationTools.Processors
                         }
                         else
                         {
-                            // A rerun never treats a wrongly saved revision as migrated (#3270).
-                            VerifyMigratedRevisions(sourceWorkItem, targetWorkItem);
+                            // A rerun never treats a wrongly saved revision as migrated (#3270), and corrects the
+                            // current values of a target an earlier run saved with empty state-stamped values (#3305).
+                            var sourceStamps = ReadSourceStateStampedValues(sourceWorkItem);
+                            var correctStamps = VerifyMigratedRevisions(sourceWorkItem, targetWorkItem, sourceStamps);
                             if (revisionsToMigrate.Count == 0)
                             {
+                                if (correctStamps)
+                                {
+                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps);
+                                }
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
                                 ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
@@ -886,6 +893,12 @@ namespace MigrationTools.Processors
                                 EnsureMigrationHyperlink(sourceWorkItem, targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                             }
                             targetWorkItem.SaveToAzureDevOps();
+                            if (stampCorrection != null)
+                            {
+                                var corrected = targetWorkItem.ToWorkItem();
+                                VerifyStateStampedFieldsSaved(corrected.Rev, f => corrected.Fields[f].Value, stampCorrection);
+                                Log.LogInformation("Target work item {TargetId}: current state-stamped values set to the source values.", corrected.Id);
+                            }
                         }
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
@@ -1159,6 +1172,7 @@ namespace MigrationTools.Processors
                     previousSourceRevision = sourceWorkItem.GetRevision(previousRevisionNumber.Value);
                 }
                 var lastRevision = revisionsToMigrate.Last();
+                var sourceStamps = ReadSourceStateStampedValues(sourceWorkItem);
 
                 foreach (var revision in revisionsToMigrate)
                 {
@@ -1234,7 +1248,7 @@ namespace MigrationTools.Processors
                         }
                         );
                         // The type change commits the new state, so it must carry the source's state-stamped values too (#3270).
-                        var typeChangeStamps = GetStateStampedTargetValues(currentRevisionWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem());
+                        var typeChangeStamps = GetStateStampedTargetValues(currentRevisionWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), sourceStamps);
                         foreach (var (field, value, _) in typeChangeStamps)
                         {
                             patchDocument.Add(new JsonPatchOperation()
@@ -1312,7 +1326,7 @@ namespace MigrationTools.Processors
                     if (!skipIterationRevision && !skipAreaRevision)
                     {
                         // Last before the save, after field maps: the save that changes state must carry the source values (#3270).
-                        var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem);
+                        var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem, sourceStamps);
                         targetWorkItem.SaveToAzureDevOps();
                         var saved = targetWorkItem.ToWorkItem();
                         VerifyStateStampedFieldsSaved(saved.Rev, f => saved.Fields[f].Value, stampedFields);
@@ -1399,6 +1413,34 @@ namespace MigrationTools.Processors
             return false;
         }
 
+        /// <summary>
+        /// Reads every revision of the source work item over REST, once per work item, so each state-stamped value the
+        /// object model reads can be checked against what Azure DevOps holds (#3305). If they cannot be read, the work
+        /// item fails with the reason rather than being saved with values that cannot be checked.
+        /// </summary>
+        private SourceStateStampedValues ReadSourceStateStampedValues(WorkItemData sourceWorkItem)
+        {
+            var id = int.Parse(sourceWorkItem.Id);
+            var revisions = new List<(int Rev, IDictionary<string, object> Fields)>();
+            const int page = 200;
+            try
+            {
+                var client = Source.GetClient<WorkItemTrackingHttpClient>();
+                for (var skip = 0; ; skip += page)
+                {
+                    var batch = client.GetRevisionsAsync(id, page, skip).GetAwaiter().GetResult();
+                    revisions.AddRange(batch.Select(r => (r.Rev ?? 0, r.Fields)));
+                    if (batch.Count < page) break;
+                }
+            }
+            catch (Exception ex) when (!(ex is MigrationRunStoppedException) && !IsTransientNetworkError(ex))
+            {
+                throw new InvalidOperationException($"the source revisions could not be read from Azure DevOps to check the state-stamped values: {WorkItemMigrationFailedException.ServerReason(ex)}", ex);
+            }
+            Log.LogDebug("Read {Count} revisions of source work item {SourceId} to check its state-stamped values.", revisions.Count, id);
+            return SourceStateStampedValues.From(id, revisions);
+        }
+
         private static string GetClosedDateField(WorkItem workItem)
         {
             return StateStampedFields.ResolveClosedDateField(
@@ -1412,7 +1454,7 @@ namespace MigrationTools.Processors
         /// has no such field, a value a field map set in this revision is kept; otherwise the field must be empty, so the
         /// service cannot leave its own stamp there unnoticed (#3270).
         /// </summary>
-        private List<(string Field, object Expected, bool IsIdentity)> GetStateStampedTargetValues(WorkItem source, WorkItem target)
+        private List<(string Field, object Expected, bool IsIdentity)> GetStateStampedTargetValues(WorkItem source, WorkItem target, SourceStateStampedValues sourceValues)
         {
             var targetFields = new List<string>();
             var closedTarget = GetClosedDateField(target);
@@ -1435,7 +1477,15 @@ namespace MigrationTools.Processors
                 }
                 else
                 {
-                    value = source.Fields[sourceField].Value;
+                    // Checked against what Azure DevOps holds for this revision: the object model could read a value as
+                    // empty part-way through a long run, and the empty value was saved (#3305).
+                    value = SourceStateStampedValues.Reconcile(source.Fields[sourceField].Value,
+                        sourceValues.Value(source.Rev, sourceField), isIdentity, out var problem);
+                    if (problem != null)
+                    {
+                        Log.LogWarning("Source work item {SourceId} revision {Revision} {Field}: {Problem}. Using the Azure DevOps value.",
+                            source.Id, source.Rev, sourceField, problem);
+                    }
                     if (isIdentity) value = CommonTools.UserMapping.MapUserIdentityValue(targetField, value);
                 }
                 values.Add((targetField, StateStampedFields.IsEmpty(value) ? null : value, isIdentity));
@@ -1452,11 +1502,11 @@ namespace MigrationTools.Processors
         /// bypasses rules. Returns the values, checked again after the save. Throws, so the work item fails clearly, if a
         /// value cannot be set.
         /// </summary>
-        private List<(string Field, object Expected, bool IsIdentity)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        private List<(string Field, object Expected, bool IsIdentity)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem, SourceStateStampedValues sourceValues)
         {
             var source = sourceRevision.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
-            var expected = GetStateStampedTargetValues(source, target);
+            var expected = GetStateStampedTargetValues(source, target, sourceValues);
             foreach (var (targetField, value, isIdentity) in expected)
             {
                 var field = target.Fields[targetField];
@@ -1509,7 +1559,13 @@ namespace MigrationTools.Processors
         /// run or an earlier version, fails clearly here instead of being skipped as migrated. Fields the source type
         /// does not have are not compared: a field map may own them.
         /// </summary>
-        private void VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        /// <returns>
+        /// True when the only differences are state-stamped values the target has as empty where the source has one, the
+        /// fault of #3305: the caller then sets the target's current values to the source's latest ones in a catch-up
+        /// save. Azure DevOps cannot rewrite saved revisions, so the earlier revisions keep the empty value; they are
+        /// listed in a warning and no longer fail the item.
+        /// </returns>
+        private bool VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, SourceStateStampedValues sourceValues)
         {
             var source = sourceWorkItem.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
@@ -1526,6 +1582,9 @@ namespace MigrationTools.Processors
             fields.AddRange(StateStampedFields.Fields.Where(f => target.Fields.Contains(f)));
 
             var wrong = new List<string>();
+            var emptied = new List<string>();
+            var latestTarget = target.Revisions[target.Revisions.Count - 1];
+            var latestNeedsCorrection = false;
             foreach (Revision tr in target.Revisions)
             {
                 var at = TargetWhen(tr);
@@ -1547,19 +1606,36 @@ namespace MigrationTools.Processors
                     var sourceField = sr.Fields.Contains(field) ? field : field == closedTarget ? GetClosedDateField(source) : null;
                     if (sourceField == null || !sr.Fields.Contains(sourceField)) continue;
                     var isIdentity = target.Fields[field].FieldDefinition.IsIdentity;
-                    var expected = sr.Fields[sourceField].Value;
+                    // What Azure DevOps holds for the source revision, not only what the object model read (#3305).
+                    var expected = SourceStateStampedValues.Reconcile(sr.Fields[sourceField].Value,
+                        sourceValues.Value((int)sr.Fields["System.Rev"].Value, sourceField), isIdentity, out _);
                     if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
                     var saved = tr.Fields.Contains(field) ? tr.Fields[field].Value : null;
                     if (!StateStampedFields.SameValue(StateStampedFields.IsEmpty(expected) ? null : expected, saved, isIdentity))
                     {
-                        wrong.Add($"revision {tr.Index + 1} {field} is '{saved}' but source revision {sr.Index + 1} is '{expected}'");
+                        var line = $"revision {tr.Index + 1} {field} is '{saved}' but source revision {sr.Index + 1} is '{expected}'";
+                        if (StateStampedFields.IsEmpty(saved))
+                        {
+                            emptied.Add(line);
+                            if (tr.Index == latestTarget.Index) latestNeedsCorrection = true;
+                        }
+                        else wrong.Add(line);
                     }
                 }
             }
             if (wrong.Count > 0)
             {
+                wrong.AddRange(emptied);
                 throw new InvalidOperationException($"the already migrated target work item does not match the source, stamped instead of the source values: {string.Join("; ", wrong.Take(10))}{(wrong.Count > 10 ? $"; and {wrong.Count - 10} more" : "")}.");
             }
+            if (emptied.Count > 0)
+            {
+                Log.LogWarning("Target work item {TargetId} (source {SourceId}) was saved by an earlier run with empty state-stamped values where the source has them (#3305). {Action} Azure DevOps cannot change saved revisions, so its history keeps them: {Revisions}{More}",
+                    target.Id, source.Id,
+                    latestNeedsCorrection ? "Its current values are being set to the source values." : "Its current values already match the source.",
+                    string.Join("; ", emptied.Take(10)), emptied.Count > 10 ? $"; and {emptied.Count - 10} more" : "");
+            }
+            return latestNeedsCorrection;
         }
 
 
@@ -1570,7 +1646,7 @@ namespace MigrationTools.Processors
                 .ToList();
             if (wrong.Count > 0)
             {
-                throw new InvalidOperationException($"target revision {revision} was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
+                throw new InvalidOperationException($"target revision {revision} was not saved with the source's state-stamped values: {string.Join("; ", wrong)}.");
             }
 
         }
