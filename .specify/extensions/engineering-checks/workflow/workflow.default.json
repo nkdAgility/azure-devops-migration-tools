@@ -386,7 +386,7 @@
         },
         {
           "message": "the automated outcome checks have not all passed",
-          "pattern": "(?m)^Automated outcome checks \\(all passed\\)",
+          "pattern": "(?m)^Automated outcome checks \\(all passed\\) at [0-9a-f]{40}:",
           "type": "pattern"
         },
         {
@@ -407,7 +407,7 @@
         },
         {
           "message": "the automated outcome checks have not all passed",
-          "pattern": "(?m)^Automated outcome checks \\(all passed\\)",
+          "pattern": "(?m)^Automated outcome checks \\(all passed\\) at [0-9a-f]{40}:",
           "type": "pattern"
         },
         {

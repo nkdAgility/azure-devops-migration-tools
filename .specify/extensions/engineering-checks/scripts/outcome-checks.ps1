@@ -1,6 +1,6 @@
 # Outcome Done: runs every outcome check the spec defined against the real system.
 # Each check is a line in the item's 'Outcome checks' section:  - <what is checked>: `<command>`
-# Writes .specify/reviews/outcome-checks.md only when every check passes.
+# Writes .specify/reviews/outcome-checks.md only when every check passes, naming the commit it ran on.
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
 Remove-Item .specify/reviews/outcome-checks.md -ErrorAction SilentlyContinue
@@ -23,5 +23,5 @@ $failed = @($results | Where-Object exit -ne 0)
 $body = ($results | ForEach-Object { "- $($_.name): ``$($_.command)`` exit $($_.exit)" }) -join "`n"
 if ($failed) { Write-Error "Outcome checks failed: $($failed.name -join ', ')"; exit 1 }
 New-Item -ItemType Directory -Force .specify/reviews | Out-Null
-"Automated outcome checks (all passed):`n$body" | Set-Content .specify/reviews/outcome-checks.md -Encoding utf8
+"Automated outcome checks (all passed) at $(git rev-parse HEAD):`n$body" | Set-Content .specify/reviews/outcome-checks.md -Encoding utf8
 exit 0
