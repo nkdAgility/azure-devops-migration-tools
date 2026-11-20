@@ -23,6 +23,8 @@ try {
 
     Import-Module (Join-Path $root '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
     $cfg = Get-WorkflowConfig -Root $root
+    # The manager reads this item's record and activity from this worktree.
+    Set-StoredWorktree $id ([IO.Path]::GetFullPath($root))
     $ad = Get-BoardAdapter $cfg $root
     $item = & $ad.GetItem $id
     if (-not $item -or $item.tags -contains $cfg.tags.blocked) { exit 0 }
