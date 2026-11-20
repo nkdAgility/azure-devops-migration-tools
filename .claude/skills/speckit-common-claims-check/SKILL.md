@@ -1,0 +1,1 @@
+../../../.specify/extensions/common/.specify-dev/agent-commands/claude/speckit-common-claims-check/SKILL.md

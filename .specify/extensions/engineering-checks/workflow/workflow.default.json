@@ -1,0 +1,508 @@
+{
+  "specRoot": "docs/specs",
+  "$comment": "The approved engineering Definition of Workflow (spec/definition-of-workflow-engineering.md) as data. A repo copies this to .specify/memory/workflow.json and changes only the settings marked per repo. WIP limits and stuckAfterMinutes are placeholders until Martin sets them.",
+  "validatingBeforeMerge": true,
+  "usesPackage": false,
+  "board": {
+    "adapter": "github",
+    "stateField": "NKDA-STATE",
+    "categoryStatus": {
+      "Proposed": "Backlog",
+      "In Progress": "In progress",
+      "In review": "In review",
+      "Completed": "Done",
+      "Removed": "Not planned"
+    },
+    "statusNames": {
+      "Closed": "Done",
+      "Removed": "Not planned"
+    },
+    "moveComments": true
+  },
+  "categories": [
+    "Proposed",
+    "In Progress",
+    "Completed",
+    "Removed"
+  ],
+  "states": [
+    {
+      "name": "Proposed",
+      "category": "Proposed",
+      "kind": "wait-martin",
+      "wipLimit": null,
+      "stuckAfterMinutes": null
+    },
+    {
+      "name": "Approved",
+      "category": "Proposed",
+      "kind": "wait",
+      "wipLimit": null,
+      "stuckAfterMinutes": null
+    },
+    {
+      "name": "Refining",
+      "category": "Proposed",
+      "kind": "work",
+      "wipLimit": 2,
+      "stuckAfterMinutes": 240
+    },
+    {
+      "name": "Refined",
+      "category": "Proposed",
+      "kind": "wait",
+      "wipLimit": null,
+      "stuckAfterMinutes": null
+    },
+    {
+      "name": "Specifying",
+      "category": "In Progress",
+      "kind": "work",
+      "wipLimit": 2,
+      "stuckAfterMinutes": 240
+    },
+    {
+      "name": "Specified",
+      "category": "In Progress",
+      "kind": "wait-martin",
+      "wipLimit": null,
+      "stuckAfterMinutes": null
+    },
+    {
+      "name": "Building",
+      "category": "In Progress",
+      "kind": "work",
+      "wipLimit": 2,
+      "stuckAfterMinutes": 480
+    },
+    {
+      "name": "Validating",
+      "category": "In Progress",
+      "kind": "work",
+      "wipLimit": 2,
+      "stuckAfterMinutes": 240
+    },
+    {
+      "name": "In review",
+      "category": "In Progress",
+      "kind": "work",
+      "wipLimit": 3,
+      "stuckAfterMinutes": 1440
+    },
+    {
+      "name": "Delivering",
+      "category": "In Progress",
+      "kind": "wait-children",
+      "wipLimit": 2,
+      "stuckAfterMinutes": null
+    },
+    {
+      "name": "Closed",
+      "category": "Completed",
+      "kind": "end",
+      "wipLimit": null,
+      "stuckAfterMinutes": null
+    },
+    {
+      "name": "Removed",
+      "category": "Removed",
+      "kind": "end",
+      "wipLimit": null,
+      "stuckAfterMinutes": null
+    }
+  ],
+  "orderBeforeMerge": [
+    "Proposed",
+    "Approved",
+    "Refining",
+    "Refined",
+    "Specifying",
+    "Specified",
+    "Building",
+    "Validating",
+    "In review",
+    "Closed"
+  ],
+  "orderAfterMerge": [
+    "Proposed",
+    "Approved",
+    "Refining",
+    "Refined",
+    "Specifying",
+    "Specified",
+    "Building",
+    "In review",
+    "Validating",
+    "Closed"
+  ],
+  "backMoves": [
+    {
+      "from": "Validating",
+      "to": "Building",
+      "needs": "a reason naming the failed outcome check"
+    }
+  ],
+  "shifts": {
+    "Proposed>Approved": {
+      "name": "Decided",
+      "checks": [
+        {
+          "type": "pattern",
+          "pattern": "(?m)^Approved:\\s*\\S",
+          "message": "no 'Approved:' line with Martin's words"
+        }
+      ]
+    },
+    "Approved>Refining": {
+      "name": "Assigned",
+      "checks": [
+        {
+          "type": "pattern",
+          "pattern": "(?m)^WKR:\\s*\\S",
+          "message": "no 'WKR:' line naming the WKR that manages it"
+        }
+      ]
+    },
+    "Refining>Refined": {
+      "name": "Understood",
+      "checks": [
+        {
+          "type": "section",
+          "name": "Scope",
+          "message": "no 'Scope' section (paths and what is out of scope)"
+        },
+        {
+          "type": "section",
+          "name": "Sources read",
+          "message": "no 'Sources read' section naming the source-of-truth docs read"
+        },
+        {
+          "type": "section",
+          "name": "Reproduction",
+          "types": [
+            "Bug"
+          ],
+          "message": "a Bug needs a 'Reproduction' section showing it fails on main"
+        }
+      ]
+    },
+    "Refined>Specifying": {
+      "name": "Pulled",
+      "records": "started",
+      "checks": [
+        {
+          "type": "productOutcome",
+          "message": "no product outcome: .specify/memory/product-outcome.md needs 'Outcome:' and Martin's 'Words:' before any spec is started"
+        }
+      ]
+    },
+    "Specifying>Specified": {
+      "name": "Specified",
+      "checks": [
+        {
+          "type": "section",
+          "name": "Outcome checks",
+          "message": "no 'Outcome checks' section (system, command and pass for each)"
+        },
+        {
+          "type": "section",
+          "name": "Spec",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'Spec' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "Personas",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'Personas' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "Rubber duck",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'Rubber duck' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "Red team",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'Red team' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "MCP story",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'MCP story' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "API story",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'API story' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "Architecture check",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'Architecture check' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "Refactor assessment",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "'Refactor assessment' is missing or still open"
+        },
+        {
+          "type": "section",
+          "name": "Cause",
+          "types": [
+            "Bug"
+          ],
+          "message": "a Bug needs a 'Cause' section"
+        },
+        {
+          "type": "section",
+          "name": "Proposed fix",
+          "types": [
+            "Bug"
+          ],
+          "message": "a Bug needs a 'Proposed fix' section"
+        },
+        {
+          "type": "section",
+          "name": "Outcome",
+          "types": [
+            "Feedback"
+          ],
+          "message": "Feedback needs an 'Outcome' section"
+        }
+      ]
+    },
+    "Specified>Building": {
+      "name": "Ready",
+      "checks": [
+        {
+          "type": "specAgreed",
+          "source": "wkr",
+          "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
+        },
+        {
+          "type": "frontMatter",
+          "source": "wkr",
+          "field": "purpose",
+          "message": "no worker outcome: the WKR file's front matter needs 'purpose:' (the one outcome this worker delivers)"
+        },
+        {
+          "type": "frontMatter",
+          "source": "wkr",
+          "field": "paths",
+          "message": "no paths: the WKR file's front matter needs 'paths:' (what this item may edit)"
+        },
+        {
+          "type": "noOpen",
+          "name": "Decisions for Martin",
+          "message": "'Decisions for Martin' still holds open questions"
+        },
+        {
+          "type": "noOpenQuestions",
+          "message": "an open question (Q-n) is still waiting for an answer"
+        }
+      ]
+    },
+    "Building>Validating": {
+      "name": "OutputDone",
+      "checks": [
+        {
+          "message": "no 'Output done evidence' section",
+          "name": "Output done evidence",
+          "type": "section"
+        },
+        {
+          "message": "Output Done manual validation is below the minimum confidence",
+          "name": "Output done evidence",
+          "type": "confidence"
+        },
+        {
+          "message": "the done checks (build, tests, proof) did not pass",
+          "type": "script",
+          "run": "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/done-checks.ps1"
+        },
+        {
+          "type": "script",
+          "run": "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1",
+          "message": "the docs are not reconciled into the spec root"
+        }
+      ]
+    },
+    "Building>In review": {
+      "name": "OutputDone",
+      "checks": [
+        {
+          "message": "no 'Output done evidence' section",
+          "name": "Output done evidence",
+          "type": "section"
+        },
+        {
+          "message": "Output Done manual validation is below the minimum confidence",
+          "name": "Output done evidence",
+          "type": "confidence"
+        },
+        {
+          "message": "the done checks (build, tests, proof) did not pass",
+          "type": "script",
+          "run": "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/done-checks.ps1"
+        },
+        {
+          "type": "script",
+          "run": "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1",
+          "message": "the docs are not reconciled into the spec root"
+        }
+      ]
+    },
+    "Validating>In review": {
+      "name": "OutcomeDone",
+      "checks": [
+        {
+          "message": "no 'Outcome done' section",
+          "name": "Outcome done",
+          "type": "section"
+        },
+        {
+          "message": "the automated outcome checks have not all passed for this item, on this commit, in its latest attempt",
+          "source": "wkr",
+          "type": "outcomeCurrent"
+        },
+        {
+          "message": "Outcome Done manual validation is below the minimum confidence",
+          "name": "Outcome done",
+          "type": "confidence"
+        }
+      ]
+    },
+    "Validating>Closed": {
+      "name": "OutcomeDone",
+      "records": "finished",
+      "checks": [
+        {
+          "message": "no 'Outcome done' section",
+          "name": "Outcome done",
+          "type": "section"
+        },
+        {
+          "message": "the automated outcome checks have not all passed for this item, on this commit, in its latest attempt",
+          "source": "wkr",
+          "type": "outcomeCurrent"
+        },
+        {
+          "message": "Outcome Done manual validation is below the minimum confidence",
+          "name": "Outcome done",
+          "type": "confidence"
+        }
+      ]
+    },
+    "In review>Closed": {
+      "name": "Merged",
+      "records": "finished",
+      "checks": [
+        {
+          "type": "prMerged",
+          "message": "the item's PR has not merged"
+        }
+      ]
+    },
+    "In review>Validating": {
+      "name": "Merged",
+      "checks": [
+        {
+          "type": "prMerged",
+          "message": "the item's PR has not merged"
+        }
+      ]
+    },
+    "*>Removed": {
+      "name": "Removed",
+      "records": "finished",
+      "checks": [
+        {
+          "type": "pattern",
+          "pattern": "(?m)^Removed because:\\s*\\S",
+          "message": "no 'Removed because:' line giving the reason"
+        }
+      ]
+    },
+    "Refined>Delivering": {
+      "name": "SplitApproved",
+      "records": "started",
+      "checks": [
+        {
+          "type": "pattern",
+          "pattern": "(?m)^Split approved:\\s*\\S",
+          "message": "no 'Split approved:' line with Martin's words"
+        },
+        {
+          "type": "hasChildren",
+          "message": "the split has no WPs on the board as children"
+        }
+      ]
+    },
+    "Delivering>Closed": {
+      "name": "Delivered",
+      "records": "finished",
+      "checks": [
+        {
+          "type": "childrenDone",
+          "message": "not every WP is Closed or Removed, with at least one Closed"
+        }
+      ]
+    }
+  },
+  "tags": {
+    "expedite": "Expedite",
+    "blocked": "blocked"
+  },
+  "minConfidence": 85,
+  "parentOrder": [
+    "Proposed",
+    "Approved",
+    "Refining",
+    "Refined",
+    "Delivering",
+    "Closed"
+  ],
+  "adopt": {
+    "default": "Proposed",
+    "map": {
+      "triage": "Proposed",
+      "needs-assessment": "Proposed",
+      "ready": "Approved",
+      "in-progress": "Building",
+      "state:fixing": "Building",
+      "state:in-review": "In review"
+    },
+    "oldWorkflow": "platform/development/definition-of-workflow.md",
+    "wkrMarker": "I'm working on this",
+    "statusMap": {
+      "Backlog": "Proposed",
+      "Todo": "Approved",
+      "In progress": "Building",
+      "Duplicate": "Removed",
+      "In review": "In review"
+    }
+  }
+}

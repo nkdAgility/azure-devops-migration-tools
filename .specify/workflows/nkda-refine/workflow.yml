@@ -1,0 +1,30 @@
+schema_version: "1.0"
+workflow:
+  id: "nkda-refine"
+  name: "Refine an item"
+  version: "0.1.0"
+  author: "nkdAgility"
+  description: "Refining: reads the source of truth, sets scope, reproduces a bug, then moves the item to Refined through its policy"
+requires:
+  speckit_version: ">=1.4,<2.0"
+inputs:
+  item:
+    type: string
+    required: true
+    prompt: "Item reference (#123)"
+  integration:
+    type: string
+    default: "auto"
+    prompt: "Integration to use ('auto' uses the project's initialized integration)"
+steps:
+  - id: intake
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/intake.ps1 -Text '{{ inputs.item }}'"
+  - id: refine
+    type: prompt
+    integration: "{{ inputs.integration }}"
+    timeout: 3600
+    prompt: "Follow the instructions in .specify/extensions/engineering-checks/commands/refine.md exactly. Arguments: none"
+  - id: refined
+    type: shell
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1 -To Refined -Reason 'Understood: sources read, scope set'"

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "workflows": {
+    "speckit": {
+      "name": "Full SDD Cycle",
+      "version": "1.0.2",
+      "description": "Runs specify \u2192 plan \u2192 tasks \u2192 implement with review gates",
+      "source": "bundled",
+      "installed_at": "2026-11-19T16:29:19.293368+00:00",
+      "updated_at": "2026-11-19T16:29:19.293382+00:00"
+    },
+    "bugfix": {
+      "name": "Guided Bug Fix",
+      "version": "1.0.1",
+      "description": "Runs bug assess \u2192 human review gate \u2192 bug fix \u2192 bug test on a bug report",
+      "source": "catalog",
+      "catalog_name": "default",
+      "url": "https://raw.githubusercontent.com/github/spec-kit/main/workflows/bugfix/workflow.yml",
+      "installed_at": "2026-11-19T16:29:45.621836+00:00",
+      "updated_at": "2026-11-19T16:29:45.621846+00:00"
+    },
+    "assess": {
+      "name": "Idea Assessment Pipeline",
+      "version": "1.0.0",
+      "description": "Runs intake \u2192 research \u2192 define \u2192 shape \u2192 decide with a verdict review gate before a manual /speckit.specify handoff",
+      "source": "catalog",
+      "catalog_name": "default",
+      "url": "https://raw.githubusercontent.com/github/spec-kit/main/workflows/assess/workflow.yml",
+      "installed_at": "2026-11-19T16:29:47.462321+00:00",
+      "updated_at": "2026-11-19T16:29:47.462339+00:00"
+    },
+    "nkda-refine": {
+      "name": "Refine an item",
+      "version": "0.1.0",
+      "description": "Refining: reads the source of truth, sets scope, reproduces a bug, then moves the item to Refined through its policy",
+      "source": "C:\\Users\\MartinHinshelwoodNKD\\source\\repos\\nkda-speckit\\workflows\\refine\\workflow.yml",
+      "installed_at": "2026-11-19T16:29:58.811915+00:00",
+      "updated_at": "2026-11-19T16:29:58.811928+00:00"
+    },
+    "nkda-adopt": {
+      "name": "Adopt a repo",
+      "version": "0.1.0",
+      "description": "Moves a repo onto the workflow: board set-up, docs conversion, reconcile of work in flight, carry-over and a final check. Stops for Martin's approval of the docs plan and of the reconcile.",
+      "source": "C:\\Users\\MartinHinshelwoodNKD\\source\\repos\\nkda-speckit\\workflows\\adopt\\workflow.yml",
+      "installed_at": "2026-11-19T16:30:00.486948+00:00",
+      "updated_at": "2026-11-19T16:30:00.486961+00:00"
+    }
+  }
+}

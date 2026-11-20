@@ -1,0 +1,166 @@
+[
+  {
+    "id": 3308,
+    "title": "Prove the app Entra ID credentials (certificate, client secret, managed identity) end to end",
+    "type": "Product Backlog Item",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3305,
+    "title": "Long migrations save later work items with an empty State Change Date",
+    "type": "Bug",
+    "old": "",
+    "mapped": "In review",
+    "new": "Proposed",
+    "missing": [
+      "no 'Approved:' line with Martin's words"
+    ],
+    "removeTags": []
+  },
+  {
+    "id": 3304,
+    "title": "Remove dead projects and scripts",
+    "type": null,
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3301,
+    "title": "Feed the review log from the test plan, query and other processors",
+    "type": "Product Backlog Item",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3299,
+    "title": "Re-running over in-sync work items is as slow as migrating them and hits rate limits",
+    "type": "Bug",
+    "old": "",
+    "mapped": "In review",
+    "new": "Proposed",
+    "missing": [
+      "no 'Approved:' line with Martin's words"
+    ],
+    "removeTags": []
+  },
+  {
+    "id": 3284,
+    "title": "DocsRelease publishes the docs before the build finishes, and even when it fails",
+    "type": "Bug",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3278,
+    "title": "Remove-E2EObjects.ps1 deletes other scenarios' Custom.amte2e* fields when given an amte2e-<issue>- prefix",
+    "type": "Bug",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3269,
+    "title": "Validate that all users can be mapped (or are marked OK to convert to text) before migrating",
+    "type": "Product Backlog Item",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3268,
+    "title": "AzureDevOpsPipelineProcessor drops release artifacts, so classic releases that download an artifact are rejected by the target",
+    "type": "Bug",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3260,
+    "title": "Plans and suites: Test Cases in an existing plan's root suite are not added on re-run",
+    "type": "Bug",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3258,
+    "title": "StringManipulatorTool default pattern removes supplementary-plane letters, not just emoji",
+    "type": "Bug",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3256,
+    "title": "Test Case step and parameter references are silently left pointing at source IDs when Shared Steps/Parameter are not migrated",
+    "type": "Bug",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3255,
+    "title": "Remove unused docs/data/releases*.json",
+    "type": "Product Backlog Item",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3254,
+    "title": "init: Basic template is identical to WorkItemTracking, and templates use sample values instead of defaults",
+    "type": "Product Backlog Item",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3252,
+    "title": "Add a validate (dry-run) mode that stops before any change to the target",
+    "type": "Product Backlog Item",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  },
+  {
+    "id": 3225,
+    "title": "EntraId auth: intermittent TF30063 401 at the first connection (2 of 40 runs), succeeds on re-run",
+    "type": "Product Backlog Item",
+    "old": "",
+    "mapped": "Proposed",
+    "new": "Proposed",
+    "missing": [],
+    "removeTags": []
+  }
+]

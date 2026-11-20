@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.specify/events.py\" speckit.engineering-checks.guard pre_tool_use 30",
+            "timeout": 35,
+            "__speckit_event__": true
+          }
+        ]
+      }
+    ]
+  }
+}

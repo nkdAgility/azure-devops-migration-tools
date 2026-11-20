@@ -1,0 +1,38 @@
+schema_version: "1.0"
+
+extension:
+  id: common
+  name: "nkda common"
+  version: "0.1.0"
+  description: "Shared by engineering and content: blind review, claims check, cold read, completion report, and approval binding"
+  author: nkdAgility
+  repository: https://github.com/nkdAgility/nkda-speckit
+  license: MIT
+
+requires:
+  speckit_version: ">=1.4,<2.0"
+  tools:
+    - name: pwsh
+      required: true
+
+provides:
+  commands:
+    - name: speckit.common.blind-review
+      file: commands/blind-review.md
+      description: "A second reviewer checks the change, seeing only the diff, the item and the rules"
+    - name: speckit.common.claims-check
+      file: commands/claims-check.md
+      description: "Label every claim: verified, documented, inference or unknown"
+    - name: speckit.common.cold-read
+      file: commands/cold-read.md
+      description: "A reader who did not write the text says what they understood"
+    - name: speckit.common.confidence
+      file: commands/confidence.md
+      description: "Score the manually run validation of one gate as a confidence figure with reasons"
+    - name: speckit.common.completion-report
+      file: commands/completion-report.md
+      description: "What was done, how it was tested, what was not done"
+
+tags:
+  - "review"
+  - "approval"

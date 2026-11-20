@@ -1,0 +1,21 @@
+# Adoption step 2, after Martin approves the plan: runs each 'git mv' line in .specify/adopt/docs-plan.md
+# (so history is kept) and records the systems list. Commits nothing.
+$ErrorActionPreference = 'Stop'
+$plan = '.specify/adopt/docs-plan.md'
+$root = 'docs/specs'
+if (Test-Path .specify/memory/workflow.json) { $c = Get-Content .specify/memory/workflow.json -Raw | ConvertFrom-Json; if ($c.PSObject.Properties['specRoot'] -and $c.specRoot) { $root = $c.specRoot.TrimEnd('/') } }
+if (-not (Test-Path $plan)) { Write-Error "$plan was not written."; exit 1 }
+$t = (Get-Content $plan -Raw) -replace "`r`n", "`n"
+$moves = [regex]::Matches($t, '(?m)^\s*git mv\s+(\S+)\s+(\S+)\s*$')
+foreach ($mv in $moves) {
+    $from = $mv.Groups[1].Value; $to = $mv.Groups[2].Value
+    if (-not (Test-Path $from)) { if (Test-Path $to) { "already moved: $to"; continue }; Write-Error "not found: $from"; exit 1 }
+    New-Item -ItemType Directory -Force (Split-Path $to) | Out-Null
+    git mv $from $to; if ($LASTEXITCODE) { exit 1 }
+    "moved $from -> $to"
+}
+$sys = [regex]::Match($t, '(?ms)^##\s*Systems\s*\n(.*?)(?=^##\s|\z)').Groups[1].Value.Trim()
+New-Item -ItemType Directory -Force $root | Out-Null
+"# Systems`n`nEach system and the source paths that belong to it. The docs check uses this to find which ``$root/{system}/`` files a change must update.`n`n$sys`n" | Set-Content "$root/systems.md" -Encoding utf8
+"$($moves.Count) moves; systems written to $root/systems.md"
+exit 0

@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "common": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:b3f88c5ee42b929949b7f259929bf31ac74e112d2f3387fd8750631893c64ddc",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.common.blind-review",
+          "speckit.common.claims-check",
+          "speckit.common.cold-read",
+          "speckit.common.confidence",
+          "speckit.common.completion-report"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-19T16:29:49.143878+00:00"
+    },
+    "engineering-checks": {
+      "version": "0.1.0",
+      "source": "local",
+      "manifest_hash": "sha256:1d832e654a2e4b57b7b3fc352b76fd686eb9137cf59e5f15627dffede670fd0b",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.engineering-checks.challenge",
+          "speckit.engineering-checks.arch-check",
+          "speckit.engineering-checks.refine",
+          "speckit.engineering-checks.define-outcome-checks",
+          "speckit.engineering-checks.mcp-story",
+          "speckit.engineering-checks.personas",
+          "speckit.engineering-checks.refactor-assessment",
+          "speckit.engineering-checks.api-story",
+          "speckit.engineering-checks.rubber-duck",
+          "speckit.engineering-checks.assess-feedback",
+          "speckit.engineering-checks.adopt-docs",
+          "speckit.engineering-checks.guard"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-19T16:29:50.972916+00:00"
+    },
+    "bug": {
+      "version": "1.0.2",
+      "source": "local",
+      "manifest_hash": "sha256:00ec851a8e57713e9d65401e4c7fa5b4fa4a689decacb0b654ba5411c653b647",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.bug.assess",
+          "speckit.bug.fix",
+          "speckit.bug.test"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-20T01:33:12.249809+00:00"
+    },
+    "assess": {
+      "version": "1.0.2",
+      "source": "local",
+      "manifest_hash": "sha256:c446e95c0cfc9482eb794fa90d428c5da3257162515db2cebd9ae3ec534d1919",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.assess.intake",
+          "speckit.assess.research",
+          "speckit.assess.define",
+          "speckit.assess.shape",
+          "speckit.assess.decide"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-20T01:33:13.559836+00:00"
+    }
+  }
+}
