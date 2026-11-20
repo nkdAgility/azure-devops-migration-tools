@@ -147,10 +147,19 @@ function Get-BoardAdapter {
 
 # ---------------------------------------------------------------- evidence and checks
 
+function Get-ItemRoot($Item, [string]$Root = '.') {
+    # Where the item's own record lives: its worker's worktree once one is recorded, else the given root.
+    if (-not $script:StoreRoot) { $script:StoreRoot = $Root }
+    $id = if ($Item -is [System.Collections.IDictionary]) { $Item['id'] } elseif ($Item -and $Item.PSObject.Properties['id']) { $Item.id } else { $null }
+    if (-not $id) { return $Root }
+    $wt = Get-StoredWorktree $id
+    if ($wt -and (Test-Path (Join-Path $wt ".specify/wkr/$($Item.id).md"))) { $wt } else { $Root }
+}
+
 function Get-ItemEvidence {
     param($Item, [string]$Root = '.')
     $parts = @("$($Item.body)") + @($Item.comments | ForEach-Object { "$($_.body)" })
-    $wkr = Join-Path $Root ".specify/wkr/$($Item.id).md"
+    $wkr = Join-Path (Get-ItemRoot $Item $Root) ".specify/wkr/$($Item.id).md"
     if (Test-Path $wkr) { $parts += Get-Content $wkr -Raw }
     ($parts -join "`n`n") -replace "`r`n", "`n"
 }
@@ -298,6 +307,8 @@ function Get-ItemRecord($State, $Id) { $k = "$Id"; if (-not $State.ContainsKey($
 function Add-StoredMove($Id, $Record) { $s = Read-BoardState; $r = Get-ItemRecord $s $Id; $r.moves = @(@($r.moves) + @($Record)); Write-BoardState $s }
 function Get-StoredWkr($Id) { $s = Read-BoardState; $k = "$Id"; if ($s.ContainsKey($k)) { $s[$k].wkr } else { $null } }
 function Set-StoredWkr($Id, [string]$Wkr) { $s = Read-BoardState; (Get-ItemRecord $s $Id).wkr = $Wkr; Write-BoardState $s }
+function Get-StoredWorktree($Id) { $s = Read-BoardState; $k = "$Id"; if ($s.ContainsKey($k)) { $s[$k]['worktree'] } else { $null } }
+function Set-StoredWorktree($Id, [string]$Path) { $s = Read-BoardState; $r = Get-ItemRecord $s $Id; if ($r['worktree'] -ne $Path) { $r['worktree'] = $Path; Write-BoardState $s } }
 
 function Get-ItemMoves($Item) {
     $fromComments = @($Item.comments | ForEach-Object {
@@ -316,7 +327,10 @@ function Get-StateSince($Item) {
 }
 
 function Get-LastActivity($Item, [string]$Root = '.') {
-    $times = @(Get-StateSince $Item) + @($Item.comments | ForEach-Object { [datetime]$_.at })
+    # A restart counts as activity, so a restarted worker gets a full hang window (it does not reset the time in state).
+    $restarts = @(Get-ItemMoves $Item | Where-Object { $_['restart'] } | ForEach-Object { [datetime]$_.at })
+    $times = @(Get-StateSince $Item) + @($Item.comments | ForEach-Object { [datetime]$_.at }) + $restarts
+    $Root = Get-ItemRoot $Item $Root
     $wkr = Join-Path $Root ".specify/wkr/$($Item.id).md"
     if (Test-Path $wkr) {
         $times += (Get-Item $wkr).LastWriteTimeUtc
@@ -332,6 +346,7 @@ function Get-LastActivity($Item, [string]$Root = '.') {
 function Test-Check {
     param($Check, $Item, [string]$Evidence, $Adapter, [string]$Root = '.', [switch]$SkipScripts, $Config)
     if ($Check.ContainsKey('types') -and $Check.types -and ($Item.type -notin $Check.types)) { return $null }
+    $Root = Get-ItemRoot $Item $Root
     if ($Check.ContainsKey('source') -and $Check.source -eq 'wkr') {
         $wkr = Join-Path $Root ".specify/wkr/$($Item.id).md"
         $Evidence = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
@@ -667,4 +682,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SpecApprovalProblem, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
