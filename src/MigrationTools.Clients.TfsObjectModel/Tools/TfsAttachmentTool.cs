@@ -11,6 +11,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Proxy;
 using MigrationTools.DataContracts;
 using MigrationTools.Processors;
 using MigrationTools.Processors.Infrastructure;
+using MigrationTools.Services;
 using MigrationTools.Tools.Infrastructure;
 
 namespace MigrationTools.Tools
@@ -96,6 +97,10 @@ namespace MigrationTools.Tools
                 catch (Exception ex)
                 {
                     Log.LogError(ex, "AttachmentMigrationEnricher:Unable to process atachment from source wi {SourceWorkItemId} called {AttachmentName}", source.ToWorkItem().Id, wia.Name);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.AttachmentNotMigrated,
+                        $"Attachment '{wia.Name}' could not be migrated: {ex.Message}",
+                        "Download the attachment from the source work item and attach it to the target work item.",
+                        sourceId: source.ToWorkItem().Id.ToString());
                     Telemetry.TrackException(ex, null);
                 }
             }
@@ -142,6 +147,9 @@ namespace MigrationTools.Tools
                 {
                     Log.LogError(ex, "Exception downloading attachements");
                     Telemetry.TrackException(ex, null);
+                    Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.AttachmentNotMigrated,
+                        $"Attachment '{wia.Name}' could not be downloaded from the source: {ex.Message}",
+                        "Download the attachment from the source work item and attach it to the target work item, or re-run.");
                     return null;
                 }
             }
@@ -189,6 +197,10 @@ namespace MigrationTools.Tools
             else
             {
                 Log.LogWarning(" [SKIP] Attachment {filename} on Work Item {targetWorkItemId} is bigger than the limit of {maxAttachmentSize} bites for Azure DevOps.", filename, targetWorkItem.Id, Options.MaxAttachmentSize);
+                Services.GetService<WorkItemReviewLog>()?.Record(WorkItemReviewCategory.AttachmentNotMigrated,
+                    $"Attachment '{filename}' is bigger than MaxAttachmentSize ({Options.MaxAttachmentSize} bytes) and was not migrated.",
+                    "Store the file elsewhere and link it from the target work item, or raise MaxAttachmentSize if the target allows it and re-run.",
+                    targetId: targetWorkItem.Id.ToString());
             }
         }
 

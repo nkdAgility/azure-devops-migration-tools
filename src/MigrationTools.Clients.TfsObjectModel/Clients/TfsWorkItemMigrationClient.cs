@@ -11,6 +11,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using MigrationTools._EngineV1.DataContracts;
 using MigrationTools.DataContracts;
 using MigrationTools.Endpoints;
+using MigrationTools.Processors;
 using MigrationTools.Services;
 using Serilog;
 
@@ -72,9 +73,144 @@ namespace MigrationTools.Clients
             }
         }
 
+        private ReflectedWorkItemIdMap _reflectedIdMap;
+
+        /// <summary>The map loaded by <see cref="LoadReflectedWorkItemIdMap"/>, or null when it has not been loaded.</summary>
+        public ReflectedWorkItemIdMap ReflectedIdMap => _reflectedIdMap;
+
+        /// <summary>
+        /// Reads the reflected work item ID of every target work item with one WIQL query per field (#3299). From then on a
+        /// reflected item is loaded by id and an item missing from the map is known not to be in the target, with no query.
+        /// </summary>
+        public ReflectedWorkItemIdMap LoadReflectedWorkItemIdMap()
+        {
+            using (var activity = ActivitySourceProvider.ActivitySource.StartActivity("LoadReflectedWorkItemIdMap", ActivityKind.Client))
+            {
+                var map = new ReflectedWorkItemIdMap();
+                try
+                {
+                    if (CollectionHasConfiguredField)
+                    {
+                        AddToMap(map, Options.ReflectedWorkItemIdField, null);
+                    }
+                    if (!string.Equals(Options.ReflectedWorkItemIdField, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var types = string.Join(", ", NonCustomisableWorkItemTypes.Types.Select(t => "'" + t.Replace("'", "''") + "'"));
+                        AddToMap(map, NonCustomisableWorkItemTypes.ReflectedWorkItemIdField, $"[System.WorkItemType] IN ({types})");
+                    }
+                }
+                catch (Exception ex) when (ex is not MigrationRunStoppedException)
+                {
+                    // The map only saves queries, so a failure to load it must not stop the run.
+                    map.MarkIncomplete();
+                    Log.Warning("The map of migrated work items could not be loaded, so every work item is looked up one by one: {Reason}", WorkItemMigrationFailedException.ServerReason(ex));
+                    Log.Debug(ex, "LoadReflectedWorkItemIdMap failed");
+                }
+                _reflectedIdMap = map;
+                activity?.SetTag("ReflectedWorkItemIds", map.Count);
+                return map;
+            }
+        }
+
+        private void AddToMap(ReflectedWorkItemIdMap map, string field, string extraCondition)
+        {
+            var query = new StringBuilder($"SELECT [System.Id], [{field}] FROM WorkItems WHERE [{field}] <> ''");
+            var parameters = new Dictionary<string, string>();
+            if (!Options.AllowCrossProjectLinking)
+            {
+                query.Append(" AND [System.TeamProject] = @TeamProject");
+                parameters["TeamProject"] = Options.Project;
+            }
+            if (extraCondition != null)
+            {
+                query.Append(" AND ").Append(extraCondition);
+            }
+            // Azure DevOps truncates a query at 20,000 items without an error, so the load is split into id ranges that
+            // can never hold that many. The highest id comes first in a descending query, even a truncated one.
+            Log.Debug("LoadReflectedWorkItemIdMap: {Query}", query);
+            var newest = Store.Query(query + " ORDER BY [System.Id] DESC", parameters);
+            if (newest.Count == 0)
+            {
+                return;
+            }
+            foreach (var (from, to) in ReflectedWorkItemIdMap.IdRanges(newest[0].Id, IdRangeWidth))
+            {
+                var items = Store.Query($"{query} AND [System.Id] >= {from} AND [System.Id] <= {to}", parameters);
+                if (items.Count >= IncompleteMapThreshold)
+                {
+                    map.MarkIncomplete();
+                    Log.Warning("{Count} target work items with a value in {Field} between ids {From} and {To}, close to the 20,000 item query limit: every work item is looked up one by one.", items.Count, field, from, to);
+                }
+                foreach (WorkItem wi in items)
+                {
+                    try
+                    {
+                        if (wi.Fields.Contains(field))
+                        {
+                            map.Add(wi.Fields[field].Value?.ToString(), wi.Id);
+                        }
+                    }
+                    catch (Exception ex) when (ex is not MigrationRunStoppedException)
+                    {
+                        // For example TF201077 for an item in a project that is being deleted: the map cannot vouch for it.
+                        if (map.IsComplete)
+                        {
+                            Log.Warning("Target work item {Id} could not be read while loading the map of migrated work items, so every work item is looked up one by one: {Reason}", wi.Id, WorkItemMigrationFailedException.ServerReason(ex));
+                        }
+                        map.MarkIncomplete();
+                    }
+                }
+            }
+        }
+
+        /// <summary>Ids per map load query: fewer than the 20,000 item query limit, since ids are unique in a collection.</summary>
+        public const int IdRangeWidth = 15000;
+
+        /// <summary>A load query returning this many items may have been truncated at the 20,000 item limit.</summary>
+        public const int IncompleteMapThreshold = 19000;
+
+        /// <summary>
+        /// When false, a source item missing from the map is queried instead of being taken as not in the target. Set
+        /// while retrying a work item, whose earlier attempt may have saved a target item before failing.
+        /// </summary>
+        public bool MapMissesAreAuthoritative { get; set; } = true;
+
+        /// <summary>Adds a target item created or found during the run to the map.</summary>
+        public void RecordReflectedWorkItem(string reflectedWorkItemId, int targetId)
+        {
+            _reflectedIdMap?.Add(reflectedWorkItemId, targetId);
+        }
+
+        /// <summary>
+        /// Answers a lookup from the map: the target item loaded by id, or null when the map shows it is not in the target.
+        /// Returns false when there is no map or it cannot say, so the caller queries as before.
+        /// </summary>
+        private bool TryFindInMap(string refId, out WorkItemData found)
+        {
+            found = null;
+            if (_reflectedIdMap is null || _reflectedIdMap.MustQuery(refId))
+            {
+                return false;
+            }
+            if (!_reflectedIdMap.TryGetTargetId(refId, out _) && !MapMissesAreAuthoritative)
+            {
+                return false;
+            }
+            if (_reflectedIdMap.TryGetTargetId(refId, out var targetId))
+            {
+                found = GetWorkItemIfExists(targetId);
+                return found is not null;
+            }
+            return true;
+        }
+
         public override WorkItemData FindReflectedWorkItem(WorkItemData workItemToReflect, bool cache)
         {
             TfsReflectedWorkItemId ReflectedWorkItemId = new TfsReflectedWorkItemId(workItemToReflect);
+            if (TryFindInMap(ReflectedWorkItemId.ToString(), out var mapped))
+            {
+                return mapped;
+            }
             WorkItem found = GetFromCache(ReflectedWorkItemId)?.ToWorkItem();
             if (found == null)
             {
@@ -94,6 +230,10 @@ namespace MigrationTools.Clients
 
         public override WorkItemData FindReflectedWorkItemByReflectedWorkItemId(string refId)
         {
+            if (TryFindInMap(refId, out var mapped))
+            {
+                return mapped;
+            }
             if (!CollectionHasConfiguredField)
             {
                 return FindInNonCustomisableTypes(refId);
@@ -334,6 +474,10 @@ namespace MigrationTools.Clients
             {
                 activity?.SetTagsFromOptions(Options);
                 activity?.SetTag("ReflectedWorkItemId", refId);
+                if (TryFindInMap(refId.ToString(), out var mapped))
+                {
+                    return mapped;
+                }
                 var foundWorkItem = GetFromCache(refId);
                 if (foundWorkItem is null)
                 {
@@ -410,6 +554,13 @@ namespace MigrationTools.Clients
                         }
                     }
 
+                }
+                catch (MigrationRunStoppedException)
+                {
+                    // Already a readable reason (for example a sign-in failure); wrapping it would bury it under a stack trace.
+                    activity?.Stop();
+                    activity?.SetStatus(ActivityStatusCode.Error);
+                    throw;
                 }
                 catch (Exception ex)
                 {

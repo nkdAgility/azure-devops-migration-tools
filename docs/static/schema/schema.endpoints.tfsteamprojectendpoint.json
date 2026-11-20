@@ -52,6 +52,68 @@
             "string",
             "null"
           ]
+        },
+        "EntraId": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "Credential": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "TenantId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "ClientId": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "CertificateThumbprint": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "CertificatePath": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "CertificatePassword": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "ClientSecret": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "LoginHint": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "AuthenticationRecordPath": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
         }
       }
     },

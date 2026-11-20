@@ -83,6 +83,8 @@ namespace MigrationTools.Processors
 
         public WorkItemMetrics workItemMetrics { get; private set; }
 
+        private readonly WorkItemReviewLog _reviewLog;
+
         public TfsWorkItemMigrationProcessor(
             IOptions<TfsWorkItemMigrationProcessorOptions> options,
             TfsCommonTools tfsCommonTools,
@@ -94,6 +96,7 @@ namespace MigrationTools.Processors
         {
             contextLog = Serilog.Log.ForContext<TfsWorkItemMigrationProcessor>();
             workItemMetrics = services.GetRequiredService<WorkItemMetrics>();
+            _reviewLog = services.GetService<WorkItemReviewLog>() ?? new WorkItemReviewLog(LogLocationService.GetLogPath());
         }
 
         new TfsWorkItemMigrationProcessorOptions Options => (TfsWorkItemMigrationProcessorOptions)base.Options;
@@ -101,6 +104,10 @@ namespace MigrationTools.Processors
         new TfsTeamProjectEndpoint Source => (TfsTeamProjectEndpoint)base.Source;
 
         new TfsTeamProjectEndpoint Target => (TfsTeamProjectEndpoint)base.Target;
+
+        private TfsWorkItemMigrationClient TargetClient => (TfsWorkItemMigrationClient)Target.WorkItems;
+
+        private readonly RerunCounts _rerunCounts = new RerunCounts();
 
         internal void TraceWriteLine(LogEventLevel level, string message, Dictionary<string, object> properties = null)
         {
@@ -144,6 +151,8 @@ namespace MigrationTools.Processors
             }
 
             _itemsInError = new List<string>();
+            contextLog.Information("Work items that need review are written as they are found to {ReviewLogPath}", _reviewLog.FilePath);
+            _reviewLog.LoadEarlierRuns($"{Source.Options.Collection}{Source.Options.Project} -> {Target.Options.Collection}{Target.Options.Project}");
 
             try
             {
@@ -157,6 +166,11 @@ namespace MigrationTools.Processors
 
                 //////////////////////////////////////////////////
                 CommonTools.NodeStructure.ValidateAllNodesExistOrAreMapped(this, sourceWorkItems, Source.WorkItems.Project.Name, Target.WorkItems.Project.Name);
+                if (CommonTools.NodeStructure.Enabled)
+                {
+                    // Validation stops the run when a path is missing, so reaching here means every path was found.
+                    _reviewLog.MarkPathsValidated();
+                }
                 ValidateAllUsersExistOrAreMapped(sourceWorkItems);
                 //////////////////////////////////////////////////
 
@@ -174,9 +188,14 @@ namespace MigrationTools.Processors
                 //////////////////////////////////////////////////
 
                 sourceWorkItems = SharedItemsFirst(sourceWorkItems);
+                _reviewLog.SetItemsToMigrate(sourceWorkItems.Select(w => w.Id));
 
                 // After filtering, so the scan only covers (and only stops for) items that will be migrated.
                 ValidateRevisionHistoryFields(sourceWorkItems);
+
+                var reflectedIdMap = TargetClient.LoadReflectedWorkItemIdMap();
+                contextLog.Information("Found {MigratedCount} work items already migrated to the target ({AmbiguousCount} source items with more than one target item are looked up one by one).",
+                    reflectedIdMap.Count, reflectedIdMap.AmbiguousCount);
 
                 _current = 1;
                 _count = sourceWorkItems.Count;
@@ -196,10 +215,14 @@ namespace MigrationTools.Processors
                     using (LogContext.PushProperty("sourceWorkItemId", sourceWorkItem.Id))
                     using (LogContext.PushProperty("sourceRevisionInt", sourceWorkItem.Revision))
                     using (LogContext.PushProperty("targetWorkItemId", null))
+                    using (_reviewLog.BeginItem(sourceWorkItem.Id.ToString(), sourceWorkItem.Type?.Name, sourceWorkItem.Revision))
                     {
                         try
                         {
+                            _rerunCounts.Begin();
                             ProcessWorkItemAsync(sourceWorkItemData, progressTimer, Options.WorkItemCreateRetryLimit).Wait();
+                            _rerunCounts.Succeeded();
+                            _reviewLog.CompleteCurrentItem();
 
                             stopwatch.Stop();
                             var processingTime = stopwatch.Elapsed.TotalMilliseconds;
@@ -225,10 +248,12 @@ namespace MigrationTools.Processors
                                 ExceptionDispatchInfo.Capture(stop).Throw();
                             }
                             _itemsInError.Add(sourceWorkItem.Id.ToString());
+                            _rerunCounts.Fail();
                             var failure = (e as AggregateException)?.Flatten().InnerExceptions.OfType<WorkItemMigrationFailedException>().FirstOrDefault()
                                 ?? e as WorkItemMigrationFailedException;
                             var message = failure?.Message ?? WorkItemMigrationFailedException.Describe(sourceWorkItem.Id.ToString(), null, null, sourceWorkItem.Type?.Name, e);
                             workItemLog.Error("{FailureMessage}", message);
+                            RecordItemFailure(message);
                             Log.LogDebug(e, "Details for source work item {WorkItemId}", sourceWorkItem.Id);
 
                             if (Options.StopOnFirstError)
@@ -248,9 +273,13 @@ namespace MigrationTools.Processors
             finally
             {
                 LogMissingTargetFieldSummary();
+                contextLog.Information("Work items: {RunSummary}.", _rerunCounts.ToString());
                 CommonTools.ExportWorkItemMapping.SaveMappings();
                 CommonTools.EmbededImages?.ProcessorExecutionEnd(this);
                 CommonTools.GitRepository?.LogUnresolvedSummary();
+                _reviewLog.FlushHeldEntries();
+                _reviewLog.LogSummary(Log);
+                _reviewLog.WriteLatestView();
 
                 if (_itemsInError.Count > 0)
                 {
@@ -391,7 +420,7 @@ namespace MigrationTools.Processors
             }
             try
             {
-                var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token));
+                var connection = new VssConnection(Target.Options.Collection, Target.Options.Authentication.CreateRestCredentials());
                 var project = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
                     .GetProject(Target.Options.Project).Result;
                 var properties = connection.GetClient<Microsoft.TeamFoundation.Core.WebApi.ProjectHttpClient>()
@@ -473,6 +502,7 @@ namespace MigrationTools.Processors
                         + "in the target. This will not cause any errors, but may result in disconnected users that could have "
                         + "been mapped. Use the ExportUsersForMapping processor to create a list of mappable users.",
                         usersToMap.IdentityMap.Count);
+                    CommonTools.UserMapping.SetUsersMissingInTarget(usersToMap.IdentityMap);
                 }
             }
             var userMapping = CommonTools.UserMapping;
@@ -513,7 +543,7 @@ namespace MigrationTools.Processors
                 // Test that
                 if (token.IsNullOrEmpty())
                 {
-                    Log.LogError("When you are migrating to Azure DevOps you MUST provide an PAT so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
+                    Log.LogError("When you are migrating to Azure DevOps you MUST use a PAT or Microsoft Entra ID (AuthenticationMode EntraId) on the Target so that we can call the REST API for certain actions. For example we would be unable to deal with a Work item Type change.");
                     throw new MigrationRunStoppedException("Missing PersonalAccessToken from Target.");
                 }
             }
@@ -545,7 +575,7 @@ namespace MigrationTools.Processors
                     string token = Target.Options.Authentication?.ResolveAccessToken();
                     if (!string.IsNullOrEmpty(token))
                     {
-                        using (var connection = new VssConnection(Target.Options.Collection, new VssBasicCredential(string.Empty, token)))
+                        using (var connection = new VssConnection(Target.Options.Collection, Target.Options.Authentication.CreateRestCredentials()))
                         using (var client = connection.GetClient<WorkItemTrackingHttpClient>())
                         {
                             var wit = client.GetWorkItemTypeAsync(Target.Options.Project, typeName).GetAwaiter().GetResult();
@@ -647,6 +677,31 @@ namespace MigrationTools.Processors
         /// in historical revisions (e.g. items moved from another project or process) are not caught up front (#3173).
         /// The first occurrence is logged prominently and a summary is produced at the end of the run.
         /// </summary>
+        private void RecordItemFailure(string message)
+        {
+            _reviewLog.ItemNotMigrated(_reviewLog.CurrentSourceId);
+            if (_reviewLog.CurrentItemHas(WorkItemReviewCategory.RerunMismatch))
+            {
+                return;
+            }
+            var targetId = _reviewLog.CurrentTargetId;
+            if (string.IsNullOrEmpty(targetId) || targetId == "0")
+            {
+                _reviewLog.Record(WorkItemReviewCategory.Failed, message,
+                    "Fix the cause given in the reason, then re-run; the item was not created in the target.");
+            }
+            else if (_reviewLog.CurrentItemReplayedRevisions)
+            {
+                _reviewLog.Record(WorkItemReviewCategory.PartMigrated, message,
+                    "Fix the cause given in the reason, then re-run; the target item exists but is missing the revisions from the one that failed.");
+            }
+            else
+            {
+                _reviewLog.Record(WorkItemReviewCategory.UpdateFailed, message,
+                    "Fix the cause given in the reason, then re-run; the target item has every revision, but its attachments, links or other updates may be incomplete.");
+            }
+        }
+
         private void RecordMissingTargetField(string sourceType, string targetType, string fieldReferenceName, string sourceWorkItemId, int sourceRevision)
         {
             // Field maps are applied later in the revision replay; a field they consume is not dropped.
@@ -654,6 +709,10 @@ namespace MigrationTools.Processors
             {
                 return;
             }
+            _reviewLog.Record(WorkItemReviewCategory.FieldNotMapped,
+                $"Field '{fieldReferenceName}' has data on source type '{sourceType}' but does not exist on target type '{targetType}'; the value was not migrated.",
+                $"Add '{fieldReferenceName}' to '{targetType}' in the target process, or map it with a field map, then re-run.",
+                sourceId: sourceWorkItemId);
             if (_missingTargetFields.Record(sourceType, targetType, fieldReferenceName, sourceWorkItemId, sourceRevision))
             {
                 Log.LogWarning("Field '{MissingField}' has data in source revisions of type '{SourceType}' but does not exist on target type '{TargetType}'. "
@@ -748,7 +807,7 @@ namespace MigrationTools.Processors
                     {
                         case FieldType.String:
                             string oldValue = sourceFieldValue?.ToString();
-                            string newValue = CommonTools.StringManipulator.ProcessString(oldValue);
+                            string newValue = CommonTools.StringManipulator.ProcessString(oldValue, f.ReferenceName);
                             newWorkItem.Fields[f.ReferenceName].Value = newValue;
                             break;
                         default:
@@ -806,6 +865,7 @@ namespace MigrationTools.Processors
         {
             if (targetWorkItem != null && Options.FixHtmlAttachmentLinks)
             {
+                _reviewLog.MarkChecked(WorkItemReviewCategory.EmbeddedImageNotMigrated);
                 CommonTools.EmbededImages.FixEmbededImages(this, targetWorkItem);
             }
         }
@@ -838,6 +898,7 @@ namespace MigrationTools.Processors
                 {
                     if (sourceWorkItem.Type != "Test Plan" && sourceWorkItem.Type != "Test Suite")
                     {
+                        List<(string Field, object Expected, bool IsIdentity)> stampCorrection = null;
                         workItemMetrics.RevisionsPerWorkItem.Record(sourceWorkItem.Rev);
                         var targetWorkItem = Target.WorkItems.FindReflectedWorkItem(sourceWorkItem, false);
                         ///////////////////////////////////////////////
@@ -849,29 +910,76 @@ namespace MigrationTools.Processors
                         List<RevisionItem> revisionsToMigrate =CommonTools.RevisionManager.GetRevisionsToMigrate(sourceWorkItem.Revisions.Values.ToList(), targetWorkItem?.Revisions.Values.ToList());
                         if (targetWorkItem == null)
                         {
+                            // A new target has no earlier revisions that could differ from the source.
+                            _reviewLog.MarkChecked(WorkItemReviewCategory.RerunMismatch);
+                            _rerunCounts.Set(RerunCounts.Outcome.Created);
                             targetWorkItem = ReplayRevisions(revisionsToMigrate, sourceWorkItem, null);
                             activity?.SetTag("Revisions", revisionsToMigrate.Count);
 
                         }
                         else
                         {
-                            // A rerun never treats a wrongly saved revision as migrated (#3270).
-                            VerifyMigratedRevisions(sourceWorkItem, targetWorkItem);
-                            if (revisionsToMigrate.Count == 0)
+                            // A rerun never treats a wrongly saved revision as migrated (#3270), and corrects the
+                            // current values of a target an earlier run saved with empty state-stamped values (#3305).
+                            // The source is read again only when a value needs a second read, so an in-sync re-run stays fast (#3299).
+                            var sourceStamps = new Lazy<SourceStateStampedValues>(() => ReadSourceStateStampedValues(sourceWorkItem));
+                            bool correctStamps;
+                            _reviewLog.SetCurrentItem(targetId: targetWorkItem.Id);
+                            try
                             {
+                                correctStamps = VerifyMigratedRevisions(sourceWorkItem, targetWorkItem, sourceStamps);
+                                _reviewLog.MarkChecked(WorkItemReviewCategory.RerunMismatch);
+                            }
+                            catch (InvalidOperationException mismatch)
+                            {
+                                _reviewLog.Record(WorkItemReviewCategory.RerunMismatch, mismatch.Message,
+                                    "Compare the target work item with the source, correct or delete the target item, then re-run.");
+                                throw;
+                            }
+                            var difference = revisionsToMigrate.Count == 0 ? FindReRunDifference(sourceWorkItem, targetWorkItem) : null;
+                            if (revisionsToMigrate.Count == 0 && correctStamps)
+                            {
+                                difference = (difference == null ? "" : difference + "; ") + "current state-stamped values are empty where the source has them";
+                            }
+                            if (revisionsToMigrate.Count == 0 && difference == null)
+                            {
+                                // In sync (#3299): no enrichers, link lookups, field maps or save.
+                                _rerunCounts.Set(RerunCounts.Outcome.InSync);
+                                TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and is in sync: revisions, fields and links match the source");
+                                activity?.SetTag("Revisions", 0);
+                            }
+                            else if (revisionsToMigrate.Count == 0)
+                            {
+                                _rerunCounts.Set(RerunCounts.Outcome.Updated);
+                                TraceWriteLine(LogEventLevel.Information, "Work item exists with no revisions to sync, but the target differs: {Difference}",
+                                    new Dictionary<string, object>() { { "Difference", difference } });
                                 ProcessWorkItemAttachments(sourceWorkItem, targetWorkItem, false);
+                                CommonTools.WorkItemLink.OtherWorkItemsSaved = 0;
                                 ProcessWorkItemLinks(sourceWorkItem, targetWorkItem, true);
                                 ProcessHTMLFieldAttachements(targetWorkItem);
                                 ProcessWorkItemEmbeddedLinks(sourceWorkItem, targetWorkItem);
-                                CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                // The in-sync check may already have applied them; a field map is not always safe to run twice.
+                                if (!_fieldMapsAppliedToTarget)
+                                {
+                                    CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+                                }
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
+                                // After field maps and enrichers, as in revision replay, so nothing can overwrite the correction (#3305).
+                                if (correctStamps)
+                                {
+                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps.Value);
+                                }
                                 StampCatchUpSave(targetWorkItem);
-                                TraceWriteLine(LogEventLevel.Information, "Skipping as work item exists and no revisions to sync detected");
+                                if (!targetWorkItem.ToWorkItem().IsDirty && CommonTools.WorkItemLink.OtherWorkItemsSaved == 0)
+                                {
+                                    _rerunCounts.Set(RerunCounts.Outcome.Checked);
+                                }
                                 activity?.SetTag("Revisions", 0);
                             }
                             else
                             {
+                                _rerunCounts.Set(RerunCounts.Outcome.Updated);
                                 TraceWriteLine(LogEventLevel.Information, "Syncing as there are {revisionsToMigrateCount} revisions detected",
                                     new Dictionary<string, object>(){
                                     { "revisionsToMigrateCount", revisionsToMigrate.Count }
@@ -888,11 +996,23 @@ namespace MigrationTools.Processors
                                 EnsureMigrationHyperlink(sourceWorkItem, targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                             }
                             targetWorkItem.SaveToAzureDevOps();
+                            if (stampCorrection != null)
+                            {
+                                var corrected = targetWorkItem.ToWorkItem();
+                                VerifyStateStampedFieldsSaved(corrected.Rev, f => corrected.Fields[f].Value, stampCorrection);
+                                VerifyStateStampedValuesStored(targetWorkItem, new List<(int, int, List<(string Field, object Expected, bool IsIdentity)>)> { (corrected.Rev, sourceWorkItem.Rev, stampCorrection) });
+                                Log.LogInformation("Target work item {TargetId}: current state-stamped values set to the source values.", corrected.Id);
+                            }
                         }
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (targetWorkItem != null)
                         {
-                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);                            targetWorkItem.ToWorkItem().Close();
+                            CommonTools.ExportWorkItemMapping.AddMapping(sourceWorkItem.Id, targetWorkItem.Id);
+                            if (int.TryParse(targetWorkItem.Id, out var savedTargetId) && savedTargetId > 0)
+                            {
+                                TargetClient.RecordReflectedWorkItem(Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString(), savedTargetId);
+                            }
+                            targetWorkItem.ToWorkItem().Close();
                         }
                         if (sourceWorkItem != null)
                         {
@@ -901,6 +1021,10 @@ namespace MigrationTools.Processors
                     }
                     else
                     {
+                        _reviewLog.Record(WorkItemReviewCategory.Skipped,
+                            $"{sourceWorkItem.Type} work items are not migrated by the work item processor.",
+                            "Migrate it with TfsTestPlansAndSuitesMigrationProcessor after all Test Cases are migrated.");
+                        _reviewLog.ItemNotMigrated(sourceWorkItem.Id);
                         TraceWriteLine(LogEventLevel.Warning, "SKIP: Unable to migrate {sourceWorkItemTypeName}/{sourceWorkItemId}. Use the TestPlansAndSuitesMigrationContext after you have migrated all Test Cases. ",
                             new Dictionary<string, object>() {
                             {"sourceWorkItemTypeName", sourceWorkItem.Type },
@@ -925,7 +1049,16 @@ namespace MigrationTools.Processors
                             {"Retrys", retries },
                             {"RetryLimit", retryLimit }
                             });
-                        await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
+                        // The failed attempt may have saved a target item the map does not know about, so query for it.
+                        TargetClient.MapMissesAreAuthoritative = false;
+                        try
+                        {
+                            await ProcessWorkItemAsync(sourceWorkItem, progressTimer, retryLimit, retries);
+                        }
+                        finally
+                        {
+                            TargetClient.MapMissesAreAuthoritative = true;
+                        }
                     }
                     else
                     {
@@ -959,8 +1092,69 @@ namespace MigrationTools.Processors
             }
         }
 
+        /// <summary>
+        /// What an already migrated target with no revisions to replay lacks, from the loaded items only (#3299).
+        /// </summary>
+        /// <returns>A description of the difference, or null when the target is in sync and needs no work.</returns>
+        private string FindReRunDifference(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            _fieldMapsAppliedToTarget = false;
+            if (sourceWorkItem.Type == "Test Case")
+            {
+                return "test case shared steps and parameters are always checked";
+            }
+            var source = sourceWorkItem.ToWorkItem();
+            if (CommonTools.WorkItemLink.Enabled && source.Links.Count > 0)
+            {
+                var missingLink = CommonTools.WorkItemLink.FindMissingLink(this, sourceWorkItem, targetWorkItem, TargetClient.ReflectedIdMap);
+                if (missingLink != null)
+                {
+                    return "missing " + missingLink;
+                }
+            }
+            if (CommonTools.Attachment.Enabled && source.Attachments.Count > 0)
+            {
+                var missingAttachment = AttachmentDiff.FirstMissing(
+                    source.Attachments.Cast<Attachment>().Select(a => (a.Name, a.Length)),
+                    targetWorkItem.ToWorkItem().Attachments.Cast<Attachment>().Select(a => (a.Name, a.Length)));
+                if (missingAttachment != null)
+                {
+                    return "missing attachment " + missingAttachment;
+                }
+            }
+            return FieldMapsChangeTarget(sourceWorkItem, targetWorkItem);
+        }
+
+        /// <summary>
+        /// Runs the field maps on the loaded target in memory, so a target counts as in sync only when it already holds
+        /// the values the current field maps give it (#3299). A field map added or changed since the first run is applied.
+        /// </summary>
+        /// <returns>The fields the field maps would change, or null when they change nothing.</returns>
+        private bool _fieldMapsAppliedToTarget;
+
+        private string FieldMapsChangeTarget(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        {
+            var target = targetWorkItem.ToWorkItem();
+            CommonTools.FieldMappingTool.ApplyFieldMappings(sourceWorkItem, targetWorkItem);
+            _fieldMapsAppliedToTarget = true;
+            SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
+            if (!target.IsDirty)
+            {
+                return null;
+            }
+            // The object model marks ChangedBy and ChangedDate on every edit.
+            var changed = target.Fields.Cast<Field>()
+                .Where(f => f.IsDirty && f.ReferenceName != "System.ChangedBy" && f.ReferenceName != "System.ChangedDate")
+                .Select(f => f.ReferenceName).ToList();
+            return "field maps change " + (changed.Count > 0 ? string.Join(", ", changed) : "the work item");
+        }
+
         private void ProcessWorkItemAttachments(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool save = true)
         {
+            if (targetWorkItem != null && CommonTools.Attachment.Enabled)
+            {
+                _reviewLog.MarkChecked(WorkItemReviewCategory.AttachmentNotMigrated);
+            }
             if (targetWorkItem != null && CommonTools.Attachment.Enabled && sourceWorkItem.ToWorkItem().Attachments.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Attachemnts {SourceWorkItemAttachmentCount} | LinkMigrator:{AttachmentMigration}", new Dictionary<string, object>() { { "SourceWorkItemAttachmentCount", sourceWorkItem.ToWorkItem().Attachments.Count }, { "AttachmentMigration", CommonTools.Attachment.Enabled } });
@@ -1105,6 +1299,16 @@ namespace MigrationTools.Processors
 
         private void ProcessWorkItemLinks(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, bool inline = false)
         {
+            if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled)
+            {
+                if (sourceWorkItem.ToWorkItem().Links.Count == 0)
+                {
+                    // No source links left, so no link can still be missing; otherwise the link and git tools mark
+                    // the check when they run.
+                    _reviewLog.MarkChecked(WorkItemReviewCategory.LinkSkipped);
+                    _reviewLog.MarkChecked(WorkItemReviewCategory.LinkLeftOnSource);
+                }
+            }
             if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", CommonTools.WorkItemLink.Enabled } });
@@ -1141,6 +1345,9 @@ namespace MigrationTools.Processors
                     {
                         Log.LogWarning("Source work item {SourceId} changed type from '{FirstType}' to '{FinalType}'. Target type '{FirstTargetType}' does not exist or is disabled in the target project, so the work item will be created as '{ShellType}' instead.",
                             sourceWorkItem.Id, firstSourceType, finalSourceType, selection.FirstType, selection.ShellType);
+                        _reviewLog.Record(WorkItemReviewCategory.TypeChanged,
+                            $"Created as '{selection.ShellType}' because target type '{selection.FirstType}' (from '{firstSourceType}') does not exist or is disabled.",
+                            "Check the work item type on the target; enable or add the type, or map it, if it should differ.");
                     }
                     targetWorkItem = CreateWorkItem_Shell(Target.WorkItems.Project, sourceWorkItem, selection.ShellType);
                 }
@@ -1161,10 +1368,14 @@ namespace MigrationTools.Processors
                     previousSourceRevision = sourceWorkItem.GetRevision(previousRevisionNumber.Value);
                 }
                 var lastRevision = revisionsToMigrate.Last();
+                var sourceStamps = ReadSourceStateStampedValues(sourceWorkItem);
+                var savedStamps = new List<(int TargetRevision, int SourceRevision, List<(string Field, object Expected, bool IsIdentity)> Expected)>();
 
                 foreach (var revision in revisionsToMigrate)
                 {
                     replaying = revision;
+                    _reviewLog.SetCurrentItem(revision: revision.Number);
+                    _reviewLog.MarkRevisionReplayed(revision.Number);
                     workItemMetrics.RevisionsProcessedCount.Add(1);
                     var currentRevisionWorkItem = sourceWorkItem.GetRevision(revision.Number);
 
@@ -1180,6 +1391,9 @@ namespace MigrationTools.Processors
                     {
                         Log.LogWarning("Source work item {SourceId} revision {RevisionNumber} has type '{RevisionType}', which does not exist or is disabled in the target; keeping '{CurrentType}'.",
                             sourceWorkItem.Id, revision.Number, revisionType, targetWorkItem.Type);
+                        _reviewLog.Record(WorkItemReviewCategory.TypeChanged,
+                            $"Revision type '{revisionType}' does not exist or is disabled in the target; kept '{targetWorkItem.Type}'.",
+                            "Check the work item type on the target; enable or add the type, or map it, if it should differ.");
                     }
                     bool typeChange = (destType != targetWorkItem.Type);
 
@@ -1189,8 +1403,7 @@ namespace MigrationTools.Processors
                     {
                         ValidatePatTokenRequirement();
                         Uri collectionUri = Target.Options.Collection;
-                        string token = Target.Options.Authentication.ResolveAccessToken();
-                        VssConnection connection = new VssConnection(collectionUri, new VssBasicCredential(string.Empty, token));
+                        VssConnection connection = new VssConnection(collectionUri, Target.Options.Authentication.CreateRestCredentials());
                         WorkItemTrackingHttpClient workItemTrackingClient = connection.GetClient<WorkItemTrackingHttpClient>();
                         JsonPatchDocument patchDocument = new JsonPatchDocument();
                         DateTime changedDate = ((DateTime)currentRevisionWorkItem.Fields["System.ChangedDate"].Value).AddMilliseconds(-3);
@@ -1236,7 +1449,7 @@ namespace MigrationTools.Processors
                         }
                         );
                         // The type change commits the new state, so it must carry the source's state-stamped values too (#3270).
-                        var typeChangeStamps = GetStateStampedTargetValues(currentRevisionWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem());
+                        var typeChangeStamps = GetStateStampedTargetValues(currentRevisionWorkItem.ToWorkItem(), targetWorkItem.ToWorkItem(), sourceStamps);
                         foreach (var (field, value, _) in typeChangeStamps)
                         {
                             patchDocument.Add(new JsonPatchOperation()
@@ -1255,6 +1468,7 @@ namespace MigrationTools.Processors
                         var committed = typeChanged.Revisions[typeChanged.Revisions.Count - 1];
                         VerifyStateStampedFieldsSaved(result.Rev ?? typeChanged.Rev,
                             f => committed.Fields.Contains(f) ? committed.Fields[f].Value : null, typeChangeStamps);
+                        savedStamps.Add((result.Rev ?? typeChanged.Rev, revision.Number, typeChangeStamps));
                     }
                     PopulateWorkItem(currentRevisionWorkItem, targetWorkItem, destType);
 
@@ -1311,13 +1525,24 @@ namespace MigrationTools.Processors
                     var skipIterationRevision = SkipRevisionWithInvalidIterationPath(targetWorkItem);
                     var skipAreaRevision = SkipRevisionWithInvalidAreaPath(targetWorkItem);
 
-                    if (!skipIterationRevision && !skipAreaRevision)
+                    if (skipIterationRevision || skipAreaRevision)
+                    {
+                        var path = skipIterationRevision ? "iteration" : "area";
+                        Log.LogWarning("Revision {RevisionNumber} of source work item {SourceId} was not saved because its {PathKind} path does not exist in the target.",
+                            revision.Number, sourceWorkItem.Id, path);
+                        _reviewLog.Record(WorkItemReviewCategory.PathNotMapped,
+                            $"Revision {revision.Number} was not saved: its {path} path does not exist in the target.",
+                            "Create or map the path in the target (TfsNodeStructureTool), then re-run to add the revision.");
+                    }
+                    else
                     {
                         // Last before the save, after field maps: the save that changes state must carry the source values (#3270).
-                        var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem);
+                        var stampedFields = ApplyStateStampedFieldsFromSource(currentRevisionWorkItem, targetWorkItem, sourceStamps);
                         targetWorkItem.SaveToAzureDevOps();
                         var saved = targetWorkItem.ToWorkItem();
+                        _reviewLog.SetCurrentItem(targetId: targetWorkItem.Id);
                         VerifyStateStampedFieldsSaved(saved.Rev, f => saved.Fields[f].Value, stampedFields);
+                        savedStamps.Add((saved.Rev, revision.Number, stampedFields));
                         CommonTools.Attachment.CleanUpAfterSave();
                         if (CommonTools.WorkItemLink.Enabled && CommonTools.WorkItemLink.HasDeferredLinks)
                         {
@@ -1333,8 +1558,16 @@ namespace MigrationTools.Processors
                                {"RevisionNumber", revision.Number },
                                {"RevisionsToMigrateCount",  revisionsToMigrate.Count}
                            });
+                    // As soon as the target exists, so a retry after a later revision fails resumes it instead of creating another.
+                    if (int.TryParse(targetWorkItem.Id, out var savedId) && savedId > 0)
+                    {
+                        TargetClient.RecordReflectedWorkItem(Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString(), savedId);
+                    }
                 }
 
+                // The checks after each save read the object model's copy of the saved revision; this reads what Azure
+                // DevOps stored (#3305).
+                VerifyStateStampedValuesStored(targetWorkItem, savedStamps);
                 // Attachments, links and the migration comment were saved with the replayed revisions (#3192),
                 // so there is no extra save here with a ChangedBy/ChangedDate later than the source history.
                 CommonTools.Attachment.CleanUpAfterSave();
@@ -1401,6 +1634,95 @@ namespace MigrationTools.Processors
             return false;
         }
 
+        /// <summary>
+        /// Reads every revision of the source work item again through the object model, once per work item, so each
+        /// state-stamped value read for a revision can be checked against a second read of it (#3305). If they cannot be read, the work
+        /// item fails with the reason rather than being saved with values that cannot be checked.
+        /// </summary>
+        private SourceStateStampedValues ReadSourceStateStampedValues(WorkItemData sourceWorkItem)
+        {
+            return ReadRevisionsAgain(Source.WorkItems, int.Parse(sourceWorkItem.Id), "source");
+        }
+
+        /// <summary>
+        /// Loads the work item again from the server through the object model and returns the state-stamped values of each
+        /// of its revisions: a read independent of the one being checked. Only the object model is used, so this works
+        /// against servers without a REST API.
+        /// </summary>
+        private SourceStateStampedValues ReadRevisionsAgain(IWorkItemMigrationClient client, int id, string side)
+        {
+            var revisions = new List<(int Rev, IDictionary<string, object> Fields)>();
+            var names = new List<string> { StateStampedFields.CommonClosedDate, StateStampedFields.SystemClosedDate };
+            names.AddRange(StateStampedFields.Fields);
+            try
+            {
+                var workItem = client.GetWorkItem(id).ToWorkItem();
+                try
+                {
+                    foreach (Revision r in workItem.Revisions)
+                    {
+                        var fields = new Dictionary<string, object>();
+                        foreach (var name in names)
+                        {
+                            if (r.Fields.Contains(name)) fields[name] = r.Fields[name].Value;
+                        }
+                        revisions.Add(((int)r.Fields["System.Rev"].Value, fields));
+                    }
+                }
+                finally { workItem.Close(); }
+            }
+            catch (Exception ex) when (!(ex is MigrationRunStoppedException) && !IsTransientNetworkError(ex))
+            {
+                // No inner exception: the reported reason is the innermost message, and this one says what failed (#3305).
+                Log.LogDebug(ex, "Reading {Side} work item {Id} again failed.", side, id);
+                throw new InvalidOperationException($"the {side} revisions could not be read from Azure DevOps to check the state-stamped values: {WorkItemMigrationFailedException.ServerReason(ex)}");
+            }
+            Log.LogDebug("Read {Count} revisions of {Side} work item {Id} again to check its state-stamped values.", revisions.Count, side, id);
+            return SourceStateStampedValues.From(id, revisions);
+        }
+
+        /// <summary>
+        /// Loads the target work item again from the server after the replay and checks each revision saved in it holds
+        /// the state-stamped values it was saved with (#3305). The check after each save reads the object model's copy,
+        /// which keeps a value it sent even if Azure DevOps did not store it. Fails the work item with the revision, the
+        /// field and both values; a re-run then sets the current values (see <see cref="VerifyMigratedRevisions"/>).
+        /// </summary>
+        private void VerifyStateStampedValuesStored(WorkItemData targetWorkItem, List<(int TargetRevision, int SourceRevision, List<(string Field, object Expected, bool IsIdentity)> Expected)> saved)
+        {
+            if (saved.Count == 0) return;
+            var stored = ReadRevisionsAgain(Target.WorkItems, int.Parse(targetWorkItem.Id), "target");
+            var wrong = new List<string>();
+            var unproven = new List<string>();
+            foreach (var (targetRevision, sourceRevision, expected) in saved)
+            {
+                foreach (var (field, value, isIdentity) in expected)
+                {
+                    var actual = stored.Value(targetRevision, field);
+                    // Identities compare as accounts, as on a re-run (#3290): the same account can read back in another form.
+                    var match = SourceStateStampedValues.CompareStored(value, actual, isIdentity, TargetAccountsNamed);
+                    if (match == IdentityMatch.Different)
+                    {
+                        wrong.Add($"revision {targetRevision} (source revision {sourceRevision}) {field} reads back from the server as '{actual}' but the source is '{value}'");
+                    }
+                    else if (match == IdentityMatch.Unproven)
+                    {
+                        unproven.Add($"revision {targetRevision} {field} '{actual}' against '{value}'");
+                    }
+                }
+            }
+            if (unproven.Count > 0)
+            {
+                // As after each save and on a re-run: an identity that cannot be proven either way is named, not failed.
+                Log.LogWarning("Target work item {TargetId}: could not confirm that {Count} identity value(s) read back from the server are the account the source and user mapping give, because the account behind the display name could not be read or the name is shared: {Values}. Check these values in the target if they matter.",
+                    targetWorkItem.Id, unproven.Count, string.Join("; ", unproven.Distinct().Take(10)));
+            }
+            if (wrong.Count > 0)
+            {
+                throw new InvalidOperationException($"the target was not stored with the source's state-stamped values: {string.Join("; ", wrong.Take(10))}{(wrong.Count > 10 ? $"; and {wrong.Count - 10} more" : "")}.");
+            }
+            Log.LogDebug("Target work item {TargetId}: {Count} saved revisions hold the source's state-stamped values in Azure DevOps.", targetWorkItem.Id, saved.Count);
+        }
+
         private static string GetClosedDateField(WorkItem workItem)
         {
             return StateStampedFields.ResolveClosedDateField(
@@ -1414,7 +1736,7 @@ namespace MigrationTools.Processors
         /// has no such field, a value a field map set in this revision is kept; otherwise the field must be empty, so the
         /// service cannot leave its own stamp there unnoticed (#3270).
         /// </summary>
-        private List<(string Field, object Expected, bool IsIdentity)> GetStateStampedTargetValues(WorkItem source, WorkItem target)
+        private List<(string Field, object Expected, bool IsIdentity)> GetStateStampedTargetValues(WorkItem source, WorkItem target, SourceStateStampedValues sourceValues)
         {
             var targetFields = new List<string>();
             var closedTarget = GetClosedDateField(target);
@@ -1437,7 +1759,23 @@ namespace MigrationTools.Processors
                 }
                 else
                 {
-                    value = source.Fields[sourceField].Value;
+                    // Checked against a second read of this revision: a value could be read as empty part-way through
+                    // a long run, and the empty value was saved (#3305).
+                    string problem;
+                    try
+                    {
+                        value = SourceStateStampedValues.Reconcile(source.Fields[sourceField].Value,
+                            sourceValues.Value(source.Rev, sourceField), isIdentity, out problem);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        throw new InvalidOperationException($"the state-stamped field {sourceField} could not be read reliably: {ex.Message}.");
+                    }
+                    if (problem != null)
+                    {
+                        Log.LogWarning("Source work item {SourceId} revision {Revision} {Field}: {Problem}. Using '{Value}'.",
+                            source.Id, source.Rev, sourceField, problem, value);
+                    }
                     if (isIdentity) value = CommonTools.UserMapping.MapUserIdentityValue(targetField, value);
                 }
                 values.Add((targetField, StateStampedFields.IsEmpty(value) ? null : value, isIdentity));
@@ -1454,11 +1792,11 @@ namespace MigrationTools.Processors
         /// bypasses rules. Returns the values, checked again after the save. Throws, so the work item fails clearly, if a
         /// value cannot be set.
         /// </summary>
-        private List<(string Field, object Expected, bool IsIdentity)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem)
+        private List<(string Field, object Expected, bool IsIdentity)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem, SourceStateStampedValues sourceValues)
         {
             var source = sourceRevision.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
-            var expected = GetStateStampedTargetValues(source, target);
+            var expected = GetStateStampedTargetValues(source, target, sourceValues);
             foreach (var (targetField, value, isIdentity) in expected)
             {
                 var field = target.Fields[targetField];
@@ -1511,7 +1849,13 @@ namespace MigrationTools.Processors
         /// run or an earlier version, fails clearly here instead of being skipped as migrated. Fields the source type
         /// does not have are not compared: a field map may own them.
         /// </summary>
-        private void VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem)
+        /// <returns>
+        /// True when the only differences are state-stamped values the target has as empty where the source has one, the
+        /// fault of #3305: the caller then sets the target's current values to the source's latest ones in a catch-up
+        /// save. Azure DevOps cannot rewrite saved revisions, so the earlier revisions keep the empty value; they are
+        /// listed in a warning and no longer fail the item.
+        /// </returns>
+        private bool VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, Lazy<SourceStateStampedValues> sourceValues)
         {
             var source = sourceWorkItem.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
@@ -1528,6 +1872,9 @@ namespace MigrationTools.Processors
             fields.AddRange(StateStampedFields.Fields.Where(f => target.Fields.Contains(f)));
 
             var wrong = new List<string>();
+            var emptied = new List<string>();
+            var latestTarget = target.Revisions[target.Revisions.Count - 1];
+            var latestNeedsCorrection = false;
             var unproven = new List<string>();
             foreach (Revision tr in target.Revisions)
             {
@@ -1550,16 +1897,27 @@ namespace MigrationTools.Processors
                     var sourceField = sr.Fields.Contains(field) ? field : field == closedTarget ? GetClosedDateField(source) : null;
                     if (sourceField == null || !sr.Fields.Contains(sourceField)) continue;
                     var isIdentity = target.Fields[field].FieldDefinition.IsIdentity;
-                    var expected = sr.Fields[sourceField].Value;
-                    if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
                     var saved = tr.Fields.Contains(field) ? tr.Fields[field].Value : null;
+                    var firstRead = sr.Fields[sourceField].Value;
+                    // A second read of the source revision (#3305), only when the first read and the target disagree on
+                    // whether there is a value: both empty or both set needs nothing more, so an in-sync re-run stays fast.
+                    var expected = StateStampedFields.IsEmpty(firstRead) == StateStampedFields.IsEmpty(saved)
+                        ? firstRead
+                        : SourceStateStampedValues.Reconcile(firstRead, sourceValues.Value.Value((int)sr.Fields["System.Rev"].Value, sourceField), isIdentity, out _);
+                    if (isIdentity) expected = CommonTools.UserMapping.MapUserIdentityValue(field, expected);
                     expected = StateStampedFields.IsEmpty(expected) ? null : expected;
                     var match = isIdentity
                         ? StateStampedFields.CompareIdentity(expected, saved, TargetAccountsNamed)
                         : StateStampedFields.SameValue(expected, saved) ? IdentityMatch.Same : IdentityMatch.Different;
                     if (match == IdentityMatch.Different)
                     {
-                        wrong.Add($"revision {tr.Index + 1} {field} is '{saved}' but source revision {sr.Index + 1} is '{expected}'");
+                        var line = $"revision {tr.Index + 1} {field} is '{saved}' but source revision {sr.Index + 1} is '{expected}'";
+                        if (StateStampedFields.IsEmpty(saved))
+                        {
+                            emptied.Add(line);
+                            if (tr.Index == latestTarget.Index) latestNeedsCorrection = true;
+                        }
+                        else wrong.Add(line);
                     }
                     else if (match == IdentityMatch.Unproven)
                     {
@@ -1574,8 +1932,17 @@ namespace MigrationTools.Processors
             }
             if (wrong.Count > 0)
             {
+                wrong.AddRange(emptied);
                 throw new InvalidOperationException($"the already migrated target work item does not match the source, stamped instead of the source values: {string.Join("; ", wrong.Take(10))}{(wrong.Count > 10 ? $"; and {wrong.Count - 10} more" : "")}.");
             }
+            if (emptied.Count > 0)
+            {
+                Log.LogWarning("Target work item {TargetId} (source {SourceId}) was saved by an earlier run with empty state-stamped values where the source has them (#3305). {Action} Azure DevOps cannot change saved revisions, so its history keeps them: {Revisions}{More}",
+                    target.Id, source.Id,
+                    latestNeedsCorrection ? "Its current values are being set to the source values." : "Its current values already match the source.",
+                    string.Join("; ", emptied.Take(10)), emptied.Count > 10 ? $"; and {emptied.Count - 10} more" : "");
+            }
+            return latestNeedsCorrection;
         }
 
 
@@ -1595,7 +1962,7 @@ namespace MigrationTools.Processors
                 .ToList();
             if (wrong.Count > 0)
             {
-                throw new InvalidOperationException($"target revision {revision} was saved with values the service stamped instead of the source values: {string.Join("; ", wrong)}.");
+                throw new InvalidOperationException($"target revision {revision} was not saved with the source's state-stamped values: {string.Join("; ", wrong)}.");
             }
         }
 

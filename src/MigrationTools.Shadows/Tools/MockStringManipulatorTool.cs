@@ -8,5 +8,10 @@ namespace MigrationTools.Tools.Shadows
         {
             throw new NotImplementedException();
         }
+
+        public string? ProcessString(string? value, string? fieldName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
