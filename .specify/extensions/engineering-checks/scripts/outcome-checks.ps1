@@ -6,13 +6,20 @@
 # item, the commit and the attempt.
 $ErrorActionPreference = 'Stop'
 Remove-Item .specify/reviews/outcome-checks.md -ErrorAction SilentlyContinue
-$id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
+# Until this attempt has recorded its start on the item, the repo carries an "attempt in progress" marker, so an
+# attempt that fails before it knows its item still blocks the outcome gate (outcomeCurrent checks for it).
+New-Item -ItemType Directory -Force .specify/reviews | Out-Null
+$pending = '.specify/reviews/outcome-attempt-pending'
+"outcome checks attempt started $(Get-Date -Format o)" | Set-Content $pending -Encoding utf8
+try { $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number } catch { $id = $null }
+if (-not $id) { Write-Error '.specify/items/current.json could not be read; the attempt stays pending and blocks the outcome gate.'; exit 1 }
 $sha = git rev-parse HEAD
-if ($LASTEXITCODE -ne 0 -or -not $sha) { Write-Error 'git rev-parse HEAD failed; the commit is not known.'; exit 1 }
+if ($LASTEXITCODE -ne 0 -or -not $sha) { Write-Error 'git rev-parse HEAD failed; the attempt stays pending and blocks the outcome gate.'; exit 1 }
 $attempt = [guid]::NewGuid().ToString('N').Substring(0, 12)
 $wkr = ".specify/wkr/$id.md"
 New-Item -ItemType Directory -Force .specify/wkr | Out-Null
 Add-Content $wkr "Outcome checks started for #$id at $sha attempt ${attempt}:"
+Remove-Item $pending -ErrorAction SilentlyContinue
 $fail = { param($why) Add-Content $wkr "Outcome checks failed for #$id at $sha attempt ${attempt}: $why"; Write-Error $why -ErrorAction Continue; exit 1 }
 try {
     Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force

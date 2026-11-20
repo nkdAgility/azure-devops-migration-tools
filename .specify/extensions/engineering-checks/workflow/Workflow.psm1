@@ -169,7 +169,8 @@ function Get-OutcomeProblem([string]$Text, $Id, [string]$Head) {
     $lastStart = $marks | Where-Object { $_.Groups['kind'].Value -eq 'Outcome checks started' } | Select-Object -Last 1
     if (-not $last) { return "the last outcome check attempt for #$Id did not finish" }
     if ($last.Groups['kind'].Value -ne $pass) { return "the last outcome check attempt for #$Id failed" }
-    if ($lastStart -and $lastStart.Groups['att'].Value -ne $last.Groups['att'].Value) {
+    if (-not $lastStart) { return "the outcome check pass for #$Id has no recorded start: it is not proof of an attempt" }
+    if ($lastStart.Groups['att'].Value -ne $last.Groups['att'].Value) {
         return "the latest outcome check attempt for #$Id ($($lastStart.Groups['att'].Value)) did not finish with a pass"
     }
     if ($last.Groups['sha'].Value -ne $Head) { return "the outcome checks passed at $($last.Groups['sha'].Value), not the current commit $Head" }
@@ -282,7 +283,7 @@ function Test-Check {
         'specAgreed'      { $null -ne (Get-SpecAgreed $Evidence) }
         'outcomeCurrent'  {
             $head = if ($Check.ContainsKey('head')) { $Check.head } else { git -C $Root rev-parse HEAD 2>$null }
-            $null -eq (Get-OutcomeProblem $Evidence $Item.id "$head")
+            (-not (Test-Path (Join-Path $Root '.specify/reviews/outcome-attempt-pending'))) -and $null -eq (Get-OutcomeProblem $Evidence $Item.id "$head")
         }
         'noOpen'          { $s = Get-Section $Evidence $Check.name; $null -eq $s -or -not [regex]::IsMatch($s, '(?i)\bopen\b') }
         'noOpenQuestions' { @(Get-OpenQuestions $Evidence).Count -eq 0 }

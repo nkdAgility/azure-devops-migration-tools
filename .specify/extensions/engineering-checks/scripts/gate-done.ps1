@@ -10,6 +10,7 @@ if ($Gate -eq 'outcome') {
     Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
     $report = '.specify/reviews/outcome-checks.md'
     if (-not (Test-Path $report)) { Write-Error "$report was not written: the outcome checks have not passed."; exit 1 }
+    if (Test-Path .specify/reviews/outcome-attempt-pending) { Write-Error "an outcome check attempt did not record its start; run the outcome checks again."; exit 1 }
     $r = (Get-Content $report -Raw) -replace "`r`n", "`n"
     $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
     $wkr = ".specify/wkr/$id.md"
@@ -17,8 +18,11 @@ if ($Gate -eq 'outcome') {
     $head = git rev-parse HEAD
     # The report itself must be a pass for this item at this commit (an earlier pass on the WKR cannot stand in
     # for a report about another item), and it must close the latest attempt recorded on the WKR.
-    $problem = Get-OutcomeProblem $r $id $head
-    if (-not $problem) { $problem = Get-OutcomeProblem ($history + "`n" + $r) $id $head }
+    $own = [regex]::Match($r, '(?m)^Automated outcome checks \(all passed\) for #(\d+) at ([0-9a-f]{40}) attempt [0-9a-f]+:')
+    $problem = if (-not $own.Success) { "$report is not a pass report" }
+        elseif ($own.Groups[1].Value -ne "$id") { "$report is for #$($own.Groups[1].Value), not #$id" }
+        elseif ($own.Groups[2].Value -ne $head) { "$report is for $($own.Groups[2].Value), not the current commit $head" }
+        else { Get-OutcomeProblem ($history + "`n" + $r) $id $head }
     if ($problem) { Write-Error "$problem; run the outcome checks again."; exit 1 }
     $body = $r + "`n" + $body
 }
