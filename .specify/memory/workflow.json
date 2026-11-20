@@ -386,9 +386,9 @@
           "type": "section"
         },
         {
-          "message": "the automated outcome checks have not all passed",
-          "pattern": "(?m)^Automated outcome checks \\(all passed\\) at [0-9a-f]{40}:",
-          "type": "pattern"
+          "message": "the automated outcome checks have not all passed for this item, on this commit, in its latest attempt",
+          "source": "wkr",
+          "type": "outcomeCurrent"
         },
         {
           "message": "Outcome Done manual validation is below the minimum confidence",
@@ -407,9 +407,9 @@
           "type": "section"
         },
         {
-          "message": "the automated outcome checks have not all passed",
-          "pattern": "(?m)^Automated outcome checks \\(all passed\\) at [0-9a-f]{40}:",
-          "type": "pattern"
+          "message": "the automated outcome checks have not all passed for this item, on this commit, in its latest attempt",
+          "source": "wkr",
+          "type": "outcomeCurrent"
         },
         {
           "message": "Outcome Done manual validation is below the minimum confidence",

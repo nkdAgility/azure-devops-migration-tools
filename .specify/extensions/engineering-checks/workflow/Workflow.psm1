@@ -154,6 +154,20 @@ function Get-ItemEvidence {
     ($parts -join "`n`n") -replace "`r`n", "`n"
 }
 
+function Get-OutcomeProblem([string]$Text, $Id, [string]$Head) {
+    # Why the outcome evidence does not stand for this item now, or $null when it does. Every attempt leaves a
+    # marker: "Automated outcome checks (all passed) for #<id> at <sha> attempt <a>:" or
+    # "Outcome checks failed for #<id> at <sha> attempt <a>: <why>". The last marker for this item must be a pass
+    # at the current commit; a pass for another item, an older commit, or one followed by a failed attempt does not count.
+    $marks = @([regex]::Matches($Text, '(?m)^(?<kind>Automated outcome checks \(all passed\)|Outcome checks failed) for #(?<id>\d+) at (?<sha>[0-9a-f]{40}) attempt (?<att>[0-9a-f]+):') |
+        Where-Object { $_.Groups['id'].Value -eq "$Id" })
+    if (-not $marks) { return "no outcome check result for #$Id" }
+    $last = $marks[-1]
+    if ($last.Groups['kind'].Value -ne 'Automated outcome checks (all passed)') { return "the last outcome check attempt for #$Id failed" }
+    if ($last.Groups['sha'].Value -ne $Head) { return "the outcome checks passed at $($last.Groups['sha'].Value), not the current commit $Head" }
+    $null
+}
+
 function Get-SpecAgreed([string]$Text) {
     # Martin's own words on the last "Spec agreed:" line, or $null: at least three characters, not the stock phrase.
     $m = [regex]::Matches($Text, '(?m)^Spec agreed:[ \t]*(.*)$') | Select-Object -Last 1
@@ -250,6 +264,10 @@ function Test-Check {
         'pattern'         { [regex]::IsMatch($Evidence, $Check.pattern) }
         'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b(?!\s+findings:\s*0\s*$)') }
         'specAgreed'      { $null -ne (Get-SpecAgreed $Evidence) }
+        'outcomeCurrent'  {
+            $head = if ($Check.ContainsKey('head')) { $Check.head } else { git -C $Root rev-parse HEAD 2>$null }
+            $null -eq (Get-OutcomeProblem $Evidence $Item.id "$head")
+        }
         'noOpen'          { $s = Get-Section $Evidence $Check.name; $null -eq $s -or -not [regex]::IsMatch($s, '(?i)\bopen\b') }
         'noOpenQuestions' { @(Get-OpenQuestions $Evidence).Count -eq 0 }
         'confidence'      {
@@ -549,4 +567,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
