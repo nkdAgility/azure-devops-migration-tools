@@ -1,6 +1,6 @@
 ---
 name: speckit-engineering-checks-arch-check
-description: 'Check the plan against the repository''s architecture rules'
+description: Check the plan against the repository's architecture rules
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
   author: nkdAgility

@@ -168,7 +168,7 @@ function Get-SkillText([string]$Extension, [string]$CommandFile) {
     $t = (Get-Content $CommandFile -Raw) -replace "`r`n", "`n"
     $m = [regex]::Match($t, '(?s)\A---\n(.*?)\n---\n(.*)\z')
     $desc = [regex]::Match($m.Groups[1].Value, '(?m)^description:\s*(.+)$').Groups[1].Value.Trim().Trim('"')
-    if ($desc -match ": |'|^[\[\]{}&*!|>%@``#,?-]") { $desc = "'" + $desc.Replace("'", "''") + "'" }
+    if ($desc -match ": |^[\[\]{}&*!|>%@``#,?'""-]") { $desc = "'" + $desc.Replace("'", "''") + "'" }
     $name = "speckit-$Extension-$([IO.Path]::GetFileNameWithoutExtension($CommandFile))"
     "---`nname: $name`ndescription: $desc`ncompatibility: Requires spec-kit project structure with .specify/ directory`nmetadata:`n  author: nkdAgility`n  source: ${Extension}:commands/$(Split-Path $CommandFile -Leaf)`n---`n" + $m.Groups[2].Value
 }

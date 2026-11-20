@@ -1,6 +1,6 @@
 ---
 name: speckit-engineering-checks-define-outcome-checks
-description: 'Define the item''s outcome checks so a machine can run them against the real system'
+description: Define the item's outcome checks so a machine can run them against the real system
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
   author: nkdAgility
