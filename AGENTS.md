@@ -12,7 +12,7 @@ Unit tests are not enough for changes to migration behaviour, exit codes, valida
 
 ## Definition of done (Martin)
 
-1. Up to date with `main`. 2. Builds. 3. Tests pass. 4. A real end-to-end migration completes correctly on the test orgs. 5. Meets the architectural norms. 6. Meets the original ask. 7. Clean up anything created only for the work (scratch projects, temp worktrees, logs).
+1. Up to date with `main`. 2. Builds. 3. Tests pass. 4. A real end-to-end migration completes correctly on the test orgs. This applies to a change to the product (`src/`, `tools/`, `build/`); a change only to process or docs files has no migration to prove and skips it. 5. Meets the architectural norms. 6. Meets the original ask. 7. Clean up anything created only for the work (scratch projects, temp worktrees, logs).
 
 Then report: what was done, how it was tested, how the docs were updated (with `GenerateDocs.ps1`), confidence, and what was not done. Turn auto-merge on only when confidence is 90% or higher; otherwise make sure it is off.
 
