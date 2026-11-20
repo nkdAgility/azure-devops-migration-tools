@@ -43,6 +43,40 @@
       },
       "registered_skills": [],
       "installed_at": "2026-11-19T16:29:50.972916+00:00"
+    },
+    "bug": {
+      "version": "1.0.2",
+      "source": "local",
+      "manifest_hash": "sha256:00ec851a8e57713e9d65401e4c7fa5b4fa4a689decacb0b654ba5411c653b647",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.bug.assess",
+          "speckit.bug.fix",
+          "speckit.bug.test"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-20T01:33:12.249809+00:00"
+    },
+    "assess": {
+      "version": "1.0.2",
+      "source": "local",
+      "manifest_hash": "sha256:c446e95c0cfc9482eb794fa90d428c5da3257162515db2cebd9ae3ec534d1919",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.assess.intake",
+          "speckit.assess.research",
+          "speckit.assess.define",
+          "speckit.assess.shape",
+          "speckit.assess.decide"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-20T01:33:13.559836+00:00"
     }
   }
 }

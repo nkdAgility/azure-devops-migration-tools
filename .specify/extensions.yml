@@ -1,4 +1,6 @@
 installed:
+- assess
+- bug
 - common
 - engineering-checks
 settings:

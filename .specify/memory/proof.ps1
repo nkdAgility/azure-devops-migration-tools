@@ -14,24 +14,36 @@ New-Item -ItemType Directory -Force $work | Out-Null
 foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seed = Join-Path $d.FullName 'seed.ps1'; $assert = Join-Path $d.FullName 'assert.ps1'; $config = Join-Path $d.FullName 'config.json'
     if (-not ((Test-Path $seed) -and (Test-Path $assert) -and (Test-Path $config))) { $notCovered += $d.Name; continue }
-    $seedText = Get-Content $seed -Raw
-    $src = [regex]::Match($seedText, '\[string\]\$Src\s*=\s*"([^"]+)"').Groups[1].Value
-    $tgt = [regex]::Match($seedText, '\[string\]\$Tgt\s*=\s*"([^"]+)"').Groups[1].Value
-    if (-not $src -or -not $tgt) { $notCovered += $d.Name; continue }
-    $sSrc = "amte2e-p$RunId-$($d.Name)-src"; $sTgt = "amte2e-p$RunId-$($d.Name)-tgt"
-    $scratch += $sSrc, $sTgt
-    "== $($d.Name): $sSrc -> $sTgt"
+    # Every named resource the seed takes (projects, and processes such as Process or NoBugProcess) gets a scratch
+    # name of this run, so nothing shared is seeded or migrated into. The config is re-pointed at the same names,
+    # longest value first so that "x" is not replaced inside "x-src". Each script gets only the parameters it declares.
+    $defaults = [ordered]@{}
+    foreach ($m in [regex]::Matches((Get-Content $seed -Raw), '\[string\]\$(\w+)\s*=\s*"([^"]+)"')) { $defaults[$m.Groups[1].Value] = $m.Groups[2].Value }
+    if (-not ($defaults.Contains('Src') -and $defaults.Contains('Tgt'))) { $notCovered += $d.Name; continue }
+    $names = [ordered]@{}
+    foreach ($k in $defaults.Keys) { $names[$k] = "amte2e-p$RunId-$($d.Name)-$($k.ToLower())" }
+    $scratch += $names.Values
+    "== $($d.Name): $(($names.Keys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')"
+    $cfgText = Get-Content $config -Raw
+    foreach ($k in ($defaults.Keys | Sort-Object { $defaults[$_].Length } -Descending)) { $cfgText = $cfgText.Replace($defaults[$k], $names[$k]) }
     $cfgFile = Join-Path $work "$($d.Name).json"
-    (Get-Content $config -Raw).Replace($src, $sSrc).Replace($tgt, $sTgt) | Set-Content $cfgFile -Encoding utf8
-    pwsh -NoProfile -File $seed -Src $sSrc -Tgt $sTgt
+    $cfgText | Set-Content $cfgFile -Encoding utf8
+    $argsFor = { param($script, [hashtable]$extra = @{})
+        $declared = @([regex]::Matches((Get-Content $script -Raw), '(?m)\[\w+\]\$(\w+)') | ForEach-Object { $_.Groups[1].Value })
+        $a = @(); foreach ($k in $names.Keys) { if ($declared -contains $k) { $a += "-$k", $names[$k] } }
+        foreach ($k in $extra.Keys) { if ($declared -contains $k) { $a += "-$k", $extra[$k] } }
+        , $a }
+    $seedArgs = & $argsFor $seed
+    pwsh -NoProfile -File $seed @seedArgs
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; continue }
     pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; continue }
-    pwsh -NoProfile -File $assert -Src $sSrc -Tgt $sTgt -OutFile (Join-Path $work "$($d.Name).assert.md")
+    $assertArgs = & $argsFor $assert @{ OutFile = (Join-Path $work "$($d.Name).assert.md") }
+    pwsh -NoProfile -File $assert @assertArgs
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)" }
 }
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
-"scratch projects left for clean-up: $($scratch -join ', ')"
+"scratch projects and processes left for clean-up: $($scratch -join ', ')"
 if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"; exit 1 }
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', ')"; exit 1 }
 "all covered scenarios passed; results in $work"
