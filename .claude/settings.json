@@ -12,6 +12,19 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.specify/events.py\" speckit.engineering-checks.auto-advance post_tool_use 60",
+            "timeout": 65,
+            "__speckit_event__": true,
+            "type": "command"
+          }
+        ]
+      }
     ]
   }
 }

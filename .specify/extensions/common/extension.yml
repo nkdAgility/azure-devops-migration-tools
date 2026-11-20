@@ -32,6 +32,9 @@ provides:
     - name: speckit.common.completion-report
       file: commands/completion-report.md
       description: "What was done, how it was tested, what was not done"
+    - name: speckit.common.ask-martin
+      file: commands/ask-martin.md
+      description: "Before asking Martin anything: decide whether to ask at all, then ask so he can answer from the message alone"
 
 tags:
   - "review"

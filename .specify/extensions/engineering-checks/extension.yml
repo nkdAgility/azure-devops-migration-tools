@@ -55,11 +55,23 @@ provides:
     - name: speckit.engineering-checks.guard
       file: commands/guard.md
       description: "Blocks pushes to main and hand edits to run state"
+    - name: speckit.engineering-checks.manager
+      file: commands/manager.md
+      description: "Be this repo's MANAGER: run the board through the Definition of Workflow and start a worker for each item it pulls"
+    - name: speckit.engineering-checks.auto-advance
+      file: commands/auto-advance.md
+      description: "Moves an item on as soon as its evidence meets the exit policy for its state"
+    - name: speckit.engineering-checks.wkr
+      file: commands/wkr.md
+      description: "Be the worker (WKR) for one item: take it through its workflow to a merged PR, asking Martin only what is his to decide"
 
 events:
   pre_tool_use:
     command: speckit.engineering-checks.guard
     timeout: 30
+  post_tool_use:
+    command: speckit.engineering-checks.auto-advance
+    timeout: 60
 
 tags:
   - "engineering"

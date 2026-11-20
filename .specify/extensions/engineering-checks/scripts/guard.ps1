@@ -172,6 +172,39 @@ while ($scopeDir -and -not (Test-Path $scopeDir)) { $scopeDir = Split-Path $scop
 $scopeRoot = if ($scopeDir) { git -C $scopeDir rev-parse --show-toplevel 2>$null } else { $null }
 if ($LASTEXITCODE -ne 0) { $scopeRoot = $null }
 $scope = if ($scopeRoot) { Get-Scope $scopeRoot } else { $null }
+
+# Product code is changed only for an item in Building, Validating or In review: an item gets there only through
+# Refining, an approved spec and the Ready gate. No item, or an item in any other state, blocks the edit.
+if ($scopeRoot -and (Test-Path (Join-Path $scopeRoot '.specify/memory/workflow.json'))) {
+    $productTargets = @()
+    $writeTargets = if ($call.tool_name -match '^(Write|Edit|MultiEdit|NotebookEdit)$') { @(if ($inputs.file_path) { [string]$inputs.file_path } elseif ($inputs.notebook_path) { [string]$inputs.notebook_path }) } elseif ($isShell) { @(Get-ShellWriteTargets $cmd) } else { @() }
+    $wf = Get-Content (Join-Path $scopeRoot '.specify/memory/workflow.json') -Raw | ConvertFrom-Json
+    $productPaths = if ($wf.PSObject.Properties['productPaths'] -and $wf.productPaths) { @($wf.productPaths) } else { @('src/') }
+    $rootFull = [IO.Path]::GetFullPath($scopeRoot).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    foreach ($t in $writeTargets) {
+        if (-not $t) { continue }
+        $full = [IO.Path]::GetFullPath($(if ([IO.Path]::IsPathRooted($t)) { $t } else { Join-Path "$($call.cwd)" $t }))
+        if (-not $full.StartsWith($rootFull, [StringComparison]::OrdinalIgnoreCase)) { continue }
+        $rel = $full.Substring($rootFull.Length).Replace('\', '/')
+        if ($productPaths | Where-Object { $p = $_.Replace('\', '/').TrimStart('/'); if ($p.EndsWith('/')) { $rel.StartsWith($p, [StringComparison]::OrdinalIgnoreCase) } else { $rel -ieq $p -or $rel.StartsWith("$p/", [StringComparison]::OrdinalIgnoreCase) } }) { $productTargets += $rel }
+    }
+    if ($productTargets) {
+        $cur = Join-Path $scopeRoot '.specify/items/current.json'
+        if (-not (Test-Path $cur)) {
+            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and this branch has no item. Product code is changed only by the worker for an item in Building, after Refining, an approved spec and the Ready gate.")
+            exit 2
+        }
+        $itemId = (Get-Content $cur -Raw | ConvertFrom-Json).number
+        Import-Module (Join-Path $scopeRoot '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
+        $wcfg = Get-WorkflowConfig -Root $scopeRoot
+        $state = (& (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId).state
+        if ($state -notin 'Building', 'Validating', 'In review') {
+            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only once the item is in Building: through Refining, Martin's approval of the spec, and the Ready gate.")
+            exit 2
+        }
+    }
+}
+
 if ($scope) {
     $outside = "This is outside the Purpose of #$($scope.id): $($scope.purpose) (paths: $($scope.paths -join ', '))."
     $how = " If the agreed spec needs it, add it to paths: in $($scope.wkr) and ask Martin to approve; otherwise record it on the item as a proposed follow-up."
