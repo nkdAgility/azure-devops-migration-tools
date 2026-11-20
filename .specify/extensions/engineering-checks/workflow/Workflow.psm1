@@ -204,7 +204,7 @@ function Get-SharedDrift([string]$Source, [string]$Target) {
     $srcExt = (Resolve-Path (Join-Path $Source 'extensions')).Path
     $root = (Resolve-Path $Target).Path.TrimEnd('\', '/')
     foreach ($f in Get-ChildItem $srcExt -Recurse -File) {
-        $rel = $f.FullName.Substring($srcExt.Length).TrimStart('\', '/')
+        $rel = $f.FullName.Substring($srcExt.Length).TrimStart('\', '/').Replace('\', '/')
         $copy = Join-Path $root ".specify/extensions/$rel"
         if (-not (Test-Path $copy)) { $drift.Add(".specify/extensions/$rel (missing)"); continue }
         if (((Get-Content $f.FullName -Raw) -replace "`r`n", "`n") -ne ((Get-Content $copy -Raw) -replace "`r`n", "`n")) { $drift.Add(".specify/extensions/$rel") }
@@ -214,6 +214,14 @@ function Get-SharedDrift([string]$Source, [string]$Target) {
             $n = "speckit-$($e.Name)-$($c.BaseName)"; $want = Get-SkillText $e.Name $c.FullName
             foreach ($p in Get-SkillCopies $root $e.Name $n) {
                 if ((((Get-Content $p -Raw) -replace "`r`n", "`n")) -ne $want) { $drift.Add($p.Substring($root.Length + 1).Replace('\', '/')) }
+            }
+            # A skills folder that holds this extension's other skills must hold this one too.
+            $folders = @(Get-ChildItem (Join-Path $root ".specify/extensions/$($e.Name)/.specify-dev/agent-commands") -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName) +
+                @(Get-ChildItem $root -Directory -Force -Filter '.*' -ErrorAction SilentlyContinue | ForEach-Object { Join-Path $_.FullName 'skills' } | Where-Object { Test-Path $_ })
+            foreach ($dir in $folders) {
+                if ((Get-ChildItem $dir -Directory -Filter "speckit-$($e.Name)-*" -ErrorAction SilentlyContinue) -and -not (Test-Path (Join-Path $dir "$n/SKILL.md"))) {
+                    $drift.Add("$((Join-Path $dir $n).Substring($root.Length + 1).Replace('\', '/'))/SKILL.md (missing)")
+                }
             }
         }
     }
