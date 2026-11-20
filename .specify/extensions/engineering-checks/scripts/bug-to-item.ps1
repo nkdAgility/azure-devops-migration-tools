@@ -9,6 +9,8 @@ if ($t -match '(?im)^\s*-\s*\*\*Verdict\*\*:\s*invalid') { Write-Error "The asse
 $rec = Join-Path $PSScriptRoot 'record.ps1'
 $rel = [IO.Path]::GetRelativePath((Get-Location), $a.FullName).Replace('\', '/')
 & $rec -Section 'Spec' -Body "Working spec: ``$rel`` (the bug assessment Martin approves)."
+# The version Martin is shown at the review gate; spec-agreed.ps1 binds his approval to exactly this.
+& $rec -Line "Spec presented: $rel sha256 $((Get-FileHash $a.FullName -Algorithm SHA256).Hash.ToLower())"
 & $rec -Section 'Reproduction' -Body (Sec 'Reproduction')
 & $rec -Section 'Cause' -Body (Sec 'Root Cause Hypothesis')
 & $rec -Section 'Proposed fix' -Body (Sec 'Proposed Remediation')

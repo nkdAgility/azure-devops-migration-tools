@@ -210,6 +210,10 @@ function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     $agreed = [regex]::Matches($Text, '(?m)^Spec agreed:') | Select-Object -Last 1
     $ver = [regex]::Matches($Text, '(?m)^Spec version:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
     if (-not $ver -or $ver.Index -lt $agreed.Index) { return "Martin's approval is not bound to a spec version (spec-agreed.ps1 records it)" }
+    # The approval must follow the latest version presented to him, and be bound to exactly that version.
+    $shown = [regex]::Matches($Text, '(?m)^Spec presented:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
+    if (-not $shown -or $shown.Index -gt $agreed.Index) { return "Martin has not approved the version last presented to him" }
+    if ($shown.Groups['h'].Value -ne $ver.Groups['h'].Value) { return "the approval is bound to a version other than the one presented to Martin" }
     $file = Join-Path $Root $ver.Groups['p'].Value
     if (-not (Test-Path $file)) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
     $now = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
