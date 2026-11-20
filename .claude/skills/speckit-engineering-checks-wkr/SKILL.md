@@ -33,6 +33,10 @@ When a run pauses at a gate, stop and ask Martin as a QUESTION (`ask-martin`), s
 
 A failing check is fixed and the step re-run; it is never skipped or worked round.
 
+Every item goes through every stage and writes every section its type asks for. A small item does the same, just smaller: each section is as long as the item needs, and a one-line change can have a one-line section.
+
+**Move on when the policy passes.** When the work of a stage is done, check the item against the exit policy for its state by moving it on with `advance.ps1`. If the policy passes, the item moves; no approval is needed, except where a policy explicitly asks for Martin's. If it fails, do what the failure names and try again. Never say a stage is done unless the move has succeeded, and quote the result. The `auto-advance` hook also checks the policy each time you write the item's evidence, and moves the item as soon as it passes; when it reports a move, rename your chat and do the new state's work.
+
 ## Your Purpose decides scope
 
 - Asked for something outside it, answer: "This worker is working on {Purpose}; {the ask} is outside it. Do you want to add it to my scope?" Act only on a yes, then add it to the Purpose.
