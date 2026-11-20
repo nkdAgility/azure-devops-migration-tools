@@ -17,13 +17,30 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     # Every named resource the seed takes (projects, and processes such as Process or NoBugProcess) gets a scratch
     # name of this run, so nothing shared is seeded or migrated into. The config is re-pointed at the same names,
     # longest value first so that "x" is not replaced inside "x-src". Each script gets only the parameters it declares.
+    # A process gets a scratch name only where the proof can stand one up: one the seed creates itself, or the shared
+    # baseline (amte2e-agile), which Initialize-E2EEnvironment.ps1 creates here in both test orgs before seeding.
+    # Any other process the seed expects to exist keeps its shared name, and the run says so.
+    $seedText = Get-Content $seed -Raw
     $defaults = [ordered]@{}
-    foreach ($m in [regex]::Matches((Get-Content $seed -Raw), '\[string\]\$(\w+)\s*=\s*"([^"]+)"')) { $defaults[$m.Groups[1].Value] = $m.Groups[2].Value }
+    foreach ($m in [regex]::Matches($seedText, '\[string\]\$(\w+)\s*=\s*"([^"]+)"')) { $defaults[$m.Groups[1].Value] = $m.Groups[2].Value }
     if (-not ($defaults.Contains('Src') -and $defaults.Contains('Tgt'))) { $notCovered += $d.Name; continue }
-    $names = [ordered]@{}
-    foreach ($k in $defaults.Keys) { $names[$k] = "amte2e-p$RunId-$($d.Name)-$($k.ToLower())" }
+    $baseline = 'amte2e-agile'
+    $names = [ordered]@{}; $initialise = @()
+    foreach ($k in @($defaults.Keys)) {
+        $scratchName = "amte2e-p$RunId-$($d.Name)-$($k.ToLower())"
+        if ($k -notmatch 'Process$') { $names[$k] = $scratchName; continue }
+        if ($seedText -match "New-E2E\w*Process[^\n]*\`$$k\b") { $names[$k] = $scratchName }
+        elseif ($defaults[$k] -eq $baseline) { $names[$k] = $scratchName; $initialise += $scratchName }
+        else { "   $k keeps the shared process $($defaults[$k]): the seed expects it to exist and the proof cannot create it"; $defaults.Remove($k) }
+    }
     $scratch += $names.Values
     "== $($d.Name): $(($names.Keys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')"
+    $initFailed = $false
+    foreach ($p in $initialise) {
+        pwsh -NoProfile -File tools/e2e/Initialize-E2EEnvironment.ps1 -Process $p
+        if ($LASTEXITCODE -ne 0) { $initFailed = $true }
+    }
+    if ($initFailed) { $failed += "$($d.Name) (creating its scratch process)"; continue }
     $cfgText = Get-Content $config -Raw
     foreach ($k in ($defaults.Keys | Sort-Object { $defaults[$_].Length } -Descending)) { $cfgText = $cfgText.Replace($defaults[$k], $names[$k]) }
     $cfgFile = Join-Path $work "$($d.Name).json"
