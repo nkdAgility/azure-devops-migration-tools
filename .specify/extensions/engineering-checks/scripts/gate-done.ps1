@@ -14,7 +14,11 @@ if ($Gate -eq 'outcome') {
     $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
     $wkr = ".specify/wkr/$id.md"
     $history = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
-    $problem = Get-OutcomeProblem ($history + "`n" + $r) $id (git rev-parse HEAD)
+    $head = git rev-parse HEAD
+    # The report itself must be a pass for this item at this commit (an earlier pass on the WKR cannot stand in
+    # for a report about another item), and it must close the latest attempt recorded on the WKR.
+    $problem = Get-OutcomeProblem $r $id $head
+    if (-not $problem) { $problem = Get-OutcomeProblem ($history + "`n" + $r) $id $head }
     if ($problem) { Write-Error "$problem; run the outcome checks again."; exit 1 }
     $body = $r + "`n" + $body
 }

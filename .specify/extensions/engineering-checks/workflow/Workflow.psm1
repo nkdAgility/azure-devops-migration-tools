@@ -159,11 +159,19 @@ function Get-OutcomeProblem([string]$Text, $Id, [string]$Head) {
     # marker: "Automated outcome checks (all passed) for #<id> at <sha> attempt <a>:" or
     # "Outcome checks failed for #<id> at <sha> attempt <a>: <why>". The last marker for this item must be a pass
     # at the current commit; a pass for another item, an older commit, or one followed by a failed attempt does not count.
-    $marks = @([regex]::Matches($Text, '(?m)^(?<kind>Automated outcome checks \(all passed\)|Outcome checks failed) for #(?<id>\d+) at (?<sha>[0-9a-f]{40}) attempt (?<att>[0-9a-f]+):') |
+    # Each attempt is also opened with "Outcome checks started for ...": the pass must close the latest started
+    # attempt, so an attempt that stopped before its result (incomplete) outranks an earlier pass.
+    $marks = @([regex]::Matches($Text, '(?m)^(?<kind>Automated outcome checks \(all passed\)|Outcome checks failed|Outcome checks started) for #(?<id>\d+) at (?<sha>[0-9a-f]{40}) attempt (?<att>[0-9a-f]+):') |
         Where-Object { $_.Groups['id'].Value -eq "$Id" })
     if (-not $marks) { return "no outcome check result for #$Id" }
-    $last = $marks[-1]
-    if ($last.Groups['kind'].Value -ne 'Automated outcome checks (all passed)') { return "the last outcome check attempt for #$Id failed" }
+    $pass = 'Automated outcome checks (all passed)'
+    $last = $marks | Where-Object { $_.Groups['kind'].Value -ne 'Outcome checks started' } | Select-Object -Last 1
+    $lastStart = $marks | Where-Object { $_.Groups['kind'].Value -eq 'Outcome checks started' } | Select-Object -Last 1
+    if (-not $last) { return "the last outcome check attempt for #$Id did not finish" }
+    if ($last.Groups['kind'].Value -ne $pass) { return "the last outcome check attempt for #$Id failed" }
+    if ($lastStart -and $lastStart.Groups['att'].Value -ne $last.Groups['att'].Value) {
+        return "the latest outcome check attempt for #$Id ($($lastStart.Groups['att'].Value)) did not finish with a pass"
+    }
     if ($last.Groups['sha'].Value -ne $Head) { return "the outcome checks passed at $($last.Groups['sha'].Value), not the current commit $Head" }
     $null
 }
