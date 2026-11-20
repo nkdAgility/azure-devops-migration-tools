@@ -1,6 +1,6 @@
 ---
 name: speckit-engineering-checks-adopt-docs
-description: 'Adoption: plan the move of this repo''s source-of-truth docs into docs/specs/'
+description: 'Adoption: plan the move of this repo''s source-of-truth docs into the repo''s spec root (specRoot in .specify/memory/workflow.json, default docs/specs/)'
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
   author: nkdAgility
@@ -13,10 +13,12 @@ Read this repo's documentation and agent files. Plan how they move into the docs
 
 ```
 docs/            for people: guides by audience; docs/adr/ for decisions
-docs/specs/      the source of truth: lexicon.md, architecture.md, rules.md, seams.md
-docs/specs/{system}/   README.md, architecture.md, rules.md, contracts.md, behaviour.md
+{specRoot}/      the source of truth: lexicon.md, architecture.md, rules.md, seams.md
+{specRoot}/{system}/   README.md, architecture.md, rules.md, contracts.md, behaviour.md
 .agents/         agent set-up only (reading order, routing, task profiles)
 ```
+
+{specRoot} is `specRoot` in `.specify/memory/workflow.json` (default `docs/specs`). Where `docs/` is a website (for example a Hugo site), nothing under it is moved or changed, and the spec root is outside it.
 
 $ARGUMENTS
 

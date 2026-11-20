@@ -300,10 +300,9 @@
       "name": "Ready",
       "checks": [
         {
-          "type": "pattern",
+          "type": "specAgreed",
           "source": "wkr",
-          "pattern": "(?m)^Spec agreed:[ \\t]*(?!approved by Martin at the review gate)\\S.{2,}$",
-          "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
+                    "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
         },
         {
           "type": "pattern",

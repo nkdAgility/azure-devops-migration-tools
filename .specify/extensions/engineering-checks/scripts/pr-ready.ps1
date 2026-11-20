@@ -37,14 +37,8 @@ if (-not $isSource) {
     }
     if (-not $src -or -not (Test-Path (Join-Path $src 'extensions'))) { $fail.Add('the shared copies cannot be checked: set NKDA_SPECKIT_SOURCE or sharedSource in .specify/memory/workflow.json') }
     else {
-        $srcExt = (Resolve-Path (Join-Path $src 'extensions')).Path
-        foreach ($f in Get-ChildItem $srcExt -Recurse -File) {
-            $rel = $f.FullName.Substring($srcExt.Length).TrimStart('\', '/')
-            $copy = Join-Path '.specify/extensions' $rel
-            if (-not (Test-Path $copy)) { $fail.Add("shared file not copied in: .specify/extensions/$rel"); continue }
-            $a = (Get-Content $f.FullName -Raw) -replace "`r`n", "`n"; $b = (Get-Content $copy -Raw) -replace "`r`n", "`n"
-            if ($a -ne $b) { $fail.Add("shared file differs from its source: .specify/extensions/$rel") }
-        }
+        Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+        foreach ($d in (Get-SharedDrift $src (Get-Location).Path)) { $fail.Add("shared file differs from its source: $d (run nkda-speckit's scripts/sync-to-repo.ps1)") }
     }
 }
 

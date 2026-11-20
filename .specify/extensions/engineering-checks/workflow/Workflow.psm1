@@ -154,6 +154,58 @@ function Get-ItemEvidence {
     ($parts -join "`n`n") -replace "`r`n", "`n"
 }
 
+function Get-SpecAgreed([string]$Text) {
+    # Martin's own words on the last "Spec agreed:" line, or $null: at least three characters, not the stock phrase.
+    $m = [regex]::Matches($Text, '(?m)^Spec agreed:[ \t]*(.*)$') | Select-Object -Last 1
+    if (-not $m) { return $null }
+    $words = $m.Groups[1].Value.Trim()
+    if ($words.Length -lt 3 -or $words -match '(?i)^approved by Martin at the review gate') { return $null }
+    $words
+}
+
+function Get-SkillText([string]$Extension, [string]$CommandFile) {
+    # The agent skill Spec Kit generates from an extension command: the same text, with the skill front matter.
+    $t = (Get-Content $CommandFile -Raw) -replace "`r`n", "`n"
+    $m = [regex]::Match($t, '(?s)\A---\n(.*?)\n---\n(.*)\z')
+    $desc = [regex]::Match($m.Groups[1].Value, '(?m)^description:\s*(.+)$').Groups[1].Value.Trim().Trim('"')
+    if ($desc -match ": |'|^[\[\]{}&*!|>%@``#,?-]") { $desc = "'" + $desc.Replace("'", "''") + "'" }
+    $name = "speckit-$Extension-$([IO.Path]::GetFileNameWithoutExtension($CommandFile))"
+    "---`nname: $name`ndescription: $desc`ncompatibility: Requires spec-kit project structure with .specify/ directory`nmetadata:`n  author: nkdAgility`n  source: ${Extension}:commands/$(Split-Path $CommandFile -Leaf)`n---`n" + $m.Groups[2].Value
+}
+
+function Get-SkillCopies([string]$Target, [string]$Extension, [string]$Name) {
+    # Every generated copy of one skill in a target repo: the extension's .specify-dev/agent-commands/<agent>/ copy,
+    # and each agent's own skills folder (a dot folder at the repo root). Copies that are links are left out.
+    $found = @(Get-ChildItem (Join-Path $Target ".specify/extensions/$Extension/.specify-dev/agent-commands") -Directory -ErrorAction SilentlyContinue |
+        ForEach-Object { Join-Path $_.FullName "$Name/SKILL.md" })
+    $found += @(Get-ChildItem $Target -Directory -Force -Filter '.*' -ErrorAction SilentlyContinue |
+        ForEach-Object { Join-Path $_.FullName "skills/$Name/SKILL.md" })
+    @($found | Where-Object { (Test-Path $_) -and -not (((Get-Content $_ -Raw) -replace "`r`n", "`n") -match '^\.\./') })
+}
+
+function Get-SharedDrift([string]$Source, [string]$Target) {
+    # Every shared file in a target repo that is missing or differs from nkda-speckit: the extensions as copied,
+    # and the skills generated from their commands.
+    $drift = [Collections.Generic.List[string]]::new()
+    $srcExt = (Resolve-Path (Join-Path $Source 'extensions')).Path
+    $root = (Resolve-Path $Target).Path.TrimEnd('\', '/')
+    foreach ($f in Get-ChildItem $srcExt -Recurse -File) {
+        $rel = $f.FullName.Substring($srcExt.Length).TrimStart('\', '/')
+        $copy = Join-Path $root ".specify/extensions/$rel"
+        if (-not (Test-Path $copy)) { $drift.Add(".specify/extensions/$rel (missing)"); continue }
+        if (((Get-Content $f.FullName -Raw) -replace "`r`n", "`n") -ne ((Get-Content $copy -Raw) -replace "`r`n", "`n")) { $drift.Add(".specify/extensions/$rel") }
+    }
+    foreach ($e in Get-ChildItem $srcExt -Directory) {
+        foreach ($c in Get-ChildItem (Join-Path $e.FullName 'commands') -Filter *.md -ErrorAction SilentlyContinue) {
+            $n = "speckit-$($e.Name)-$($c.BaseName)"; $want = Get-SkillText $e.Name $c.FullName
+            foreach ($p in Get-SkillCopies $root $e.Name $n) {
+                if ((((Get-Content $p -Raw) -replace "`r`n", "`n")) -ne $want) { $drift.Add($p.Substring($root.Length + 1).Replace('\', '/')) }
+            }
+        }
+    }
+    , $drift
+}
+
 function Get-Section([string]$Text, [string]$Name) {
     # The evidence is the body, then comments, then the WKR, so the last section with the name is the current one.
     # A section ends only at a heading of its own level or higher, so its sub-headings stay inside it.
@@ -196,7 +248,8 @@ function Test-Check {
     }
     $ok = switch ($Check.type) {
         'pattern'         { [regex]::IsMatch($Evidence, $Check.pattern) }
-        'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b') }
+        'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b(?!\s+findings:\s*0\s*$)') }
+        'specAgreed'      { $null -ne (Get-SpecAgreed $Evidence) }
         'noOpen'          { $s = Get-Section $Evidence $Check.name; $null -eq $s -or -not [regex]::IsMatch($s, '(?i)\bopen\b') }
         'noOpenQuestions' { @(Get-OpenQuestions $Evidence).Count -eq 0 }
         'confidence'      {
@@ -495,4 +548,5 @@ function Format-AttentionList($Report) {
 }
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
-    Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch
+    Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
+    Get-SpecAgreed, Get-SkillText, Get-SkillCopies, Get-SharedDrift
