@@ -151,6 +151,8 @@ function Get-ShellWriteTargets([string]$Command) {
                     if ($v -match '^(?i)-(Path|LiteralPath|FilePath|Destination)$') { continue }
                     if ($v -match '^(?i)-(Value|Encoding|ItemType|Name|NewName|Filter|Include|Exclude|InputObject|Width)$') { $skipNext = $true; continue }
                     if ($v -match '^-' -or $v -match '^\$') { continue }
+                    # Not a path: a here-string marker (@' or @"), or a token with no letters or digits in it.
+                    if ($v -match '^@|@$' -or $v -notmatch '[\w]') { continue }
                     $t.Add($v)
                 }
             }
@@ -218,7 +220,9 @@ if ($scope) {
         $full = [IO.Path]::GetFullPath($abs)
         if (-not $full.StartsWith($rootFull, [StringComparison]::OrdinalIgnoreCase)) { continue }
         $rel = $full.Substring($rootFull.Length).Replace('\', '/')
-        $own = $rel -match '^\.specify/(wkr|items|reviews)/'
+        # The workflow's own files are never outside an item's scope: its record, reviews, bug assessments,
+        # idea assessments and working spec folders.
+        $own = $rel -match '^/?(\.specify/(wkr|items|reviews|bugs|assessments)/|specs/)'
         if (-not $own -and -not ($scope.paths | Where-Object { $rel -match (ConvertTo-GlobRegex $_) })) { Write-Ask "$rel is not in the paths. $outside$how" }
     }
     $buildCmd = '(?i)\bdotnet\s+(build|test|run|publish|pack)\b|\bmsbuild\b|\bproof\.ps1\b|\bInvoke-MigrationE2E\.ps1\b|\bInvoke-Pester\b|\bnpm\s+(run|test)\b|\bBuild\.ps1\b'
