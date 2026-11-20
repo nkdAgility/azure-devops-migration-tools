@@ -17,7 +17,7 @@
       "Closed": "Done",
       "Removed": "Not planned"
     },
-    "moveComments": true
+    "moveComments": false
   },
   "categories": [
     "Proposed",
@@ -145,21 +145,14 @@
   "shifts": {
     "Proposed>Approved": {
       "name": "Decided",
-      "checks": [
-        {
-          "type": "pattern",
-          "pattern": "(?m)^Approved:\\s*\\S",
-          "message": "no 'Approved:' line with Martin's words"
-        }
-      ]
+      "checks": []
     },
     "Approved>Refining": {
       "name": "Assigned",
       "checks": [
         {
-          "type": "pattern",
-          "pattern": "(?m)^WKR:\\s*\\S",
-          "message": "no 'WKR:' line naming the WKR that manages it"
+          "type": "wkrAssigned",
+          "message": "no WKR is assigned to manage it"
         }
       ]
     },
@@ -183,6 +176,16 @@
             "Bug"
           ],
           "message": "a Bug needs a 'Reproduction' section showing it fails on main"
+        },
+        {
+          "type": "section",
+          "name": "Rubber duck",
+          "message": "no 'Rubber duck' section (the item explained plainly, and the gaps it showed)"
+        },
+        {
+          "type": "section",
+          "name": "Architecture check",
+          "message": "'Architecture check' is missing or still has open findings"
         }
       ]
     },
@@ -222,14 +225,6 @@
         },
         {
           "type": "section",
-          "name": "Rubber duck",
-          "types": [
-            "Product Backlog Item"
-          ],
-          "message": "'Rubber duck' is missing or still open"
-        },
-        {
-          "type": "section",
           "name": "Red team",
           "types": [
             "Product Backlog Item"
@@ -251,14 +246,6 @@
             "Product Backlog Item"
           ],
           "message": "'API story' is missing or still open"
-        },
-        {
-          "type": "section",
-          "name": "Architecture check",
-          "types": [
-            "Product Backlog Item"
-          ],
-          "message": "'Architecture check' is missing or still open"
         },
         {
           "type": "section",

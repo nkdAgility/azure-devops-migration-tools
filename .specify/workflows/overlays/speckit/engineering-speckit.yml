@@ -25,20 +25,6 @@ edits:
       -File .specify/reviews/challenge.md
 - insert_after: plan
   step:
-    id: nkda-arch-check
-    type: prompt
-    integration: '{{ inputs.integration }}'
-    timeout: 1800
-    prompt: 'Follow the instructions in .specify/extensions/engineering-checks/commands/arch-check.md
-      exactly. Arguments: '
-- insert_after: plan
-  step:
-    id: nkda-arch-check-clean
-    type: shell
-    run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/open-findings.ps1
-      -File .specify/reviews/arch-check.md
-- insert_after: plan
-  step:
     id: nkda-define-outcome-checks
     type: prompt
     integration: '{{ inputs.integration }}'
@@ -85,12 +71,6 @@ edits:
       integration: '{{ inputs.integration }}'
       timeout: 1800
       prompt: 'Follow the instructions in .specify/extensions/engineering-checks/commands/refactor-assessment.md
-        exactly. Arguments: none'
-    - id: nkda-rubber-duck
-      type: prompt
-      integration: '{{ inputs.integration }}'
-      timeout: 1800
-      prompt: 'Follow the instructions in .specify/extensions/engineering-checks/commands/rubber-duck.md
         exactly. Arguments: none'
 - insert_after: plan
   step:
