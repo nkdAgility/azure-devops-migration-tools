@@ -55,6 +55,12 @@ provides:
     - name: speckit.engineering-checks.guard
       file: commands/guard.md
       description: "Blocks pushes to main and hand edits to run state"
+    - name: speckit.engineering-checks.manager
+      file: commands/manager.md
+      description: "Be this repo's MANAGER: run the board through the Definition of Workflow and start a worker for each item it pulls"
+    - name: speckit.engineering-checks.wkr
+      file: commands/wkr.md
+      description: "Be the worker (WKR) for one item: take it through its workflow to a merged PR, asking Martin only what is his to decide"
 
 events:
   pre_tool_use:

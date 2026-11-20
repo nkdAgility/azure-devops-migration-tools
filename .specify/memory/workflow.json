@@ -18,7 +18,7 @@
       "Closed": "Done",
       "Removed": "Not planned"
     },
-    "moveComments": true,
+    "moveComments": false,
     "repo": "nkdAgility/azure-devops-migration-tools"
   },
   "categories": [
@@ -147,21 +147,14 @@
   "shifts": {
     "Proposed>Approved": {
       "name": "Decided",
-      "checks": [
-        {
-          "type": "pattern",
-          "pattern": "(?m)^Approved:\\s*\\S",
-          "message": "no 'Approved:' line with Martin's words"
-        }
-      ]
+      "checks": []
     },
     "Approved>Refining": {
       "name": "Assigned",
       "checks": [
         {
-          "type": "pattern",
-          "pattern": "(?m)^WKR:\\s*\\S",
-          "message": "no 'WKR:' line naming the WKR that manages it"
+          "message": "no WKR is assigned to manage it",
+          "type": "wkrAssigned"
         }
       ]
     },
@@ -302,7 +295,7 @@
         {
           "type": "specAgreed",
           "source": "wkr",
-                    "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
+          "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
         },
         {
           "type": "frontMatter",

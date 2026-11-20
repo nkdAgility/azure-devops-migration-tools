@@ -8,6 +8,7 @@ $script:MoveMarker = 'nkda-move'
 
 function Get-WorkflowConfig {
     param([string]$Root = '.')
+    $script:StoreRoot = $Root
     $repoCfg = Join-Path $Root '.specify/memory/workflow.json'
     $path = if (Test-Path $repoCfg) { $repoCfg } else { Join-Path $PSScriptRoot 'workflow.default.json' }
     $cfg = Get-Content $path -Raw | ConvertFrom-Json -AsHashtable
@@ -279,15 +280,38 @@ function Get-Section([string]$Text, [string]$Name) {
     if ($m) { $m.Groups[1].Value.Trim() } else { $null }
 }
 
+# The workflow's own records (each move, which worker owns an item, restarts) are kept in the main checkout's
+# .specify/manager/board-state.json, never on the issue: the item being in its state is the record Martin sees.
+function Get-BoardStatePath {
+    $root = if ($script:StoreRoot) { $script:StoreRoot } else { '.' }
+    $common = git -C $root rev-parse --git-common-dir 2>$null
+    $main = $root
+    if ($LASTEXITCODE -eq 0 -and $common) {
+        $abs = if ([IO.Path]::IsPathRooted($common)) { $common } else { Join-Path $root $common }
+        $main = Split-Path ([IO.Path]::GetFullPath($abs)) -Parent
+    }
+    Join-Path $main '.specify/manager/board-state.json'
+}
+function Read-BoardState { $p = Get-BoardStatePath; if (Test-Path $p) { Get-Content $p -Raw | ConvertFrom-Json -AsHashtable } else { @{} } }
+function Write-BoardState($State) { $p = Get-BoardStatePath; New-Item -ItemType Directory -Force (Split-Path $p) | Out-Null; $State | ConvertTo-Json -Depth 8 | Set-Content $p -Encoding utf8 }
+function Get-ItemRecord($State, $Id) { $k = "$Id"; if (-not $State.ContainsKey($k)) { $State[$k] = @{ moves = @(); wkr = $null } }; $State[$k] }
+function Add-StoredMove($Id, $Record) { $s = Read-BoardState; $r = Get-ItemRecord $s $Id; $r.moves = @(@($r.moves) + @($Record)); Write-BoardState $s }
+function Get-StoredWkr($Id) { $s = Read-BoardState; $k = "$Id"; if ($s.ContainsKey($k)) { $s[$k].wkr } else { $null } }
+function Set-StoredWkr($Id, [string]$Wkr) { $s = Read-BoardState; (Get-ItemRecord $s $Id).wkr = $Wkr; Write-BoardState $s }
+
 function Get-ItemMoves($Item) {
-    @($Item.comments | ForEach-Object {
+    $fromComments = @($Item.comments | ForEach-Object {
         $m = [regex]::Match("$($_.body)", "<!--\s*$script:MoveMarker\s+(\{.*?\})\s*-->")
         if ($m.Success) { $m.Groups[1].Value | ConvertFrom-Json -AsHashtable }
     })
+    $s = Read-BoardState; $k = "$($Item.id)"
+    $stored = if ($s.ContainsKey($k)) { @($s[$k].moves) } else { @() }
+    @(@($fromComments) + @($stored) | Where-Object { $_ } | Sort-Object { [datetime]$_.at })
 }
 
 function Get-StateSince($Item) {
-    $moves = Get-ItemMoves $Item | Where-Object { $_.to -eq $Item.state }
+    # A restart is not entering the state: it does not reset how long the item has waited.
+    $moves = Get-ItemMoves $Item | Where-Object { $_.to -eq $Item.state -and -not $_['restart'] }
     if ($moves) { [datetime]($moves | Select-Object -Last 1).at } else { [datetime]$Item.createdAt }
 }
 
@@ -316,6 +340,7 @@ function Test-Check {
         'pattern'         { [regex]::IsMatch($Evidence, $Check.pattern) }
         'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b(?!\s+findings:\s*0\s*$)') }
         'frontMatter'     { $fm = Get-FrontMatter $Evidence; $null -ne $fm -and $fm.Contains($Check.field) -and @($fm[$Check.field] | Where-Object { "$_".Trim().Length -ge 3 }).Count -gt 0 }
+        'wkrAssigned'     { $script:StoreRoot = $Root; [bool](Get-StoredWkr $Item.id) -or [regex]::IsMatch($Evidence, '(?m)^WKR:\s*\S') }
         'specAgreed'      { $null -eq (Get-SpecApprovalProblem $Evidence $Root) }
         'outcomeCurrent'  {
             $head = if ($Check.ContainsKey('head')) { $Check.head } else { git -C $Root rev-parse HEAD 2>$null }
@@ -419,7 +444,9 @@ function Move-WorkItem {
     $json = $record | ConvertTo-Json -Compress
     $text = "Moved from **$($item.state)** to **$To** ($($t.shift.name)): $Reason`n`n<!-- $script:MoveMarker $json -->"
     & $Adapter.SetState $item $To
-    if ($Config.board.moveComments -ne $false) { & $Adapter.AddComment $item $text }
+    Add-StoredMove $item.id $record
+    # Moves are never written on the issue unless a repo turns moveComments on.
+    if ($Config.board.moveComments -eq $true) { & $Adapter.AddComment $item $text }
     @{ ok = $true; moved = $true; from = $item.state; to = $To; shift = $t.shift.name; records = $record['records'] }
 }
 
@@ -520,7 +547,8 @@ function Invoke-AdoptionApply {
         if ($item.state -ne $p.new) {
             $rec = [ordered]@{ from = $item.state; to = $p.new; shift = 'Adopted'; at = (Get-Date).ToUniversalTime().ToString('o'); reason = "adopted from $(if ($p.old) { $p.old } else { 'no old state' })" }
             & $Adapter.SetState $item $p.new
-            & $Adapter.AddComment $item "Adopted onto the workflow in **$($p.new)** ($($rec.reason)).`n`n<!-- $script:MoveMarker $($rec | ConvertTo-Json -Compress) -->"
+            Add-StoredMove $item.id $rec
+            if ($Config.board.moveComments -eq $true) { & $Adapter.AddComment $item "Adopted onto the workflow in **$($p.new)** ($($rec.reason)).`n`n<!-- $script:MoveMarker $($rec | ConvertTo-Json -Compress) -->" }
         }
         foreach ($t in @($p.removeTags | Where-Object { $_ -notlike 'status:*' })) { & $Adapter.SetTag (& $Adapter.GetItem $p.id) $t $false }
     }
@@ -567,13 +595,16 @@ function Invoke-WorkflowManager {
         $free = if ($next.wipLimit) { $next.wipLimit - @($all | Where-Object { $_.state -eq $next.name }).Count } else { [int]::MaxValue }
         foreach ($cand in @(Get-PullOrder $Config @($all | Where-Object { $_.state -eq $w.name -and $_.tags -notcontains $blocked -and -not ($w.name -eq 'Refined' -and (Test-IsParent $_)) }))) {
             if ($free -le 0) { break }
-            if ($w.name -eq 'Approved' -and (Test-Check -Check @{ type = 'pattern'; pattern = '(?m)^WKR:\s*\S'; message = '' } -Item $cand -Evidence (Get-ItemEvidence $cand $Root) -Adapter $Adapter)) {
+            # Which worker owns an item is kept in the board state (an older "WKR:" line on the item still counts).
+            $owner = Get-StoredWkr $cand.id
+            if (-not $owner) { $legacy = [regex]::Match((Get-ItemEvidence $cand $Root), '(?m)^WKR:\s*(\S+)'); if ($legacy.Success) { $owner = $legacy.Groups[1].Value } }
+            if (-not $owner -and $cand.ContainsKey('parent') -and $cand.parent) { $owner = Get-StoredWkr $cand.parent }
+            if (-not $owner -and $w.name -eq 'Approved') {
                 $wkr = "WKR-$($cand.id)"
-                if (-not $WhatIf) { & $Adapter.AddComment $cand "WKR: $wkr" }
-                $cand = & $Adapter.GetItem $cand.id
+                if (-not $WhatIf) { Set-StoredWkr $cand.id $wkr }
                 $report.actions += @{ action = 'start-wkr'; id = $cand.id; wkr = $wkr; state = $next.name }
             }
-            else { $named = [regex]::Match((Get-ItemEvidence $cand $Root), '(?m)^WKR:\s*(\S+)'); if (-not $named.Success -and $cand.ContainsKey('parent') -and $cand.parent) { $named = [regex]::Match((Get-ItemEvidence (& $Adapter.GetItem $cand.parent) $Root), '(?m)^WKR:\s*(\S+)') }; $report.actions += @{ action = 'resume-wkr'; id = $cand.id; wkr = $named.Groups[1].Value; state = $next.name } }
+            else { $report.actions += @{ action = 'resume-wkr'; id = $cand.id; wkr = "$owner"; state = $next.name } }
             $r = Move-WorkItem -Config $Config -Id $cand.id -To $next.name -Reason "pulled from $($w.name) into a free $($next.name) slot" -Adapter $Adapter -Root $Root -WhatIf:$WhatIf
             if ($r.ok) { $report.pulls += @{ id = $cand.id; from = $w.name; to = $next.name }; $free-- }
             else { $report.attention += @{ kind = 'pull-refused'; id = $cand.id; state = $w.name; detail = ($r.failures -join '; ') } }
@@ -594,7 +625,10 @@ function Invoke-WorkflowManager {
                 $restarts = @(Get-ItemMoves $item | Where-Object { $_['restart'] }).Count
                 $s = @{ id = $item.id; state = $item.state; idleMinutes = [math]::Round($idle) }
                 $report.stuck += $s
-                if ($restarts -eq 0) { $report.actions += @{ action = 'restart-step'; id = $item.id; state = $item.state } }
+                if ($restarts -eq 0) {
+                    $report.actions += @{ action = 'restart-step'; id = $item.id; state = $item.state }
+                    if (-not $WhatIf) { Add-StoredMove $item.id ([ordered]@{ from = $item.state; to = $item.state; shift = 'Restart'; at = $Now.ToString('o'); reason = 'hung; restarted once'; restart = $true }) }
+                }
                 else { $report.attention += @{ kind = 'hung'; id = $item.id; state = $item.state; detail = 'hung again after a restart' } }
             }
         }
