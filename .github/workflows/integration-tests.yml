@@ -17,9 +17,29 @@ on:
   push:
     branches: [main]
   merge_group:
+  # A pull request runs the live tests only when it changes the product or this workflow; a change only to
+  # process or docs files has nothing for them to test. Main, the merge queue and manual runs always run them.
   pull_request:
+    paths:
+      - 'src/**'
+      - 'tools/**'
+      - 'build/**'
+      - 'MigrationTools.sln'
+      - '**/*.props'
+      - '**/*.targets'
+      - 'global.json'
+      - '.github/workflows/integration-tests.yml'
   pull_request_target:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'src/**'
+      - 'tools/**'
+      - 'build/**'
+      - 'MigrationTools.sln'
+      - '**/*.props'
+      - '**/*.targets'
+      - 'global.json'
+      - '.github/workflows/integration-tests.yml'
   workflow_dispatch:
 
 permissions:
