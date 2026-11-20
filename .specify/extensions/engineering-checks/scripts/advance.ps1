@@ -1,9 +1,9 @@
 # Moves the current item to the next state in this repo's order, through the policy check.
-param([Parameter(Mandatory)][string]$Reason, [string]$To)
+param([Parameter(Mandatory)][string]$Reason, [string]$To, [int]$Id)
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
 $cfg = Get-WorkflowConfig
-$id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
+$id = if ($Id) { $Id } else { (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number }
 if (-not $To) {
     $adapter = Get-BoardAdapter $cfg
     $item = & $adapter.GetItem $id

@@ -303,15 +303,15 @@
           "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
         },
         {
-          "type": "pattern",
+          "type": "frontMatter",
           "source": "wkr",
-          "pattern": "(?ms)^---[ \\t]*\\n(?:(?!^---).)*?^purpose:[ \\t]*\\S[^\\n]{2,}$",
+          "field": "purpose",
           "message": "no worker outcome: the WKR file's front matter needs 'purpose:' (the one outcome this worker delivers)"
         },
         {
-          "type": "pattern",
+          "type": "frontMatter",
           "source": "wkr",
-          "pattern": "(?ms)^---[ \\t]*\\n(?:(?!^---).)*?^paths:[ \\t]*\\n[ \\t]*-[ \\t]*\\S",
+          "field": "paths",
           "message": "no paths: the WKR file's front matter needs 'paths:' (what this item may edit)"
         },
         {

@@ -6,6 +6,7 @@
 # own scripts are checked instead (every .ps1 and .psm1 it changes must parse).
 param([string]$Base = 'origin/main')
 $ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [Text.Encoding]::UTF8  # git's -z paths are UTF-8
 $cfgPath = '.specify/memory/done-checks.json'
 if (-not (Test-Path $cfgPath)) { Write-Error "Missing ${cfgPath}: the repository must name its build, test and proof commands."; exit 1 }
 $cfg = Get-Content $cfgPath -Raw | ConvertFrom-Json
@@ -13,12 +14,16 @@ $cfg = Get-Content $cfgPath -Raw | ConvertFrom-Json
 $product = @('src/')
 $wf = '.specify/memory/workflow.json'
 if (Test-Path $wf) { $w = Get-Content $wf -Raw | ConvertFrom-Json; if ($w.PSObject.Properties['productPaths'] -and $w.productPaths) { $product = @($w.productPaths) } }
-$changed = foreach ($d in @(@('--name-only', "$Base...HEAD"), @('--name-only'), @('--name-only', '--cached'))) {
-    $out = @(git diff @d)
+# --no-renames lists both sides of a rename, so moving product code out of a product path still counts.
+# -z gives paths unquoted and unescaped (core.quotePath would otherwise quote a name such as src/Éxample.cs).
+$changed = foreach ($d in @(@("$Base...HEAD"), @(), @('--cached'))) {
+    $out = (git -c core.quotePath=false diff --name-only --no-renames -z @d) -join ''
     if ($LASTEXITCODE -ne 0) { Write-Error "git diff $($d -join ' ') failed; the changed files are not known."; exit 1 }
-    $out
+    $out -split "`0"
 }
-$changed = @(@($changed) + @(git ls-files --others --exclude-standard) | Where-Object { $_ } | Sort-Object -Unique)
+$untracked = (git ls-files --others --exclude-standard -z) -join ''
+if ($LASTEXITCODE -ne 0) { Write-Error 'git ls-files failed; the changed files are not known.'; exit 1 }
+$changed = @(@($changed) + @($untracked -split "`0") | Where-Object { $_ } | Sort-Object -Unique)
 $touchesProduct = $changed | Where-Object { $f = $_; $product | Where-Object { $p = $_.Replace('\', '/').TrimStart('/'); if ($p.EndsWith('/')) { $f.StartsWith($p) } else { $f -eq $p -or $f.StartsWith("$p/") } } }
 
 if (-not $touchesProduct) {

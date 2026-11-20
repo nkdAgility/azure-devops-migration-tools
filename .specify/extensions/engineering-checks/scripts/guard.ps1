@@ -68,15 +68,15 @@ function Get-Scope([string]$Root) {
     $lines = [IO.File]::ReadAllLines($wkr)
     $start = [array]::IndexOf(($lines | ForEach-Object { $_.Trim() }), '---')
     if ($start -lt 0) { return $null }
-    $purpose = ''; $paths = @(); $inPaths = $false
+    $purpose = ''; $paths = @(); $inPaths = $false; $closed = $false
     for ($i = $start + 1; $i -lt $lines.Count; $i++) {
         $l = $lines[$i]
-        if ($l.Trim() -eq '---') { break }
+        if ($l.Trim() -eq '---') { $closed = $true; break }
         if ($l -match '^purpose:\s*(?<v>.+)$') { $purpose = $Matches['v'].Trim('"', "'"); $inPaths = $false; continue }
         if ($l -match '^paths:\s*$') { $inPaths = $true; continue }
         if ($inPaths) { if ($l -match '^\s*-\s*(?<v>.+?)\s*$') { $paths += $Matches['v'].Trim('"', "'"); continue }; if ($l -match '^\S') { $inPaths = $false } }
     }
-    if (-not $paths) { return $null }
+    if (-not $closed -or -not $paths) { return $null }  # a front-matter block that is not closed is not a scope
     $product = @('src/')
     $cfg = Join-Path $Root '.specify/memory/workflow.json'
     if (Test-Path $cfg) { $c = Get-Content $cfg -Raw | ConvertFrom-Json; if ($c.PSObject.Properties['productPaths'] -and $c.productPaths) { $product = @($c.productPaths) } }
@@ -86,36 +86,13 @@ function Write-Ask([string]$Reason) {
     @{ hookSpecificOutput = @{ hookEventName = 'PreToolUse'; permissionDecision = 'ask'; permissionDecisionReason = $Reason } } | ConvertTo-Json -Depth 5 -Compress
     exit 0
 }
-$scopeDir = if ($inputs.file_path) { Split-Path ([string]$inputs.file_path) -Parent } elseif ($inputs.notebook_path) { Split-Path ([string]$inputs.notebook_path) -Parent } else { "$($call.cwd)" }
-while ($scopeDir -and -not (Test-Path $scopeDir)) { $scopeDir = Split-Path $scopeDir -Parent }
-$scopeRoot = if ($scopeDir) { git -C $scopeDir rev-parse --show-toplevel 2>$null } else { $null }
-if ($LASTEXITCODE -ne 0) { $scopeRoot = $null }
-$scope = if ($scopeRoot) { Get-Scope $scopeRoot } else { $null }
-if ($scope) {
-    $outside = "This is outside the Purpose of #$($scope.id): $($scope.purpose) (paths: $($scope.paths -join ', '))."
-    $how = " If the agreed spec needs it, add it to paths: in $($scope.wkr) and ask Martin to approve; otherwise record it on the item as a proposed follow-up."
-    $target = if ($inputs.file_path) { [string]$inputs.file_path } elseif ($inputs.notebook_path) { [string]$inputs.notebook_path } else { '' }
-    if ($target -and $call.tool_name -match '^(Write|Edit|MultiEdit|NotebookEdit)$') {
-        $full = [IO.Path]::GetFullPath($target); $rootFull = [IO.Path]::GetFullPath($scopeRoot).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
-        if ($full.StartsWith($rootFull, [StringComparison]::OrdinalIgnoreCase)) {
-            $rel = $full.Substring($rootFull.Length).Replace('\', '/')
-            $own = $rel -match '^\.specify/(wkr|items|reviews)/'
-            if (-not $own -and -not ($scope.paths | Where-Object { $rel -match (ConvertTo-GlobRegex $_) })) { Write-Ask "$rel is not in the paths. $outside$how" }
-        }
-    }
-    $buildCmd = '(?i)\bdotnet\s+(build|test|run|publish|pack)\b|\bmsbuild\b|\bproof\.ps1\b|\bInvoke-MigrationE2E\.ps1\b|\bInvoke-Pester\b|\bnpm\s+(run|test)\b|\bBuild\.ps1\b'
-    if ($call.tool_name -match '^(Bash|PowerShell)$' -and "$($inputs.command)" -match $buildCmd) {
-        $touchesProduct = $scope.paths | Where-Object { $p = $_.Replace('\', '/').TrimStart('/'); $scope.product | Where-Object { $p.StartsWith($_.Replace('\', '/').TrimStart('/'), [StringComparison]::OrdinalIgnoreCase) } }
-        if (-not $touchesProduct) { Write-Ask "A build, test or end-to-end run, but the paths include no product code ($($scope.product -join ', ')). $outside$how" }
-    }
-}
-
 # Draft until ready: a pull request is marked ready only through pr-ready.ps1, is always opened as a draft,
-# and is marked draft before any edit on its branch.
+# and is marked draft before any edit on its branch. This runs before the scope check below, so an edit that is
+# then approved outside the paths never lands while the pull request is ready.
 $isShell = $call.tool_name -match '^(Bash|PowerShell)$'
 $cmd = "$($inputs.command)"
+$segs = @($cmd -split '[|;&\r\n]+')
 if ($isShell) {
-    $segs = $cmd -split '[|;&\r\n]+'
     if (($segs | Where-Object { $_ -match '\bgh\s+pr\s+ready\b' -and $_ -notmatch '--undo\b' }) -or $cmd -match 'markPullRequestReadyForReview') {
         [Console]::Error.WriteLine('guard: a pull request is marked ready only through pr-ready.ps1, which checks it is complete first.')
         exit 2
@@ -130,27 +107,91 @@ $writes = ($call.tool_name -match '^(Write|Edit|MultiEdit|NotebookEdit)$') -or (
 if ($writes) {
     $dir = if ($inputs.file_path) { Split-Path ([string]$inputs.file_path) -Parent } elseif ($inputs.notebook_path) { Split-Path ([string]$inputs.notebook_path) -Parent } else { "$($call.cwd)" }
     while ($dir -and -not (Test-Path $dir)) { $dir = Split-Path $dir -Parent }
-    if (-not $dir) { exit 0 }
-    git -C $dir rev-parse --is-inside-work-tree 2>$null | Out-Null
-    if ($LASTEXITCODE -ne 0) { exit 0 }
-    Push-Location $dir
-    try {
-        $out = gh pr view --json number,isDraft,state 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            # No pull request, or no GitHub remote at all: nothing to mark draft.
-            if ("$out" -match '(?i)no (open )?pull requests? found|no git remotes|none of the git remotes|not a git repository') { exit 0 }
-            [Console]::Error.WriteLine("guard: could not check whether this branch has a pull request ready for review ($out); blocking the edit.")
-            exit 2
-        }
-        $pr = "$out" | ConvertFrom-Json
-        if ($pr.state -eq 'OPEN' -and -not $pr.isDraft) {
-            gh pr ready $pr.number --undo 2>&1 | Out-Null
+    $inRepo = $false
+    if ($dir) { git -C $dir rev-parse --is-inside-work-tree 2>$null | Out-Null; $inRepo = $LASTEXITCODE -eq 0 }
+    if ($inRepo) {
+        Push-Location $dir
+        try {
+            $out = gh pr view --json number,isDraft,state 2>&1
             if ($LASTEXITCODE -ne 0) {
-                [Console]::Error.WriteLine("guard: PR #$($pr.number) is ready for review and could not be marked draft; blocking the edit.")
-                exit 2
+                # No pull request, or no GitHub remote at all: nothing to mark draft.
+                if ("$out" -notmatch '(?i)no (open )?pull requests? found|no git remotes|none of the git remotes|not a git repository') {
+                    [Console]::Error.WriteLine("guard: could not check whether this branch has a pull request ready for review ($out); blocking the edit.")
+                    exit 2
+                }
+            } else {
+                $pr = "$out" | ConvertFrom-Json
+                if ($pr.state -eq 'OPEN' -and -not $pr.isDraft) {
+                    gh pr ready $pr.number --undo 2>&1 | Out-Null
+                    if ($LASTEXITCODE -ne 0) {
+                        [Console]::Error.WriteLine("guard: PR #$($pr.number) is ready for review and could not be marked draft; blocking the edit.")
+                        exit 2
+                    }
+                    [Console]::Error.WriteLine("guard: PR #$($pr.number) marked draft before this edit; mark it ready only through pr-ready.ps1.")
+                }
             }
-            [Console]::Error.WriteLine("guard: PR #$($pr.number) marked draft before this edit; mark it ready only through pr-ready.ps1.")
+        } finally { Pop-Location }
+    }
+}
+
+# The worker's Purpose decides scope (after the draft step).
+function Get-ShellWriteTargets([string]$Command) {
+    # Best effort: the files a shell command writes. Redirections (> and >>), the path arguments of the
+    # PowerShell file cmdlets, and the operands of cp, mv, rm, touch, tee and sed -i.
+    $t = [Collections.Generic.List[string]]::new()
+    foreach ($m in [regex]::Matches($Command, '(?<![0-9&=-])>>?\s*(?<q>[''"]?)(?<p>[^\s''"|;&>]+)\k<q>')) { if ($m.Groups['p'].Value -notmatch '^\$?null$|^&') { $t.Add($m.Groups['p'].Value) } }
+    foreach ($seg in ($Command -split '[|;&\r\n]+')) {
+        $toks = @([regex]::Matches($seg, '(?<q>[''"])(?<v>.*?)\k<q>|(?<v>[^\s''"]+)') | ForEach-Object { $_.Groups['v'].Value })
+        for ($i = 0; $i -lt $toks.Count; $i++) {
+            if ($toks[$i] -match '^(?i)(Set-Content|Add-Content|Out-File|New-Item|Copy-Item|Move-Item|Remove-Item|Rename-Item|Clear-Content|cp|mv|rm|touch|tee|truncate)$') {
+                $skipNext = $false
+                for ($j = $i + 1; $j -lt $toks.Count; $j++) {
+                    $v = $toks[$j]
+                    if ($skipNext) { $skipNext = $false; continue }
+                    if ($v -match '^(?i)-(Path|LiteralPath|FilePath|Destination)$') { continue }
+                    if ($v -match '^(?i)-(Value|Encoding|ItemType|Name|NewName|Filter|Include|Exclude|InputObject|Width)$') { $skipNext = $true; continue }
+                    if ($v -match '^-' -or $v -match '^\$') { continue }
+                    $t.Add($v)
+                }
+            }
+            if ($toks[$i] -eq 'sed' -and ($toks -contains '-i')) { $t.Add($toks[-1]) }
         }
-    } finally { Pop-Location }
+    }
+    , $t
+}
+function Test-GlobsOverlap([string]$Glob, [string]$Prefix) {
+    # Whether a paths glob can match a file under a product path: the glob's literal start and the prefix agree as
+    # far as both go (so **/*.cs overlaps src/, and docs/** does not).
+    $g = $Glob.Replace('\', '/').TrimStart('/'); $p = $Prefix.Replace('\', '/').TrimStart('/')
+    $lit = ($g -split '[*?\[]', 2)[0]
+    $n = [Math]::Min($lit.Length, $p.Length)
+    $lit.Substring(0, $n).Equals($p.Substring(0, $n), [StringComparison]::OrdinalIgnoreCase)
+}
+$scopeDir = if ($inputs.file_path) { Split-Path ([string]$inputs.file_path) -Parent } elseif ($inputs.notebook_path) { Split-Path ([string]$inputs.notebook_path) -Parent } else { "$($call.cwd)" }
+while ($scopeDir -and -not (Test-Path $scopeDir)) { $scopeDir = Split-Path $scopeDir -Parent }
+$scopeRoot = if ($scopeDir) { git -C $scopeDir rev-parse --show-toplevel 2>$null } else { $null }
+if ($LASTEXITCODE -ne 0) { $scopeRoot = $null }
+$scope = if ($scopeRoot) { Get-Scope $scopeRoot } else { $null }
+if ($scope) {
+    $outside = "This is outside the Purpose of #$($scope.id): $($scope.purpose) (paths: $($scope.paths -join ', '))."
+    $how = " If the agreed spec needs it, add it to paths: in $($scope.wkr) and ask Martin to approve; otherwise record it on the item as a proposed follow-up."
+    $targets = @()
+    if ($call.tool_name -match '^(Write|Edit|MultiEdit|NotebookEdit)$') { $targets = @(if ($inputs.file_path) { [string]$inputs.file_path } elseif ($inputs.notebook_path) { [string]$inputs.notebook_path }) }
+    elseif ($isShell) { $targets = @(Get-ShellWriteTargets $cmd) }
+    $rootFull = [IO.Path]::GetFullPath($scopeRoot).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    foreach ($target in $targets) {
+        if (-not $target) { continue }
+        $abs = if ([IO.Path]::IsPathRooted($target)) { $target } else { Join-Path "$($call.cwd)" $target }
+        $full = [IO.Path]::GetFullPath($abs)
+        if (-not $full.StartsWith($rootFull, [StringComparison]::OrdinalIgnoreCase)) { continue }
+        $rel = $full.Substring($rootFull.Length).Replace('\', '/')
+        $own = $rel -match '^\.specify/(wkr|items|reviews)/'
+        if (-not $own -and -not ($scope.paths | Where-Object { $rel -match (ConvertTo-GlobRegex $_) })) { Write-Ask "$rel is not in the paths. $outside$how" }
+    }
+    $buildCmd = '(?i)\bdotnet\s+(build|test|run|publish|pack)\b|\bmsbuild\b|\bproof\.ps1\b|\bInvoke-MigrationE2E\.ps1\b|\bInvoke-Pester\b|\bnpm\s+(run|test)\b|\bBuild\.ps1\b'
+    if ($isShell -and $cmd -match $buildCmd) {
+        $touchesProduct = $scope.paths | Where-Object { $g = $_; $scope.product | Where-Object { Test-GlobsOverlap $g $_ } }
+        if (-not $touchesProduct) { Write-Ask "A build, test or end-to-end run, but the paths include no product code ($($scope.product -join ', ')). $outside$how" }
+    }
 }
 exit 0

@@ -154,6 +154,22 @@ function Get-ItemEvidence {
     ($parts -join "`n`n") -replace "`r`n", "`n"
 }
 
+function Get-FrontMatter([string]$Text) {
+    # The WKR file's front matter: the first block between a line "---" and the next line "---", as a map of
+    # field -> value (scalars) or field -> list (a field followed by "- item" lines). $null when there is no closed block.
+    $lines = $Text -replace "`r`n", "`n" -split "`n"
+    $open = [array]::IndexOf(@($lines | ForEach-Object { $_.Trim() }), '---')
+    if ($open -lt 0) { return $null }
+    $fm = [ordered]@{}; $key = $null
+    for ($i = $open + 1; $i -lt $lines.Count; $i++) {
+        $l = $lines[$i]
+        if ($l.Trim() -eq '---') { return $fm }
+        if ($l -match '^(?<k>[A-Za-z][\w-]*):[ \t]*(?<v>.*)$') { $key = $Matches['k']; $fm[$key] = if ($Matches['v'].Trim()) { $Matches['v'].Trim().Trim('"', "'") } else { @() }; continue }
+        if ($key -and $l -match '^\s*-\s*(?<v>.+?)\s*$') { $fm[$key] = @(@($fm[$key]) + $Matches['v'].Trim('"', "'")) }
+    }
+    $null
+}
+
 function Get-OutcomeProblem([string]$Text, $Id, [string]$Head) {
     # Why the outcome evidence does not stand for this item now, or $null when it does. Every attempt leaves a
     # marker: "Automated outcome checks (all passed) for #<id> at <sha> attempt <a>:" or
@@ -216,13 +232,13 @@ function Get-SharedDrift([string]$Source, [string]$Target) {
         $rel = $f.FullName.Substring($srcExt.Length).TrimStart('\', '/').Replace('\', '/')
         $copy = Join-Path $root ".specify/extensions/$rel"
         if (-not (Test-Path $copy)) { $drift.Add(".specify/extensions/$rel (missing)"); continue }
-        if (((Get-Content $f.FullName -Raw) -replace "`r`n", "`n") -ne ((Get-Content $copy -Raw) -replace "`r`n", "`n")) { $drift.Add(".specify/extensions/$rel") }
+        if (((Get-Content $f.FullName -Raw) -replace "`r`n", "`n") -cne ((Get-Content $copy -Raw) -replace "`r`n", "`n")) { $drift.Add(".specify/extensions/$rel") }
     }
     foreach ($e in Get-ChildItem $srcExt -Directory) {
         foreach ($c in Get-ChildItem (Join-Path $e.FullName 'commands') -Filter *.md -ErrorAction SilentlyContinue) {
             $n = "speckit-$($e.Name)-$($c.BaseName)"; $want = Get-SkillText $e.Name $c.FullName
             foreach ($p in Get-SkillCopies $root $e.Name $n) {
-                if ((((Get-Content $p -Raw) -replace "`r`n", "`n")) -ne $want) { $drift.Add($p.Substring($root.Length + 1).Replace('\', '/')) }
+                if ((((Get-Content $p -Raw) -replace "`r`n", "`n")) -cne $want) { $drift.Add($p.Substring($root.Length + 1).Replace('\', '/')) }
             }
             # A skills folder that holds this extension's other skills must hold this one too.
             $folders = @(Get-ChildItem (Join-Path $root ".specify/extensions/$($e.Name)/.specify-dev/agent-commands") -Directory -ErrorAction SilentlyContinue | ForEach-Object FullName) +
@@ -280,6 +296,7 @@ function Test-Check {
     $ok = switch ($Check.type) {
         'pattern'         { [regex]::IsMatch($Evidence, $Check.pattern) }
         'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b(?!\s+findings:\s*0\s*$)') }
+        'frontMatter'     { $fm = Get-FrontMatter $Evidence; $null -ne $fm -and $fm.Contains($Check.field) -and @($fm[$Check.field] | Where-Object { "$_".Trim().Length -ge 3 }).Count -gt 0 }
         'specAgreed'      { $null -ne (Get-SpecAgreed $Evidence) }
         'outcomeCurrent'  {
             $head = if ($Check.ContainsKey('head')) { $Check.head } else { git -C $Root rev-parse HEAD 2>$null }
@@ -300,7 +317,8 @@ function Test-Check {
             $f = Join-Path $Root '.specify/memory/product-outcome.md'
             if (-not (Test-Path $f)) { $false } else {
                 $t = Get-Content $f -Raw
-                [regex]::IsMatch($t, '(?m)^\W*Outcome:\W*\s*\S.{2,}$') -and [regex]::IsMatch($t, '(?m)^\W*Words:\W*\s*\S.{2,}$')
+                # Each field on its own line, with a value of its own: a blank field never borrows the next line.
+                [regex]::IsMatch($t, '(?m)^[^\w\n]*Outcome:[^\w\n]*?[^\S\n]*\w[^\n]{2,}$') -and [regex]::IsMatch($t, '(?m)^[^\w\n]*Words:[^\w\n]*?[^\S\n]*\S[^\n]{2,}$')
             }
         }
         'hasChildren'     { @($Item['children']).Count -gt 0 }
@@ -584,4 +602,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift

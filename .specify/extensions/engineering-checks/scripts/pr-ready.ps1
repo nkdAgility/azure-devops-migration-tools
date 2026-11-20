@@ -15,6 +15,7 @@ if ($LASTEXITCODE -ne 0) { Write-Error 'git status failed; the working tree is n
 if ($dirty) { $fail.Add("the working tree has uncommitted changes: $(($dirty | ForEach-Object { $_.Substring(3) }) -join ', ')") }
 
 git fetch -q 2>$null
+if ($LASTEXITCODE -ne 0) { Write-Error 'git fetch failed: the remote branch cannot be checked, so the PR is not marked ready.'; exit 1 }
 $up = git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null
 if ($LASTEXITCODE -ne 0 -or -not $up) { $fail.Add('the branch has no remote branch: push it first') }
 else {
@@ -49,7 +50,10 @@ if (-not $fail.Count) {
 }
 
 if ($fail.Count) { $fail | ForEach-Object { Write-Error "not ready: $_" -ErrorAction Continue }; exit 1 }
-$args2 = @('pr', 'ready'); if ($Number) { $args2 += "$Number" }
-gh @args2
+# Only this branch's own PR is marked ready: the checks above were run on this branch.
+$mine = gh pr view --json number 2>$null | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or -not $mine) { Write-Error 'this branch has no open pull request.'; exit 1 }
+if ($Number -and $Number -ne $mine.number) { Write-Error "PR #$Number is not this branch's pull request (#$($mine.number)); only the branch that passed the checks can be marked ready."; exit 1 }
+gh pr ready $mine.number
 if ($LASTEXITCODE -ne 0) { exit 1 }
 exit 0

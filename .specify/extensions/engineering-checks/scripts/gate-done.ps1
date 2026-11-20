@@ -1,6 +1,8 @@
 # Records one gate's evidence (its confidence file) on the item and moves it on through the policy.
 param([Parameter(Mandatory)][ValidateSet('output','outcome')][string]$Gate)
 $ErrorActionPreference = 'Stop'
+# The item is read once; the evidence is recorded on, and the move made for, that same item.
+$id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
 $conf = ".specify/reviews/$Gate-confidence.md"
 if (-not (Test-Path $conf)) { Write-Error "$conf was not written."; exit 1 }
 $section = if ($Gate -eq 'output') { 'Output done evidence' } else { 'Outcome done' }
@@ -12,7 +14,6 @@ if ($Gate -eq 'outcome') {
     if (-not (Test-Path $report)) { Write-Error "$report was not written: the outcome checks have not passed."; exit 1 }
     if (Test-Path .specify/reviews/outcome-attempt-pending) { Write-Error "an outcome check attempt did not record its start; run the outcome checks again."; exit 1 }
     $r = (Get-Content $report -Raw) -replace "`r`n", "`n"
-    $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
     $wkr = ".specify/wkr/$id.md"
     $history = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
     $head = git rev-parse HEAD
@@ -26,7 +27,7 @@ if ($Gate -eq 'outcome') {
     if ($problem) { Write-Error "$problem; run the outcome checks again."; exit 1 }
     $body = $r + "`n" + $body
 }
-& (Join-Path $PSScriptRoot 'record.ps1') -Section $section -Body $body
+& (Join-Path $PSScriptRoot 'record.ps1') -Section $section -Body $body -Id $id
 $reason = if ($Gate -eq 'output') { 'Output Done: automated checks passed and manual validation scored' } else { 'Outcome Done: outcome checks passed and real-system validation scored' }
-& (Join-Path $PSScriptRoot 'advance.ps1') -Reason $reason
+& (Join-Path $PSScriptRoot 'advance.ps1') -Reason $reason -Id $id
 exit $LASTEXITCODE
