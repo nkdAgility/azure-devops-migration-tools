@@ -60,7 +60,7 @@ $build = (Invoke-E2ERest "$Src/_apis/build/definitions?name=amte2e-build").value
 if (-not $build) {
     $build = Invoke-E2ERest "$Src/_apis/build/definitions" -Method POST -Body @{
         name = "amte2e-build"; type = "build"; quality = "definition"; queue = @{ id = $queue.id }
-        # properties as the designer writes them; the processor only maps the repository when they are present.
+        # properties as the designer writes them; pipelines-3312 covers a repository without them.
         repository = @{ id = $repo.id; name = $repo.name; type = "TfsGit"; url = $repo.remoteUrl; defaultBranch = "refs/heads/main"; properties = @{ cleanOptions = "0"; labelSources = "0"; labelSourcesFormat = "`$(build.buildNumber)"; reportBuildStatus = "true"; gitLfsSupport = "false"; skipSyncSource = "false"; checkoutNestedSubmodules = "false"; fetchDepth = "1" } }
         variableGroups = @(@{ id = $vg.id })
         process = @{ type = 1; phases = @(@{ name = "Job 1"; refName = "Job_1"; condition = "succeeded()"; target = @{ type = 1; executionOptions = @{ type = 0 }; allowScriptsAuthAccessOption = $false }; jobAuthorizationScope = 1
