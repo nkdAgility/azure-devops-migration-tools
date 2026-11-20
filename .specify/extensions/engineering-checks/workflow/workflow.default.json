@@ -176,6 +176,16 @@
             "Bug"
           ],
           "message": "a Bug needs a 'Reproduction' section showing it fails on main"
+        },
+        {
+          "type": "section",
+          "name": "Rubber duck",
+          "message": "no 'Rubber duck' section (the item explained plainly, and the gaps it showed)"
+        },
+        {
+          "type": "section",
+          "name": "Architecture check",
+          "message": "'Architecture check' is missing or still has open findings"
         }
       ]
     },
@@ -215,14 +225,6 @@
         },
         {
           "type": "section",
-          "name": "Rubber duck",
-          "types": [
-            "Product Backlog Item"
-          ],
-          "message": "'Rubber duck' is missing or still open"
-        },
-        {
-          "type": "section",
           "name": "Red team",
           "types": [
             "Product Backlog Item"
@@ -244,14 +246,6 @@
             "Product Backlog Item"
           ],
           "message": "'API story' is missing or still open"
-        },
-        {
-          "type": "section",
-          "name": "Architecture check",
-          "types": [
-            "Product Backlog Item"
-          ],
-          "message": "'Architecture check' is missing or still open"
         },
         {
           "type": "section",
