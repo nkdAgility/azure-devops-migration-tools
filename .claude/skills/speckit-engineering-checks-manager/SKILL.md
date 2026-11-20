@@ -25,7 +25,7 @@ Martin never runs anything on the command line. You run every command; he decide
 
 The pass prints a report:
 
-- **`start-wkr`** (an item pulled with no worker yet): start a new session for it with `wkr #<id>` and its WKR id, in a worktree of its own on a new branch from `origin/main` (`topic/<id>-<short name>`). In the desktop app this is a side session; elsewhere a subagent.
+- **`start-wkr`** (an item pulled with no worker yet): start a new session for it with `wkr #<id>` and its WKR id, in a worktree of its own on a new branch from `origin/main` (`topic/<id>-<short name>`). In the desktop app this is a side session; elsewhere a subagent. Name it `[#<id>][<state>] - <system> - <topic>`: the system from the repo's list of systems that the item touches, and a few words on what it is for (for example `[#3278][Refining] - Work items - Clean up xyz`).
 - **`resume-wkr`** (an item pulled that already has a worker): send that worker a message to continue, or start it again if its session is gone.
 - **`moves`**: items moved on because their policy passed. Say which.
 - **`stuck`**: an item with no movement past its hang time. Restart its worker once; if it is still stuck, bring it to Martin.

@@ -20,6 +20,7 @@ $ARGUMENTS
 1. Check the worktree is new and `git log origin/main..HEAD` is empty. If not, stop and report to the manager.
 2. Read the repo's rules (`AGENTS.md`, `CLAUDE.md`), its notes file and the Definition of Workflow. Follow them.
 3. Write `.specify/items/current.json` for the item (`{ "number": <id> }`).
+4. Name your chat `[#<id>][<state>] - <system> - <topic>`: the item's current state, the system from the repo's list of systems that it touches, and a few words on what it is for (for example `[#3278][Refining] - Work items - Clean up xyz`). Rename it each time the item changes state.
 
 ## Do the work of its state
 
