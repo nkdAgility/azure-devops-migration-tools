@@ -16,6 +16,14 @@ Unit tests are not enough for changes to migration behaviour, exit codes, valida
 
 Then report: what was done, how it was tested, how the docs were updated (with `GenerateDocs.ps1`), confidence, and what was not done. Turn auto-merge on only when confidence is 90% or higher; otherwise make sure it is off.
 
+## The worker's Purpose decides scope (Martin)
+
+A worker delivers one outcome, its Purpose, written at the top of the item's WKR file with the `paths` it may edit.
+
+- Asked for something outside it, answer: "This worker is working on {Purpose}; {the ask} is outside it. Do you want to add it to my scope?" Act only on a yes, then add it to the Purpose.
+- Hand back only what is outside the Purpose or an extra you can finish without. It goes on the item as a proposed follow-up.
+- A bug or a required refactor is never handed back: the Definition of Done places it.
+
 ## Draft until ready (Martin)
 
 A pull request is a draft while anything it needs is not in it: an uncommitted or unpushed change on its branch, a shared file not yet copied in, or an open check or rule. It is marked ready only when all of these are done. Any agent that edits a file on a branch with a pull request marks that pull request draft first.

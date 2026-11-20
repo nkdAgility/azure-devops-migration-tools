@@ -189,7 +189,12 @@
     "Refined>Specifying": {
       "name": "Pulled",
       "records": "started",
-      "checks": []
+      "checks": [
+        {
+          "type": "productOutcome",
+          "message": "no product outcome: .specify/memory/product-outcome.md needs 'Outcome:' and Martin's 'Words:' before any spec is started"
+        }
+      ]
     },
     "Specifying>Specified": {
       "name": "Specified",
@@ -297,6 +302,18 @@
           "source": "wkr",
           "pattern": "(?m)^Spec agreed:[ \\t]*(?!approved by Martin at the review gate)\\S.{2,}$",
           "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
+        },
+        {
+          "type": "pattern",
+          "source": "wkr",
+          "pattern": "(?ms)^---[ \\t]*\\n(?:(?!^---).)*?^purpose:[ \\t]*\\S[^\\n]{2,}$",
+          "message": "no worker outcome: the WKR file's front matter needs 'purpose:' (the one outcome this worker delivers)"
+        },
+        {
+          "type": "pattern",
+          "source": "wkr",
+          "pattern": "(?ms)^---[ \\t]*\\n(?:(?!^---).)*?^paths:[ \\t]*\\n[ \\t]*-[ \\t]*\\S",
+          "message": "no paths: the WKR file's front matter needs 'paths:' (what this item may edit)"
         },
         {
           "type": "noOpen",

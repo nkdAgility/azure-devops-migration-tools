@@ -206,6 +206,15 @@ function Test-Check {
             $why = if ($s) { [regex]::IsMatch($s, '(?ims)^Reasons:\s*\n\s*-\s*\S') } else { $false }
             $f -and $f.Success -and [int]$f.Groups[1].Value -ge $min -and $why
         }
+        'productOutcome'  {
+            # The current product outcome, in Martin's words: .specify/memory/product-outcome.md with
+            # "Outcome: <what>" and "Words: <what Martin said>".
+            $f = Join-Path $Root '.specify/memory/product-outcome.md'
+            if (-not (Test-Path $f)) { $false } else {
+                $t = Get-Content $f -Raw
+                [regex]::IsMatch($t, '(?m)^\W*Outcome:\W*\s*\S.{2,}$') -and [regex]::IsMatch($t, '(?m)^\W*Words:\W*\s*\S.{2,}$')
+            }
+        }
         'hasChildren'     { @($Item['children']).Count -gt 0 }
         'childrenDone'    {
             $kids = @($Item['children'] | ForEach-Object { & $Adapter.GetItem $_ })

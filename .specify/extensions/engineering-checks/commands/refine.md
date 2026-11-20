@@ -12,9 +12,15 @@ For the item in `.specify/items/current.json`:
 
 $ARGUMENTS
 
-Write these to the item's WKR file (`.specify/wkr/<number>.md`):
+Write these to the item's WKR file (`.specify/wkr/<number>.md`). It opens with front matter: the Purpose (the worker outcome: the one outcome this worker exists to deliver, in one or two sentences) and the `paths` (globs) the item may edit. Martin agrees both at Ready; the item is not Ready without them. The guard asks Martin before any edit outside the paths, and before any build, test or end-to-end run when the paths include no product code.
 
 ```
+---
+purpose: <the outcome this worker delivers>
+paths:
+  - <glob, for example src/MigrationTools/**>
+---
+
 ## Sources read
 - <doc path>: <what it says that matters here>
 
