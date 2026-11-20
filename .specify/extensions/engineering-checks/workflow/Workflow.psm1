@@ -202,6 +202,21 @@ function Get-SpecAgreed([string]$Text) {
     $words
 }
 
+function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
+    # Why Martin's spec approval does not stand for the spec as it is now, or $null when it does. The approval is
+    # the last "Spec agreed:" line; spec-agreed.ps1 binds it with a "Spec version: <path> sha256 <hash>" line after it.
+    # A spec changed since, or an approval never bound, needs Martin's approval again: he approves only what he saw.
+    if (-not (Get-SpecAgreed $Text)) { return "no 'Spec agreed:' line with Martin's own words" }
+    $agreed = [regex]::Matches($Text, '(?m)^Spec agreed:') | Select-Object -Last 1
+    $ver = [regex]::Matches($Text, '(?m)^Spec version:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
+    if (-not $ver -or $ver.Index -lt $agreed.Index) { return "Martin's approval is not bound to a spec version (spec-agreed.ps1 records it)" }
+    $file = Join-Path $Root $ver.Groups['p'].Value
+    if (-not (Test-Path $file)) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
+    $now = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
+    if ($now -ne $ver.Groups['h'].Value) { return "the spec changed after Martin approved it; it needs his approval again" }
+    $null
+}
+
 function Get-SkillText([string]$Extension, [string]$CommandFile) {
     # The agent skill Spec Kit generates from an extension command: the same text, with the skill front matter.
     $t = (Get-Content $CommandFile -Raw) -replace "`r`n", "`n"
@@ -297,7 +312,7 @@ function Test-Check {
         'pattern'         { [regex]::IsMatch($Evidence, $Check.pattern) }
         'section'         { $s = Get-Section $Evidence $Check.name; $null -ne $s -and $s -ne '' -and -not [regex]::IsMatch($s, '(?im)^\s*(status:\s*)?(open|tbd|todo)\b(?!\s+findings:\s*0\s*$)') }
         'frontMatter'     { $fm = Get-FrontMatter $Evidence; $null -ne $fm -and $fm.Contains($Check.field) -and @($fm[$Check.field] | Where-Object { "$_".Trim().Length -ge 3 }).Count -gt 0 }
-        'specAgreed'      { $null -ne (Get-SpecAgreed $Evidence) }
+        'specAgreed'      { $null -eq (Get-SpecApprovalProblem $Evidence $Root) }
         'outcomeCurrent'  {
             $head = if ($Check.ContainsKey('head')) { $Check.head } else { git -C $Root rev-parse HEAD 2>$null }
             (-not (Test-Path (Join-Path $Root '.specify/reviews/outcome-attempt-pending'))) -and $null -eq (Get-OutcomeProblem $Evidence $Item.id "$head")
@@ -602,4 +617,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift

@@ -7,6 +7,8 @@ $t = (Get-Content $a.FullName -Raw) -replace "`r`n", "`n"
 function Sec($name) { $m = [regex]::Match($t, "(?ms)^##\s*$([regex]::Escape($name))\s*\n(.*?)(?=^##\s|\z)"); if ($m.Success) { $m.Groups[1].Value.Trim() } else { '' } }
 if ($t -match '(?im)^\s*-\s*\*\*Verdict\*\*:\s*invalid') { Write-Error "The assessment says this is not a bug. Record 'Removed because:' and move it to Removed."; exit 1 }
 $rec = Join-Path $PSScriptRoot 'record.ps1'
+$rel = [IO.Path]::GetRelativePath((Get-Location), $a.FullName).Replace('\', '/')
+& $rec -Section 'Spec' -Body "Working spec: ``$rel`` (the bug assessment Martin approves)."
 & $rec -Section 'Reproduction' -Body (Sec 'Reproduction')
 & $rec -Section 'Cause' -Body (Sec 'Root Cause Hypothesis')
 & $rec -Section 'Proposed fix' -Body (Sec 'Proposed Remediation')
