@@ -566,7 +566,7 @@ function Invoke-WorkflowManager {
     # find hung work, and list what needs Martin. Returns a report; changes only states and move records.
     param($Config, $Adapter, [string]$Root = '.', [datetime]$Now = (Get-Date).ToUniversalTime(), [switch]$WhatIf)
     if (-not $Adapter) { $Adapter = Get-BoardAdapter $Config $Root }
-    $report = [ordered]@{ at = $Now.ToString('o'); pulls = @(); moves = @(); actions = @(); stuck = @(); attention = @() }
+    $report = [ordered]@{ at = $Now.ToString('o'); pulls = @(); moves = @(); failing = @(); actions = @(); stuck = @(); attention = @() }
     $order = $Config.order
     $blocked = $Config.tags.blocked
 
@@ -584,6 +584,18 @@ function Invoke-WorkflowManager {
         if ($t.ok) {
             $r = Move-WorkItem -Config $Config -Id $item.id -To $to -Reason "its $($t.shift.name) policy passed" -Adapter $Adapter -Root $Root -WhatIf:$WhatIf
             if ($r.ok) { $report.moves += @{ id = $item.id; from = $item.state; to = $to; shift = $t.shift.name } }
+        }
+        elseif ($def.kind -eq 'work') {
+            # What the worker still has to do; 'changed' is true when the list differs from the last pass, so the
+            # manager tells the worker once per change rather than on every pass.
+            $missing = @($t.failures | Where-Object { $_ -notmatch ' is full \(' })
+            if ($missing.Count) {
+                $key = "$($item.state)>$to|" + ($missing -join '|')
+                $s = Read-BoardState; $rec = Get-ItemRecord $s $item.id
+                $changed = "$($rec['lastFailures'])" -ne $key
+                if ($changed -and -not $WhatIf) { $rec['lastFailures'] = $key; Write-BoardState $s }
+                $report.failing += @{ id = $item.id; state = $item.state; to = $to; missing = $missing; changed = $changed }
+            }
         }
     }
 

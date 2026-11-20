@@ -33,7 +33,22 @@ try {
     $to = $order[$i + 1]
 
     $t = Test-Move -Config $cfg -Item $item -To $to -Adapter $ad -Root $root -AllItems @(& $ad.GetItems) -SkipScripts
-    if (-not $t.ok -or @($t.skipped).Count) { exit 0 }
+    # What still stands between the item and its next state, other than a full WIP slot (the manager pulls when one frees).
+    $missing = @($t.failures | Where-Object { $_ -notmatch ' is full \(' })
+    if ($missing.Count) {
+        # Tell the worker what is still missing, once per change: the same list is not repeated on every write.
+        $seenFile = Join-Path $root ".specify/items/auto-advance-$id.txt"
+        $now = "$($item.state)>$to`n" + ($missing -join "`n")
+        $before = if (Test-Path $seenFile) { Get-Content $seenFile -Raw } else { '' }
+        if ($now.Trim() -ne "$before".Trim()) {
+            Set-Content $seenFile $now -Encoding utf8
+            "auto-advance: #$id is not yet ready to leave $($item.state) for $to. Still missing:"
+            $missing | ForEach-Object { "- $_" }
+            "Do each of these you can, now and without asking; ask Martin only for one that needs his approval or decision."
+        }
+        exit 0
+    }
+    if (@($t.skipped).Count) { exit 0 }
     $r = Move-WorkItem -Config $cfg -Id $id -To $to -Reason "its $($t.shift.name) policy passed" -Adapter $ad -Root $root
     if ($r.ok -and $r.moved) { "auto-advance: #$id moved from $($r.from) to $($r.to) ($($t.shift.name) policy passed). Rename your chat for the new state and do its work." }
 } catch {
