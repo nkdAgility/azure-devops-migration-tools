@@ -4,7 +4,8 @@
 param([string]$Base = 'main')
 $ErrorActionPreference = 'Stop'
 $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
-$wkr = ".specify/wkr/$id.md"
+Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+$wkr = Get-ItemRecordPath '.' $id
 $wkrText = if (Test-Path $wkr) { Get-Content $wkr -Raw } else { '' }
 $failures = [Collections.Generic.List[string]]::new()
 $root = 'docs/specs'
@@ -34,8 +35,8 @@ foreach ($d in @(Get-ChildItem specs -Recurse -Filter discrepancies.md -ErrorAct
     $open = Select-String $d.FullName -Pattern '(?i)\b(open|unresolved)\b' -SimpleMatch:$false
     if ($open) { $failures.Add("$($d.FullName): discrepancies are still open") }
 }
-$specDirs = @(Get-ChildItem specs -Directory -ErrorAction SilentlyContinue)
-if ($specDirs) { $failures.Add("the working spec is still in specs/ ($($specDirs.Name -join ', ')); delete it once reconciled into $root/") }
+# The item's folder (specs/<issue>-<name>/) is kept until the outcome checks have passed; pr-ready.ps1 requires it
+# deleted, once reconciled into $root/, before the pull request is marked ready.
 
 if ($failures.Count) { $failures | ForEach-Object { Write-Error $_ -ErrorAction Continue }; exit 1 }
 "docs reconciled"

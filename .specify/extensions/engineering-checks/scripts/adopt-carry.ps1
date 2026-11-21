@@ -4,12 +4,11 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
 $cfg = Get-WorkflowConfig
 $ad = Get-BoardAdapter $cfg
-New-Item -ItemType Directory -Force .specify/wkr | Out-Null
 $n = 0
 foreach ($item in @(& $ad.GetItems)) {
     $status = @($item.comments | Where-Object { "$($_.body)" -like "$($cfg.adopt.wkrMarker)*" }) | Select-Object -Last 1
     if (-not $status) { continue }
-    $f = ".specify/wkr/$($item.id).md"
+    $f = Join-Path (New-ItemFolder '.' $item.id $item.title) 'item.md'
     if (-not (Test-Path $f)) {
         $tag = [regex]::Match("$($status.body)", '<!--\s*(?:worker|wkr)[:=\s]*([^\s>]+)').Groups[1].Value
         $wkr = if ($tag) { $tag } else { "WKR-$($item.id)" }

@@ -147,19 +147,48 @@ function Get-BoardAdapter {
 
 # ---------------------------------------------------------------- evidence and checks
 
+function Get-ItemFolder([string]$Root = '.', $Id) {
+    # The item's folder: specs/<issue>-<name>/ (Spec Kit's feature-folder layout, numbered by the issue). $null if none yet.
+    Get-ChildItem (Join-Path $Root 'specs') -Directory -Filter "$Id-*" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+}
+
+function Get-ItemRecordPath([string]$Root = '.', $Id) {
+    # The item's record: specs/<issue>-<name>/item.md. An older record at .specify/wkr/<issue>.md is still read.
+    $folder = Get-ItemFolder $Root $Id
+    if ($folder) { return (Join-Path $folder 'item.md') }
+    $legacy = Join-Path $Root ".specify/wkr/$Id.md"
+    if (Test-Path $legacy) { return $legacy }
+    Join-Path $Root "specs/$Id/item.md"
+}
+
+function New-ItemFolder([string]$Root = '.', $Id, [string]$Title) {
+    # Creates specs/<issue>-<name>/ with item.md, the name taken from the issue's title. Returns the folder.
+    $existing = Get-ItemFolder $Root $Id
+    if ($existing) { return $existing }
+    $name = ($Title.ToLowerInvariant() -replace '[^a-z0-9]+', '-').Trim('-')
+    if ($name.Length -gt 40) { $name = $name.Substring(0, 40).Trim('-') }
+    if (-not $name) { $name = 'item' }
+    $folder = Join-Path $Root "specs/$Id-$name"
+    New-Item -ItemType Directory -Force $folder | Out-Null
+    $legacy = Join-Path $Root ".specify/wkr/$Id.md"
+    $record = Join-Path $folder 'item.md'
+    if (Test-Path $legacy) { Move-Item $legacy $record } elseif (-not (Test-Path $record)) { "# #$Id $Title`n" | Set-Content $record -Encoding utf8 }
+    $folder
+}
+
 function Get-ItemRoot($Item, [string]$Root = '.') {
     # Where the item's own record lives: its worker's worktree once one is recorded, else the given root.
     if (-not $script:StoreRoot) { $script:StoreRoot = $Root }
     $id = if ($Item -is [System.Collections.IDictionary]) { $Item['id'] } elseif ($Item -and $Item.PSObject.Properties['id']) { $Item.id } else { $null }
     if (-not $id) { return $Root }
     $wt = Get-StoredWorktree $id
-    if ($wt -and (Test-Path (Join-Path $wt ".specify/wkr/$($Item.id).md"))) { $wt } else { $Root }
+    if ($wt -and (Test-Path (Get-ItemRecordPath $wt $Item.id))) { $wt } else { $Root }
 }
 
 function Get-ItemEvidence {
     param($Item, [string]$Root = '.')
     $parts = @("$($Item.body)") + @($Item.comments | ForEach-Object { "$($_.body)" })
-    $wkr = Join-Path (Get-ItemRoot $Item $Root) ".specify/wkr/$($Item.id).md"
+    $wkr = Get-ItemRecordPath (Get-ItemRoot $Item $Root) $Item.id
     if (Test-Path $wkr) { $parts += Get-Content $wkr -Raw }
     ($parts -join "`n`n") -replace "`r`n", "`n"
 }
@@ -351,7 +380,7 @@ function Get-LastActivity($Item, [string]$Root = '.') {
     $restarts = @(Get-ItemMoves $Item | Where-Object { $_['restart'] } | ForEach-Object { [datetime]$_.at })
     $times = @(Get-StateSince $Item) + @($Item.comments | ForEach-Object { [datetime]$_.at }) + $restarts
     $Root = Get-ItemRoot $Item $Root
-    $wkr = Join-Path $Root ".specify/wkr/$($Item.id).md"
+    $wkr = Get-ItemRecordPath $Root $Item.id
     if (Test-Path $wkr) {
         $times += (Get-Item $wkr).LastWriteTimeUtc
         $run = [regex]::Match((Get-Content $wkr -Raw), '(?m)^Run:\s*(\S+)')
@@ -368,7 +397,7 @@ function Test-Check {
     if ($Check.ContainsKey('types') -and $Check.types -and ($Item.type -notin $Check.types)) { return $null }
     $Root = Get-ItemRoot $Item $Root
     if ($Check.ContainsKey('source') -and $Check.source -eq 'wkr') {
-        $wkr = Join-Path $Root ".specify/wkr/$($Item.id).md"
+        $wkr = Get-ItemRecordPath $Root $Item.id
         $Evidence = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
     }
     $ok = switch ($Check.type) {
@@ -500,13 +529,13 @@ function Sync-ItemWatch {
     param($Config, [Parameter(Mandatory)]$Id, $Adapter, [string]$Root = '.')
     if (-not $Adapter) { $Adapter = Get-BoardAdapter $Config $Root }
     $item = & $Adapter.GetItem $Id
-    $seenPath = Join-Path $Root ".specify/wkr/$Id.seen.json"
+    $seenPath = Join-Path $Root ".specify/items/$Id.seen.json"
     $seen = if (Test-Path $seenPath) { Get-Content $seenPath -Raw | ConvertFrom-Json -AsHashtable } else { @{ comments = 0; state = $item.state; tags = @($item.tags) } }
     $comments = @($item.comments)
     $new = @($comments | Select-Object -Skip ([int]$seen.comments) | Where-Object { "$($_.body)" -notmatch "<!--\s*$script:MoveMarker" })
     $changes = [ordered]@{ id = $Id; newComments = $new.Count; stateChanged = ($seen.state -ne $item.state); tagsChanged = ((@($seen.tags) -join ',') -ne (@($item.tags) -join ',')); answered = @(); blocked = $false }
 
-    $wkr = Join-Path $Root ".specify/wkr/$Id.md"
+    $wkr = Get-ItemRecordPath $Root $Id
     if (-not (Test-Path $wkr)) { New-Item -ItemType Directory -Force (Split-Path $wkr) | Out-Null; "# WKR-$Id`n" | Set-Content $wkr -Encoding utf8 }
     $wkrText = (Get-Content $wkr -Raw) -replace "`r`n", "`n"
     foreach ($c in $new) {
@@ -535,6 +564,7 @@ function Sync-ItemWatch {
     $changes.blocked = $want
     $item = & $Adapter.GetItem $Id
     # The cursor is the snapshot this pass processed, so a reply that arrived meanwhile is read next time.
+    New-Item -ItemType Directory -Force (Split-Path $seenPath) | Out-Null
     @{ comments = $comments.Count; state = $item.state; tags = @($item.tags) } | ConvertTo-Json | Set-Content $seenPath -Encoding utf8
     $changes
 }
@@ -706,4 +736,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SpecApprovalProblem, Get-SharedSource, Get-RetroNote, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Get-SharedSource, Get-RetroNote, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift

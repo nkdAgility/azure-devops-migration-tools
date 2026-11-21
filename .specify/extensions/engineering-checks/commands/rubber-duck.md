@@ -10,4 +10,4 @@ Explain the spec and plan step by step to someone who knows nothing about it. Ev
 
 $ARGUMENTS
 
-Write it to the item's WKR file (`.specify/wkr/<number>.md`) as a section headed `## Rubber duck`. If something cannot be settled, write it under `## Questions` as `- Q-n <question> (for <who>) open`, and leave the section saying `open`.
+Write it to the item's record (`specs/<number>-<name>/item.md`) as a section headed `## Rubber duck`. If something cannot be settled, write it under `## Questions` as `- Q-n <question> (for <who>) open`, and leave the section saying `open`.

@@ -7,10 +7,13 @@ $ErrorActionPreference = 'Stop'
 $Text = (@($Text) + @($Rest) -join ' ').Trim().Trim("'").Trim()
 if ($Text -notmatch '#(\d+)') { Write-Error 'No item reference (#123) in the request. Create the issue first.'; exit 1 }
 $id = $Matches[1]
-New-Item -ItemType Directory -Force .specify/items, .specify/wkr | Out-Null
+New-Item -ItemType Directory -Force .specify/items | Out-Null
 @{ number = [int]$id } | ConvertTo-Json | Set-Content .specify/items/current.json -Encoding utf8
-$wkr = ".specify/wkr/$id.md"
-if (-not (Test-Path $wkr)) { "# WKR-$id`n" | Set-Content $wkr -Encoding utf8 }
+# The item's folder, specs/<issue>-<name>/, holds its record (item.md) and Spec Kit's spec, plan and tasks.
+Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+$title = try { "$((& (Get-BoardAdapter (Get-WorkflowConfig)).GetItem $id).title)" } catch { '' }
+$folder = New-ItemFolder '.' $id $title
+$wkr = Join-Path $folder 'item.md'
 $run = Get-ChildItem .specify/workflows/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
 if ($run -and -not (Select-String $wkr -Pattern '^Run:' -Quiet)) { Add-Content $wkr "Run: $($run.Name)" }
 "item #$id"

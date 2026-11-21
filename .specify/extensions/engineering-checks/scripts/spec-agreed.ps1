@@ -5,9 +5,9 @@
 # needs his approval again.
 $ErrorActionPreference = 'Stop'
 $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
-$wkr = ".specify/wkr/$id.md"
-$text = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
 Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+$wkr = Get-ItemRecordPath '.' $id
+$text = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
 # The same rule as the Specified>Building check (specAgreed): the last line, Martin's own words.
 $words = Get-SpecAgreed $text
 if (-not $words) {

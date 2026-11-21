@@ -8,7 +8,7 @@ For the Feedback item in `.specify/items/current.json`: find whether it is real,
 
 $ARGUMENTS
 
-Write `## Assessment` to the item's WKR file with what you found, then recommend exactly one of:
+Write `## Assessment` to the item's record (`specs/<number>-<name>/item.md`) with what you found, then recommend exactly one of:
 
 - **build as Feedback**: a small change to an existing feature; name the feature;
 - **group into a Package** with other items; name them;

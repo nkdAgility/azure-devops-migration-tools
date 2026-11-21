@@ -1,4 +1,5 @@
-# Runs after each tool use. When a worker has just written its item's evidence (.specify/wkr/ or .specify/reviews/),
+# Runs after each tool use. When a worker has just written its item's evidence (its folder under specs/, the older
+# .specify/wkr/, or .specify/reviews/),
 # it checks the item against the exit policy for its state and, if the policy passes, moves it on through
 # move-state's own check. It never answers for Martin: only an item in a working state moves (wait states are pulled
 # by the manager within the WIP limits, or wait for Martin), and a policy that runs a slow check (a build, the tests,
@@ -11,7 +12,7 @@ try {
     $paths = @()
     if ($call.tool_name -match '^(Write|Edit|MultiEdit|NotebookEdit)$') { $paths = @("$($in.file_path)$($in.notebook_path)") }
     elseif ($call.tool_name -match '^(Bash|PowerShell)$') { $paths = @("$($in.command)") }
-    if (-not ($paths | Where-Object { $_ -match '\.specify[\\/](wkr|reviews)[\\/]' })) { exit 0 }
+    if (-not ($paths | Where-Object { $_ -match '\.specify[\\/](wkr|reviews)[\\/]|(^|[\\/\s])specs[\\/]\d+-' })) { exit 0 }
 
     $dir = if ($in.file_path) { Split-Path ([string]$in.file_path) -Parent } else { "$($call.cwd)" }
     while ($dir -and -not (Test-Path $dir)) { $dir = Split-Path $dir -Parent }

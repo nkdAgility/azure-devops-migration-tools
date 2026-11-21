@@ -10,4 +10,4 @@ Who uses or is affected by this change. For each persona: who they are, what the
 
 $ARGUMENTS
 
-Write it to the item's WKR file (`.specify/wkr/<number>.md`) as a section headed `## Personas`. If something cannot be settled, write it under `## Questions` as `- Q-n <question> (for <who>) open`, and leave the section saying `open`.
+Write it to the item's record (`specs/<number>-<name>/item.md`) as a section headed `## Personas`. If something cannot be settled, write it under `## Questions` as `- Q-n <question> (for <who>) open`, and leave the section saying `open`.

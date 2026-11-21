@@ -26,7 +26,7 @@ $ARGUMENTS
 
 Run the item's workflows yourself, with Spec Kit v1.4.1 (`uvx --from git+https://github.com/github/spec-kit.git@v1.4.1 specify workflow run <workflow> --input ...`), the item reference first in the request (`#<id> ...`):
 
-- **Refining:** `nkda-refine`. It writes the item's record, `.specify/wkr/<id>.md`, opening with your Purpose and the `paths` you may edit.
+- **Refining:** `nkda-refine`. It writes the item's record, `specs/<id>-<name>/item.md`, opening with your Purpose and the `paths` you may edit.
 - **Then its route:** `speckit` (Product Backlog Item), `bugfix` (Bug) or `assess` (Feedback).
 
 When a run pauses at a gate, stop and ask Martin as a QUESTION (`ask-martin`), showing what he is approving in full: the spec, the plan or the assessment. Resume the run with his answer as the gate's input (`specify workflow resume <run> --input <verdict input>=<his choice>`), and record his words as `Spec agreed: <his words>` where the gate is the spec's. Never answer a gate yourself.

@@ -17,8 +17,9 @@ if (-not $id) { Write-Error '.specify/items/current.json could not be read; the 
 $sha = git rev-parse HEAD
 if ($LASTEXITCODE -ne 0 -or -not $sha) { Write-Error 'git rev-parse HEAD failed; the attempt stays pending and blocks the outcome gate.'; exit 1 }
 $attempt = [guid]::NewGuid().ToString('N').Substring(0, 12)
-$wkr = ".specify/wkr/$id.md"
-New-Item -ItemType Directory -Force .specify/wkr | Out-Null
+Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+$wkr = Get-ItemRecordPath '.' $id
+New-Item -ItemType Directory -Force (Split-Path $wkr) | Out-Null
 Add-Content $wkr "Outcome checks started for #$id at $sha attempt ${attempt}:"
 # Removed only while it still holds this attempt's token: another attempt's marker keeps blocking the gate.
 if ((Test-Path $pending) -and (Get-Content $pending -Raw) -match $token) { Remove-Item $pending }
