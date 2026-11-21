@@ -506,9 +506,12 @@ function Sync-ItemWatch {
     $open = @(Get-OpenQuestions (Get-ItemEvidence $item $Root))
     $tag = $Config.tags.blocked
     $isBlocked = $item.tags -contains $tag
-    if ($open.Count -and -not $isBlocked) { & $Adapter.SetTag $item $tag $true }
-    if (-not $open.Count -and $isBlocked) { & $Adapter.SetTag $item $tag $false }
-    $changes.blocked = [bool]$open.Count
+    # `blocked` also stays while a reason tag (spec-reconcile-required, outcome-check-failed, ...) is on the item.
+    $reasons = @($Config['blockedReasons'] | Where-Object { $_ -and $item.tags -contains $_ })
+    $want = [bool]($open.Count -or $reasons.Count)
+    if ($want -and -not $isBlocked) { & $Adapter.SetTag $item $tag $true }
+    if (-not $want -and $isBlocked) { & $Adapter.SetTag $item $tag $false }
+    $changes.blocked = $want
     $item = & $Adapter.GetItem $Id
     # The cursor is the snapshot this pass processed, so a reply that arrived meanwhile is read next time.
     @{ comments = $comments.Count; state = $item.state; tags = @($item.tags) } | ConvertTo-Json | Set-Content $seenPath -Encoding utf8

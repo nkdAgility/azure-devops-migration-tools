@@ -137,13 +137,7 @@
     "Validating",
     "Closed"
   ],
-  "backMoves": [
-    {
-      "from": "Validating",
-      "to": "Building",
-      "needs": "a reason naming the failed outcome check"
-    }
-  ],
+  "backMoves": [],
   "shifts": {
     "Proposed>Approved": {
       "name": "Decided",
@@ -500,5 +494,10 @@
     "tools/",
     "build/",
     "MigrationTools.sln"
+  ],
+  "blockedReasons": [
+    "spec-reconcile-required",
+    "outcome-check-failed",
+    "more-information-needed"
   ]
 }

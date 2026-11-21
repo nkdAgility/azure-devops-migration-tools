@@ -199,9 +199,14 @@ if ($scopeRoot -and (Test-Path (Join-Path $scopeRoot '.specify/memory/workflow.j
         $itemId = (Get-Content $cur -Raw | ConvertFrom-Json).number
         Import-Module (Join-Path $scopeRoot '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
         $wcfg = Get-WorkflowConfig -Root $scopeRoot
-        $state = (& (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId).state
+        $gItem = & (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId
+        $state = $gItem.state
         if ($state -notin 'Building', 'Validating', 'In review') {
             [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only once the item is in Building: through Refining, Martin's approval of the spec, and the Ready gate.")
+            exit 2
+        }
+        if (@($gItem.tags) -contains 'spec-reconcile-required') {
+            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is tagged spec-reconcile-required. Revise the spec and get Martin's approval of the new version first; then clear the tag with set-blocked.ps1 -Clear.")
             exit 2
         }
     }
