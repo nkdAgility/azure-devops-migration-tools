@@ -16,7 +16,7 @@ $ARGUMENTS
 
 A small item does every step the same, just smaller: each section is as long as the item needs, and a one-line change can have a one-line section.
 
-Write these to the item's WKR file (`.specify/wkr/<number>.md`). It opens with front matter: the Purpose (the worker outcome: the one outcome this worker exists to deliver, in one or two sentences) and the `paths` (globs) the item may edit. Martin agrees both at Ready; the item is not Ready without them. The guard asks Martin before any edit outside the paths, and before any build, test or end-to-end run when the paths include no product code.
+Write these to the item's record (`specs/<number>-<name>/item.md`). It opens with front matter: the Purpose (the worker outcome: the one outcome this worker exists to deliver, in one or two sentences) and the `paths` (globs) the item may edit. Martin agrees both at Ready; the item is not Ready without them. The guard asks Martin before any edit outside the paths, and before any build, test or end-to-end run when the paths include no product code.
 
 ```
 ---

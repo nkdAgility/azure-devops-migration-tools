@@ -17,8 +17,9 @@ if (-not $id) { Write-Error '.specify/items/current.json could not be read; the 
 $sha = git rev-parse HEAD
 if ($LASTEXITCODE -ne 0 -or -not $sha) { Write-Error 'git rev-parse HEAD failed; the attempt stays pending and blocks the outcome gate.'; exit 1 }
 $attempt = [guid]::NewGuid().ToString('N').Substring(0, 12)
-$wkr = ".specify/wkr/$id.md"
-New-Item -ItemType Directory -Force .specify/wkr | Out-Null
+Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+$wkr = Get-ItemRecordPath '.' $id
+New-Item -ItemType Directory -Force (Split-Path $wkr) | Out-Null
 Add-Content $wkr "Outcome checks started for #$id at $sha attempt ${attempt}:"
 # Removed only while it still holds this attempt's token: another attempt's marker keeps blocking the gate.
 if ((Test-Path $pending) -and (Get-Content $pending -Raw) -match $token) { Remove-Item $pending }
@@ -42,7 +43,14 @@ $results = foreach ($c in $checks) {
 }
 $failed = @($results | Where-Object exit -ne 0)
 $body = ($results | ForEach-Object { "- $($_.name): ``$($_.command)`` exit $($_.exit)" }) -join "`n"
-if ($failed) { & $fail "Outcome checks failed: $($failed.name -join ', ')" }
+$setBlocked = Join-Path $PSScriptRoot 'set-blocked.ps1'
+if ($failed) {
+    # Items never move back: the item stays in Validating, tagged blocked and outcome-check-failed, and the worker
+    # fixes the code there.
+    try { & $setBlocked -Why outcome-check-failed -Id $id | Out-Host } catch { Write-Warning "could not tag #${id}: $_" }
+    & $fail "Outcome checks failed: $($failed.name -join ', ')"
+}
+if ($item.tags -contains 'outcome-check-failed') { try { & $setBlocked -Why outcome-check-failed -Clear -Id $id | Out-Host } catch { Write-Warning "could not clear the tag on #${id}: $_" } }
 New-Item -ItemType Directory -Force .specify/reviews | Out-Null
 "Automated outcome checks (all passed) for #$id at $sha attempt ${attempt}:`n$body" | Set-Content .specify/reviews/outcome-checks.md -Encoding utf8
 exit 0

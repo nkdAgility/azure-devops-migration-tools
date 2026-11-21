@@ -13,7 +13,7 @@ From the item (`.specify/items/current.json`), its spec, and the repository's ow
 
 $ARGUMENTS
 
-Write them to the item's WKR file (`.specify/wkr/<number>.md`) as a section, one line per check, in exactly this form:
+Write them to the item's record (`specs/<number>-<name>/item.md`) as a section, one line per check, in exactly this form:
 
 ```
 ## Outcome checks

@@ -3,7 +3,11 @@ $ErrorActionPreference = 'Stop'
 $rec = Join-Path $PSScriptRoot 'record.ps1'
 $root = 'docs/specs'
 if (Test-Path .specify/memory/workflow.json) { $c = Get-Content .specify/memory/workflow.json -Raw | ConvertFrom-Json; if ($c.PSObject.Properties['specRoot'] -and $c.specRoot) { $root = $c.specRoot.TrimEnd('/') } }
-$spec = Get-ChildItem specs -Recurse -Filter spec.md -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
+Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+$id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
+# The spec in the item's own folder (specs/<issue>-<name>/spec.md); else the newest spec under specs/.
+$own = Get-ItemFolder '.' $id
+$spec = if ($own -and (Test-Path (Join-Path $own 'spec.md'))) { Get-Item (Join-Path $own 'spec.md') } else { Get-ChildItem specs -Recurse -Filter spec.md -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1 }
 if (-not $spec) { Write-Error 'No spec.md under specs/.'; exit 1 }
 $rel = [IO.Path]::GetRelativePath((Get-Location), $spec.FullName).Replace('\', '/')
 & $rec -Section 'Spec' -Body "Working spec: ``$rel`` (deleted once reconciled into $root/)."
