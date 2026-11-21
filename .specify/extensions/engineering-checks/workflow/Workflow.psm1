@@ -212,6 +212,26 @@ function Get-SpecAgreed([string]$Text) {
     $words
 }
 
+function Get-SharedSource($Config, [string]$Root = '.') {
+    # nkda-speckit: NKDA_SPECKIT_SOURCE, or `sharedSource` in the repo's workflow settings, relative to the main checkout.
+    if ($env:NKDA_SPECKIT_SOURCE) { return $env:NKDA_SPECKIT_SOURCE }
+    if (-not ($Config -and $Config['sharedSource'])) { return $null }
+    if ([IO.Path]::IsPathRooted($Config.sharedSource)) { return $Config.sharedSource }
+    $common = git -C $Root rev-parse --git-common-dir 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $common) { return (Join-Path $Root $Config.sharedSource) }
+    $abs = if ([IO.Path]::IsPathRooted($common)) { $common } else { Join-Path $Root $common }
+    Join-Path (Split-Path ([IO.Path]::GetFullPath($abs)) -Parent) $Config.sharedSource
+}
+
+function Get-RetroNote($Config, $Item, [string]$Root = '.') {
+    # The item's retrospective note in the shared source's feedback/ folder: *-<repo>-<item>.md, or $null.
+    $src = Get-SharedSource $Config $Root
+    if (-not $src) { return $null }
+    $top = git -C $Root rev-parse --show-toplevel 2>$null
+    $repo = if ($Config['board'] -and $Config.board['repo']) { ($Config.board.repo -split '/')[-1] } elseif ($top) { Split-Path $top -Leaf } else { '*' }
+    Get-ChildItem (Join-Path $src 'feedback') -Filter "*-$repo-$($Item.id).md" -ErrorAction SilentlyContinue | Select-Object -First 1
+}
+
 function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     # Why Martin's spec approval does not stand for the spec as it is now, or $null when it does. The approval is
     # the last "Spec agreed:" line; spec-agreed.ps1 binds it with a "Spec version: <path> sha256 <hash>" line after it.
@@ -357,6 +377,7 @@ function Test-Check {
         'frontMatter'     { $fm = Get-FrontMatter $Evidence; $null -ne $fm -and $fm.Contains($Check.field) -and @($fm[$Check.field] | Where-Object { "$_".Trim().Length -ge 3 }).Count -gt 0 }
         'wkrAssigned'     { $script:StoreRoot = $Root; [bool](Get-StoredWkr $Item.id) -or [regex]::IsMatch($Evidence, '(?m)^WKR:\s*\S') }
         'specAgreed'      { $null -eq (Get-SpecApprovalProblem $Evidence $Root) }
+        'retroDone'       { [bool](Get-RetroNote $Config $Item $Root) }
         'outcomeCurrent'  {
             $head = if ($Check.ContainsKey('head')) { $Check.head } else { git -C $Root rev-parse HEAD 2>$null }
             (-not (Test-Path (Join-Path $Root '.specify/reviews/outcome-attempt-pending'))) -and $null -eq (Get-OutcomeProblem $Evidence $Item.id "$head")
@@ -685,4 +706,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SpecApprovalProblem, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Get-SharedSource, Get-RetroNote, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift

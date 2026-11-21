@@ -394,6 +394,10 @@
           "message": "Outcome Done manual validation is below the minimum confidence",
           "name": "Outcome done",
           "type": "confidence"
+        },
+        {
+          "message": "no retrospective note: run the retro command (a blind analysis of the work against the Definition of Workflow) before the item closes",
+          "type": "retroDone"
         }
       ]
     },
@@ -404,6 +408,10 @@
         {
           "type": "prMerged",
           "message": "the item's PR has not merged"
+        },
+        {
+          "message": "no retrospective note: run the retro command (a blind analysis of the work against the Definition of Workflow) before the item closes",
+          "type": "retroDone"
         }
       ]
     },
@@ -449,6 +457,10 @@
         {
           "type": "childrenDone",
           "message": "not every WP is Closed or Removed, with at least one Closed"
+        },
+        {
+          "message": "no retrospective note: run the retro command (a blind analysis of the work against the Definition of Workflow) before the item closes",
+          "type": "retroDone"
         }
       ]
     }

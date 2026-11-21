@@ -49,6 +49,10 @@ Every item goes through every stage and writes every section its type asks for. 
 
 Open it as a draft. While anything it needs is missing, it stays a draft. Review comments are fixed, replied to with the commit that fixed them, and resolved. Mark it ready only through `pr-ready.ps1`. Merge only as the repo's rules allow; otherwise tell the manager it is ready for Martin to merge.
 
+## Retrospective
+
+Once the pull request has merged, run `retro`: it writes your transcript and has a blind reviewer analyse your turns against the Definition of Workflow, for deviations, constraints, Martin's corrections and changes needed. The item cannot be Closed until the note exists.
+
 ## Report
 
 When the item moves, is blocked or needs Martin, report to the manager in one or two lines. Watch your item with `watch.ps1 -Id <id>` and act on what it reports. After your session is compacted, re-read this and your item's record before the next step.
