@@ -10,7 +10,8 @@ $items = if ($isDir) { Get-ChildItem $Staged -Recurse -File -Force | Where-Objec
 $snapshot = @($items | ForEach-Object {
     $bytes = [IO.File]::ReadAllBytes($_.FullName)
     $rel = if ($isDir) { [IO.Path]::GetRelativePath((Resolve-Path $Staged), $_.FullName) } else { $_.Name }
-    @{ rel = $rel; bytes = $bytes; hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)) }
+    # The fingerprint is over the text with line endings normalised, the same as approval-bind and approval-check.
+    @{ rel = $rel; bytes = $bytes; hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes(([Text.Encoding]::UTF8.GetString($bytes) -replace "`r`n", "`n")))) }
 })
 $fp = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes((($snapshot | ForEach-Object { "$($_.rel) $($_.hash)" }) -join "`n"))))
 if ($fp -ne (Get-Content $Record -Raw | ConvertFrom-Json).fingerprint) { Write-Error "Changed since approval: $Staged. Approve it again."; exit 1 }
