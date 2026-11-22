@@ -18,7 +18,7 @@ Then report: what was done, how it was tested, how the docs were updated (with `
 
 ## The worker's Purpose decides scope (Martin)
 
-A worker delivers one outcome, its Purpose, written at the top of the item's record, `.specify/wkr/<issue number>.md`, with the `paths` it may edit.
+A worker delivers one outcome, its Purpose, written at the top of the item's record, `specs/<issue number>-<name>/item.md`, with the `paths` it may edit.
 
 - Asked for something outside it, answer: "This worker is working on {Purpose}; {the ask} is outside it. Do you want to add it to my scope?" Act only on a yes, then add it to the Purpose.
 - Hand back only what is outside the Purpose or an extra you can finish without. It goes on the item as a proposed follow-up.

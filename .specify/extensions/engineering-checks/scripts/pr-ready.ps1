@@ -43,6 +43,14 @@ if (-not $isSource) {
     }
 }
 
+# Specs are not kept (Martin): once the outcome checks have passed, the item's folder, specs/<issue>-<name>/, is
+# reconciled into the docs and deleted in this pull request, before it is marked ready.
+if (Test-Path .specify/items/current.json) {
+    $curId = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
+    $left = Get-ChildItem specs -Directory -Filter "$curId-*" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($left) { $fail.Add("specs/$($left.Name)/ is still here: reconcile what was decided and built into the docs, then delete the folder in this pull request") }
+}
+
 if (-not $fail.Count) {
     $done = @('.specify/extensions/engineering-checks/scripts/done-checks.ps1', 'extensions/engineering-checks/scripts/done-checks.ps1') | Where-Object { Test-Path $_ } | Select-Object -First 1
     if (-not $done) { $fail.Add('done-checks.ps1 was not found') }

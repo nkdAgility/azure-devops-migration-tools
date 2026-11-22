@@ -35,7 +35,7 @@ if ($call.tool_name -match 'Write|Edit' -and $text -match '\.specify[\\/]workflo
     exit 2
 }
 
-# The worker's Purpose decides scope. The item's WKR file (.specify/wkr/<n>.md) carries front matter:
+# The worker's Purpose decides scope. The item's record (specs/<issue>-<name>/item.md) carries front matter:
 #   ---
 #   purpose: <the one outcome this worker delivers>
 #   paths:
@@ -43,7 +43,7 @@ if ($call.tool_name -match 'Write|Edit' -and $text -match '\.specify[\\/]workflo
 #   ---
 # An edit to a repo file that matches none of the paths, or a build, test or end-to-end command when the paths
 # include no product code (productPaths in .specify/memory/workflow.json), asks Martin. No current item, or a
-# WKR file without paths, means no opinion. The workflow's own files (.specify/wkr, items, reviews) are allowed.
+# record without paths, means no opinion. The workflow's own files (specs/, .specify/items, reviews, bugs) are allowed.
 function ConvertTo-GlobRegex([string]$Glob) {
     $g = $Glob.Trim().Replace('\', '/').TrimStart('/'); $sb = [Text.StringBuilder]::new('^'); $i = 0
     while ($i -lt $g.Length) {
@@ -63,7 +63,10 @@ function Get-Scope([string]$Root) {
     $cur = Join-Path $Root '.specify/items/current.json'
     if (-not (Test-Path $cur)) { return $null }
     $id = (Get-Content $cur -Raw | ConvertFrom-Json).number
-    $wkrRel = ".specify/wkr/$id.md"; $wkr = Join-Path $Root $wkrRel
+    # The item's record: specs/<issue>-<name>/item.md (an older .specify/wkr/<issue>.md is still read).
+    $folder = Get-ChildItem (Join-Path $Root 'specs') -Directory -Filter "$id-*" -ErrorAction SilentlyContinue | Select-Object -First 1
+    $wkrRel = if ($folder) { "specs/$($folder.Name)/item.md" } else { ".specify/wkr/$id.md" }
+    $wkr = Join-Path $Root $wkrRel
     if (-not (Test-Path $wkr)) { return $null }
     $lines = [IO.File]::ReadAllLines($wkr)
     $start = [array]::IndexOf(($lines | ForEach-Object { $_.Trim() }), '---')
@@ -199,9 +202,14 @@ if ($scopeRoot -and (Test-Path (Join-Path $scopeRoot '.specify/memory/workflow.j
         $itemId = (Get-Content $cur -Raw | ConvertFrom-Json).number
         Import-Module (Join-Path $scopeRoot '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
         $wcfg = Get-WorkflowConfig -Root $scopeRoot
-        $state = (& (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId).state
+        $gItem = & (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId
+        $state = $gItem.state
         if ($state -notin 'Building', 'Validating', 'In review') {
             [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only once the item is in Building: through Refining, Martin's approval of the spec, and the Ready gate.")
+            exit 2
+        }
+        if (@($gItem.tags) -contains 'spec-reconcile-required') {
+            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is tagged spec-reconcile-required. Revise the spec and get Martin's approval of the new version first; then clear the tag with set-blocked.ps1 -Clear.")
             exit 2
         }
     }

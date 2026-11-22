@@ -58,6 +58,9 @@ provides:
     - name: speckit.engineering-checks.manager
       file: commands/manager.md
       description: "Be this repo's MANAGER: run the board through the Definition of Workflow and start a worker for each item it pulls"
+    - name: speckit.engineering-checks.retro
+      file: commands/retro.md
+      description: "The retrospective on the process: a blind analysis of the worker's turns against the Definition of Workflow, written as feedback for the process agent"
     - name: speckit.engineering-checks.auto-advance
       file: commands/auto-advance.md
       description: "Moves an item on as soon as its evidence meets the exit policy for its state"

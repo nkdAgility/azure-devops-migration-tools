@@ -21,12 +21,14 @@ $ARGUMENTS
 
 Run the item's workflows yourself, with Spec Kit v1.4.1 (`uvx --from git+https://github.com/github/spec-kit.git@v1.4.1 specify workflow run <workflow> --input ...`), the item reference first in the request (`#<id> ...`):
 
-- **Refining:** `nkda-refine`. It writes the item's record, `.specify/wkr/<id>.md`, opening with your Purpose and the `paths` you may edit.
+- **Refining:** `nkda-refine`. It writes the item's record, `specs/<id>-<name>/item.md`, opening with your Purpose and the `paths` you may edit.
 - **Then its route:** `speckit` (Product Backlog Item), `bugfix` (Bug) or `assess` (Feedback).
 
 When a run pauses at a gate, stop and ask Martin as a QUESTION (`ask-martin`), showing what he is approving in full: the spec, the plan or the assessment. Resume the run with his answer as the gate's input (`specify workflow resume <run> --input <verdict input>=<his choice>`), and record his words as `Spec agreed: <his words>` where the gate is the spec's. Never answer a gate yourself.
 
 A failing check is fixed and the step re-run; it is never skipped or worked round.
+
+**Items never move back.** If the work shows the agreed spec cannot be met as written, keep the item in its state, tag it with `set-blocked.ps1 -Why spec-reconcile-required`, revise the spec, record what you found, and ask Martin to approve the new version as a QUESTION, showing what changed. Change no product code until he approves; then clear the tag with `set-blocked.ps1 -Why spec-reconcile-required -Clear`. A failed outcome check tags the item `outcome-check-failed` itself: fix the code in Validating and run the checks again. Waiting for an answer you cannot find yourself: `-Why more-information-needed`.
 
 Every item goes through every stage and writes every section its type asks for. A small item does the same, just smaller: each section is as long as the item needs, and a one-line change can have a one-line section.
 
@@ -41,6 +43,10 @@ Every item goes through every stage and writes every section its type asks for. 
 ## The pull request
 
 Open it as a draft. While anything it needs is missing, it stays a draft. Review comments are fixed, replied to with the commit that fixed them, and resolved. Mark it ready only through `pr-ready.ps1`. Merge only as the repo's rules allow; otherwise tell the manager it is ready for Martin to merge.
+
+## Retrospective
+
+Once the pull request has merged, run `retro`: it writes your transcript and has a blind reviewer analyse your turns against the Definition of Workflow, for deviations, constraints, Martin's corrections and changes needed. The item cannot be Closed until the note exists.
 
 ## Report
 

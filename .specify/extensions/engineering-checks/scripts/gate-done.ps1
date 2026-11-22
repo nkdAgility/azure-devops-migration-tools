@@ -14,7 +14,7 @@ if ($Gate -eq 'outcome') {
     if (-not (Test-Path $report)) { Write-Error "$report was not written: the outcome checks have not passed."; exit 1 }
     if (Test-Path .specify/reviews/outcome-attempt-pending) { Write-Error "an outcome check attempt did not record its start; run the outcome checks again."; exit 1 }
     $r = (Get-Content $report -Raw) -replace "`r`n", "`n"
-    $wkr = ".specify/wkr/$id.md"
+    $wkr = Get-ItemRecordPath '.' $id
     $history = if (Test-Path $wkr) { (Get-Content $wkr -Raw) -replace "`r`n", "`n" } else { '' }
     $head = git rev-parse HEAD
     # The report itself must be a pass for this item at this commit (an earlier pass on the WKR cannot stand in
