@@ -12,7 +12,7 @@ if (-not $spec) { Write-Error 'No spec.md under specs/.'; exit 1 }
 $rel = [IO.Path]::GetRelativePath((Get-Location), $spec.FullName).Replace('\', '/')
 & $rec -Section 'Spec' -Body "Working spec: ``$rel`` (deleted once reconciled into $root/)."
 # The version Martin is shown at the review gate; spec-agreed.ps1 binds his approval to exactly this.
-& $rec -Line "Spec presented: $rel sha256 $((Get-FileHash $spec.FullName -Algorithm SHA256).Hash.ToLower())"
+& $rec -Line "Spec presented: $rel sha256 $(Get-TextHash $spec.FullName)"
 foreach ($p in @(, @('Red team', '.specify/reviews/challenge.md'))) {
     if (-not (Test-Path $p[1])) { Write-Error "$($p[1]) was not written."; exit 1 }
     & $rec -Section $p[0] -Body (Get-Content $p[1] -Raw)

@@ -241,6 +241,20 @@ function Get-SpecAgreed([string]$Text) {
     $words
 }
 
+function Get-TextHash([string]$Path) {
+    # The fingerprint of a text file's content: SHA-256 of its UTF-8 text with line endings normalised to LF, so a
+    # checkout that converts LF to CRLF (or back) does not make an approved file look changed.
+    $text = [IO.File]::ReadAllText($Path) -replace "`r`n", "`n"
+    ([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($text)))).ToLowerInvariant()
+}
+
+function Test-TextHash([string]$Path, [string]$Hash) {
+    # Whether a recorded fingerprint still matches the file: the line-ending-normalised fingerprint, or one recorded
+    # before that change over the file's raw bytes (so approvals bound earlier stay valid).
+    $Hash = $Hash.ToLowerInvariant()
+    (Get-TextHash $Path) -eq $Hash -or (Get-FileHash $Path -Algorithm SHA256).Hash.ToLowerInvariant() -eq $Hash
+}
+
 function Get-SharedSource($Config, [string]$Root = '.') {
     # nkda-speckit: NKDA_SPECKIT_SOURCE, or `sharedSource` in the repo's workflow settings, relative to the main checkout.
     if ($env:NKDA_SPECKIT_SOURCE) { return $env:NKDA_SPECKIT_SOURCE }
@@ -275,8 +289,7 @@ function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     if ($shown.Groups['h'].Value -ne $ver.Groups['h'].Value) { return "the approval is bound to a version other than the one presented to Martin" }
     $file = Join-Path $Root $ver.Groups['p'].Value
     if (-not (Test-Path $file)) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
-    $now = (Get-FileHash $file -Algorithm SHA256).Hash.ToLower()
-    if ($now -ne $ver.Groups['h'].Value) { return "the spec changed after Martin approved it; it needs his approval again" }
+    if (-not (Test-TextHash $file $ver.Groups['h'].Value)) { return "the spec changed after Martin approved it; it needs his approval again" }
     $null
 }
 
@@ -736,4 +749,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SpecApprovalProblem, Get-SharedSource, Get-RetroNote, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift

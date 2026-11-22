@@ -5,7 +5,7 @@ function Get-Fingerprint([string]$p) {
     $files = if (Test-Path $p -PathType Container) { Get-ChildItem $p -Recurse -File -Force | Where-Object FullName -ne ([IO.Path]::GetFullPath($Record)) | Sort-Object FullName } else { Get-Item $p }
     $lines = foreach ($f in $files) {
         $rel = if (Test-Path $p -PathType Container) { [IO.Path]::GetRelativePath((Resolve-Path $p), $f.FullName) } else { $f.Name }
-        "$rel $((Get-FileHash $f.FullName -Algorithm SHA256).Hash)"
+        "$rel $([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes(([IO.File]::ReadAllText($f.FullName) -replace "`r`n", "`n")))))"
     }
     $bytes = [Text.Encoding]::UTF8.GetBytes(($lines -join "`n"))
     [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))

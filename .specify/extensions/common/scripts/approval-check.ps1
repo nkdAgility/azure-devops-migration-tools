@@ -7,7 +7,7 @@ $rec = Get-Content $Record -Raw | ConvertFrom-Json
 $files = if (Test-Path $Path -PathType Container) { Get-ChildItem $Path -Recurse -File -Force | Where-Object FullName -ne ([IO.Path]::GetFullPath($Record)) | Sort-Object FullName } else { Get-Item $Path }
 $lines = foreach ($f in $files) {
     $rel = if (Test-Path $Path -PathType Container) { [IO.Path]::GetRelativePath((Resolve-Path $Path), $f.FullName) } else { $f.Name }
-    "$rel $((Get-FileHash $f.FullName -Algorithm SHA256).Hash)"
+    "$rel $([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes(([IO.File]::ReadAllText($f.FullName) -replace "`r`n", "`n")))))"
 }
 $fp = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes(($lines -join "`n"))))
 if ($fp -ne $rec.fingerprint) { Write-Error "Changed since approval: $Path. Approve it again."; exit 1 }
