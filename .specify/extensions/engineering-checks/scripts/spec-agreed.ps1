@@ -23,8 +23,7 @@ if (-not $shown) { Write-Error "#$id records no 'Spec presented:' version, so th
 if ($agreed.Index -lt $shown.Index) { Write-Error "Martin's last 'Spec agreed:' line is older than the version presented to him; it needs his approval of the version presented."; exit 1 }
 $path = $shown.Groups['p'].Value; $hash = $shown.Groups['h'].Value
 if (-not (Test-Path $path)) { Write-Error "The working spec $path is missing."; exit 1 }
-$now = Get-TextHash $path
-if ($now -ne $hash) { Write-Error "The spec $path changed after it was presented to Martin; present it again and get his approval."; exit 1 }
+if (-not (Test-TextHash $path $hash)) { Write-Error "The spec $path changed after it was presented to Martin; present it again and get his approval."; exit 1 }
 $bound = [regex]::Matches($text, '(?m)^Spec version:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Where-Object { $_.Index -gt $agreed.Index } | Select-Object -Last 1
 if ($bound) {
     if ($bound.Groups['h'].Value -ne $hash) { Write-Error "This approval is already bound to another version; it is never rebound. Get a new approval."; exit 1 }
