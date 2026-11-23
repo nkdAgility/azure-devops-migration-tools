@@ -127,7 +127,7 @@ This will rebuild the Plans and Suites and wire up all of the Test Cases.
 
 _note: Runs are not migrated._
 
-If a Test Case in a suite has not been migrated in step 1, it is left out of the rebuilt suite, an error names it, and the run exits with code 1. Migrate it, then run this step again. That repairs suites under the root suite, but not a Test Case that sits directly in the plan's root suite: those are only added when the plan is created, so on a re-run against the existing plan they stay missing ([#3260](https://github.com/nkdAgility/azure-devops-migration-tools/issues/3260)). For those, add the Test Case to the root suite in the target by hand, or delete the target plan and run this step again so it is created afresh.
+If a Test Case in a suite has not been migrated in step 1, it is left out of the rebuilt suite, an error names it, and the run exits with code 1. Migrate it, then run this step again: Test Cases missing from the existing target plan, its root suite included, are added, and those already there are left as they are.
 
 The important bits:
 
@@ -136,7 +136,7 @@ The important bits:
 - Leave `OnlyElementsWithTag` empty unless you want only plans, suites and Test Cases carrying that tag. The check is a substring match on the tags text, so `move` also matches an item tagged `remove`; choose a tag that no other tag contains. The filter applies at every level, so tag the whole hierarchy:
   - a plan without the tag is skipped with everything in it;
   - a suite under the root suite without the tag is skipped with all of its child suites. The root suite is not checked this way, so its child suites are always processed;
-  - a suite's own Test Cases are only added when that suite has the tag. For the root suite this applies only when the plan is created: if the plan already exists in the target, the Test Cases directly in its root suite are not added again on that run;
+  - a suite's own Test Cases are only added when that suite has the tag, the root suite included;
   - each Test Case must have the tag too.
 - `FilterCompleted: true` skips source plans whose name already exists in the target.
 - Test Plan names must be unique in the target, and suite titles must be unique among the suites under the same parent. Plans are matched by name and suites by title, so duplicates stop the run (`Test plans ... all have the same name!` or `Sequence contains more than one element`).
