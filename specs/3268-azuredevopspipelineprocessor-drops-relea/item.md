@@ -50,3 +50,24 @@ Open findings: 0
 
 ## Proposed follow-ups
 - Release triggers are dropped by `ResetObject()` (`Triggers = null`); artifact triggers could be mapped the same way.
+
+## Spec
+
+Working spec: `specs/3268-azuredevopspipelineprocessor-drops-relea/assessment.md` (the bug assessment Martin approves).
+
+Spec presented: specs/3268-azuredevopspipelineprocessor-drops-relea/assessment.md sha256 b85c376a34ba425992866e8db87d67de869584be8b2f0287d39c07aca2c12750
+
+## Reproduction
+
+On `main` (e2ddb400), against scratch projects `amte2e-3268-src`/`amte2e-3268-tgt`: one release with Build artifact `_amte2e-3268-build`, downloaded by deploy job "Agent job". The target rejects the POST with `InvalidRequestException` "Artifact alias '_amte2e-3268-build' does not matching any linked artifact aliases for deploy job 'Agent job'", followed by "0 of 1 source ReleaseDefinition(s) were skipped and 1 were rejected by the target", `EXIT CODE: 1`.
+
+
+## Cause
+
+
+
+
+## Proposed fix
+
+
+
