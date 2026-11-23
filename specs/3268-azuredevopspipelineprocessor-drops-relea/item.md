@@ -137,7 +137,12 @@ Outcome checks started for #3268 at 2a960d7330f3283ea9acffe26c48ed8b6c5f7982 att
 
 ## Outcome done
 
-Automated outcome checks all passed for #3268 at 2a960d73 (`.specify/reviews/outcome-checks.md`):
+Automated outcome checks (all passed) for #3268 at df67541b576f588e2efa5aab72310133d6b55178 attempt bd3c70742d3e:
+- rest-client, test orgs: a classic release with a Build artifact downloaded by its deploy job migrates; pass = exit 0 and the target release's artifact points at the target project and the migrated build definition: `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3268/assert.ps1 -Case mapped` exit 0
+- rest-client, test orgs: a release whose artifact cannot be mapped is skipped with a clear error; pass = exit 1, the log names the release, alias and type, and no 400 from the target: `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3268/assert.ps1 -Case unmappable` exit 0
+- rest-client, unit: artifact mapping and skip rules; pass = exit 0: `dotnet test src/MigrationTools.Clients.AzureDevops.Rest.Tests --filter "FullyQualifiedName~ReleaseArtifact"` exit 0
+
+
 - Mapped, on the test orgs: the release migrates with exit 0; its artifact keeps alias `_amte2e-3268-build` and points at the target project and the migrated build definition (35).
 - Unmappable, on the test orgs: exit 1 with one error naming the release, alias and type; counted as skipped; no 400; nothing created in the target.
 - Unit: the 10 `ReleaseArtifactMapTests` pass.
@@ -150,3 +155,4 @@ Reasons:
 - The failure path gives the clear report the issue asked for instead of a 400.
 - Git and service-connection artifacts are proved by unit tests, not end to end.
 
+Outcome checks started for #3268 at df67541b576f588e2efa5aab72310133d6b55178 attempt bd3c70742d3e:
