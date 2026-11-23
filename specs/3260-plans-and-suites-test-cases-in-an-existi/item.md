@@ -115,3 +115,14 @@ Open findings: 0
 2. Also re-apply default configurations to an existing root suite (as "Suite Exists" does for child suites)? Proposed: yes.
 3. Should step 3 of the failure path (unmigrated root Test Case) exit 1 on an existing plan? It will once the call runs;
    today it silently exits 0. Proposed: yes, consistent with child suites.
+
+Decided: 1 accept, no option; 2 yes; 3 yes (approved as proposed).
+
+## Spec
+
+The bug assessment: `specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md`.
+
+Spec presented: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md sha256 07571fbddd2e86db02c313a7bbcfab1814b84ea7ec129852e0ed711649ea40f1
+
+Spec agreed: Approve as proposed
+Spec version: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md sha256 07571fbddd2e86db02c313a7bbcfab1814b84ea7ec129852e0ed711649ea40f1
