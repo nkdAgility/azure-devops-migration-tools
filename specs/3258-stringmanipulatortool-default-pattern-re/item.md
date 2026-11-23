@@ -70,7 +70,7 @@ The issue's framing ("remove emoji, keep letters") is superseded. Originally, th
 ## Proposed fix
 The default pattern is narrowed to the characters XML 1.0 (the SOAP payload) cannot carry, which is what the save rejects:
 
-`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[￾￿]`
+`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uFFFE\uFFFF]`
 
 - That covers C0 controls except tab, LF and CR; lone surrogates; and U+FFFE/U+FFFF. Every valid surrogate pair (letters and emoji), U+FE0F and all BMP emoji are kept.
 - `\x7F-\x9F` (DEL and C1) are legal in XML 1.0. Whether SOAP rejects them can't be tested on Azure DevOps Services, because REST will not seed them (Q-6).
@@ -112,7 +112,7 @@ On `main`, test orgs, scratch projects `amte2e-3258-*`, which were deleted after
 
 1. Enable `StringManipulatorTool` with `Manipulators: []`. Seed a Bug with `Microsoft.VSTS.Build.FoundIn` = `A𐓏B 𠀀 W⌚ E😀`. Migrate. The target has `AB  W⌚ E`, the run exits 0, and the loss is silent.
 2. Replace the default with a no-op manipulator and seed one Bug per character. SOAP saved U+104CF, U+1F600, U+231A and U+FE0F unchanged. U+FFFE failed the save after the retry limit, and the run exited 1.
-3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A￾B` unchanged.
+3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A\uFFFEB` unchanged.
 
 [NEEDS CLARIFICATION: whether SOAP rejects DEL and C1 (U+007F–U+009F). Azure DevOps Services REST refuses to seed them, so this can't be tested on the test orgs.]
 
@@ -125,7 +125,7 @@ The default equates "surrogate pair" with "emoji". It doesn't target the charact
 ## Proposed fix
 
 **Preferred**: replace the default pattern with
-`[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[￾￿]`.
+`[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uFFFE\uFFFF]`.
 This keeps DEL/C1 scrubbing as on `main` unless Martin decides otherwise (Q-6). Update `Description` to say it removes characters the SOAP API cannot save. The pattern stays a plain regex, so users can copy it into their own config.
 
 **Alternatives**:
@@ -169,7 +169,7 @@ On `main`, test orgs, scratch projects `amte2e-3258-*`, which were deleted after
 
 1. Enable `StringManipulatorTool` with `Manipulators: []`. Seed a Bug with `Microsoft.VSTS.Build.FoundIn` = `A𐓏B 𠀀 W⌚ E😀`. Migrate. The target has `AB  W⌚ E`, the run exits 0, and the loss is silent.
 2. Replace the default with a no-op manipulator and seed one Bug per character. SOAP saved U+104CF, U+1F600, U+231A and U+FE0F unchanged. U+FFFE failed the save after the retry limit, and the run exited 1.
-3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A￾B` unchanged.
+3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A\uFFFEB` unchanged.
 
 DEL and C1 (U+007F–U+009F) couldn't be tested, because Azure DevOps Services REST refuses to seed them. Martin decided not to scrub them.
 
@@ -182,7 +182,7 @@ The default equates "surrogate pair" with "emoji". It doesn't target the charact
 ## Proposed fix
 
 **Preferred**: replace the default pattern with
-`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[￾￿]`.
+`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uFFFE\uFFFF]`.
 DEL and C1 are no longer scrubbed (Martin, Q-6). Update `Description` to say it removes characters the SOAP API cannot save. The pattern stays a plain regex, so users can copy it into their own config.
 
 **Alternatives**:
@@ -217,7 +217,7 @@ On `main`, test orgs, scratch projects `amte2e-3258-*`, which were deleted after
 
 1. Enable `StringManipulatorTool` with `Manipulators: []`. Seed a Bug with `Microsoft.VSTS.Build.FoundIn` = `A𐓏B 𠀀 W⌚ E😀`. Migrate. The target has `AB  W⌚ E`, the run exits 0, and the loss is silent.
 2. Replace the default with a no-op manipulator and seed one Bug per character. SOAP saved U+104CF, U+1F600, U+231A and U+FE0F unchanged. U+FFFE failed the save after the retry limit, and the run exited 1.
-3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A￾B` unchanged.
+3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A\uFFFEB` unchanged.
 
 DEL and C1 (U+007F–U+009F) couldn't be tested, because Azure DevOps Services REST refuses to seed them. Martin decided not to scrub them.
 
@@ -230,7 +230,7 @@ The default equates "surrogate pair" with "emoji". It doesn't target the charact
 ## Proposed fix
 
 **Preferred**: replace the default pattern with
-`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[￾￿]`.
+`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uFFFE\uFFFF]`.
 DEL and C1 are no longer scrubbed (Martin, Q-6). Update `Description` to say it removes characters the SOAP API cannot save. The pattern stays a plain regex, so users can copy it into their own config.
 
 **Alternatives**:
@@ -265,7 +265,7 @@ On `main`, test orgs, scratch projects `amte2e-3258-*`, which were deleted after
 
 1. Enable `StringManipulatorTool` with `Manipulators: []`. Seed a Bug with `Microsoft.VSTS.Build.FoundIn` = `A𐓏B 𠀀 W⌚ E😀`. Migrate. The target has `AB  W⌚ E`, the run exits 0, and the loss is silent.
 2. Replace the default with a no-op manipulator and seed one Bug per character. SOAP saved U+104CF, U+1F600, U+231A and U+FE0F unchanged. U+FFFE failed the save after the retry limit, and the run exited 1.
-3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A￾B` unchanged.
+3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A\uFFFEB` unchanged.
 
 DEL and C1 (U+007F–U+009F) couldn't be tested, because Azure DevOps Services REST refuses to seed them. Martin decided not to scrub them.
 
@@ -278,7 +278,7 @@ The default equates "surrogate pair" with "emoji". It doesn't target the charact
 ## Proposed fix
 
 **Preferred**: replace the default pattern with
-`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[￾￿]`.
+`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uFFFE\uFFFF]`.
 DEL and C1 are no longer scrubbed (Martin, Q-6). Update `Description` to say it removes characters the SOAP API cannot save. The pattern stays a plain regex, so users can copy it into their own config.
 
 **Alternatives**:
