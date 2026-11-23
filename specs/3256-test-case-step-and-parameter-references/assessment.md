@@ -62,6 +62,10 @@ The "target not found" case was never handled: both methods only act when a targ
 - A re-run after the Shared Steps are migrated must remap the reference and stop the warning. `MigrateSharedSteps` replaces in the target value, which on a re-run already holds the source ID, so it still matches. Check this in the e2e re-run.
 - A new review category changes the summary output: update the docs and anything that parses the category list.
 
+## Docs
+
+Docs unchanged: docs-site: only the content of two pages changes (the processor reference's review-category table and the Migrating Plans and Suites warning); how the docs site is built, laid out and checked does not change, so platform/specs/docs-site/ has nothing to describe.
+
 ## Open Questions
 
 - None. Martin approved the three decisions from refinement (new category; default WIQL as a follow-up; keep the stale ID and report it).
