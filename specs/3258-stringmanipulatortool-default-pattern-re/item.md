@@ -150,7 +150,7 @@ This keeps DEL/C1 scrubbing as on `main` unless Martin decides otherwise (Q-6). 
 - Q-3 Q-5 release as a bug fix? (for Martin) answered: bug fix plus release note
 - Q-4 Q-6 keep scrubbing DEL/C1? (for Martin) answered: stop scrubbing
 - Q-5 whether SOAP rejects DEL and C1 (U+007F–U+009F). Azure DevOps Services REST refuses to seed them, so this can't be tested on the test orgs. (for Martin) answered: moot, DEL/C1 are no longer scrubbed
-- Q-7 `Remove-E2EObjects.ps1 -Prefix amte2e-3258-` would derive field prefix `Custom.amte2e` and delete every e2e field. The clean-up uses Remove-E2EProject for the two scratch projects instead. Is that the clean-up you want? (for Martin) answered (2026-11-23): fix Remove-E2EObjects in this item
+- Q-7 `Remove-E2EObjects.ps1 -Prefix amte2e-3258-` would derive field prefix `Custom.amte2e` and delete every e2e field. The clean-up uses Remove-E2EProject for the two scratch projects instead. Is that the clean-up you want? (for Martin) answered (2026-11-23): fix Remove-E2EObjects. Its field-prefix fix is covered by #3278, which owns tools/e2e/Remove-E2EObjects.ps1; #3258 does not edit that file and uses it once #3278 lands
 
 Spec agreed: Approve (2026-11-21, review gate on .specify/bugs/stringmanipulator-soap-scrub/assessment.md); Title: Fix it here; Configs: Fix them here; DEL/C1: Stop scrubbing
 Spec presented: .specify/bugs/stringmanipulator-soap-scrub/assessment.md sha256 ae708d85da7436fcb4fd77a7f5c733bfb55f2d945f6b5a9d6bc4cf22bde4e313
