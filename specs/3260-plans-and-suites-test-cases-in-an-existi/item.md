@@ -169,3 +169,22 @@ Spec presented: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.m
 
 Spec agreed: Approve as proposed
 Spec version: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md sha256 07571fbddd2e86db02c313a7bbcfab1814b84ea7ec129852e0ed711649ea40f1
+Outcome checks started for #3260 at 1da302259145d1113db677f4c58abeb412bd901a attempt 349362a5031d:
+
+## Outcome done
+
+Automated outcome checks (all passed) for #3260 at 1da302259145d1113db677f4c58abeb412bd901a attempt 349362a5031d:
+- Root-suite top-up, no duplicates and the unmigrated-Test-Case error, on the test orgs: `pwsh -NoProfile -File tools/e2e/scenarios/testplans-3260/run.ps1` exit 0
+
+- First migration: root 1, Suite A 1, all runs exit 0.
+- TC2 added to root and Suite A, re-run: root 2, Suite A 2, exit 0 (on `main` the root stayed at 1).
+- Re-run with nothing new: root 2, Suite A 2, no duplicates, exit 0.
+- TC3 in the root suite, not migrated: exit 1, error names TC3 and the root suite.
+- TC3 migrated, re-run: root 3, Suite A 2, exit 0.
+
+Confidence: 90%
+Reasons:
+- Every phase of the scenario gave the expected exit code and target suites on this commit, and the same scenario fails its asserts on `main`.
+- Not checked end to end: `OnlyElementsWithTag` on an existing plan (outcome check 5); that code path is unchanged.
+
+
