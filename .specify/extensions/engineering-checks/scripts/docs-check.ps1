@@ -8,6 +8,14 @@ $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
 Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
 $wkr = Get-ItemRecordPath '.' $id
 $wkrText = if (Test-Path $wkr) { Get-Content $wkr -Raw } else { '' }
+# The spec Martin approved (a feature spec or a bug assessment), when his approval still stands for it.
+$approvedSpec = ''
+$normRecord = $wkrText -replace "`r`n", "`n"
+if (-not (Get-SpecApprovalProblem $normRecord '.')) {
+    $ver = [regex]::Matches($normRecord, '(?m)^Spec version:[ \t]*(?<p>\S+)[ \t]+sha256') | Select-Object -Last 1
+    $specFile = if ($ver) { Resolve-SpecPath '.' $ver.Groups['p'].Value } else { $null }
+    if ($specFile) { $approvedSpec = (Get-Content $specFile -Raw) -replace "`r`n", "`n" }
+}
 $failures = [Collections.Generic.List[string]]::new()
 $root = 'docs/specs'
 $cfgPath = '.specify/memory/workflow.json'
@@ -27,8 +35,11 @@ else {
     foreach ($s in $systems) {
         $touched = $changed | Where-Object { $f = $_; ($s.paths | Where-Object { $p = $_; if ($p.EndsWith('/')) { $f -like "$p*" } else { $f -eq $p -or $f -like "$p/*" } }) -and $f -notlike "$root/*" }
         if (-not $touched) { continue }
-        # A waiver counts only if it was in the spec Martin approved: the line comes before his last "Spec agreed:".
-        $waiver = [regex]::Matches($wkrText, "(?m)^Docs unchanged:\s*$([regex]::Escape($s.name))\s*:\s*\S") | Select-Object -Last 1
+        # A waiver counts only if it was in the spec Martin approved: either in the approved spec itself (the file his
+        # approval is bound to, while that approval stands), or on the record before his last "Spec agreed:".
+        $waiverPattern = "(?m)^\s*(?:-\s*)?Docs unchanged:\s*$([regex]::Escape($s.name))\s*:\s*\S"
+        if ($approvedSpec -and [regex]::IsMatch($approvedSpec, $waiverPattern)) { continue }
+        $waiver = [regex]::Matches($wkrText, $waiverPattern) | Select-Object -Last 1
         $agreed = [regex]::Matches($wkrText, '(?m)^Spec agreed:') | Select-Object -Last 1
         if ($waiver -and $agreed -and $waiver.Index -lt $agreed.Index) { continue }
         if ($waiver) { $failures.Add("the 'Docs unchanged: $($s.name)' reason was added after Martin agreed the spec; it must be in the spec he approves"); continue }
