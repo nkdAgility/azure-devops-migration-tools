@@ -1,0 +1,43 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information"
+  },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "AzureDevOpsEndpoint",
+        "AuthenticationMode": "EntraId",
+        "AccessToken": "set-by-harness",
+        "Organisation": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-3312-src",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      },
+      "Target": {
+        "EndpointType": "AzureDevOpsEndpoint",
+        "AuthenticationMode": "EntraId",
+        "AccessToken": "set-by-harness",
+        "Organisation": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-3312-tgt",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId"
+      }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "AzureDevOpsPipelineProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "MigrateBuildPipelines": true,
+        "MigrateReleasePipelines": false,
+        "MigrateTaskGroups": false,
+        "MigrateVariableGroups": false,
+        "MigrateServiceConnections": false,
+        "RepositoryNameMaps": {},
+        "BuildPipelines": [
+          "amte2e-3312-yaml"
+        ]
+      }
+    ]
+  }
+}
