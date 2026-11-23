@@ -50,6 +50,9 @@ if (Test-Path .specify/items/current.json) {
     $left = Get-ChildItem specs -Directory -Filter "$curId-*" -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($left) { $fail.Add("specs/$($left.Name)/ is still here: reconcile what was decided and built into the docs, then delete the folder in this pull request") }
 }
+# No temporary Spec Kit or workflow file reaches main: a bug or idea assessment, a review file, or an older item record.
+$temp = @(git ls-files -- .specify/bugs .specify/assessments .specify/reviews .specify/wkr 2>$null)
+if ($temp) { $fail.Add("temporary workflow files are tracked on this branch: $($temp -join ', '). Fold what matters into the item's record or the docs, then remove them (git rm) in this pull request") }
 
 if (-not $fail.Count) {
     $done = @('.specify/extensions/engineering-checks/scripts/done-checks.ps1', 'extensions/engineering-checks/scripts/done-checks.ps1') | Where-Object { Test-Path $_ } | Select-Object -First 1

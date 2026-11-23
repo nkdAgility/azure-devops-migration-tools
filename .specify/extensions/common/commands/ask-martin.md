@@ -16,7 +16,7 @@ Ask only when one of these is true:
 
 First check the repo's rules, its notes file and the item. If one settles it, apply it and don't ask. A question of fact (where a file is, what a run did) is never put to him: find it out.
 
-If only one option survives the checks below, there is no question: take it, record it on the item with the options dropped and why, and say so in your report.
+If only one option survives the check below, there is no question: take it, record it on the item with the options dropped and why, and say so in your report.
 
 ## Show it
 
@@ -33,7 +33,9 @@ He approves only what he has seen. Every ask says in plain words what the thing 
 - **Impact:** for each option, what changes for the people using it, and what goes wrong if it is the wrong choice.
 - **Reply:** the exact words for each option.
 
-Only options that pass the repo's rules and architecture checks are shown; one line under them names any dropped option and the check it failed. Number QUESTIONs upwards across the conversation and never reuse a number. One decision per block.
+**Check every question before asking.** Write the question and every option, then have a separate reviewer check each option, seeing only the question, the options, the repo's architecture and core rules, the product outcome, and the item's Purpose and spec, never your reasoning. An option is valid only if it keeps the architecture and core rules, does the thing properly rather than fast (an option that cuts a corner to save time is invalid when a proper one exists), serves the product outcome, and delivers the item's Purpose and spec. With one valid option there is no question: take it, record it on the item with the dropped options and the test each failed, and say so in your report. With none, the question is wrong: rethink it. With two or more, ask Martin about those only, with one line naming each dropped option and the test it failed.
+
+Number QUESTIONs upwards across the conversation and never reuse a number. One decision per block.
 
 ## His instruction is his approval
 

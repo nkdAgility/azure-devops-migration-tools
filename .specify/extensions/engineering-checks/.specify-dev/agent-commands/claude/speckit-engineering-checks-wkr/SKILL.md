@@ -29,9 +29,13 @@ Run the item's workflows yourself, with Spec Kit v1.4.1 (`uvx --from git+https:/
 - **Refining:** `nkda-refine`. It writes the item's record, `specs/<id>-<name>/item.md`, opening with your Purpose and the `paths` you may edit.
 - **Then its route:** `speckit` (Product Backlog Item), `bugfix` (Bug) or `assess` (Feedback).
 
+Before any question to Martin, check every option as `ask-martin` says: a separate reviewer tests each against the architecture and core rules, doing it properly rather than fast, the product outcome, and the item's Purpose and spec. Ask only when two or more options survive; with one, take it and record why.
+
 When a run pauses at a gate, stop and ask Martin as a QUESTION (`ask-martin`), showing what he is approving in full: the spec, the plan or the assessment. Resume the run with his answer as the gate's input (`specify workflow resume <run> --input <verdict input>=<his choice>`), and record his words as `Spec agreed: <his words>` where the gate is the spec's. Never answer a gate yourself.
 
 A failing check is fixed and the step re-run; it is never skipped or worked round.
+
+Commit the item's folder, `specs/<issue>-<name>/`, each time its record, spec or assessment changes, so the pull request always shows where the item stands. When you update the docs, name each one on the item under `## Docs updated` as `- <system>: `<doc path>`: <phrase from the doc>`; a system whose docs need no change needs `Docs unchanged: <system>: <reason>` in the spec Martin approves. Nothing temporary reaches `main`: before the pull request is marked ready, the item's folder and any file under `.specify/bugs/`, `.specify/assessments/`, `.specify/reviews/` or `.specify/wkr/` are removed.
 
 **Items never move back.** If the work shows the agreed spec cannot be met as written, keep the item in its state, tag it with `set-blocked.ps1 -Why spec-reconcile-required`, revise the spec, record what you found, and ask Martin to approve the new version as a QUESTION, showing what changed. Change no product code until he approves; then clear the tag with `set-blocked.ps1 -Why spec-reconcile-required -Clear`. A failed outcome check tags the item `outcome-check-failed` itself: fix the code in Validating and run the checks again. Waiting for an answer you cannot find yourself: `-Why more-information-needed`.
 

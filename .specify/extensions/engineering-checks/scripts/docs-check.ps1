@@ -1,6 +1,7 @@
-# Output Done, docs reconciled: every system the change touches has its {specRoot}/{system}/ (default docs/specs/) updated, or is
-# marked unchanged with a reason ("Docs unchanged: <system>: <reason>" on the item); no discrepancy is left
-# open; and the working spec folder is deleted in the same change. Fails the step otherwise.
+# Output Done, docs reconciled: every system the change touches has its {specRoot}/{system}/ (default docs/specs/)
+# updated to describe what this item added (named on the item under "## Docs updated", with a phrase the doc must
+# contain), or is marked unchanged with a reason that was in the spec Martin approved ("Docs unchanged: <system>:
+# <reason>"); and no discrepancy is left open. The item's folder is removed later, before the PR is marked ready.
 param([string]$Base = 'main')
 $ErrorActionPreference = 'Stop'
 $id = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
@@ -26,9 +27,23 @@ else {
     foreach ($s in $systems) {
         $touched = $changed | Where-Object { $f = $_; ($s.paths | Where-Object { $p = $_; if ($p.EndsWith('/')) { $f -like "$p*" } else { $f -eq $p -or $f -like "$p/*" } }) -and $f -notlike "$root/*" }
         if (-not $touched) { continue }
-        $docsChanged = $changed | Where-Object { $_ -like "$root/$($s.name)/*" }
-        $waived = [regex]::IsMatch($wkrText, "(?m)^Docs unchanged:\s*$([regex]::Escape($s.name))\s*:\s*\S")
-        if (-not $docsChanged -and -not $waived) { $failures.Add("system '$($s.name)' changed but $root/$($s.name)/ was not updated, and no 'Docs unchanged: $($s.name): <reason>' line is on the item") }
+        # A waiver counts only if it was in the spec Martin approved: the line comes before his last "Spec agreed:".
+        $waiver = [regex]::Matches($wkrText, "(?m)^Docs unchanged:\s*$([regex]::Escape($s.name))\s*:\s*\S") | Select-Object -Last 1
+        $agreed = [regex]::Matches($wkrText, '(?m)^Spec agreed:') | Select-Object -Last 1
+        if ($waiver -and $agreed -and $waiver.Index -lt $agreed.Index) { continue }
+        if ($waiver) { $failures.Add("the 'Docs unchanged: $($s.name)' reason was added after Martin agreed the spec; it must be in the spec he approves"); continue }
+        # The docs must say what this item added: a line under "## Docs updated" names the doc and a phrase from it,
+        # "- <system>: ``<doc path>``: <phrase>"; the doc must be changed in this change and contain the phrase.
+        $lines = [regex]::Matches("$(Get-Section ($wkrText -replace "`r`n", "`n") 'Docs updated')", "(?m)^\s*-\s*$([regex]::Escape($s.name))\s*:\s*``(?<p>[^``]+)``\s*:\s*(?<ph>\S.*?)\s*$")
+        $ok = $false
+        foreach ($l in $lines) {
+            $p = $l.Groups['p'].Value.Replace('\', '/').TrimStart('/')
+            if ($p -notlike "$root/$($s.name)/*") { $failures.Add("'Docs updated' for $($s.name) names $p, which is not under $root/$($s.name)/"); continue }
+            if ($changed -notcontains $p) { $failures.Add("'Docs updated' for $($s.name) names $p, which this change does not change"); continue }
+            if (-not (Test-Path $p) -or -not ((Get-Content $p -Raw) -match [regex]::Escape($l.Groups['ph'].Value))) { $failures.Add("$p does not contain ""$($l.Groups['ph'].Value)"", the phrase 'Docs updated' names for $($s.name)"); continue }
+            $ok = $true
+        }
+        if (-not $ok -and -not $lines.Count) { $failures.Add("system '$($s.name)' changed: update $root/$($s.name)/ to describe what this item added, and name it on the item under '## Docs updated' as '- $($s.name): ``<doc path>``: <phrase from the doc>' (or put 'Docs unchanged: $($s.name): <reason>' in the spec Martin approves)") }
     }
 }
 foreach ($d in @(Get-ChildItem specs -Recurse -Filter discrepancies.md -ErrorAction SilentlyContinue)) {
