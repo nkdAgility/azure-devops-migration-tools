@@ -71,3 +71,31 @@ On `main` (e2ddb400), against scratch projects `amte2e-3268-src`/`amte2e-3268-tg
 
 
 
+
+## Cause
+
+- `ReleaseDefinition.ResetObject()` (`src/MigrationTools/DataContracts/Pipelines/ReleaseDefinitions.cs:54`) sets `Artifacts = null`, while the deploy phases still name the alias in `artifactsDownloadInput`.
+- `CreateReleasePipelinesAsync` (`AzureDevOpsPipelineProcessor.cs:385-418`) maps queues, task groups, variable groups and service connections but never artifacts.
+- `InternalExecute` (`AzureDevOpsPipelineProcessor.cs:84-92`) discards the mappings `CreateBuildPipelinesAsync` returns, so the release step has no build mapping.
+- The typed `Artifact`/`DefinitionReference` models drop any field they do not declare (for example `repository`, `branches`, `connection`), so even a kept artifact would be posted incomplete.
+
+
+## Proposed fix
+
+1. Keep `Artifacts` in `ResetObject()`. Make `Artifact` and `DefinitionReference` carry unknown JSON fields (`[JsonExtensionData]`), and clear `artifactSourceDefinitionUrl`, which holds a source URL.
+2. Pass the build mappings from the build step to the release step. When builds are not migrated in this run, create the build mappings by matching source and target build definitions by name (the existing `FindExistingMappings`).
+3. Map each artifact before the POST:
+   - **Build**, from the source project: `definitionReference.definition` becomes the target build definition id and name; `definitionReference.project` becomes the target project id and name, taken from the target build definition's `project`.
+   - **Git** (Azure Repos), from the source project: `definition` becomes the target repository (by name, through `RepositoryNameMaps`), and `project` the target project.
+   - **Types backed by a service connection** (GitHub, external TFS/Azure DevOps build, Jenkins and similar): `definitionReference.connection` becomes the target service connection from the service-connection mapping the run already holds. The rest of the reference (external repository, job or definition) points outside the migrated project and is kept as is.
+   - **Not mappable**: an Azure Artifacts artifact (it points at a feed, and feeds are not migrated); a Build or Git artifact from another project; any artifact with no target match, including a service connection that was not migrated. The release is not posted. It is logged as an error naming the release, the alias, the type and why, counts as skipped, and the run fails as it does today for skipped items.
+4. Unit tests: Build mapped; Git mapped; service-connection type mapped; Build not in target, so skipped; cross-project Build, so skipped; Azure Artifacts, so skipped; unknown fields round-trip.
+5. E2E scenario `tools/e2e/scenarios/pipelines-3268` (seed, config, assert) run on `main` and on the change: the happy path (release created, artifact pointing at the target build and project, exit 0) and an unmappable artifact (clear error, exit 1). `GenerateDocs.ps1` is run; no option changes are expected.
+
+
+## Outcome checks
+
+- rest-client, test orgs: a classic release with a Build artifact downloaded by its deploy job migrates; pass = exit 0 and the target release's artifact points at the target project and the migrated build definition: `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3268/assert.ps1 -Case mapped`
+- rest-client, test orgs: a release whose artifact cannot be mapped is skipped with a clear error; pass = exit 1, the log names the release, alias and type, and no 400 from the target: `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3268/assert.ps1 -Case unmappable`
+- rest-client, unit: artifact mapping and skip rules; pass = exit 0: `dotnet test src/MigrationTools.Clients.AzureDevops.Rest.Tests --filter "FullyQualifiedName~ReleaseArtifact"`
+
