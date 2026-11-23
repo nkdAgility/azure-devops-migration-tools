@@ -24,8 +24,12 @@ if ($t -match '(?im)^\s*-\s*\*\*Verdict\*\*:\s*invalid') { Write-Error "The asse
 $rec = Join-Path $PSScriptRoot 'record.ps1'
 $rel = [IO.Path]::GetRelativePath((Get-Location), $a.FullName).Replace('\', '/')
 & $rec -Section 'Spec' -Body "Working spec: ``$rel`` (the bug assessment Martin approves)."
-# The version Martin is shown at the review gate; spec-agreed.ps1 binds his approval to exactly this.
-& $rec -Line "Spec presented: $rel sha256 $(Get-TextHash $a.FullName)"
+# The version Martin is shown at the review gate; spec-agreed.ps1 binds his approval to exactly this. An assessment
+# already presented and unchanged (for example only moved into the item's folder) is not presented again, so an
+# approval Martin has already given still stands.
+$recText = Get-Content (Get-ItemRecordPath '.' $id) -Raw
+$lastShown = [regex]::Matches("$recText", '(?m)^Spec presented:[ \t]*\S+[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})') | Select-Object -Last 1
+if (-not ($lastShown -and (Test-TextHash $a.FullName $lastShown.Groups['h'].Value))) { & $rec -Line "Spec presented: $rel sha256 $(Get-TextHash $a.FullName)" }
 & $rec -Section 'Reproduction' -Body (Sec 'Reproduction')
 & $rec -Section 'Cause' -Body (Sec 'Root Cause Hypothesis')
 & $rec -Section 'Proposed fix' -Body (Sec 'Proposed Remediation')
