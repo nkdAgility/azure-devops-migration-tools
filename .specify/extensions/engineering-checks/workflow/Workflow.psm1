@@ -235,6 +235,16 @@ function Get-OutcomeProblem([string]$Text, $Id, [string]$Head) {
     $null
 }
 
+function Get-TopicBranch([string]$Root = '.', $Id) {
+    # The item's branch on the remote: topic/<item folder> (topic/<id>-<short name>). Once the folder is removed
+    # (before the pull request is marked ready), the topic/<id>-* branch already pushed, else topic/<id>.
+    $folder = Get-ItemFolder $Root $Id
+    if ($folder) { return "topic/$(Split-Path $folder -Leaf)" }
+    $pushed = @(git -C $Root ls-remote --heads origin "refs/heads/topic/$Id-*" 2>$null | ForEach-Object { ($_ -split '\s+')[1] -replace '^refs/heads/', '' })
+    if ($pushed.Count -eq 1) { return $pushed[0] }
+    "topic/$Id"
+}
+
 function Get-SpecAgreed([string]$Text) {
     # Martin's words on the last "Spec agreed:" line, or $null when there are fewer than three characters. Words he
     # chose by clicking an offered answer count as his.
@@ -806,6 +816,6 @@ function Format-AttentionList($Report) {
     $lines -join "`n"
 }
 
-Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
+Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
     Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
