@@ -118,6 +118,10 @@ Open findings: 0
 
 Decided: 1 accept, no option; 2 yes; 3 yes (approved as proposed).
 
+Docs unchanged: tfs-object-model: there is no platform/specs/tfs-object-model/ spec; the behaviour is documented on the Migrating Plans and Suites page, which is updated.
+Docs unchanged: e2e-harness: a new scenario only; the harness and its rules are unchanged.
+Docs unchanged: docs-site: one how-to page's content changes; the docs-site rules and list pages are unchanged.
+
 ## Spec
 
 The bug assessment: `specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md`.
