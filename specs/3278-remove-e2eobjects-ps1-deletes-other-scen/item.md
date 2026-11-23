@@ -86,10 +86,10 @@ the path people actually hit.
 
 ## Outcome checks
 
-- The cleanup's rules hold (scoped fields only, refusals, -WhatIf deletes nothing), on the e2e harness with Azure DevOps mocked; pass = exit 0 and 0 failed: `pwsh -NoProfile -Command "$c = New-PesterConfiguration; $c.Run.Path = 'tools/e2e'; $c.Run.Exit = $true; Invoke-Pester -Configuration $c"`
+- The cleanup's rules hold (scoped fields only, refusals, -WhatIf deletes nothing), on the e2e harness with Azure DevOps mocked; pass = exit 0 and 0 failed: `pwsh -NoProfile -Command "Invoke-Pester -Path tools/e2e -CI"`
 - A scoped dry run on the real test orgs lists only this issue's objects and deletes nothing; pass = exit 0: `pwsh -NoProfile -File tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-3278- -WhatIf`
-- On the real test orgs, a prefix that matches every e2e object is refused before anything is deleted; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e- | Out-Null; exit 1 } catch { if ($_.Exception.Message -match 'matches every e2e object') { exit 0 } else { exit 1 } }"`
-- On the real test orgs, a run with neither -Prefix nor -All is refused; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 | Out-Null; exit 1 } catch { if ($_.Exception.Message -match '-All for every e2e object') { exit 0 } else { exit 1 } }"`
+- On the real test orgs, a prefix that matches every e2e object is refused before anything is deleted; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e- | Out-Null; exit 1 } catch { if ((Get-Error -Newest 1 | Out-String) -match 'matches every e2e object') { exit 0 } else { exit 1 } }"`
+- On the real test orgs, a run with neither -Prefix nor -All is refused; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 | Out-Null; exit 1 } catch { if ((Get-Error -Newest 1 | Out-String) -match 'or -All for every e2e object') { exit 0 } else { exit 1 } }"`
 ## Rubber duck
 
 Walking the proposed fix step by step turned up these points:
@@ -415,3 +415,5 @@ Reasons:
 - A live scoped run on the test org deleted only this issue's scratch field and left all 12 other e2e fields in place.
 - The refusal paths were run live and deleted nothing; -WhatIf deleted nothing.
 - What keeps it from higher: -All was not run live (it would wipe the shared fields), the target org was not exercised, and the new CI workflow has not yet run on GitHub.
+Outcome checks started for #3278 at 82616fa23fb6c47e42c6b1550badceab439130e0 attempt 18595943e515:
+Outcome checks failed for #3278 at 82616fa23fb6c47e42c6b1550badceab439130e0 attempt 18595943e515: Outcome checks failed: The cleanup's rules hold (scoped fields only, refusals, -WhatIf deletes nothing), on the e2e harness with Azure DevOps mocked; pass = exit 0 and 0 failed, On the real test orgs, a prefix that matches every e2e object is refused before anything is deleted; pass = exit 0, On the real test orgs, a run with neither -Prefix nor -All is refused; pass = exit 0
