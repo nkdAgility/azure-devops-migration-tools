@@ -21,6 +21,37 @@ namespace MigrationTools.Tests.Processors
             }, StateStampedFields.Fields.ToList());
         }
 
+        [TestMethod, TestCategory("L0")]
+        public void IsCatchUpSave_SameAuthorOneSecondLater_True()
+        {
+            Assert.IsTrue(StateStampedFields.IsCatchUpSave(Closed, "Person A", Closed.AddSeconds(1), "Person A", replaysSourceRevision: false));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsCatchUpSave_RevisionReplaysASourceRevision_False()
+        {
+            Assert.IsFalse(StateStampedFields.IsCatchUpSave(Closed, "Person A", Closed.AddSeconds(1), "Person A", replaysSourceRevision: true));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsCatchUpSave_OtherAuthor_False()
+        {
+            Assert.IsFalse(StateStampedFields.IsCatchUpSave(Closed, "Person A", Closed.AddSeconds(1), "Migration", replaysSourceRevision: false));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsCatchUpSave_NotOneSecondLater_False()
+        {
+            Assert.IsFalse(StateStampedFields.IsCatchUpSave(Closed, "Person A", Closed.AddSeconds(2), "Person A", replaysSourceRevision: false));
+            Assert.IsFalse(StateStampedFields.IsCatchUpSave(Closed, "Person A", Closed.AddMinutes(3), "Person A", replaysSourceRevision: false));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void IsCatchUpSave_LocalAndUtcDates_ComparedAsUtc()
+        {
+            Assert.IsTrue(StateStampedFields.IsCatchUpSave(Closed.ToLocalTime(), "Person A", Closed.AddSeconds(1), "person a", replaysSourceRevision: false));
+        }
+
         private const string Mapped = "Person A <TENANT\\person-a@example.invalid>";
 
         private static System.Collections.Generic.IReadOnlyList<System.Collections.Generic.IReadOnlyCollection<string>> Accounts(params string[][] uniqueNames) => uniqueNames;

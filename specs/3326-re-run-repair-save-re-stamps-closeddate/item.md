@@ -3,6 +3,8 @@ purpose: A re-run repair save on an already-migrated work item keeps the source'
 paths:
   - src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
   - src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs
+  - src/MigrationTools.Clients.TfsObjectModel.Tests/Tools/TfsGitRepositoryToolTests.cs
+  - docs/content/docs/reference/tools/tfsgitrepositorytool/**
   - src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
   - src/MigrationTools.Clients.TfsObjectModel/Processors/StateStampedFields.cs
   - src/MigrationTools.Clients.TfsObjectModel.Tests/Processors/**
@@ -102,3 +104,20 @@ Spec agreed: Approve. Q-6: Add to scope.
 - Docs match the code; pass = exit 0 and `git diff --exit-code -- docs` is clean after regeneration: `pwsh -NoProfile -File GenerateDocs.ps1; git diff --exit-code -- docs`
 
 Spec version: specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md sha256 1e94c27bf12167fbd5044426fab9ba8b715678d24d87def9983084466f686aab
+
+## Docs updated
+- tfs-object-model: `docs/content/docs/reference/processors/tfs-workitem-migration-processor/index.md`: "The same applies to a value Azure DevOps stamped in an earlier re-run's own catch-up save"
+- tfs-object-model: `docs/content/docs/reference/processors/tfs-workitem-migration-processor/index.md`: "A catch-up save on a re-run also sets every state-stamped field to the source's latest values"
+- tfs-object-model: `docs/content/docs/reference/tools/tfsgitrepositorytool/index.md`: "A re-run counts such a link as present while the target still lacks the commit or branch"
+- `GenerateDocs.ps1` exit 0; it changed no generated file (no option class changed).
+
+## End-to-end results
+Scenario `tools/e2e/scenarios/rerun-3326` (seed, config, assert), run directly with the built tool on the test orgs, in scratch projects of this item.
+- **Branch** (d810cbec + tests, `amt3326-b2src`/`amt3326-b2tgt`): first run 7 created, exit 0. Assert exit 0, every check PASS: re-run after removing the links exit 0 (5 updated, 2 in sync), every current state-stamped value equals the source (T4, stamped as main's catch-up save would, corrected); a further re-run exit 0 with 7 in sync, 0 updated, no new revision; a genuinely wrong target (T5) fails with "stamped instead of the source values", exit 1, no stack trace.
+- **main** (d1e2300c, `amt3326-msrc`/`amt3326-mtgt`): first run 7 created, exit 0. Assert exit 3: the re-run after removing the links exits 1 (4 updated, 1 failed: T4); ClosedDate is re-stamped to the save time on T1 (unresolved commit link) and T2 (resolvable commit link), and T4 is not corrected; the further re-run exits 1 with 3 failed. The T5 failure path behaves the same as on the branch.
+- Earlier manual runs on the branch build (`amt3326-gsrc`/`amt3326-gtgt`): the repair of target #13969 kept ClosedDate at the source value (13:16:13); #13970, stamped by main, was corrected (revision 6 ClosedDate 13:16:08); two further re-runs had all 4 items in sync with no new revision.
+
+## Tests
+- `dotnet build MigrationTools.sln`: exit 0.
+- `dotnet test MigrationTools.sln --no-build` with the test-org settings: exit 0; 849 passed, 0 failed (TfsObjectModel 439, Tests 305, Rest 87, Host 12, FileSystem 6).
+- New L0 tests: `StateStampedFieldsTests.IsCatchUpSave_*` (5), `TfsGitRepositoryToolTests.TryParseTargetUri_*` (3) and `TargetLacksArtifact_*` (3).

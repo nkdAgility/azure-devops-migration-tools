@@ -282,6 +282,57 @@ namespace MigrationTools.Tests.Tools
             { TargetArtifacts = artifacts };
         }
 
+        private static readonly Guid TargetRepoId = Guid.Parse("865b17bd-2f97-4885-ab8b-aad3d3607de3");
+        private const string TargetCommitUri = "vstfs:///git/commit/f7b0390c-9ad8-4dca-bdd0-a4bc69f81d30%2f865b17bd-2f97-4885-ab8b-aad3d3607de3%2f6cb791aff4844189fffd176472b182ca0ad9f23d";
+
+        [TestMethod, TestCategory("L0")]
+        public void TryParseTargetUri_CommitLink_ReadsRepoAndCommit()
+        {
+            Assert.IsTrue(TfsGitRepositoryTool.TryParseTargetUri(TargetCommitUri, out bool isBranch, out Guid repoId, out string commit));
+            Assert.IsFalse(isBranch);
+            Assert.AreEqual(TargetRepoId, repoId);
+            Assert.AreEqual("6cb791aff4844189fffd176472b182ca0ad9f23d", commit);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void TryParseTargetUri_BranchLink_ReadsRepoAndRef()
+        {
+            Assert.IsTrue(TfsGitRepositoryTool.TryParseTargetUri($"vstfs:///git/ref/f7b0390c-9ad8-4dca-bdd0-a4bc69f81d30%2f{TargetRepoId}%2fGBmain", out bool isBranch, out Guid repoId, out string refId));
+            Assert.IsTrue(isBranch);
+            Assert.AreEqual(TargetRepoId, repoId);
+            Assert.AreEqual("GBmain", refId);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void TryParseTargetUri_NotAGitLink_False()
+        {
+            Assert.IsFalse(TfsGitRepositoryTool.TryParseTargetUri("vstfs:///Build/Build/12", out _, out _, out _));
+            Assert.IsFalse(TfsGitRepositoryTool.TryParseTargetUri(null, out _, out _, out _));
+            Assert.IsFalse(TfsGitRepositoryTool.TryParseTargetUri("vstfs:///git/commit/project%2fnot-a-guid%2fabc", out _, out _, out _));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void TargetLacksArtifact_CommitMissingInTarget_TrueAndRecordsNothing()
+        {
+            var tool = Tool(new TfsGitTargetArtifactCache((r, c) => false, (r, b) => false));
+            Assert.IsTrue(tool.TargetLacksArtifact(TargetCommitUri));
+            Assert.IsEmpty(tool.LinksLeftOnSource);
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void TargetLacksArtifact_CommitInTarget_False()
+        {
+            var tool = Tool(new TfsGitTargetArtifactCache((r, c) => r == TargetRepoId && c == "6cb791aff4844189fffd176472b182ca0ad9f23d", (r, b) => false));
+            Assert.IsFalse(tool.TargetLacksArtifact(TargetCommitUri));
+        }
+
+        [TestMethod, TestCategory("L0")]
+        public void TargetLacksArtifact_VerifyTargetExistsOff_False()
+        {
+            var tool = Tool(new TfsGitTargetArtifactCache((r, c) => false, (r, b) => false), new TfsGitRepositoryToolOptions { VerifyTargetExists = false });
+            Assert.IsFalse(tool.TargetLacksArtifact(TargetCommitUri));
+        }
+
         [TestMethod, TestCategory("L0")]
         public void VerifyTargetExists_DefaultsToTrue()
         {
