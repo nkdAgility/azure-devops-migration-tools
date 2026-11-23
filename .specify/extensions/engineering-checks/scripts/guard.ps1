@@ -45,7 +45,10 @@ if ($call.tool_name -match 'Write|Edit' -and $text -match '\.specify[\\/]workflo
 # include no product code (productPaths in .specify/memory/workflow.json), asks Martin. No current item, or a
 # record without paths, means no opinion. The workflow's own files (specs/, .specify/items, reviews, bugs) are allowed.
 function ConvertTo-GlobRegex([string]$Glob) {
-    $g = $Glob.Trim().Replace('\', '/').TrimStart('/'); $sb = [Text.StringBuilder]::new('^'); $i = 0
+    $g = $Glob.Trim().Replace('\', '/').TrimStart('/')
+    # "folder/**" also matches the folder itself.
+    if ($g.EndsWith('/**')) { return ((ConvertTo-GlobRegex $g.Substring(0, $g.Length - 3)).TrimEnd('$') + '(?:/.*)?$') }
+    $sb = [Text.StringBuilder]::new('^'); $i = 0
     while ($i -lt $g.Length) {
         $c = $g[$i]
         if ($c -eq '*') {
@@ -77,7 +80,7 @@ function Get-Scope([string]$Root) {
         if ($l.Trim() -eq '---') { $closed = $true; break }
         if ($l -match '^purpose:\s*(?<v>.+)$') { $purpose = $Matches['v'].Trim('"', "'"); $inPaths = $false; continue }
         if ($l -match '^paths:\s*$') { $inPaths = $true; continue }
-        if ($inPaths) { if ($l -match '^\s*-\s*(?<v>.+?)\s*$') { $paths += $Matches['v'].Trim('"', "'"); continue }; if ($l -match '^\S') { $inPaths = $false } }
+        if ($inPaths) { if ($l -match '^\s*-\s*(?<v>.+?)\s*$') { $p = ($Matches['v'] -replace '\s+#.*$', '').Trim().Trim('"', "'"); if ($p) { $paths += $p }; continue }; if ($l -match '^\S') { $inPaths = $false } }
     }
     if (-not $closed -or -not $paths) { return $null }  # a front-matter block that is not closed is not a scope
     $product = @('src/')
@@ -146,16 +149,26 @@ function Get-ShellWriteTargets([string]$Command) {
     foreach ($seg in ($Command -split '[|;&\r\n]+')) {
         $toks = @([regex]::Matches($seg, '(?<q>[''"])(?<v>.*?)\k<q>|(?<v>[^\s''"]+)') | ForEach-Object { $_.Groups['v'].Value })
         for ($i = 0; $i -lt $toks.Count; $i++) {
-            if ($toks[$i] -match '^(?i)(Set-Content|Add-Content|Out-File|New-Item|Copy-Item|Move-Item|Remove-Item|Rename-Item|Clear-Content|cp|mv|rm|touch|tee|truncate)$') {
-                $skipNext = $false
+            $cmdName = $toks[$i]
+            if ($cmdName -match '^(?i)(Set-Content|Add-Content|Out-File|New-Item|Copy-Item|Move-Item|Remove-Item|Rename-Item|Clear-Content|cp|mv|rm|touch|tee|truncate)$') {
+                # Only what the command writes: the destination of a copy or move; the path of every other cmdlet
+                # (never the text being written, nor the source being read); every operand of rm, touch, tee, truncate.
+                $named = $null; $positional = [Collections.Generic.List[string]]::new(); $takeNext = $null
                 for ($j = $i + 1; $j -lt $toks.Count; $j++) {
                     $v = $toks[$j]
-                    if ($skipNext) { $skipNext = $false; continue }
-                    if ($v -match '^(?i)-(Path|LiteralPath|FilePath|Destination)$') { continue }
-                    if ($v -match '^(?i)-(Value|Encoding|ItemType|Name|NewName|Filter|Include|Exclude|InputObject|Width)$') { $skipNext = $true; continue }
-                    if ($v -match '^-' -or $v -match '^\$') { continue }
-                    # Not a path: a here-string marker (@' or @"), or a token with no letters or digits in it.
-                    if ($v -match '^@|@$' -or $v -notmatch '[\w]') { continue }
+                    if ($takeNext) { if ($takeNext -eq 'target') { $named = $v }; $takeNext = $null; continue }
+                    if ($cmdName -match '^(?i)(Copy-Item|Move-Item)$' -and $v -match '^(?i)-Destination$') { $takeNext = 'target'; continue }
+                    if ($cmdName -notmatch '^(?i)(Copy-Item|Move-Item|cp|mv|rm|touch|tee|truncate)$' -and $v -match '^(?i)-(Path|LiteralPath|FilePath)$') { $takeNext = 'target'; continue }
+                    if ($v -match '^-[A-Za-z]') { if ($v -match '^(?i)-(Value|Encoding|ItemType|Name|NewName|Filter|Include|Exclude|InputObject|Width|Path|LiteralPath)$') { $takeNext = 'skip' }; continue }
+                    $positional.Add($v)
+                }
+                $cands = if ($named) { @($named) }
+                         elseif ($cmdName -match '^(?i)(Copy-Item|Move-Item|cp|mv)$') { @($positional | Select-Object -Last 1) }
+                         elseif ($cmdName -match '^(?i)(rm|touch|tee|truncate)$') { @($positional) }
+                         else { @($positional | Select-Object -First 1) }
+                foreach ($v in $cands) {
+                    # Not a path: a variable, a here-string marker (@' or @"), or a token with no letters or digits in it.
+                    if (-not $v -or $v -match '^\$' -or $v -match '^@|@$' -or $v -notmatch '[\w]' -or $v -match '[\r\n]') { continue }
                     $t.Add($v)
                 }
             }
