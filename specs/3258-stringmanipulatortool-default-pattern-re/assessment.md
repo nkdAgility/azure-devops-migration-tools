@@ -18,11 +18,11 @@ With StringManipulatorTool enabled and no manipulators configured, String fields
 
 ## Reproduction
 
-On `main`, test orgs, scratch projects `amte2e-3258-*`, which were deleted afterwards. Full detail is in `item.md` in this folder.
+On `main`, test orgs, scratch projects `amte2e-3258-*`, which were deleted afterwards. Full detail is in `.specify/wkr/3258.md`.
 
 1. Enable `StringManipulatorTool` with `Manipulators: []`. Seed a Bug with `Microsoft.VSTS.Build.FoundIn` = `A𐓏B 𠀀 W⌚ E😀`. Migrate. The target has `AB  W⌚ E`, the run exits 0, and the loss is silent.
 2. Replace the default with a no-op manipulator and seed one Bug per character. SOAP saved U+104CF, U+1F600, U+231A and U+FE0F unchanged. U+FFFE failed the save after the retry limit, and the run exited 1.
-3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A￾B` unchanged.
+3. Unit level: applying the default pattern with .NET `Regex.Replace` turns `A𐓏B` and `A𠀀B` into `AB`, and leaves `A⌚B` and `A\uFFFEB` unchanged.
 
 DEL and C1 (U+007F–U+009F) couldn't be tested, because Azure DevOps Services REST refuses to seed them. Martin decided not to scrub them.
 
@@ -39,7 +39,7 @@ The default equates "surrogate pair" with "emoji". It doesn't target the charact
 ## Proposed Remediation
 
 **Preferred**: replace the default pattern with
-`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[￾￿]`.
+`[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uFFFE\uFFFF]`.
 DEL and C1 are no longer scrubbed (Martin, Q-6). Update `Description` to say it removes characters the SOAP API cannot save. The pattern stays a plain regex, so users can copy it into their own config.
 
 **Alternatives**:
