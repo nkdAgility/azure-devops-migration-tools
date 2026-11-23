@@ -392,3 +392,22 @@ convention tied to an issue number. Confidence: high.
 
 Spec agreed: Cleanup only removes the issue's own objects, full clean needs -All
 Spec version: specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md sha256 e7692bbfc8d55c32730ed0ceef68f6a1b2771238e09484b17cc7213f28fb300a
+
+## Docs updated
+
+- e2e-harness: `platform/specs/architecture.md`: "### tools/e2e/Remove-E2EObjects.ps1". The harness docs moved here from `.github/copilot-instructions.md` (now an index pointing to `platform/specs/`) before the build, so R8's entry lives in this file.
+- e2e-harness: `tools/e2e/reports/2026-10-regression.md`: "./tools/e2e/Remove-E2EObjects.ps1 -All".
+
+## Output done evidence
+
+- Pester, the change: `Invoke-Pester ./tools/e2e` gave 19 passed, 0 failed.
+- Pester, the same tests against main's `Remove-E2EObjects.ps1` and `E2EAzDo.psm1`: 1 passed, 18 failed, including "deletes only the issue's own fields". The bug shows on main.
+- Windows PowerShell 5.1: both files parse with no errors, and `Get-E2EFieldFilter -Prefix amte2e-3272-` returns `^Custom\.amte2e3272(?!\d)` (R7).
+- Live, nkdagility-adomt-source, own scratch field `Custom.amte2e3278Probe`:
+  - 12 e2e fields before the probe was created.
+  - `-Prefix amte2e-3278- -WhatIf` listed only that field ("would delete field …/Custom.amte2e3278Probe") and deleted nothing. Exit 0.
+  - `-Prefix amte2e-3278-` printed "deleted field …/Custom.amte2e3278Probe" and "remaining: none". Exit 0. Afterwards there were 12 e2e fields again: every other scenario's field was untouched.
+  - `-Prefix amte2e-fields- -WhatIf` printed "field filter: none" and listed only that prefix's projects. Its exit 1 is covered by the unit test; the live call was cut short by output filtering.
+  - `-Prefix amte2e-` was refused with "it matches every e2e object". A bare run was refused with "…or -All for every e2e object". Nothing was deleted.
+- main was not run live: without `-WhatIf` it would delete the shared fields.
+- Confidence: 90%
