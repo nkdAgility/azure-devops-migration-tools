@@ -204,7 +204,7 @@ function Get-FrontMatter([string]$Text) {
         $l = $lines[$i]
         if ($l.Trim() -eq '---') { return $fm }
         if ($l -match '^(?<k>[A-Za-z][\w-]*):[ \t]*(?<v>.*)$') { $key = $Matches['k']; $fm[$key] = if ($Matches['v'].Trim()) { $Matches['v'].Trim().Trim('"', "'") } else { @() }; continue }
-        if ($key -and $l -match '^\s*-\s*(?<v>.+?)\s*$') { $fm[$key] = @(@($fm[$key]) + $Matches['v'].Trim('"', "'")) }
+        if ($key -and $l -match '^\s*-\s*(?<v>.+?)\s*$') { $v = ($Matches['v'] -replace '\s+#.*$', '').Trim().Trim('"', "'"); if ($v) { $fm[$key] = @(@($fm[$key]) + $v) } }
     }
     $null
 }
