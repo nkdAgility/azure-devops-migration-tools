@@ -35,9 +35,9 @@ Re-running Plans and Suites into an existing target plan adds the Test Cases mis
 
 `StringManipulatorTool`'s built-in default removes only what SOAP cannot save.
 
-- `seed.ps1`: projects `amte2e-3258-src`, `-tgt` and `-tgtu`; one Bug whose Title and Found In hold letters outside the
-  BMP and emoji, and one Bug whose Found In holds U+FFFE.
-- `config.json` (default, `Manipulators` empty): exits 0; `assert.ps1` checks both Bugs migrated, the letters and emoji
-  kept, and U+FFFE removed.
-- `config-user.json` (its own manipulator removes `W`): exits 1; `assert.ps1 -Config config-user.json` checks the
-  manipulator ran on Title and Found In and the U+FFFE Bug was not migrated.
+- `seed.ps1`: projects `amte2e-3258-src2`, `-tgt2` and `-tgtu2`; one Bug whose Title and Found In hold letters outside
+  the BMP, emoji and U+FE0F, and one Bug whose Found In is `X`, U+FFFE, `Y`.
+- `config.json` (default, `Manipulators` empty) must exit 0; `assert.ps1` checks the letters, emoji and U+FE0F are
+  kept and U+FFFE is removed (`XY`).
+- `config-user.json` (a no-op manipulator, which replaces the default; the U+FFFE Bug is not in its query) must exit 0;
+  `assert.ps1 -User` checks the letters, emoji and U+FE0F are kept.

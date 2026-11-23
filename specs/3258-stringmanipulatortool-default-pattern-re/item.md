@@ -360,7 +360,8 @@ Spec fix: specs/3258-stringmanipulatortool-default-pattern-re/assessment.md sha2
 `appsettings.json` added to paths: it holds the documented defaults `GenerateDocs.ps1` reads, so the generated page showed the old pattern until it changed.
 
 ## Validation (test orgs, 2026-11-23)
-- Unit: `dotnet test src/MigrationTools.Tests --filter "FullyQualifiedName~StringManipulator"`: 46 passed, 0 failed.
-- Branch, `config.json` (default): exit 0. Title and Found In kept `A𐓏B 𠀀 W⌚ E😀`; the U+FFFE Bug migrated with Found In `AB`.
-- Branch, `config-user.json` (own manipulator): exit 1. The manipulator ran on Title and Found In; the U+FFFE Bug failed to save, as the default no longer applies.
-- main, `config.json`: exit 1. Found In became `AB  W⌚ E`; the U+FFFE Bug failed to save.
+- Unit: `dotnet test src/MigrationTools.Tests --filter "FullyQualifiedName~StringManipulator"`: 46 passed, 0 failed. All L1 suites: 821 passed, 0 failed.
+- Branch, `config.json` (default): exit 0, 2 created, 0 failed. Title and Found In kept `A𐓏B 𠀀 W⌚ E😀 H❤️`; Found In `X`U+FFFE`Y` became `XY`.
+- Branch, `config-user.json` (no-op manipulator): exit 0, 1 created, 0 failed. Title and Found In kept `A𐓏B 𠀀 W⌚ E😀 H❤️`, U+FE0F included.
+- main, `config.json`: exit 1, 1 created, 1 failed. Found In became `AB  W⌚ E H❤`; the U+FFFE Bug failed to save.
+- main, `config-user.json`: exit 0, Found In kept, the same as the branch.Spec fix: specs/3258-stringmanipulatortool-default-pattern-re/assessment.md sha256 a7a69f040271a9c10880921ea10b385b9aaa2b1ede257bbbf790b1f9551b3817 -> 7ad0d08eaf51c5755e4680b6d7ff90284f03684221b4b760b88596df5573231d: wrote in Martin's answers to Q-5 and Q-7; corrected pattern escapes and an old path; recorded that the docs-site system docs are unchanged

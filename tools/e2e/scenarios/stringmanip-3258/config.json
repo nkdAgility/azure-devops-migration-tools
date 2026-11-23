@@ -6,7 +6,7 @@
       "Source": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
-        "Project": "amte2e-3258-src",
+        "Project": "amte2e-3258-src2",
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "Authentication": { "AuthenticationMode": "EntraId" },
@@ -15,7 +15,7 @@
       "Target": {
         "EndpointType": "TfsTeamProjectEndpoint",
         "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
-        "Project": "amte2e-3258-tgt",
+        "Project": "amte2e-3258-tgt2",
         "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
         "AllowCrossProjectLinking": false,
         "Authentication": { "AuthenticationMode": "EntraId" },
@@ -25,8 +25,8 @@
     "CommonTools": {
       "TfsNodeStructureTool": {
         "Enabled": true,
-        "Areas": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3258-src([\\\\]?.*)$", "Replacement": "amte2e-3258-tgt$1" } ] },
-        "Iterations": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3258-src([\\\\]?.*)$", "Replacement": "amte2e-3258-tgt$1" } ] },
+        "Areas": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3258-src2([\\\\]?.*)$", "Replacement": "amte2e-3258-tgt2$1" } ] },
+        "Iterations": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3258-src2([\\\\]?.*)$", "Replacement": "amte2e-3258-tgt2$1" } ] },
         "ShouldCreateMissingRevisionPaths": true,
         "ReplicateAllExistingNodes": true
       },
