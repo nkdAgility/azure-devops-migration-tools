@@ -6,8 +6,7 @@ $body = "Closes #$id`n`n"
 if (Test-Path .specify/reviews/completion-report.md) { $body += Get-Content .specify/reviews/completion-report.md -Raw }
 # The item's branch on the remote is topic/<item folder> (topic/<id>-<short name>), whatever the local branch is called.
 Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
-$folder = Get-ItemFolder '.' $id
-$head = if ($folder) { "topic/$(Split-Path $folder -Leaf)" } else { "topic/$id" }
+$head = Get-TopicBranch '.' $id
 git push -u origin "HEAD:refs/heads/$head"
 if ($LASTEXITCODE -ne 0) { Write-Error "could not push the branch to $head."; exit 1 }
 # A pull request already open from the topic branch, or from this local branch (opened before the topic branch was used).
