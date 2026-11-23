@@ -133,3 +133,20 @@ Reasons:
 
 Paths extended: Martin answered QUESTION 2 with "2:a": platform/specs/core/** and platform/specs/e2e-harness/** added.
 
+Outcome checks started for #3268 at 2a960d7330f3283ea9acffe26c48ed8b6c5f7982 attempt 5a4f5482309f:
+
+## Outcome done
+
+Automated outcome checks all passed for #3268 at 2a960d73 (`.specify/reviews/outcome-checks.md`):
+- Mapped, on the test orgs: the release migrates with exit 0; its artifact keeps alias `_amte2e-3268-build` and points at the target project and the migrated build definition (35).
+- Unmappable, on the test orgs: exit 1 with one error naming the release, alias and type; counted as skipped; no 400; nothing created in the target.
+- Unit: the 10 `ReleaseArtifactMapTests` pass.
+The original report (the target rejecting a release whose deploy job downloads a Build artifact) no longer happens: on main the same scenario fails 7 of 7 checks.
+
+Confidence: 90%
+
+Reasons:
+- The customer's exact failure is reproduced on main and gone on the change, against real Azure DevOps.
+- The failure path gives the clear report the issue asked for instead of a 400.
+- Git and service-connection artifacts are proved by unit tests, not end to end.
+
