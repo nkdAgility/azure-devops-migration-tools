@@ -9,6 +9,7 @@ paths:
   - docs/content/docs/reference/processors/tfs-test-plans-and-suites-migration-processor/**
   - platform/specs/tfs-object-model/**
   - platform/specs/e2e-harness/**
+  - platform/specs/docs-site/migrating-plans-and-suites.md
 ---
 
 # 3260: Test Cases in an existing plan's root suite are not added on re-run
@@ -126,6 +127,7 @@ Decided: 1 accept, no option; 2 yes; 3 yes (approved as proposed).
 
 - tfs-object-model: `platform/specs/tfs-object-model/test-plans-and-suites.md`: on a new plan and on a re-run into an existing one
 - e2e-harness: `platform/specs/e2e-harness/scenarios.md`: Re-running Plans and Suites into an existing target plan adds the Test Cases missing from its root suite
+- docs-site: `platform/specs/docs-site/migrating-plans-and-suites.md`: The page must not describe the root suite as an exception
 
 ## Output done evidence
 
