@@ -123,3 +123,6 @@ The "target not found" case was never handled: both methods only act when a targ
 - Unit: the same pair for Shared Parameter.
 - E2E: the new scenario (Test Case only in the query) asserts the two warnings and the count; the existing `sharedsteps` scenario still passes with no new entries.
 
+
+Spec agreed: Spec agreed
+Spec version: .specify/bugs/sharedsteps-unresolved-refs/assessment.md sha256 f67ea8fdec629a8b614225772cfb7bdc2654f9247b6208a2147b3592e4372ca5
