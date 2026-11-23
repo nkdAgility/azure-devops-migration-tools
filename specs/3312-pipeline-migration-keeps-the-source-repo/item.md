@@ -189,3 +189,23 @@ Reasons:
 - Meets the original ask: the repository is mapped with or without properties (the L0 test and the live mapped case pass, and the target repository id and URL are the target's). A missing repository gives one clear message naming the definition, the repository and what to do, with no TF401019 and no stack trace, and the other definition still migrates (live missing case). The existing pipeline scenarios match main (live existing case). Remaining doubt: GitHub, Bitbucket and TFVC repositories are covered only by the L0 test, not a live run. Seeding a GitHub service connection on the test orgs isn't worth the cost for an unchanged pass-through path.
 
 
+Outcome checks started for #3312 at f569975e552f259774332c2137176178e7494305 attempt b5e9d79683c2:
+
+## Outcome done
+
+Automated outcome checks (all passed) for #3312 at f569975e552f259774332c2137176178e7494305 attempt b5e9d79683c2:
+- Repository mapping unit tests, local; pass = exit 0 and BuildDefinitionRepositoryMapTests all pass: `dotnet test src/MigrationTools.Clients.AzureDevops.Rest.Tests --filter "TestCategory=L0"` exit 0
+- Definition without repository properties migrates to the target repository, on nkdagility-adomt-source to nkdagility-adomt-target (amte2e-3312-*); pass = exit 0 and the target amte2e-3312-yaml repository id is the target amte2e-3312-app id: `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3312/assert.ps1 -Case mapped` exit 0
+- Definition whose repository is missing in the target fails clearly and the others carry on, on the same test orgs; pass = exit 0 from the assert (tool exit 1, one "cannot be migrated because its repository" error, no TF401019, amte2e-3312-yaml created, amte2e-3312-missing absent): `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3312/assert.ps1 -Case missing` exit 0
+- Existing pipeline scenarios still behave as on main, in amte2e-3312-pipe-*; pass = exit 0 from the assert (config.json exits 0 with the classic build on the target repo, config-novariablegroups.json exits 1 with only the variable-group skip): `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3312/assert.ps1 -Case existing` exit 0
+
+Confidence: 93%
+Raised by: reading each run's migration log for every live case, rather than only the assert's PASS lines, after an earlier wrong error pattern showed that a PASS can hide a check that tested nothing.
+Reasons:
+- Mapped (live, nkdagility-adomt-target/amte2e-3312-tgt): the tool exited 0 with no ERR lines. The created amte2e-3312-yaml stores repository id 3cc16230-… (the target amte2e-3312-app) and the target URL. The #3312 symptom (TF401019 on main) is gone.
+- Missing (live): the tool exited 1 with exactly one ERR line naming amte2e-3312-missing, amte2e-3312-gone and amte2e-3312-tgt, and saying what to do. There was no TF401019 and no stack trace, amte2e-3312-yaml was still created, and the missing definition is absent from the target. That is the issue's expected behaviour.
+- Existing scenarios (live, amte2e-3312-pipe-*): novariablegroups gives the same exit 1 and the same variable-group skip lines as main, with no other errors. The full config exits 0, and the classic build (with properties) points at the target repository 0ab16373-….
+- The same scenario also passed inside the full end-to-end proof at Output Done, in its own fresh scratch projects.
+- Remaining doubt: GitHub, Bitbucket and TFVC definitions were not run live; only the L0 test covers their pass-through. The live 3-definition case at the reporter's scale (61 definitions) was not reproduced, but the code path doesn't depend on the count.
+
+
