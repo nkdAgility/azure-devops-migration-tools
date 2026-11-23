@@ -348,3 +348,4 @@ Martin also decided (2026-11-21): route `System.Title` through the tool (Q-2), a
 - Reduced to `AB`: U+0001, U+000B, U+001F, U+FFFE, U+FFFF, a lone high surrogate and a lone low surrogate.
 - A user-supplied manipulator replaces the default.
 
+Spec fix: specs/3258-stringmanipulatortool-default-pattern-re/assessment.md sha256 ae708d85da7436fcb4fd77a7f5c733bfb55f2d945f6b5a9d6bc4cf22bde4e313 -> a7a69f040271a9c10880921ea10b385b9aaa2b1ede257bbbf790b1f9551b3817: wrote in Martin's answers to Q-5 and Q-7; corrected pattern escapes and an old path
