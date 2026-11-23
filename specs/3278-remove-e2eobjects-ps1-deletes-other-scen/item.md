@@ -417,3 +417,21 @@ Reasons:
 - What keeps it from higher: -All was not run live (it would wipe the shared fields), the target org was not exercised, and the new CI workflow has not yet run on GitHub.
 Outcome checks started for #3278 at 82616fa23fb6c47e42c6b1550badceab439130e0 attempt 18595943e515:
 Outcome checks failed for #3278 at 82616fa23fb6c47e42c6b1550badceab439130e0 attempt 18595943e515: Outcome checks failed: The cleanup's rules hold (scoped fields only, refusals, -WhatIf deletes nothing), on the e2e harness with Azure DevOps mocked; pass = exit 0 and 0 failed, On the real test orgs, a prefix that matches every e2e object is refused before anything is deleted; pass = exit 0, On the real test orgs, a run with neither -Prefix nor -All is refused; pass = exit 0
+Outcome checks started for #3278 at a7c87d62ec03541d565ae25df7c75c8380ab6b12 attempt e6f83b9e2270:
+
+## Outcome done
+
+The outcome checks ran on a7c87d62 and all four passed:
+
+- Pester: 19 passed, 0 failed.
+- The live dry run with `-Prefix amte2e-3278- -WhatIf` printed the field filter `^Custom\.amte2e3278(?!\d)`, listed nothing outside the issue and deleted nothing.
+- The live `-Prefix amte2e-` run and the live bare run were both refused.
+
+The live runs in Output done evidence also cover the real deletion: the scoped run removed only `Custom.amte2e3278Probe`, with 12 other fields untouched. The proof cleanup's prefix with no issue number deleted projects and processes but no fields, and exited 1.
+
+Confidence: 90%
+
+Reasons:
+- Every outcome check passed on the real test orgs and in Pester on this commit.
+- The bug is shown on main (18 of 19 tests fail there) and fixed here.
+- Not higher: `-All` was not run live, because it would wipe the shared fields, and the new CI workflow has not run on GitHub yet.
