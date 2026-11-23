@@ -169,3 +169,12 @@ The repository mapping was placed inside the `Properties` null check that only `
 - L0: repository with properties is mapped; without properties is mapped; `RepositoryNameMaps` rename is mapped; target missing (with and without properties) is reported not found and the id is left unchanged; non-`TfsGit` repositories are not treated as Azure Repos Git.
 - E2E on the test orgs: the reproduction above migrates and points at the target repository; a definition whose repository exists only in the source fails with the clear message while the other is created; the existing `pipelines` scenarios behave as on `main`.
 
+
+
+## Docs
+
+Docs unchanged: rest-client: there is no platform/specs/rest-client/ doc yet, and no option class changed (GenerateDocs.ps1 shows no diff). The behaviour is covered by the L0 tests and the pipelines-3312 scenario.
+Docs unchanged: e2e-harness: there is no platform/specs/e2e-harness/ doc yet. The new scenario follows the existing proof conventions (seed, config and assert with -Src/-Tgt) and adds none.
+
+Spec agreed: Approve
+Spec version: specs/3312-pipeline-migration-keeps-the-source-repo/assessment.md sha256 fc82a8de5c194cc3c0450c653c3cf2c94e861f8433d758f44207fe20648af97f
