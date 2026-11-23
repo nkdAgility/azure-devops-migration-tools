@@ -4,7 +4,7 @@ purpose: When a Test Case's Shared Steps or Shared Parameter reference cannot be
 paths:
   - src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
   - src/MigrationTools.Clients.TfsObjectModel/Tools/UnresolvedTestCaseReference.cs
-  - platform/specs/core/**, platform/specs/tfs-object-model/**
+  - platform/specs/core/**, platform/specs/tfs-object-model/**, platform/specs/e2e-harness/**
   - src/MigrationTools/**/WorkItemReview*.cs   # the new review category
   - src/MigrationTools.Clients.TfsObjectModel.Tests/**
   - tools/e2e/scenarios/sharedsteps-3256/**
@@ -175,6 +175,7 @@ The "target not found" case was never handled: both methods only act when a targ
 
 - core: `platform/specs/core/review-log.md`: `reference-left-on-source`
 - tfs-object-model: `platform/specs/tfs-object-model/test-case-references.md`: UnresolvedTestCaseReference.Report
+- e2e-harness: `platform/specs/e2e-harness/scenarios.md`: sharedsteps-3256
 
 ## Build evidence
 
