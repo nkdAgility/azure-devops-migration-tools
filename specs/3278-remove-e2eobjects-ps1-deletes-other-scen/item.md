@@ -435,3 +435,4 @@ Reasons:
 - Every outcome check passed on the real test orgs and in Pester on this commit.
 - The bug is shown on main (18 of 19 tests fail there) and fixed here.
 - Not higher: `-All` was not run live, because it would wipe the shared fields, and the new CI workflow has not run on GitHub yet.
+Outcome checks started for #3278 at 1644d128ca8499cd98f03b44ad2a1dd0ffc4e7e0 attempt 96f166ce0be8:
