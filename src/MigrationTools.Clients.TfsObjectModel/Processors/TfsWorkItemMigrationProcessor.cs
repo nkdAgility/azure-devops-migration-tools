@@ -939,7 +939,7 @@ namespace MigrationTools.Processors
                             var difference = revisionsToMigrate.Count == 0 ? FindReRunDifference(sourceWorkItem, targetWorkItem) : null;
                             if (revisionsToMigrate.Count == 0 && correctStamps)
                             {
-                                difference = (difference == null ? "" : difference + "; ") + "current state-stamped values are empty where the source has them";
+                                difference = (difference == null ? "" : difference + "; ") + "current state-stamped values are not the source values";
                             }
                             if (revisionsToMigrate.Count == 0 && difference == null)
                             {
@@ -966,9 +966,10 @@ namespace MigrationTools.Processors
                                 // A field map must not change the reflected id, or the next run cannot find this item (#2998).
                                 SetReflectedWorkItemId(targetWorkItem, Source.WorkItems.CreateReflectedWorkItemId(sourceWorkItem).ToString());
                                 // After field maps and enrichers, as in revision replay, so nothing can overwrite the correction (#3305).
-                                if (correctStamps)
+                                // Every repair save sets them, or the service can stamp the save time (#3326).
+                                if (correctStamps || targetWorkItem.ToWorkItem().IsDirty)
                                 {
-                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps.Value);
+                                    stampCorrection = ApplyStateStampedFieldsFromSource(sourceWorkItem, targetWorkItem, sourceStamps.Value, sendUnchanged: true);
                                 }
                                 StampCatchUpSave(targetWorkItem);
                                 if (!targetWorkItem.ToWorkItem().IsDirty && CommonTools.WorkItemLink.OtherWorkItemsSaved == 0)
@@ -1001,7 +1002,7 @@ namespace MigrationTools.Processors
                                 var corrected = targetWorkItem.ToWorkItem();
                                 VerifyStateStampedFieldsSaved(corrected.Rev, f => corrected.Fields[f].Value, stampCorrection);
                                 VerifyStateStampedValuesStored(targetWorkItem, new List<(int, int, List<(string Field, object Expected, bool IsIdentity)>)> { (corrected.Rev, sourceWorkItem.Rev, stampCorrection) });
-                                Log.LogInformation("Target work item {TargetId}: current state-stamped values set to the source values.", corrected.Id);
+                                Log.LogInformation("Target work item {TargetId}: state-stamped values saved as the source values.", corrected.Id);
                             }
                         }
                         CommonTools.Attachment.CleanUpAfterSave();
@@ -1792,7 +1793,9 @@ namespace MigrationTools.Processors
         /// bypasses rules. Returns the values, checked again after the save. Throws, so the work item fails clearly, if a
         /// value cannot be set.
         /// </summary>
-        private List<(string Field, object Expected, bool IsIdentity)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem, SourceStateStampedValues sourceValues)
+        /// <param name="sendUnchanged">Sends a value even when the target already has it. A repair save on an existing
+        /// item needs this: an unchanged value is left to the service, which can stamp the save time (#3326).</param>
+        private List<(string Field, object Expected, bool IsIdentity)> ApplyStateStampedFieldsFromSource(WorkItemData sourceRevision, WorkItemData targetWorkItem, SourceStateStampedValues sourceValues, bool sendUnchanged = false)
         {
             var source = sourceRevision.ToWorkItem();
             var target = targetWorkItem.ToWorkItem();
@@ -1803,7 +1806,11 @@ namespace MigrationTools.Processors
                 var before = field.Value;
                 try
                 {
-                    if (field.IsEditable)
+                    if (sendUnchanged && StateStampedFields.SameValue(value, field.Value, isIdentity))
+                    {
+                        ObjectModelFieldWriter.SetBelowClientRules(target, targetField, value);
+                    }
+                    else if (field.IsEditable)
                     {
                         if (StateStampedFields.SameValue(value, field.Value, isIdentity)) continue;
                         try
@@ -1851,8 +1858,9 @@ namespace MigrationTools.Processors
         /// </summary>
         /// <returns>
         /// True when the only differences are state-stamped values the target has as empty where the source has one, the
-        /// fault of #3305: the caller then sets the target's current values to the source's latest ones in a catch-up
-        /// save. Azure DevOps cannot rewrite saved revisions, so the earlier revisions keep the empty value; they are
+        /// fault of #3305, or values the service stamped in an earlier re-run's catch-up save (<see
+        /// cref="StateStampedFields.IsCatchUpSave"/>, #3326): the caller then sets the target's current values to the
+        /// source's latest ones in a catch-up save. Azure DevOps cannot rewrite saved revisions, so the earlier revisions keep the empty value; they are
         /// listed in a warning and no longer fail the item.
         /// </returns>
         private bool VerifyMigratedRevisions(WorkItemData sourceWorkItem, WorkItemData targetWorkItem, Lazy<SourceStateStampedValues> sourceValues)
@@ -1873,14 +1881,20 @@ namespace MigrationTools.Processors
 
             var wrong = new List<string>();
             var emptied = new List<string>();
+            // Values the service stamped in a re-run's own catch-up save (#3326): history only; the latest is corrected.
+            var restamped = new List<string>();
             var latestTarget = target.Revisions[target.Revisions.Count - 1];
             var latestNeedsCorrection = false;
+            var latestRestamped = false;
             var unproven = new List<string>();
+            Revision previous = null;
             foreach (Revision tr in target.Revisions)
             {
+                var prior = previous;
+                previous = tr;
                 var at = TargetWhen(tr);
-                var sr = sourceRevisions.FirstOrDefault(r => SourceWhen(r) >= at && (SourceWhen(r) - at).TotalMilliseconds <= 10)
-                    ?? sourceRevisions.LastOrDefault(r => SourceWhen(r) <= at);
+                var replayed = sourceRevisions.FirstOrDefault(r => SourceWhen(r) >= at && (SourceWhen(r) - at).TotalMilliseconds <= 10);
+                var sr = replayed ?? sourceRevisions.LastOrDefault(r => SourceWhen(r) <= at);
                 if (sr == null)
                 {
                     wrong.Add($"revision {tr.Index + 1} (dated {at:o}) is earlier than every source revision");
@@ -1888,10 +1902,12 @@ namespace MigrationTools.Processors
                 }
                 var sourceState = sr.Fields["System.State"].Value as string;
                 var targetState = tr.Fields["System.State"].Value as string;
-                if (!string.Equals(sourceState, targetState, StringComparison.Ordinal))
+                var stateMatches = string.Equals(sourceState, targetState, StringComparison.Ordinal);
+                if (!stateMatches)
                 {
                     wrong.Add($"revision {tr.Index + 1} State is '{targetState}' but source revision {sr.Index + 1} is '{sourceState}'");
                 }
+                var stampedHere = new List<string>();
                 foreach (var field in fields)
                 {
                     var sourceField = sr.Fields.Contains(field) ? field : field == closedTarget ? GetClosedDateField(source) : null;
@@ -1917,12 +1933,24 @@ namespace MigrationTools.Processors
                             emptied.Add(line);
                             if (tr.Index == latestTarget.Index) latestNeedsCorrection = true;
                         }
-                        else wrong.Add(line);
+                        else stampedHere.Add(line);
                     }
                     else if (match == IdentityMatch.Unproven)
                     {
                         unproven.Add($"revision {tr.Index + 1} {field} '{saved}' against '{expected}'");
                     }
+                }
+                if (stampedHere.Count == 0) continue;
+                if (stateMatches && prior != null && StateStampedFields.IsCatchUpSave(
+                        TargetWhen(prior), prior.Fields["System.ChangedBy"].Value as string,
+                        at, tr.Fields["System.ChangedBy"].Value as string, replaysSourceRevision: replayed != null))
+                {
+                    restamped.AddRange(stampedHere);
+                    if (tr.Index == latestTarget.Index) latestRestamped = latestNeedsCorrection = true;
+                }
+                else
+                {
+                    wrong.AddRange(stampedHere);
                 }
             }
             if (unproven.Count > 0)
@@ -1934,6 +1962,13 @@ namespace MigrationTools.Processors
             {
                 wrong.AddRange(emptied);
                 throw new InvalidOperationException($"the already migrated target work item does not match the source, stamped instead of the source values: {string.Join("; ", wrong.Take(10))}{(wrong.Count > 10 ? $"; and {wrong.Count - 10} more" : "")}.");
+            }
+            if (restamped.Count > 0)
+            {
+                Log.LogWarning("Target work item {TargetId} (source {SourceId}): an earlier re-run's catch-up save let Azure DevOps stamp its own state-stamped values (#3326). {Action} Azure DevOps cannot change saved revisions, so its history keeps them: {Revisions}",
+                    target.Id, source.Id,
+                    latestRestamped ? "Its current values are being set to the source values." : "Its current values already match the source.",
+                    string.Join("; ", restamped.Take(10)));
             }
             if (emptied.Count > 0)
             {
