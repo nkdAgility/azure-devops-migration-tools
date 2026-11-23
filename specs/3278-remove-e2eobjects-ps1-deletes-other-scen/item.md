@@ -419,20 +419,22 @@ Outcome checks started for #3278 at 82616fa23fb6c47e42c6b1550badceab439130e0 att
 Outcome checks failed for #3278 at 82616fa23fb6c47e42c6b1550badceab439130e0 attempt 18595943e515: Outcome checks failed: The cleanup's rules hold (scoped fields only, refusals, -WhatIf deletes nothing), on the e2e harness with Azure DevOps mocked; pass = exit 0 and 0 failed, On the real test orgs, a prefix that matches every e2e object is refused before anything is deleted; pass = exit 0, On the real test orgs, a run with neither -Prefix nor -All is refused; pass = exit 0
 Outcome checks started for #3278 at a7c87d62ec03541d565ae25df7c75c8380ab6b12 attempt e6f83b9e2270:
 
+Outcome checks started for #3278 at 1644d128ca8499cd98f03b44ad2a1dd0ffc4e7e0 attempt 96f166ce0be8:
+Outcome checks started for #3278 at 6258a6b7e4f3d6a0dea634f51dfb9ac8d924d16e attempt 5ee5d763a67b:
+
 ## Outcome done
 
-The outcome checks ran on a7c87d62 and all four passed:
-
-- Pester: 19 passed, 0 failed.
-- The live dry run with `-Prefix amte2e-3278- -WhatIf` printed the field filter `^Custom\.amte2e3278(?!\d)`, listed nothing outside the issue and deleted nothing.
-- The live `-Prefix amte2e-` run and the live bare run were both refused.
-
-The live runs in Output done evidence also cover the real deletion: the scoped run removed only `Custom.amte2e3278Probe`, with 12 other fields untouched. The proof cleanup's prefix with no issue number deleted projects and processes but no fields, and exited 1.
+Automated outcome checks (all passed) for #3278 at 6258a6b7e4f3d6a0dea634f51dfb9ac8d924d16e attempt 5ee5d763a67b:
+- The cleanup's rules hold (scoped fields only, refusals, -WhatIf deletes nothing), on the e2e harness with Azure DevOps mocked; pass = exit 0 and 0 failed: `pwsh -NoProfile -Command "Invoke-Pester -Path tools/e2e -CI"` exit 0
+- A scoped dry run on the real test orgs lists only this issue's objects and deletes nothing; pass = exit 0: `pwsh -NoProfile -File tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-3278- -WhatIf` exit 0
+- On the real test orgs, a prefix that matches every e2e object is refused before anything is deleted; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e- | Out-Null; exit 1 } catch { if ((Get-Error -Newest 1 | Out-String) -match 'matches every e2e object') { exit 0 } else { exit 1 } }"` exit 0
+- On the real test orgs, a run with neither -Prefix nor -All is refused; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 | Out-Null; exit 1 } catch { if ((Get-Error -Newest 1 | Out-String) -match 'or -All for every e2e object') { exit 0 } else { exit 1 } }"` exit 0
 
 Confidence: 90%
 
 Reasons:
 - Every outcome check passed on the real test orgs and in Pester on this commit.
-- The bug is shown on main (18 of 19 tests fail there) and fixed here.
-- Not higher: `-All` was not run live, because it would wipe the shared fields, and the new CI workflow has not run on GitHub yet.
-Outcome checks started for #3278 at 1644d128ca8499cd98f03b44ad2a1dd0ffc4e7e0 attempt 96f166ce0be8:
+- The bug is shown on main (18 of 19 tests fail there) and fixed here. A live scoped run removed only Custom.amte2e3278Probe and left the 12 other e2e fields in place.
+- Not higher: -All was not run live, because it would wipe the shared fields, and the new CI workflow has not run on GitHub yet.
+
+
