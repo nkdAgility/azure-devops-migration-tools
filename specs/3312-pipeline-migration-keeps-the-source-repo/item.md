@@ -91,3 +91,39 @@ The repository mapping was placed inside the `Properties` null check that only `
 
 Spec agreed: Approve
 Spec version: .specify/bugs/pipeline-repo-map/assessment.md sha256 7b83b3a0da20cfa5eb575072401ce0e9b3f0aef88aaf696e905f7ff2037fa173
+
+## Spec
+
+Working spec: `specs/3312-pipeline-migration-keeps-the-source-repo/assessment.md` (the bug assessment Martin approves).
+
+
+## Reproduction
+
+1. In nkdagility-adomt-source, project `amte2e-3312-src`, create repository `amte2e-3312-app` with `/azure-pipelines.yml`. Create the same repository in nkdagility-adomt-target, project `amte2e-3312-tgt`.
+2. Create a YAML build definition `amte2e-3312-yaml` (`process.type = 2`) whose `repository` has `id`, `name`, `type = TfsGit`, `url` and `defaultBranch`, but no `properties`. The stored definition reports no `properties`.
+3. Run `tools/e2e/Invoke-MigrationE2E.ps1` on `main` (56bab21f) with `AzureDevOpsPipelineProcessor`, `MigrateBuildPipelines: true` and `BuildPipelines: ["amte2e-3312-yaml"]`.
+4. Result: `TF401019: The Git repository with name or identifier f6ad1e84-ca6a-4c38-ba8d-c943943278be does not exist ...`, then `0 of 1 source BuildDefinition(s) were skipped and 1 were rejected by the target`, exit code 1.
+
+
+## Cause
+
+The repository mapping was placed inside the `Properties` null check that only `ConnectedServiceId` needs. Definitions without `properties` (typical of YAML definitions created through the REST API) keep the source repository id, and the target rejects it. Confidence: high (reproduced on `main`).
+
+
+## Proposed fix
+
+**Preferred**: Move the repository mapping out of the `Properties` check into a step that runs for every build definition whose repository type is `TfsGit`. Put the mapping in a small `BuildDefinitionRepositoryMap` class: find the source repository's name by id (falling back to the definition's repository name), apply `RepositoryNameMaps`, and set `Repository.Id` and `Name` from the target repository. If no target repository matches, don't send the definition. Log one error: `BuildDefinition "<name>" cannot be migrated because its repository "<repo>" does not exist in the target project "<project>". Migrate the repository first, or add a RepositoryNameMaps entry that maps it to an existing target repository.` The definition then counts as skipped, so the run still exits 1 while the others are created. Keep `ConnectedServiceId` behind the `Properties` check. Leave repositories that aren't `TfsGit` unchanged.
+
+**Alternatives**:
+- Keep sending a definition whose target repository is missing, with a null id, and let the target reject it. Rejected: it produces the raw server error the issue rules out.
+
+**Files likely to change**:
+- `src/MigrationTools.Clients.AzureDevops.Rest/Processors/AzureDevOpsPipelineProcessor.cs`
+- `src/MigrationTools.Clients.AzureDevops.Rest/Processors/BuildDefinitionRepositoryMap.cs` (new)
+- `src/MigrationTools.Clients.AzureDevops.Rest.Tests/Processors/BuildDefinitionRepositoryMapTests.cs` (new)
+- `tools/e2e/scenarios/pipelines-3312/` (new e2e scenario)
+
+**Tests to add or update**:
+- L0: repository with properties is mapped; without properties is mapped; `RepositoryNameMaps` rename is mapped; target missing (with and without properties) is reported not found and the id is left unchanged; non-`TfsGit` repositories are not treated as Azure Repos Git.
+- E2E on the test orgs: the reproduction above migrates and points at the target repository; a definition whose repository exists only in the source fails with the clear message while the other is created; the existing `pipelines` scenarios behave as on `main`.
+
