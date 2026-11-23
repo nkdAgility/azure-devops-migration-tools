@@ -68,13 +68,9 @@ Tests: unit tests with a fake target that returns null / a match, asserting one 
 
 ## Outcome checks
 
-| # | System | Command | Pass |
-|---|--------|---------|------|
-| 1 | Test orgs, scratch `amte2e-3256-*`, Test Case only in query | `Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/sharedsteps-3256/config.json` | Exit 0; log has one warning naming Shared Steps 5xxx and Test Case, one naming Shared Parameter; review summary counts 2 unresolved references (on main: none) |
-| 2 | Test orgs, `sharedsteps` scenario (all three types) | `Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/sharedsteps/config.json` then `assert.ps1` | All asserts pass; no unresolved-reference warnings |
-| 3 | Local | `dotnet test` on `MigrationTools.Clients.TfsObjectModel.Tests` (L0/L1) | New tests pass: unresolved → one review entry each; resolved → none and the field is remapped |
-| 4 | Docs | `GenerateDocs.ps1` | Docs build; Migrating Plans and Suites warning points at the new log line |
-
+- Test Case only, then a re-run with all three types, on the test orgs (references reported, then remapped): `pwsh -NoProfile -File tools/e2e/scenarios/sharedsteps-3256/run.ps1`
+- Unit tests for the reporting and its re-run resolution: `dotnet test src/MigrationTools.Clients.TfsObjectModel.Tests --filter FullyQualifiedName~UnresolvedTestCaseReference`
+- Docs reconciled for every system the change touches: `pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1`
 ## Decisions for Martin
 
 Martin approved the three recommendations: a new review category, the default WIQL change as a separate follow-up, and keeping the stale ID and reporting it.
