@@ -59,8 +59,8 @@ Fault 2 is what makes fault 1 reachable on every re-run for the 24 live items; i
 **Preferred**:
 1. Before any change, run issue step 5 on the reproduction, so both halves are observed on `main`, and capture the repair save's field changes to see what else the server writes.
 2. In a small named method (not more inline branches in `ProcessWorkItemAsync`), apply the state-stamped fields from the source's latest revision on **every** repair save, after field maps and enrichers, and run `VerifyStateStampedFieldsSaved` / `VerifyStateStampedValuesStored` for all of them. Show on the reproduction that `ClosedDate` then stays at the source value. If it does not (the server restamps whatever the client sets for that link), the fix needs another answer, for example a corrective save after the link save, and the assessment is updated.
-3. Make `GetTargetUri` agree with `Enrich` about an unresolved link: a source link left on the source because the target lacks the commit counts as present when the target holds the raw source link. This stops the permanent "differs" and the repeated repair saves. It is a smaller change and likely a separate commit; whether it is in Purpose is a question (Q-6).
-4. Make `VerifyMigratedRevisions` return a result that says what to correct (empty values, or a re-stamped catch-up revision) instead of a bare `bool`. A wrong current value is corrected only under Q-1's proposal: the latest target revision is our catch-up save (no source revision within 10 ms, dated after the matching source revision), its State equals the source's, and the only differing stamped fields are on that revision. Anything else still fails as #3270.
+3. In `HasExternalLink` (`TfsWorkItemLinkTool.cs:199-207`), count an unresolved Git link as present when the target holds the raw source URI that `Enrich` left because the target lacks the commit (use the tool's target-existence result). This stops the permanent "differs" and the repeated repair saves. `GetTargetUri` stays as it is, because #3192 replay relies on it skipping the existence check. A separate commit; in Purpose only if Martin agrees (Q-6).
+4. Make `VerifyMigratedRevisions` return a result that says what to correct (empty values, or a re-stamped catch-up revision) instead of a bare `bool`. A wrong current value is corrected only on the latest target revision, and only when: it pairs with no source revision within 10 ms; its State equals the source's; every wrong value is a stamped field on that revision; no earlier revision is wrong; and its ChangedDate is the previous target revision's + 1 s with that revision's ChangedBy, which is what `StampCatchUpSave` writes. A small named predicate with unit tests. Anything else still fails as #3270 (Q-1, decided).
 5. Read the source stamps lazily so an in-sync re-run stays fast (#3299).
 
 **Alternatives**:
@@ -87,14 +87,14 @@ Fault 2 is what makes fault 1 reachable on every re-run for the 24 live items; i
 - The cause of the server's re-stamp for this link type is unproven; setting the fields might not stop it. The reproduction is the test, and the Definition of Done needs it passing on the branch.
 - Correcting a current value does not rewrite history; the earlier wrongly stamped revision stays in the target.
 - One extra read per repaired item (post-save verification); in-sync items must not pay it.
-- Changing `GetTargetUri` affects revision replay (#3192), which uses it to find the target link to remove when the source removes a Git link; check that path does not start leaving or removing the wrong link.
+- `GetTargetUri` is not changed, because revision replay (#3192) uses it to find the target link to remove. The `HasExternalLink` change must not make replay leave or remove the wrong link either.
 - Other-end-of-link saves (`OtherWorkItemsSaved`) may re-stamp too; whether that is in Purpose is Q-3.
 - `TfsWorkItemOverwriteProcessor` and bulk edit are out of scope; hand back as follow-ups only if they share the unguarded save.
 
 ## Open Questions
 
-- [NEEDS CLARIFICATION: Q-1 — is the catch-up-save rule an acceptable definition of "safe to correct"?]
-- [NEEDS CLARIFICATION: Q-3 — are `OtherWorkItemsSaved` saves in this item's Purpose?]
-- [NEEDS CLARIFICATION: Q-6 — is the permanent "target differs" for an unresolved Git link (`GetTargetUri`) in this item's Purpose, or a separate follow-up? It is why the live items are repaired on every run.]
+- Q-1 decided after review: the catch-up rule in step 4.
+- Q-3 decided after review: proposed follow-up (that save only moves Hierarchy links; not reproduced).
+- [NEEDS CLARIFICATION: Q-6 — add the permanent "target differs" fix (step 3; `TfsWorkItemLinkTool.cs`, `TfsGitRepositoryTool.cs`) to this item's Purpose? Review found it the only surviving option, but scope needs Martin's yes.]
 
 Answered since the earlier assessment: Q-4 (live conditions) and Q-5 (outcome check); BypassRules as the cause is ruled out.

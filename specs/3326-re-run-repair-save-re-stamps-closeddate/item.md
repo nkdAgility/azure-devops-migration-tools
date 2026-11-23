@@ -65,12 +65,15 @@ Gaps the explanation showed:
 Open findings: 0
 
 ## Questions
-- Q-1 What makes a wrongly stamped current value safe to correct on a re-run? Proposal: only when the latest target revision is a catch-up save (no source revision within 10 ms, dated after the matching source revision), its State equals the source's, and the only differing state-stamped fields are on that revision; anything else still fails as a wrong target (#3270). (for Martin) open
+- Q-1 What makes a wrongly stamped current value safe to correct on a re-run? Proposal: only when the latest target revision is a catch-up save (no source revision within 10 ms, dated after the matching source revision), its State equals the source's, and the only differing state-stamped fields are on that revision; anything else still fails as a wrong target (#3270). decided (one option survived review): correct only the latest target revision, and only when it pairs with no source revision within 10 ms, its State equals the source's, every wrong value is a stamped field on that revision, no earlier revision is wrong, and its ChangedDate is the previous target revision's + 1 s with that revision's ChangedBy (what `StampCatchUpSave` writes). Rejected: "source ChangedDate + 1 s" (StampCatchUpSave adds to the previous target revision, so it misses the reproduced case, where rev 5 = rev 4 + 1 s); always correcting the latest revision (hides #3270); delete and migrate again (out of scope).
 - Q-2 Reproduction on `main`: run steps 1-5 on the test orgs before the spec. (for the worker) answered: run with a Hierarchy link and a resolvable commit link (not reproduced), then with an unresolved commit link (reproduced); see Reproduction. Step 5 is still to run.
-- Q-3 Do the other end of a link's saves (`OtherWorkItemsSaved`) also re-stamp, and is that in this item's Purpose? If yes, the Purpose needs adding to; if it only shows in the end-to-end run, hand back as a follow-up. (for Martin) open
+- Q-3 Do the other end of a link's saves (`OtherWorkItemsSaved`) also re-stamp, and is that in this item's Purpose? If yes, the Purpose needs adding to; if it only shows in the end-to-end run, hand back as a follow-up. decided (one option survived review): proposed follow-up. That save (`TfsWorkItemLinkTool.cs:509-526`) only moves a Hierarchy parent link and never adds an ExternalLink, and Hierarchy repairs did not re-stamp in the controls, so no bug is shown there.
+
+## Proposed follow-ups
+- Check whether the other-end-of-link save in `TfsWorkItemLinkTool` (`OtherWorkItemsSaved`) can re-stamp a Closed item's state-stamped fields; not reproduced here.
 - Q-4 What differs in the live migration from the test-org run? (for Martin) answered from the customer logs (via MANAGER-ADMT): BypassRules on, no custom rules (inherited Agile Task), Azure DevOps Services; every stamping save adds an unresolved commit ArtifactLink. The BypassRules and custom-rule hypotheses are ruled out.
 - Q-5 Which outcome check shows the live fault? (for Martin) answered: the unresolved commit link reproduction is the outcome check (see Reproduction and the Real system checks below).
-- Q-6 Is the permanent "target differs" for an unresolved Git link (`GetTargetUri` skips the target-existence check, so the link left on the source is never found) in this item's Purpose? It is why the live items are repaired on every run. If yes, add `src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs` and `TfsWorkItemLinkTool.cs` to the paths and to the Purpose; if no, hand back as a proposed follow-up. (for Martin) open
+- Q-6 Is the permanent "target differs" for an unresolved Git link (`GetTargetUri` skips the target-existence check, so the link left on the source is never found) in this item's Purpose? It is why the live items are repaired on every run. If yes, add `src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs` and `TfsWorkItemLinkTool.cs` to the paths and to the Purpose; if no, hand back as a proposed follow-up. Review: only "in Purpose" survives, because it is a bug found in this work, it causes the save that re-stamps, and without it a re-run never ends in sync. The fix goes in `HasExternalLink` (`TfsWorkItemLinkTool.cs:199-207`), not in `GetTargetUri`, which #3192 replay relies on. It needs Martin's yes to add the two files to the Purpose and paths. (for Martin) open
 
 ## Spec
 
@@ -93,72 +96,4 @@ Spec presented: not yet. The earlier presented hash (503db291) is for the supers
 - Real system, the same scenarios run on `main` first show the fault and on the branch show the fix, with exit codes reported in the pull request; pass = both runs recorded: `pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/rerun-3326/config.json`
 - Production path has no REST and no stack trace (issue expectation): the repair path stays in `MigrationTools.Clients.TfsObjectModel`, and the failure-path scenario logs show the "stamped instead of the source values" message without a stack trace; pass = exit 0 from the search for REST use in the changed files and no `   at ` stack frames in the scenario logs: `pwsh -NoProfile -Command "git diff origin/main --name-only -- src | ForEach-Object { if (Select-String -Path $_ -Pattern 'HttpClient|WorkItemTrackingHttpClient|\.Rest\.' -Quiet) { throw \"REST in $_\" } }; Get-ChildItem $env:TEMP/amtproof-* -Recurse -Filter *.log | Select-String -Pattern '^\s+at \S+\(' | ForEach-Object { throw \"stack trace: $_\" }"`
 - Docs match the code; pass = exit 0 and `git diff --exit-code -- docs` is clean after regeneration: `pwsh -NoProfile -File GenerateDocs.ps1; git diff --exit-code -- docs`
-
-## Spec
-
-Working spec: `specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md` (the bug assessment Martin approves).
-
-Spec presented: specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md sha256 22d531036cb61c36ef7eaac11fa32b412aaa5eccb38c56e5b011689db9cdf305
-
-## Reproduction
-
-Reproduced on `main` (origin/main 78147078, local build 16.3.6-Local.7, test orgs, process `amte2e-agile`, BypassRules on, 23 November). Scratch projects `amt3326-gsrc` / `amt3326-gtgt`.
-
-1. Push a commit to the source repo only. Link 2 inherited-Agile Tasks to it and take them New -> Active -> Closed.
-2. Migrate with `tools/e2e/Invoke-MigrationE2E.ps1` (built `MigrationTools.ConsoleFull`, TfsGitRepositoryTool mapping on). Both items created, exit 0. The enricher warns "commit ... not found in target repo amt3326-gtgt/amt3326-gtgt; leaving link vstfs:///Git/Commit/<source project id>%2F<source repo id>%2F<sha> pointing at the source".
-3. Remove that commit link on target #13970 (target revision 4).
-4. Re-run. Log: "target differs: missing external link", 1 updated, exit 0. Target revision 5: ChangedDate 13:18:13 (revision 4 + 1 s), **ClosedDate 13:19:19, the save time**; source and target revision 3 have 13:16:08. State stays Closed.
-
-Controls that do **not** reproduce on the same orgs and process: a Hierarchy-Reverse link repair on 2 Closed User Stories (revision 5 kept ClosedDate), and a Git commit link repair where the commit exists in the target and is rewritten to the target repo (revision 6 kept ClosedDate). Full output and exit codes: item.md, Reproduction.
-
-Not yet run: step 5 of the issue (a second re-run failing with "stamped instead of the source values"); the code says it must (see `VerifyMigratedRevisions`), but it is not observed. [NEEDS CLARIFICATION: run it as the first step of the fix, to confirm the second half on the test orgs.]
-
-Also seen: with the unresolved link present on the target, every re-run reports "target differs: missing external link" although nothing is missing, so the item is never reported in sync.
-
-
-## Cause
-
-Two faults.
-
-1. **The re-stamp.** A repair save on an existing target leaves the state-stamped fields unset unless the target's current values were empty (#3305). With BypassRules on and no custom rules, the service still writes the save time into `ClosedDate` when the repair re-adds an ArtifactLink that points at the source project and repo. A Hierarchy link and a resolvable commit link are saved without re-stamping, so what differs is the link, not the state rule. Why the service re-stamps for that link is **not** pinned down (candidates: the server treating an artifact link to a foreign project as a different kind of save, or a second internal save). The next run's check then sees a set but different value and fails the item. Confidence: high that the unset fields are the gap and that setting them on every repair save is correct; **medium** that setting them stops the re-stamp, because the cause of the re-stamp itself is unproven. The fix must be shown on the reproduction above, not assumed.
-2. **The permanent "differs".** `GetTargetUri` skips the target-existence check, so an unresolved link is reported missing on every run, and a repair is attempted every time, so the item never reaches in sync. Confidence: medium-high from the code; confirm with a debug run.
-
-Fault 2 is what makes fault 1 reachable on every re-run for the 24 live items; it also means the re-stamp can recur.
-
-
-## Proposed fix
-
-**Preferred**:
-1. Before any change, run issue step 5 on the reproduction, so both halves are observed on `main`, and capture the repair save's field changes to see what else the server writes.
-2. In a small named method (not more inline branches in `ProcessWorkItemAsync`), apply the state-stamped fields from the source's latest revision on **every** repair save, after field maps and enrichers, and run `VerifyStateStampedFieldsSaved` / `VerifyStateStampedValuesStored` for all of them. Show on the reproduction that `ClosedDate` then stays at the source value. If it does not (the server restamps whatever the client sets for that link), the fix needs another answer, for example a corrective save after the link save, and the assessment is updated.
-3. Make `GetTargetUri` agree with `Enrich` about an unresolved link: a source link left on the source because the target lacks the commit counts as present when the target holds the raw source link. This stops the permanent "differs" and the repeated repair saves. It is a smaller change and likely a separate commit; whether it is in Purpose is a question (Q-6).
-4. Make `VerifyMigratedRevisions` return a result that says what to correct (empty values, or a re-stamped catch-up revision) instead of a bare `bool`. A wrong current value is corrected only under Q-1's proposal: the latest target revision is our catch-up save (no source revision within 10 ms, dated after the matching source revision), its State equals the source's, and the only differing stamped fields are on that revision. Anything else still fails as #3270.
-5. Read the source stamps lazily so an in-sync re-run stays fast (#3299).
-
-**Alternatives**:
-- Fix only fault 2: repairs stop for unresolved links, but every other repair still re-stamps if the server does so. Not enough alone.
-- Always replay a corrective revision on repair: more reads and a visible extra revision on every repair; rejected.
-- Treat any set-but-different current value as correctable: hides #3270 wrongly migrated targets; rejected.
-
-**Files likely to change**:
-- `src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs`
-- `src/MigrationTools.Clients.TfsObjectModel/Processors/StateStampedFields.cs`
-- `src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs` and `TfsWorkItemLinkTool.cs` (fault 2; needs adding to the Purpose's `paths` if accepted)
-- `src/MigrationTools.Clients.TfsObjectModel.Tests/Processors/**`
-- `tools/e2e/**` (scenario), `docs/content/docs/reference/processors/tfs-workitem-migration-processor/index.md` if behaviour text changes (regenerate with `GenerateDocs.ps1`)
-
-**Tests to add or update**:
-- Unit: a repair save with `correctStamps` false sets all state-stamped fields from the source.
-- Unit: a catch-up revision with only a re-stamped value is corrected; a wrongly migrated revision still fails (#3270); a state mismatch is not "corrected".
-- Unit: an in-sync item does no second read (#3299).
-- Unit (fault 2): a source commit link left on the source because the target lacks the commit is not reported missing when the target holds it.
-- End to end, on `main` and on the branch with exit codes, using the unresolved-link reproduction as the main scenario: repair of a Closed Task; a Resolved item and a reopened item; an item already wrongly stamped; a genuinely wrong target (must fail); a further re-run that is clean and reports every item in sync. Keep the Hierarchy and resolvable-commit repairs as controls.
-
-
-## Questions
-
-- Q-1 Q-1 — is the catch-up-save rule an acceptable definition of "safe to correct"? (for Martin) open
-- Q-2 Q-3 — are `OtherWorkItemsSaved` saves in this item's Purpose? (for Martin) open
-- Q-3 Q-6 — is the permanent "target differs" for an unresolved Git link (`GetTargetUri`) in this item's Purpose, or a separate follow-up? It is why the live items are repaired on every run. (for Martin) open
-- Q-4 run it as the first step of the fix, to confirm the second half on the test orgs. (for Martin) open
 
