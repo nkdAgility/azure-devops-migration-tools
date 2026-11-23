@@ -302,16 +302,25 @@ function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     if (-not $ver -or $ver.Index -lt $agreed.Index) { return "Martin's approval is not bound to a spec version (spec-agreed.ps1 records it)" }
     # The approval is bound to exactly the latest version presented to him. A presentation after his approval of the
     # same text (the file only moved, say) does not need his approval again.
-    $shown = [regex]::Matches($Text, '(?m)^Spec presented:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
-    if (-not $shown) { return "no 'Spec presented:' line: the spec was never presented to Martin" }
-    if ($shown.Groups['h'].Value -ne $ver.Groups['h'].Value) {
-        if ($shown.Index -gt $agreed.Index) { return "Martin has not approved the version last presented to him" }
-        return "the approval is bound to a version other than the one presented to Martin"
+    $presented = @([regex]::Matches($Text, '(?m)^Spec presented:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$'))
+    if (-not $presented) { return "no 'Spec presented:' line: the spec was never presented to Martin" }
+    $shown = $presented[-1]
+    $bound = [regex]::Matches($Text, '(?m)^Spec version:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Where-Object { $_.Index -gt $agreed.Index } | Select-Object -First 1
+    $before = $presented | Where-Object { $_.Index -lt $agreed.Index } | Select-Object -Last 1
+    if ($before -and $bound.Groups['h'].Value -ne $before.Groups['h'].Value -and $shown.Groups['h'].Value -ne $bound.Groups['h'].Value) { return "the approval is bound to a version other than the one presented to Martin" }
+    if (-not $before -and $shown.Groups['h'].Value -ne $bound.Groups['h'].Value) { return "the approval is bound to a version other than the one presented to Martin" }
+    # Small fixes made after his approval (his own answers written in, typing mistakes) keep it, when each is recorded
+    # by spec-fix.ps1 as "Spec fix: <path> sha256 <old> -> <new>: <what was fixed>", starting from the approved version.
+    $accepted = [Collections.Generic.List[string]]::new(); $accepted.Add($bound.Groups['h'].Value)
+    foreach ($fx in [regex]::Matches($Text, '(?m)^Spec fix:[ \t]*\S+[ \t]+sha256[ \t]+(?<o>[0-9a-f]{64})[ \t]*->[ \t]*(?<n>[0-9a-f]{64}):') | Where-Object { $_.Index -gt $agreed.Index }) {
+        if (-not $accepted.Contains($fx.Groups['o'].Value)) { return "a 'Spec fix:' starts from a version Martin did not approve" }
+        $accepted.Add($fx.Groups['n'].Value)
     }
+    if ($shown.Index -gt $agreed.Index -and -not $accepted.Contains($shown.Groups['h'].Value)) { return "Martin has not approved the version last presented to him" }
     $file = Resolve-SpecPath $Root $ver.Groups['p'].Value
     if (-not $file) { $file = Resolve-SpecPath $Root $shown.Groups['p'].Value }
     if (-not $file) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
-    if (-not (Test-TextHash $file $ver.Groups['h'].Value)) { return "the spec changed after Martin approved it; it needs his approval again" }
+    if (-not ($accepted | Where-Object { Test-TextHash $file $_ })) { return "the spec changed after Martin approved it; record a small fix with spec-fix.ps1, or get his approval again" }
     $null
 }
 
@@ -473,11 +482,26 @@ function Test-Check {
         'prMerged'        { (& $Adapter.GetPrState $Item) -eq 'MERGED' }
         'script'          {
             if ($SkipScripts) { return @{ skipped = $true; message = $Check.message } }
-            Push-Location $Root; try { & pwsh -NoProfile -Command $Check.run *> $null; $LASTEXITCODE -eq 0 } finally { Pop-Location }
+            # The script's output is kept, so a refusal says what failed: .specify/reviews/check-<name>.log, and its last lines.
+            $slug = ((@($Check.run -split '[\s/\\]+') | Where-Object { $_ -match '\.ps1$' } | Select-Object -First 1) -replace '\.ps1$', '')
+            if (-not $slug) { $slug = 'script' }
+            $logRel = ".specify/reviews/check-$slug.log"
+            Push-Location $Root
+            try {
+                New-Item -ItemType Directory -Force (Split-Path $logRel) | Out-Null
+                & pwsh -NoProfile -Command $Check.run *> $logRel
+                $passed = $LASTEXITCODE -eq 0
+                if (-not $passed) { $script:lastScriptLog = @{ path = $logRel; tail = (@(Get-Content $logRel -Tail 8 -ErrorAction SilentlyContinue) -join "`n") } }
+                $passed
+            } finally { Pop-Location }
         }
         default           { throw "Unknown check type '$($Check.type)'." }
     }
-    if ($ok) { $null } else { @{ message = $Check.message } }
+    if ($ok) { $null }
+    elseif ($Check.type -eq 'script' -and $script:lastScriptLog) {
+        $l = $script:lastScriptLog; $script:lastScriptLog = $null
+        @{ message = "$($Check.message) (output in $($l.path); it ends:`n$($l.tail))" }
+    } else { @{ message = $Check.message } }
 }
 
 # ---------------------------------------------------------------- the move
