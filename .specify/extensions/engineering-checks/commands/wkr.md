@@ -46,6 +46,8 @@ Every item goes through every stage and writes every section its type asks for. 
 
 ## The pull request
 
+When the policies for In review pass, open the pull request with `open-pr.ps1`; never ask Martin to open it.
+
 Open it as a draft. While anything it needs is missing, it stays a draft. Review comments are fixed, replied to with the commit that fixed them, and resolved. Mark it ready only through `pr-ready.ps1`. Merge only as the repo's rules allow; otherwise tell the manager it is ready for Martin to merge.
 
 ## Retrospective
