@@ -275,6 +275,19 @@ function Get-RetroNote($Config, $Item, [string]$Root = '.') {
     Get-ChildItem (Join-Path $src 'feedback') -Filter "*-$repo-$($Item.id).md" -ErrorAction SilentlyContinue | Select-Object -First 1
 }
 
+function Resolve-SpecPath([string]$Root = '.', [string]$Path) {
+    # A recorded spec path, or, when the file has since moved into the item's folder (a bug assessment moved out of
+    # .specify/bugs/), the file of the same name there. $null if neither exists. The fingerprint still decides whether
+    # it is the same spec.
+    $p = Join-Path $Root $Path
+    if (Test-Path $p) { return $p }
+    $cur = Join-Path $Root '.specify/items/current.json'
+    if (-not (Test-Path $cur)) { return $null }
+    $folder = Get-ItemFolder $Root ((Get-Content $cur -Raw | ConvertFrom-Json).number)
+    if ($folder -and (Test-Path (Join-Path $folder (Split-Path $Path -Leaf)))) { return (Join-Path $folder (Split-Path $Path -Leaf)) }
+    $null
+}
+
 function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     # Why Martin's spec approval does not stand for the spec as it is now, or $null when it does. The approval is
     # the last "Spec agreed:" line; spec-agreed.ps1 binds it with a "Spec version: <path> sha256 <hash>" line after it.
@@ -287,8 +300,8 @@ function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     $shown = [regex]::Matches($Text, '(?m)^Spec presented:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
     if (-not $shown -or $shown.Index -gt $agreed.Index) { return "Martin has not approved the version last presented to him" }
     if ($shown.Groups['h'].Value -ne $ver.Groups['h'].Value) { return "the approval is bound to a version other than the one presented to Martin" }
-    $file = Join-Path $Root $ver.Groups['p'].Value
-    if (-not (Test-Path $file)) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
+    $file = Resolve-SpecPath $Root $ver.Groups['p'].Value
+    if (-not $file) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
     if (-not (Test-TextHash $file $ver.Groups['h'].Value)) { return "the spec changed after Martin approved it; it needs his approval again" }
     $null
 }
@@ -749,4 +762,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SpecApprovalProblem, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
