@@ -26,5 +26,14 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "PowerShell(gh *)",
+      "PowerShell(az *)",
+      "Bash(gh *)",
+      "Bash(az *)",
+      "Edit(specs/**)"
+    ]
   }
 }
