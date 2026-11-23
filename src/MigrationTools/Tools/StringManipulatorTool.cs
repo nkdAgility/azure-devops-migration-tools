@@ -81,8 +81,8 @@ namespace MigrationTools.Tools
             Options.Manipulators.Add(new RegexStringManipulator()
             {
                 Enabled = true,
-                Description = "Default: Removes control characters and emojis but preserves Unicode letters and symbols",
-                Pattern = @"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]|[\uD800-\uDBFF][\uDC00-\uDFFF]|\uFE0F",
+                Description = "Default: Removes characters the SOAP API cannot save (control characters other than tab, line feed and carriage return; unpaired surrogates; U+FFFE and U+FFFF). Letters outside the BMP and emoji are kept.",
+                Pattern = @"[\x00-\x08\x0B\x0C\x0E-\x1F]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uFFFE\uFFFF]",
                 Replacement = ""
             });
         }
