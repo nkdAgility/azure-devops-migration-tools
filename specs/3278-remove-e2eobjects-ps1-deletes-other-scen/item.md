@@ -396,8 +396,8 @@ Spec version: specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md 
 ## Docs updated
 
 - e2e-harness: `platform/specs/e2e-harness/cleanup.md`: Who owns which objects
-- e2e-harness: `platform/specs/architecture.md`: ### tools/e2e/Remove-E2EObjects.ps1
-- e2e-harness: `tools/e2e/reports/2026-10-regression.md`: ./tools/e2e/Remove-E2EObjects.ps1 -All
+
+Also changed: `platform/specs/architecture.md` (a Remove-E2EObjects.ps1 entry next to Invoke-MigrationE2E.ps1) and the cleanup command in `tools/e2e/reports/2026-10-regression.md` (now `-All`).
 
 ## Output done evidence
 
