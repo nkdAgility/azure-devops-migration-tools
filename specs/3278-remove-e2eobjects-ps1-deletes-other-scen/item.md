@@ -154,14 +154,7 @@ Proposed fix, amended by both checks:
 
 ## Decisions for Martin
 
-1. Field naming: (A) keep current names and map both `amte2e<n>` and `amte2eAmt<n>`, leaving unnumbered fields
-   (`amte2eIssueOnly`, `amte2eLegacy`) deletable only by the full clean; or (B) rename seeders' fields to one
-   convention `amte2e<n>…` per scenario. A is smaller; B makes scoping complete.
-2. Should a full clean (`-Prefix amte2e-`, the default) require an explicit switch (e.g. `-All`) so the default
-   run can't wipe shared fields by accident?
-3. Should an unmappable prefix refuse the whole run (proposed) or still delete projects/processes and skip fields?
-4. Tests: add Pester `tools/e2e/*.Tests.ps1` plus a CI step that runs them (new convention), or add Pester tests
-   that are only run locally, or drop script tests and rely on `-WhatIf` proof?
+All answered; see Questions Q-1 to Q-4.
 
 ## Questions
 
@@ -210,3 +203,5 @@ Not applicable to the product API. The script uses the same Azure DevOps REST en
 ## Refactor assessment
 
 Small and required: move the field-prefix logic from the script into a function in `E2EAzDo.psm1` (R6), so the naming rules live in one place and can be tested without the API. The deletion loops stay as they are, apart from the `ShouldProcess` wrappers.
+
+Spec agreed: Spec agreed
