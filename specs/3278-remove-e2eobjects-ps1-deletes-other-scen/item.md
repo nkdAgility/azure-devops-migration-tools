@@ -395,8 +395,9 @@ Spec version: specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md 
 
 ## Docs updated
 
-- e2e-harness: `platform/specs/architecture.md`: "### tools/e2e/Remove-E2EObjects.ps1". The harness docs moved here from `.github/copilot-instructions.md` (now an index pointing to `platform/specs/`) before the build, so R8's entry lives in this file.
-- e2e-harness: `tools/e2e/reports/2026-10-regression.md`: "./tools/e2e/Remove-E2EObjects.ps1 -All".
+- e2e-harness: `platform/specs/e2e-harness/cleanup.md`: Who owns which objects
+- e2e-harness: `platform/specs/architecture.md`: ### tools/e2e/Remove-E2EObjects.ps1
+- e2e-harness: `tools/e2e/reports/2026-10-regression.md`: ./tools/e2e/Remove-E2EObjects.ps1 -All
 
 ## Output done evidence
 
