@@ -90,13 +90,13 @@ The default pattern is narrowed to the characters XML 1.0 (the SOAP payload) can
 - End to end failure path, same scenario, Bug `FoundIn` = `X`U+FFFE`Y`; pass = exit 0, 0 failed and target `FoundIn` = `XY` (main fails the item and exits 1): same command as above, asserted by `assert.ps1`
 - User manipulator still wins, same scenario with a no-op manipulator configured; pass = exit 0 and target `FoundIn` keeps U+FE0F and the emoji: `./tools/e2e/Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/stringmanip-3258/config-user.json; pwsh -NoProfile -File tools/e2e/scenarios/stringmanip-3258/assert.ps1 -User`
 - Docs match the code; pass = exit 0 and no diff after regeneration: `pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1`
-- Clean-up; pass = no `amte2e-3258-*` project left in either org: `pwsh -NoProfile -File tools/e2e/scenarios/stringmanip-3258/cleanup.ps1` (deletes only the two scratch projects, see Q-7)
+- Clean-up; pass = no `amte2e-3258-*` project left in either org: `pwsh -NoProfile -File tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-3258-` with its field prefix fixed so it touches only this item's scratch objects (Q-7)
 ## Decisions for Martin
 - Q-1 resolved by Martin (2026-11-20): scrub what SOAP does not support. Emoji are kept.
 - Q-2 resolved by Martin (2026-11-21): fix it here. Was: `System.Title` is never passed to the tool, because `PopulateWorkItem` copies it directly. Under the SOAP rule a U+FFFE in a Title would still fail the save. Route Title through the tool here, or in a separate item? (for Martin) answered
 - Q-3 resolved by Martin (2026-11-21): fix them here. Was: `configuration-default.json` and `configuration-classic.json` ship `[^( -~)\n\r\t]+`, which removes all non-ASCII text and far exceeds the SOAP rule. Change them here, or raise a separate issue? (for Martin) answered
 - Q-4 resolved by the rule: keep the emoji sample as an opt-in, and reword it.
-- Q-5 This changes migrated output for anyone on the built-in default. Release it as a bug fix? (for Martin) open
+- Q-5 resolved by Martin (2026-11-23): bug fix in the next minor release, with a release note. Was: This changes migrated output for anyone on the built-in default. Release it as a bug fix? (for Martin) answered
 - Q-6 resolved by Martin (2026-11-21): stop scrubbing them; the default removes only XML-invalid characters. Was: Should DEL and C1 (`\x7F-\x9F`) be scrubbed too? They are legal XML, and Azure DevOps Services REST would not seed them, so SOAP was not tested with them; an on-prem TFS source could hold them. Default proposal: keep scrubbing them, as main does now, to avoid a regression. (for Martin) openRun: 6ea6a085
 Run: b8178864
 
@@ -147,10 +147,12 @@ This keeps DEL/C1 scrubbing as on `main` unless Martin decides otherwise (Q-6). 
 
 - Q-1 Q-2 route `System.Title` through the tool here or in a separate item? (for Martin) answered: fix it here
 - Q-2 Q-3 change the shipped configs' ASCII-only pattern here, or in a separate issue? (for Martin) answered: fix them here
-- Q-3 Q-5 release as a bug fix? (for Martin) open
+- Q-3 Q-5 release as a bug fix? (for Martin) answered: bug fix plus release note
 - Q-4 Q-6 keep scrubbing DEL/C1? (for Martin) answered: stop scrubbing
 - Q-5 whether SOAP rejects DEL and C1 (U+007F–U+009F). Azure DevOps Services REST refuses to seed them, so this can't be tested on the test orgs. (for Martin) answered: moot, DEL/C1 are no longer scrubbed
-- Q-7 `Remove-E2EObjects.ps1 -Prefix amte2e-3258-` would derive field prefix `Custom.amte2e` and delete every e2e field. The clean-up uses Remove-E2EProject for the two scratch projects instead. Is that the clean-up you want? (for Martin) open
+- Q-7 `Remove-E2EObjects.ps1 -Prefix amte2e-3258-` would derive field prefix `Custom.amte2e` and delete every e2e field. The clean-up uses Remove-E2EProject for the two scratch projects instead. Is that the clean-up you want? (for Martin) answered (2026-11-23): fix Remove-E2EObjects in this item
 
 Spec agreed: Approve (2026-11-21, review gate on .specify/bugs/stringmanipulator-soap-scrub/assessment.md); Title: Fix it here; Configs: Fix them here; DEL/C1: Stop scrubbing
 Spec presented: .specify/bugs/stringmanipulator-soap-scrub/assessment.md sha256 ae708d85da7436fcb4fd77a7f5c733bfb55f2d945f6b5a9d6bc4cf22bde4e313
+Spec agreed: Spec agreed, fix it as assessed
+Spec version: .specify/bugs/stringmanipulator-soap-scrub/assessment.md sha256 ae708d85da7436fcb4fd77a7f5c733bfb55f2d945f6b5a9d6bc4cf22bde4e313
