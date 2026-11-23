@@ -178,3 +178,14 @@ Docs unchanged: e2e-harness: there is no platform/specs/e2e-harness/ doc yet. Th
 
 Spec agreed: Approve
 Spec version: specs/3312-pipeline-migration-keeps-the-source-repo/assessment.md sha256 fc82a8de5c194cc3c0450c653c3cf2c94e861f8433d758f44207fe20648af97f
+
+## Output done evidence
+
+Confidence: 92%
+Raised by: rerunning all three outcome-check asserts after fixing the error-line pattern, which had made the first "no errors logged" checks vacuous. Each now finds and counts real ERR lines.
+Reasons:
+- Blind review: a separate reviewer saw only the diff, the issue and the rules, and found 0 open findings. Doubt: it ran nothing, so it relies on the live checks for behaviour.
+- Architecture check: the change stays in the REST processor and data contracts, adds no TFS object model dependency, adds no restating comments, and changes no option classes (GenerateDocs made no changes). No doubt worth more cost.
+- Meets the original ask: the repository is mapped with or without properties (the L0 test and the live mapped case pass, and the target repository id and URL are the target's). A missing repository gives one clear message naming the definition, the repository and what to do, with no TF401019 and no stack trace, and the other definition still migrates (live missing case). The existing pipeline scenarios match main (live existing case). Remaining doubt: GitHub, Bitbucket and TFVC repositories are covered only by the L0 test, not a live run. Seeding a GitHub service connection on the test orgs isn't worth the cost for an unchanged pass-through path.
+
+
