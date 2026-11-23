@@ -16,12 +16,23 @@ if ($dirty) { $fail.Add("the working tree has uncommitted changes: $(($dirty | F
 
 git fetch -q 2>$null
 if ($LASTEXITCODE -ne 0) { Write-Error 'git fetch failed: the remote branch cannot be checked, so the PR is not marked ready.'; exit 1 }
-$up = git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null
-if ($LASTEXITCODE -ne 0 -or -not $up) { $fail.Add('the branch has no remote branch: push it first') }
+# This checkout's pull request: the one open from the item's topic branch (topic/<item folder>, as open-pr.ps1 pushes
+# it), else the one for the branch's upstream. Its head branch is what the checkout must match, whatever the upstream says.
+$pr = $null
+if (Test-Path .specify/items/current.json) {
+    Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+    $cid = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
+    $topic = Get-TopicBranch '.' $cid
+    $pr = gh pr view $topic --json number,headRefName 2>$null | ConvertFrom-Json
+}
+if (-not $pr) { $pr = gh pr view --json number,headRefName 2>$null | ConvertFrom-Json }
+$up = if ($pr) { "origin/$($pr.headRefName)" } else { git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null }
+$remote = if ($up) { git rev-parse --verify -q "$up" 2>$null } else { $null }
+if (-not $remote) { $fail.Add("the branch has no remote branch$(if ($up) { " ($up)" }): push it first") }
 else {
-    $head = git rev-parse HEAD; $remote = git rev-parse '@{u}'
+    $head = git rev-parse HEAD
     if ($head -ne $remote) {
-        $ahead = git rev-list --count '@{u}..HEAD'; $behind = git rev-list --count 'HEAD..@{u}'
+        $ahead = git rev-list --count "$up..HEAD"; $behind = git rev-list --count "HEAD..$up"
         $fail.Add("the branch does not match $up ($ahead unpushed, $behind not pulled)")
     }
 }
@@ -62,8 +73,8 @@ if (-not $fail.Count) {
 
 if ($fail.Count) { $fail | ForEach-Object { Write-Error "not ready: $_" -ErrorAction Continue }; exit 1 }
 # Only this branch's own PR is marked ready: the checks above were run on this branch.
-$mine = gh pr view --json number 2>$null | ConvertFrom-Json
-if ($LASTEXITCODE -ne 0 -or -not $mine) { Write-Error 'this branch has no open pull request.'; exit 1 }
+$mine = $pr
+if (-not $mine) { Write-Error 'this branch has no open pull request.'; exit 1 }
 if ($Number -and $Number -ne $mine.number) { Write-Error "PR #$Number is not this branch's pull request (#$($mine.number)); only the branch that passed the checks can be marked ready."; exit 1 }
 gh pr ready $mine.number
 if ($LASTEXITCODE -ne 0) { exit 1 }

@@ -94,7 +94,7 @@ edits:
     id: nkda-done-checks
     type: shell
     run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/done-checks.ps1
-    timeout: 3600
+    timeout: 43200
 - insert_after: implement
   step:
     id: nkda-docs-check

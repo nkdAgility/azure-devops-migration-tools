@@ -29,7 +29,8 @@ $rel = [IO.Path]::GetRelativePath((Get-Location), $a.FullName).Replace('\', '/')
 # approval Martin has already given still stands.
 $recText = Get-Content (Get-ItemRecordPath '.' $id) -Raw
 $lastShown = [regex]::Matches("$recText", '(?m)^Spec presented:[ \t]*\S+[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})') | Select-Object -Last 1
-if (-not ($lastShown -and (Test-TextHash $a.FullName $lastShown.Groups['h'].Value))) { & $rec -Line "Spec presented: $rel sha256 $(Get-TextHash $a.FullName)" }
+$stands = -not (Get-SpecApprovalProblem ("$recText" -replace "`r`n", "`n") '.')
+if (-not $stands -and -not ($lastShown -and (Test-TextHash $a.FullName $lastShown.Groups['h'].Value))) { & $rec -Line "Spec presented: $rel sha256 $(Get-TextHash $a.FullName)" }
 & $rec -Section 'Reproduction' -Body (Sec 'Reproduction')
 & $rec -Section 'Cause' -Body (Sec 'Root Cause Hypothesis')
 & $rec -Section 'Proposed fix' -Body (Sec 'Proposed Remediation')
