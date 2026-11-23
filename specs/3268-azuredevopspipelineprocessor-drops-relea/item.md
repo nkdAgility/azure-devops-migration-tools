@@ -8,6 +8,8 @@ paths:
   - docs/data/classes/reference.processors.azuredevopspipelineprocessor.yaml
   - docs/static/schema/schema.processors.azuredevopspipelineprocessor.json
   - platform/specs/rest-client/**
+  - platform/specs/core/**
+  - platform/specs/e2e-harness/**
   - specs/3268-azuredevopspipelineprocessor-drops-relea/**
 ---
 
@@ -120,4 +122,14 @@ Reasons:
 - The reported failure is reproduced on main and gone on the change, against the real target, on both the happy and the failure path.
 - The mapping is tested per artifact type, and the existing pipeline scenarios still pass.
 - Git and service-connection artifacts are proved by unit tests only, not end to end.
+
+
+## Docs updated
+
+- rest-client: `platform/specs/rest-client/pipeline-processor.md`: A release definition keeps its artifacts
+- core: `platform/specs/core/release-definition-contract.md`: It keeps the artifacts.
+- e2e-harness: `platform/specs/e2e-harness/pipelines-3268.md`: proves that classic release definitions keep their artifacts
+
+
+Paths extended: Martin answered QUESTION 2 with "2:a": platform/specs/core/** and platform/specs/e2e-harness/** added.
 
