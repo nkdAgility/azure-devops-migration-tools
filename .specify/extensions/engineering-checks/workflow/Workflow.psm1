@@ -322,11 +322,13 @@ function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     # Small fixes made after his approval (his own answers written in, typing mistakes) keep it, when each is recorded
     # by spec-fix.ps1 as "Spec fix: <path> sha256 <old> -> <new>: <what was fixed>", starting from the approved version.
     $accepted = [Collections.Generic.List[string]]::new(); $accepted.Add($bound.Groups['h'].Value)
+    $lastFix = $null
     foreach ($fx in [regex]::Matches($Text, '(?m)^Spec fix:[ \t]*\S+[ \t]+sha256[ \t]+(?<o>[0-9a-f]{64})[ \t]*->[ \t]*(?<n>[0-9a-f]{64}):') | Where-Object { $_.Index -gt $agreed.Index }) {
         if (-not $accepted.Contains($fx.Groups['o'].Value)) { return "a 'Spec fix:' starts from a version Martin did not approve" }
-        $accepted.Add($fx.Groups['n'].Value)
+        $accepted.Add($fx.Groups['n'].Value); $lastFix = $fx
     }
-    if ($shown.Index -gt $agreed.Index -and -not $accepted.Contains($shown.Groups['h'].Value)) { return "Martin has not approved the version last presented to him" }
+    # A version presented after his approval needs it, unless a small fix recorded later replaced that version.
+    if ($shown.Index -gt $agreed.Index -and -not $accepted.Contains($shown.Groups['h'].Value) -and -not ($lastFix -and $lastFix.Index -gt $shown.Index)) { return "Martin has not approved the version last presented to him" }
     $file = Resolve-SpecPath $Root $ver.Groups['p'].Value
     if (-not $file) { $file = Resolve-SpecPath $Root $shown.Groups['p'].Value }
     if (-not $file) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
