@@ -1,6 +1,8 @@
 ---
-purpose: A re-run repair save on an already-migrated work item keeps the source's state-stamped values (ClosedDate/By, ResolvedDate/By, ActivatedDate/By, StateChangeDate) instead of re-stamping them with the save time, and a re-run corrects a target already stamped wrongly where that is safe.
+purpose: A re-run repair save on an already-migrated work item keeps the source's state-stamped values (ClosedDate/By, ResolvedDate/By, ActivatedDate/By, StateChangeDate) instead of re-stamping them with the save time, and a re-run corrects a target already stamped wrongly where that is safe. A Git commit link left pointing at the source, because the target lacks the commit, is no longer reported missing on every re-run, so that re-run ends in sync (Q-6, added at Martin's yes).
 paths:
+  - src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
+  - src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs
   - src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
   - src/MigrationTools.Clients.TfsObjectModel/Processors/StateStampedFields.cs
   - src/MigrationTools.Clients.TfsObjectModel.Tests/Processors/**
@@ -73,13 +75,15 @@ Open findings: 0
 - Check whether the other-end-of-link save in `TfsWorkItemLinkTool` (`OtherWorkItemsSaved`) can re-stamp a Closed item's state-stamped fields; not reproduced here.
 - Q-4 What differs in the live migration from the test-org run? (for Martin) answered from the customer logs (via MANAGER-ADMT): BypassRules on, no custom rules (inherited Agile Task), Azure DevOps Services; every stamping save adds an unresolved commit ArtifactLink. The BypassRules and custom-rule hypotheses are ruled out.
 - Q-5 Which outcome check shows the live fault? (for Martin) answered: the unresolved commit link reproduction is the outcome check (see Reproduction and the Real system checks below).
-- Q-6 Is the permanent "target differs" for an unresolved Git link (`GetTargetUri` skips the target-existence check, so the link left on the source is never found) in this item's Purpose? It is why the live items are repaired on every run. If yes, add `src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs` and `TfsWorkItemLinkTool.cs` to the paths and to the Purpose; if no, hand back as a proposed follow-up. Review: only "in Purpose" survives, because it is a bug found in this work, it causes the save that re-stamps, and without it a re-run never ends in sync. The fix goes in `HasExternalLink` (`TfsWorkItemLinkTool.cs:199-207`), not in `GetTargetUri`, which #3192 replay relies on. It needs Martin's yes to add the two files to the Purpose and paths. (for Martin) open
+- Q-6 Is the permanent "target differs" for an unresolved Git link (`GetTargetUri` skips the target-existence check, so the link left on the source is never found) in this item's Purpose? It is why the live items are repaired on every run. If yes, add `src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs` and `TfsWorkItemLinkTool.cs` to the paths and to the Purpose; if no, hand back as a proposed follow-up. Review: only "in Purpose" survives, because it is a bug found in this work, it causes the save that re-stamps, and without it a re-run never ends in sync. The fix goes in `HasExternalLink` (`TfsWorkItemLinkTool.cs:199-207`), not in `GetTargetUri`, which #3192 replay relies on. It needs Martin's yes to add the two files to the Purpose and paths. (for Martin) answered: "Add to scope"; added to the Purpose and paths.
 
 ## Spec
 
 Working spec: `specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md` (the bug assessment Martin approves, reassessed after the reproduction).
 
-Spec presented: not yet. The earlier presented hash (503db291) is for the superseded assessment.
+Spec presented: specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md sha256 1e94c27bf12167fbd5044426fab9ba8b715678d24d87def9983084466f686aab
+
+Spec agreed: Approve. Q-6: Add to scope.
 
 ## Outcome checks
 
