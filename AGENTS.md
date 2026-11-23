@@ -28,6 +28,10 @@ A worker delivers one outcome, its Purpose, written at the top of the item's rec
 
 A pull request is a draft while anything it needs is not in it: an uncommitted or unpushed change on its branch, a shared file not yet copied in, or an open check or rule. It is marked ready only when all of these are done. Any agent that edits a file on a branch with a pull request marks that pull request draft first.
 
+## Pushing (Martin)
+
+Workers push their own item branch and open its draft pull request without asking. Merging still needs Martin.
+
 ## Azure DevOps scope (Martin)
 
 Ignore `dev.azure.com/nkdagility/AzureDevOps-Tools`: never query it or use it to decide anything. Releases run from `.github/workflows/main.yml`; the legacy `build/azure-pipeline.yml` was removed in October 2026.

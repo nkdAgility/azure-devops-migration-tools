@@ -238,6 +238,7 @@ namespace MigrationTools.Processors
             var definitionsNotInTarget = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions).ToList();
             var definitionsToBeMigrated = FilterOutIncompatibleBuildDefinitions(definitionsNotInTarget, availableTasks, TaskGroupMapping).ToList();
             definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsToBeMigrated, TaskGroupMapping, VariableGroupMapping).ToList();
+            definitionsToBeMigrated = MapRepositories(definitionsToBeMigrated, sourceRepositories, targetRepositories).ToList();
 
             // Replace taskgroup and variablegroup sIds with tIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
@@ -249,7 +250,6 @@ namespace MigrationTools.Processors
                 if (definitionToBeMigrated.Repository?.Properties != null)
                 {
                     definitionToBeMigrated.Repository.Properties.ConnectedServiceId = targetConnectedServiceId;
-                    MapRepositoriesInBuidDefinition(sourceRepositories, targetRepositories, definitionToBeMigrated);
                 }
 
                 if (TaskGroupMapping is not null)
@@ -326,21 +326,25 @@ namespace MigrationTools.Processors
             return mappings;
         }
 
-        private void MapRepositoriesInBuidDefinition(IEnumerable<GitRepository> sourceRepositories, IEnumerable<GitRepository> targetRepositories, BuildDefinition definitionToBeMigrated)
+        private IEnumerable<BuildDefinition> MapRepositories(IEnumerable<BuildDefinition> definitions, IEnumerable<GitRepository> sourceRepositories, IEnumerable<GitRepository> targetRepositories)
         {
-            var sourceRepoId = definitionToBeMigrated.Repository.Id;
-            string sourceRepositoryName = sourceRepositories.FirstOrDefault(s => s.Id == sourceRepoId)?.Name ?? string.Empty;
-            string targetRepoId;
-
-            if (Options.RepositoryNameMaps.ContainsKey(sourceRepositoryName))  //Map repository name if configured
+            foreach (var definition in definitions)
             {
-                targetRepoId = targetRepositories.FirstOrDefault(r => Options.RepositoryNameMaps[sourceRepositoryName] == r.Name)?.Id;
+                if (!BuildDefinitionRepositoryMap.UsesAzureReposGit(definition))
+                {
+                    yield return definition;
+                    continue;
+                }
+                var (targetRepositoryName, mapped) = BuildDefinitionRepositoryMap.Apply(definition, sourceRepositories, targetRepositories, Options.RepositoryNameMaps);
+                if (mapped)
+                {
+                    yield return definition;
+                    continue;
+                }
+                Log.LogError(
+                    @"BuildDefinition ""{DefinitionName}"" cannot be migrated because its repository ""{RepositoryName}"" does not exist in the target project ""{TargetProject}"". Migrate the repository first, or add a RepositoryNameMaps entry that maps it to an existing target repository.",
+                    definition.Name, targetRepositoryName, Target.Options.Project);
             }
-            else
-            {
-                targetRepoId = targetRepositories.FirstOrDefault(r => sourceRepositoryName == r.Name)?.Id;
-            }
-            definitionToBeMigrated.Repository.Id = targetRepoId;
         }
 
         private async Task<IEnumerable<Mapping>> CreatePoolMappingsAsync<DefinitionType>()
