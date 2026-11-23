@@ -389,3 +389,6 @@ convention tied to an issue number. Confidence: high.
 - Empty and `amte2e` prefixes are refused.
 - `-WhatIf` calls no delete, with mocked REST calls.
 
+
+Spec agreed: Cleanup only removes the issue's own objects, full clean needs -All
+Spec version: specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md sha256 e7692bbfc8d55c32730ed0ceef68f6a1b2771238e09484b17cc7213f28fb300a
