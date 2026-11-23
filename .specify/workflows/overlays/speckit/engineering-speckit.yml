@@ -8,7 +8,7 @@ edits:
     id: nkda-intake
     type: shell
     run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/intake.ps1
-      -Text '{{ inputs.spec }}'
+      -Text \"{{ inputs.spec }}\"
 - insert_after: specify
   step:
     id: nkda-challenge
@@ -77,7 +77,7 @@ edits:
     id: nkda-specified
     type: shell
     run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1
-      -To Specified -Reason 'spec and plan written, challenged and architecture-checked'
+      -To Specified -Reason \"spec and plan written, challenged and architecture-checked\"
 - insert_before: tasks
   step:
     id: nkda-spec-agreed
@@ -88,7 +88,7 @@ edits:
     id: nkda-ready
     type: shell
     run: 'pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1
-      -To Building -Reason ''Definition of Ready: spec agreed by Martin'''
+      -To Building -Reason \"\"Definition of Ready: spec agreed by Martin'''
 - insert_after: implement
   step:
     id: nkda-done-checks
