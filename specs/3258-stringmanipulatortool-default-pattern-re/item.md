@@ -90,7 +90,7 @@ The default pattern is narrowed to the characters XML 1.0 (the SOAP payload) can
 - End to end failure path, same scenario, Bug `FoundIn` = `X`U+FFFE`Y`; pass = exit 0, 0 failed and target `FoundIn` = `XY` (main fails the item and exits 1): same command as above, asserted by `assert.ps1`
 - User manipulator still wins, same scenario with a no-op manipulator configured; pass = exit 0 and target `FoundIn` keeps U+FE0F and the emoji: `./tools/e2e/Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/stringmanip-3258/config-user.json; pwsh -NoProfile -File tools/e2e/scenarios/stringmanip-3258/assert.ps1 -User`
 - Docs match the code; pass = exit 0 and no diff after regeneration: `pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1`
-- Clean-up; pass = no `amte2e-3258-*` project left in either org: `pwsh -NoProfile -File tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-3258-` with its field prefix fixed so it touches only this item's scratch objects (Q-7)
+- Clean-up; pass = no `amte2e-3258-*` project left in either org: `pwsh -NoProfile -File tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-3258-` once #3278's field-prefix fix is on main, so it touches only this item's scratch objects (Q-7)
 ## Decisions for Martin
 - Q-1 resolved by Martin (2026-11-20): scrub what SOAP does not support. Emoji are kept.
 - Q-2 resolved by Martin (2026-11-21): fix it here. Was: `System.Title` is never passed to the tool, because `PopulateWorkItem` copies it directly. Under the SOAP rule a U+FFFE in a Title would still fail the save. Route Title through the tool here, or in a separate item? (for Martin) answered
