@@ -86,14 +86,10 @@ the path people actually hit.
 
 ## Outcome checks
 
-- `-Prefix amte2e-3272- -WhatIf` (mocked) lists only `Custom.amte2e3272*` fields and calls no delete.
-- `-Prefix amte2e-abc-` and `-Prefix x` exit non-zero with the refusal message and touch nothing.
-- `-Prefix amte2e-` still targets all `Custom.amte2e*` (full clean behaviour kept).
-- Pester tests pass locally and in CI.
-- Live proof, safe: run `-WhatIf` only against the test orgs with a scratch prefix on `main` (shows all fields)
-  and on the change (shows only scratch fields); then a real run on a scratch prefix whose fields were created
-  for the test, and check other scenarios' fields are still present.
-
+- The cleanup's rules hold (scoped fields only, refusals, -WhatIf deletes nothing), on the e2e harness with Azure DevOps mocked; pass = exit 0 and 0 failed: `pwsh -NoProfile -Command "$c = New-PesterConfiguration; $c.Run.Path = 'tools/e2e'; $c.Run.Exit = $true; Invoke-Pester -Configuration $c"`
+- A scoped dry run on the real test orgs lists only this issue's objects and deletes nothing; pass = exit 0: `pwsh -NoProfile -File tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-3278- -WhatIf`
+- On the real test orgs, a prefix that matches every e2e object is refused before anything is deleted; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e- | Out-Null; exit 1 } catch { if ($_.Exception.Message -match 'matches every e2e object') { exit 0 } else { exit 1 } }"`
+- On the real test orgs, a run with neither -Prefix nor -All is refused; pass = exit 0: `pwsh -NoProfile -Command "try { ./tools/e2e/Remove-E2EObjects.ps1 | Out-Null; exit 1 } catch { if ($_.Exception.Message -match '-All for every e2e object') { exit 0 } else { exit 1 } }"`
 ## Rubber duck
 
 Walking the proposed fix step by step turned up these points:
