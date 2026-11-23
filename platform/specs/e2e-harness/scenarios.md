@@ -28,3 +28,16 @@ Re-running Plans and Suites into an existing target plan adds the Test Cases mis
 - Order: step 1, then step 2, 3 and 4 configs, assert (TC1 / TC1); step 2, then step 2 and 4 configs, assert
   (TC1, TC2 / TC1, TC2); step 4 config again, same assert; step 3, then step 4 config (exits 1 and names TC3); step 2
   and 4 configs, assert (TC1, TC2, TC3 / TC1, TC2).
+
+## Two-config scenarios
+
+### stringmanip-3258
+
+`StringManipulatorTool`'s built-in default removes only what SOAP cannot save.
+
+- `seed.ps1`: projects `amte2e-3258-src`, `-tgt` and `-tgtu`; one Bug whose Title and Found In hold letters outside the
+  BMP and emoji, and one Bug whose Found In holds U+FFFE.
+- `config.json` (default, `Manipulators` empty): exits 0; `assert.ps1` checks both Bugs migrated, the letters and emoji
+  kept, and U+FFFE removed.
+- `config-user.json` (its own manipulator removes `W`): exits 1; `assert.ps1 -Config config-user.json` checks the
+  manipulator ran on Title and Found In and the U+FFFE Bug was not migrated.

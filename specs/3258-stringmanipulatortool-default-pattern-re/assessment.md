@@ -72,3 +72,5 @@ Martin also decided (2026-11-21): route `System.Title` through the tool (Q-2), a
 None open. Martin decided (2026-11-23):
 - Q-5: release as a bug fix in the next minor release, with a release note.
 - Q-7: the e2e clean-up uses `Remove-E2EObjects.ps1 -Prefix amte2e-3258-` once #3278 fixes its field prefix. #3278 owns that file.
+
+Docs unchanged: docs-site: only the tool's reference page and its generated data change; the site's layouts, rules and build are untouched.
