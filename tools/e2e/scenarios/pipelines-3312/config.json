@@ -35,8 +35,7 @@
         "MigrateServiceConnections": false,
         "RepositoryNameMaps": {},
         "BuildPipelines": [
-          "amte2e-3312-yaml",
-          "amte2e-3312-missing"
+          "amte2e-3312-yaml"
         ]
       }
     ]
