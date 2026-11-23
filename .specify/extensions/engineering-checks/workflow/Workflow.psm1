@@ -236,11 +236,12 @@ function Get-OutcomeProblem([string]$Text, $Id, [string]$Head) {
 }
 
 function Get-SpecAgreed([string]$Text) {
-    # Martin's own words on the last "Spec agreed:" line, or $null: at least three characters, not the stock phrase.
+    # Martin's words on the last "Spec agreed:" line, or $null when there are fewer than three characters. Words he
+    # chose by clicking an offered answer count as his.
     $m = [regex]::Matches($Text, '(?m)^Spec agreed:[ \t]*(.*)$') | Select-Object -Last 1
     if (-not $m) { return $null }
     $words = $m.Groups[1].Value.Trim()
-    if ($words.Length -lt 3 -or $words -match '(?i)^approved by Martin at the review gate') { return $null }
+    if ($words.Length -lt 3) { return $null }
     $words
 }
 
@@ -299,11 +300,16 @@ function Get-SpecApprovalProblem([string]$Text, [string]$Root = '.') {
     $agreed = [regex]::Matches($Text, '(?m)^Spec agreed:') | Select-Object -Last 1
     $ver = [regex]::Matches($Text, '(?m)^Spec version:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
     if (-not $ver -or $ver.Index -lt $agreed.Index) { return "Martin's approval is not bound to a spec version (spec-agreed.ps1 records it)" }
-    # The approval must follow the latest version presented to him, and be bound to exactly that version.
+    # The approval is bound to exactly the latest version presented to him. A presentation after his approval of the
+    # same text (the file only moved, say) does not need his approval again.
     $shown = [regex]::Matches($Text, '(?m)^Spec presented:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
-    if (-not $shown -or $shown.Index -gt $agreed.Index) { return "Martin has not approved the version last presented to him" }
-    if ($shown.Groups['h'].Value -ne $ver.Groups['h'].Value) { return "the approval is bound to a version other than the one presented to Martin" }
+    if (-not $shown) { return "no 'Spec presented:' line: the spec was never presented to Martin" }
+    if ($shown.Groups['h'].Value -ne $ver.Groups['h'].Value) {
+        if ($shown.Index -gt $agreed.Index) { return "Martin has not approved the version last presented to him" }
+        return "the approval is bound to a version other than the one presented to Martin"
+    }
     $file = Resolve-SpecPath $Root $ver.Groups['p'].Value
+    if (-not $file) { $file = Resolve-SpecPath $Root $shown.Groups['p'].Value }
     if (-not $file) { return "the approved spec $($ver.Groups['p'].Value) is missing" }
     if (-not (Test-TextHash $file $ver.Groups['h'].Value)) { return "the spec changed after Martin approved it; it needs his approval again" }
     $null

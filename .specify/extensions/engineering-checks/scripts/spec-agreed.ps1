@@ -20,7 +20,13 @@ if (-not $words) {
 $agreed = [regex]::Matches($text, '(?m)^Spec agreed:') | Select-Object -Last 1
 $shown = [regex]::Matches($text, '(?m)^Spec presented:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Select-Object -Last 1
 if (-not $shown) { Write-Error "#$id records no 'Spec presented:' version, so the approval cannot be bound to what Martin saw."; exit 1 }
-if ($agreed.Index -lt $shown.Index) { Write-Error "Martin's last 'Spec agreed:' line is older than the version presented to him; it needs his approval of the version presented."; exit 1 }
+if ($agreed.Index -lt $shown.Index) {
+    # The same text presented again after his approval (the file only moved): the approval already bound still stands.
+    $prior = [regex]::Matches($text, '(?m)^Spec version:[ \t]*(?<p>\S+)[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})[ \t]*$') | Where-Object { $_.Index -gt $agreed.Index } | Select-Object -Last 1
+    $now = Resolve-SpecPath '.' $shown.Groups['p'].Value
+    if ($prior -and $prior.Groups['h'].Value -eq $shown.Groups['h'].Value -and $now -and (Test-TextHash $now $shown.Groups['h'].Value)) { "spec agreed: $words (already bound; the text presented since is the same)"; exit 0 }
+    Write-Error "Martin's last 'Spec agreed:' line is older than the version presented to him; it needs his approval of the version presented."; exit 1
+}
 $path = $shown.Groups['p'].Value; $hash = $shown.Groups['h'].Value
 $found = Resolve-SpecPath '.' $path
 if (-not $found) { Write-Error "The working spec $path is missing."; exit 1 }
