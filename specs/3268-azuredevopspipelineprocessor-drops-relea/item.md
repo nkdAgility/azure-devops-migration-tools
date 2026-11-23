@@ -101,3 +101,23 @@ On `main` (e2ddb400), against scratch projects `amte2e-3268-src`/`amte2e-3268-tg
 
 Spec agreed: Approve
 Spec version: specs/3268-azuredevopspipelineprocessor-drops-relea/assessment.md sha256 8933531c4964dbb052d6bda726165d926662c1f644e65c3a58d77fefafca1bea
+
+## Output done evidence
+
+- Build: `dotnet build MigrationTools.sln`: 0 errors, after merging origin/main (fb9bc56e).
+- Tests: `dotnet test MigrationTools.sln` with the test orgs: all pass (Rest.Tests 97, MigrationTools.Tests 305, TfsObjectModel.Tests 428, Host.Tests 12, FileSystem.Tests 6; 0 failed). The 10 new `ReleaseArtifactMapTests` cover Build, Git, renamed Git, service connection, build not in target, cross-project, unmigrated service connection, Azure Artifacts, first unmapped artifact, and unknown fields kept.
+- E2E `tools/e2e/scenarios/pipelines-3268/assert.ps1`, scratch projects amte2e-3268-src/tgt:
+  - main, `-Case mapped`: 7 of 7 checks fail (target rejects with "Artifact alias ... does not matching any linked artifact aliases", exit 1).
+  - main, `-Case unmappable`: 3 checks fail (400 from the target, not counted as skipped).
+  - change, `-Case mapped`: 7 of 7 pass, tool exit 0, the artifact points at the target project and build definition 35.
+  - change, `-Case unmappable`: 5 of 5 pass, tool exit 1 with one clear error naming the release, alias and type, and nothing posted.
+- Regression: the existing `pipelines` scenario in scratch projects amte2e-3268-pipe-src/tgt: variable group, task group, build and release all migrated, exit 0.
+- Docs: `GenerateDocs.ps1` produced no changes (no options changed). rest-client doc written; core and e2e-harness wait on Martin (QUESTION 2).
+
+Confidence: 90%
+
+Reasons:
+- The reported failure is reproduced on main and gone on the change, against the real target, on both the happy and the failure path.
+- The mapping is tested per artifact type, and the existing pipeline scenarios still pass.
+- Git and service-connection artifacts are proved by unit tests only, not end to end.
+
