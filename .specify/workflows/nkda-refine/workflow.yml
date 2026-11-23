@@ -19,7 +19,7 @@ inputs:
 steps:
   - id: intake
     type: shell
-    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/intake.ps1 -Text '{{ inputs.item }}'"
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/intake.ps1 -Text \"{{ inputs.item }}\""
   - id: refine
     type: prompt
     integration: "{{ inputs.integration }}"
@@ -27,4 +27,4 @@ steps:
     prompt: "Follow the instructions in .specify/extensions/engineering-checks/commands/refine.md exactly. Arguments: none"
   - id: refined
     type: shell
-    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1 -To Refined -Reason 'Understood: sources read, scope set'"
+    run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1 -To Refined -Reason \"Understood: sources read, scope set\""

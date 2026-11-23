@@ -26,5 +26,22 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "PowerShell(gh *)",
+      "PowerShell(az *)",
+      "Bash(gh *)",
+      "Bash(az *)",
+      "Edit(specs/**)",
+      "Edit(.specify/bugs/**)",
+      "Edit(.specify/assessments/**)",
+      "Edit(.specify/reviews/**)",
+      "Edit(.specify/items/**)",
+      "Edit(.specify/wkr/**)"
+    ]
+  },
+  "enabledPlugins": {
+    "nkda-engineering-delivery@nkda-engineering": false
   }
 }

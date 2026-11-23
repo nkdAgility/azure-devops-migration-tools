@@ -108,55 +108,6 @@ function Write-Ask([string]$Reason) {
     @{ hookSpecificOutput = @{ hookEventName = 'PreToolUse'; permissionDecision = 'ask'; permissionDecisionReason = $Reason } } | ConvertTo-Json -Depth 5 -Compress
     exit 0
 }
-# Draft until ready: a pull request is marked ready only through pr-ready.ps1, is always opened as a draft,
-# and is marked draft before any edit on its branch. This runs before the scope check below, so an edit that is
-# then approved outside the paths never lands while the pull request is ready.
-$isShell = $call.tool_name -match '^(Bash|PowerShell)$'
-$cmd = "$($inputs.command)"
-$segs = @($cmd -split '[|;&\r\n]+')
-if ($isShell) {
-    if (($segs | Where-Object { $_ -match '\bgh\s+pr\s+ready\b' -and $_ -notmatch '--undo\b' }) -or $cmd -match 'markPullRequestReadyForReview') {
-        [Console]::Error.WriteLine('guard: a pull request is marked ready only through pr-ready.ps1, which checks it is complete first.')
-        exit 2
-    }
-    if ($segs | Where-Object { $_ -match '\bgh\s+pr\s+create\b' -and $_ -notmatch '(--draft|-d)\b' }) {
-        [Console]::Error.WriteLine('guard: a pull request is opened as a draft (gh pr create --draft) and marked ready through pr-ready.ps1.')
-        exit 2
-    }
-}
-$writePattern = '(?i)\b(Set-Content|Add-Content|Out-File|Copy-Item|Move-Item|Remove-Item|New-Item|Rename-Item|Clear-Content|tee|cp|mv|rm|touch|truncate)\b|\bsed\s+-i|(?<![0-9&=-])>(?!\s*\$?null\b|&)|\bgit\b(\s+-\S+(\s+[^\s-]\S*)?)*\s+(add|commit|mv|rm|checkout|switch|reset|restore|merge|rebase|cherry-pick|revert|stash|apply|am|pull)\b|\bdotnet\s+(format|new|add)\b|\bnpm\s+(install|i|ci)\b'
-$writes = ($call.tool_name -match '^(Write|Edit|MultiEdit|NotebookEdit)$') -or ($isShell -and $cmd -match $writePattern)
-if ($writes) {
-    $dir = if ($inputs.file_path) { Split-Path ([string]$inputs.file_path) -Parent } elseif ($inputs.notebook_path) { Split-Path ([string]$inputs.notebook_path) -Parent } else { "$($call.cwd)" }
-    while ($dir -and -not (Test-Path $dir)) { $dir = Split-Path $dir -Parent }
-    $inRepo = $false
-    if ($dir) { git -C $dir rev-parse --is-inside-work-tree 2>$null | Out-Null; $inRepo = $LASTEXITCODE -eq 0 }
-    if ($inRepo) {
-        Push-Location $dir
-        try {
-            $out = gh pr view --json number,isDraft,state 2>&1
-            if ($LASTEXITCODE -ne 0) {
-                # No pull request, or no GitHub remote at all: nothing to mark draft.
-                if ("$out" -notmatch '(?i)no (open )?pull requests? found|no git remotes|none of the git remotes|not a git repository') {
-                    [Console]::Error.WriteLine("guard: could not check whether this branch has a pull request ready for review ($out); blocking the edit.")
-                    exit 2
-                }
-            } else {
-                $pr = "$out" | ConvertFrom-Json
-                if ($pr.state -eq 'OPEN' -and -not $pr.isDraft) {
-                    gh pr ready $pr.number --undo 2>&1 | Out-Null
-                    if ($LASTEXITCODE -ne 0) {
-                        [Console]::Error.WriteLine("guard: PR #$($pr.number) is ready for review and could not be marked draft; blocking the edit.")
-                        exit 2
-                    }
-                    [Console]::Error.WriteLine("guard: PR #$($pr.number) marked draft before this edit; mark it ready only through pr-ready.ps1.")
-                }
-            }
-        } finally { Pop-Location }
-    }
-}
-
-# The worker's Purpose decides scope (after the draft step).
 function Get-ShellWriteTargets([string]$Command) {
     # Best effort: the files a shell command writes. Redirections (> and >>), the path arguments of the
     # PowerShell file cmdlets, and the operands of cp, mv, rm, touch, tee and sed -i.
@@ -193,6 +144,68 @@ function Get-ShellWriteTargets([string]$Command) {
     }
     , $t
 }
+# Draft until ready: a pull request is marked ready only through pr-ready.ps1, is always opened as a draft,
+# and is marked draft before any edit on its branch. This runs before the scope check below, so an edit that is
+# then approved outside the paths never lands while the pull request is ready.
+$isShell = $call.tool_name -match '^(Bash|PowerShell)$'
+$cmd = "$($inputs.command)"
+$segs = @($cmd -split '[|;&\r\n]+')
+if ($isShell) {
+    if (($segs | Where-Object { $_ -match '\bgh\s+pr\s+ready\b' -and $_ -notmatch '--undo\b' }) -or $cmd -match 'markPullRequestReadyForReview') {
+        [Console]::Error.WriteLine('guard: a pull request is marked ready only through pr-ready.ps1, which checks it is complete first.')
+        exit 2
+    }
+    if ($segs | Where-Object { $_ -match '\bgh\s+pr\s+create\b' -and $_ -notmatch '(--draft|-d)\b' }) {
+        [Console]::Error.WriteLine('guard: a pull request is opened as a draft (gh pr create --draft) and marked ready through pr-ready.ps1.')
+        exit 2
+    }
+}
+$writePattern = '(?i)\b(Set-Content|Add-Content|Out-File|Copy-Item|Move-Item|Remove-Item|New-Item|Rename-Item|Clear-Content|tee|cp|mv|rm|touch|truncate)\b|\bsed\s+-i|(?<![0-9&=-])>(?!\s*\$?null\b|&)|\bgit\b(\s+-\S+(\s+[^\s-]\S*)?)*\s+(add|commit|mv|rm|checkout|switch|reset|restore|merge|rebase|cherry-pick|revert|stash|apply|am|pull)\b|\bdotnet\s+(format|new|add)\b|\bnpm\s+(install|i|ci)\b'
+$writes = ($call.tool_name -match '^(Write|Edit|MultiEdit|NotebookEdit)$') -or ($isShell -and $cmd -match $writePattern)
+if ($writes) {
+    # The branch being edited is the one the write lands in. A shell command that only writes files elsewhere (temp
+    # files, say) leaves this branch's pull request alone; git, dotnet and npm commands change the repo they run in.
+    $repoCmd = $isShell -and $cmd -match '(?i)\bgit\b|\bdotnet\s+(format|new|add)\b|\bnpm\s+(install|i|ci)\b|\bsed\s+-i'
+    $shellTargets = if ($isShell -and -not $repoCmd) { @(Get-ShellWriteTargets $cmd | Where-Object { $_ }) } else { @() }
+    $dir = if ($inputs.file_path) { Split-Path ([string]$inputs.file_path) -Parent } elseif ($inputs.notebook_path) { Split-Path ([string]$inputs.notebook_path) -Parent } else { "$($call.cwd)" }
+    if ($shellTargets.Count) {
+        $inside = @($shellTargets | ForEach-Object {
+            $full = [IO.Path]::GetFullPath($(if ([IO.Path]::IsPathRooted($_)) { $_ } else { Join-Path "$($call.cwd)" $_ }))
+            $d = Split-Path $full -Parent
+            while ($d -and -not (Test-Path $d)) { $d = Split-Path $d -Parent }
+            if ($d) { $top = git -C $d rev-parse --show-toplevel 2>$null; if ($LASTEXITCODE -eq 0 -and $top) { $d } }
+        })
+        $dir = if ($inside.Count) { $inside[0] } else { $null }
+    }
+    while ($dir -and -not (Test-Path $dir)) { $dir = Split-Path $dir -Parent }
+    $inRepo = $false
+    if ($dir) { git -C $dir rev-parse --is-inside-work-tree 2>$null | Out-Null; $inRepo = $LASTEXITCODE -eq 0 }
+    if ($inRepo) {
+        Push-Location $dir
+        try {
+            $out = gh pr view --json number,isDraft,state 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                # No pull request, or no GitHub remote at all: nothing to mark draft.
+                if ("$out" -notmatch '(?i)no (open )?pull requests? found|no git remotes|none of the git remotes|not a git repository') {
+                    [Console]::Error.WriteLine("guard: could not check whether this branch has a pull request ready for review ($out); blocking the edit.")
+                    exit 2
+                }
+            } else {
+                $pr = "$out" | ConvertFrom-Json
+                if ($pr.state -eq 'OPEN' -and -not $pr.isDraft) {
+                    gh pr ready $pr.number --undo 2>&1 | Out-Null
+                    if ($LASTEXITCODE -ne 0) {
+                        [Console]::Error.WriteLine("guard: PR #$($pr.number) is ready for review and could not be marked draft; blocking the edit.")
+                        exit 2
+                    }
+                    [Console]::Error.WriteLine("guard: PR #$($pr.number) marked draft before this edit; mark it ready only through pr-ready.ps1.")
+                }
+            }
+        } finally { Pop-Location }
+    }
+}
+
+# The worker's Purpose decides scope (after the draft step).
 function Test-GlobsOverlap([string]$Glob, [string]$Prefix) {
     # Whether a paths glob can match a file under a product path: the glob's literal start and the prefix agree as
     # far as both go (so **/*.cs overlaps src/, and docs/** does not).
