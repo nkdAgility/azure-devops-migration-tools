@@ -126,3 +126,45 @@ The "target not found" case was never handled: both methods only act when a targ
 
 Spec agreed: Spec agreed
 Spec version: .specify/bugs/sharedsteps-unresolved-refs/assessment.md sha256 f67ea8fdec629a8b614225772cfb7bdc2654f9247b6208a2147b3592e4372ca5
+
+## Spec
+
+Working spec: `specs/3256-test-case-step-and-parameter-references/assessment.md` (the bug assessment Martin approves).
+
+
+## Reproduction
+
+Reproduced on main (56bab21f), 2026-11-20, on the test orgs with scratch projects `amte2e-3256-src` / `amte2e-3256-tgt` (since deleted):
+
+1. Seed with `tools/e2e/scenarios/sharedsteps/seed.ps1 -Src amte2e-3256-src -Tgt amte2e-3256-tgt`: Shared Steps 5591, Shared Parameter 5592, Test Case 5593 using both.
+2. Use the `sharedsteps` scenario config with the project names swapped and `WIQLQuery` narrowed to `[System.WorkItemType] IN ('Test Case')`.
+3. Run `tools/e2e/Invoke-MigrationE2E.ps1 -Config <config>`.
+
+Observed: exit 0, `1 created, 0 failed`. Target Test Case 9344 has `<compref id="2" ref="5591" />` and `"dataSetId":5592`, `"sharedParameterDataSetIds":[5592]`; neither ID exists in the target. The log has only the two generic link skips (`SharedStepReferencedBy-Reverse` / `SharedParameterReferencedBy-Reverse ... target WI has not been migrated`, review `link-skipped: 2`). Nothing mentions the field references.
+
+
+## Cause
+
+The "target not found" case was never handled: both methods only act when a target match exists, and the only reporting added so far (`ReadableSourceItems`) covers a missing source item. Confidence: high (code reading plus the reproduction above).
+
+
+## Proposed fix
+
+**Preferred**: in `TfsWorkItemLinkTool`, when `FindReflectedWorkItemByReflectedWorkItemId` returns null for a Shared Steps or Shared Parameter, log a warning naming the kind, the source referenced ID, the Test Case source and target IDs and the consequence ("its step reference keeps the source id" / "its data source reference keeps the source id"), and record a `WorkItemReviewLog` entry in a **new category** (approved: for example `reference-unresolved`) with the action "Migrate the Shared Steps / Shared Parameter, then re-run". Put the warning and the record in one private helper beside `ReadableSourceItems`. The field keeps the source ID (approved: keep and report, don't clear). Object model only; no REST.
+
+**Alternatives**:
+- Reuse `link-skipped`: no new category, but it mixes the field-reference consequence with the link skip already logged for the same item. Not chosen.
+- Remove the types from the default WIQL: separate follow-up (approved), because it changes what a default run migrates.
+
+**Files likely to change**:
+- `src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs`
+- `WorkItemReviewCategory` (new category) and its summary wording
+- `src/MigrationTools.Clients.TfsObjectModel.Tests/**`
+- `tools/e2e/scenarios/sharedsteps-3256/**` (new)
+- docs, via `GenerateDocs.ps1`, and the Migrating Plans and Suites warning from #3251
+
+**Tests to add or update**:
+- Unit: unresolved Shared Steps → one warning and one review entry; resolved → none, and the `ref` is remapped.
+- Unit: the same pair for Shared Parameter.
+- E2E: the new scenario (Test Case only in the query) asserts the two warnings and the count; the existing `sharedsteps` scenario still passes with no new entries.
+
