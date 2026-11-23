@@ -110,6 +110,11 @@ Open findings: 0
    (unchanged rule from `AddChildTestCases`).
 6. Each check run on `main` (shows the gap for 1 and 3) and on the change, with output and exit codes in the PR.
 
+Checks 1-4 run as one scenario, phases 1-5 of `tools/e2e/scenarios/testplans-3260/run.ps1` (exit codes and target
+suites checked at each phase; its projects deleted at the end). Check 5 is not automated: the tag rule is unchanged.
+
+- Root-suite top-up, no duplicates and the unmigrated-Test-Case error, on the test orgs: `pwsh -NoProfile -File tools/e2e/scenarios/testplans-3260/run.ps1`
+
 ## Decisions for Martin
 
 1. Behaviour change: on re-run the root suite is now topped up. Anyone relying on hand-curated target root suites (the
