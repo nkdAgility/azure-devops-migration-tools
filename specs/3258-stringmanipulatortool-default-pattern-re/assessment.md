@@ -69,5 +69,6 @@ Martin also decided (2026-11-21): route `System.Title` through the tool (Q-2), a
 
 ## Open Questions
 
-- [NEEDS CLARIFICATION: Q-5 release as a bug fix in the next minor release, with a release note?]
-- [NEEDS CLARIFICATION: Q-7 clean up by deleting only the two amte2e-3258-* scratch projects (Remove-E2EProject), not Remove-E2EObjects -Prefix, which would delete every Custom.amte2e* field?]
+None open. Martin decided (2026-11-23):
+- Q-5: release as a bug fix in the next minor release, with a release note.
+- Q-7: the e2e clean-up uses `Remove-E2EObjects.ps1 -Prefix amte2e-3258-` once #3278 fixes its field prefix. #3278 owns that file.
