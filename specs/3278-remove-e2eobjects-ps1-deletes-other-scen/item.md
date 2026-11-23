@@ -204,4 +204,128 @@ Not applicable to the product API. The script uses the same Azure DevOps REST en
 
 Small and required: move the field-prefix logic from the script into a function in `E2EAzDo.psm1` (R6), so the naming rules live in one place and can be tested without the API. The deletion loops stay as they are, apart from the `ShouldProcess` wrappers.
 
-Spec agreed: Spec agreed
+
+## Spec
+
+Working spec: `specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md` (the bug assessment Martin approves).
+
+
+## Reproduction
+
+The script was not run against the test orgs, because doing so would delete the shared fields. The expression at
+`Remove-E2EObjects.ps1:15` was evaluated locally:
+
+1. `amte2e-3272-` → `Custom.amte2e` (every e2e field).
+2. `amte2e-abc-` and `x` → `Custom.amte2e` (every e2e field).
+3. `amt3272-` → `Custom.amte2e3272` (scoped correctly).
+
+
+## Cause
+
+The prefix-to-field mapping treats "unrecognised prefix" as "match all", and there is no single field-naming
+convention tied to an issue number. Confidence: high.
+
+
+## Proposed fix
+
+**Preferred**: as agreed with Martin (Q-1 to Q-4 in `specs/3278-remove-e2eobjects-ps1-deletes-other-scen/item.md`):
+
+- Add `Get-E2EFieldFilter` in `E2EAzDo.psm1`, using a digit-boundary regex over `amt<n>-` and `amte2e-<n>-`.
+- Rename every scenario's fields to `amte2e<n>…`.
+- Make a full clean need `-All`.
+- An unmappable prefix skips the fields and exits non-zero. An empty or too-broad prefix is refused outright.
+- Add `-WhatIf` through `SupportsShouldProcess`.
+- Add Pester tests and a CI step that runs them.
+
+**Requirements** (agreed with Martin):
+
+Updated with Martin's answers to Q-1 to Q-4.
+
+- R9 Pester tests `tools/e2e/*.Tests.ps1` cover the mapping, the refusal and `-WhatIf` with mocked API calls; a CI step in `.github/workflows/` runs them on PRs that change `tools/e2e/` (Q-4).
+
+- R1 `-Prefix <p>` deletes only what the prefix owns. Fields match `^Custom\.amte2e<n>(?!\d)`, where `<n>` comes from `amt<n>-` or `amte2e-<n>-`. Every scenario's fields are renamed to `amte2e<n>…` (`seed.ps1`, `assert.ps1`, scenario `*.json`), so each issue's cleanup is complete (Q-1 B).
+- R2 A full clean needs `-All`. A bare run with no `-Prefix` and no `-All` stops with an error (Q-2).
+- R3 A prefix that can't be mapped, including an empty one, still deletes the matching projects and processes but no fields, warns "Cannot map prefix '<p>' to a field filter; no fields were deleted.", and exits non-zero (Q-3).
+- R3a An empty prefix, or one that would match every e2e project (for example `amte2e`), is refused before any delete. Otherwise skipping only the fields would still let it remove every project and process without `-All`.
+- R1a Scenarios with no issue of their own (`fields`: `amte2eIssueOnly`, `amte2eLegacy`) are renamed to the number of the issue that created the scenario, found from git history.
+- R4 `-WhatIf` lists every project, recycled project, process and field the run would delete, deletes nothing, skips the retry waits, and reports "would delete".
+- R5 Every run prints its resolved field filter first.
+- R6 The mapping is one function in `E2EAzDo.psm1`, next to `Assert-E2EName`.
+- R7 Runs on Windows PowerShell 5.1 and PowerShell 7.
+- R8 `.github/copilot-instructions.md` and `tools/e2e/reports/2026-10-regression.md:108` document the prefix forms, `-WhatIf` and the full-clean switch.
+
+**Files likely to change**: `tools/e2e/Remove-E2EObjects.ps1`, `tools/e2e/E2EAzDo.psm1`, scenario `seed.ps1` /
+`assert.ps1` / `*.json`, `tools/e2e/Remove-E2EObjects.Tests.ps1`, a workflow in `.github/workflows/`,
+`.github/copilot-instructions.md`, `tools/e2e/reports/2026-10-regression.md`.
+
+**Tests to add or update**:
+
+- The mapping table above.
+- The digit boundary (3272 does not match 32720).
+- An unmappable prefix deletes no fields.
+- Empty and `amte2e` prefixes are refused.
+- `-WhatIf` calls no delete, with mocked REST calls.
+
+
+## Spec
+
+Working spec: `specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md` (the bug assessment Martin approves).
+
+Spec presented: specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md sha256 e501b300da886bac472202bd3fb8e06d92187f75e0ab0ce1b1843348195aa1ef
+
+## Reproduction
+
+The script was not run against the test orgs, because doing so would delete the shared fields. The expression at
+`Remove-E2EObjects.ps1:15` was evaluated locally:
+
+1. `amte2e-3272-` → `Custom.amte2e` (every e2e field).
+2. `amte2e-abc-` and `x` → `Custom.amte2e` (every e2e field).
+3. `amt3272-` → `Custom.amte2e3272` (scoped correctly).
+
+
+## Cause
+
+The prefix-to-field mapping treats "unrecognised prefix" as "match all", and there is no single field-naming
+convention tied to an issue number. Confidence: high.
+
+
+## Proposed fix
+
+**Preferred**: as agreed with Martin (Q-1 to Q-4 in `specs/3278-remove-e2eobjects-ps1-deletes-other-scen/item.md`):
+
+- Add `Get-E2EFieldFilter` in `E2EAzDo.psm1`, using a digit-boundary regex over `amt<n>-` and `amte2e-<n>-`.
+- Rename every scenario's fields to `amte2e<n>…`.
+- Make a full clean need `-All`.
+- An unmappable prefix skips the fields and exits non-zero. An empty or too-broad prefix is refused outright.
+- Add `-WhatIf` through `SupportsShouldProcess`.
+- Add Pester tests and a CI step that runs them.
+
+**Requirements** (agreed with Martin):
+
+Updated with Martin's answers to Q-1 to Q-4.
+
+- R9 Pester tests `tools/e2e/*.Tests.ps1` cover the mapping, the refusal and `-WhatIf` with mocked API calls; a CI step in `.github/workflows/` runs them on PRs that change `tools/e2e/` (Q-4).
+
+- R1 `-Prefix <p>` deletes only what the prefix owns. Fields match `^Custom\.amte2e<n>(?!\d)`, where `<n>` comes from `amt<n>-` or `amte2e-<n>-`. Every scenario's fields are renamed to `amte2e<n>…` (`seed.ps1`, `assert.ps1`, scenario `*.json`), so each issue's cleanup is complete (Q-1 B).
+- R2 A full clean needs `-All`. A bare run with no `-Prefix` and no `-All` stops with an error (Q-2).
+- R3 A prefix that can't be mapped, including an empty one, still deletes the matching projects and processes but no fields, warns "Cannot map prefix '<p>' to a field filter; no fields were deleted.", and exits non-zero (Q-3).
+- R3a An empty prefix, or one that would match every e2e project (for example `amte2e`), is refused before any delete. Otherwise skipping only the fields would still let it remove every project and process without `-All`.
+- R1a Scenarios with no issue of their own (`fields`: `amte2eIssueOnly`, `amte2eLegacy`) are renamed to the number of the issue that created the scenario, found from git history.
+- R4 `-WhatIf` lists every project, recycled project, process and field the run would delete, deletes nothing, skips the retry waits, and reports "would delete".
+- R5 Every run prints its resolved field filter first.
+- R6 The mapping is one function in `E2EAzDo.psm1`, next to `Assert-E2EName`.
+- R7 Runs on Windows PowerShell 5.1 and PowerShell 7.
+- R8 `.github/copilot-instructions.md` and `tools/e2e/reports/2026-10-regression.md:108` document the prefix forms, `-WhatIf` and the full-clean switch.
+
+**Files likely to change**: `tools/e2e/Remove-E2EObjects.ps1`, `tools/e2e/E2EAzDo.psm1`, scenario `seed.ps1` /
+`assert.ps1` / `*.json`, `tools/e2e/Remove-E2EObjects.Tests.ps1`, a workflow in `.github/workflows/`,
+`.github/copilot-instructions.md`, `tools/e2e/reports/2026-10-regression.md`.
+
+**Tests to add or update**:
+
+- The mapping table above.
+- The digit boundary (3272 does not match 32720).
+- An unmappable prefix deletes no fields.
+- Empty and `amte2e` prefixes are refused.
+- `-WhatIf` calls no delete, with mocked REST calls.
+

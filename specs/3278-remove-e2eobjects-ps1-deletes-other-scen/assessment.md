@@ -55,6 +55,23 @@ convention tied to an issue number. Confidence: high.
 - Add `-WhatIf` through `SupportsShouldProcess`.
 - Add Pester tests and a CI step that runs them.
 
+**Requirements** (agreed with Martin):
+
+Updated with Martin's answers to Q-1 to Q-4.
+
+- R9 Pester tests `tools/e2e/*.Tests.ps1` cover the mapping, the refusal and `-WhatIf` with mocked API calls; a CI step in `.github/workflows/` runs them on PRs that change `tools/e2e/` (Q-4).
+
+- R1 `-Prefix <p>` deletes only what the prefix owns. Fields match `^Custom\.amte2e<n>(?!\d)`, where `<n>` comes from `amt<n>-` or `amte2e-<n>-`. Every scenario's fields are renamed to `amte2e<n>…` (`seed.ps1`, `assert.ps1`, scenario `*.json`), so each issue's cleanup is complete (Q-1 B).
+- R2 A full clean needs `-All`. A bare run with no `-Prefix` and no `-All` stops with an error (Q-2).
+- R3 A prefix that can't be mapped, including an empty one, still deletes the matching projects and processes but no fields, warns "Cannot map prefix '<p>' to a field filter; no fields were deleted.", and exits non-zero (Q-3).
+- R3a An empty prefix, or one that would match every e2e project (for example `amte2e`), is refused before any delete. Otherwise skipping only the fields would still let it remove every project and process without `-All`.
+- R1a Scenarios with no issue of their own (`fields`: `amte2eIssueOnly`, `amte2eLegacy`) are renamed to the number of the issue that created the scenario, found from git history.
+- R4 `-WhatIf` lists every project, recycled project, process and field the run would delete, deletes nothing, skips the retry waits, and reports "would delete".
+- R5 Every run prints its resolved field filter first.
+- R6 The mapping is one function in `E2EAzDo.psm1`, next to `Assert-E2EName`.
+- R7 Runs on Windows PowerShell 5.1 and PowerShell 7.
+- R8 `.github/copilot-instructions.md` and `tools/e2e/reports/2026-10-regression.md:108` document the prefix forms, `-WhatIf` and the full-clean switch.
+
 **Files likely to change**: `tools/e2e/Remove-E2EObjects.ps1`, `tools/e2e/E2EAzDo.psm1`, scenario `seed.ps1` /
 `assert.ps1` / `*.json`, `tools/e2e/Remove-E2EObjects.Tests.ps1`, a workflow in `.github/workflows/`,
 `.github/copilot-instructions.md`, `tools/e2e/reports/2026-10-regression.md`.
@@ -66,6 +83,11 @@ convention tied to an issue number. Confidence: high.
 - An unmappable prefix deletes no fields.
 - Empty and `amte2e` prefixes are refused.
 - `-WhatIf` calls no delete, with mocked REST calls.
+
+## Docs
+
+- e2e-harness: `.github/copilot-instructions.md` gains a `tools/e2e/Remove-E2EObjects.ps1` entry (prefix forms, `-All`, `-WhatIf`), and `tools/e2e/reports/2026-10-regression.md:108` uses `-All`. There is no `platform/specs/e2e-harness/` doc to update.
+- Docs unchanged: packaging: the new CI step only runs the Pester tests and changes no release behaviour.
 
 ## Risks & Considerations
 
