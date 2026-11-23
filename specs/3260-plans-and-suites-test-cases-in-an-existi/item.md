@@ -118,12 +118,7 @@ Open findings: 0
 
 Decided: 1 accept, no option; 2 yes; 3 yes (approved as proposed).
 
-Docs unchanged: tfs-object-model: there is no platform/specs/tfs-object-model/ spec; the behaviour is documented on the Migrating Plans and Suites page, which is updated.
-Docs unchanged: e2e-harness: a new scenario only; the harness and its rules are unchanged.
 
-## Docs updated
-
-- docs-site: `docs/content/docs/how-to/migrating-plans-and-suites/index.md`: Test Cases missing from the existing target plan, its root suite included, are added
 
 ## Output done evidence
 
@@ -160,3 +155,7 @@ Spec presented: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.m
 
 Spec agreed: Approve as proposed
 Spec version: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md sha256 07571fbddd2e86db02c313a7bbcfab1814b84ea7ec129852e0ed711649ea40f1
+
+Revised: the approved assessment gains its Docs section (three 'Docs unchanged' reasons) and a corrected risk on the exit code.
+
+Spec presented: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md sha256 2ea96b92611fcdad04227962105072a2395192dc0cbbae79bf84f76a42d82407
