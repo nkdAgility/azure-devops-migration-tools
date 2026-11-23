@@ -887,13 +887,13 @@ namespace MigrationTools.Processors
                 ApplyFieldMappings(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                 AssignReflectedWorkItemId(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
                 FixAssignedToValue(sourcePlan.RootSuite.Id, targetPlan.RootSuite.Id);
-                // Add Test Cases & apply configurations
-                AddChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
             }
             else
             {
                 InnerLog(sourcePlan, $"Found Plan {newPlanName}", 5);
+                ApplyDefaultConfigurations(sourcePlan.RootSuite, targetPlan.RootSuite);
             }
+            AddChildTestCases(sourcePlan.RootSuite, targetPlan.RootSuite, targetPlan);
             targetPlan.Save();
             targetPlan.Refresh();
             if (HasChildSuites(sourcePlan.RootSuite))
