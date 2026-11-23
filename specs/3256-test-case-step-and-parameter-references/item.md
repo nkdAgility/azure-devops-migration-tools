@@ -240,3 +240,26 @@ Reasons:
 - Not 100%: the re-run resolving an earlier `reference-left-on-source` row is covered by unit tests, not end to end, and it has had no independent review yet.
 
 
+Outcome checks started for #3256 at 63faa73a8ed15653e9483b0082722a110ddad22a attempt 9e733e1e1258:
+
+## Outcome done
+
+Automated outcome checks (all passed) for #3256 at 63faa73a8ed15653e9483b0082722a110ddad22a attempt 9e733e1e1258:
+- Test Case only, then a re-run with all three types, on the test orgs (references reported, then remapped): `pwsh -NoProfile -File tools/e2e/scenarios/sharedsteps-3256/run.ps1` exit 0
+- Unit tests for the reporting and its re-run resolution: `dotnet test src/MigrationTools.Clients.TfsObjectModel.Tests --filter FullyQualifiedName~UnresolvedTestCaseReference` exit 0
+- Docs reconciled for every system the change touches: `pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/docs-check.ps1` exit 0
+
+Real-system validation on the test orgs (nkdagility-adomt-source to nkdagility-adomt-target), using scratch projects amte2e-3256-src/tgt that run.ps1 deletes afterwards:
+- Test Case only (the default query's effect): exit 0. The Test Case keeps the source Shared Steps and Shared Parameter ids. The run logs one `[SKIP] ... not remapped` warning for each, writes two `reference-left-on-source` review rows, and shows `reference-left-on-source: 2` in the summary.
+- Re-run with all three types: exit 0. The Test Case's `ref` and `dataSetId` point at the target copies, and no new rows are written.
+- On main the same Test-Case-only run exits 0 with no warning, no row and no count (assert exit 4), which is the reported defect.
+
+Confidence: 90%
+
+Reasons:
+- The outcome the issue asks for (a warning per unresolved reference, and a count in the end-of-run summary) is seen on the real system, and its absence on main is shown with the same scenario.
+- A re-run that includes the missing types repairs the references and stops reporting them.
+- The full build, every test suite and the repository's proof passed at Output Done.
+- Not higher: the earlier row being marked resolved on a re-run is shown in unit tests only, because each e2e run uses its own log folder. The default WIQL still excludes the types (a separate follow-up, as approved), so users must act on the warning.
+
+
