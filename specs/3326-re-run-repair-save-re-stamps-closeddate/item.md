@@ -5,6 +5,9 @@ paths:
   - src/MigrationTools.Clients.TfsObjectModel/Tools/TfsGitRepositoryTool.cs
   - src/MigrationTools.Clients.TfsObjectModel.Tests/Tools/TfsGitRepositoryToolTests.cs
   - docs/content/docs/reference/tools/tfsgitrepositorytool/**
+  - platform/specs/tfs-object-model/**
+  - platform/specs/e2e-harness/**
+  - platform/specs/docs-site/reference-pages.md
   - src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs
   - src/MigrationTools.Clients.TfsObjectModel/Processors/StateStampedFields.cs
   - src/MigrationTools.Clients.TfsObjectModel.Tests/Processors/**
@@ -106,11 +109,13 @@ Spec agreed: Approve. Q-6: Add to scope.
 Spec version: specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md sha256 1e94c27bf12167fbd5044426fab9ba8b715678d24d87def9983084466f686aab
 
 ## Docs updated
-- tfs-object-model: `docs/content/docs/reference/processors/tfs-workitem-migration-processor/index.md`: "The same applies to a value Azure DevOps stamped in an earlier re-run's own catch-up save"
-- tfs-object-model: `docs/content/docs/reference/processors/tfs-workitem-migration-processor/index.md`: "A catch-up save on a re-run also sets every state-stamped field to the source's latest values"
-- tfs-object-model: `docs/content/docs/reference/tools/tfsgitrepositorytool/index.md`: "A re-run counts such a link as present while the target still lacks the commit or branch"
+- tfs-object-model: `platform/specs/tfs-object-model/rerun.md`: Every repair save sets them.
+- tfs-object-model: `platform/specs/tfs-object-model/rerun.md`: is history only
+- tfs-object-model: `platform/specs/tfs-object-model/rerun.md`: counts that raw link as present while the target still
+- e2e-harness: `platform/specs/e2e-harness/scenarios.md`: Re-run repairs on already migrated items (#3326)
+- docs-site: `platform/specs/docs-site/reference-pages.md`: every catch-up save sets the state-stamped fields to the source values
+- Reference pages (docs-site) also changed: `docs/content/docs/reference/processors/tfs-workitem-migration-processor/index.md` and `docs/content/docs/reference/tools/tfsgitrepositorytool/index.md`.
 - `GenerateDocs.ps1` exit 0; it changed no generated file (no option class changed).
-
 ## End-to-end results
 Scenario `tools/e2e/scenarios/rerun-3326` (seed, config, assert), run directly with the built tool on the test orgs, in scratch projects of this item.
 - **Branch** (d810cbec + tests, `amt3326-b2src`/`amt3326-b2tgt`): first run 7 created, exit 0. Assert exit 0, every check PASS: re-run after removing the links exit 0 (5 updated, 2 in sync), every current state-stamped value equals the source (T4, stamped as main's catch-up save would, corrected); a further re-run exit 0 with 7 in sync, 0 updated, no new revision; a genuinely wrong target (T5) fails with "stamped instead of the source values", exit 1, no stack trace.
