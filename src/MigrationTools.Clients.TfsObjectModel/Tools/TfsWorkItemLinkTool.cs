@@ -230,13 +230,20 @@ namespace MigrationTools.Tools
                 .Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
             var sourceSharedSteps = ReadableSourceItems(processor, sourceSharedStepLinks, wiSourceL, wiTargetL, "Shared Steps",
                 "its step reference keeps the source id");
+            var reviewLog = Services.GetService<WorkItemReviewLog>();
+            reviewLog?.MarkChecked(WorkItemReviewCategory.ReferenceLeftOnSource);
 
             foreach (WorkItemData sourceSharedStep in sourceSharedSteps)
             {
                 WorkItemData matchingTargetSharedStep =
                     processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
 
-                if (matchingTargetSharedStep != null)
+                if (matchingTargetSharedStep == null)
+                {
+                    UnresolvedTestCaseReference.Report(Log, reviewLog, "Shared Steps", microsoftVstsTcmSteps,
+                        sourceSharedStep.Id, wiSourceL.Id, wiTargetL.Id);
+                }
+                else
                 {
                     newSteps = newSteps.Replace($"ref=\"{sourceSharedStep.Id}\"",
                         $"ref=\"{matchingTargetSharedStep.Id}\"");
@@ -289,12 +296,19 @@ namespace MigrationTools.Tools
             var sourceSharedParameters = ReadableSourceItems(processor, sourceSharedParametersLinks, wiSourceL, wiTargetL, "Shared Parameter",
                 "its data source reference keeps the source id");
 
+            var reviewLog = Services.GetService<WorkItemReviewLog>();
+            reviewLog?.MarkChecked(WorkItemReviewCategory.ReferenceLeftOnSource);
             var sourceToTarget = new Dictionary<string, string>();
             foreach (WorkItemData sourceSharedParameter in sourceSharedParameters)
             {
                 WorkItemData matchingTargetSharedParameter =
                     processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedParameter);
-                if (matchingTargetSharedParameter != null)
+                if (matchingTargetSharedParameter == null)
+                {
+                    UnresolvedTestCaseReference.Report(Log, reviewLog, "Shared Parameter", microsoftVstsTcmLocalDataSource,
+                        sourceSharedParameter.Id, wiSourceL.Id, wiTargetL.Id);
+                }
+                else
                 {
                     sourceToTarget[sourceSharedParameter.Id] = matchingTargetSharedParameter.Id;
                 }

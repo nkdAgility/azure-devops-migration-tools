@@ -21,6 +21,7 @@ namespace MigrationTools.Services
         public const string RerunMismatch = "rerun-mismatch";
         public const string LinkSkipped = "link-skipped";
         public const string LinkLeftOnSource = "link-left-on-source";
+        public const string ReferenceLeftOnSource = "reference-left-on-source";
         public const string FieldNotMapped = "field-not-mapped";
         public const string FieldMapFailed = "field-map-failed";
         public const string FieldTruncated = "field-truncated";
@@ -48,6 +49,7 @@ namespace MigrationTools.Services
         {
             [LinkSkipped] = "follow-up-links.jsonl",
             [LinkLeftOnSource] = "follow-up-links.jsonl",
+            [ReferenceLeftOnSource] = "follow-up-links.jsonl",
             [UserNotMapped] = "follow-up-users-not-mapped.jsonl",
             [AttachmentNotMigrated] = "follow-up-attachments.jsonl",
             [EmbeddedImageNotMigrated] = "follow-up-attachments.jsonl",

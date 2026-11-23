@@ -3,6 +3,8 @@ issue: 3256
 purpose: When a Test Case's Shared Steps or Shared Parameter reference cannot be remapped because the referenced item is not in the target, the run says so (a warning per reference and a count in the end-of-run review summary) instead of silently leaving the source ID.
 paths:
   - src/MigrationTools.Clients.TfsObjectModel/Tools/TfsWorkItemLinkTool.cs
+  - src/MigrationTools.Clients.TfsObjectModel/Tools/UnresolvedTestCaseReference.cs
+  - platform/specs/core/**, platform/specs/tfs-object-model/**
   - src/MigrationTools/**/WorkItemReview*.cs   # the new review category
   - src/MigrationTools.Clients.TfsObjectModel.Tests/**
   - tools/e2e/scenarios/sharedsteps-3256/**
@@ -168,3 +170,16 @@ The "target not found" case was never handled: both methods only act when a targ
 - Unit: the same pair for Shared Parameter.
 - E2E: the new scenario (Test Case only in the query) asserts the two warnings and the count; the existing `sharedsteps` scenario still passes with no new entries.
 
+
+## Docs updated
+
+- core: `platform/specs/core/review-log.md`: `reference-left-on-source`
+- tfs-object-model: `platform/specs/tfs-object-model/test-case-references.md`: UnresolvedTestCaseReference.Report
+
+## Build evidence
+
+- Unit (L0): `UnresolvedTestCaseReferenceTests`, 6 passed. Existing suites: MigrationTools.Tests L0 227 passed; MigrationTools.Clients.TfsObjectModel.Tests L0|L1 426 passed, 1 skipped.
+- E2E `tools/e2e/scenarios/sharedsteps-3256`, scratch projects amte2e-3256-* (deleted afterwards):
+  - main (e2cdafa4), `config-testcase-only.json`: exit 0; assert `-Expect Unresolved` exit 4. Source ids kept (ref=7524, dataSetId 7525), no warning, 0 `reference-left-on-source` entries, no summary count.
+  - change, `config-testcase-only.json`: exit 0; assert exit 0. Both warnings logged, 2 entries, summary `reference-left-on-source: 2`.
+  - change, re-run with `config.json` (all three types): exit 0; assert `-Expect Resolved` exit 0. ref=11162 and dataSetId 11161 (target ids), 0 entries.

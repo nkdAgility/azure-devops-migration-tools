@@ -115,6 +115,7 @@ The file is JSON Lines: one JSON object per line, with these fields.
 | `rerun-mismatch` | On a re-run, a revision already in the target does not match the source. |
 | `link-skipped` | A link was not migrated: the related item was not migrated (a link to an item that migrates later in the run is added from its side, so it is held and written only if that item fails or the run ends without reaching it; a killed run loses it), cannot be read, or its link type does not exist in the target; or a hyperlink is not valid. |
 | `link-left-on-source` | A git commit, branch or pull request link could not be rewritten and still points at the source. |
+| `reference-left-on-source` | A Test Case's step (`ref`) or parameter (`dataSetId`) reference names a Shared Steps or Shared Parameter that is not in the target, so it still holds the source id. Migrate it and re-run. |
 | `field-not-mapped` | A source field has a value but does not exist on the target work item type, so the value was dropped. |
 | `field-truncated` | A string value was cut to `StringManipulatorTool` `MaxStringLength`. |
 | `field-map-failed` | A field map threw an error (logged as `Field map fault`), so its value was not set. The entry names the map and a short hash of its configuration; it resolves only when that same map, with the same configuration, runs cleanly. If you change the map's configuration to fix it, the old entry stays open in the latest view: the review log cannot tell a corrected map from a different one. |
