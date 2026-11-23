@@ -30,6 +30,8 @@ When a run pauses at a gate, stop and ask Martin as a QUESTION (`ask-martin`), s
 
 A failing check is fixed and the step re-run; it is never skipped or worked round.
 
+Commit the item's folder, `specs/<issue>-<name>/`, each time its record, spec or assessment changes, so the pull request always shows where the item stands. When you update the docs, name each one on the item under `## Docs updated` as `- <system>: `<doc path>`: <phrase from the doc>`; a system whose docs need no change needs `Docs unchanged: <system>: <reason>` in the spec Martin approves. Nothing temporary reaches `main`: before the pull request is marked ready, the item's folder and any file under `.specify/bugs/`, `.specify/assessments/`, `.specify/reviews/` or `.specify/wkr/` are removed.
+
 **Items never move back.** If the work shows the agreed spec cannot be met as written, keep the item in its state, tag it with `set-blocked.ps1 -Why spec-reconcile-required`, revise the spec, record what you found, and ask Martin to approve the new version as a QUESTION, showing what changed. Change no product code until he approves; then clear the tag with `set-blocked.ps1 -Why spec-reconcile-required -Clear`. A failed outcome check tags the item `outcome-check-failed` itself: fix the code in Validating and run the checks again. Waiting for an answer you cannot find yourself: `-Why more-information-needed`.
 
 Every item goes through every stage and writes every section its type asks for. A small item does the same, just smaller: each section is as long as the item needs, and a one-line change can have a one-line section.

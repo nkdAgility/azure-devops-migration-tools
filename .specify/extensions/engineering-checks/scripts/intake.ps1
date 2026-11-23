@@ -14,6 +14,7 @@ Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
 $title = try { "$((& (Get-BoardAdapter (Get-WorkflowConfig)).GetItem $id).title)" } catch { '' }
 $folder = New-ItemFolder '.' $id $title
 $wkr = Join-Path $folder 'item.md'
+"item record: $([IO.Path]::GetRelativePath((Get-Location), $wkr).Replace('\', '/')); commit the item's folder"
 $run = Get-ChildItem .specify/workflows/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
 if ($run -and -not (Select-String $wkr -Pattern '^Run:' -Quiet)) { Add-Content $wkr "Run: $($run.Name)" }
 "item #$id"
