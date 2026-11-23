@@ -410,4 +410,11 @@ Spec version: specs/3278-remove-e2eobjects-ps1-deletes-other-scen/assessment.md 
   - `-Prefix amte2e-fields- -WhatIf` printed "field filter: none" and listed only that prefix's projects. Its exit 1 is covered by the unit test; the live call was cut short by output filtering.
   - `-Prefix amte2e-` was refused with "it matches every e2e object". A bare run was refused with "…or -All for every e2e object". Nothing was deleted.
 - main was not run live: without `-WhatIf` it would delete the shared fields.
-- Confidence: 90%
+
+Confidence: 90%
+
+Reasons:
+- The bug is reproduced on main: the new tests fail there (18 of 19) and pass on the change (19 of 19).
+- A live scoped run on the test org deleted only this issue's scratch field and left all 12 other e2e fields in place.
+- The refusal paths were run live and deleted nothing; -WhatIf deleted nothing.
+- What keeps it from higher: -All was not run live (it would wipe the shared fields), the target org was not exercised, and the new CI workflow has not yet run on GitHub.
