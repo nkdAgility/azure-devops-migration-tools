@@ -16,7 +16,8 @@ $rel = [IO.Path]::GetRelativePath((Get-Location), $spec.FullName).Replace('\', '
 $recPath = Get-ItemRecordPath '.' $id
 $recText = if (Test-Path $recPath) { Get-Content $recPath -Raw } else { '' }
 $lastShown = [regex]::Matches("$recText", '(?m)^Spec presented:[ \t]*\S+[ \t]+sha256[ \t]+(?<h>[0-9a-f]{64})') | Select-Object -Last 1
-if (-not ($lastShown -and (Test-TextHash $spec.FullName $lastShown.Groups['h'].Value))) { & $rec -Line "Spec presented: $rel sha256 $(Get-TextHash $spec.FullName)" }
+$stands = -not (Get-SpecApprovalProblem ("$recText" -replace "`r`n", "`n") '.')
+if (-not $stands -and -not ($lastShown -and (Test-TextHash $spec.FullName $lastShown.Groups['h'].Value))) { & $rec -Line "Spec presented: $rel sha256 $(Get-TextHash $spec.FullName)" }
 foreach ($p in @(, @('Red team', '.specify/reviews/challenge.md'))) {
     if (-not (Test-Path $p[1])) { Write-Error "$($p[1]) was not written."; exit 1 }
     & $rec -Section $p[0] -Body (Get-Content $p[1] -Raw)
