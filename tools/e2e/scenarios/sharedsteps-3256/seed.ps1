@@ -1,6 +1,6 @@
 # sharedsteps-3256: a Test Case whose Shared Steps and Shared Parameter are not migrated keeps their source ids.
-# Seeds one of each and a Test Case that uses both. config-testcase-only.json migrates only the Test Case, so both
-# references stay unresolved and must be reported; config.json then migrates all three, and the re-run remaps them.
+# Seeds one of each and a Test Case that uses both. config.json migrates only the Test Case, so both references
+# stay unresolved and must be reported; config-all.json then migrates all three, and the re-run remaps them.
 param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$Process = "amte2e-agile")
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force

@@ -1,10 +1,18 @@
 # sharedsteps-3256 assertions.
-#   -Expect Unresolved: after config-testcase-only.json. The Test Case keeps the source ids, and the run reports each
-#                       reference (a warning and a reference-left-on-source review entry).
-#   -Expect Resolved:   after config.json. The Test Case points at the target Shared Steps and Shared Parameter.
+#   -Expect Unresolved (default): after config.json, which migrates only the Test Case. The Test Case keeps the source
+#                       ids, and the run reports each reference (a warning and a reference-left-on-source review entry).
+#   -Expect Resolved:   after a re-run with config-all.json. The Test Case points at the target Shared Steps and
+#                       Shared Parameter.
+# -LogDirectory defaults to the newest folder Invoke-MigrationE2E.ps1 wrote when it was given none, among those whose
+# run log names this scenario's target project (other runs may be writing folders there at the same time).
 param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$OutFile,
-    [Parameter(Mandatory)][string]$LogDirectory, [Parameter(Mandatory)][ValidateSet("Unresolved", "Resolved")][string]$Expect)
+    [string]$LogDirectory, [ValidateSet("Unresolved", "Resolved")][string]$Expect = "Unresolved")
 $ErrorActionPreference = "Stop"
+if (-not $LogDirectory) {
+    $LogDirectory = Get-ChildItem ([IO.Path]::GetTempPath()) -Directory -Filter "amt-e2e-logs-*" | Sort-Object LastWriteTime -Descending |
+        Where-Object { Get-ChildItem $_.FullName -Recurse -Filter "migration2*.log" | Select-String -SimpleMatch "Found target project as $Tgt" -List } |
+        Select-Object -First 1 -ExpandProperty FullName
+}
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 $s = Read-E2EState $PSScriptRoot

@@ -182,6 +182,8 @@ The "target not found" case was never handled: both methods only act when a targ
 
 - Unit (L0): `UnresolvedTestCaseReferenceTests`, 6 passed. Existing suites: MigrationTools.Tests L0 227 passed; MigrationTools.Clients.TfsObjectModel.Tests L0|L1 426 passed, 1 skipped.
 - E2E `tools/e2e/scenarios/sharedsteps-3256`, scratch projects amte2e-3256-* (deleted afterwards):
-  - main (e2cdafa4), `config-testcase-only.json`: exit 0; assert `-Expect Unresolved` exit 4. Source ids kept (ref=7524, dataSetId 7525), no warning, 0 `reference-left-on-source` entries, no summary count.
-  - change, `config-testcase-only.json`: exit 0; assert exit 0. Both warnings logged, 2 entries, summary `reference-left-on-source: 2`.
-  - change, re-run with `config.json` (all three types): exit 0; assert `-Expect Resolved` exit 0. ref=11162 and dataSetId 11161 (target ids), 0 entries.
+  - main (e2cdafa4), Test Cases only (now `config.json`): exit 0; assert `-Expect Unresolved` exit 4. Source ids kept (ref=7524, dataSetId 7525), no warning, 0 `reference-left-on-source` entries, no summary count.
+  - change, Test Cases only: exit 0; assert exit 0. Both warnings logged, 2 entries, summary `reference-left-on-source: 2`.
+  - change, re-run with `config-all.json` (all three types): exit 0; assert `-Expect Resolved` exit 0. ref=11162 and dataSetId 11161 (target ids), 0 entries.
+
+  - change, again in the proof's shape (`config.json`, no log directory, `assert.ps1` with no arguments), then `config-all.json`: both asserts exit 0.
