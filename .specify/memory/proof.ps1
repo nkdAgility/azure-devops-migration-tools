@@ -6,8 +6,23 @@
 # them, then run the scenario's assertions. Fails if any seed, migration or assertion fails.
 # Scenarios without an assert are listed as not covered. Scratch projects are listed at the end and are not
 # deleted here: Remove-E2EObjects.ps1 with a per-run prefix also deletes other scenarios' fields (#3278).
-param([string]$RunId = (Get-Date -Format 'MMddHHmm'))
+param([string]$RunId = (Get-Date -Format 'MMddHHmm'), [string]$Item)
 $ErrorActionPreference = 'Stop'
+# Every object a run creates is named amte2e-<item>-p<run>-..., so each worker can find and remove its own.
+if (-not $Item -and (Test-Path .specify/items/current.json)) { $Item = "$((Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number)" }
+if (-not $Item) { Write-Error 'no item: pass -Item <issue number>, or run from an item worktree'; exit 1 }
+# One proof at a time on the shared test orgs: concurrent runs collide there (VS800075, dropped connections).
+$lockPath = Join-Path ([IO.Path]::GetTempPath()) 'amte2e-proof.lock'
+$lock = $null; $waited = 0
+while (-not $lock) {
+    try { $lock = [IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') }
+    catch [IO.IOException] {
+        if ($waited -ge 3600) { Write-Error 'another proof has held the test orgs for an hour; giving up'; exit 1 }
+        if ($waited % 60 -eq 0) { "waiting for another proof run to finish with the test orgs ($waited s)" }
+        Start-Sleep 5; $waited += 5
+    }
+}
+try {
 $failed = @(); $notCovered = @(); $scratch = @()
 $work = Join-Path ([IO.Path]::GetTempPath()) "amtproof-$RunId"
 New-Item -ItemType Directory -Force $work | Out-Null
@@ -27,7 +42,7 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $baseline = 'amte2e-agile'
     $names = [ordered]@{}; $initialise = @()
     foreach ($k in @($defaults.Keys)) {
-        $scratchName = "amte2e-p$RunId-$($d.Name)-$($k.ToLower())"
+        $scratchName = "amte2e-$Item-p$RunId-$($d.Name)-$($k.ToLower())"
         if ($k -notmatch 'Process$') { $names[$k] = $scratchName; continue }
         if ($seedText -match "New-E2E\w*Process[^\n]*\`$$k\b") { $names[$k] = $scratchName }
         elseif ($defaults[$k] -eq $baseline) { $names[$k] = $scratchName; $initialise += $scratchName }
@@ -65,3 +80,4 @@ if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', ')"; exit 1 }
 "all covered scenarios passed; results in $work"
 exit 0
+} finally { $lock.Dispose() }
