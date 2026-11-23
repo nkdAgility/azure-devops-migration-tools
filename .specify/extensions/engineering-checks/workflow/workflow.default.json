@@ -280,7 +280,7 @@
         {
           "type": "specAgreed",
           "source": "wkr",
-          "message": "no 'Spec agreed:' line with Martin's own words (a stock phrase does not count)"
+          "message": "no 'Spec agreed:' line with Martin's words"
         },
         {
           "type": "frontMatter",
