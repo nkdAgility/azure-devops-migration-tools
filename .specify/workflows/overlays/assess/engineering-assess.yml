@@ -7,7 +7,7 @@ edits:
     id: nkda-intake
     type: shell
     run: pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/intake.ps1
-      -Text '{{ inputs.idea }}'
+      -Text \"{{ inputs.idea }}\"
 - insert_after: shape
   step:
     id: nkda-challenge
