@@ -42,6 +42,9 @@ Result on `main` (origin/main 78147078, local build 16.3.6-Local.7, test orgs, p
 - Hierarchy link (scratch projects `amt3326-src`/`amt3326-tgt`, seeded by a copy of the longrun-3305 seed with 2 Features and 4 Closed User Stories): first run created 6, exit 0, assert PASS. The parent link was removed on 2 target stories; the re-run logged "no revisions to sync, but the target differs: missing System.LinkTypes.Hierarchy-Reverse link", saved one revision on each (2 updated, 4 in sync, exit 0). On both, revision 5 kept ClosedDate at the source value (13:04:55 and 13:04:54) and ClosedBy unchanged; the longrun-3305 assert, current values included, PASS.
 - Git commit link (scratch projects `amt3326-gsrc`/`amt3326-gtgt`, one commit pushed to a same-named repo in both orgs, 2 Closed stories linked to it, TfsGitRepositoryTool mapping on): first run created 2, exit 0. The commit link was removed on one target story (target revision 5); the re-run logged "missing external link vstfs:///Git/Commit/..." and saved revision 6 (1 updated, 1 in sync, exit 0). ClosedDate stayed at the source value (13:08:27).
 - So on this org and process, a repair save with BypassRules keeps ClosedDate without the fields being set. The live case must differ in something not yet known: the target process (a custom or inherited rule on Closed), BypassRules not granted on the target store (the processor warns and the service then stamps its own clock, line 476), the server version, or another change in the same save. See Q-4.
+- **Reproduced** with the live conditions from Q-4: a Git commit link the target cannot resolve. A commit was pushed to the source repo of `amt3326-gsrc` only, and 2 inherited-Agile Tasks were linked to it and taken New -> Active -> Closed. First run: both created (exit 0), and the enricher warned "commit ... not found in target repo amt3326-gtgt/amt3326-gtgt; leaving link vstfs:///Git/Commit/<source project id>%2F<source repo id>%2F<sha> pointing at the source". A re-run with the link in place logged "target differs: missing external link" but changed nothing ("checked with nothing to change"). The link was then removed on target #13970 (target revision 4) and the run repeated: "target differs: missing external link", 1 updated, exit 0. Target revision 5 has ChangedDate 13:18:13 (revision 4 + 1 s) and **ClosedDate 13:19:19, the save time**, where the source and target revision 3 have 13:16:08. State stays Closed. This matches the live report.
+- What sets this case apart: the repair re-adds an ArtifactLink that still points at the source project and repo. A link that resolves in the target (rewritten to the target repo) or a Hierarchy link is saved without re-stamping. The cause of the re-stamp itself (the unresolved artifact, or the external-link save) is still to be pinned down in the spec.
+- Also seen: with the unresolved link present on the target, every re-run reports the item as "target differs: missing external link", although nothing is missing, so such an item is never reported in sync.
 
 ## Rubber duck
 When the migration runs again against a target that has already been migrated, it checks each existing target item. If the source has no new revisions but the target is missing a link (or an attachment, or a field map result), it adds the missing piece and saves the item once. For a Closed item that save is a state-bearing save to the server, and the process's Closed rule writes the current time into `ClosedDate` (and maybe `ClosedBy`). The user sees a Closed date that is different from the source, which is a data-parity fault, and on the next run the item then fails the check because its date is now wrong, so the user cannot get a clean run without deleting the item. It affects anyone who re-runs a migration to repair links, which is the normal use of a re-run, and the 24 items show it is already happening.
@@ -68,5 +71,68 @@ Open findings: 0
 ## Questions
 - Q-1 What makes a wrongly stamped current value safe to correct on a re-run? Proposal: only when the latest target revision is a catch-up save (no source revision within 10 ms, dated after the matching source revision), its State equals the source's, and the only differing state-stamped fields are on that revision; anything else still fails as a wrong target (#3270). (for Martin) open
 - Q-2 Reproduction on `main`: run steps 1-5 on the test orgs before the spec, with the scratch projects named for this item, and record the output and exit codes here. (for the worker, at the start of Specifying, needs `az login`) answered: run, not reproduced (see Reproduction)
-- Q-4 What differs in the live migration from the test-org run: the target process and its rules on Closed, whether the log warned that BypassRules is not enabled on the target, and the target server (Azure DevOps Services or Server, which version)? Without one of these, a fix cannot be shown to change the outcome on the test orgs. (for Martin) open
+- Q-4 What differs in the live migration from the test-org run: the target process and its rules on Closed, whether the log warned that BypassRules is not enabled on the target, and the target server (Azure DevOps Services or Server, which version)? Without one of these, a fix cannot be shown to change the outcome on the test orgs. (for Martin) answered from the customer logs (via MANAGER-ADMT): BypassRules on, no custom rules (inherited Agile Task), Azure DevOps Services; every stamping save adds an unresolved commit ArtifactLink. Reproduced, see Reproduction.
 - Q-3 Do the other end of a link's saves (`OtherWorkItemsSaved`) also re-stamp, and is that in this item's Purpose? If yes, the Purpose needs adding to; if it only shows in the end-to-end run, hand back as a follow-up. (for Martin) open
+
+## Spec
+
+Working spec: `specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md` (the bug assessment Martin approves).
+
+Spec presented: specs/3326-re-run-repair-save-re-stamps-closeddate/assessment.md sha256 503db291a90a00856d5fbcc0ffedd5232146321e80c105494b8c282f1a6c5c3d
+
+## Reproduction
+
+1. Seed Closed work items with a parent link and a Git commit link in a scratch project on `nkdagility-adomt-source`; migrate to `nkdagility-adomt-target` with `tools/e2e/Invoke-MigrationE2E.ps1`.
+2. Remove the commit link on one target item and the parent link on another.
+3. Re-run. Expected per the issue: "no revisions to sync, but the target differs", one extra revision, ClosedDate moved to the save time.
+4. Re-run again. Expected per the issue: the item fails with "stamped instead of the source values".
+
+**Result on `main` (origin/main 78147078, test orgs, process `amte2e-agile`, BypassRules on, 23 Nov): not reproduced**, for either the hierarchy link or the Git commit link (details in item.md, Reproduction). ClosedDate stayed at the source value on every repair save.
+
+[NEEDS CLARIFICATION: what differs in the live migration. Candidates, most likely first: (a) BypassRules not granted on the target store, so the service stamps its own clock (the processor only warns, line 476); (b) a target process with a custom or inherited rule on Closed that fires on every save while in Closed; (c) server version or type; (d) another change in the same save. This is Q-4.]
+
+
+## Cause
+
+A repair save on an existing target leaves the state-stamped fields unset unless the target's current values were empty (#3305). If the target server runs a Closed-state rule on that save, it overwrites `ClosedDate` (and possibly `ClosedBy`) with the save time. The next run's check then sees a set but different value and fails the item. The code gap is certain; whether it is the cause of the 24 live items is **not** established: the same repair on the test orgs with BypassRules kept the value. Confidence: high that the gap exists in the code and that setting the fields on every repair save is harmless and correct; medium-low that it fixes the live fault until Q-4 is answered. The live fault probably depends on BypassRules not being granted, or a target process rule.
+
+
+## Proposed fix
+
+**Preferred**: First, get Q-4 answered, or reproduce with BypassRules off on a scratch target and with a custom Closed rule, so the fix can be shown to change the outcome. Then, in a small named method (not more inline branches in `ProcessWorkItemAsync`), apply the state-stamped fields from the source's latest revision on **every** repair save, after field maps and enrichers, and run the existing `VerifyStateStampedFieldsSaved` / `VerifyStateStampedValuesStored` for all of them. Make `VerifyMigratedRevisions` return a result that says what to correct (empty values, or a re-stamped catch-up revision) instead of a bare `bool`. A wrong current value is corrected only under Q-1's proposal: the latest target revision is our catch-up save (no source revision within 10 ms, dated after the matching source revision), its State equals the source's, and the only differing stamped fields are on that revision. Anything else still fails as #3270. Read the source stamps lazily so an in-sync re-run stays fast (#3299). If BypassRules is the cause, also consider failing or warning loudly on a re-run repair save without BypassRules, since the service would stamp regardless.
+
+**Alternatives**:
+- Always replay a corrective revision on repair: more reads and a visible extra revision on every repair; rejected.
+- Treat any set-but-different current value as correctable: hides #3270 wrongly migrated targets; rejected.
+
+**Files likely to change**:
+- `src/MigrationTools.Clients.TfsObjectModel/Processors/TfsWorkItemMigrationProcessor.cs`
+- `src/MigrationTools.Clients.TfsObjectModel/Processors/StateStampedFields.cs`
+- `src/MigrationTools.Clients.TfsObjectModel.Tests/Processors/**`
+- `tools/e2e/**` (scenario), `docs/content/docs/reference/processors/tfs-workitem-migration-processor/index.md` if behaviour text changes (regenerate with `GenerateDocs.ps1`)
+
+**Tests to add or update**:
+- Unit: a repair save with `correctStamps` false still sets all state-stamped fields from the source.
+- Unit: a catch-up revision with only a re-stamped value is corrected; a wrongly migrated revision still fails (#3270); a state mismatch is not "corrected".
+- Unit: an in-sync item does no second read (#3299).
+- End to end, on `main` and on the branch with exit codes: repair of a Closed item (hierarchy and commit link), a Resolved or reopened item, an item already wrongly stamped, a genuinely wrong target (must fail), a further clean re-run. Includes the BypassRules-off and custom-rule variants if Q-4 points there.
+
+
+## Outcome checks
+
+- Unit, the repair branch sets every state-stamped field (ClosedDate/By, ResolvedDate/By, ActivatedDate/By, StateChangeDate) from the source's latest revision when `correctStamps` is false; pass = exit 0 and the new repair-stamp tests pass: `dotnet test src/MigrationTools.Clients.TfsObjectModel.Tests --filter "TestCategory=L0&FullyQualifiedName~Processors"`
+- Unit, a latest target revision that is our catch-up save with only a re-stamped value is corrected, and a wrongly migrated revision (#3270) or a state mismatch still fails; pass = exit 0 and those tests pass: `dotnet test src/MigrationTools.Clients.TfsObjectModel.Tests --filter "TestCategory=L0&FullyQualifiedName~Processors"`
+- Unit, an in-sync item does no second read of source values (#3299); pass = exit 0 and the in-sync read-count test passes: `dotnet test src/MigrationTools.Clients.TfsObjectModel.Tests --filter "TestCategory=L0&FullyQualifiedName~FastRerun"`
+- Solution builds and the whole test suite passes on the test orgs; pass = exit 0 and no failed tests: `dotnet build MigrationTools.sln; $env:MigrationTools__Tests__UseEntraId='true'; $env:MigrationTools__Tests__SourceCollection='https://dev.azure.com/nkdagility-adomt-source'; $env:MigrationTools__Tests__TargetCollection='https://dev.azure.com/nkdagility-adomt-target'; dotnet test MigrationTools.sln --no-build`
+- Real system (nkdagility-adomt-source to nkdagility-adomt-target, scratch projects, new scenario `tools/e2e/scenarios/rerun-3326`): after removing the parent link on one Closed target item and the commit link on another, the re-run repairs both, exits 0, and every target ClosedDate/ClosedBy equals the source value; pass = exit 0 and the scenario assert prints PASS: `pwsh -NoProfile -File .specify/memory/proof.ps1`
+- Real system, a Resolved item and a reopened item (Active) repaired the same way keep ResolvedDate/By, ActivatedDate/By and StateChangeDate at the source values; pass = exit 0 and the rerun-3326 assert prints PASS for those items: `pwsh -NoProfile -File .specify/memory/proof.ps1`
+- Real system, a target already wrongly stamped by an earlier repair save (catch-up revision, same State, only stamped fields differ) is corrected on re-run without delete and migrate; pass = exit 0 and current ClosedDate equals the source: `pwsh -NoProfile -File .specify/memory/proof.ps1`
+- Real system, a genuinely wrongly migrated target (#3270, a different State or a stamped value on a non-catch-up revision) still fails the item with "stamped instead of the source values"; pass = migration exit non-zero and that message in the log, asserted by the rerun-3326 assert: `pwsh -NoProfile -File .specify/memory/proof.ps1`
+- Real system, a further re-run after the repair is clean; pass = exit 0, no new revisions on any item, and every item reported in sync: `pwsh -NoProfile -File .specify/memory/proof.ps1`
+- Real system, the same scenarios run on `main` first show the fault (or its absence, as recorded under Reproduction) and on the branch show the fix, with exit codes reported in the pull request; pass = both runs recorded: `pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/rerun-3326/config.json`
+- Docs match the code; pass = exit 0 and `git diff --exit-code -- docs` is clean after regeneration: `pwsh -NoProfile -File GenerateDocs.ps1; git diff --exit-code -- docs`
+
+## Questions
+
+- Q-5 Outcome check not runnable yet: the repair with BypassRules not granted on the target, and with a custom Closed rule, which the issue's live fault may depend on (Q-4). Until Q-4 is answered there is no command that reproduces it, so the fix cannot be shown to change the live outcome. (for Martin) answered: Q-4 answered; BypassRules is on and there are no custom rules. The fault reproduces with an unresolved commit link (see Reproduction), so that is the outcome check to run.
+
