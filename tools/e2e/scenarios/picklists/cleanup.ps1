@@ -1,4 +1,4 @@
-# Removes only what the picklists scenario creates: amte2e-amt3241-* projects and processes, Custom.amte2eAmt3241* fields
+# Removes only what the picklists scenario creates: amte2e-amt3241-* projects and processes, Custom.amte2e3241* fields
 # and the picklists those fields used. Remove-E2EObjects.ps1 would also remove other scenarios' objects.
 param([string[]]$Organisations = @("nkdagility-adomt-source", "nkdagility-adomt-target"))
 $ErrorActionPreference = "Stop"
@@ -17,7 +17,7 @@ foreach ($org in $Organisations) {
             catch { if ($try -ge 4) { throw }; Start-Sleep -Seconds 15 }
         }
     }
-    foreach ($f in @((Invoke-E2ERest "_apis/wit/fields" -Org $org).value | Where-Object referenceName -like "Custom.amte2eAmt3241*")) {
+    foreach ($f in @((Invoke-E2ERest "_apis/wit/fields" -Org $org).value | Where-Object referenceName -like "Custom.amte2e3241*")) {
         Remove-E2EField $f.referenceName -Org $org
         $listNote = ""
         if ($f.picklistId) {

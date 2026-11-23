@@ -18,7 +18,7 @@ $process = "amte2e-amt3241-pl"; $targetProcess = "amte2e-amt3241-pl-tgt"
 $src = "amte2e-amt3241-src"; $tgt = "amte2e-amt3241-tgt"; $tgt0 = "amte2e-amt3241-tgt0"
 
 function New-PicklistField([string]$Name, [string]$Type, [string[]]$Items, [bool]$Suggested, [string]$Org) {
-    if (-not $Name.StartsWith("amte2eAmt3241")) { throw "Refusing to create field '$Name'." }
+    if (-not $Name.StartsWith("amte2e3241")) { throw "Refusing to create field '$Name'." }
     $existing = (Invoke-E2ERest "_apis/wit/fields" -Org $Org).value | Where-Object name -eq $Name
     if ($existing) { return $existing.referenceName }
     $list = Invoke-E2ERest "_apis/work/processes/lists" -Org $Org -Method POST -Body @{ name = "picklist_$([guid]::NewGuid())"; type = $Type; isSuggested = $Suggested; items = $Items }
@@ -35,18 +35,18 @@ if ($TargetProject) {
 Set-E2EOrg $tgtOrg
 New-E2EProject -Name $tgt0 -Process "amte2e-agile" -Org $tgtOrg | Out-Null
 if (Get-E2EProcessId $targetProcess $tgtOrg) { throw "Process $targetProcess already exists in $tgtOrg; remove it first." }
-New-E2EField "amte2eAmt3241AsText" -Org $tgtOrg | Out-Null
-New-PicklistField "amte2eAmt3241Diff" "String" @("One", "Four") $false $tgtOrg | Out-Null
-New-PicklistField "amte2eAmt3241Size" "Integer" @("1", "2") $false $tgtOrg | Out-Null
+New-E2EField "amte2e3241AsText" -Org $tgtOrg | Out-Null
+New-PicklistField "amte2e3241Diff" "String" @("One", "Four") $false $tgtOrg | Out-Null
+New-PicklistField "amte2e3241Size" "Integer" @("1", "2") $false $tgtOrg | Out-Null
 
 Set-E2EOrg $srcOrg
 $fields = [ordered]@{
-    Colour = New-PicklistField "amte2eAmt3241Colour" "String" @("Red", "Green", "Blue") $false $srcOrg
-    Points = New-PicklistField "amte2eAmt3241Points" "Integer" @("1", "2", "3", "5", "8") $false $srcOrg
-    Tag    = New-PicklistField "amte2eAmt3241Tag" "String" @("Alpha", "Beta") $true $srcOrg
-    AsText = New-PicklistField "amte2eAmt3241AsText" "String" @("High", "Low") $false $srcOrg
-    Diff   = New-PicklistField "amte2eAmt3241Diff" "String" @("One", "Two", "Three") $false $srcOrg
-    Size   = New-PicklistField "amte2eAmt3241Size" "String" @("S", "M") $false $srcOrg
+    Colour = New-PicklistField "amte2e3241Colour" "String" @("Red", "Green", "Blue") $false $srcOrg
+    Points = New-PicklistField "amte2e3241Points" "Integer" @("1", "2", "3", "5", "8") $false $srcOrg
+    Tag    = New-PicklistField "amte2e3241Tag" "String" @("Alpha", "Beta") $true $srcOrg
+    AsText = New-PicklistField "amte2e3241AsText" "String" @("High", "Low") $false $srcOrg
+    Diff   = New-PicklistField "amte2e3241Diff" "String" @("One", "Two", "Three") $false $srcOrg
+    Size   = New-PicklistField "amte2e3241Size" "String" @("S", "M") $false $srcOrg
 }
 $procId = New-E2EBaseProcess -Name $process -Wits @("User Story", "Bug", "Task", "Feature", "Epic", "Issue") -Org $srcOrg
 $story = Get-E2EDerivedWit $procId "User Story"
