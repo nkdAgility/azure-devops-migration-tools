@@ -85,8 +85,24 @@ function Get-Scope([string]$Root) {
     if (-not $closed -or -not $paths) { return $null }  # a front-matter block that is not closed is not a scope
     $product = @('src/')
     $cfg = Join-Path $Root '.specify/memory/workflow.json'
-    if (Test-Path $cfg) { $c = Get-Content $cfg -Raw | ConvertFrom-Json; if ($c.PSObject.Properties['productPaths'] -and $c.productPaths) { $product = @($c.productPaths) } }
-    @{ id = $id; wkr = $wkrRel; purpose = $purpose; paths = $paths; product = $product }
+    $specRoot = 'docs/specs'
+    if (Test-Path $cfg) {
+        $c = Get-Content $cfg -Raw | ConvertFrom-Json
+        if ($c.PSObject.Properties['productPaths'] -and $c.productPaths) { $product = @($c.productPaths) }
+        if ($c.PSObject.Properties['specRoot'] -and $c.specRoot) { $specRoot = $c.specRoot.TrimEnd('/') }
+    }
+    # The docs of every system the item's paths touch ({specRoot}/{system}/): the item must update them, so they are
+    # always within its scope. Systems come from {specRoot}/systems.md ("- <system>: <path> <path> ...").
+    $docs = @()
+    $sys = Join-Path $Root "$specRoot/systems.md"
+    if (Test-Path $sys) {
+        foreach ($m in [regex]::Matches((Get-Content $sys -Raw), '(?m)^\s*-\s*([^:]+):\s*(.+)$')) {
+            $name = $m.Groups[1].Value.Trim()
+            $sysPaths = @($m.Groups[2].Value -split '[,\s]+' | Where-Object { $_ } | ForEach-Object { $_.Trim('`') })
+            if ($paths | Where-Object { $g = $_; $sysPaths | Where-Object { Test-GlobsOverlap $g $_ } }) { $docs += "$specRoot/$name/**" }
+        }
+    }
+    @{ id = $id; wkr = $wkrRel; purpose = $purpose; paths = $paths; product = $product; docs = $docs }
 }
 function Write-Ask([string]$Reason) {
     @{ hookSpecificOutput = @{ hookEventName = 'PreToolUse'; permissionDecision = 'ask'; permissionDecisionReason = $Reason } } | ConvertTo-Json -Depth 5 -Compress
@@ -244,6 +260,8 @@ if ($scope) {
         # The workflow's own files are never outside an item's scope: its record, reviews, bug assessments,
         # idea assessments and working spec folders.
         $own = $rel -match '^/?(\.specify/(wkr|items|reviews|bugs|assessments)/|specs/)'
+        # So are the docs of the systems its paths touch, which it must update.
+        if (-not $own -and ($scope.docs | Where-Object { $rel -match (ConvertTo-GlobRegex $_) })) { $own = $true }
         if (-not $own -and -not ($scope.paths | Where-Object { $rel -match (ConvertTo-GlobRegex $_) })) { Write-Ask "$rel is not in the paths. $outside$how" }
     }
     $buildCmd = '(?i)\bdotnet\s+(build|test|run|publish|pack)\b|\bmsbuild\b|\bproof\.ps1\b|\bInvoke-MigrationE2E\.ps1\b|\bInvoke-Pester\b|\bnpm\s+(run|test)\b|\bBuild\.ps1\b'
