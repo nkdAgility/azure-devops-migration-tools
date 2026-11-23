@@ -187,3 +187,39 @@ The "target not found" case was never handled: both methods only act when a targ
   - change, re-run with `config-all.json` (all three types): exit 0; assert `-Expect Resolved` exit 0. ref=11162 and dataSetId 11161 (target ids), 0 entries.
 
   - change, again in the proof's shape (`config.json`, no log directory, `assert.ps1` with no arguments), then `config-all.json`: both asserts exit 0.
+
+## Output done evidence
+
+Automated checks (`done-checks.ps1`, on the change, 2026-11-23): `dotnet build MigrationTools.sln` succeeded. `dotnet test MigrationTools.sln` with the live test orgs: Host 12 passed (2 skipped), FileSystem 6, MigrationTools.Tests 305 (2 skipped), TfsObjectModel 434 (6 of them new for this item), Rest 81; 0 failed. Proof (`proof.ps1`): all covered scenarios passed, including the new `sharedsteps-3256` and the existing `sharedsteps`. `docs-check.ps1`: docs reconciled.
+
+Manual validation on the test orgs, own scratch projects amte2e-3256-* (deleted afterwards):
+- main (e2cdafa4), Test Cases only: exit 0; the Test Case keeps source ids 7524/7525, with no warning, no review entry and no count. The scenario's assert fails (exit 4).
+- change, Test Cases only: exit 0; two `[SKIP] ... not remapped` warnings, two `reference-left-on-source` entries, and `reference-left-on-source: 2` in the summary. The assert passes, both with an explicit log directory and in the proof's shape.
+- change, re-run with all three types: exit 0; the references point at the target copies (for example ref=12509, dataSetId 12508), with no new entries. The assert passes.
+
+Not covered: the resolved row for an earlier entry on a re-run is shown by the unit tests only. Each e2e run writes to its own log folder, so the tool does not read the earlier run's log. The default WIQL is unchanged (approved as a separate follow-up).
+
+Confidence: 90%
+
+
+
+## Output done evidence
+
+Automated checks (`done-checks.ps1`, on the change, 2026-11-23): `dotnet build MigrationTools.sln` succeeded. `dotnet test MigrationTools.sln` with the live test orgs: Host 12 passed (2 skipped), FileSystem 6, MigrationTools.Tests 305 (2 skipped), TfsObjectModel 434 (6 of them new for this item), Rest 81; 0 failed. Proof (`proof.ps1`): all covered scenarios passed, including the new `sharedsteps-3256` and the existing `sharedsteps`. `docs-check.ps1`: docs reconciled.
+
+Manual validation on the test orgs, own scratch projects amte2e-3256-* (deleted afterwards):
+- main (e2cdafa4), Test Cases only: exit 0; the Test Case keeps source ids 7524/7525, with no warning, no review entry and no count. The scenario's assert fails (exit 4).
+- change, Test Cases only: exit 0; two `[SKIP] ... not remapped` warnings, two `reference-left-on-source` entries, and `reference-left-on-source: 2` in the summary. The assert passes, both with an explicit log directory and in the proof's shape.
+- change, re-run with all three types: exit 0; the references point at the target copies (for example ref=12509, dataSetId 12508), with no new entries. The assert passes.
+
+Not covered: the resolved row for an earlier entry on a re-run is shown by the unit tests only. Each e2e run writes to its own log folder, so the tool does not read the earlier run's log. The default WIQL is unchanged (approved as a separate follow-up).
+
+Confidence: 90%
+
+Reasons:
+- The defect is shown failing on main and passing on the change on the real test orgs, with exit codes and the target fields checked.
+- The full build, every test suite (live tests included) and the repository's proof all pass on the change.
+- The change is small and object-model only: one helper and two null branches in TfsWorkItemLinkTool, plus one review category.
+- Not 100%: the re-run resolving an earlier `reference-left-on-source` row is covered by unit tests, not end to end, and it has had no independent review yet.
+
+
