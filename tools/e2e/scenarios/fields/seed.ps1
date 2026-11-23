@@ -1,7 +1,7 @@
 # fields: #3186/#3202 history-only fields, #3151 validator uses the source WIT for field maps, #3209 reflected id before field maps.
-#  legacy   - User Story created in amte2e-fields-old (whose process has Custom.amte2eLegacy) and then moved into the source
+#  legacy   - User Story created in amte2e-fields-old (whose process has Custom.amte2e3227Legacy) and then moved into the source
 #             project, whose process does not have the field: its value only exists in revision history (#3173 case).
-#  issue    - Issue with Custom.amte2eIssueOnly (only on Issue in the source process). The config maps Issue -> Task and
+#  issue    - Issue with Custom.amte2e3227IssueOnly (only on Issue in the source process). The config maps Issue -> Task and
 #             has a FieldtoFieldMap with ApplyTo ["Issue"] for the field, so validation must pass (#3151).
 #  reflect  - Task with one revision; a TargetToTarget map copies Custom.ReflectedWorkItemId to System.Description (#3209);
 #             the Issue-only field is mapped to Integration Build, which is why the reflected id goes to Description.
@@ -16,8 +16,8 @@ Set-E2EOrg "nkdagility-adomt-target"
 New-E2EProject -Name "amte2e-fields-tgt" -Process "amte2e-agile" | Out-Null
 
 Set-E2EOrg $org
-$legacyRef = New-E2EField "amte2eLegacy" -Org $org
-$issueRef = New-E2EField "amte2eIssueOnly" -Org $org
+$legacyRef = New-E2EField "amte2e3227Legacy" -Org $org
+$issueRef = New-E2EField "amte2e3227IssueOnly" -Org $org
 $oldProc = New-E2EBaseProcess -Name "amte2e-fields-old" -Org $org
 Add-E2EFieldToWit $oldProc "User Story" $legacyRef
 $srcProc = New-E2EBaseProcess -Name "amte2e-fields-srcproc" -Org $org

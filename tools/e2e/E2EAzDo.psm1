@@ -122,6 +122,20 @@ function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
 function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
 function Get-E2EProcesses([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
 
+# Which Custom.amte2e* fields a cleanup may delete. Every field a scenario creates is named amte2e<issue>..., so an issue's
+# prefix (amt<issue>- or amte2e-<issue>-) owns exactly the fields carrying that number, and not those of a longer number
+# that starts with it. -All owns every e2e field. Any other prefix owns no fields ($null). A prefix that every scratch
+# project name starts with would make a scoped cleanup a full one, so it is refused.
+function Get-E2EFieldFilter([string]$Prefix, [switch]$All) {
+    if ($All) {
+        if ($Prefix) { throw "Use -All or -Prefix, not both." }
+        return '^Custom\.amte2e'
+    }
+    if (-not $Prefix -or $script:Prefix.StartsWith($Prefix)) { throw "Refusing prefix '$Prefix': it matches every e2e object. Use -All for a full clean." }
+    if ($Prefix -match '^amt(\d+)-$' -or $Prefix -match '^amte2e-(\d+)-$') { return "^Custom\.amte2e$($Matches[1])(?!\d)" }
+    $null
+}
+
 # Creates or updates a work item. $Fields is an ordered hashtable of reference name -> value.
 # Extra JSON-patch operations (relations, etc.) can be passed in $Ops.
 function Set-E2EWorkItem {

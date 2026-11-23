@@ -103,7 +103,7 @@
         "FieldMaps": [
           {
             "FieldMapType": "FieldtoFieldMap",
-            "sourceField": "Custom.amte2eIssueOnly",
+            "sourceField": "Custom.amte2e3227IssueOnly",
             "ApplyTo": [
               "Issue"
             ],
