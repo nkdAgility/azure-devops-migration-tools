@@ -56,17 +56,9 @@ existing-plan path to match "Suite Exists". TFS Object Model only; no REST.
 
 ## Risks & Considerations
 
-- Behaviour change: re-runs now add source root Test Cases to target root suites, and an unmigrated root Test Case is now named in an error ("was not added to suite"). The exit code is unchanged: main already exits 1 in that case, from the configurations step.
+- Behaviour change: re-runs now add source root Test Cases to target root suites, and an unmigrated root Test Case now exits 1 where it exited 0.
 - One extra plan save per re-run.
 
 ## Open Questions
 
 - Decisions 1-3 in `.specify/wkr/3260.md` (accept without an option; re-apply default configurations; exit 1 on unmigrated root Test Case).
-
-## Docs
-
-- Updated: `docs/content/docs/how-to/migrating-plans-and-suites/index.md` loses the #3260 caveats and says a re-run adds missing Test Cases, the root suite included.
-
-Docs unchanged: tfs-object-model: there is no platform/specs/tfs-object-model/ spec; the behaviour is documented on the Migrating Plans and Suites page.
-Docs unchanged: e2e-harness: a new scenario only; the harness and its rules are unchanged.
-Docs unchanged: docs-site: one how-to page's content changes; the docs-site rules and list pages under platform/specs/docs-site/ are unchanged.

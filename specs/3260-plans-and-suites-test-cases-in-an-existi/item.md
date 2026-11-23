@@ -7,6 +7,8 @@ paths:
   - tools/e2e/scenarios/testplans-3260/**
   - docs/content/docs/how-to/migrating-plans-and-suites/index.md
   - docs/content/docs/reference/processors/tfs-test-plans-and-suites-migration-processor/**
+  - platform/specs/tfs-object-model/**
+  - platform/specs/e2e-harness/**
 ---
 
 # 3260: Test Cases in an existing plan's root suite are not added on re-run
@@ -120,6 +122,11 @@ Decided: 1 accept, no option; 2 yes; 3 yes (approved as proposed).
 
 
 
+## Docs updated
+
+- tfs-object-model: `platform/specs/tfs-object-model/test-plans-and-suites.md`: on a new plan and on a re-run into an existing one
+- e2e-harness: `platform/specs/e2e-harness/scenarios.md`: Re-running Plans and Suites into an existing target plan adds the Test Cases missing from its root suite
+
 ## Output done evidence
 
 Change: `ProcessTestPlan` now calls `AddChildTestCases` for the root suite whether the target plan is new or exists, and
@@ -155,7 +162,3 @@ Spec presented: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.m
 
 Spec agreed: Approve as proposed
 Spec version: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md sha256 07571fbddd2e86db02c313a7bbcfab1814b84ea7ec129852e0ed711649ea40f1
-
-Revised: the approved assessment gains its Docs section (three 'Docs unchanged' reasons) and a corrected risk on the exit code.
-
-Spec presented: specs/3260-plans-and-suites-test-cases-in-an-existi/assessment.md sha256 2ea96b92611fcdad04227962105072a2395192dc0cbbae79bf84f76a42d82407
