@@ -1,4 +1,6 @@
 # pipelines-3268 outcome checks. Run seed.ps1 first, and build MigrationTools.ConsoleFull.
+#   -Case proof       (default, as proof.ps1 runs it after migrating config.json) the migrated release's artifact
+#                     points at the target, then the unmappable case
 #   -Case mapped      a release whose deploy job downloads a Build artifact migrates, with the artifact pointing at
 #                     the target project and the migrated build definition
 #   -Case unmappable  a release whose Build artifact has no target build definition is skipped with a clear error,
@@ -8,7 +10,7 @@
 param(
     [string]$Src = "amte2e-3268-src",
     [string]$Tgt = "amte2e-3268-tgt",
-    [Parameter(Mandatory)][ValidateSet('mapped', 'unmappable')][string]$Case,
+    [ValidateSet('proof', 'mapped', 'unmappable')][string]$Case = 'proof',
     [string]$OutFile
 )
 $ErrorActionPreference = 'Stop'
@@ -47,35 +49,41 @@ function Remove-Release([string]$Name) {
 }
 function Get-Errors([string]$Text) { @($Text -split "`n" | Where-Object { $_ -match '^\[[0-9:]+ ERR\]' }) }
 
+function Test-Mapped {
+    $release = Get-Release 'amte2e-3268-release'
+    $build = (Invoke-E2ERest "$Tgt/_apis/build/definitions?name=amte2e-3268-build").value | Select-Object -First 1
+    $project = Invoke-E2ERest "_apis/projects/$Tgt"
+    $artifacts = @($release.artifacts | Where-Object { $_ })
+    $artifact = $artifacts | Select-Object -First 1
+    Check ($null -ne $release) 'amte2e-3268-release exists in the target'
+    Check ($artifacts.Count -eq 1) "the release has its artifact ($($artifacts.Count))"
+    Check ($artifact.alias -eq '_amte2e-3268-build') "the alias is kept ($($artifact.alias))"
+    Check ($artifact.definitionReference.project.id -eq $project.id) "the artifact points at the target project ($($artifact.definitionReference.project.id) vs $($project.id))"
+    Check ($null -ne $build -and $artifact.definitionReference.definition.id -eq "$($build.id)") "the artifact points at the target build definition ($($artifact.definitionReference.definition.id) vs $($build.id))"
+}
+function Test-Unmappable {
+    Remove-Release 'amte2e-3268-orphan-release'
+    $run = Invoke-Run (Get-Config 'config-unmappable.json')
+    $pattern = 'ReleaseDefinition "amte2e-3268-orphan-release" cannot be migrated because its artifact "_amte2e-3268-orphan" \(Build\) cannot be mapped to the target: its build definition "amte2e-3268-orphan" is not in the target project'
+    $clear = @(Get-Errors $run.Text | Where-Object { $_ -match $pattern })
+    Check ($run.Code -eq 1) "unmappable: tool exit code is 1 (was $($run.Code))"
+    Check ($clear.Count -eq 1) "unmappable: one clear error naming the release, alias and type (found $($clear.Count))"
+    Check ($run.Text -notmatch 'InvalidRequestException|does not matching any linked artifact') 'unmappable: the target was not sent the release (no 400)'
+    Check ($run.Text -match '1 of 1 source ReleaseDefinition\(s\) were skipped and 0 were rejected') 'unmappable: the release counts as skipped'
+    Check ($null -eq (Get-Release 'amte2e-3268-orphan-release')) 'unmappable: amte2e-3268-orphan-release is not in the target'
+}
+
 Set-E2EOrg nkdagility-adomt-target
 switch ($Case) {
+    'proof' { Test-Mapped; Test-Unmappable }
     'mapped' {
         Remove-Release 'amte2e-3268-release'
         $run = Invoke-Run (Get-Config 'config.json')
         Check ($run.Code -eq 0) "tool exit code is 0 (was $($run.Code))"
         Check ((Get-Errors $run.Text).Count -eq 0) "no errors logged ($((Get-Errors $run.Text) -join ' | '))"
-        $release = Get-Release 'amte2e-3268-release'
-        $build = (Invoke-E2ERest "$Tgt/_apis/build/definitions?name=amte2e-3268-build").value | Select-Object -First 1
-        $project = Invoke-E2ERest "_apis/projects/$Tgt"
-        $artifacts = @($release.artifacts | Where-Object { $_ })
-        $artifact = $artifacts | Select-Object -First 1
-        Check ($null -ne $release) 'amte2e-3268-release exists in the target'
-        Check ($artifacts.Count -eq 1) "the release has its artifact ($($artifacts.Count))"
-        Check ($artifact.alias -eq '_amte2e-3268-build') "the alias is kept ($($artifact.alias))"
-        Check ($artifact.definitionReference.project.id -eq $project.id) "the artifact points at the target project ($($artifact.definitionReference.project.id) vs $($project.id))"
-        Check ($null -ne $build -and $artifact.definitionReference.definition.id -eq "$($build.id)") "the artifact points at the target build definition ($($artifact.definitionReference.definition.id) vs $($build.id))"
+        Test-Mapped
     }
-    'unmappable' {
-        Remove-Release 'amte2e-3268-orphan-release'
-        $run = Invoke-Run (Get-Config 'config-unmappable.json')
-        $pattern = 'ReleaseDefinition "amte2e-3268-orphan-release" cannot be migrated because its artifact "_amte2e-3268-orphan" \(Build\) cannot be mapped to the target: its build definition "amte2e-3268-orphan" is not in the target project'
-        $clear = @(Get-Errors $run.Text | Where-Object { $_ -match $pattern })
-        Check ($run.Code -eq 1) "tool exit code is 1 (was $($run.Code))"
-        Check ($clear.Count -eq 1) "one clear error naming the release, alias and type (found $($clear.Count))"
-        Check ($run.Text -notmatch 'InvalidRequestException|does not matching any linked artifact') 'the target was not sent the release (no 400)'
-        Check ($run.Text -match '1 of 1 source ReleaseDefinition\(s\) were skipped and 0 were rejected') 'the release counts as skipped'
-        Check ($null -eq (Get-Release 'amte2e-3268-orphan-release')) 'amte2e-3268-orphan-release is not in the target'
-    }
+    'unmappable' { Test-Unmappable }
 }
 Remove-Item $work -Recurse -Force
 if ($OutFile) { $results | Set-Content $OutFile }
