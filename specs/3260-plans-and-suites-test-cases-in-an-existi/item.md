@@ -120,7 +120,37 @@ Decided: 1 accept, no option; 2 yes; 3 yes (approved as proposed).
 
 Docs unchanged: tfs-object-model: there is no platform/specs/tfs-object-model/ spec; the behaviour is documented on the Migrating Plans and Suites page, which is updated.
 Docs unchanged: e2e-harness: a new scenario only; the harness and its rules are unchanged.
-Docs unchanged: docs-site: one how-to page's content changes; the docs-site rules and list pages are unchanged.
+
+## Docs updated
+
+- docs-site: `docs/content/docs/how-to/migrating-plans-and-suites/index.md`: Test Cases missing from the existing target plan, its root suite included, are added
+
+## Output done evidence
+
+Change: `ProcessTestPlan` now calls `AddChildTestCases` for the root suite whether the target plan is new or exists, and
+re-applies default configurations to an existing root suite. Scenario `tools/e2e/scenarios/testplans-3260/` (seed steps
+1-3, three configs, `assert.ps1`), run in scratch projects on a build of `main` (`d2cc0431`) and on the change:
+
+| Phase | main | change |
+|---|---|---|
+| 1. First migration (TC1 in root and Suite A) | runs exit 0; root 1, Suite A 1: PASS | runs exit 0; root 1, Suite A 1: PASS |
+| 2. TC2 added to root and Suite A, re-run | exit 0; root 1, Suite A 2: FAIL | exit 0; root 2, Suite A 2: PASS |
+| 3. Re-run, nothing new | exit 0; root 1: FAIL | exit 0; root 2, Suite A 2, no duplicates: PASS |
+| 4. TC3 in root, not yet migrated | exit 1, from configurations ("Target Reflected Work Item Not found ... 5814"); TC3 not named as missing from the suite | exit 1, "Test Case 5816:'tc3 root only' was not added to suite 'amte2e 3260 plan' because it has not been migrated" |
+| 5. TC3 migrated, re-run | exit 0; root 1: FAIL | exit 0; root 3, Suite A 2: PASS |
+
+Correction to decision 3: on `main` this case already exits 1, through the configurations step, not 0 as the record
+said. The change makes the error name the Test Case and the suite; the exit code is the same.
+
+Done checks (`done-checks.ps1`, on `44382465`): build succeeded; tests 832 passed, 4 skipped, 0 failed (L2/L3 against the
+test orgs); proof: all 9 covered scenarios passed. A first proof run failed in the `longrun-3305` seed on a dropped
+connection and was re-run whole. `testplans-3260` is multi-step, so the proof lists it as not covered; the runs above
+are its proof. Scratch projects and processes from every run were deleted (projects remain in the recycle bin).
+
+Confidence: 90%
+Reasons:
+- The fix is one moved call into a method that already handles existing entries and unmigrated Test Cases; the e2e runs show the root suite topped up, no duplicates, and the failure path, with `main` failing the same asserts.
+- Not covered: `OnlyElementsWithTag` on an existing plan (outcome check 5) was not run end to end; the tag check sits at the top of `AddChildTestCases` and is unchanged.
 
 ## Spec
 
