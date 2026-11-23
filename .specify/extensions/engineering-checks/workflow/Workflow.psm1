@@ -482,11 +482,26 @@ function Test-Check {
         'prMerged'        { (& $Adapter.GetPrState $Item) -eq 'MERGED' }
         'script'          {
             if ($SkipScripts) { return @{ skipped = $true; message = $Check.message } }
-            Push-Location $Root; try { & pwsh -NoProfile -Command $Check.run *> $null; $LASTEXITCODE -eq 0 } finally { Pop-Location }
+            # The script's output is kept, so a refusal says what failed: .specify/reviews/check-<name>.log, and its last lines.
+            $slug = ((@($Check.run -split '[\s/\\]+') | Where-Object { $_ -match '\.ps1$' } | Select-Object -First 1) -replace '\.ps1$', '')
+            if (-not $slug) { $slug = 'script' }
+            $logRel = ".specify/reviews/check-$slug.log"
+            Push-Location $Root
+            try {
+                New-Item -ItemType Directory -Force (Split-Path $logRel) | Out-Null
+                & pwsh -NoProfile -Command $Check.run *> $logRel
+                $passed = $LASTEXITCODE -eq 0
+                if (-not $passed) { $script:lastScriptLog = @{ path = $logRel; tail = (@(Get-Content $logRel -Tail 8 -ErrorAction SilentlyContinue) -join "`n") } }
+                $passed
+            } finally { Pop-Location }
         }
         default           { throw "Unknown check type '$($Check.type)'." }
     }
-    if ($ok) { $null } else { @{ message = $Check.message } }
+    if ($ok) { $null }
+    elseif ($Check.type -eq 'script' -and $script:lastScriptLog) {
+        $l = $script:lastScriptLog; $script:lastScriptLog = $null
+        @{ message = "$($Check.message) (output in $($l.path); it ends:`n$($l.tail))" }
+    } else { @{ message = $Check.message } }
 }
 
 # ---------------------------------------------------------------- the move
