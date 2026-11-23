@@ -67,8 +67,8 @@ The String Manipulator Tool is configured with an array of manipulators, each de
       {
         "$type": "RegexStringManipulator",
         "Enabled": true,
-        "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F",
-        "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
+        "Description": "Remove characters the SOAP API cannot save",
+        "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]|[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]|[\\uFFFE\\uFFFF]",
         "Replacement": ""
       }
     ]
@@ -98,17 +98,14 @@ Each manipulator supports these properties:
 
 ### Removing Invalid Characters
 
-Remove control characters, characters outside the Basic Multilingual Plane, and the emoji variation selector U+FE0F. This is the built-in pattern. It keeps letters such as `é`, `ł` and `ж`, and most CJK text. Its limits:
-
-- It removes **every** character outside the Basic Multilingual Plane (stored as a surrogate pair). That includes most emoji, but also rare letters such as Osage (`𐓏`) and CJK Extension B (`𠀀`).
-- Emoji inside the Basic Multilingual Plane, such as `⌚` (U+231A), are not removed.
+Remove only the characters the SOAP (TFS object model) API cannot save: control characters other than tab, line feed and carriage return; unpaired surrogates; and the noncharacters U+FFFE and U+FFFF. This is the built-in pattern, used when `Manipulators` is empty. Everything else is kept, including accented letters, letters outside the Basic Multilingual Plane such as Osage (`𐓏`) and CJK Extension B (`𠀀`), and emoji such as `⌚` and `😀`. DEL and the C1 controls (U+007F to U+009F) are kept too. Setting your own `Manipulators` replaces the built-in pattern; add it to your list if you still want it.
 
 ```json
 {
   "$type": "RegexStringManipulator",
-  "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F",
+  "Description": "Remove characters the SOAP API cannot save",
   "Enabled": true,
-  "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
+  "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]|[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]|[\\uFFFE\\uFFFF]",
   "Replacement": ""
 }
 ```
@@ -153,9 +150,9 @@ Remove HTML tags from single-line `String` fields. HTML fields such as `System.D
 }
 ```
 
-### Removing Emojis for SOAP Compatibility
+### Removing Emoji
 
-Remove emojis that can cause issues with SOAP interfaces. Like the built-in pattern, it removes every character outside the Basic Multilingual Plane (including rare letters) and leaves emoji inside it, such as `⌚`:
+SOAP saves emoji, so the built-in pattern keeps them. To remove them anyway, use this pattern. It removes every character outside the Basic Multilingual Plane (including rare letters such as `𐓏`) and leaves emoji inside it, such as `⌚`:
 
 ```json
 {

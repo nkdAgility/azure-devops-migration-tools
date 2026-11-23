@@ -33,9 +33,9 @@ configurationSamples:
               {
                 "$type": "RegexStringManipulator",
                 "Enabled": true,
-                "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
+                "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]|[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]|[\\uFFFE\\uFFFF]",
                 "Replacement": "",
-                "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F"
+                "Description": "Remove characters the SOAP API cannot save"
               }
             ]
           }
@@ -54,9 +54,9 @@ configurationSamples:
       "Manipulators": [
         {
           "Enabled": true,
-          "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F-\\x9F]|[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]|\\uFE0F",
+          "Pattern": "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]|[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]|[\\uFFFE\\uFFFF]",
           "Replacement": "",
-          "Description": "Remove control characters, characters outside the BMP (most emoji) and U+FE0F"
+          "Description": "Remove characters the SOAP API cannot save"
         }
       ]
     }
