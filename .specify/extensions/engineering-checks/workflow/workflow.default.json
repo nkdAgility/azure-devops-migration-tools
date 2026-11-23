@@ -6,8 +6,7 @@
   "board": {
     "adapter": "github",
     "stateField": "NKDA-STATE",
-    "categoryStatus": {
-      "Proposed": "Backlog",
+    "categoryStatus": { "Proposed": "Backlog", "Approved": "Todo",
       "In Progress": "In progress",
       "In review": "In review",
       "Completed": "Done",

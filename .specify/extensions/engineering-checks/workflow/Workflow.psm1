@@ -78,6 +78,7 @@ function New-GitHubBoardAdapter {
             type      = if ($i.PSObject.Properties['issueType'] -and $i.issueType) { $i.issueType.name } else { $null }
             state     = if ($state) { $state } elseif ($i.state -eq 'CLOSED') { 'Closed' } else { 'Proposed' }
             oldStatus = if ($state) { $null } else { $status }
+            status    = $status
             stateSet  = [bool]$state -or $i.state -eq 'CLOSED'
             tags      = @($i.labels | ForEach-Object { $_.name })
             createdAt = $i.createdAt
@@ -103,6 +104,8 @@ function New-GitHubBoardAdapter {
             $it.children = @(gh api "repos/$nwo/issues/$id/sub_issues" --jq '.[].number' 2>$null | Where-Object { $_ })
             $it
         }.GetNewClosure()
+        # The built-in Status a state is shown as: the state's category, unless the state is listed by name.
+        StatusFor  = { param($state) if (-not $StateField) { & $toStatus $state } elseif ($CategoryStatus.ContainsKey($state)) { $CategoryStatus[$state] } else { $CategoryStatus[$StateCategory[$state]] } }.GetNewClosure()
         SetState   = {
             param($item, $state)
             # With a state field, the built-in Status shows the state's category (a state listed by name overrides it).
@@ -661,9 +664,22 @@ function Invoke-WorkflowManager {
     # find hung work, and list what needs Martin. Returns a report; changes only states and move records.
     param($Config, $Adapter, [string]$Root = '.', [datetime]$Now = (Get-Date).ToUniversalTime(), [switch]$WhatIf)
     if (-not $Adapter) { $Adapter = Get-BoardAdapter $Config $Root }
-    $report = [ordered]@{ at = $Now.ToString('o'); pulls = @(); moves = @(); failing = @(); actions = @(); stuck = @(); attention = @() }
+    $report = [ordered]@{ at = $Now.ToString('o'); pulls = @(); moves = @(); failing = @(); actions = @(); stuck = @(); attention = @(); statusFixed = @() }
     $order = $Config.order
     $blocked = $Config.tags.blocked
+
+    # 0. The workflow state is the truth; the built-in Status only shows it. Put back any Status something else changed
+    #    (for example GitHub's own automation moving an issue to "In progress" when a linked pull request opens).
+    if ($Adapter.ContainsKey('StatusFor')) {
+        foreach ($item in @(& $Adapter.GetItems)) {
+            if (-not $item['stateSet'] -or -not $item['status']) { continue }
+            $want = & $Adapter.StatusFor $item.state
+            if ($want -and $item.status -ne $want) {
+                if (-not $WhatIf) { & $Adapter.SetState $item $item.state }
+                $report.statusFixed += @(@{ id = $item.id; state = $item.state; was = $item.status; now = $want })
+            }
+        }
+    }
 
     # 1. Move work forward where its policy passes (script checks are left to the run itself).
     foreach ($item in @(& $Adapter.GetItems)) {
