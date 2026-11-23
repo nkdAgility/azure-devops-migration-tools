@@ -76,7 +76,7 @@ try {
 } finally { if (-not $lock) { Remove-Item $ticket -ErrorAction SilentlyContinue } }
 try {
 $failed = @(); $notCovered = @(); $scratch = @()
-$work = Join-Path ([IO.Path]::GetTempPath()) "amtproof-$RunId"
+$work = Join-Path ([IO.Path]::GetTempPath()) "amtproof-$Item-$RunId"
 New-Item -ItemType Directory -Force $work | Out-Null
 foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seed = Join-Path $d.FullName 'seed.ps1'; $assert = Join-Path $d.FullName 'assert.ps1'; $config = Join-Path $d.FullName 'config.json'
@@ -105,7 +105,7 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     "== $($d.Name): $(($names.Keys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')"
     $initFailed = $false
     foreach ($p in $initialise) {
-        pwsh -NoProfile -File tools/e2e/Initialize-E2EEnvironment.ps1 -Process $p
+        pwsh -NoProfile -File tools/e2e/Initialize-E2EEnvironment.ps1 -Process $p *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
         if ($LASTEXITCODE -ne 0) { $initFailed = $true }
     }
     if ($initFailed) { $failed += "$($d.Name) (creating its scratch process)"; continue }
@@ -119,18 +119,18 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
         foreach ($k in $extra.Keys) { if ($declared -contains $k) { $a += "-$k", $extra[$k] } }
         , $a }
     $seedArgs = & $argsFor $seed
-    pwsh -NoProfile -File $seed @seedArgs
+    pwsh -NoProfile -File $seed @seedArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; continue }
-    pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile
+    pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; continue }
     $assertArgs = & $argsFor $assert @{ OutFile = (Join-Path $work "$($d.Name).assert.md") }
-    pwsh -NoProfile -File $assert @assertArgs
+    pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)" }
 }
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
 "scratch projects and processes left for clean-up: $($scratch -join ', ')"
 if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"; exit 1 }
-if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', ')"; exit 1 }
+if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', '); each scenario's output is in $work\<scenario>.log"; exit 1 }
 "all covered scenarios passed; results in $work"
 exit 0
 } finally { $lock.Dispose(); Remove-Item $ticket -ErrorAction SilentlyContinue }
