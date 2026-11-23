@@ -55,7 +55,7 @@ Open findings: 0
 
 Working spec: `specs/3268-azuredevopspipelineprocessor-drops-relea/assessment.md` (the bug assessment Martin approves).
 
-Spec presented: specs/3268-azuredevopspipelineprocessor-drops-relea/assessment.md sha256 b85c376a34ba425992866e8db87d67de869584be8b2f0287d39c07aca2c12750
+Spec presented: specs/3268-azuredevopspipelineprocessor-drops-relea/assessment.md sha256 8933531c4964dbb052d6bda726165d926662c1f644e65c3a58d77fefafca1bea
 
 ## Reproduction
 
@@ -99,3 +99,5 @@ On `main` (e2ddb400), against scratch projects `amte2e-3268-src`/`amte2e-3268-tg
 - rest-client, test orgs: a release whose artifact cannot be mapped is skipped with a clear error; pass = exit 1, the log names the release, alias and type, and no 400 from the target: `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3268/assert.ps1 -Case unmappable`
 - rest-client, unit: artifact mapping and skip rules; pass = exit 0: `dotnet test src/MigrationTools.Clients.AzureDevops.Rest.Tests --filter "FullyQualifiedName~ReleaseArtifact"`
 
+Spec agreed: Approve
+Spec version: specs/3268-azuredevopspipelineprocessor-drops-relea/assessment.md sha256 8933531c4964dbb052d6bda726165d926662c1f644e65c3a58d77fefafca1bea
