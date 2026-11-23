@@ -57,6 +57,11 @@ The repository mapping was placed inside the `Properties` null check that only `
 - The repository `url` is not remapped; the target resolves the repository by id. The e2e check confirms the stored URL is the target's.
 - No option classes change, so the generated docs should not change.
 
+## Docs
+
+Docs unchanged: rest-client: there is no platform/specs/rest-client/ doc yet, and no option class changed (GenerateDocs.ps1 shows no diff). The behaviour is covered by the L0 tests and the pipelines-3312 scenario.
+Docs unchanged: e2e-harness: there is no platform/specs/e2e-harness/ doc yet. The new scenario follows the existing proof conventions (seed, config and assert with -Src/-Tgt) and adds none.
+
 ## Open Questions
 
 None.
