@@ -88,3 +88,6 @@ The repository mapping was placed inside the `Properties` null check that only `
 - Definition whose repository is missing in the target fails clearly and the others carry on, on the same test orgs; pass = exit 0 from the assert (tool exit 1, one "cannot be migrated because its repository" error, no TF401019, amte2e-3312-yaml created, amte2e-3312-missing absent): `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3312/assert.ps1 -Case missing`
 - Existing pipeline scenarios still behave as on main, in amte2e-3312-pipe-*; pass = exit 0 from the assert (config.json exits 0 with the classic build on the target repo, config-novariablegroups.json exits 1 with only the variable-group skip): `pwsh -NoProfile -File tools/e2e/scenarios/pipelines-3312/assert.ps1 -Case existing`
 
+
+Spec agreed: Approve
+Spec version: .specify/bugs/pipeline-repo-map/assessment.md sha256 7b83b3a0da20cfa5eb575072401ce0e9b3f0aef88aaf696e905f7ff2037fa173
