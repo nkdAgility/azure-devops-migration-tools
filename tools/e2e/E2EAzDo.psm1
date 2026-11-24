@@ -54,7 +54,16 @@ function Invoke-E2ERest {
         # Assigned directly: returning a byte[] through an if-expression would unroll it and send it as text.
         if ($Body -is [string] -or $Body -is [byte[]]) { $params.Body = $Body } else { $params.Body = $Body | ConvertTo-Json -Depth 20 }
     }
-    Invoke-RestMethod @params
+    # A request that never got a response (a dropped connection) is retried when it is safe to send twice. POST is not:
+    # creating the pool's lease team is the claim, and a second send would misread a won claim as lost.
+    for ($try = 1; ; $try++) {
+        try { return Invoke-RestMethod @params }
+        catch {
+            $noResponse = -not $_.Exception.Response -and $_.Exception -is [System.Net.Http.HttpRequestException]
+            if (-not $noResponse -or $Method -eq "POST" -or $try -ge 3) { throw }
+            Start-Sleep -Seconds (2 * $try)
+        }
+    }
 }
 
 function Wait-E2EOperation($op, [int]$TimeoutSeconds = 600) {
