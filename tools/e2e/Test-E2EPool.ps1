@@ -8,11 +8,13 @@
     -Case Race      target org: two takes started at once, as separate pwsh processes, never get the same project.
     -Case Lease     target org: a live lease is left alone, an expired lease and a dead local owner's lease are taken
                     over, and a project left half-filled is cleared on take.
+    -Case Linkscope both orgs: linkscope seeded, migrated and asserted through the pool; its gone project is made and deleted
+                    in the source org only, and no target-org project is created or deleted.
     -Case Scenario  both orgs: runs -Scenario -Runs times through the pool (seed, migration, assert, release) and checks
                     the live, deleted, process and Custom.amte2e* field counts are the same before and after.
     Prints PASS/FAIL per check and exits 0 only if every check passes. Takes only pool projects and gives back all it took.
 #>
-param([Parameter(Mandatory)][ValidateSet("Cycle", "Race", "Lease", "Scenario")][string]$Case, [int]$Trials = 10, [string]$Scenario = "wicore", [int]$Runs = 2)
+param([Parameter(Mandatory)][ValidateSet("Cycle", "Race", "Lease", "Scenario", "Linkscope")][string]$Case, [int]$Trials = 10, [string]$Scenario = "wicore", [int]$Runs = 2)
 $ErrorActionPreference = "Stop"
 $here = $PSScriptRoot
 Import-Module (Join-Path $here "E2EAzDo.psm1") -Force -WarningAction SilentlyContinue
@@ -104,6 +106,20 @@ switch ($Case) {
             if (Get-E2EPoolSlot $p.name) { Remove-E2EPoolLease $t.Id $org } else { Remove-E2EProject $p.name -Org $org }
         }
         $l = Get-E2EPoolLease $a.Id $org; if ($l) { Invoke-E2ERest "_apis/projects/$($a.Id)/teams/$($l.Team.id)" -Org $org -Method DELETE | Out-Null }
+    }
+    "Linkscope" {
+        $d = Join-Path $here "scenarios/linkscope"
+        $logs = Join-Path ([IO.Path]::GetTempPath()) "amt3342-linkscope-$run"
+        $tgtBefore = @((Invoke-E2ERest "_apis/projects?`$top=1000" -Org $tgt).value).Count + @((Invoke-E2ERest "_apis/projects?stateFilter=deleted&`$top=1000" -Org $tgt).value).Count
+        pwsh -NoProfile -File (Join-Path $d "seed.ps1") 2>&1 | Select-Object -Last 1
+        Check "linkscope seed" ($LASTEXITCODE -eq 0) "exit $LASTEXITCODE"
+        pwsh -NoProfile -File (Join-Path $here "Invoke-MigrationE2E.ps1") -Config (Join-Path $d "config.json") -LogDirectory $logs 2>&1 | Select-Object -Last 1
+        Check "linkscope migration" ($LASTEXITCODE -eq 0) "exit $LASTEXITCODE"
+        pwsh -NoProfile -File (Join-Path $d "assert.ps1") -LogDirectory $logs 2>&1 | Where-Object { "$_" -like "FAIL*" }
+        Check "linkscope assertions" ($LASTEXITCODE -eq 0) "exit $LASTEXITCODE"
+        foreach ($org in $src, $tgt) { Clear-E2EPool -Org $org -Owner $run | Out-Null }
+        $tgtAfter = @((Invoke-E2ERest "_apis/projects?`$top=1000" -Org $tgt).value).Count + @((Invoke-E2ERest "_apis/projects?stateFilter=deleted&`$top=1000" -Org $tgt).value).Count
+        Check "target org project count" ($tgtAfter -eq $tgtBefore) "live + deleted $tgtBefore -> $tgtAfter"
     }
     "Scenario" {
         function Get-Counts {
