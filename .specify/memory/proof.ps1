@@ -160,7 +160,7 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
 "pool projects used: $((@($used | Sort-Object -Unique)) -join ', ')"
 "released: $((@($released | Sort-Object -Unique) | ForEach-Object { "$_ (cleared)" }) -join ', ')"
-"scratch processes left for clean-up: $($processes -join ', ')"
+"scratch processes (Remove-E2EObjects.ps1 deletes them): $($processes -join ', ')"
 if ($notReleased) { "NOT RELEASED:"; $notReleased | ForEach-Object { "  $_" }; Write-Error "pool projects could not be given back"; exit 1 }
 if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"; exit 1 }
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', '); each scenario's output is in $work\<scenario>.log"; exit 1 }
