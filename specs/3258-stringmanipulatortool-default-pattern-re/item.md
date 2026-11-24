@@ -365,3 +365,19 @@ Spec fix: specs/3258-stringmanipulatortool-default-pattern-re/assessment.md sha2
 - Branch, `config-user.json` (no-op manipulator): exit 0, 1 created, 0 failed. Title and Found In kept `A𐓏B 𠀀 W⌚ E😀 H❤️`, U+FE0F included.
 - main, `config.json`: exit 1, 1 created, 1 failed. Found In became `AB  W⌚ E H❤`; the U+FFFE Bug failed to save.
 - main, `config-user.json`: exit 0, Found In kept, the same as the branch.Spec fix: specs/3258-stringmanipulatortool-default-pattern-re/assessment.md sha256 a7a69f040271a9c10880921ea10b385b9aaa2b1ede257bbbf790b1f9551b3817 -> 7ad0d08eaf51c5755e4680b6d7ff90284f03684221b4b760b88596df5573231d: wrote in Martin's answers to Q-5 and Q-7; corrected pattern escapes and an old path; recorded that the docs-site system docs are unchanged
+
+## Output done evidence
+
+Automated checks: build passes; L1 suites 82 + 310 + 421 + 11 passed; StringManipulatorEnricherTests 46 passed (letters outside the BMP, emoji and U+FE0F kept; C0 controls, lone surrogates, U+FFFE and U+FFFF removed; a user manipulator replaces the default).
+
+Manual validation on the test orgs (scenario stringmanip-3258, 2026-11-23):
+- Branch, default: exit 0, 2 created, 0 failed; Title and Found In kept every letter and emoji; U+FFFE removed (XY).
+- Branch, user manipulator: exit 0, 1 created, everything kept.
+- main, default: exit 1, 1 failed; Found In lost the letters and emoji (AB  W⌚ E H❤).
+- main, user manipulator: exit 0.
+
+Not yet run: the full proof (proof.ps1), blocked by the target org's 1000-project limit.
+
+Confidence: 88%
+
+
