@@ -175,3 +175,5 @@ Spec version: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256
 Plan agreed: Approve plan
 
 Building over the WIP limit: Martin, 2026-11-24, "go over the WIP limit, it's expedite". The board stays Specified until a Building slot frees (the workflow tool has no WIP override).
+
+Spec revised (FR-014, US6, SC-001, SC-008: linkscope keeps a disposable source-org project). Spec agreed: Approve
