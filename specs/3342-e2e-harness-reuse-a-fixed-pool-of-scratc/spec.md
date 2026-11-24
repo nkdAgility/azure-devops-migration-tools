@@ -122,15 +122,16 @@ A one-off adopt step renames existing live `amte2e-*` and `amt3326-*` projects t
 
 ### User Story 6 - `linkscope` still tests a missing project (Priority: P3)
 
-`linkscope` needs a project that does not exist. It uses a name that is never created, and no longer deletes a project to make one.
+`linkscope` needs a work item that cannot be read: X, in a project that is deleted after links to X are made. Destroying X is not enough, because Azure DevOps then removes its links, and nothing can link into a project that never existed. So `linkscope` alone keeps creating and deleting its `gone` project, only in the source org, through a helper of its own outside the pool (Martin, 2026-11-24: "Delete in source org"). The source org has 146 free project slots; each run uses one for about 28 days.
 
-**Why this priority**: The scenario's purpose is the absent project; a pool project cannot be absent.
+**Why this priority**: The scenario's purpose is the unreadable item; a pool project cannot give one.
 
-**Independent Test**: Run `linkscope` before and after the change. Its assertions pass both times and no project is deleted.
+**Independent Test**: Run `linkscope` through the pool. Its assertions pass, its source, target and fail-target projects come from the pool and are given back, and the only project created and deleted is its `gone` project in the source org.
 
 **Acceptance Scenarios**:
 
-1. **Given** the scenario runs, **When** the migration refers to the missing project, **Then** the name resolves to no project in the org and the assertions are unchanged.
+1. **Given** the scenario runs, **When** the migration loads X, **Then** it fails with TF26198 as before and the assertions are unchanged.
+2. **Given** the helper is asked for a project in the target org, **When** it is called, **Then** it refuses before any call.
 
 ---
 
@@ -165,7 +166,7 @@ A one-off adopt step renames existing live `amte2e-*` and `amt3326-*` projects t
 - **FR-011**: A one-off adopt script MUST rename eligible live `amte2e-*` and `amt<issue>-*` projects into the pool, create no project, be safe to run twice, and support `-WhatIf`. Eligible means no lease team and no change (project, work item or repo) in the last 24 hours. Others are skipped and listed with the reason.
 - **FR-012**: `Remove-E2EObjects.ps1` MUST gain a clear-the-pool mode. `-All` and the per-issue prefix MUST NOT delete a pool project. Process and `Custom.amte2e*` field cleanup MUST work as before.
 - **FR-013**: `proof.ps1` MUST drop the per-run project names and the "left for clean-up" project list, and MUST report each pool project used and that it was cleared.
-- **FR-014**: `linkscope` MUST use a name that never exists for its missing-project case, and MUST NOT delete a project.
+- **FR-014**: `linkscope`'s `gone` project MUST be created and deleted only in the source org, through a helper named for that purpose (`New-E2EDisposableProject` / `Remove-E2EDisposableProject`) that refuses any other org and any name outside the guard. No other scenario may use it. Its other projects MUST come from the pool.
 - **FR-015**: Scenarios that cannot use a pooled project (a non-Agile base process) MUST be listed as not poolable in `platform/specs/e2e-harness/scenarios.md`.
 - **FR-016**: The harness changes MUST run on PowerShell 7+ and need no credential beyond the sign-in the harness already uses.
 - **FR-017**: `platform/specs/e2e-harness/cleanup.md`, `platform/specs/e2e-harness/scenarios.md` and the "Validating Changes End to End" section of `platform/specs/architecture.md` MUST describe the pool, the lease, take and release, and the not-poolable list.
@@ -182,13 +183,14 @@ A one-off adopt step renames existing live `amte2e-*` and `amt3326-*` projects t
 
 ### Measurable Outcomes
 
-- **SC-001**: After any number of proof runs, the number of live projects and deleted projects, the number of processes and the number of `Custom.amte2e*` fields in each test org are the same as before the runs, once the run's processes and fields are cleaned up.
+- **SC-001**: After any number of proof runs, the number of live projects and (in the target org) deleted projects, the number of processes and the number of `Custom.amte2e*` fields in each test org are the same as before the runs, once the run's processes and fields are cleaned up.
 - **SC-002**: All scenarios the proof selects today pass their assertions through the pool. At most 3 of the 30 may be listed as not poolable, each with a stated reason.
 - **SC-003**: Two takes started at the same time never return the same project (checked on at least 10 trials per org).
 - **SC-004**: A project taken after a crashed run holds no work items, extra teams, child nodes, queries, extra repos, pipelines, variable groups or test plans when returned.
 - **SC-005**: After the adopt step, each org's eligible scratch projects are all `amte2e-pool-NN`, and its live project count has not risen.
 - **SC-006**: The proof's final output names every pool project used and states each was cleared, and prints no per-run project name.
 - **SC-007**: `git diff` against `main` shows no change under `src/`, and no run touches `migrationSource1` or `migrationTarget1`.
+- **SC-008**: Apart from `linkscope`'s `gone` project in the source org, no run creates or deletes a project.
 
 ## Checked live before approval (harness sign-in, target org, 2026-11-24)
 
