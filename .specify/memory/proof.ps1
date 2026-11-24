@@ -8,7 +8,9 @@
 # scenario's projects are given back (cleared and renamed back) before the next scenario and in a finally, and the
 # pool slots used are listed at the end. Scratch processes are listed and not deleted here: Remove-E2EObjects.ps1 with
 # a per-run prefix also deletes other scenarios' fields (#3278).
-param([string]$RunId = (Get-Date -Format 'MMddHHmm'), [string]$Item, [switch]$All, [string]$Base = 'origin/main')
+param([string]$RunId = (Get-Date -Format 'MMddHHmm'), [string]$Item, [switch]$All, [string]$Base = 'origin/main',
+    # Run only these scenarios, whatever the change touches (used by tools/e2e/Test-E2EPool.ps1 -Case Scenario).
+    [string[]]$Only)
 $ErrorActionPreference = 'Stop'
 # Every object a run creates is named amte2e-<item>-p<run>-..., so each worker can find and remove its own.
 if (-not $Item -and (Test-Path .specify/items/current.json)) { $Item = "$((Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number)" }
@@ -52,6 +54,7 @@ foreach ($p in $product) {
 # Only scenarios with a seed, a config and an assert can run; the list says what will actually run.
 $runnable = @(Get-ChildItem tools/e2e/scenarios -Directory | Where-Object { (Test-Path (Join-Path $_.FullName 'seed.ps1')) -and (Test-Path (Join-Path $_.FullName 'assert.ps1')) -and (Test-Path (Join-Path $_.FullName 'config.json')) } | ForEach-Object Name)
 if (-not $runAll) { foreach ($k in @($why.Keys)) { if ($runnable -notcontains $k) { $why.Remove($k) } } }
+if ($Only) { $runAll = $false; $why = @{}; foreach ($n in $Only) { $why[$n] = 'asked for (-Only)' } }
 if ($runAll) { "== running all $($runnable.Count) runnable scenarios: $reasonAll" } else { "== running $($why.Count) scenario(s):"; $why.Keys | Sort-Object | ForEach-Object { "   $_ ($($why[$_]))" } }
 
 # One proof at a time on the shared test orgs: concurrent runs collide there (VS800075, dropped connections).
