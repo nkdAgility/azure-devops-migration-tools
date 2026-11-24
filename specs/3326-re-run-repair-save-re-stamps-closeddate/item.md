@@ -126,3 +126,16 @@ Scenario `tools/e2e/scenarios/rerun-3326` (seed, config, assert), run directly w
 - `dotnet build MigrationTools.sln`: exit 0.
 - `dotnet test MigrationTools.sln --no-build` with the test-org settings: exit 0; 849 passed, 0 failed (TfsObjectModel 439, Tests 305, Rest 87, Host 12, FileSystem 6).
 - New L0 tests: `StateStampedFieldsTests.IsCatchUpSave_*` (5), `TfsGitRepositoryToolTests.TryParseTargetUri_*` (3) and `TargetLacksArtifact_*` (3).
+
+## Output done evidence
+
+Confidence: 88%
+
+Reasons:
+- The fault is reproduced on `main` on the test orgs and shown fixed on the branch with the same scenario (`rerun-3326`). On `main` the assert exits 3: ClosedDate is re-stamped on two repaired items, an item already stamped fails, and a further re-run fails 3 items. On the branch it exits 0: every current state-stamped value equals the source, a further re-run saves nothing, and a genuinely wrong target still fails, with no stack trace.
+- Built and tested: `dotnet build MigrationTools.sln` exit 0; `dotnet test MigrationTools.sln` against the test orgs exit 0, 849 passed, 0 failed; 11 new L0 tests for the catch-up rule and the target link check.
+- Not REST in the work item path: the repair stamps go through the object model; the unresolved-link check reuses the Git existence cache that `VerifyTargetExists` already uses.
+- Docs updated for both behaviours; `GenerateDocs.ps1` leaves nothing else changed.
+- Below 90% because: why Azure DevOps re-stamps on that save is not understood, only shown to stop when the values are sent explicitly; the catch-up rule (previous revision + 1 s, same author, no source revision within 10 ms) is tested on the test orgs and in unit tests but not on the customer's data; no blind review has run yet; the full proof across every scenario is still to pass.
+
+
