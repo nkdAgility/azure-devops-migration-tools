@@ -35,7 +35,7 @@
       "TfsWorkItemLinkTool": { "Enabled": true, "FilterIfLinkCountMatches": true, "SaveAfterEachLinkIsAdded": false },
       "TfsUserMappingTool": { "Enabled": false },
       "TfsTeamSettingsTool": { "Enabled": false },
-      "TfsWorkItemTypeValidatorTool": { "Enabled": true, "IncludeWorkItemTypes": [ "User Story" ], "ExcludeDefaultWorkItemTypes": false, "ExcludeSourceFields": { "User Story": [ "Custom.amte2eAmt3241AsText" ] } }
+      "TfsWorkItemTypeValidatorTool": { "Enabled": true, "IncludeWorkItemTypes": [ "User Story" ], "ExcludeDefaultWorkItemTypes": false, "ExcludeSourceFields": { "User Story": [ "Custom.amte2e3241AsText" ] } }
     },
     "Processors": [
       {

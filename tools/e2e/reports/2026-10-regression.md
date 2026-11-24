@@ -105,7 +105,7 @@ dotnet build MigrationTools.sln
 ./tools/e2e/scenarios/wicore/seed.ps1                      # every scenario has a seed.ps1
 ./tools/e2e/Invoke-MigrationE2E.ps1 -Config tools/e2e/scenarios/wicore/config.json
 ./tools/e2e/scenarios/wicore/assert.ps1                    # exit code = number of failed checks
-./tools/e2e/Remove-E2EObjects.ps1                          # removes every amte2e-* project/process and Custom.amte2e* field; lists leftovers
+./tools/e2e/Remove-E2EObjects.ps1 -All                     # removes every amte2e-* project/process and Custom.amte2e* field; lists leftovers
 ```
 - **Executable assertions exist only for `wicore` and `identity`.** For the other scenarios, the evidence in this report came from log lines and REST checks run by hand during the pass. Re-running those scenarios repeats the migration, but checking the target state is still manual. Adding an `assert.ps1` for each is a follow-up.
 - `users`: run `scenarios/users/New-UsersConfigs.ps1` after seeding. `TfsUserMappingTool` needs an absolute path to the mapping file, so the configs are generated for the current checkout and are not committed.

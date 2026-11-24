@@ -33,6 +33,8 @@ Before any question to Martin, check every option as `ask-martin` says: a separa
 
 When a run pauses at a gate, stop and ask Martin as a QUESTION (`ask-martin`), showing what he is approving in full: the spec, the plan or the assessment. Resume the run with his answer as the gate's input (`specify workflow resume <run> --input <verdict input>=<his choice>`), and record his words as `Spec agreed: <his words>` where the gate is the spec's. Never answer a gate yourself.
 
+After Martin approves a spec, write in his answers or fix a typing mistake only as a small fix, recorded with `spec-fix.ps1`; anything larger goes back to him as a QUESTION.
+
 A failing check is fixed and the step re-run; it is never skipped or worked round.
 
 Commit the item's folder, `specs/<issue>-<name>/`, each time its record, spec or assessment changes, so the pull request always shows where the item stands. When you update the docs, name each one on the item under `## Docs updated` as `- <system>: `<doc path>`: <phrase from the doc>`; a system whose docs need no change needs `Docs unchanged: <system>: <reason>` in the spec Martin approves. Nothing temporary reaches `main`: before the pull request is marked ready, the item's folder and any file under `.specify/bugs/`, `.specify/assessments/`, `.specify/reviews/` or `.specify/wkr/` are removed.
