@@ -171,3 +171,7 @@ Open findings: 0
 
 Spec agreed: approved.
 Spec version: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256 822601652e1c35fd157a70a468c6f40906f1046c640c4aba61ef2a6be105d987
+
+Plan agreed: Approve plan
+
+Building over the WIP limit: Martin, 2026-11-24, "go over the WIP limit, it's expedite". The board stays Specified until a Building slot frees (the workflow tool has no WIP override).
