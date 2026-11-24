@@ -17,12 +17,25 @@
     ./tools/e2e/Remove-E2EObjects.ps1 -All
 #>
 [CmdletBinding(SupportsShouldProcess)]
-param([string[]]$Organisations = @("nkdagility-adomt-source", "nkdagility-adomt-target"), [string]$Prefix, [switch]$All)
+param([string[]]$Organisations = @("nkdagility-adomt-source", "nkdagility-adomt-target"), [string]$Prefix, [switch]$All, [switch]$ClearPool)
 $ErrorActionPreference = "Stop"
-Import-Module (Join-Path $PSScriptRoot "E2EAzDo.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "E2EAzDo.psm1") -Force -WarningAction SilentlyContinue
 Import-Module (Join-Path $PSScriptRoot "E2EProcess.psm1") -Force
 
-if (-not $All -and -not $Prefix) { throw "Give -Prefix amt<issue>- (or amte2e-<issue>-) to clean one issue, or -All for every e2e object." }
+if ($ClearPool) {
+    if ($All -or $Prefix) { throw "Use -ClearPool on its own: it gives back every leased pool project and touches no process or field." }
+    foreach ($org in $Organisations) {
+        foreach ($h in @(Get-E2EPoolProject -Org $org -All | Where-Object Lease)) {
+            if (-not $PSCmdlet.ShouldProcess("$org/$($h.Name)", "Release pool project (held by $($h.Lease.Token))")) { "would release $org/$($h.Name) -> $(Format-E2EPoolName $h.Slot) (held by $($h.Lease.Token), until $($h.Lease.Expires.ToString('o')))"; continue }
+            "releasing $org/$($h.Name), held by $($h.Lease.Token)"
+            try { $slot = Reset-E2EPoolProject -Name $h.Name -Org $org -Force; "released $org/$($h.Name) -> $slot (cleared)" } catch { "NOT RELEASED $org/$($h.Name): $($_.Exception.Message)"; $failedRelease = $true }
+        }
+        "pool in $($org): $(@(Get-E2EPoolProject -Org $org).Count) free"
+    }
+    if ($failedRelease) { exit 1 }
+    exit 0
+}
+if (-not $All -and -not $Prefix) { throw "Give -Prefix amt<issue>- (or amte2e-<issue>-) to clean one issue, -All for every e2e object, or -ClearPool to give back every leased pool project." }
 $fieldFilter = Get-E2EFieldFilter -Prefix $Prefix -All:$All
 if ($All) { $Prefix = "amte2e-" }
 Assert-E2EName $Prefix
@@ -33,9 +46,15 @@ function Get-ScopedFields([string]$Org) { if ($fieldFilter) { @(Get-E2EFields -O
 $leftovers = @()
 foreach ($org in $Organisations) {
     Set-E2EOrg $org
-    foreach ($p in @(Get-E2EProjects -Org $org -Prefix $Prefix)) {
-        if (-not $PSCmdlet.ShouldProcess("$org/$($p.name)", "Delete project")) { "$verb project $org/$($p.name)"; continue }
-        try { Remove-E2EProject $p.name -Org $org; "deleted project $org/$($p.name)" } catch { $leftovers += "project $org/$($p.name): $($_.Exception.Message)" }
+    # Projects are never deleted (#3342): a deleted project counts toward the org's 1,000-project limit for about 28 days.
+    # Pool projects leased under this prefix are given back (cleared, back on amte2e-agile, renamed amte2e-pool-NN), so
+    # the processes they used can be deleted below. Any other project of the prefix is left and reported.
+    foreach ($h in @(Get-E2EPoolProject -Org $org -All | Where-Object { $_.Lease -and ($ClearPool -or $_.Name.StartsWith($Prefix)) })) {
+        if (-not $PSCmdlet.ShouldProcess("$org/$($h.Name)", "Release pool project (held by $($h.Lease.Token))")) { "would release $org/$($h.Name) -> $(Format-E2EPoolName $h.Slot) (held by $($h.Lease.Token))"; continue }
+        try { $slot = Reset-E2EPoolProject -Name $h.Name -Org $org -Force; "released $org/$($h.Name) -> $slot (cleared)" } catch { $leftovers += "pool project $org/$($h.Name): $($_.Exception.Message)" }
+    }
+    foreach ($p in @(Get-E2EProjects -Org $org -Prefix $Prefix | Where-Object { -not (Get-E2EPoolSlot $_.name) -and -not (Get-E2EPoolLease $_.id $org) })) {
+        "kept project $org/$($p.name): not a pool project; projects are never deleted (adopt it with Initialize-E2EPool.ps1)"
     }
     # Destroy scratch projects waiting in the recycle bin so their processes are no longer referenced.
     try {
@@ -59,7 +78,7 @@ foreach ($org in $Organisations) {
         try { Remove-E2EField $f.referenceName -Org $org; "deleted field $org/$($f.referenceName)" } catch { $leftovers += "field $org/$($f.referenceName): $(($_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue).message)" }
     }
     if (-not $WhatIfPreference) {
-        $remaining = @(Get-E2EProjects -Org $org -Prefix $Prefix).name + @(Get-E2EProcesses -Org $org -Prefix $Prefix).name + @(Get-ScopedFields $org).referenceName | Where-Object { $_ }
+        $remaining = @(Get-E2EProjects -Org $org -Prefix $Prefix | Where-Object { -not (Get-E2EPoolSlot $_.name) }).name + @(Get-E2EProcesses -Org $org -Prefix $Prefix).name + @(Get-ScopedFields $org).referenceName | Where-Object { $_ }
         "remaining in $($org): " + $(if ($remaining) { $remaining -join ", " } else { "none" })
     }
 }

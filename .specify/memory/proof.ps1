@@ -4,8 +4,10 @@
 # Every scenario this change needs (see below; -All for every one) that has a seed, a config and an assert is run in scratch projects of its own, never in the
 # projects the automated tests use: seed the scratch projects, run the migration with the config re-pointed at
 # them, then run the scenario's assertions. Fails if any seed, migration or assertion fails.
-# Scenarios without an assert are listed as not covered. Scratch projects are listed at the end and are not
-# deleted here: Remove-E2EObjects.ps1 with a per-run prefix also deletes other scenarios' fields (#3278).
+# Scenarios without an assert are listed as not covered. Projects come from the scratch project pool (#3342): each
+# scenario's projects are given back (cleared and renamed back) before the next scenario and in a finally, and the
+# pool slots used are listed at the end. Scratch processes are listed and not deleted here: Remove-E2EObjects.ps1 with
+# a per-run prefix also deletes other scenarios' fields (#3278).
 param([string]$RunId = (Get-Date -Format 'MMddHHmm'), [string]$Item, [switch]$All, [string]$Base = 'origin/main')
 $ErrorActionPreference = 'Stop'
 # Every object a run creates is named amte2e-<item>-p<run>-..., so each worker can find and remove its own.
@@ -75,12 +77,32 @@ try {
     }
 } finally { if (-not $lock) { Remove-Item $ticket -ErrorAction SilentlyContinue } }
 try {
-$failed = @(); $notCovered = @(); $scratch = @()
+$failed = @(); $notCovered = @(); $scratch = @(); $processes = @(); $used = @(); $released = @(); $notReleased = @()
+# Projects come from the scratch project pool (#3342). Every seed this run starts takes them as this proof, so the
+# proof can give back everything the run holds, after each scenario and again in the finally below.
+$poolRun = "proof-$Item-$RunId"
+$env:AMTE2E_POOL_OWNER = "${PID}:$poolRun"
+$env:AMTE2E_POOL_ITEM = $Item
+Import-Module (Join-Path $PWD 'tools/e2e/E2EAzDo.psm1') -Force -WarningAction SilentlyContinue
+$poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
+$releasePool = {
+    foreach ($org in $poolOrgs) {
+        $held = @(Get-E2EPoolProject -Org $org -Owner $poolRun)
+        foreach ($h in $held) { $script:used += "$org/$(Format-E2EPoolName $h.Slot)" }
+        foreach ($line in @(Clear-E2EPool -Org $org -Owner $poolRun)) {
+            $line
+            if ($line -match '^released \S+ -> (\S+)') { $script:released += "$org/$($Matches[1])" } elseif ($line -like 'NOT RELEASED*') { $script:notReleased += $line }
+        }
+    }
+}
+try {
 $work = Join-Path ([IO.Path]::GetTempPath()) "amtproof-$Item-$RunId"
 New-Item -ItemType Directory -Force $work | Out-Null
 foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seed = Join-Path $d.FullName 'seed.ps1'; $assert = Join-Path $d.FullName 'assert.ps1'; $config = Join-Path $d.FullName 'config.json'
     if (-not $runAll -and -not $why.ContainsKey($d.Name)) { continue }
+    # The previous scenario's projects go back to the pool before the next one takes any.
+    & $releasePool
     if (-not ((Test-Path $seed) -and (Test-Path $assert) -and (Test-Path $config))) { $notCovered += $d.Name; continue }
     # Every named resource the seed takes (projects, and processes such as Process or NoBugProcess) gets a scratch
     # name of this run, so nothing shared is seeded or migrated into. The config is re-pointed at the same names,
@@ -102,6 +124,7 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
         else { "   $k keeps the shared process $($defaults[$k]): the seed expects it to exist and the proof cannot create it"; $defaults.Remove($k) }
     }
     $scratch += $names.Values
+    $processes += @($names.Keys | Where-Object { $_ -match 'Process$' } | ForEach-Object { $names[$_] })
     "== $($d.Name): $(($names.Keys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')"
     $initFailed = $false
     foreach ($p in $initialise) {
@@ -127,8 +150,15 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)" }
 }
+} finally {
+    # Give back every pool project this run holds, whatever happened above. Each is cleared and renamed back.
+    & $releasePool
+}
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
-"scratch projects and processes left for clean-up: $($scratch -join ', ')"
+"pool projects used: $((@($used | Sort-Object -Unique)) -join ', ')"
+"released: $((@($released | Sort-Object -Unique) | ForEach-Object { "$_ (cleared)" }) -join ', ')"
+"scratch processes left for clean-up: $($processes -join ', ')"
+if ($notReleased) { "NOT RELEASED:"; $notReleased | ForEach-Object { "  $_" }; Write-Error "pool projects could not be given back"; exit 1 }
 if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"; exit 1 }
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', '); each scenario's output is in $work\<scenario>.log"; exit 1 }
 "all covered scenarios passed; results in $work"

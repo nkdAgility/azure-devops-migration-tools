@@ -114,6 +114,39 @@ function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
     Reset-E2EPoolProject -Name $Name -Org $Org | Out-Null
 }
 
+# The one exception to the pool (#3342 FR-014): linkscope needs a work item that cannot be read, which only a deleted
+# project gives (destroying the item removes its links too). Its 'gone' project is created and deleted here, in the
+# source org only, which has room; each one counts toward that org's limit for about 28 days. No other scenario uses it.
+$script:DisposableOrg = "nkdagility-adomt-source"
+function Assert-E2EDisposable([string]$Name, [string]$Org) {
+    if ($Org -ne $script:DisposableOrg) { throw "Refusing a disposable project in '$Org': only $($script:DisposableOrg) has room for projects that are deleted." }
+    if ($Name -notmatch '-gone$') { throw "Refusing disposable project '$Name': only linkscope's '*-gone' project is disposable." }
+    Assert-E2EName $Name
+}
+
+function New-E2EDisposableProject {
+    param([Parameter(Mandatory)][string]$Name, [string]$Process = "amte2e-agile", [string]$Org = $script:DefaultOrg)
+    Assert-E2EDisposable $Name $Org
+    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
+    if ($p) { return $p }
+    $processId = Get-E2EProcessId $Process $Org
+    if (-not $processId) { throw "Process '$Process' not found in $Org. Run tools/e2e/Initialize-E2EEnvironment.ps1 first." }
+    Wait-E2EOperation (Invoke-E2ERest "_apis/projects" -Org $Org -Method POST -Body @{
+        name = $Name; description = "AMT e2e linkscope project, deleted by its seed"
+        capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = $processId } }
+    }) | Out-Null
+    for ($i = 0; ; $i++) {
+        try { $p = Invoke-E2ERest "_apis/projects/$Name" -Org $Org; Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null; return $p }
+        catch { if ($i -ge 19) { throw }; Start-Sleep -Seconds 3 }
+    }
+}
+
+function Remove-E2EDisposableProject([string]$Name, [string]$Org = $script:DefaultOrg) {
+    Assert-E2EDisposable $Name $Org
+    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
+    if ($p) { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null }
+}
+
 # -Prefix selects one issue's scratch objects (for example "amt3242-"); it must itself pass Assert-E2EName.
 function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
 function Get-E2EProcesses([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
