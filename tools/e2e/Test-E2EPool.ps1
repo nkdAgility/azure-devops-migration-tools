@@ -77,6 +77,7 @@ switch ($Case) {
                 Invoke-E2ERest "_apis/projects/$($p.Id)/teams" -Org $org -Method POST -Body @{ name = "amte2e-pool-lease"; description = $desc } | Out-Null
             } finally { $env:AMTE2E_POOL_OWNER = $saved }
         }
+        $script:planted = @($a, $b, $c)
         & $plant $a ":other-live-run" ([datetime]::UtcNow.AddHours(1))
         Check "held lease state" ((@(Get-E2EPoolProject -Org $org | Where-Object Id -eq $a.Id))[0].State -eq "Held") (Format-E2EPoolName $a.Slot)
         # Expired: a lease past its expiry is taken over, and the project (half-filled first) is cleared on take.
@@ -158,6 +159,12 @@ switch ($Case) {
 finally {
     # Whatever happened, give back what this run holds.
     foreach ($org in $src, $tgt) { Clear-E2EPool -Org $org -Owner $run | Where-Object { $_ -like "NOT RELEASED*" } }
+    # Leases the Lease case planted for other owners are removed too, even when a check failed part-way.
+    foreach ($pp in @($script:planted | Where-Object { $_ })) {
+        $cur = Invoke-E2ERest "_apis/projects/$($pp.Id)" -Org $tgt
+        $l = Get-E2EPoolLease $pp.Id $tgt
+        if ($l -and $l.Run -in "other-live-run", "crashed-run", "dead-run") { try { Reset-E2EPoolProject -Name $cur.name -Org $tgt -Force | Out-Null } catch { "NOT RELEASED $($cur.name): $($_.Exception.Message)" } }
+    }
 }
 $failed = @($results | Where-Object { -not $_.Pass }).Count
 "$Case`: $($results.Count - $failed) of $($results.Count) checks passed"

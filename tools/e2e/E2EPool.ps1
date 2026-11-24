@@ -259,12 +259,14 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
 
     # Work items: destroy=true deletes and purges in one call. The query returns at most 5,000 here, so loop.
     for ($round = 0; $round -lt 50; $round++) {
-        $ids = Get-E2EProjectWorkItemIds $pr $Org
+        $ids = @(Get-E2EProjectWorkItemIds $pr $Org)
         if (-not $ids.Count) { break }
         $before = $e.Count
         for ($i = 0; $i -lt $ids.Count; $i += 200) {
             $batch = $ids[$i..([Math]::Min($i + 199, $ids.Count - 1))]
-            foreach ($wi in @((Invoke-E2ERest "_apis/wit/workitems?ids=$($batch -join ',')&fields=System.WorkItemType" -Org $Org).value)) {
+            $read = "_apis/wit/workitems?ids=$($batch -join ',')&fields=System.Id,System.WorkItemType"
+            $items = try { @((Invoke-E2ERest $read -Org $Org).value) } catch { throw "Reading work items to clear failed ($read): $($_.ErrorDetails.Message)" }
+            foreach ($wi in $items) {
                 Invoke-E2EStep { Remove-E2EPoolWorkItem $pr $p.name $wi $Org } "$($wi.fields.'System.WorkItemType') $($wi.id)" $e
             }
         }
@@ -297,6 +299,8 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
     if (-not $keep) {
         $null = Invoke-E2ERest "$pr/_apis/git/repositories" -Org $Org -Method POST -Body @{ name = "amte2e-pool-new-$([Guid]::NewGuid().ToString('N').Substring(0, 6))"; project = @{ id = $pr } }
         foreach ($x in $old) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/git/repositories/$($x.id)" -Org $Org -Method DELETE } "repo $($x.name)" $e }
+        # A deleted repo can stay in the listing for a moment; wait until only the new one is there.
+        for ($i = 0; $i -lt 20 -and @(Get-E2EList "$pr/_apis/git/repositories" $Org).Count -gt 1; $i++) { Start-Sleep -Seconds 3 }
     }
     foreach ($x in Get-E2EList "$pr/_apis/git/recycleBin/repositories" $Org) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/git/recycleBin/repositories/$($x.id)" -Org $Org -Method DELETE } "recycled repo $($x.name)" $e }
 
