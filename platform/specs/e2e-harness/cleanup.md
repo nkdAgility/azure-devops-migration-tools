@@ -26,7 +26,11 @@ Each test org keeps a fixed set of projects named `amte2e-pool-NN`, on `amte2e-a
   `<pid>:<run>`), so seeds it starts share its leases. An expired lease, or one whose holder is a process on this
   machine that has exited, may be taken over; the taker deletes that lease team only if it is unchanged since it was
   read. The holder re-reads its lease before every destructive step and stops if it is no longer there.
-- **Clear.** Work items are destroyed (not left in the recycle bin); test plans and runs, build and release
+- **Clear.** Work items are destroyed (not left in the recycle bin; Test Cases through the test case API). Shared
+  Steps and Shared Parameters can't be deleted by any REST API (only in the web portal), so they are kept as
+  leftovers: retitled `amte2e-pool leftover`, moved to the area `pool-leftovers`, every link removed. Every harness
+  query leaves them out (`Get-E2EPoolLeftoverFilter`, used by `Get-E2EAllWorkItems` and by the `sharedsteps` and
+  `testplans` source queries). Test plans and runs, build and release
   definitions, variable groups, service connections, environments, wikis, extra dashboards, queries, extra teams, area
   and iteration children and tags are deleted; the repos are replaced by one new empty repo. "Cleared" is checked by
   an inventory of those surfaces read from the service (`Get-E2EPoolInventory`), not by the clearing code's own list.

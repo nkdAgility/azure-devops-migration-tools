@@ -187,6 +187,35 @@ Describe "Reset-E2EPoolProject" {
     }
 }
 
+Describe "clearing work items" {
+    It "deletes a <Type> through <Route>" -ForEach @(
+        @{ Type = "Test Case"; Route = "the test case API"; Expect = "pid/_apis/test/testcases/5" }
+        @{ Type = "Task"; Route = "the work item API with destroy"; Expect = "_apis/wit/workitems/5?destroy=true" }
+    ) {
+        InModuleScope E2EAzDo -Parameters @{ T = $Type; E = $Expect } {
+            param($T, $E)
+            Mock Invoke-E2ERest {}
+            Mock Set-E2EPoolLeftover { throw "not a leftover" }
+            Remove-E2EPoolWorkItem "pid" "proj" ([pscustomobject]@{ id = 5; fields = @{ "System.WorkItemType" = $T } }) "o"
+            Should -Invoke Invoke-E2ERest -Times 1 -Exactly -ParameterFilter { $Path -eq $E -and $Method -eq "DELETE" }
+        }
+    }
+
+    It "keeps a <Type> as a leftover, since no API can delete it" -ForEach @(@{ Type = "Shared Steps" }, @{ Type = "Shared Parameter" }) {
+        InModuleScope E2EAzDo -Parameters @{ T = $Type } {
+            param($T)
+            Mock Invoke-E2ERest { throw "no delete expected" }
+            Mock Set-E2EPoolLeftover {}
+            Remove-E2EPoolWorkItem "pid" "proj" ([pscustomobject]@{ id = 5; fields = @{ "System.WorkItemType" = $T } }) "o"
+            Should -Invoke Set-E2EPoolLeftover -Times 1 -Exactly -ParameterFilter { $Id -eq 5 -and $ProjectName -eq "proj" }
+        }
+    }
+
+    It "leaves leftovers out of queries" {
+        Get-E2EPoolLeftoverFilter | Should -Be "NOT ([System.Title] = 'amte2e-pool leftover' AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter'))"
+    }
+}
+
 Describe "disposable projects (linkscope only)" {
     It "refuses <Case>" -ForEach @(
         @{ Case = "the target org"; Name = "amte2e-x-gone"; Org = "nkdagility-adomt-target"; Msg = "*only nkdagility-adomt-source*" }

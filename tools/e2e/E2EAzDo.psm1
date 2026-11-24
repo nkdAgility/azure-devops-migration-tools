@@ -196,7 +196,8 @@ function Get-E2EWiql([string]$Project, [string]$Wiql, [string]$Org = $script:Def
 }
 
 function Get-E2EAllWorkItems([string]$Project, [string]$Org = $script:DefaultOrg) {
-    $ids = Get-E2EWiql $Project "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '$Project' ORDER BY [System.Id]" $Org | ForEach-Object id
+    # Pool leftovers (Shared Steps and Shared Parameters no API can delete, #3342) are never part of a scenario.
+    $ids = Get-E2EWiql $Project "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '$Project' AND $(Get-E2EPoolLeftoverFilter) ORDER BY [System.Id]" $Org | ForEach-Object id
     if (-not $ids) { return @() }
     # The work items list API takes at most 200 ids per request.
     $ids = @($ids)

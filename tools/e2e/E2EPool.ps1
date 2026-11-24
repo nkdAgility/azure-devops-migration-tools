@@ -151,8 +151,22 @@ function Get-E2EDashboards([string]$ProjectId, [string]$Org) {
     }
 }
 
+# Work items in the project, leftovers left out (FR-004b).
 function Get-E2EProjectWorkItemIds([string]$ProjectId, [string]$Org) {
-    @((Invoke-E2ERest "$ProjectId/_apis/wit/wiql?`$top=5000" -Org $Org -Method POST -Body @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project" }).workItems | ForEach-Object id)
+    @((Invoke-E2ERest "$ProjectId/_apis/wit/wiql?`$top=5000" -Org $Org -Method POST -Body @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND $(Get-E2EPoolLeftoverFilter)" }).workItems | ForEach-Object id)
+}
+
+# Leftovers that are not as FR-004b allows: a leftover with a link or outside pool-leftovers, or any other item in it.
+function Get-E2EPoolLeftoverProblems([string]$ProjectId, [string]$ProjectName, [string]$Org) {
+    $area = "$ProjectName\$($script:LeftoverArea)"
+    $ids = @((Invoke-E2ERest "$ProjectId/_apis/wit/wiql" -Org $Org -Method POST -Body @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND NOT ($(Get-E2EPoolLeftoverFilter))" }).workItems | ForEach-Object id)
+    foreach ($id in $ids) {
+        $w = Invoke-E2ERest "_apis/wit/workitems/$id`?`$expand=relations" -Org $Org
+        if ($w.fields.'System.AreaPath' -ne $area -or @($w.relations | Where-Object { $_ }).Count) { "leftover $id" }
+    }
+    if ((Get-E2EChildNodes $ProjectId Areas $Org).Children | Where-Object name -eq $script:LeftoverArea) {
+        @((Invoke-E2ERest "$ProjectId/_apis/wit/wiql" -Org $Org -Method POST -Body @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND [System.AreaPath] UNDER '$area' AND $(Get-E2EPoolLeftoverFilter)" }).workItems | ForEach-Object { "item $($_.id) in $($script:LeftoverArea)" })
+    }
 }
 
 # A count per surface, read by REST and independent of Clear-E2EPoolProject's own list. -1 means it could not be read.
@@ -166,7 +180,8 @@ function Get-E2EPoolInventory([string]$ProjectId, [string]$Org) {
         workItems          = & $count { Get-E2EProjectWorkItemIds $ProjectId $Org }
         recycleBin         = & $count { Get-E2EList "$ProjectId/_apis/wit/recyclebin" $Org }
         extraTeams         = & $count { Get-E2EList "_apis/projects/$ProjectId/teams?`$top=500" $Org | Where-Object { $_.id -ne $p.defaultTeam.id -and $_.name -ne $script:LeaseTeam } }
-        areaNodes          = & $count { (Get-E2EChildNodes $ProjectId Areas $Org).Children }
+        areaNodes          = & $count { (Get-E2EChildNodes $ProjectId Areas $Org).Children | Where-Object name -ne $script:LeftoverArea }
+        leftoverProblems   = & $count { Get-E2EPoolLeftoverProblems $ProjectId $p.name $Org }
         iterationNodes     = & $count { (Get-E2EChildNodes $ProjectId Iterations $Org).Children }
         queries            = & $count { Get-E2EQueryItems $ProjectId $Org }
         tags               = & $count { Get-E2EList "$ProjectId/_apis/wit/tags" $Org }
@@ -199,11 +214,35 @@ function Invoke-E2EStep([scriptblock]$Step, [string]$What, [System.Collections.G
     }
 }
 
-# Test work items (Test Case, Shared Steps, Shared Parameter) are refused by the work item delete (400); the test case
-# endpoint deletes them permanently. Everything else is destroyed through the work item endpoint.
-$script:TestItemTypes = @("Test Case", "Shared Steps", "Shared Parameter")
-function Remove-E2EPoolWorkItem([string]$ProjectId, $Item, [string]$Org) {
-    if ($Item.fields.'System.WorkItemType' -in $script:TestItemTypes) { Invoke-E2ERest "$ProjectId/_apis/test/testcases/$($Item.id)" -Org $Org -Method DELETE | Out-Null }
+# Test Cases are refused by the work item delete (400); the test case endpoint deletes them permanently. Shared Steps
+# and Shared Parameters have no delete in any REST API (only the web portal can delete them), so they are kept as
+# leftovers (spec FR-004, Martin 2026-11-24 "Tolerate leftovers"): retitled, moved to the area pool-leftovers, every
+# link removed. Every harness query leaves them out (Get-E2EPoolLeftoverFilter). Everything else is destroyed.
+$script:LeftoverTypes = @("Shared Steps", "Shared Parameter")
+$script:LeftoverTitle = "amte2e-pool leftover"
+$script:LeftoverArea = "pool-leftovers"
+
+# The WIQL clause that leaves leftovers out of a query.
+function Get-E2EPoolLeftoverFilter { "NOT ([System.Title] = '$($script:LeftoverTitle)' AND [System.WorkItemType] IN ('$($script:LeftoverTypes -join "','")'))" }
+
+function Set-E2EPoolLeftover([string]$ProjectId, [string]$ProjectName, [int]$Id, [string]$Org) {
+    $areas = Get-E2EChildNodes $ProjectId Areas $Org
+    if (-not ($areas.Children | Where-Object name -eq $script:LeftoverArea)) {
+        Invoke-E2ERest "$ProjectId/_apis/wit/classificationnodes/Areas" -Org $Org -Method POST -Body @{ name = $script:LeftoverArea } | Out-Null
+    }
+    $full = Invoke-E2ERest "_apis/wit/workitems/$Id`?`$expand=relations" -Org $Org
+    $area = "$ProjectName\$($script:LeftoverArea)"
+    $rels = @($full.relations | Where-Object { $_ })
+    if ($full.fields.'System.Title' -eq $script:LeftoverTitle -and $full.fields.'System.AreaPath' -eq $area -and -not $rels.Count) { return }
+    $ops = @(@{ op = "add"; path = "/fields/System.Title"; value = $script:LeftoverTitle }, @{ op = "add"; path = "/fields/System.AreaPath"; value = $area })
+    for ($i = $rels.Count - 1; $i -ge 0; $i--) { $ops += @{ op = "remove"; path = "/relations/$i" } }
+    Invoke-E2ERest "_apis/wit/workitems/$Id`?bypassRules=true&suppressNotifications=true" -Org $Org -Method PATCH -Body (ConvertTo-Json @($ops) -Depth 10) -ContentType "application/json-patch+json" | Out-Null
+}
+
+function Remove-E2EPoolWorkItem([string]$ProjectId, [string]$ProjectName, $Item, [string]$Org) {
+    $type = $Item.fields.'System.WorkItemType'
+    if ($type -eq "Test Case") { Invoke-E2ERest "$ProjectId/_apis/test/testcases/$($Item.id)" -Org $Org -Method DELETE | Out-Null }
+    elseif ($type -in $script:LeftoverTypes) { Set-E2EPoolLeftover $ProjectId $ProjectName $Item.id $Org }
     else { Invoke-E2ERest "_apis/wit/workitems/$($Item.id)?destroy=true" -Org $Org -Method DELETE | Out-Null }
 }
 
@@ -226,7 +265,7 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
         for ($i = 0; $i -lt $ids.Count; $i += 200) {
             $batch = $ids[$i..([Math]::Min($i + 199, $ids.Count - 1))]
             foreach ($wi in @((Invoke-E2ERest "_apis/wit/workitems?ids=$($batch -join ',')&fields=System.WorkItemType" -Org $Org).value)) {
-                Invoke-E2EStep { Remove-E2EPoolWorkItem $pr $wi $Org } "$($wi.fields.'System.WorkItemType') $($wi.id)" $e
+                Invoke-E2EStep { Remove-E2EPoolWorkItem $pr $p.name $wi $Org } "$($wi.fields.'System.WorkItemType') $($wi.id)" $e
             }
         }
         if ($e.Count -gt $before) { break }
@@ -247,7 +286,7 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
     }
     foreach ($g in "Areas", "Iterations") {
         $n = Get-E2EChildNodes $pr $g $Org
-        foreach ($x in $n.Children) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/wit/classificationnodes/$g/$([Uri]::EscapeDataString($x.name))?`$reclassifyId=$($n.Root.id)" -Org $Org -Method DELETE } "$g node $($x.name)" $e }
+        foreach ($x in @($n.Children | Where-Object { $g -ne "Areas" -or $_.name -ne $script:LeftoverArea })) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/wit/classificationnodes/$g/$([Uri]::EscapeDataString($x.name))?`$reclassifyId=$($n.Root.id)" -Org $Org -Method DELETE } "$g node $($x.name)" $e }
     }
     foreach ($x in Get-E2EList "$pr/_apis/wit/tags" $Org) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/wit/tags/$($x.id)" -Org $Org -Method DELETE } "tag $($x.name)" $e }
 
