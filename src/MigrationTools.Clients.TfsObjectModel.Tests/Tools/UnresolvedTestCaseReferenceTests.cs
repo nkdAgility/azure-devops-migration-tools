@@ -105,6 +105,30 @@ namespace MigrationTools.Tests.Tools
         }
 
         [TestMethod, TestCategory("L0")]
+        public void ReRun_LastLinkRemovedFromSource_ResolvesEarlierEntry()
+        {
+            using (var first = Run("20260101000000"))
+            using (first.BeginItem("5593", "Test Case"))
+            {
+                first.MarkChecked(WorkItemReviewCategory.ReferenceLeftOnSource);
+                UnresolvedTestCaseReference.Report(null, first, "Shared Steps", "Microsoft.VSTS.TCM.Steps", "5591", "5593", "9344");
+                first.CompleteCurrentItem();
+            }
+
+            using var second = Run("20260102000000");
+            using (second.BeginItem("5593", "Test Case"))
+            {
+                // The reference and its last link were removed from the source, so the link tool does not run.
+                UnresolvedTestCaseReference.MarkCheckedWithoutLinks(second);
+                second.CompleteCurrentItem();
+            }
+
+            var resolved = WorkItemReviewLog.ReadEntries(second.FilePath).Where(e => e.Category == WorkItemReviewCategory.Resolved).ToList();
+            Assert.AreEqual(1, resolved.Count);
+            Assert.AreEqual("5593", resolved[0].SourceId);
+        }
+
+        [TestMethod, TestCategory("L0")]
         public void ReRun_CheckNotRun_DoesNotResolveEarlierEntry()
         {
             using (var first = Run("20260101000000"))

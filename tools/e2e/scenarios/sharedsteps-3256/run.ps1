@@ -10,8 +10,11 @@ $buildArgs = if ($BuildOutput) { @{ BuildOutput = $BuildOutput } } else { @{} }
 $work = Join-Path ([IO.Path]::GetTempPath()) ("amt-3256-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
 New-Item -ItemType Directory -Force $work | Out-Null
 $failed = @()
+$seeded = $false
+$passed = $false
 try {
     & "$PSScriptRoot\seed.ps1" -Src $Src -Tgt $Tgt
+    $seeded = $true
     foreach ($step in @(@{ Config = "config.json"; Expect = "Unresolved" }, @{ Config = "config-all.json"; Expect = "Resolved" })) {
         $cfg = Join-Path $work $step.Config
         (Get-Content (Join-Path $PSScriptRoot $step.Config) -Raw).Replace("amte2e-3256-src", $Src).Replace("amte2e-3256-tgt", $Tgt) | Set-Content $cfg -Encoding utf8
@@ -21,12 +24,16 @@ try {
         & "$PSScriptRoot\assert.ps1" -Src $Src -Tgt $Tgt -LogDirectory $logs -Expect $step.Expect
         if ($LASTEXITCODE -ne 0) { $failed += "$($step.Expect) assertions exit $LASTEXITCODE" }
     }
+    $passed = -not $failed
 }
 finally {
-    Remove-E2EProject $Src -Org nkdagility-adomt-source
+    # The seed creates the target project first; the source is ours to delete only once the seed has finished.
+    if ($seeded) { Remove-E2EProject $Src -Org nkdagility-adomt-source }
     Remove-E2EProject $Tgt -Org nkdagility-adomt-target
     Remove-Item (Join-Path $PSScriptRoot "state.local.json") -ErrorAction SilentlyContinue
-    Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue
+    # Keep the migration logs when anything failed, so the failure can be read without another run.
+    if ($passed) { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
+    else { Write-Warning "sharedsteps-3256 logs kept in $work" }
 }
 if ($failed) { Write-Error "sharedsteps-3256 failed: $($failed -join '; ')"; exit 1 }
 "sharedsteps-3256 passed"

@@ -23,5 +23,14 @@ namespace MigrationTools.Tools
                 $"Migrate the {kind} (include '{kind}' in the WIQL query), then re-run to remap the reference.",
                 sourceId: testCaseSourceId, targetId: testCaseTargetId);
         }
+
+        /// <summary>
+        /// Marks the check as done for a work item with no source links: with no Shared Steps or Shared Parameter
+        /// link left, no reference can be unresolved, so an earlier entry for the item is resolved.
+        /// </summary>
+        public static void MarkCheckedWithoutLinks(WorkItemReviewLog reviewLog)
+        {
+            reviewLog?.MarkChecked(WorkItemReviewCategory.ReferenceLeftOnSource);
+        }
     }
 }

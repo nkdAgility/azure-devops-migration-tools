@@ -1309,6 +1309,10 @@ namespace MigrationTools.Processors
                     _reviewLog.MarkChecked(WorkItemReviewCategory.LinkLeftOnSource);
                 }
             }
+            if (targetWorkItem != null && sourceWorkItem.ToWorkItem().Links.Count == 0)
+            {
+                UnresolvedTestCaseReference.MarkCheckedWithoutLinks(_reviewLog);
+            }
             if (targetWorkItem != null && CommonTools.WorkItemLink.Enabled && sourceWorkItem.ToWorkItem().Links.Count > 0)
             {
                 TraceWriteLine(LogEventLevel.Information, "Links {SourceWorkItemLinkCount} | LinkMigrator:{LinkMigration}", new Dictionary<string, object>() { { "SourceWorkItemLinkCount", sourceWorkItem.ToWorkItem().Links.Count }, { "LinkMigration", CommonTools.WorkItemLink.Enabled } });
