@@ -192,7 +192,19 @@ function Test-E2EPoolClear([string]$ProjectId, [string]$Org) {
 }
 
 function Invoke-E2EStep([scriptblock]$Step, [string]$What, [System.Collections.Generic.List[string]]$Errors) {
-    try { & $Step | Out-Null } catch { $Errors.Add("${What}: $($_.Exception.Message)") }
+    try { & $Step | Out-Null }
+    catch {
+        $msg = try { ($_.ErrorDetails.Message | ConvertFrom-Json).message } catch { $null }
+        $Errors.Add("${What}: $(if ($msg) { $msg } else { $_.Exception.Message })")
+    }
+}
+
+# Test work items (Test Case, Shared Steps, Shared Parameter) are refused by the work item delete (400); the test case
+# endpoint deletes them permanently. Everything else is destroyed through the work item endpoint.
+$script:TestItemTypes = @("Test Case", "Shared Steps", "Shared Parameter")
+function Remove-E2EPoolWorkItem([string]$ProjectId, $Item, [string]$Org) {
+    if ($Item.fields.'System.WorkItemType' -in $script:TestItemTypes) { Invoke-E2ERest "$ProjectId/_apis/test/testcases/$($Item.id)" -Org $Org -Method DELETE | Out-Null }
+    else { Invoke-E2ERest "_apis/wit/workitems/$($Item.id)?destroy=true" -Org $Org -Method DELETE | Out-Null }
 }
 
 # Clears what scenarios create (research R3), in an order where nothing still refers to what is removed.
@@ -211,7 +223,12 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
         $ids = Get-E2EProjectWorkItemIds $pr $Org
         if (-not $ids.Count) { break }
         $before = $e.Count
-        foreach ($id in $ids) { Invoke-E2EStep { Invoke-E2ERest "_apis/wit/workitems/$id`?destroy=true" -Org $Org -Method DELETE } "work item $id" $e }
+        for ($i = 0; $i -lt $ids.Count; $i += 200) {
+            $batch = $ids[$i..([Math]::Min($i + 199, $ids.Count - 1))]
+            foreach ($wi in @((Invoke-E2ERest "_apis/wit/workitems?ids=$($batch -join ',')&fields=System.WorkItemType" -Org $Org).value)) {
+                Invoke-E2EStep { Remove-E2EPoolWorkItem $pr $wi $Org } "$($wi.fields.'System.WorkItemType') $($wi.id)" $e
+            }
+        }
         if ($e.Count -gt $before) { break }
     }
     foreach ($x in Get-E2EList "$pr/_apis/wit/recyclebin" $Org) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/wit/recyclebin/$($x.id)" -Org $Org -Method DELETE } "recycled work item $($x.id)" $e }
