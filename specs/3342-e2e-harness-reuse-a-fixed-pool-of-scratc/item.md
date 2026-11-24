@@ -177,3 +177,81 @@ Plan agreed: Approve plan
 Building over the WIP limit: Martin, 2026-11-24, "go over the WIP limit, it's expedite". The board stays Specified until a Building slot frees (the workflow tool has no WIP override).
 
 Spec revised (FR-014, US6, SC-001, SC-008: linkscope keeps a disposable source-org project). Spec agreed: Approve
+
+## Spec
+
+Working spec: `specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md` (deleted once reconciled into platform/specs/).
+
+Spec presented: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256 d48c03c519689cc27e79af8c5d8aae16dd7e68ce36cf0ffaa6fe769c9245771e
+
+## Red team
+
+# Challenge: #3342 e2e-harness reuses a fixed pool of scratch projects
+
+Target: `specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md` and `item.md`. Checked against `tools/e2e/E2EAzDo.psm1` and `.specify/memory/proof.ps1`.
+
+The stock clarify, checklist and analyze steps are not repeated. This attacks the idea.
+
+### F1 The premise that deleted projects use up the limit is not checked
+The whole case rests on soft-deleted projects counting toward the 1,000-project limit. `item.md` says "Not re-checked here" for the 49 live and 951 deleted figures. 49 + 951 = 1,000 fits the claim, but no one has seen a create refused for that reason. If the real limit counts only live projects, or the failure is something else (rate limit, name reservation after delete), the pool fixes nothing and costs a lot of machinery.
+Settled by: one live `POST _apis/projects` on the target org, recording the exact refusal message and code, and the Microsoft limit wording for deleted projects.
+
+### F2 Renaming a project does not rename what hangs off its old name
+FR-006 renames the pool project to the seed's name. These names survive a rename: the default repo (created with the project's original name), the default team (`<original> Team`), and pipeline and dashboard names. Adopted projects keep their old per-run names, for example `amte2e-p11231341-git-src`, in those places. A scenario or assertion that looks up repo `<project>` or team `<project> Team` finds nothing or the wrong thing. "Remove repos except the default" also keeps a default repo that is named after a project that no longer exists.
+Settled by: rename one live pool project, then read its default repo and default team names. If they stay, specify what the take does about them, or list the scenarios that depend on them as not poolable.
+
+### F3 "Clear" is a hand-written list, and the default repo's contents are not on it
+FR-004 clears work items, teams, nodes, queries, extra repos, pipelines, variable groups and test plans. The default repo is kept, so its branches, commits, tags, pull requests and policies carry over. `git` and `prlinks-3286` create exactly those. Also left behind: work item tags (project-scoped definitions, `tags` scenario), test runs and results, attachments, dashboards, boards and backlog settings, service connections, environments, wikis, project and repo permissions, and team iteration and area settings. SC-004 only checks the same list, so it cannot detect anything missing.
+Settled by: a diff of "everything a fresh project holds" against a cleared one, from the REST surface (repos, refs, PRs, tags, dashboards, environments, security namespaces). Then either add each item to FR-004 or make the scenario not poolable. Also state that SC-004's check is that diff, not the list.
+
+### F4 Release does not return the project to a process the cleanup can delete
+FR-005 switches the project to the seed's process on take. FR-007 release clears and renames, but says nothing about the process. A project left on a per-scenario process holds it, so `Remove-E2EObjects.ps1` cannot delete that process, because Azure DevOps refuses to delete a process that has projects on it. The process list and the `Custom.amte2e*` field list then grow, which is the leak the item set out to stop, moved from projects to processes.
+Settled by: switch the project back to `amte2e-agile` on release, and add a SC that the process count is unchanged after a run.
+
+### F5 The process switch is proven for one case only
+`item.md` proved a switch from a per-run inherited process to `amte2e-agile`, with an empty project. The pool needs the opposite direction too: `amte2e-agile` to a process with added fields, rules, a custom work item type, or the NoBug process. Migrating can be refused for custom work item types or states, and it is asynchronous with no stated timeout. FR-005's "confirm it by reading the project's process type" does not check that a custom process's fields and rules are active in the project.
+Settled by: live switch of an empty pool project onto each distinct process the 30 seeds use, with the work item types read back. Record which are refused and list those scenarios as not poolable now, not during the build.
+
+### F6 Taking over an expired lease can race, and renewal has no owner
+US3 covers two takers creating the lease team. It does not cover two takers both finding the same expired lease. Taker A deletes the stale team and creates its own. Taker B, which read the stale team earlier, then deletes by name and removes A's new lease, and B's create succeeds. Both now hold the project, and the destroy-work-items clear runs under a live proof. The spec says renewal is "by the taker while it holds the project" but names no heartbeat. A scenario that outlasts 4 hours, or a hung machine that wakes up, gets its project cleared mid-run. The expiry is compared against each machine's own clock.
+Settled by: delete the stale lease by team id and expected description, so a replaced lease is not deleted. Specify a renewal loop with its interval, and a taker re-checks that it still owns the lease before each destructive step. Use the server's time for expiry, for example the team creation date.
+
+### F7 A crash blocks the pool for the length of the lease
+A proof that dies leaves its projects leased for up to 4 hours. With a pool of 6 and a 4-project scenario, one crash leaves 2 free, and every later proof, including a retry of the same one, fails with FR-008 until the lease expires. The spec relies on "the lease expires" for crash recovery, but crashes are the common case for a harness under development. The same owner retrying its own crashed run is treated like a stranger.
+Settled by: the proof releases in a `finally` and, on start, releases leases whose claimant is its own previous run on this machine. The claimant name should include machine and process id so a dead local run can be told from a live remote one. Also consider a shorter lease with renewal.
+
+### F8 The pool is too small for the concurrency the lease exists to allow
+FR-010 sets the size to the largest scenario plus a spare, giving 6 for "at most 4". US3 exists so that two proofs, for example CI and a worker, can run at once, which needs about 8 projects, and a third needs 12. The 2 spare do not cover another live proof. The claim "at most 4" is also unchecked: `linkscope` makes five `New-E2EProject`/`Remove-E2EProject` calls, `rerun-3299-crossproject` four, `git` three, and `picklists` creates projects in a loop with no stated bound. These counts are calls, not projects per org.
+Settled by: count the distinct projects per org per scenario from the seeds (and the `picklists` loop bound). Size the pool as (the largest count) times (the number of proofs that may run at once), and say what that number is.
+
+### F9 The adopt step renames projects that people or other runs are using now
+FR-011 takes the first 6 live `amte2e-*`/`amt3326-*` per org, in name order, then clears them on first take. Those include `amt3326-*` projects that belong to an issue worker who may be working in them today, and `amte2e-*` projects of a proof running right now. Renaming one mid-run breaks it, and the first take then destroys its work items. The projects left over keep names that may collide with seed-hard-coded names (`amte2e-git-src`), so a take fails with "rename target already exists" for ever.
+Settled by: adopt only projects whose newest work item or repo activity is older than a stated age, or that the owner lists by name. List the unadopted projects whose names equal a seed's hard-coded name, and decide what happens to them before adoption.
+
+### F10 Destroying work items depends on a permission nobody has confirmed
+Q-4 settles on destroy, and the spec ends with "if the harness cannot, this spec changes". That puts a hard dependency in the Assumptions of an approved spec. Rename of a project, process migration, and removing repos and pipelines each need their own permission too (project administrator or collection administrator), and the spec names only the work item one. The 49 live projects were created under possibly different identities.
+Settled by: a live probe with the harness's own sign-in, in a pool candidate: destroy one work item, rename, migrate process, delete a repo and a pipeline. Record each result in the spec before approving it.
+
+### F11 A simpler way to reach the same outcome: stable names per scenario, no rename
+The pool needs a lease team, a rename, a process switch back and forth, and an adopt step, and each of these has a finding above (F2, F4, F5, F6, F9). The limit problem comes from creating and deleting projects with new names every run. Give each scenario project a fixed name (`amte2e-<scenario>-src`, `-tgt`), never delete it, and clear it in `New-E2EProject` when found. At roughly 2 to 4 projects over 30 scenarios that is under about 100 projects per org, far below 1,000, and the count stays constant. There is no rename, so repo and team names stay valid and hard-coded names such as `amte2e-git-src` work as they are. There is no process switch, since a scenario's project stays on its own process. `linkscope` is a name that never exists, as US6 already proposes. The lease team and the clear stay, so cross-machine safety and F3 are unchanged. The cost is about 100 permanent projects instead of 6, and a project is idle between uses.
+Settled by: compare the two on the F2, F4, F5 and F9 failures. If the one-org count (for example 100 of 1,000, with the 951 deleted aging out) is acceptable to Martin, prefer stable names.
+
+### F12 Ids and history assumptions are asserted, not checked
+"Scenarios that need fresh ids already do not rely on this" is stated for 30 seeds without a check. Cleared projects also lose nothing the source side needs (`ReflectedWorkItemId` carries the source project name, which now differs per take), and a target project that used to be new now has had thousands of destroyed work items, which can slow queries and count against org limits for destroyed-item metadata.
+Settled by: grep the 30 `assert.ps1` files for literal ids, revision counts, or project names in `ReflectedWorkItemId`, and run two scenarios back to back through a reused project to compare results.
+
+### F13 Success is measured in ways the change can pass while the aim fails
+SC-001 compares live and deleted counts before and after "any number of runs". It would pass even if processes, fields, repos or tags grow without bound (F3, F4), and it cannot be measured at all if an unrelated person deletes a project during the run. SC-002 says all scenarios pass "through the pool" but the acceptable not-poolable set is open ended, so a design that excludes most scenarios would pass.
+Settled by: add a bound on the not-poolable list, for example at most 3 of the 30, and add the process and field counts to SC-001.
+
+
+## Dispositions
+
+Each finding is settled in spec.md, "Challenge dispositions", with the live checks in "Checked live before approval". F11 is rejected there with its reason.
+
+Open findings: 0
+
+
+
+Spec agreed: Approve
+Spec version: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256 d48c03c519689cc27e79af8c5d8aae16dd7e68ce36cf0ffaa6fe769c9245771e
