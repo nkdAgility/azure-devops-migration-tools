@@ -271,6 +271,27 @@ Discovers and documents:
 
 ---
 
+### tools/e2e/Remove-E2EObjects.ps1
+
+**Path:** `tools/e2e/Remove-E2EObjects.ps1`
+
+**Purpose:** Deletes e2e scratch objects from the test organisations: projects, inherited processes and `Custom.amte2e*` fields, in that order, and lists leftovers.
+
+**Usage:**
+```powershell
+.\tools\e2e\Remove-E2EObjects.ps1 -Prefix amte2e-3278- -WhatIf   # list what one issue's cleanup would delete
+.\tools\e2e\Remove-E2EObjects.ps1 -Prefix amte2e-3278-           # delete one issue's objects
+.\tools\e2e\Remove-E2EObjects.ps1 -All                           # delete every e2e object
+```
+
+**Parameters:** `-Prefix` or `-All` (one is required), `-Organisations` (defaults to the test orgs), `-WhatIf`.
+
+**Scope:** `-Prefix amt<issue>-` or `amte2e-<issue>-` deletes that issue's projects and processes and the fields named `Custom.amte2e<issue>…`, but not those of a longer number that starts with it. Any other prefix, such as `amte2e-fields-`, deletes its projects and processes but no fields, warns, and exits 1. A prefix that every e2e object starts with (`amte2e-`, `amte2e`, or empty) is refused; use `-All`. Every field a scenario creates is named `amte2e<issue>…`, with the number of the issue it belongs to, so an issue's cleanup removes all its fields.
+
+**Tests:** `tools/e2e/Remove-E2EObjects.Tests.ps1` (Pester 5+, every Azure DevOps call mocked), run on pull requests that change `tools/e2e/` by `.github/workflows/e2e-harness-tests.yml`.
+
+---
+
 ## Architecture Patterns
 
 ### TFS Object Model vs REST API
