@@ -334,3 +334,28 @@ Open findings: 0
 Spec revised (FR-004, FR-004a, FR-004b: Shared Steps and Shared Parameters kept as leftovers).
 Spec agreed: Approve
 Spec version: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256 ba52a227862945b18c3d3a61fa556c449a61f993b899398423981b9922f4ffd1
+
+## Output done evidence
+
+Commit a12dd8c7, 2026-11-24, harness sign-in (az login, Entra ID).
+
+- main, before: main's New-E2EProject on the target org fails: "Failed to add a project as this organization already has 1000 projects". EXIT CODE: 1.
+- Pool adopted by rename, nothing created or deleted: target 48 (amte2e-pool-01..48), source 46; live 49 -> 49 and 47 -> 47. migrationSource1/migrationTarget1 skipped ("used by the automated tests").
+- Test-E2EPool.ps1 -Case Cycle: 14 of 14 PASS, EXIT CODE: 0 (both orgs: empty by inventory, process switched, renamed with team and repo, given back to amte2e-pool-NN on amte2e-agile, no lease, counts unchanged).
+- -Case Race -Trials 10: 10 of 10 PASS, EXIT CODE: 0 (first run 9 of 10: a dropped connection, fixed by retrying requests that got no response, never a POST).
+- -Case Lease: 6 of 6 PASS, EXIT CODE: 0 (held left alone; expired and orphaned taken over; half-filled project cleared on take).
+- -Case Scenario -Scenario wicore -Runs 2: 4 of 4 PASS, EXIT CODE: 0; live, deleted, process and Custom.amte2e* field counts equal before and after in both orgs.
+- Pester (tools/e2e): 55 passed, 0 failed.
+- done-checks.ps1: build OK; dotnet test 838 passed, 0 failed, 4 skipped (L2/L3 live on the test orgs); proof: all 10 runnable scenarios passed through the pool, "pool projects used: nkdagility-adomt-source/amte2e-pool-25, nkdagility-adomt-target/amte2e-pool-43", "released: ... (cleared)". DONE-CHECKS EXIT CODE: 0.
+- linkscope by hand (not run by the proof): 15 of 15 PASS, ASSERT EXIT CODE: 0; gone project made and deleted in the source org only; its 3 pool projects given back.
+- Found while building and settled with Martin: linkscope keeps a disposable source-org project (FR-014); Shared Steps and Shared Parameters, which no REST API deletes, are kept as leftovers (FR-004b).
+- Cleanup: Remove-E2EObjects.ps1 -Prefix amte2e-3342- deleted this item's 11 scratch processes, EXIT CODE: 0. Target org afterwards: live 49, deleted 951, pool 48 free. Source: live 47, deleted 809 (807 + 2 linkscope gone projects).
+- Docs updated: e2e-harness: `platform/specs/e2e-harness/cleanup.md`: "The scratch project pool"; e2e-harness: `platform/specs/e2e-harness/scenarios.md`: "Not poolable"; e2e-harness: `platform/specs/architecture.md`: "Scratch project pool".
+
+Not covered: the multi-step and not-covered scenarios (testplans, users, git and others the proof lists as not covered) were not run through the pool; their seeds use New-E2EProject unchanged. A concurrent proof from a second machine was not run; Race covers two processes on one machine against the same org-side claim.
+
+Confidence: 88%
+Reasons:
+- Every live check, the full test suite and the proof pass on this commit, and the target org's counts are unchanged.
+- Two spec gaps surfaced only on live data (linkscope, Shared Steps); others of that kind may remain in the scenarios the proof does not cover.
+- Not proven across two machines, though the claim is enforced by the service, not the machine.
