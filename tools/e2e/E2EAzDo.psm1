@@ -93,29 +93,25 @@ function Remove-E2EProcess([string]$Name, [string]$Org = $script:DefaultOrg) {
     if ($id) { Invoke-E2ERest "_apis/work/processes/$id" -Org $Org -Method DELETE | Out-Null }
 }
 
+# Projects come from the scratch project pool (E2EPool.ps1, #3342): deleted projects count toward the org's
+# 1,000-project limit for about 28 days, so the harness never creates or deletes one. New-E2EProject takes a free
+# pool project, clears it, puts it on $Process and renames it $Name; Remove-E2EProject gives it back.
+. (Join-Path $PSScriptRoot "E2EPool.ps1")
+
 function New-E2EProject {
-    param([Parameter(Mandatory)][string]$Name, [string]$Process = "Agile", [string]$Org = $script:DefaultOrg)
-    Assert-E2EName $Name
-    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
-    if ($p) { return $p }
-    $processId = Get-E2EProcessId $Process $Org
-    if (-not $processId) { throw "Process '$Process' not found in $Org. Run tools/e2e/Initialize-E2EEnvironment.ps1 first." }
-    $op = Invoke-E2ERest "_apis/projects" -Org $Org -Method POST -Body @{
-        name = $Name; description = "AMT e2e regression scratch project"
-        capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = $processId } }
-    }
-    Wait-E2EOperation $op | Out-Null
-    # A new project can take a while to be readable by name, and its classification nodes longer, after the operation succeeds.
+    param([Parameter(Mandatory)][string]$Name, [string]$Process = "amte2e-agile", [string]$Org = $script:DefaultOrg)
+    # The pool's projects all derive from Agile; plain "Agile" (the old default) means the shared amte2e-agile.
+    if ($Process -eq "Agile") { $Process = "amte2e-agile" }
+    $p = Request-E2EPoolProject -Name $Name -Process $Process -Org $Org
+    # Classification nodes can lag a rename; wait until the project answers by its new name.
     for ($i = 0; ; $i++) {
-        try { $p = Invoke-E2ERest "_apis/projects/$Name" -Org $Org; Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null; return $p }
+        try { Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null; return $p }
         catch { if ($i -ge 19) { throw }; Start-Sleep -Seconds 3 }
     }
 }
 
 function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
-    Assert-E2EName $Name
-    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
-    if ($p) { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null }
+    Reset-E2EPoolProject -Name $Name -Org $Org | Out-Null
 }
 
 # -Prefix selects one issue's scratch objects (for example "amt3242-"); it must itself pass Assert-E2EName.
@@ -186,4 +182,4 @@ function Get-E2EAttachmentBytes([string]$Url) {
     [byte[]]$response.RawContentStream.ToArray()
 }
 
-Export-ModuleMember -Function *-E2E*, Initialize-E2E, Assert-E2EName
+Export-ModuleMember -Function *-E2E*, Initialize-E2E, Assert-E2EName, Get-E2EPoolInventory
