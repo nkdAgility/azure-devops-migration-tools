@@ -359,3 +359,9 @@ Reasons:
 - Every live check, the full test suite and the proof pass on this commit, and the target org's counts are unchanged.
 - Two spec gaps surfaced only on live data (linkscope, Shared Steps); others of that kind may remain in the scenarios the proof does not cover.
 - Not proven across two machines, though the claim is enforced by the service, not the machine.
+
+## Docs updated
+
+- e2e-harness: `platform/specs/e2e-harness/cleanup.md`: The scratch project pool
+- e2e-harness: `platform/specs/e2e-harness/scenarios.md`: Not poolable
+
