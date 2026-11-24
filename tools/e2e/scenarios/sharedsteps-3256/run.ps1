@@ -27,13 +27,14 @@ try {
     $passed = -not $failed
 }
 finally {
+    # Keep the migration logs when anything failed, so the failure can be read without another run. This runs
+    # first, so the path is printed even if a project deletion below throws.
+    if ($passed) { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
+    else { Write-Warning "sharedsteps-3256 logs kept in $work" }
+    Remove-Item (Join-Path $PSScriptRoot "state.local.json") -ErrorAction SilentlyContinue
     # The seed creates the target project first; the source is ours to delete only once the seed has finished.
     if ($seeded) { Remove-E2EProject $Src -Org nkdagility-adomt-source }
     Remove-E2EProject $Tgt -Org nkdagility-adomt-target
-    Remove-Item (Join-Path $PSScriptRoot "state.local.json") -ErrorAction SilentlyContinue
-    # Keep the migration logs when anything failed, so the failure can be read without another run.
-    if ($passed) { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
-    else { Write-Warning "sharedsteps-3256 logs kept in $work" }
 }
 if ($failed) { Write-Error "sharedsteps-3256 failed: $($failed -join '; ')"; exit 1 }
 "sharedsteps-3256 passed"
