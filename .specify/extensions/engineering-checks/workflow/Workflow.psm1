@@ -539,8 +539,8 @@ function Test-Move {
     if ($fromDef.kind -eq 'end') { $failures.Add("$from is finished; it cannot move") }
     elseif (-not ($To -eq $next -or $isBack -or $To -eq 'Removed')) { $failures.Add("$from cannot move to $To; the next state is $next") }
 
-    # WIP limit of the state being entered.
-    if ($toDef.wipLimit -and $AllItems) {
+    # WIP limit of the state being entered; an Expedite item is not held by it.
+    if ($toDef.wipLimit -and $AllItems -and -not ($Config.tags.expedite -and @($Item.tags) -contains $Config.tags.expedite)) {
         $inTarget = @($AllItems | Where-Object { $_.state -eq $To -and "$($_.id)" -ne "$($Item.id)" }).Count
         if ($inTarget -ge $toDef.wipLimit) { $failures.Add("$To is full ($inTarget of $($toDef.wipLimit))") }
     }
@@ -759,7 +759,8 @@ function Invoke-WorkflowManager {
         $all = @(& $Adapter.GetItems)
         $free = if ($next.wipLimit) { $next.wipLimit - @($all | Where-Object { $_.state -eq $next.name }).Count } else { [int]::MaxValue }
         foreach ($cand in @(Get-PullOrder $Config @($all | Where-Object { $_.state -eq $w.name -and $_.tags -notcontains $blocked -and -not ($w.name -eq 'Refined' -and (Test-IsParent $_)) }))) {
-            if ($free -le 0) { break }
+            # An Expedite item is pulled even into a full state; the others wait for a free slot.
+            if ($free -le 0 -and -not ($Config.tags.expedite -and @($cand.tags) -contains $Config.tags.expedite)) { break }
             # Which worker owns an item is kept in the board state (an older "WKR:" line on the item still counts).
             $owner = Get-StoredWkr $cand.id
             if (-not $owner) { $legacy = [regex]::Match((Get-ItemEvidence $cand $Root), '(?m)^WKR:\s*(\S+)'); if ($legacy.Success) { $owner = $legacy.Groups[1].Value } }
