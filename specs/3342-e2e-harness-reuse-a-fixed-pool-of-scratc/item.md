@@ -168,3 +168,6 @@ Each finding is settled in spec.md, "Challenge dispositions", with the live chec
 Open findings: 0
 
 
+
+Spec agreed: approved.
+Spec version: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256 822601652e1c35fd157a70a468c6f40906f1046c640c4aba61ef2a6be105d987
