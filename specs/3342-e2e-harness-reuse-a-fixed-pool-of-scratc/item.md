@@ -77,3 +77,13 @@ Open findings: 0
 - Q-4 Delete or destroy work items when clearing? settled by the worker: destroy (delete, then purge from the recycle bin). Ids are org-wide either way, so neither choice resets them. Destroying leaves nothing behind for later queries to trip on. Only one option survives, unless the harness identity lacks the permission; that is checked when building, and if so the spec changes.
 - Q-5 Where does the claim live? settled: in the org, as a lease team `amte2e-pool-lease` in the project. It is atomic (proven live), and its description holds the claimant and an expiry, so a crashed run's claim can be taken over after it expires.
 - Q-6 Pool size per org: settled in the spec from the largest scenario's project count (for the worker).
+
+## Outcome checks
+
+- e2e-harness, target and source orgs: a project taken from the pool is empty by inventory, on the requested process, renamed, and after release is `amte2e-pool-NN` on `amte2e-agile` with no lease team; pass = exit 0 and every case PASS: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Cycle`
+- e2e-harness, target org: two takes started at once never get the same project, over 10 trials; pass = exit 0 and 10/10 distinct: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Race -Trials 10`
+- e2e-harness, target org: an expired lease and a dead local claimant's lease are taken over, a live lease is left alone, and a project left half-filled is cleared on take; pass = exit 0 and every case PASS: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Lease`
+- e2e-harness, both orgs: the adopt step renames eligible projects into the pool, creates none, skips migrationSource1/migrationTarget1 and recently changed or leased projects, and a second run changes nothing; pass = exit 0 and live project count unchanged: `pwsh -NoProfile -File tools/e2e/Initialize-E2EPool.ps1 -WhatIf; pwsh -NoProfile -File tools/e2e/Initialize-E2EPool.ps1; pwsh -NoProfile -File tools/e2e/Initialize-E2EPool.ps1`
+- e2e-harness, both orgs: a scenario (wicore) runs twice through the pool and passes; live, deleted, process and Custom.amte2e* field counts are the same before and after; pass = exit 0 and counts equal: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Scenario -Scenario wicore -Runs 2`
+- e2e-harness, cleanup: `-All` and per-issue prefix never delete a pool project, and the pool mode releases every lease; pass = exit 0 (Pester): `pwsh -NoProfile -Command "Invoke-Pester tools/e2e -CI"`
+- product, src unchanged; pass = exit 0 and no output: `git diff --quiet origin/main -- src`
