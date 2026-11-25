@@ -49,7 +49,10 @@ foreach ($org in $Organisations) {
     # Projects are never deleted (#3342): a deleted project counts toward the org's 1,000-project limit for about 28 days.
     # Pool projects leased under this prefix are given back (cleared, back on amte2e-agile, renamed amte2e-pool-NN), so
     # the processes they used can be deleted below. Any other project of the prefix is left and reported.
+    # A lease a live run still holds is left alone (only -ClearPool overrides it): -All and a prefix only give back
+    # projects whose run has expired or exited.
     foreach ($h in @(Get-E2EPoolProject -Org $org -All | Where-Object { $_.Lease -and ($ClearPool -or $_.Name.StartsWith($Prefix)) })) {
+        if (-not $ClearPool -and $h.State -eq "Held") { "kept pool project $org/$($h.Name): held by a live run ($($h.Lease.Token)) until $($h.Lease.Expires.ToString('o'))"; continue }
         if (-not $PSCmdlet.ShouldProcess("$org/$($h.Name)", "Release pool project (held by $($h.Lease.Token))")) { "would release $org/$($h.Name) -> $(Format-E2EPoolName $h.Slot) (held by $($h.Lease.Token))"; continue }
         try { $slot = Reset-E2EPoolProject -Name $h.Name -Org $org -Force; "released $org/$($h.Name) -> $slot (cleared)" } catch { $leftovers += "pool project $org/$($h.Name): $($_.Exception.Message)" }
     }

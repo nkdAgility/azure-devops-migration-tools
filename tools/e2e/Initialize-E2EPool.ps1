@@ -36,6 +36,16 @@ function Get-LastChange($Project, [string]$Org) {
     ($dates | ForEach-Object { $_.ToUniversalTime() } | Measure-Object -Maximum).Maximum
 }
 
+# projectprocessmigration only moves a project between processes with the same parent, and the pool's base process,
+# amte2e-agile, inherits from Agile.
+$agile = "adcc42ab-9882-485e-a3ed-7678f01f66bc"
+function Test-AgileBased($Project, [string]$Org) {
+    $id = Get-E2EProjectProcessId $Project.id $Org
+    if ($id -eq $agile) { return $true }
+    $proc = try { Invoke-E2ERest "_apis/work/processes/$id" -Org $Org } catch { $null }
+    $proc -and $proc.parentProcessTypeId -eq $agile
+}
+
 $failed = $false
 foreach ($org in $Organisations) {
     $all = @((Invoke-E2ERest "_apis/projects?`$top=1000" -Org $org).value)
@@ -48,6 +58,7 @@ foreach ($org in $Organisations) {
         elseif (-not (Test-E2EGuardedName $p.name)) { $why = "outside the harness name guard" }
         elseif (Get-E2EPoolSlot $p.name) { continue }
         elseif ($lease = Get-E2EPoolLease $p.id $org) { $why = "leased by $($lease.Token)" }
+        elseif (-not (Test-AgileBased $p $org)) { $why = "its process is not Agile or inherited from Agile, so a take could never switch it" }
         elseif (-not @($Include | Where-Object { $p.name -like $_ }).Count) {
             $last = Get-LastChange $p $org
             if ($last -gt [datetime]::UtcNow.AddHours(-$MinIdleHours)) { $why = "changed in the last $MinIdleHours hours ($($last.ToString('o')))" }

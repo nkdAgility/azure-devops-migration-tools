@@ -114,15 +114,20 @@ Describe "Request-E2EPoolProject" {
         }
     }
 
-    It "frees its lease when clearing fails after the claim" {
+    It "keeps a failed slot's lease and tries the next slot" {
         InModuleScope E2EAzDo {
             Mock Invoke-E2ERest { throw "404" } -ParameterFilter { $Path -eq "_apis/projects/amte2e-x-tgt" }
-            Mock Get-E2EPoolProject { @([pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }) }
+            Mock Get-E2EPoolProject { @([pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }, [pscustomobject]@{ Id = "p2"; Name = "amte2e-pool-02"; Slot = 2; Lease = $null; State = "Free" }) }
             Mock New-E2EPoolLease { $true }
-            Mock Clear-E2EPoolProject { throw "VS403000 no permission to destroy" }
+            Mock Clear-E2EPoolProject { throw "VS403000 no permission to destroy" } -ParameterFilter { $ProjectId -eq "p1" }
+            Mock Clear-E2EPoolProject {}
+            Mock Switch-E2EPoolProcess {}
+            Mock Rename-E2EPoolProject {}
+            Mock Set-E2EPoolLease {}
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p2"; name = "amte2e-x-tgt" } } -ParameterFilter { $Path -eq "_apis/projects/p2" }
             Mock Remove-E2EPoolLease {}
-            { Request-E2EPoolProject -Name "amte2e-x-tgt" -Org "nkdagility-adomt-target" } | Should -Throw "*failed and its lease was freed*VS403000*"
-            Should -Invoke Remove-E2EPoolLease -Times 1 -Exactly
+            (Request-E2EPoolProject -Name "amte2e-x-tgt" -Org "nkdagility-adomt-target").PoolSlot | Should -Be 2
+            Should -Invoke Remove-E2EPoolLease -Times 0 -Exactly
         }
     }
 

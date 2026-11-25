@@ -325,6 +325,15 @@ function Switch-E2EPoolProcess([string]$ProjectId, [string]$Process, [string]$Or
         if ($i -ge 20) { throw "Project $ProjectId in $Org did not switch to process '$Process'." }
         Start-Sleep -Seconds 3
     }
+    # The switch is confirmed by the work item types too: the project must offer every type the process defines.
+    $want = @((Invoke-E2ERest "_apis/work/processes/$typeId/workitemtypes" -Org $Org).value | Where-Object { -not $_.isDisabled } | ForEach-Object name)
+    for ($i = 0; ; $i++) {
+        $have = @((Invoke-E2ERest "$ProjectId/_apis/wit/workitemtypes" -Org $Org).value | ForEach-Object name)
+        $missing = @($want | Where-Object { $_ -notin $have })
+        if (-not $missing) { break }
+        if ($i -ge 20) { throw "Project $ProjectId in $Org is on '$Process' but lacks its work item types: $($missing -join ', ')." }
+        Start-Sleep -Seconds 3
+    }
 }
 
 function Rename-E2EPoolProject([string]$ProjectId, [string]$Name, [string]$Org) {
@@ -367,12 +376,14 @@ function Request-E2EPoolProject {
     }
 
     $pool = @(Get-E2EPoolProject -Org $Org)
-    $candidates = @($pool | Where-Object State -eq "Free") + @($pool | Where-Object State -in "Expired", "Orphaned")
-    if (-not $candidates.Count) {
-        # A crashed run's projects keep the seed's name, so look at every guarded project for an expired lease.
-        $pool = @(Get-E2EPoolProject -Org $Org -All)
-        $candidates = @($pool | Where-Object State -in "Free", "Expired", "Orphaned")
-    }
+    # Free pool-named slots first, then stale leases, then (a crashed run's projects keep the seed's name) every other
+    # guarded project with a stale lease.
+    $all = @(Get-E2EPoolProject -Org $Org -All)
+    $poolIds = @($pool.Id)
+    $others = @($all | Where-Object { $_.Id -notin $poolIds -and $_.State -in "Expired", "Orphaned" })
+    $candidates = @($pool | Where-Object State -eq "Free") + @($pool | Where-Object State -in "Expired", "Orphaned") + $others
+    $pool = @($pool) + $others
+    $errors = @()
     foreach ($c in $candidates) {
         if ($c.State -ne "Free" -and -not (Remove-E2EPoolStaleLease $c.Id $c.Lease $Org)) { continue }
         if (-not (New-E2EPoolLease $c.Id $c.Slot $Org)) { continue }
@@ -384,12 +395,12 @@ function Request-E2EPoolProject {
             return (Invoke-E2ERest "_apis/projects/$($c.Id)" -Org $Org) | Add-Member -NotePropertyName PoolSlot -NotePropertyValue $c.Slot -PassThru -Force
         }
         catch {
-            $err = $_
-            try { Remove-E2EPoolLease $c.Id $Org } catch {}
-            throw "Taking pool slot $(Format-E2EPoolName $c.Slot) in $Org for '$Name' failed and its lease was freed: $($err.Exception.Message)"
+            # The lease is kept, so this broken slot is skipped by every take until it expires, and the next slot is tried.
+            $errors += "$(Format-E2EPoolName $c.Slot): $($_.Exception.Message)"
         }
     }
-    throw "No free pool project in $Org. Leases: $(Format-E2EPoolLeases $pool)"
+    $why = if ($errors) { " Slots that failed (each keeps its lease until it expires): $($errors -join '; ')." } else { "" }
+    throw "No free pool project in $Org.$why Leases: $(Format-E2EPoolLeases $pool)"
 }
 
 # Gives a pool project back: clear, back to amte2e-agile, back to amte2e-pool-NN, lease deleted last. Never deletes it.

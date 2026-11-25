@@ -88,6 +88,8 @@ $env:AMTE2E_POOL_OWNER = "${PID}:$poolRun"
 $env:AMTE2E_POOL_ITEM = $Item
 Import-Module (Join-Path $PWD 'tools/e2e/E2EAzDo.psm1') -Force -WarningAction SilentlyContinue
 $poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
+# Renews this run's leases before each long step (migration, assertions), so they do not expire mid-scenario.
+$renewPool = { foreach ($org in $poolOrgs) { foreach ($h in @(Get-E2EPoolProject -Org $org -Owner $poolRun)) { Set-E2EPoolLease $h.Id $org -Renew } } }
 $releasePool = {
     foreach ($org in $poolOrgs) {
         $held = @(Get-E2EPoolProject -Org $org -Owner $poolRun)
@@ -128,7 +130,9 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     }
     $scratch += $names.Values
     $processes += @($names.Keys | Where-Object { $_ -match 'Process$' } | ForEach-Object { $names[$_] })
-    "== $($d.Name): $(($names.Keys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')"
+    # Projects come from the pool and are named by their slot in the summary; only scratch processes are named here.
+    $procKeys = @($names.Keys | Where-Object { $_ -match 'Process$' })
+    "== $($d.Name): $(@($names.Keys | Where-Object { $_ -notmatch 'Process$' }) -join ', ') from the pool$(if ($procKeys) { "; processes $(($procKeys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')" })"
     $initFailed = $false
     foreach ($p in $initialise) {
         pwsh -NoProfile -File tools/e2e/Initialize-E2EEnvironment.ps1 -Process $p *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
@@ -147,8 +151,10 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seedArgs = & $argsFor $seed
     pwsh -NoProfile -File $seed @seedArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; continue }
+    & $renewPool
     pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; continue }
+    & $renewPool
     $assertArgs = & $argsFor $assert @{ OutFile = (Join-Path $work "$($d.Name).assert.md") }
     pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)" }

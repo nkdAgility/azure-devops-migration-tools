@@ -57,7 +57,8 @@ Describe "Remove-E2EObjects.ps1" {
         # Pool (#3342): one free pool project, and one pool project leased under the issue's name.
         Mock Get-E2EPoolProject { @(
             [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }
-            [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p2"; Name = "amte2e-3272-src"; Slot = 2; Lease = [pscustomobject]@{ Token = "m|1|run"; Expires = [datetime]::UtcNow.AddHours(1) }; State = "Held" }
+            [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p2"; Name = "amte2e-3272-src"; Slot = 2; Lease = [pscustomobject]@{ Token = "m|1|run"; Expires = [datetime]::UtcNow.AddHours(-1) }; State = "Expired" }
+            [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p3"; Name = "amte2e-3272-live"; Slot = 3; Lease = [pscustomobject]@{ Token = "m|2|live"; Expires = [datetime]::UtcNow.AddHours(1) }; State = "Held" }
         ) }
         Mock Get-E2EPoolLease { $null }
         Mock Reset-E2EPoolProject { "amte2e-pool-02" }
@@ -77,6 +78,9 @@ Describe "Remove-E2EObjects.ps1" {
         Should -Invoke Remove-E2EProject -Times 0 -Exactly
         Should -Invoke Reset-E2EPoolProject -Times 1 -Exactly -ParameterFilter { $Name -eq "amte2e-3272-src" -and $Force }
         $out | Should -Contain "released nkdagility-adomt-source/amte2e-3272-src -> amte2e-pool-02 (cleared)"
+        # A lease a live run still holds is left alone.
+        Should -Invoke Reset-E2EPoolProject -Times 0 -Exactly -ParameterFilter { $Name -eq "amte2e-3272-live" }
+        @($out | Where-Object { $_ -like "kept pool project nkdagility-adomt-source/amte2e-3272-live: held by a live run*" }).Count | Should -Be 1
     }
 
     It "with -All never deletes or releases a free pool project" {
