@@ -1,5 +1,5 @@
 ---
-purpose: Each e2e scenario takes its scratch projects from a fixed pool that the harness keeps and clears between runs, instead of creating and deleting projects, so proofs stop using up the test orgs' 1,000-project limit.
+purpose: Each e2e scenario takes its scratch projects from a fixed pool that the harness keeps and clears between runs, instead of creating and deleting projects, so proofs stop using up the test orgs' 1,000-project limit; one scenario (wicore-fresh) still migrates into a brand-new target project each proof, so behaviour that differs on a new project is still caught.
 paths:
   - tools/e2e/**
   - platform/specs/e2e-harness/**
@@ -398,3 +398,4 @@ Reasons:
 - Not proven across two machines; the claim is enforced by the service.
 
 
+Outcome checks started for #3342 at e28308c515be3292c51e619ec2feebbf3c011030 attempt 20394328b07d:
