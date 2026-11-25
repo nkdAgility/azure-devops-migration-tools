@@ -480,3 +480,8 @@ Open findings: 0
 
 Spec agreed: yes, approved
 Spec version: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256 cbe092e90028c0e1b7790a6daa42374cfad1d3152e47ad60155ed40fc89f6e4a
+
+## Waiting
+
+wicore-fresh cannot run yet: the target org is at its limit (live 49 + deleted 951 = 1000) and refuses a new project with InvalidProjectCreateException. It needs the 1-day retention change or the purge Microsoft offered to take effect.
+
