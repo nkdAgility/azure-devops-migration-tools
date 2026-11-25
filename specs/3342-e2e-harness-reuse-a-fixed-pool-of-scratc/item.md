@@ -563,3 +563,32 @@ Open findings: 0
 
 Spec agreed: Approve
 Spec version: specs/3342-e2e-harness-reuse-a-fixed-pool-of-scratc/spec.md sha256 d7af4b33c7ed2bcda66a0d079481b056591f7915672207889b74b817914760aa
+Outcome checks started for #3342 at 1e3084d477d49810a9f4e509009a02173be0fedb attempt 980b43537dfe:
+Outcome checks failed for #3342 at 1e3084d477d49810a9f4e509009a02173be0fedb attempt 980b43537dfe: Outcome checks failed: e2e-harness, proof: the proof names each pool project used and that it was released, and prints no per-run project name or "left for clean-up" line; pass = exit 0, output has pool projects used: and released:, and has no left for clean-up
+Outcome checks started for #3342 at c33537a0185a14e5475ea920d1ff9686aa524efe attempt 324c49ba7b2d:
+
+## Outcome done
+
+Automated outcome checks (all passed) for #3342 at c33537a0185a14e5475ea920d1ff9686aa524efe attempt 324c49ba7b2d:
+- e2e-harness, target and source orgs: a project taken from the pool is empty by inventory, on the requested process, renamed, and after release is amte2e-pool-NN on amte2e-agile with no lease team; pass = exit 0 and every case PASS: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Cycle` exit 0
+- e2e-harness, target org: two takes started at once never get the same project, over 10 trials; pass = exit 0 and 10/10 distinct: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Race -Trials 10` exit 0
+- e2e-harness, target org: an expired lease and a dead local claimant's lease are taken over, a live lease is left alone, and a project left half-filled is cleared on take; pass = exit 0 and every case PASS: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Lease` exit 0
+- e2e-harness, both orgs: the adopt step renames eligible projects into the pool, creates none, skips migrationSource1/migrationTarget1 and recently changed or leased projects, and a second run changes nothing; pass = exit 0 and live project count unchanged: `pwsh -NoProfile -File tools/e2e/Initialize-E2EPool.ps1 -WhatIf; if ($LASTEXITCODE) { exit 1 }; pwsh -NoProfile -File tools/e2e/Initialize-E2EPool.ps1; exit $LASTEXITCODE` exit 0
+- e2e-harness, both orgs: a scenario (wicore) runs twice through the pool and passes; live, deleted, process and Custom.amte2e* field counts are the same before and after; pass = exit 0 and counts equal: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Scenario -Scenario wicore -Runs 2` exit 0
+- e2e-harness, cleanup: -All and per-issue prefix never delete a pool project, and the pool mode releases every lease; pass = exit 0 (Pester): `pwsh -NoProfile -Command "Invoke-Pester tools/e2e -CI"` exit 0
+- e2e-harness, both orgs: linkscope passes through the pool, its gone project made and deleted in the source org only, and the target org's live + deleted count unchanged; pass = exit 0 and every case PASS: `pwsh -NoProfile -File tools/e2e/Test-E2EPool.ps1 -Case Linkscope` exit 0
+- e2e-harness, proof: the proof names each pool project used and that it was released, and prints no per-run project name or "left for clean-up" line; pass = exit 0, output has pool projects used: and released:, and has no left for clean-up: `$o = pwsh -NoProfile -File .specify/memory/proof.ps1 | Out-String; if ($LASTEXITCODE -ne 0 -or $o -notmatch 'pool projects used:' -or $o -notmatch 'released:' -or $o -match 'left for clean-up') { exit 1 }` exit 0
+- e2e-harness, target org: without AMTE2E_FRESH_PROJECTS the proof skips wicore-fresh and makes no project, and the helper refuses a target-org project; pass = skipped line, no deleted fresh project line, and the refusal: `$env:AMTE2E_FRESH_PROJECTS = $null; $o = pwsh -NoProfile -File .specify/memory/proof.ps1 -Only wicore-fresh | Out-String; if ($o -notmatch 'wicore-fresh skipped: AMTE2E_FRESH_PROJECTS is not set' -or $o -match 'deleted fresh project') { exit 1 }; Import-Module ./tools/e2e/E2EAzDo.psm1 -Force -WarningAction SilentlyContinue; try { New-E2EDisposableProject -Name amte2e-3342-check-fresh -Org nkdagility-adomt-target | Out-Null; exit 1 } catch { if ($_.Exception.Message -notmatch 'AMTE2E_FRESH_PROJECTS') { exit 1 } }; exit 0` exit 0
+- e2e-harness, cleanup: -All -WhatIf lists no pool project for deletion; pass = exit 0 and no amte2e-pool- line says delete: `$o = pwsh -NoProfile -File tools/e2e/Remove-E2EObjects.ps1 -All -WhatIf | Out-String; if ($LASTEXITCODE -ne 0 -or $o -match '(?i)delet\w*[^\r\n]*amte2e-pool-\d+') { exit 1 }` exit 0
+- e2e-harness, docs: cleanup.md, scenarios.md and architecture.md describe the pool and lease; pass = exit 0 (each file matches): `foreach ($f in 'platform/specs/e2e-harness/cleanup.md','platform/specs/e2e-harness/scenarios.md','platform/specs/architecture.md') { if (-not (Select-String -Path $f -Pattern 'amte2e-pool' -Quiet)) { exit 1 } }` exit 0
+- e2e-harness, build: the solution still builds; pass = exit 0: `dotnet build MigrationTools.sln` exit 0
+- product, src unchanged; pass = exit 0 and no output: `git diff --quiet origin/main -- src` exit 0
+
+Confidence: 88%
+Reasons:
+- Every outcome check passed on this commit against both test orgs, with live and deleted counts unchanged.
+- Scenarios the proof does not cover were not run through the pool.
+- Not proven across two machines; the claim is enforced by the service.
+- wicore-fresh is off by default and not yet run live: the target org is at its project limit until Microsoft frees space after 2 Dec.
+
+
