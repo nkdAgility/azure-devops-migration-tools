@@ -161,7 +161,8 @@ function Remove-E2EDisposableProject([string]$Name, [string]$Org = $script:Defau
 }
 
 # -Prefix selects one issue's scratch objects (for example "amt3242-"); it must itself pass Assert-E2EName.
-function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
+# A project being deleted can be listed for a moment without a name, so a nameless entry is skipped.
+function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name -and $_.name.StartsWith($Prefix) } }
 function Get-E2EProcesses([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
 
 # Which Custom.amte2e* fields a cleanup may delete. Every field a scenario creates is named amte2e<issue>..., so an issue's
