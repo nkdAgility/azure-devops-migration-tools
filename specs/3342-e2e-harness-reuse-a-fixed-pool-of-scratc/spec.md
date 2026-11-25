@@ -168,7 +168,7 @@ A one-off adopt step renames existing live `amte2e-*` and `amt3326-*` projects t
 - **FR-012**: `Remove-E2EObjects.ps1` MUST gain a clear-the-pool mode. `-All` and the per-issue prefix MUST NOT delete a pool project. Process and `Custom.amte2e*` field cleanup MUST work as before.
 - **FR-013**: `proof.ps1` MUST drop the per-run project names and the "left for clean-up" project list, and MUST report each pool project used and that it was cleared.
 - **FR-014**: `linkscope`'s `gone` project MUST be created and deleted only in the source org, through a helper named for that purpose (`New-E2EDisposableProject` / `Remove-E2EDisposableProject`) that refuses any other org and any name outside the guard. No other scenario may use it. Its other projects MUST come from the pool.
-- **FR-014a**: A scenario `wicore-fresh` MUST run `wicore`'s seed and assertions with its source project from the pool and its target project created new for the run (named ending `-fresh`) and deleted after it, so a migration into a brand-new project is proven on every proof. `New-E2EDisposableProject` / `Remove-E2EDisposableProject` MUST allow the target org for names ending `-fresh` only, and the source org for names ending `-gone` only.
+- **FR-014a**: A scenario `wicore-fresh` MUST run `wicore`'s seed and assertions with its source project from the pool and its target project created new for the run (named ending `-fresh`) and deleted after it, so a migration into a brand-new project is proven. It MUST run only when the flag `AMTE2E_FRESH_PROJECTS=1` is set; without it the proof skips it and says so ("wicore-fresh skipped: AMTE2E_FRESH_PROJECTS is not set"), and no code creates a project. `New-E2EDisposableProject` / `Remove-E2EDisposableProject` MUST allow the target org for names ending `-fresh` only, and the source org for names ending `-gone` only.
 - **FR-015**: Scenarios that cannot use a pooled project (a non-Agile base process) MUST be listed as not poolable in `platform/specs/e2e-harness/scenarios.md`.
 - **FR-016**: The harness changes MUST run on PowerShell 7+ and need no credential beyond the sign-in the harness already uses.
 - **FR-017**: `platform/specs/e2e-harness/cleanup.md`, `platform/specs/e2e-harness/scenarios.md` and the "Validating Changes End to End" section of `platform/specs/architecture.md` MUST describe the pool, the lease, take and release, and the not-poolable list.
@@ -193,7 +193,7 @@ A one-off adopt step renames existing live `amte2e-*` and `amt3326-*` projects t
 - **SC-006**: The proof's final output names every pool project used and states each was cleared, and prints no per-run project name.
 - **SC-007**: `git diff` against `main` shows no change under `src/`, and no run touches `migrationSource1` or `migrationTarget1`.
 - **SC-008**: Apart from `linkscope`'s `gone` project in the source org and `wicore-fresh`'s one target project, no run creates or deletes a project.
-- **SC-009**: Each proof creates and deletes at most one project in the target org (`wicore-fresh`), and `wicore-fresh` passes.
+- **SC-009**: Without `AMTE2E_FRESH_PROJECTS=1`, a proof creates no project in the target org and reports `wicore-fresh` as skipped. With it, a proof creates and deletes exactly one project there and `wicore-fresh` passes (proven once the target org has room, after Microsoft's retention change).
 
 ## Checked live before approval (harness sign-in, target org, 2026-11-24)
 
