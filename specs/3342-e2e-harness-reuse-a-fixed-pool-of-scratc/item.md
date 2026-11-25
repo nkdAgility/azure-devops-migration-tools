@@ -369,3 +369,16 @@ Outcome checks started for #3342 at 7c9e012135da8d1ea071596ecbdb59ee26762707 att
 Outcome checks failed for #3342 at 7c9e012135da8d1ea071596ecbdb59ee26762707 attempt 661820e539ce: Outcome checks failed: e2e-harness, target org: an expired lease and a dead local claimant's lease are taken over, a live lease is left alone, and a project left half-filled is cleared on take; pass = exit 0 and every case PASS, e2e-harness, both orgs: a scenario (wicore) runs twice through the pool and passes; live, deleted, process and Custom.amte2e* field counts are the same before and after; pass = exit 0 and counts equal, e2e-harness, cleanup, e2e-harness, both orgs: linkscope passes through the pool, its gone project made and deleted in the source org only, and the target org's live + deleted count unchanged; pass = exit 0 and every case PASS, e2e-harness, proof: the proof names each pool project used and that it was released, and prints no per-run project name or "left for clean-up" line; pass = exit 0, output has `pool projects used, e2e-harness, cleanup
 Outcome checks started for #3342 at dea070c1305e2c462674ac12fb0bf873f7b57261 attempt 48073b8bdcaa:
 Outcome checks failed for #3342 at dea070c1305e2c462674ac12fb0bf873f7b57261 attempt 48073b8bdcaa: Outcome checks failed: e2e-harness, cleanup, e2e-harness, proof: the proof names each pool project used and that it was released, and prints no per-run project name or "left for clean-up" line; pass = exit 0, output has `pool projects used, e2e-harness, cleanup
+Outcome checks started for #3342 at 29b2b79e2fc6e7a46ca6195556cc97392aac054d attempt 361612bf1655:
+Outcome checks failed for #3342 at 29b2b79e2fc6e7a46ca6195556cc97392aac054d attempt 361612bf1655: Outcome checks failed: e2e-harness, proof: the proof names each pool project used and that it was released, and prints no per-run project name or "left for clean-up" line; pass = exit 0, output has pool projects used: and released:, and has no left for clean-up
+Outcome checks started for #3342 at 62fc7ff61308f01fd562904c25e86dfc264a2b58 attempt 40f3f98fd1ca:
+
+## Outcome done
+
+Outcome checks passed for #3342 at 62fc7ff6, attempt 40f3f98fd1ca, all checks in one run: Cycle 14/14, Race 10/10, Lease 6/6, Scenario (wicore twice) 4/4 with counts equal, Linkscope 4/4, Pester 55 passed, proof exit 0 with "pool projects used:" and "released: ... (cleared)" and no "left for clean-up" line.
+
+Confidence: 88%
+Reasons:
+- Every outcome check passed on the same commit against both test orgs, with live and deleted counts unchanged.
+- Scenarios the proof does not cover were not run through the pool.
+- Not proven across two machines; the claim is enforced by the service.
