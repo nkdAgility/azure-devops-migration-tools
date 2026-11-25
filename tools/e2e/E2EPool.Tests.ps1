@@ -227,6 +227,7 @@ Describe "disposable projects (linkscope gone, wicore-fresh target)" {
         @{ Case = "a fresh project in the source org"; Name = "amte2e-x-fresh"; Org = "nkdagility-adomt-source"; Msg = "*only names matching '-gone$'*" }
         @{ Case = "a name that is not a gone project"; Name = "amte2e-x-src"; Org = "nkdagility-adomt-source"; Msg = "*only names matching*" }
         @{ Case = "another org"; Name = "amte2e-x-fresh"; Org = "nkdagility-preview"; Msg = "*only the test orgs*" }
+        @{ Case = "a fresh target project without the flag"; Name = "amte2e-x-fresh"; Org = "nkdagility-adomt-target"; Msg = "*set AMTE2E_FRESH_PROJECTS=1*" }
         @{ Case = "a name outside the guard"; Name = "migration-gone"; Org = "nkdagility-adomt-source"; Msg = "*Refusing to touch*" }
     ) {
         InModuleScope E2EAzDo -Parameters @{ N = $Name; O = $Org; M = $Msg } {

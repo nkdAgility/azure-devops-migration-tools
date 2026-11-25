@@ -44,7 +44,7 @@ Each test org keeps a fixed set of projects named `amte2e-pool-NN`, on `amte2e-a
   the work item removes its links too). Its `*-gone` project is created and deleted with `New-E2EDisposableProject` /
   `Remove-E2EDisposableProject`, which allow only `*-gone` in `nkdagility-adomt-source` and `*-fresh` in
   `nkdagility-adomt-target`. The `*-fresh` project is `wicore-fresh`'s brand-new migration target, deleted by the proof
-  after the scenario: the one project a run makes in the target org.
+  after the scenario: the one project a run makes in the target org, and only with `AMTE2E_FRESH_PROJECTS=1`.
 
 ## Who owns which objects
 

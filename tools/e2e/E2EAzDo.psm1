@@ -133,6 +133,7 @@ function Assert-E2EDisposable([string]$Name, [string]$Org) {
     $allowed = @{ 'nkdagility-adomt-source' = '-gone$'; 'nkdagility-adomt-target' = '-fresh$' }
     if (-not $allowed.ContainsKey($Org)) { throw "Refusing a disposable project in '$Org': only the test orgs may have one." }
     if ($Name -notmatch $allowed[$Org]) { throw "Refusing disposable project '$Name' in '$Org': only names matching '$($allowed[$Org])' are disposable there." }
+    if ($Org -eq 'nkdagility-adomt-target' -and $env:AMTE2E_FRESH_PROJECTS -ne '1') { throw "Refusing a new project in '$Org': set AMTE2E_FRESH_PROJECTS=1 to allow wicore-fresh's project." }
     Assert-E2EName $Name
 }
 

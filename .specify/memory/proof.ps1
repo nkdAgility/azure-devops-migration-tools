@@ -111,6 +111,8 @@ New-Item -ItemType Directory -Force $work | Out-Null
 foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seed = Join-Path $d.FullName 'seed.ps1'; $assert = Join-Path $d.FullName 'assert.ps1'; $config = Join-Path $d.FullName 'config.json'
     if (-not $runAll -and -not $why.ContainsKey($d.Name)) { continue }
+    # wicore-fresh makes a new target project, which the target org may have no room for: it runs only behind the flag.
+    if ($d.Name -eq 'wicore-fresh' -and $env:AMTE2E_FRESH_PROJECTS -ne '1') { "wicore-fresh skipped: AMTE2E_FRESH_PROJECTS is not set"; continue }
     # The previous scenario's projects go back to the pool before the next one takes any.
     & $releasePool
     if (-not ((Test-Path $seed) -and (Test-Path $assert) -and (Test-Path $config))) { $notCovered += $d.Name; continue }

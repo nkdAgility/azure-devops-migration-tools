@@ -24,7 +24,9 @@ A scenario that cannot run in a pool project is listed here with its reason (at 
   `New-E2EDisposableProject`.
 - `wicore-fresh`: `wicore`'s seed and assertions, migrating into a brand-new target project (`*-fresh`, made with
   `New-E2EDisposableProject` and deleted by the proof after the scenario), so behaviour that differs on a new project is
-  still caught. It is the one project a run makes in the target org; its source comes from the pool.
+  still caught. It is the one project a run makes in the target org; its source comes from the pool. It runs only
+  with `AMTE2E_FRESH_PROJECTS=1` (the target org may have no room for a new project); without it the proof prints
+  "wicore-fresh skipped: AMTE2E_FRESH_PROJECTS is not set" and `New-E2EDisposableProject` refuses any target-org project.
 
 ## Multi-step scenarios
 
