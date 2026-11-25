@@ -91,6 +91,11 @@ $poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
 # Renews this run's leases before each long step (migration, assertions), so they do not expire mid-scenario.
 $renewPool = { foreach ($org in $poolOrgs) { foreach ($h in @(Get-E2EPoolProject -Org $org -Owner $poolRun)) { Set-E2EPoolLease $h.Id $org -Renew } } }
 $releasePool = {
+    # wicore-fresh's brand-new target project is deleted, the one project a run makes in the target org.
+    foreach ($f in @(Get-E2EProjects -Org 'nkdagility-adomt-target' -Prefix "amte2e-$Item-p$RunId-" | Where-Object { $_.name -match '-fresh$' })) {
+        try { Remove-E2EDisposableProject $f.name -Org 'nkdagility-adomt-target'; "deleted fresh project nkdagility-adomt-target/$($f.name)" }
+        catch { $script:notReleased += "NOT DELETED fresh project nkdagility-adomt-target/$($f.name): $($_.Exception.Message)" }
+    }
     foreach ($org in $poolOrgs) {
         $held = @(Get-E2EPoolProject -Org $org -Owner $poolRun)
         foreach ($h in $held) { $script:used += "$org/$(Format-E2EPoolName $h.Slot)" }

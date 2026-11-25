@@ -6,7 +6,7 @@ its configs, and checks the target.
 
 Scratch projects come from the scratch project pool (`amte2e-pool-NN`, see [cleanup.md](cleanup.md)): `New-E2EProject`
 takes a pool project, clears it, puts it on the process the seed asks for and gives it the seed's name, and
-`Remove-E2EProject` gives it back. No scenario creates or deletes a project, except `linkscope` (below).
+`Remove-E2EProject` gives it back. No scenario creates or deletes a project, except `linkscope` and `wicore-fresh` (below).
 
 ## Single-run scenarios
 
@@ -21,7 +21,10 @@ A scenario that cannot run in a pool project is listed here with its reason (at 
 
 - `linkscope`: its X work item must be unreadable, which only a deleted project gives. Its source, target and fail-target
   projects come from the pool; its `*-gone` project is created and deleted in the source org with
-  `New-E2EDisposableProject`, which the target org (at its project limit) never sees.
+  `New-E2EDisposableProject`.
+- `wicore-fresh`: `wicore`'s seed and assertions, migrating into a brand-new target project (`*-fresh`, made with
+  `New-E2EDisposableProject` and deleted by the proof after the scenario), so behaviour that differs on a new project is
+  still caught. It is the one project a run makes in the target org; its source comes from the pool.
 
 ## Multi-step scenarios
 

@@ -221,10 +221,12 @@ Describe "clearing work items" {
     }
 }
 
-Describe "disposable projects (linkscope only)" {
+Describe "disposable projects (linkscope gone, wicore-fresh target)" {
     It "refuses <Case>" -ForEach @(
-        @{ Case = "the target org"; Name = "amte2e-x-gone"; Org = "nkdagility-adomt-target"; Msg = "*only nkdagility-adomt-source*" }
-        @{ Case = "a name that is not a gone project"; Name = "amte2e-x-src"; Org = "nkdagility-adomt-source"; Msg = "*only linkscope*" }
+        @{ Case = "a gone project in the target org"; Name = "amte2e-x-gone"; Org = "nkdagility-adomt-target"; Msg = "*only names matching '-fresh$'*" }
+        @{ Case = "a fresh project in the source org"; Name = "amte2e-x-fresh"; Org = "nkdagility-adomt-source"; Msg = "*only names matching '-gone$'*" }
+        @{ Case = "a name that is not a gone project"; Name = "amte2e-x-src"; Org = "nkdagility-adomt-source"; Msg = "*only names matching*" }
+        @{ Case = "another org"; Name = "amte2e-x-fresh"; Org = "nkdagility-preview"; Msg = "*only the test orgs*" }
         @{ Case = "a name outside the guard"; Name = "migration-gone"; Org = "nkdagility-adomt-source"; Msg = "*Refusing to touch*" }
     ) {
         InModuleScope E2EAzDo -Parameters @{ N = $Name; O = $Org; M = $Msg } {

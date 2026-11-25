@@ -128,8 +128,11 @@ function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
 # source org only, which has room; each one counts toward that org's limit for about 28 days. No other scenario uses it.
 $script:DisposableOrg = "nkdagility-adomt-source"
 function Assert-E2EDisposable([string]$Name, [string]$Org) {
-    if ($Org -ne $script:DisposableOrg) { throw "Refusing a disposable project in '$Org': only $($script:DisposableOrg) has room for projects that are deleted." }
-    if ($Name -notmatch '-gone$') { throw "Refusing disposable project '$Name': only linkscope's '*-gone' project is disposable." }
+    # Two projects are made and deleted each run, nothing else (#3342): linkscope's '*-gone' in the source org, and
+    # wicore-fresh's '*-fresh' target in the target org (a migration into a brand-new project).
+    $allowed = @{ 'nkdagility-adomt-source' = '-gone$'; 'nkdagility-adomt-target' = '-fresh$' }
+    if (-not $allowed.ContainsKey($Org)) { throw "Refusing a disposable project in '$Org': only the test orgs may have one." }
+    if ($Name -notmatch $allowed[$Org]) { throw "Refusing disposable project '$Name' in '$Org': only names matching '$($allowed[$Org])' are disposable there." }
     Assert-E2EName $Name
 }
 

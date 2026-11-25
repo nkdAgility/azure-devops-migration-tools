@@ -40,9 +40,11 @@ Each test org keeps a fixed set of projects named `amte2e-pool-NN`, on `amte2e-a
   24 hours, or named with `-Include` by their owner) to `amte2e-pool-NN`. It never touches `migrationSource1` or
   `migrationTarget1`, skips any project whose process is not Agile or inherited from Agile (a take could never switch
   it), creates nothing, supports `-WhatIf`, and changes nothing on a second run.
-- **The one exception.** `linkscope` needs a work item that can't be read, which only a deleted project gives (deleting
+- **The two exceptions.** `linkscope` needs a work item that can't be read, which only a deleted project gives (deleting
   the work item removes its links too). Its `*-gone` project is created and deleted with `New-E2EDisposableProject` /
-  `Remove-E2EDisposableProject`, which refuse any org but `nkdagility-adomt-source` and any other name.
+  `Remove-E2EDisposableProject`, which allow only `*-gone` in `nkdagility-adomt-source` and `*-fresh` in
+  `nkdagility-adomt-target`. The `*-fresh` project is `wicore-fresh`'s brand-new migration target, deleted by the proof
+  after the scenario: the one project a run makes in the target org.
 
 ## Who owns which objects
 
