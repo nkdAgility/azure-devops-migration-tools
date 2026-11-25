@@ -56,7 +56,9 @@ function Get-E2EPoolLeaseState($Lease, [datetime]$Now = [datetime]::UtcNow) {
 }
 
 function Get-E2EPoolLeaseTeam([string]$ProjectId, [string]$Org) {
-    @((Invoke-E2ERest "_apis/projects/$ProjectId/teams?`$top=500" -Org $Org).value) | Where-Object name -eq $script:LeaseTeam | Select-Object -First 1
+    $r = Invoke-E2ERest "_apis/projects/$ProjectId/teams?`$top=500" -Org $Org
+    if ($r -is [string]) { $r = $r | ConvertFrom-Json -AsHashtable }
+    @($r.value) | Where-Object { $_.name -eq $script:LeaseTeam } | Select-Object -First 1
 }
 
 # The lease of a project, with the team behind it (Team) so a takeover can delete exactly that team.
@@ -70,8 +72,10 @@ function Get-E2EPoolLease([string]$ProjectId, [string]$Org) {
 }
 
 # The re-read before every destructive step: stop if this run no longer holds the project.
-function Assert-E2EPoolLeaseHeld([string]$ProjectId, [string]$Org) {
+# The teams list can briefly leave out a team that exists, so a missing lease is read again before it counts as lost.
+function Assert-E2EPoolLeaseHeld([string]$ProjectId, [string]$Org, [int]$Reads = 4, [int]$WaitSeconds = 5) {
     $l = Get-E2EPoolLease $ProjectId $Org
+    for ($i = 1; -not $l -and $i -lt $Reads; $i++) { Start-Sleep -Seconds $WaitSeconds; $l = Get-E2EPoolLease $ProjectId $Org }
     if (-not $l -or $l.Token -ne (Get-E2EPoolOwner).Token) { throw "Lease lost on project $ProjectId in ${Org}: it is now held by $(if ($l) { $l.Token } else { 'nobody' })." }
     $l
 }

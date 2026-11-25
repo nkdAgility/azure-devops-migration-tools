@@ -59,6 +59,38 @@ Describe "pool names" {
     }
 }
 
+Describe "Assert-E2EPoolLeaseHeld" {
+    BeforeEach { $env:AMTE2E_POOL_OWNER = "4242:runA" }
+
+    It "reads again when the teams list briefly leaves the lease out" {
+        InModuleScope E2EAzDo {
+            $script:reads = 0
+            Mock Start-Sleep {}
+            Mock Get-E2EPoolLease { $script:reads++; if ($script:reads -lt 3) { $null } else { [pscustomobject]@{ Slot = 3; Token = (Get-E2EPoolOwner).Token } } }
+            (Assert-E2EPoolLeaseHeld "p1" "nkdagility-adomt-target").Slot | Should -Be 3
+            $script:reads | Should -Be 3
+        }
+    }
+
+    It "says nobody holds it when every read misses the lease" {
+        InModuleScope E2EAzDo {
+            Mock Start-Sleep {}
+            Mock Get-E2EPoolLease { $null }
+            { Assert-E2EPoolLeaseHeld "p1" "nkdagility-adomt-target" } | Should -Throw "*held by nobody*"
+            Should -Invoke Get-E2EPoolLease -Times 4 -Exactly
+        }
+    }
+
+    It "does not read again when another run holds it" {
+        InModuleScope E2EAzDo {
+            Mock Start-Sleep {}
+            Mock Get-E2EPoolLease { [pscustomobject]@{ Slot = 3; Token = "other|9|runB" } }
+            { Assert-E2EPoolLeaseHeld "p1" "nkdagility-adomt-target" } | Should -Throw "*held by other|9|runB*"
+            Should -Invoke Get-E2EPoolLease -Times 1 -Exactly
+        }
+    }
+}
+
 Describe "Request-E2EPoolProject" {
     BeforeEach { $env:AMTE2E_POOL_OWNER = "4242:runA" }
 
