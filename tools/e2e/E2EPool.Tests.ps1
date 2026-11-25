@@ -114,7 +114,7 @@ Describe "Request-E2EPoolProject" {
         }
     }
 
-    It "keeps a failed slot's lease and tries the next slot" {
+    It "frees a failed slot's lease and tries the next slot" {
         InModuleScope E2EAzDo {
             Mock Invoke-E2ERest { throw "404" } -ParameterFilter { $Path -eq "_apis/projects/amte2e-x-tgt" }
             Mock Get-E2EPoolProject { @([pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }, [pscustomobject]@{ Id = "p2"; Name = "amte2e-pool-02"; Slot = 2; Lease = $null; State = "Free" }) }
@@ -127,7 +127,7 @@ Describe "Request-E2EPoolProject" {
             Mock Invoke-E2ERest { [pscustomobject]@{ id = "p2"; name = "amte2e-x-tgt" } } -ParameterFilter { $Path -eq "_apis/projects/p2" }
             Mock Remove-E2EPoolLease {}
             (Request-E2EPoolProject -Name "amte2e-x-tgt" -Org "nkdagility-adomt-target").PoolSlot | Should -Be 2
-            Should -Invoke Remove-E2EPoolLease -Times 0 -Exactly
+            Should -Invoke Remove-E2EPoolLease -Times 1 -Exactly
         }
     }
 

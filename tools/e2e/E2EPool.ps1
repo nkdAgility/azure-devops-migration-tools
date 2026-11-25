@@ -328,7 +328,10 @@ function Switch-E2EPoolProcess([string]$ProjectId, [string]$Process, [string]$Or
     # The switch is confirmed by the work item types too: the project must offer every type the process defines.
     $want = @((Invoke-E2ERest "_apis/work/processes/$typeId/workitemtypes" -Org $Org).value | Where-Object { -not $_.isDisabled } | ForEach-Object name)
     for ($i = 0; ; $i++) {
-        $have = @((Invoke-E2ERest "$ProjectId/_apis/wit/workitemtypes" -Org $Org).value | ForEach-Object name)
+        # This response has keys differing only in case, so it comes back as text; parse it case-sensitively.
+        $r = Invoke-E2ERest "$ProjectId/_apis/wit/workitemtypes" -Org $Org
+        if ($r -is [string]) { $r = $r | ConvertFrom-Json -AsHashtable }
+        $have = @($r.value | ForEach-Object { $_.name })
         $missing = @($want | Where-Object { $_ -notin $have })
         if (-not $missing) { break }
         if ($i -ge 20) { throw "Project $ProjectId in $Org is on '$Process' but lacks its work item types: $($missing -join ', ')." }
@@ -395,11 +398,14 @@ function Request-E2EPoolProject {
             return (Invoke-E2ERest "_apis/projects/$($c.Id)" -Org $Org) | Add-Member -NotePropertyName PoolSlot -NotePropertyValue $c.Slot -PassThru -Force
         }
         catch {
-            # The lease is kept, so this broken slot is skipped by every take until it expires, and the next slot is tried.
+            # The lease is freed (the next take clears the project first) and the next slot is tried, at most three, so a
+            # broken slot cannot block the pool and a fault common to every slot cannot hold the whole pool.
             $errors += "$(Format-E2EPoolName $c.Slot): $($_.Exception.Message)"
+            try { Remove-E2EPoolLease $c.Id $Org } catch {}
+            if ($errors.Count -ge 3) { break }
         }
     }
-    $why = if ($errors) { " Slots that failed (each keeps its lease until it expires): $($errors -join '; ')." } else { "" }
+    $why = if ($errors) { " Slots that failed (their leases were freed): $($errors -join '; ')." } else { "" }
     throw "No free pool project in $Org.$why Leases: $(Format-E2EPoolLeases $pool)"
 }
 
