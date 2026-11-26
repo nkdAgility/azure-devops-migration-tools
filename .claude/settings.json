@@ -33,6 +33,7 @@
       "PowerShell(az *)",
       "Bash(gh *)",
       "Bash(az *)",
+      "PowerShell(pwsh *.specify/extensions/engineering-checks/scripts/publish-item-docs.ps1*)",
       "Edit(specs/**)",
       "Edit(.specify/bugs/**)",
       "Edit(.specify/assessments/**)",
