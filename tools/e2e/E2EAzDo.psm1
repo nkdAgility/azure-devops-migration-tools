@@ -54,7 +54,24 @@ function Invoke-E2ERest {
         # Assigned directly: returning a byte[] through an if-expression would unroll it and send it as text.
         if ($Body -is [string] -or $Body -is [byte[]]) { $params.Body = $Body } else { $params.Body = $Body | ConvertTo-Json -Depth 20 }
     }
-    Invoke-RestMethod @params
+    # A request that never got a response (a dropped connection) is retried only when it reads: a write may have been
+    # applied without its response arriving, and sending it again can do it twice (a positional relation removal, or
+    # the pool's lease team, whose creation is the claim).
+    for ($try = 1; ; $try++) {
+        try { return Invoke-RestMethod @params }
+        catch {
+            $noResponse = -not $_.Exception.Response -and $_.Exception -is [System.Net.Http.HttpRequestException]
+            if (-not $noResponse -or $Method -ne "GET" -or $try -ge 3) { throw }
+            Start-Sleep -Seconds (2 * $try)
+        }
+    }
+}
+
+# A project by name or id, or $null only when the service says it does not exist; any other failure is thrown, so
+# an unreadable project is never mistaken for an absent one.
+function Get-E2EProjectOrNull([string]$NameOrId, [string]$Org = $script:DefaultOrg) {
+    try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($NameOrId))" -Org $Org }
+    catch { if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -eq 404) { $null } else { throw } }
 }
 
 function Wait-E2EOperation($op, [int]$TimeoutSeconds = 600) {
@@ -93,33 +110,79 @@ function Remove-E2EProcess([string]$Name, [string]$Org = $script:DefaultOrg) {
     if ($id) { Invoke-E2ERest "_apis/work/processes/$id" -Org $Org -Method DELETE | Out-Null }
 }
 
+# Projects come from the scratch project pool (E2EPool.ps1, #3342): deleted projects count toward the org's
+# 1,000-project limit for about 28 days, so the harness never creates or deletes one. New-E2EProject takes a free
+# pool project, clears it, puts it on $Process and renames it $Name; Remove-E2EProject gives it back.
+. (Join-Path $PSScriptRoot "E2EPool.ps1")
+
 function New-E2EProject {
-    param([Parameter(Mandatory)][string]$Name, [string]$Process = "Agile", [string]$Org = $script:DefaultOrg)
-    Assert-E2EName $Name
-    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
-    if ($p) { return $p }
-    $processId = Get-E2EProcessId $Process $Org
-    if (-not $processId) { throw "Process '$Process' not found in $Org. Run tools/e2e/Initialize-E2EEnvironment.ps1 first." }
-    $op = Invoke-E2ERest "_apis/projects" -Org $Org -Method POST -Body @{
-        name = $Name; description = "AMT e2e regression scratch project"
-        capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = $processId } }
-    }
-    Wait-E2EOperation $op | Out-Null
-    # A new project can take a while to be readable by name, and its classification nodes longer, after the operation succeeds.
+    param([Parameter(Mandatory)][string]$Name, [string]$Process = "amte2e-agile", [string]$Org = $script:DefaultOrg)
+    # The pool's projects all derive from Agile; plain "Agile" (the old default) means the shared amte2e-agile.
+    if ($Process -eq "Agile") { $Process = "amte2e-agile" }
+    $p = Request-E2EPoolProject -Name $Name -Process $Process -Org $Org
+    # Classification nodes can lag a rename; wait until the project answers by its new name.
     for ($i = 0; ; $i++) {
-        try { $p = Invoke-E2ERest "_apis/projects/$Name" -Org $Org; Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null; return $p }
+        try { Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null; return $p }
         catch { if ($i -ge 19) { throw }; Start-Sleep -Seconds 3 }
     }
 }
 
 function Remove-E2EProject([string]$Name, [string]$Org = $script:DefaultOrg) {
+    Reset-E2EPoolProject -Name $Name -Org $Org | Out-Null
+}
+
+# The one exception to the pool (#3342 FR-014): linkscope needs a work item that cannot be read, which only a deleted
+# project gives (destroying the item removes its links too). Its 'gone' project is created and deleted here, in the
+# source org only, which has room; each one counts toward that org's limit for about 28 days. No other scenario uses it.
+$script:DisposableOrg = "nkdagility-adomt-source"
+function Assert-E2EDisposable([string]$Name, [string]$Org) {
+    # Two projects are made and deleted each run, nothing else (#3342): linkscope's '*-gone' in the source org, and
+    # wicore-fresh's '*-fresh' target in the target org (a migration into a brand-new project).
+    $allowed = @{ 'nkdagility-adomt-source' = '-gone$'; 'nkdagility-adomt-target' = '-fresh$' }
+    if (-not $allowed.ContainsKey($Org)) { throw "Refusing a disposable project in '$Org': only the test orgs may have one." }
+    if ($Name -notmatch $allowed[$Org]) { throw "Refusing disposable project '$Name' in '$Org': only names matching '$($allowed[$Org])' are disposable there." }
+    if ($Org -eq 'nkdagility-adomt-target' -and $env:AMTE2E_FRESH_PROJECTS -ne '1') { throw "Refusing a new project in '$Org': set AMTE2E_FRESH_PROJECTS=1 to allow wicore-fresh's project." }
     Assert-E2EName $Name
-    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
-    if ($p) { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null }
+}
+
+function New-E2EDisposableProject {
+    param([Parameter(Mandatory)][string]$Name, [string]$Process = "amte2e-agile", [string]$Org = $script:DefaultOrg)
+    Assert-E2EDisposable $Name $Org
+    $p = Get-E2EProjectOrNull $Name $Org
+    # A target-org '-fresh' project must be new: one left by an earlier attempt already holds migrated data.
+    if ($p -and $Org -eq 'nkdagility-adomt-target') { throw "Project $Org/$Name already exists, so it is not a brand-new target. Delete it with Remove-E2EDisposableProject -Name $Name -Org $Org (with AMTE2E_FRESH_PROJECTS=1), or use a new run id." }
+    if ($p) { return $p }
+    $processId = Get-E2EProcessId $Process $Org
+    if (-not $processId) { throw "Process '$Process' not found in $Org. Run tools/e2e/Initialize-E2EEnvironment.ps1 first." }
+    Wait-E2EOperation (Invoke-E2ERest "_apis/projects" -Org $Org -Method POST -Body @{
+        name = $Name; description = "AMT e2e linkscope project, deleted by its seed"
+        capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = $processId } }
+    }) | Out-Null
+    for ($i = 0; ; $i++) {
+        try {
+            $p = Invoke-E2ERest "_apis/projects/$Name" -Org $Org; Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null
+            # The proof's record of what this invocation made (AMTE2E_CREATED_LOG): it deletes these, and nothing else.
+            if ($env:AMTE2E_CREATED_LOG) { "$Org|$($p.id)|$Name" | Add-Content -Path $env:AMTE2E_CREATED_LOG }
+            return $p
+        }
+        catch { if ($i -ge 19) { throw }; Start-Sleep -Seconds 3 }
+    }
+}
+
+# With -Id, exactly that project is deleted, and only while it still has the name $Name (the guard checks the name);
+# without it, the project named $Name. Returns $true when it deleted one, $false when there was none.
+function Remove-E2EDisposableProject([string]$Name, [string]$Org = $script:DefaultOrg, [string]$Id) {
+    Assert-E2EDisposable $Name $Org
+    $p = Get-E2EProjectOrNull $(if ($Id) { $Id } else { $Name }) $Org
+    if (-not $p) { return $false }
+    if ($p.name -ne $Name) { throw "Project $Id in $Org is now named '$($p.name)', not '$Name'; it is not deleted." }
+    Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null
+    $true
 }
 
 # -Prefix selects one issue's scratch objects (for example "amt3242-"); it must itself pass Assert-E2EName.
-function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
+# A project being deleted can be listed for a moment without a name, so a nameless entry is skipped.
+function Get-E2EProjects([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/projects?`$top=500" -Org $Org).value | Where-Object { $_.name -and $_.name.StartsWith($Prefix) } }
 function Get-E2EProcesses([string]$Org = $script:DefaultOrg, [string]$Prefix = $script:Prefix) { Assert-E2EName $Prefix; (Invoke-E2ERest "_apis/work/processes" -Org $Org).value | Where-Object { $_.name.StartsWith($Prefix) } }
 
 # Which Custom.amte2e* fields a cleanup may delete. Every field a scenario creates is named amte2e<issue>..., so an issue's
@@ -158,7 +221,8 @@ function Get-E2EWiql([string]$Project, [string]$Wiql, [string]$Org = $script:Def
 }
 
 function Get-E2EAllWorkItems([string]$Project, [string]$Org = $script:DefaultOrg) {
-    $ids = Get-E2EWiql $Project "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '$Project' ORDER BY [System.Id]" $Org | ForEach-Object id
+    # Pool leftovers (Shared Steps and Shared Parameters no API can delete, #3342) are never part of a scenario.
+    $ids = Get-E2EWiql $Project "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '$Project' AND $(Get-E2EPoolLeftoverFilter) ORDER BY [System.Id]" $Org | ForEach-Object id
     if (-not $ids) { return @() }
     # The work items list API takes at most 200 ids per request.
     $ids = @($ids)
@@ -186,4 +250,4 @@ function Get-E2EAttachmentBytes([string]$Url) {
     [byte[]]$response.RawContentStream.ToArray()
 }
 
-Export-ModuleMember -Function *-E2E*, Initialize-E2E, Assert-E2EName
+Export-ModuleMember -Function *-E2E*, Initialize-E2E, Assert-E2EName, Get-E2EPoolInventory

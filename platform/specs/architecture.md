@@ -275,20 +275,21 @@ Discovers and documents:
 
 **Path:** `tools/e2e/Remove-E2EObjects.ps1`
 
-**Purpose:** Deletes e2e scratch objects from the test organisations: projects, inherited processes and `Custom.amte2e*` fields, in that order, and lists leftovers.
+**Purpose:** Cleans up e2e scratch objects in the test organisations: gives back the pool projects (`amte2e-pool`, never deleted), then deletes inherited processes and `Custom.amte2e*` fields, in that order, and lists leftovers.
 
 **Usage:**
 ```powershell
-.\tools\e2e\Remove-E2EObjects.ps1 -Prefix amte2e-3278- -WhatIf   # list what one issue's cleanup would delete
-.\tools\e2e\Remove-E2EObjects.ps1 -Prefix amte2e-3278-           # delete one issue's objects
-.\tools\e2e\Remove-E2EObjects.ps1 -All                           # delete every e2e object
+.\tools\e2e\Remove-E2EObjects.ps1 -Prefix amte2e-3278- -WhatIf   # list what one issue's cleanup would do
+.\tools\e2e\Remove-E2EObjects.ps1 -Prefix amte2e-3278-           # clean up one issue's objects
+.\tools\e2e\Remove-E2EObjects.ps1 -All                           # clean up every e2e object
+.\tools\e2e\Remove-E2EObjects.ps1 -ClearPool                     # give back every leased pool project, whoever holds it
 ```
 
-**Parameters:** `-Prefix` or `-All` (one is required), `-Organisations` (defaults to the test orgs), `-WhatIf`.
+**Parameters:** `-Prefix`, `-All` or `-ClearPool` (one is required), `-Organisations` (defaults to the test orgs), `-WhatIf`.
 
-**Scope:** `-Prefix amt<issue>-` or `amte2e-<issue>-` deletes that issue's projects and processes and the fields named `Custom.amte2e<issue>…`, but not those of a longer number that starts with it. Any other prefix, such as `amte2e-fields-`, deletes its projects and processes but no fields, warns, and exits 1. A prefix that every e2e object starts with (`amte2e-`, `amte2e`, or empty) is refused; use `-All`. Every field a scenario creates is named `amte2e<issue>…`, with the number of the issue it belongs to, so an issue's cleanup removes all its fields.
+**Scope:** no run deletes a project. `-Prefix amt<issue>-` or `amte2e-<issue>-` gives back that issue's leased pool projects and deletes its processes and the fields named `Custom.amte2e<issue>…`, but not those of a longer number that starts with it. Any other prefix, such as `amte2e-fields-`, gives back its pool projects and deletes its processes but no fields, warns, and exits 1. A prefix that every e2e object starts with (`amte2e-`, `amte2e`, or empty) is refused; use `-All`. Every field a scenario creates is named `amte2e<issue>…`, with the number of the issue it belongs to, so an issue's cleanup removes all its fields.
 
-**Tests:** `tools/e2e/Remove-E2EObjects.Tests.ps1` (Pester 5+, every Azure DevOps call mocked), run on pull requests that change `tools/e2e/` by `.github/workflows/e2e-harness-tests.yml`.
+**Tests:** `tools/e2e/Remove-E2EObjects.Tests.ps1` and `tools/e2e/E2EPool.Tests.ps1` (Pester 5+, every Azure DevOps call mocked), run on pull requests that change `tools/e2e/` by `.github/workflows/e2e-harness-tests.yml`.
 
 ---
 
@@ -327,7 +328,8 @@ Unit tests are not enough for changes to migration behaviour, exit codes, valida
 - **Harness:** build `MigrationTools.ConsoleFull`, then run `tools/e2e/Invoke-MigrationE2E.ps1 -Config <scenario.json>`. It refuses any config whose endpoints are outside the test organisations, switches every endpoint to `AuthenticationMode` `EntraId` through the endpoint environment-variable overrides (TFS and REST, any endpoint name), restores any existing values afterwards, prints `EXIT CODE` and exits with it. The tool runs from `-LogDirectory` (default: a new temp folder that is kept), so its logs are written to `logs\<timestamp>` there; the folder is printed as `LOGS`. If `AMT_TEST_PAT` is set it uses that PAT instead and masks it in output. Scenario files need no token.
 - **Processors:** the configuration schema requires `SourceName` and `TargetName` on every processor.
 - **Reflected ID field:** the target process must have `Custom.ReflectedWorkItemId` (or the configured field) on every work item type that is validated, not just the ones being migrated. Use an inherited process for scratch projects.
-- **Projects:** create your own scratch source/target projects for the change (for example `amt<PR>-src` / `amt<PR>-tgt`) and seed only the work items the scenario needs. Do not modify projects used by the automated tests.
+- **Projects:** take your own scratch source/target projects for the change from the scratch project pool (for example `amt<PR>-src` / `amt<PR>-tgt`) with `New-E2EProject`, and seed only the work items the scenario needs. Do not modify projects used by the automated tests.
+- **Scratch project pool:** the harness never creates or deletes a project, because a deleted project counts toward the organisation's 1,000-project limit for about 28 days. Each test org keeps a fixed pool of projects named `amte2e-pool-NN`. `New-E2EProject` claims a free one by creating the team `amte2e-pool-lease` in it (Azure DevOps refuses a second team of that name, so only one run gets it, on any machine), clears it, switches it to the requested process and renames it to the requested name. `Remove-E2EProject` gives it back: it clears it, switches it back to `amte2e-agile`, renames it back to `amte2e-pool-NN` and deletes the lease team. A lease lasts two hours and is renewed as the run goes; an expired lease, or one held by a process on this machine that has exited, can be taken over. `tools/e2e/Initialize-E2EPool.ps1` adds idle scratch projects to the pool, and `tools/e2e/Test-E2EPool.ps1` checks the pool live. The one exception is `linkscope`, whose `*-gone` project is created and deleted in the source org only (`New-E2EDisposableProject`), because only a deleted project makes a work item unreadable.
 - **Before and after:** run each scenario on `main` and on the change, and report both results, including the exit code.
 - **Failure scenarios:** cover the failure path as well as the happy path. A reliable way to force a real server-side item failure is to map a work item type to one that is disabled or missing in the target.
 - **Report** the scenarios, the observed output lines and the exit codes in the pull request.

@@ -92,7 +92,7 @@
         "TargetName": "Target",
         "UpdateCreatedDate": true,
         "UpdateCreatedBy": true,
-        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter','Test Case') ORDER BY [System.ChangedDate] desc",
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter','Test Case') AND NOT ([System.Title] = 'amte2e-pool leftover' AND [System.WorkItemType] IN ('Shared Steps','Shared Parameter')) ORDER BY [System.ChangedDate] desc",
         "FixHtmlAttachmentLinks": false,
         "WorkItemCreateRetryLimit": 5,
         "FilterWorkItemsThatAlreadyExistInTarget": false,
