@@ -135,7 +135,11 @@ function Invoke-E2EOperationPoll([string]$Url) {
             if ($status -notin $script:BusyStatuses) { throw }
             $why = "HTTP $status"
         }
-        if ($try -ge $script:BusyWaits.Count + 1) { throw [E2EUnavailableException]::new("GET operation $Url returned $why after $try tries; Azure DevOps is unavailable. Every lease is kept.") }
+        # The same form as Invoke-E2ERest's line ("<method> <path> in <org> returned ..."), so a proof shows it alike.
+        if ($try -ge $script:BusyWaits.Count + 1) {
+            $u = [Uri]$Url
+            throw [E2EUnavailableException]::new("GET $($u.AbsolutePath.TrimStart('/').Split('/', 2)[1]) in $($u.Segments[1].TrimEnd('/')) returned $why after $try tries; Azure DevOps is unavailable. Every lease is kept.")
+        }
         Start-Sleep -Seconds $script:BusyWaits[$try - 1]
     }
 }

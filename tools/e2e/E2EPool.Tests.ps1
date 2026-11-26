@@ -563,7 +563,9 @@ Describe "replies that are not JSON: limits and lease safety (#3351 review)" {
             Mock Invoke-RestMethod { "<html>busy</html>" }
             $e = { Wait-E2EOperation ([pscustomobject]@{ id = 1; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/operations/1" }) } | Should -Throw -PassThru
             $e.Exception | Should -BeOfType [E2EUnavailableException]
-            $e.Exception.Message | Should -BeLike "GET operation https://dev.azure.com/nkdagility-adomt-source/_apis/operations/1 returned HTML instead of JSON after 4 tries*"
+            $e.Exception.Message | Should -Be "GET _apis/operations/1 in nkdagility-adomt-source returned HTML instead of JSON after 4 tries; Azure DevOps is unavailable. Every lease is kept."
+            # The proof's stop line trims a child's error text down to this message; it must come out clean.
+            ("     | " + $e.Exception.Message) -replace '^.*?(\S+ \S+ in \S+ returned)', '$1' | Should -Be $e.Exception.Message
         }
     }
 
