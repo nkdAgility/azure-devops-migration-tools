@@ -247,6 +247,8 @@ function Test-E2EPoolClear([string]$ProjectId, [string]$Org) {
 function Invoke-E2EStep([scriptblock]$Step, [string]$What, [System.Collections.Generic.List[string]]$Errors) {
     try { & $Step | Out-Null }
     catch {
+        # Azure DevOps being unavailable is not one step's failure: stop the whole clear, keeping the lease.
+        if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
         $msg = try { ($_.ErrorDetails.Message | ConvertFrom-Json).message } catch { $null }
         $Errors.Add("${What}: $(if ($msg) { $msg } else { $_.Exception.Message })")
     }
@@ -303,7 +305,7 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
         for ($i = 0; $i -lt $ids.Count; $i += 200) {
             $batch = $ids[$i..([Math]::Min($i + 199, $ids.Count - 1))]
             $read = "_apis/wit/workitems?ids=$($batch -join ',')&fields=System.Id,System.WorkItemType"
-            $items = try { @((Invoke-E2ERest $read -Org $Org).value) } catch { throw "Reading work items to clear failed ($read): $($_.ErrorDetails.Message)" }
+            $items = try { @((Invoke-E2ERest $read -Org $Org).value) } catch { if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }; throw "Reading work items to clear failed ($read): $($_.ErrorDetails.Message)" }
             foreach ($wi in $items) {
                 Invoke-E2EStep { Remove-E2EPoolWorkItem $pr $p.name $wi $Org } "$($wi.fields.'System.WorkItemType') $($wi.id)" $e
             }

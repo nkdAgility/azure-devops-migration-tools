@@ -500,3 +500,80 @@ Describe "replies that are not JSON (#3351)" {
         }
     }
 }
+
+Describe "replies that are not JSON: limits and lease safety (#3351 review)" {
+    BeforeEach { $env:AMTE2E_POOL_OWNER = "4242:runA" }
+
+    It "a persistent HTTP <Status> on a read stops after 4 tries, waiting 5, 15 and 30 seconds" -ForEach @(@{ Status = 429 }, @{ Status = 503 }) {
+        InModuleScope E2EAzDo -Parameters @{ Status = $Status } {
+            param($Status)
+            $script:Headers = @{ Authorization = "x" }; $script:s = $Status
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { throw [Microsoft.PowerShell.Commands.HttpResponseException]::new("busy", [System.Net.Http.HttpResponseMessage]::new($script:s)) }
+            $e = { Invoke-E2ERest "_apis/projects" -Org "nkdagility-adomt-source" } | Should -Throw -PassThru
+            $e.Exception | Should -BeOfType [E2EUnavailableException]
+            $e.Exception.Message | Should -Be "GET _apis/projects in nkdagility-adomt-source returned HTTP $Status after 4 tries; Azure DevOps is unavailable. Every lease is kept."
+            Should -Invoke Invoke-RestMethod -Times 4 -Exactly
+            foreach ($w in 5, 15, 30) { Should -Invoke Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq $w } }
+        }
+    }
+
+    It "a dropped connection does not use up the busy tries" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }; $script:n = 0
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { $script:n++; if ($script:n -le 2) { throw [System.Net.Http.HttpRequestException]::new("dropped") }; "<html>busy</html>" }
+            { Invoke-E2ERest "_apis/projects" -Org "nkdagility-adomt-source" } | Should -Throw "*HTML instead of JSON after 4 tries*"
+            Should -Invoke Invoke-RestMethod -Times 6 -Exactly
+        }
+    }
+
+    It "an empty body on a read is not an empty answer; on a write it is fine" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { "" }
+            { Get-E2EPoolLease "p1" "nkdagility-adomt-source" } | Should -Throw "*returned HTML instead of JSON after 4 tries*"
+            { Invoke-E2ERest "_apis/projects/p1/teams/t1" -Org "nkdagility-adomt-source" -Method DELETE } | Should -Not -Throw
+        }
+    }
+
+    It "listing the pool while Azure DevOps answers with HTML throws, and never reports a project as Free" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Get-E2EGuardedProjects { @([pscustomobject]@{ id = "p1"; name = "amte2e-pool-01" }) }
+            Mock Invoke-RestMethod { "<!DOCTYPE html><html></html>" }
+            { Get-E2EPoolProject -Org "nkdagility-adomt-source" } | Should -Throw "*returned HTML instead of JSON*"
+        }
+    }
+
+    It "clearing a project stops at once on an unavailable Azure DevOps, rather than collecting it as one step's failure" {
+        InModuleScope E2EAzDo {
+            $errors = [System.Collections.Generic.List[string]]::new()
+            { Invoke-E2EStep { throw [E2EUnavailableException]::new("GET x in o returned HTML instead of JSON after 4 tries; Azure DevOps is unavailable. Every lease is kept.") } "a step" $errors } | Should -Throw "GET x in o returned HTML*"
+            $errors.Count | Should -Be 0
+        }
+    }
+
+    It "Wait-E2EOperation stops with the clear line when the poll keeps answering with HTML" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { "<html>busy</html>" }
+            $e = { Wait-E2EOperation ([pscustomobject]@{ id = 1; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/operations/1" }) } | Should -Throw -PassThru
+            $e.Exception | Should -BeOfType [E2EUnavailableException]
+            $e.Exception.Message | Should -BeLike "GET operation https://dev.azure.com/nkdagility-adomt-source/_apis/operations/1 returned HTML instead of JSON after 4 tries*"
+        }
+    }
+
+    It "Wait-E2EOperation does not retry any other HTTP error" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { throw [Microsoft.PowerShell.Commands.HttpResponseException]::new("denied", [System.Net.Http.HttpResponseMessage]::new(401)) }
+            { Wait-E2EOperation ([pscustomobject]@{ id = 1; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/operations/1" }) } | Should -Throw "denied"
+            Should -Invoke Invoke-RestMethod -Times 1 -Exactly
+        }
+    }
+}

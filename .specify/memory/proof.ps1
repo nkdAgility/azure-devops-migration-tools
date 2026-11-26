@@ -75,6 +75,8 @@ $env:AMTE2E_POOL_OWNER = "${PID}:$poolRun"
 $env:AMTE2E_POOL_ITEM = $Item
 Import-Module (Join-Path $PWD 'tools/e2e/E2EAzDo.psm1') -Force -WarningAction SilentlyContinue
 $poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
+# Azure DevOps stayed unavailable (#3351): the pool's one line is the whole report, after the finally below has run.
+trap { if ($_.Exception.GetType().Name -eq 'E2EUnavailableException') { "STOPPED: $($_.Exception.Message)"; exit 1 }; break }
 # What this invocation creates outside the pool is recorded here (by pid as well as run id), so it deletes only that.
 $env:AMTE2E_CREATED_LOG = Join-Path ([IO.Path]::GetTempPath()) "amte2e-created-$Item-$RunId-$PID.log"
 # A run id already in use (passed again with -RunId, or drawn twice) is refused, so no two runs share a name.

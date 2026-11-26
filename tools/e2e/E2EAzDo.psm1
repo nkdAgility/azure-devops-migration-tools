@@ -57,23 +57,29 @@ function Invoke-E2ERest {
     # A request that never got a response (a dropped connection) is retried only when it reads: a write may have been
     # applied without its response arriving, and sending it again can do it twice (a positional relation removal, or
     # the pool's lease team, whose creation is the claim).
+    # Dropped connections and busy replies are counted apart, so one never uses up the other's tries.
     $call = "$Method $Path in $Org"
-    for ($try = 1; ; $try++) {
+    $dropped = 0; $busy = 0
+    while ($true) {
+        $why = $null
         try { $r = Invoke-RestMethod @params }
         catch {
             $noResponse = -not $_.Exception.Response -and $_.Exception -is [System.Net.Http.HttpRequestException]
-            if ($noResponse -and $Method -eq "GET" -and $try -lt 3) { Start-Sleep -Seconds (2 * $try); continue }
+            if ($noResponse -and $Method -eq "GET" -and $dropped -lt 2) { $dropped++; Start-Sleep -Seconds (2 * $dropped); continue }
             $status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
             if ($status -notin $script:BusyStatuses -or $Method -ne "GET") { throw }
-            if ($try -ge $script:BusyWaits.Count + 1) { throw [E2EUnavailableException]::new("$call returned HTTP $status after $try tries; Azure DevOps is unavailable. Every lease is kept.") }
-            Start-Sleep -Seconds $script:BusyWaits[$try - 1]; continue
+            $why = "HTTP $status"
         }
-        if (Test-E2EReadableReply $r) { return $r }
-        # A throttle or sign-in page comes back as 200 with HTML. It is never read as an empty answer (an empty teams
-        # list would read as "no lease"). A write is not sent again: it may already have been applied.
-        if ($Method -ne "GET") { throw [E2EUnavailableException]::new("$call returned HTML instead of JSON; it is not sent again, as it may have been applied. Every lease is kept.") }
-        if ($try -ge $script:BusyWaits.Count + 1) { throw [E2EUnavailableException]::new("$call returned HTML instead of JSON after $try tries; Azure DevOps is unavailable. Every lease is kept.") }
-        Start-Sleep -Seconds $script:BusyWaits[$try - 1]
+        if (-not $why) {
+            if (Test-E2EReadableReply $r -Read:($Method -eq "GET")) { return $r }
+            # A throttle or sign-in page comes back as 200 with HTML. It is never read as an empty answer (an empty
+            # teams list would read as "no lease"). A write is not sent again: it may already have been applied.
+            if ($Method -ne "GET") { throw [E2EUnavailableException]::new("$call returned HTML instead of JSON; it is not sent again, as it may have been applied. Every lease is kept.") }
+            $why = "HTML instead of JSON"
+        }
+        $busy++
+        if ($busy -gt $script:BusyWaits.Count) { throw [E2EUnavailableException]::new("$call returned $why after $busy tries; Azure DevOps is unavailable. Every lease is kept.") }
+        Start-Sleep -Seconds $script:BusyWaits[$busy - 1]
     }
 }
 
@@ -86,10 +92,12 @@ class E2EUnavailableException : System.Exception { E2EUnavailableException([stri
 
 # Invoke-RestMethod returns parsed JSON as objects, and returns text when it cannot parse the body. Text that is
 # JSON (an endpoint whose keys differ only in case) is readable; its callers parse it. Anything else is not.
-function Test-E2EReadableReply($Reply) {
+# An empty body is fine for a write (a DELETE has none) but not for a read (-Read): every read answers with JSON.
+function Test-E2EReadableReply($Reply, [switch]$Read) {
+    if ($null -eq $Reply) { return -not $Read }
     if ($Reply -isnot [string]) { return $true }
     $t = $Reply.Trim()
-    if (-not $t) { return $true }
+    if (-not $t) { return -not $Read }
     if ($t[0] -notin '{', '[') { return $false }
     try { $null = $t | ConvertFrom-Json -AsHashtable; $true } catch { $false }
 }
@@ -121,7 +129,7 @@ function Wait-E2EOperation($op, [int]$TimeoutSeconds = 600) {
 function Invoke-E2EOperationPoll([string]$Url) {
     for ($try = 1; ; $try++) {
         $why = $null
-        try { $r = Invoke-RestMethod -Uri $Url -Headers $script:Headers; if (Test-E2EReadableReply $r) { return $r }; $why = "HTML instead of JSON" }
+        try { $r = Invoke-RestMethod -Uri $Url -Headers $script:Headers; if (Test-E2EReadableReply $r -Read) { return $r }; $why = "HTML instead of JSON" }
         catch {
             $status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
             if ($status -notin $script:BusyStatuses) { throw }
