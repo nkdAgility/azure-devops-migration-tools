@@ -1,6 +1,6 @@
 # procdef: ProcessDefinitionProcessor with an inherited process whose User Story is customised (so its "Stories" behaviour is
 # inherited), carrying a field with '#' in its name (#3208, #2611). Reproduces #3224/#3086 and #3211 on the code they were found on.
-#   source org: field Custom.amte2eTicket#, process amte2e-procdef (Agile-derived, field on User Story), project amte2e-procdef-src
+#   source org: field Custom.amte2e3227Ticket#, process amte2e-procdef (Agile-derived, field on User Story), project amte2e-procdef-src
 #   target org: project amte2e-procdef-tgt on amte2e-agile; the amte2e-procdef process must NOT exist there before the run.
 param([string]$Src = "amte2e-procdef-src", [string]$Tgt = "amte2e-procdef-tgt", [string]$Process = "amte2e-procdef")
 $ErrorActionPreference = "Stop"
@@ -13,7 +13,7 @@ New-E2EProject -Name $Tgt -Process "amte2e-agile" -Org $tgtOrg | Out-Null
 if (Get-E2EProcessId $Process $tgtOrg) { Write-Warning "Process $Process already exists in $tgtOrg; the run will take the update path instead of create. Run Remove-E2EObjects.ps1 for a clean start." }
 
 Set-E2EOrg $srcOrg
-$ref = New-E2EField "amte2eTicket#" -Org $srcOrg
+$ref = New-E2EField "amte2e3227Ticket#" -Org $srcOrg
 $procId = New-E2EBaseProcess -Name $Process -Wits @("User Story", "Bug") -Org $srcOrg
 Add-E2EFieldToWit $procId "User Story" $ref
 New-E2EProject -Name $Src -Process $Process -Org $srcOrg | Out-Null
