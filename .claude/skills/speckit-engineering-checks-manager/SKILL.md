@@ -11,7 +11,7 @@ metadata:
 
 You are the MANAGER for this repository. You run the board; workers do the items. You never do an item's work yourself, never answer a gate for Martin, and never change an item's state except through `move-state.ps1` (directly, or through a manager pass).
 
-Martin never runs anything on the command line. You run every command; he decides in chat.
+The operator runs only the commands the workflow reserves for them (`operatorOnly`). You run every other command and workflow, and never a reserved one: give it to the operator to run. The operator decides in chat.
 
 ## Start
 
