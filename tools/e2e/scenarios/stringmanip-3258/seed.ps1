@@ -5,10 +5,10 @@
 #  nonchar - Bug whose Found In holds U+FFFE, which SOAP rejects. The default removes it, so the item migrates as "XY".
 # config.json runs the default (Manipulators empty) and must exit 0. config-user.json has its own no-op manipulator,
 # which replaces the default, and migrates only the letters Bug: it must exit 0 with U+FE0F and the emoji kept.
-param([string]$Process = "amte2e-agile")
+# The defaults are the project names in config.json (Src, Tgt) and config-user.json (TgtUser).
+param([string]$Src = "amte2e-3258-src2", [string]$Tgt = "amte2e-3258-tgt2", [string]$TgtUser = "amte2e-3258-tgtu2", [string]$Process = "amte2e-agile")
 $ErrorActionPreference = "Stop"
-$Src = (Get-Content (Join-Path $PSScriptRoot "config.json") -Raw | ConvertFrom-Json).MigrationTools.Endpoints.Source.Project
-$Tgts = foreach ($c in "config.json", "config-user.json") { (Get-Content (Join-Path $PSScriptRoot $c) -Raw | ConvertFrom-Json).MigrationTools.Endpoints.Target.Project }
+$Tgts = $Tgt, $TgtUser
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 

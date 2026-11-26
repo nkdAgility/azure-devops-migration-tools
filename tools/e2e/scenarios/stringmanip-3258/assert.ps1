@@ -1,10 +1,10 @@
 #Requires -Version 7.0
 # stringmanip-3258 assertions. Without -User, checks the run with config.json (the built-in default); with -User, the
 # run with config-user.json (a no-op manipulator, which replaces the default). The caller checks that the run exited 0.
-param([string]$OutFile, [switch]$User)
+# The defaults are the project names in config.json (Tgt) and config-user.json (TgtUser).
+param([string]$Src = "amte2e-3258-src2", [string]$Tgt = "amte2e-3258-tgt2", [string]$TgtUser = "amte2e-3258-tgtu2", [string]$OutFile, [switch]$User)
 $ErrorActionPreference = "Stop"
-$Config = if ($User) { "config-user.json" } else { "config.json" }
-$Tgt = (Get-Content (Join-Path $PSScriptRoot $Config) -Raw | ConvertFrom-Json).MigrationTools.Endpoints.Target.Project
+if ($User) { $Tgt = $TgtUser }
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
