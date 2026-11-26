@@ -58,8 +58,18 @@ if (-not $isSource) {
 # reconciled into the docs and deleted in this pull request, before it is marked ready.
 if (Test-Path .specify/items/current.json) {
     $curId = (Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number
-    $left = Get-ChildItem specs -Directory -Filter "$curId-*" -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($left) { $fail.Add("specs/$($left.Name)/ is still here: reconcile what was decided and built into the docs, then delete the folder in this pull request") }
+    Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+    if ((Get-ItemDocsMode '.') -eq 'artifacts') {
+        # The item's documents are artifacts on its issue: the folder is a local copy that is never in git, and the
+        # issue must hold every file of it as it is now.
+        $tracked = @(git ls-files -- "specs/$curId-*" 2>$null)
+        if ($tracked) { $fail.Add("the item's folder is tracked on this branch ($($tracked -join ', ')); in this repo it is kept as artifacts on #$curId. Remove it from git (git rm --cached) in this pull request") }
+        try { Publish-ItemDocs '.' $curId | Out-Null; $drift = @(Get-ItemDocsDrift '.' $curId); if ($drift) { $fail.Add("#$curId's artifacts do not match the working copy: $($drift -join ', ')") } }
+        catch { $fail.Add("#$curId's artifacts could not be checked: $_") }
+    } else {
+        $left = Get-ChildItem specs -Directory -Filter "$curId-*" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($left) { $fail.Add("specs/$($left.Name)/ is still here: reconcile what was decided and built into the docs, then delete the folder in this pull request") }
+    }
 }
 # No temporary Spec Kit or workflow file reaches main: a bug or idea assessment, a review file, or an older item record.
 $temp = @(git ls-files -- .specify/bugs .specify/assessments .specify/reviews .specify/wkr 2>$null)
