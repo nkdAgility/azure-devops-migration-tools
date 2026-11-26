@@ -21,7 +21,8 @@ New-E2EProject -Name $Tgt -Process $Process | Out-Null
 New-E2EProject -Name $FailTgt -Process $NoBugProcess | Out-Null
 Set-E2EOrg nkdagility-adomt-source
 New-E2EProject -Name $Src -Process $Process | Out-Null
-New-E2EProject -Name $Gone -Process $Process | Out-Null
+# Gone is the one project the pool cannot give (#3342): it is deleted below, so it is made in the source org only.
+New-E2EDisposableProject -Name $Gone -Process $Process | Out-Null
 
 $b = Set-E2EWorkItem $Src "User Story" -Fields ([ordered]@{ "System.Title" = "in-scope B" })
 $o = Set-E2EWorkItem $Src "User Story" -Fields ([ordered]@{ "System.Title" = "out-of-scope O" })
@@ -45,7 +46,7 @@ Set-E2EWorkItem -Id $rItem.id -Fields ([ordered]@{ "System.Description" = "link 
 $sharedSteps = Set-E2EWorkItem $Gone "Shared Steps" -Fields ([ordered]@{ "System.Title" = "S, shared steps in a project that is then deleted" })
 $t = Set-E2EWorkItem $Src "Test Case" -Fields ([ordered]@{ "System.Title" = "in-scope T (uses unreadable shared steps)" }) -Ops @(
     @{ op = "add"; path = "/relations/-"; value = @{ rel = "Microsoft.VSTS.TestCase.SharedStepReferencedBy-Reverse"; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/wit/workItems/$($sharedSteps.id)" } })
-Remove-E2EProject $Gone
+Remove-E2EDisposableProject $Gone | Out-Null
 $bug = Set-E2EWorkItem $Src "Bug" -Fields ([ordered]@{ "System.Title" = "fail-scope Bug" })
 
 Save-E2EState $PSScriptRoot @{ a = $a.id; b = $b.id; o = $o.id; x = $x.id; r = $rItem.id; t = $t.id; shared = $sharedSteps.id; bug = $bug.id }

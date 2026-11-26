@@ -4,10 +4,31 @@ Each folder under `tools/e2e/scenarios/` is one scenario run against the test or
 `tools/e2e/Invoke-MigrationE2E.ps1`. A scenario seeds its own scratch projects (`amte2e-*`), runs the built tool with
 its configs, and checks the target.
 
+Scratch projects come from the scratch project pool (`amte2e-pool-NN`, see [cleanup.md](cleanup.md)): `New-E2EProject`
+takes a pool project, clears it, puts it on the process the seed asks for and gives it the seed's name, and
+`Remove-E2EProject` gives it back. No scenario creates or deletes a project, except `linkscope` and `wicore-fresh` (below).
+
 ## Single-run scenarios
 
 A scenario with `seed.ps1`, `config.json` and `assert.ps1`, whose seed takes `-Src` and `-Tgt`, is run by the
-repository's proof (`.specify/memory/proof.ps1`) in projects named for that run.
+repository's proof (`.specify/memory/proof.ps1`) in pool projects renamed for that run. The proof gives back each
+scenario's projects before the next scenario, and again when it ends, even after a failure, then lists the pool
+projects it used and that each was released. `-Only <scenario>` runs just that scenario; a name that cannot run fails the proof before it starts. Each run's id
+ends in six random hex digits and a run id already in use is refused; a run deletes only the `-fresh` target it
+recorded making (`AMTE2E_CREATED_LOG`), checked by id.
+
+## Not poolable
+
+A scenario that cannot run in a pool project is listed here with its reason (at most 3).
+
+- `linkscope`: its X work item must be unreadable, which only a deleted project gives. Its source, target and fail-target
+  projects come from the pool; its `*-gone` project is created and deleted in the source org with
+  `New-E2EDisposableProject`.
+- `wicore-fresh`: `wicore`'s seed and assertions, migrating into a brand-new target project (`*-fresh`, made with
+  `New-E2EDisposableProject` and deleted by the proof after the scenario), so behaviour that differs on a new project is
+  still caught. It is the one project a run makes in the target org; its source comes from the pool. It runs only
+  with `AMTE2E_FRESH_PROJECTS=1` (the target org may have no room for a new project); without it the proof prints
+  "wicore-fresh skipped: AMTE2E_FRESH_PROJECTS is not set" and `New-E2EDisposableProject` refuses any target-org project.
 
 ## Multi-step scenarios
 

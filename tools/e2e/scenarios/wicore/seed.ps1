@@ -1,12 +1,13 @@
 # wi-core: hierarchy, multi-revision history, attachment and link added at known revisions, area/iteration nodes.
-param([string]$Src = "amte2e-wicore-src", [string]$Tgt = "amte2e-wicore-tgt", [string]$Process = "amte2e-agile")
+# -FreshTarget (wicore-fresh): the target is a brand-new project, made by the caller, not one from the pool.
+param([string]$Src = "amte2e-wicore-src", [string]$Tgt = "amte2e-wicore-tgt", [string]$Process = "amte2e-agile", [switch]$FreshTarget)
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 $u = Get-E2EUsers
 
 Set-E2EOrg nkdagility-adomt-target
-New-E2EProject -Name $Tgt -Process $Process | Out-Null
+if (-not $FreshTarget) { New-E2EProject -Name $Tgt -Process $Process | Out-Null }
 Set-E2EOrg nkdagility-adomt-source
 New-E2EProject -Name $Src -Process $Process | Out-Null
 
