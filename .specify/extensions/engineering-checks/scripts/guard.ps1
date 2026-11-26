@@ -295,23 +295,37 @@ if ($scopeRoot -and (Test-Path (Join-Path $scopeRoot '.specify/memory/workflow.j
     if ($productTargets) {
         $cur = Join-Path $scopeRoot '.specify/items/current.json'
         if (-not (Test-Path $cur)) {
-            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and this branch has no item. Product code is changed only by the worker for an item in Building, after Refining, an approved spec and the Ready gate.")
-            exit 2
-        }
-        $itemId = (Get-Content $cur -Raw | ConvertFrom-Json).number
-        Import-Module (Join-Path $scopeRoot '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
-        $wcfg = Get-WorkflowConfig -Root $scopeRoot
-        $gItem = & (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId
-        $state = $gItem.state
-        # The states that may change product code are the repo's own: each is flagged "editsCode" in its workflow.json.
-        if (-not (Test-StateFlag $wcfg $state 'editsCode')) {
-            $codeStates = @($wcfg.states | Where-Object { $_.ContainsKey('editsCode') -and $_.editsCode } | ForEach-Object { $_.name }) -join ', '
-            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only in $($codeStates): through Refining, Martin's approval of the spec, and the Ready gate.")
-            exit 2
-        }
-        if (@($gItem.tags) -contains 'spec-reconcile-required') {
-            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is tagged spec-reconcile-required. Revise the spec and get Martin's approval of the new version first; then clear the tag with set-blocked.ps1 -Clear.")
-            exit 2
+            # On main, a change of a kind directToMain lists may be made without an item: every file inside one kind's
+            # paths and none under "never". The commit's kind is checked again when it is pushed.
+            $onMain = (git -C $scopeRoot rev-parse --abbrev-ref HEAD 2>$null) -in 'main', 'master'
+            $dtm = if ($wf.PSObject.Properties['directToMain']) { $wf.directToMain } else { $null }
+            $fits = $false
+            if ($onMain -and $dtm -and $dtm.allowed) {
+                $dkinds = if ($dtm.PSObject.Properties['kinds'] -and @($dtm.kinds).Count) { @($dtm.kinds) } else { @([pscustomobject]@{ paths = @($dtm.paths) }) }
+                $dnever = @($dtm.never | ForEach-Object { ConvertTo-PushGlob $_ })
+                $fits = -not ($productTargets | Where-Object { $f = $_
+                    ($dnever | Where-Object { $f -match $_ }) -or -not ($dkinds | Where-Object { @($_.paths | ForEach-Object { ConvertTo-PushGlob $_ }) | Where-Object { $f -match $_ } }) })
+            }
+            if (-not $fits) {
+                [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and this branch has no item. Product code is changed only by the worker for an item in a state that edits code, or on main as a change of a kind directToMain lists.")
+                exit 2
+            }
+        } else {
+            $itemId = (Get-Content $cur -Raw | ConvertFrom-Json).number
+            Import-Module (Join-Path $scopeRoot '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
+            $wcfg = Get-WorkflowConfig -Root $scopeRoot
+            $gItem = & (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId
+            $state = $gItem.state
+            # The states that may change product code are the repo's own: each is flagged "editsCode" in its workflow.json.
+            if (-not (Test-StateFlag $wcfg $state 'editsCode')) {
+                $codeStates = @($wcfg.states | Where-Object { $_.ContainsKey('editsCode') -and $_.editsCode } | ForEach-Object { $_.name }) -join ', '
+                [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only in $($codeStates): through Refining, Martin's approval of the spec, and the Ready gate.")
+                exit 2
+            }
+            if (@($gItem.tags) -contains 'spec-reconcile-required') {
+                [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is tagged spec-reconcile-required. Revise the spec and get Martin's approval of the new version first; then clear the tag with set-blocked.ps1 -Clear.")
+                exit 2
+            }
         }
     }
 }
