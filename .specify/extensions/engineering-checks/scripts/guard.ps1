@@ -14,17 +14,55 @@ $inputs = $call.tool_input
 $text = @($inputs.command, $inputs.file_path, $inputs.path) -join ' '
 
 # Each command in a chain is checked on its own; git global options (git -C dir push) may come before push.
-$pushBlocked = foreach ($seg in ($text -split '[|;&\r\n]+')) {
-    $m = [regex]::Match($seg, '\bgit(\s+-\S+(\s+(?!push\b)[^\s-]\S*)?)*\s+push\b(?<rest>.*)$')
+# A push to main is refused unless the repo's .specify/memory/workflow.json sets directToMain, for example
+#   "directToMain": { "allowed": true, "only": "fix", "paths": ["system/**"], "never": ["specs/**"] }
+# and then only a plain push of local main whose every commit is of that kind and touches only those paths.
+function ConvertTo-PushGlob([string]$g) { '^' + ([regex]::Escape($g) -replace '\\\*\\\*', '.*' -replace '\\\*', '[^/]*' -replace '\\\?', '.') + '$' }
+function Get-DirectToMainRefusal([string]$dir, [string[]]$pa) {
+    $cfgPath = Join-Path $dir '.specify/memory/workflow.json'
+    $root = git -C $dir rev-parse --show-toplevel 2>$null
+    if ($root) { $cfgPath = Join-Path $root '.specify/memory/workflow.json' }
+    $d = if (Test-Path $cfgPath) { (Get-Content $cfgPath -Raw | ConvertFrom-Json).directToMain } else { $null }
+    if (-not $d -or -not $d.allowed) { return 'pushing to main is blocked. Merge through a PR and the merge queue.' }
+    $flags = @($pa | Where-Object { $_ -like '-*' -and $_ -notin '-u', '--set-upstream', '-q', '--quiet', '-v', '--verbose' })
+    $args2 = @($pa | Where-Object { $_ -notlike '-*' })
+    if ($flags.Count -or $args2.Count -gt 2 -or ($args2 | Where-Object { $_ -match '[:+]' }) -or ($args2.Count -eq 2 -and $args2[1] -notin 'main', 'master')) {
+        return 'push local main exactly as it is: no refspec, --all, --tags, --delete or other option.'
+    }
+    $branch = git -C $dir rev-parse --abbrev-ref HEAD 2>$null
+    if ($branch -notin 'main', 'master') { return "only local main can be pushed to main (this is $branch)." }
+    git -C $dir fetch -q origin $branch 2>$null
+    $commits = @(git -C $dir rev-list "origin/$branch..HEAD" 2>$null)
+    if ($LASTEXITCODE -ne 0) { return "the commits to push could not be listed (origin/$branch..HEAD)." }
+    $kind = if ($d.only) { [string]$d.only } else { 'fix' }
+    $paths = @($d.paths | ForEach-Object { ConvertTo-PushGlob $_ })
+    $never = @($d.never | ForEach-Object { ConvertTo-PushGlob $_ })
+    foreach ($c in $commits) {
+        $subject = git -C $dir log -1 --format=%s $c
+        if ($subject -notmatch "^$([regex]::Escape($kind))(\([^)]*\))?!?:") { return "commit $($c.Substring(0,8)) is not a $kind commit: $subject" }
+        foreach ($f in @(git -C $dir diff-tree --no-commit-id --name-only -r --root $c)) {
+            if ($never | Where-Object { $f -match $_ }) { return "commit $($c.Substring(0,8)) touches $f, which never goes to main directly." }
+            if (-not ($paths | Where-Object { $f -match $_ })) { return "commit $($c.Substring(0,8)) touches $f, outside the paths that may go to main directly." }
+        }
+    }
+    $null
+}
+foreach ($seg in ($text -split '[|;&\r\n]+')) {
+    $m = [regex]::Match($seg, '\bgit(?<g>(\s+-\S+(\s+(?!push\b)[^\s-]\S*)?)*)\s+push\b(?<rest>.*)$')
     if (-not $m.Success) { continue }
     $pa = @($m.Groups['rest'].Value.Trim() -split '\s+' | Where-Object { $_ } | ForEach-Object { $_.Trim('''"') })
     $force = $pa | Where-Object { $_ -match '^(--force(-with-lease)?(=.*)?|-[a-zA-Z]*f[a-zA-Z]*|\+.+)$' }
-    $toMain = $pa | Where-Object { $_ -match '^(\+?(refs/heads/)?(main|master)|.*:(refs/heads/)?(main|master))$' }
-    if ($force -or $toMain) { $true }
-}
-if ($pushBlocked) {
-    [Console]::Error.WriteLine('guard: pushing to main or force-pushing is blocked. Merge through a PR and the merge queue.')
-    exit 2
+    if ($force) { [Console]::Error.WriteLine('guard: force-pushing is blocked.'); exit 2 }
+    $c = [regex]::Match($m.Groups['g'].Value, '-C\s+(?<d>"[^"]+"|''[^'']+''|\S+)')
+    $dir = if ($c.Success) { $c.Groups['d'].Value.Trim('''"') } elseif ($call.cwd) { "$($call.cwd)" } else { (Get-Location).Path }
+    $refs = @($pa | Where-Object { $_ -notlike '-*' })
+    # Pushes to main: a refspec naming it, --all or --mirror, or a plain push (no refspec) from local main.
+    $toMain = ($refs | Where-Object { $_ -match '^(\+?(refs/heads/)?(main|master)|.*:(refs/heads/)?(main|master))$' }) -or ($pa | Where-Object { $_ -in '--all', '--mirror' })
+    if (-not $toMain -and $refs.Count -le 1) { $toMain = (git -C $dir rev-parse --abbrev-ref HEAD 2>$null) -in 'main', 'master' }
+    if ($toMain) {
+        $why = Get-DirectToMainRefusal $dir $pa
+        if ($why) { [Console]::Error.WriteLine("guard: $why"); exit 2 }
+    }
 }
 if ($text -match 'gh\s+issue\s+edit\b.*--(add|remove)-label\s+[''"]?state:' -or $text -match 'gh\s+project\s+item-edit\b' -or $text -match 'setIssueStatus|setIssueFieldValue|updateIssueFieldValue') {
     [Console]::Error.WriteLine('guard: board state is changed only through move-state.ps1, which checks the policy first.')
@@ -180,6 +218,9 @@ if ($writes) {
     while ($dir -and -not (Test-Path $dir)) { $dir = Split-Path $dir -Parent }
     $inRepo = $false
     if ($dir) { git -C $dir rev-parse --is-inside-work-tree 2>$null | Out-Null; $inRepo = $LASTEXITCODE -eq 0 }
+    # A file git ignores (an item's working copy kept as issue artifacts, say) is not a change to the branch.
+    $editTarget = if ($inputs.file_path) { [string]$inputs.file_path } elseif ($inputs.notebook_path) { [string]$inputs.notebook_path } else { $null }
+    if ($inRepo -and $editTarget -and -not $isShell) { git -C $dir check-ignore -q -- $editTarget 2>$null; if ($LASTEXITCODE -eq 0) { $inRepo = $false } }
     if ($inRepo) {
         Push-Location $dir
         try {
@@ -246,8 +287,10 @@ if ($scopeRoot -and (Test-Path (Join-Path $scopeRoot '.specify/memory/workflow.j
         $wcfg = Get-WorkflowConfig -Root $scopeRoot
         $gItem = & (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId
         $state = $gItem.state
-        if ($state -notin 'Building', 'Validating', 'In review') {
-            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only once the item is in Building: through Refining, Martin's approval of the spec, and the Ready gate.")
+        # The states that may change product code are the repo's own: each is flagged "editsCode" in its workflow.json.
+        if (-not (Test-StateFlag $wcfg $state 'editsCode')) {
+            $codeStates = @($wcfg.states | Where-Object { $_.ContainsKey('editsCode') -and $_.editsCode } | ForEach-Object { $_.name }) -join ', '
+            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only in $($codeStates): through Refining, Martin's approval of the spec, and the Ready gate.")
             exit 2
         }
         if (@($gItem.tags) -contains 'spec-reconcile-required') {
