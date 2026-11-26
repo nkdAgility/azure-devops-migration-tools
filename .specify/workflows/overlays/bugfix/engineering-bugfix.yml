@@ -26,7 +26,7 @@ edits:
     id: nkda-specified
     type: shell
     run: 'pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1
-      -To Specified -Reason "bug assessed: reproduction, cause and proposed fix written"'
+      -Reason "bug assessed: reproduction, cause and proposed fix written"'
 - insert_before: fix
   step:
     id: nkda-spec-agreed
@@ -37,7 +37,7 @@ edits:
     id: nkda-ready
     type: shell
     run: 'pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1
-      -To Building -Reason "Definition of Ready: spec agreed by Martin"'
+      -Reason "Definition of Ready: spec agreed by Martin"'
 - insert_after: test
   step:
     id: nkda-done-checks
