@@ -51,6 +51,7 @@
     },
     {
       "name": "Refined",
+      "parentsSplit": true,
       "category": "Proposed",
       "kind": "wait",
       "wipLimit": null,
@@ -72,6 +73,7 @@
     },
     {
       "name": "Building",
+      "editsCode": true,
       "category": "In Progress",
       "kind": "work",
       "wipLimit": 2,
@@ -79,6 +81,7 @@
     },
     {
       "name": "Validating",
+      "editsCode": true,
       "category": "In Progress",
       "kind": "work",
       "wipLimit": 2,
@@ -86,6 +89,7 @@
     },
     {
       "name": "In review",
+      "editsCode": true,
       "category": "In Progress",
       "kind": "work",
       "wipLimit": 3,
