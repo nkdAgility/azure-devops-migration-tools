@@ -62,7 +62,7 @@ finally {
         Import-Module (Join-Path $repo "tools/e2e/E2EAzDo.psm1") -Force
         foreach ($p in @(@{ Org = 'nkdagility-adomt-source'; Name = $src }, @{ Org = 'nkdagility-adomt-target'; Name = $tgt })) {
             Set-E2EOrg $p.Org
-            if (@(Get-E2EProjects -Org $p.Org -Prefix $p.Name) | Where-Object name -eq $p.Name) { Remove-E2EProject $p.Name -Org $p.Org; "deleted $($p.Org)/$($p.Name)" }
+            if (@(Get-E2EProjects -Org $p.Org -Prefix $p.Name) | Where-Object name -eq $p.Name) { Remove-E2EProject $p.Name -Org $p.Org; "gave back pool project $($p.Org)/$($p.Name)" }
         }
     }
 }
