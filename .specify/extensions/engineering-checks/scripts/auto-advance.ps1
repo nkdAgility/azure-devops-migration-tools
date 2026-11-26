@@ -24,6 +24,9 @@ try {
 
     Import-Module (Join-Path $root '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
     $cfg = Get-WorkflowConfig -Root $root
+    # In "artifacts" mode every change to the item's folder is published to its issue straight away.
+    try { $pub = @(Publish-ItemDocs $root $id); if ($pub.Count) { "auto-advance: published to #${id}: $($pub -join ', ')" } }
+    catch { [Console]::Error.WriteLine("auto-advance: could not publish #$id's documents to its issue ($_); they are only local until the next write.") }
     # The manager reads this item's record and activity from this worktree.
     Set-StoredWorktree $id ([IO.Path]::GetFullPath($root))
     $ad = Get-BoardAdapter $cfg $root
@@ -31,7 +34,7 @@ try {
     if (-not $item -or $item.tags -contains $cfg.tags.blocked) { exit 0 }
     if ((Get-StateDef $cfg $item.state).kind -ne 'work') { exit 0 }
     $order = Get-ItemOrder $cfg $item
-    $i = $order.IndexOf($item.state)
+    $i = Get-StateIndex $order $item.state
     if ($i -lt 0 -or $i -ge $order.Count - 1) { exit 0 }
     $to = $order[$i + 1]
 

@@ -10,8 +10,10 @@ if (-not (Test-Path $cfgPath)) {
     $c = Get-Content (Join-Path $PSScriptRoot '..\workflow\workflow.default.json') -Raw | ConvertFrom-Json -AsHashtable
     if ($Repo) { $c.board.repo = $Repo }
     $c | ConvertTo-Json -Depth 10 | Set-Content $cfgPath -Encoding utf8
-    "wrote $cfgPath (check the order, Package and WIP limits)"
+    "wrote $cfgPath as a draft from the template. Its states are this repo's own: rename, remove or add states for Martin to agree before going on. Only the four categories are required (at least one state in each; one in Completed, one in Removed). Check the order, Package and WIP limits too."
 }
+$bad = @(Get-WorkflowConfigProblem (Get-Content $cfgPath -Raw | ConvertFrom-Json -AsHashtable | ForEach-Object { $_['order'] = if ($_.validatingBeforeMerge) { $_.orderBeforeMerge } else { $_.orderAfterMerge }; $_ }))
+if ($bad.Count) { $bad | ForEach-Object { Write-Error "workflow.json: $_" -ErrorAction Continue }; exit 1 }
 $cfg = Get-WorkflowConfig
 $nwo = if ($cfg.board['repo']) { $cfg.board.repo } else { (gh repo view --json nameWithOwner | ConvertFrom-Json).nameWithOwner }
 $r = if ($cfg.board['repo']) { @('-R', $cfg.board.repo) } else { @() }
