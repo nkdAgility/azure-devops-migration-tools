@@ -373,3 +373,130 @@ Describe "disposable projects (linkscope gone, wicore-fresh target)" {
         }
     }
 }
+
+Describe "replies that are not JSON (#3351)" {
+    BeforeEach { $env:AMTE2E_POOL_OWNER = "4242:runA" }
+    BeforeAll {
+        $script:Html = "<!DOCTYPE html><html><body>Azure DevOps is busy</body></html>"
+        $script:Org = "nkdagility-adomt-source"
+    }
+
+    It "HTML then JSON: reads again after a wait and returns the JSON" {
+        InModuleScope E2EAzDo -Parameters @{ Html = $Html; Org = $Org } {
+            param($Html, $Org)
+            $script:Headers = @{ Authorization = "x" }; $script:n = 0
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { $script:n++; if ($script:n -lt 3) { $Html } else { [pscustomobject]@{ value = @(@{ name = "t" }) } } }
+            (Invoke-E2ERest "_apis/projects/p1/teams" -Org $Org).value[0].name | Should -Be "t"
+            Should -Invoke Invoke-RestMethod -Times 3 -Exactly
+            Should -Invoke Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 5 }
+            Should -Invoke Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 15 }
+        }
+    }
+
+    It "JSON that comes back as text is returned as it is, not retried" {
+        InModuleScope E2EAzDo -Parameters @{ Org = $Org } {
+            param($Org)
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { '{"value":[{"name":"a","Name":"b"}]}' }
+            Invoke-E2ERest "p1/_apis/wit/workitemtypes" -Org $Org | Should -BeOfType [string]
+            Should -Invoke Invoke-RestMethod -Times 1 -Exactly
+            Should -Invoke Start-Sleep -Times 0 -Exactly
+        }
+    }
+
+    It "permanent HTML: one clear line naming the call and the organisation, after 4 tries" {
+        InModuleScope E2EAzDo -Parameters @{ Html = $Html; Org = $Org } {
+            param($Html, $Org)
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { $Html }
+            $e = { Invoke-E2ERest "_apis/projects/p1/teams" -Org $Org } | Should -Throw -PassThru
+            $e.Exception | Should -BeOfType [E2EUnavailableException]
+            $e.Exception.Message | Should -Be "GET _apis/projects/p1/teams in $Org returned HTML instead of JSON after 4 tries; Azure DevOps is unavailable. Every lease is kept."
+            Should -Invoke Invoke-RestMethod -Times 4 -Exactly
+        }
+    }
+
+    It "a write answered with HTML is not sent again" {
+        InModuleScope E2EAzDo -Parameters @{ Html = $Html; Org = $Org } {
+            param($Html, $Org)
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { $Html }
+            { Invoke-E2ERest "_apis/projects/p1/teams" -Org $Org -Method POST -Body @{ name = "x" } } | Should -Throw "POST _apis/projects/p1/teams in $Org returned HTML instead of JSON; it is not sent again*"
+            Should -Invoke Invoke-RestMethod -Times 1 -Exactly
+        }
+    }
+
+    It "HTTP <Status> on a read is waited out like an HTML page" -ForEach @(@{ Status = 429 }, @{ Status = 503 }) {
+        InModuleScope E2EAzDo -Parameters @{ Org = $Org; Status = $Status } {
+            param($Org, $Status)
+            $script:Headers = @{ Authorization = "x" }; $script:n = 0; $script:s = $Status
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { $script:n++; if ($script:n -eq 1) { throw [Microsoft.PowerShell.Commands.HttpResponseException]::new("busy", [System.Net.Http.HttpResponseMessage]::new($script:s)) }; [pscustomobject]@{ value = @() } }
+            Invoke-E2ERest "_apis/projects" -Org $Org | Out-Null
+            Should -Invoke Invoke-RestMethod -Times 2 -Exactly
+        }
+    }
+
+    It "any other HTTP error is not retried" {
+        InModuleScope E2EAzDo -Parameters @{ Org = $Org } {
+            param($Org)
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { throw [Microsoft.PowerShell.Commands.HttpResponseException]::new("gone", [System.Net.Http.HttpResponseMessage]::new(404)) }
+            { Invoke-E2ERest "_apis/projects/x" -Org $Org } | Should -Throw "gone"
+            Should -Invoke Invoke-RestMethod -Times 1 -Exactly
+        }
+    }
+
+    It "an unreadable teams reply never reads as no lease" {
+        InModuleScope E2EAzDo -Parameters @{ Html = $Html; Org = $Org } {
+            param($Html, $Org)
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { $Html }
+            { Get-E2EPoolLease "p1" $Org } | Should -Throw "*returned HTML instead of JSON*"
+            { Assert-E2EPoolLeaseHeld "p1" $Org } | Should -Throw "*returned HTML instead of JSON*"
+            { Get-E2EList "_apis/projects/p1/teams" $Org } | Should -Throw "*returned HTML instead of JSON*"
+        }
+    }
+
+    It "giving a project back while Azure DevOps stays unavailable deletes nothing" {
+        InModuleScope E2EAzDo -Parameters @{ Html = $Html; Org = $Org } {
+            param($Html, $Org)
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Get-E2EProjectOrNull { [pscustomobject]@{ id = "p1"; name = "amte2e-x-src" } }
+            Mock Invoke-RestMethod { $Html }
+            { Reset-E2EPoolProject -Name "amte2e-x-src" -Org $Org } | Should -Throw "*returned HTML instead of JSON*"
+            Should -Invoke Invoke-RestMethod -Times 0 -Exactly -ParameterFilter { $Method -ne "GET" -and $Method }
+        }
+    }
+
+    It "a take that meets an unavailable Azure DevOps stops at once and keeps the lease" {
+        InModuleScope E2EAzDo -Parameters @{ Org = $Org } {
+            param($Org)
+            Mock Get-E2EProjectOrNull { $null }
+            Mock Get-E2EPoolProject { @([pscustomobject]@{ Org = $Org; Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }, [pscustomobject]@{ Org = $Org; Id = "p2"; Name = "amte2e-pool-02"; Slot = 2; Lease = $null; State = "Free" }) }
+            Mock New-E2EPoolLease { $true }
+            Mock Clear-E2EPoolProject { throw [E2EUnavailableException]::new("GET x in $Org returned HTML instead of JSON after 4 tries; Azure DevOps is unavailable. Every lease is kept.") }
+            Mock Remove-E2EPoolLease {}
+            { Request-E2EPoolProject -Name "amte2e-new-src" -Org $Org } | Should -Throw "GET x in $Org returned HTML*"
+            Should -Invoke Remove-E2EPoolLease -Times 0 -Exactly
+            Should -Invoke New-E2EPoolLease -Times 1 -Exactly
+        }
+    }
+
+    It "Wait-E2EOperation reads past an HTML page" {
+        InModuleScope E2EAzDo -Parameters @{ Html = $Html } {
+            param($Html)
+            $script:Headers = @{ Authorization = "x" }; $script:n = 0
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { $script:n++; if ($script:n -eq 1) { $Html } else { [pscustomobject]@{ status = "succeeded" } } }
+            (Wait-E2EOperation ([pscustomobject]@{ id = 1; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/operations/1" })).status | Should -Be "succeeded"
+        }
+    }
+}

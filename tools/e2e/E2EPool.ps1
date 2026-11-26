@@ -447,6 +447,8 @@ function Request-E2EPoolProject {
             # the only record of the slot while the project has another name, so the pool name comes back first; if it
             # cannot, the lease is kept and expires, and the slot is still found and cleared on a later take.
             $err = "$(Format-E2EPoolName $c.Slot): $($_.Exception.Message)"
+            # Azure DevOps stayed unavailable: the next slot would fail the same way, so stop, keeping the lease.
+            if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
             try {
                 $poolName = Format-E2EPoolName $c.Slot
                 if ((Invoke-E2ERest "_apis/projects/$($c.Id)" -Org $Org).name -ne $poolName) { Rename-E2EPoolProject $c.Id $poolName $Org }

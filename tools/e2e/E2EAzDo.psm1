@@ -57,14 +57,41 @@ function Invoke-E2ERest {
     # A request that never got a response (a dropped connection) is retried only when it reads: a write may have been
     # applied without its response arriving, and sending it again can do it twice (a positional relation removal, or
     # the pool's lease team, whose creation is the claim).
+    $call = "$Method $Path in $Org"
     for ($try = 1; ; $try++) {
-        try { return Invoke-RestMethod @params }
+        try { $r = Invoke-RestMethod @params }
         catch {
             $noResponse = -not $_.Exception.Response -and $_.Exception -is [System.Net.Http.HttpRequestException]
-            if (-not $noResponse -or $Method -ne "GET" -or $try -ge 3) { throw }
-            Start-Sleep -Seconds (2 * $try)
+            if ($noResponse -and $Method -eq "GET" -and $try -lt 3) { Start-Sleep -Seconds (2 * $try); continue }
+            $status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
+            if ($status -notin $script:BusyStatuses -or $Method -ne "GET") { throw }
+            if ($try -ge $script:BusyWaits.Count + 1) { throw [E2EUnavailableException]::new("$call returned HTTP $status after $try tries; Azure DevOps is unavailable. Every lease is kept.") }
+            Start-Sleep -Seconds $script:BusyWaits[$try - 1]; continue
         }
+        if (Test-E2EReadableReply $r) { return $r }
+        # A throttle or sign-in page comes back as 200 with HTML. It is never read as an empty answer (an empty teams
+        # list would read as "no lease"). A write is not sent again: it may already have been applied.
+        if ($Method -ne "GET") { throw [E2EUnavailableException]::new("$call returned HTML instead of JSON; it is not sent again, as it may have been applied. Every lease is kept.") }
+        if ($try -ge $script:BusyWaits.Count + 1) { throw [E2EUnavailableException]::new("$call returned HTML instead of JSON after $try tries; Azure DevOps is unavailable. Every lease is kept.") }
+        Start-Sleep -Seconds $script:BusyWaits[$try - 1]
     }
+}
+
+# Azure DevOps is busy or showing a page instead of an answer: wait and read again (4 tries in all).
+$script:BusyWaits = @(5, 15, 30)
+$script:BusyStatuses = @(429, 503)
+
+# Thrown when Azure DevOps keeps answering with HTML or busy statuses. Its message is the one line a proof shows.
+class E2EUnavailableException : System.Exception { E2EUnavailableException([string]$m) : base($m) {} }
+
+# Invoke-RestMethod returns parsed JSON as objects, and returns text when it cannot parse the body. Text that is
+# JSON (an endpoint whose keys differ only in case) is readable; its callers parse it. Anything else is not.
+function Test-E2EReadableReply($Reply) {
+    if ($Reply -isnot [string]) { return $true }
+    $t = $Reply.Trim()
+    if (-not $t) { return $true }
+    if ($t[0] -notin '{', '[') { return $false }
+    try { $null = $t | ConvertFrom-Json -AsHashtable; $true } catch { $false }
 }
 
 # A project by name or id, or $null only when the service says it does not exist; any other failure is thrown, so
@@ -83,10 +110,26 @@ function Wait-E2EOperation($op, [int]$TimeoutSeconds = 600) {
     do {
         if ((Get-Date) -gt $deadline) { throw "Operation $($op.id) did not finish within $TimeoutSeconds seconds." }
         Start-Sleep -Seconds 3
-        $s = Invoke-RestMethod -Uri $op.url -Headers $script:Headers
+        $s = Invoke-E2EOperationPoll $op.url
     } while ($s.status -in "notSet", "queued", "inProgress")
     if ($s.status -ne "succeeded") { throw "Operation failed: $($s.status) $($s.resultMessage)" }
     $s
+}
+
+# One read of an operation's status, with the same waits as Invoke-E2ERest for an HTML page or a busy status.
+# Wait-E2EOperation has already checked that the url is in a test organisation.
+function Invoke-E2EOperationPoll([string]$Url) {
+    for ($try = 1; ; $try++) {
+        $why = $null
+        try { $r = Invoke-RestMethod -Uri $Url -Headers $script:Headers; if (Test-E2EReadableReply $r) { return $r }; $why = "HTML instead of JSON" }
+        catch {
+            $status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
+            if ($status -notin $script:BusyStatuses) { throw }
+            $why = "HTTP $status"
+        }
+        if ($try -ge $script:BusyWaits.Count + 1) { throw [E2EUnavailableException]::new("GET operation $Url returned $why after $try tries; Azure DevOps is unavailable. Every lease is kept.") }
+        Start-Sleep -Seconds $script:BusyWaits[$try - 1]
+    }
 }
 
 function Get-E2EProcessId([string]$Name, [string]$Org = $script:DefaultOrg) {
