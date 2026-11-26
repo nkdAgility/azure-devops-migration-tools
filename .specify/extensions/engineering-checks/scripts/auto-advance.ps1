@@ -34,7 +34,7 @@ try {
     if (-not $item -or $item.tags -contains $cfg.tags.blocked) { exit 0 }
     if ((Get-StateDef $cfg $item.state).kind -ne 'work') { exit 0 }
     $order = Get-ItemOrder $cfg $item
-    $i = $order.IndexOf($item.state)
+    $i = Get-StateIndex $order $item.state
     if ($i -lt 0 -or $i -ge $order.Count - 1) { exit 0 }
     $to = $order[$i + 1]
 
