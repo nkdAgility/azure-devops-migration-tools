@@ -30,6 +30,7 @@ Describe "lease state" {
         @{ Case = "a past expiry"; State = "Expired"; Lease = [pscustomobject]@{ Expires = [datetime]::UtcNow.AddMinutes(-1); Machine = "elsewhere"; Pid = "" } }
         @{ Case = "another machine's live lease"; State = "Held"; Lease = [pscustomobject]@{ Expires = [datetime]::UtcNow.AddHours(1); Machine = "elsewhere"; Pid = "1" } }
         @{ Case = "a hand run (no pid)"; State = "Held"; Lease = [pscustomobject]@{ Expires = [datetime]::UtcNow.AddHours(1); Machine = [Environment]::MachineName; Pid = "" } }
+        @{ Case = "this machine, owner running past expiry"; State = "Held"; Lease = [pscustomobject]@{ Expires = [datetime]::UtcNow.AddMinutes(-30); Machine = [Environment]::MachineName; Pid = "$PID" } }
         @{ Case = "this machine, owner running"; State = "Held"; Lease = [pscustomobject]@{ Expires = [datetime]::UtcNow.AddHours(1); Machine = [Environment]::MachineName; Pid = "$PID" } }
     ) {
         InModuleScope E2EAzDo -Parameters @{ L = $Lease; S = $State } { param($L, $S) Get-E2EPoolLeaseState $L | Should -Be $S }

@@ -99,7 +99,7 @@ $poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
 # What this invocation creates outside the pool is recorded here (by pid as well as run id), so it deletes only that.
 $env:AMTE2E_CREATED_LOG = Join-Path ([IO.Path]::GetTempPath()) "amte2e-created-$Item-$RunId-$PID.log"
 # A run id already in use (passed again with -RunId, or drawn twice) is refused, so no two runs share a name.
-$inUse = @(foreach ($org in $poolOrgs) { @(Get-E2EProjects -Org $org -Prefix "amte2e-$Item-p$RunId-").name; @(Get-E2EProcesses -Org $org -Prefix "amte2e-$Item-p$RunId-").name } | Where-Object { $_ })
+$inUse = @($(foreach ($org in $poolOrgs) { @(Get-E2EProjects -Org $org -Prefix "amte2e-$Item-p$RunId-").name; @(Get-E2EProcesses -Org $org -Prefix "amte2e-$Item-p$RunId-").name }) | Where-Object { $_ })
 if ($inUse) { Write-Error "run id $RunId is already in use (found: $($inUse -join ', ')); give another -RunId"; exit 1 }
 # Renews this run's leases before each long step (migration, assertions), so they do not expire mid-scenario.
 $renewPool = { foreach ($org in $poolOrgs) { foreach ($h in @(Get-E2EPoolProject -Org $org -Owner $poolRun)) { Set-E2EPoolLease $h.Id $org -Renew } } }
@@ -110,9 +110,8 @@ $releasePool = {
     foreach ($line in $freshProjects) {
         $fOrg, $fId, $fName = $line.Split('|', 3)
         try {
-            $cur = Get-E2EProjectOrNull $fId $fOrg
-            if ($cur -and $cur.name -eq $fName) { Remove-E2EDisposableProject $fName -Org $fOrg; "deleted fresh project $fOrg/$fName" }
-            elseif ($cur) { $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: its id now has the name $($cur.name)" }
+            # Deleted by the recorded id, never by a fresh lookup of the name, which another run could have reused.
+            if (Remove-E2EDisposableProject $fName -Org $fOrg -Id $fId) { "deleted fresh project $fOrg/$fName" }
             $rest = @(Get-Content $env:AMTE2E_CREATED_LOG | Where-Object { $_ -ne $line }); Set-Content $env:AMTE2E_CREATED_LOG $rest
         }
         catch { $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: $($_.Exception.Message)" }

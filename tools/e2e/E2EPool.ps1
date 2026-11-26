@@ -56,9 +56,13 @@ function ConvertFrom-E2EPoolLease([string]$Text) {
 # Free, Held, Expired or Orphaned (this machine, owner pid set and no longer running).
 function Get-E2EPoolLeaseState($Lease, [datetime]$Now = [datetime]::UtcNow) {
     if (-not $Lease) { return "Free" }
-    if ($Lease.Expires -lt $Now) { return "Expired" }
+    # On this machine the owner's process is checked first: while it runs, its project is Held even past expiry (a long
+    # migration may still be writing to it); once it has exited, the lease is Orphaned whatever its expiry.
     $ownerPid = 0
-    if ($Lease.Machine -eq [Environment]::MachineName -and [int]::TryParse("$($Lease.Pid)", [ref]$ownerPid) -and -not (Get-Process -Id $ownerPid -ErrorAction SilentlyContinue)) { return "Orphaned" }
+    if ($Lease.Machine -eq [Environment]::MachineName -and [int]::TryParse("$($Lease.Pid)", [ref]$ownerPid)) {
+        if (Get-Process -Id $ownerPid -ErrorAction SilentlyContinue) { return "Held" } else { return "Orphaned" }
+    }
+    if ($Lease.Expires -lt $Now) { return "Expired" }
     "Held"
 }
 

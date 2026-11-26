@@ -169,10 +169,15 @@ function New-E2EDisposableProject {
     }
 }
 
-function Remove-E2EDisposableProject([string]$Name, [string]$Org = $script:DefaultOrg) {
+# With -Id, exactly that project is deleted, and only while it still has the name $Name (the guard checks the name);
+# without it, the project named $Name. Returns $true when it deleted one, $false when there was none.
+function Remove-E2EDisposableProject([string]$Name, [string]$Org = $script:DefaultOrg, [string]$Id) {
     Assert-E2EDisposable $Name $Org
-    $p = Get-E2EProjectOrNull $Name $Org
-    if ($p) { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null }
+    $p = Get-E2EProjectOrNull $(if ($Id) { $Id } else { $Name }) $Org
+    if (-not $p) { return $false }
+    if ($p.name -ne $Name) { throw "Project $Id in $Org is now named '$($p.name)', not '$Name'; it is not deleted." }
+    Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null
+    $true
 }
 
 # -Prefix selects one issue's scratch objects (for example "amt3242-"); it must itself pass Assert-E2EName.

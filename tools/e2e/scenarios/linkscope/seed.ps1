@@ -46,7 +46,7 @@ Set-E2EWorkItem -Id $rItem.id -Fields ([ordered]@{ "System.Description" = "link 
 $sharedSteps = Set-E2EWorkItem $Gone "Shared Steps" -Fields ([ordered]@{ "System.Title" = "S, shared steps in a project that is then deleted" })
 $t = Set-E2EWorkItem $Src "Test Case" -Fields ([ordered]@{ "System.Title" = "in-scope T (uses unreadable shared steps)" }) -Ops @(
     @{ op = "add"; path = "/relations/-"; value = @{ rel = "Microsoft.VSTS.TestCase.SharedStepReferencedBy-Reverse"; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/wit/workItems/$($sharedSteps.id)" } })
-Remove-E2EDisposableProject $Gone
+Remove-E2EDisposableProject $Gone | Out-Null
 $bug = Set-E2EWorkItem $Src "Bug" -Fields ([ordered]@{ "System.Title" = "fail-scope Bug" })
 
 Save-E2EState $PSScriptRoot @{ a = $a.id; b = $b.id; o = $o.id; x = $x.id; r = $rItem.id; t = $t.id; shared = $sharedSteps.id; bug = $bug.id }
