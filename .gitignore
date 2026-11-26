@@ -173,3 +173,6 @@ logs/
 .specify/manager/
 .specify/items/
 .specify/reviews/
+
+# Item working copies: kept as artifacts on the item's issue (itemDocs: artifacts), never committed.
+/specs/

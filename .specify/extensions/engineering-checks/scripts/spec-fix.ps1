@@ -38,7 +38,20 @@ foreach ($p in @($rel, $ver.Groups['p'].Value) | Select-Object -Unique) {
     }
     if ($old) { break }
 }
-if (-not $old) { Write-Error "The approved text of $rel is not in git, so the fix cannot be measured. Commit the approved version before fixing it, or get Martin's approval of the new version."; exit 1 }
+# In "artifacts" mode the approved text is in the version history of the spec's artifact on the issue.
+if (-not $old -and (Get-ItemDocsMode '.') -eq 'artifacts') {
+    $folder = Get-ItemFolder '.' $id
+    $inFolder = if ($folder) { [IO.Path]::GetRelativePath($folder, $file).Replace('\', '/') } else { Split-Path $file -Leaf }
+    foreach ($body in @(Get-ItemArtifactVersions '.' $id $inFolder)) {
+        $t = ($body -replace "`r`n", "`n").TrimEnd("`n")
+        foreach ($cand in @("$t`n", $t)) {
+            $h = ([Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($cand)))).ToLowerInvariant()
+            if ($accepted.Contains($h)) { $old = $cand; $from = $h; break }
+        }
+        if ($old) { break }
+    }
+}
+if (-not $old) { Write-Error "The approved text of $rel is not in git or in its artifact's history, so the fix cannot be measured. Commit the approved version before fixing it, or get Martin's approval of the new version."; exit 1 }
 $a = @($old -split "`n"); $b = @(((Get-Content $file -Raw) -replace "`r`n", "`n") -split "`n")
 $diff = @(Compare-Object $a $b)
 $chars = ($diff | ForEach-Object { "$($_.InputObject)".Length } | Measure-Object -Sum).Sum

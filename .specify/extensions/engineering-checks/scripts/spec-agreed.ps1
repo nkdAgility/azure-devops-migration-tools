@@ -38,5 +38,8 @@ if ($bound) {
     "spec agreed: $words (already bound to $path at $hash)"; exit 0
 }
 Add-Content $wkr "Spec version: $path sha256 $hash"
-"spec agreed: $words (bound to $path at $hash)"
+# In "artifacts" mode the approved version goes onto the issue now, so its version history holds what Martin approved.
+$pub = @(Publish-ItemDocs '.' $id)
+if (@(Get-ItemDocsDrift '.' $id).Count) { Write-Error "The item's documents could not all be published to #$id; the approval is recorded locally only."; exit 1 }
+"spec agreed: $words (bound to $path at $hash)$(if ($pub.Count) { "; published: $($pub -join ', ')" })"
 exit 0
