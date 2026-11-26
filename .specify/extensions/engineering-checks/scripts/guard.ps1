@@ -218,6 +218,9 @@ if ($writes) {
     while ($dir -and -not (Test-Path $dir)) { $dir = Split-Path $dir -Parent }
     $inRepo = $false
     if ($dir) { git -C $dir rev-parse --is-inside-work-tree 2>$null | Out-Null; $inRepo = $LASTEXITCODE -eq 0 }
+    # A file git ignores (an item's working copy kept as issue artifacts, say) is not a change to the branch.
+    $editTarget = if ($inputs.file_path) { [string]$inputs.file_path } elseif ($inputs.notebook_path) { [string]$inputs.notebook_path } else { $null }
+    if ($inRepo -and $editTarget -and -not $isShell) { git -C $dir check-ignore -q -- $editTarget 2>$null; if ($LASTEXITCODE -eq 0) { $inRepo = $false } }
     if ($inRepo) {
         Push-Location $dir
         try {

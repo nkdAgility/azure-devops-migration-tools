@@ -187,6 +187,123 @@ function Get-ItemRecordPath([string]$Root = '.', $Id) {
     Join-Path $Root "specs/$Id/item.md"
 }
 
+# ---------------------------------------------------------------- item documents: files or issue artifacts
+# A repo chooses where an item's documents are kept, with "itemDocs" in its workflow.json:
+#   "files" (the default): specs/<issue>-<name>/ is committed on the branch and removed before the PR is ready;
+#   "artifacts": specs/<issue>-<name>/ is a local working copy, not in git, and each file in it is published as a
+#                Markdown artifact on the item's issue, which is the record the checks read.
+
+function Get-ItemDocsMode([string]$Root = '.') {
+    $p = Join-Path $Root '.specify/memory/workflow.json'
+    if (-not (Test-Path $p)) { return 'files' }
+    $c = Get-Content $p -Raw | ConvertFrom-Json
+    if ($c.PSObject.Properties['itemDocs'] -and "$($c.itemDocs)" -eq 'artifacts') { 'artifacts' } else { 'files' }
+}
+
+function Get-ItemDocsRepoArgs([string]$Root = '.') {
+    $p = Join-Path $Root '.specify/memory/workflow.json'
+    if (Test-Path $p) { $c = Get-Content $p -Raw | ConvertFrom-Json -AsHashtable; if ($c['board'] -and $c.board['repo']) { return @('-R', $c.board.repo) } }
+    @()
+}
+
+function Get-ArtifactName([string]$Rel) {
+    # An artifact name for a file in the item's folder: its path inside the folder, "/" as "_"; only letters, digits,
+    # spaces, ".", "-" and "_" are kept (GitHub refuses brackets, "!" and "?").
+    (($Rel.Replace('\', '/') -replace '/', '_') -replace '[^\w .-]', '-')
+}
+
+function ConvertTo-DocText([string]$Text) { ("$Text" -replace "`r`n", "`n").TrimEnd("`n") }
+
+function Get-ItemArtifacts([string]$Root = '.', $Id) {
+    $r = Get-ItemDocsRepoArgs $Root
+    Push-Location $Root
+    try {
+        $j = gh issue artifact list $Id @r --json number,name 2>$null
+        if ($LASTEXITCODE -ne 0) { throw "could not list the artifacts on #$Id" }
+        @($j | ConvertFrom-Json)
+    } finally { Pop-Location }
+}
+
+function Get-ItemArtifactText([string]$Root = '.', $Id, [string]$Rel, [int]$Version) {
+    # The current text of the artifact for <Rel>, or of one of its versions; $null when there is no such artifact.
+    $name = Get-ArtifactName $Rel
+    $a = @(Get-ItemArtifacts $Root $Id | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+    if (-not $a) { return $null }
+    $r = Get-ItemDocsRepoArgs $Root
+    $v = if ($Version) { @('--version', "$Version") } else { @() }
+    Push-Location $Root
+    try { $b = gh issue artifact view $Id $a.number @r @v --json body 2>$null; if ($LASTEXITCODE -ne 0) { throw "could not read artifact $name on #$Id" }; ($b | ConvertFrom-Json).body }
+    finally { Pop-Location }
+}
+
+function Get-ItemArtifactVersions([string]$Root = '.', $Id, [string]$Rel) {
+    # Every version's text of the artifact for <Rel>, oldest first.
+    $name = Get-ArtifactName $Rel
+    $a = @(Get-ItemArtifacts $Root $Id | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+    if (-not $a) { return @() }
+    $r = Get-ItemDocsRepoArgs $Root
+    Push-Location $Root
+    try {
+        $j = gh issue artifact view $Id $a.number @r --json versions 2>$null
+        if ($LASTEXITCODE -ne 0) { throw "could not read the versions of artifact $name on #$Id" }
+        @(($j | ConvertFrom-Json).versions | Sort-Object { [int]$_.version } | ForEach-Object { "$($_.body)" })
+    } finally { Pop-Location }
+}
+
+function Get-ItemDocFiles([string]$Root = '.', $Id) {
+    $folder = Get-ItemFolder $Root $Id
+    if (-not $folder) { return @() }
+    @(Get-ChildItem $folder -File -Recurse | ForEach-Object { @{ rel = [IO.Path]::GetRelativePath($folder, $_.FullName).Replace('\', '/'); path = $_.FullName } })
+}
+
+function Publish-ItemDocs([string]$Root = '.', $Id) {
+    # In "artifacts" mode, publishes each file of the item's folder as an artifact on its issue: created when new,
+    # edited only when its text changed (so the version history holds real changes only). Returns what it changed.
+    if ((Get-ItemDocsMode $Root) -ne 'artifacts') { return @() }
+    $r = Get-ItemDocsRepoArgs $Root
+    $existing = @(Get-ItemArtifacts $Root $Id)
+    $done = @()
+    Push-Location $Root
+    try {
+        foreach ($f in @(Get-ItemDocFiles $Root $Id)) {
+            $name = Get-ArtifactName $f.rel
+            $text = ConvertTo-DocText ([IO.File]::ReadAllText($f.path))
+            $a = @($existing | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+            $tmp = [IO.Path]::GetTempFileName(); [IO.File]::WriteAllText($tmp, $text + "`n")
+            try {
+                if ($a) {
+                    $cur = (gh issue artifact view $Id $a.number @r --json body 2>$null | ConvertFrom-Json).body
+                    if ((ConvertTo-DocText $cur) -eq $text) { continue }
+                    gh issue artifact edit $Id $a.number @r -F $tmp 2>&1 | Out-Null
+                    if ($LASTEXITCODE -ne 0) { throw "could not update artifact $name on #$Id" }
+                    $done += "updated $name"
+                } else {
+                    gh issue artifact create $Id @r -F $tmp --name $name 2>&1 | Out-Null
+                    if ($LASTEXITCODE -ne 0) { throw "could not create artifact $name on #$Id" }
+                    $done += "created $name"
+                }
+            } finally { Remove-Item $tmp -ErrorAction SilentlyContinue }
+        }
+    } finally { Pop-Location }
+    $done
+}
+
+function Get-ItemDocsDrift([string]$Root = '.', $Id) {
+    # In "artifacts" mode, the files of the item's folder whose artifact is missing or holds other text.
+    if ((Get-ItemDocsMode $Root) -ne 'artifacts') { return @() }
+    $existing = @(Get-ItemArtifacts $Root $Id)
+    $r = Get-ItemDocsRepoArgs $Root
+    Push-Location $Root
+    try {
+        @(foreach ($f in @(Get-ItemDocFiles $Root $Id)) {
+            $a = @($existing | Where-Object { $_.name -eq (Get-ArtifactName $f.rel) }) | Select-Object -First 1
+            if (-not $a) { $f.rel; continue }
+            $cur = (gh issue artifact view $Id $a.number @r --json body 2>$null | ConvertFrom-Json).body
+            if ((ConvertTo-DocText $cur) -ne (ConvertTo-DocText ([IO.File]::ReadAllText($f.path)))) { $f.rel }
+        })
+    } finally { Pop-Location }
+}
+
 function New-ItemFolder([string]$Root = '.', $Id, [string]$Title) {
     # Creates specs/<issue>-<name>/ with item.md, the name taken from the issue's title. Returns the folder.
     $existing = Get-ItemFolder $Root $Id
@@ -204,7 +321,7 @@ function New-ItemFolder([string]$Root = '.', $Id, [string]$Title) {
 
 function Get-ItemRoot($Item, [string]$Root = '.') {
     # Where the item's own record lives: its worker's worktree once one is recorded, else the given root.
-    if (-not $script:StoreRoot) { $script:StoreRoot = $Root }
+    if (-not (Get-Variable -Scope Script -Name StoreRoot -ValueOnly -ErrorAction SilentlyContinue)) { $script:StoreRoot = $Root }
     $id = if ($Item -is [System.Collections.IDictionary]) { $Item['id'] } elseif ($Item -and $Item.PSObject.Properties['id']) { $Item.id } else { $null }
     if (-not $id) { return $Root }
     $wt = Get-StoredWorktree $id
@@ -214,8 +331,11 @@ function Get-ItemRoot($Item, [string]$Root = '.') {
 function Get-ItemEvidence {
     param($Item, [string]$Root = '.')
     $parts = @("$($Item.body)") + @($Item.comments | ForEach-Object { "$($_.body)" })
-    $wkr = Get-ItemRecordPath (Get-ItemRoot $Item $Root) $Item.id
+    $iroot = Get-ItemRoot $Item $Root
+    $wkr = Get-ItemRecordPath $iroot $Item.id
     if (Test-Path $wkr) { $parts += Get-Content $wkr -Raw }
+    # In "artifacts" mode, with no working copy here (the worker's worktree is gone, say), the record is read from the issue.
+    elseif ((Get-ItemDocsMode $iroot) -eq 'artifacts') { $t = Get-ItemArtifactText $iroot $Item.id 'item.md'; if ($t) { $parts += $t } }
     ($parts -join "`n`n") -replace "`r`n", "`n"
 }
 
@@ -849,4 +969,4 @@ function Format-AttentionList($Report) {
 
 Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemDocsMode, Get-ArtifactName, Get-ItemArtifacts, Get-ItemArtifactText, Get-ItemArtifactVersions, Get-ItemDocFiles, Publish-ItemDocs, Get-ItemDocsDrift, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
