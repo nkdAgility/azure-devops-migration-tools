@@ -31,6 +31,22 @@ function Get-WorkflowConfigProblem($Config) {
     }
     if (-not @($Config.order).Count) { 'the state order is empty' }
     foreach ($o in @($Config.order)) { if ($o -notin $states.name) { "the order names '$o', which is not a state" } }
+    # operatorOnly: commands only the operator runs. Each entry has a name and at least one match glob.
+    if ($Config -is [hashtable] -and $Config.ContainsKey('operatorOnly')) {
+        foreach ($e in @($Config.operatorOnly)) {
+            if (-not ($e -is [hashtable]) -or -not "$($e['name'])") { "an operatorOnly entry has no name" }
+            elseif (-not @($e['match'] | Where-Object { "$_" }).Count) { "the operatorOnly entry '$($e['name'])' has no match" }
+        }
+    }
+}
+# The operatorOnly entry a command matches (case-insensitive wildcards, on the whole command or any part of a chain), or $null.
+function Get-OperatorOnlyMatch($Config, [string]$Command) {
+    if (-not ($Config -is [hashtable]) -or -not $Config.ContainsKey('operatorOnly') -or -not "$Command".Trim()) { return $null }
+    $parts = @($Command) + @($Command -split '[|;&\r\n]+' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    foreach ($e in @($Config.operatorOnly)) {
+        foreach ($g in @($e['match'])) { if ($parts | Where-Object { $_ -like "$g" }) { return $e } }
+    }
+    $null
 }
 function Get-CategoryState($Config, [string]$Category) { @($Config.states | Where-Object { $_['category'] -eq $Category } | ForEach-Object { $_.name }) | Select-Object -First 1 }
 function Get-EntryState($Config) { @($Config.order)[0] }
@@ -967,6 +983,6 @@ function Format-AttentionList($Report) {
     $lines -join "`n"
 }
 
-Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
+Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-OperatorOnlyMatch,Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
     Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemDocsMode, Get-ArtifactName, Get-ItemArtifacts, Get-ItemArtifactText, Get-ItemArtifactVersions, Get-ItemDocFiles, Publish-ItemDocs, Get-ItemDocsDrift, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift

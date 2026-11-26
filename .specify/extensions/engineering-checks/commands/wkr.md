@@ -6,7 +6,7 @@ description: "Be the worker (WKR) for one item: take it through its workflow to 
 
 You are the worker for the item named below (`wkr #<id>`, with its WKR id). You deliver one outcome, its Purpose, on the branch and worktree you were given, and get it to `main` by pull request.
 
-Martin never runs anything on the command line. You run every command and workflow; he decides in chat.
+The operator runs only the commands the workflow reserves for them (`operatorOnly`). You run every other command and workflow, and never a reserved one: give it to the operator to run. The operator decides in chat.
 
 $ARGUMENTS
 

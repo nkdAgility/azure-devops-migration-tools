@@ -64,6 +64,18 @@ foreach ($seg in ($text -split '[|;&\r\n]+')) {
         if ($why) { [Console]::Error.WriteLine("guard: $why"); exit 2 }
     }
 }
+# operatorOnly: commands the repo's workflow reserves for the operator. An agent never runs one; it gives it to them.
+if ($call.tool_name -match '^(Bash|PowerShell)$' -and "$($inputs.command)".Trim()) {
+    $opDir = if ($call.cwd) { "$($call.cwd)" } else { (Get-Location).Path }
+    $opRoot = git -C $opDir rev-parse --show-toplevel 2>$null
+    $opCfgPath = Join-Path $(if ($opRoot) { $opRoot } else { $opDir }) '.specify/memory/workflow.json'
+    if (Test-Path $opCfgPath) {
+        $opCfg = Get-Content $opCfgPath -Raw | ConvertFrom-Json -AsHashtable
+        Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+        $op = Get-OperatorOnlyMatch $opCfg "$($inputs.command)"
+        if ($op) { [Console]::Error.WriteLine("guard: '$($op['name'])' is reserved for the operator$(if ($op['why']) { " ($($op['why']))" }). Give them the command to run."); exit 2 }
+    }
+}
 if ($text -match 'gh\s+issue\s+edit\b.*--(add|remove)-label\s+[''"]?state:' -or $text -match 'gh\s+project\s+item-edit\b' -or $text -match 'setIssueStatus|setIssueFieldValue|updateIssueFieldValue') {
     [Console]::Error.WriteLine('guard: board state is changed only through move-state.ps1, which checks the policy first.')
     exit 2
