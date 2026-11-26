@@ -13,7 +13,8 @@ takes a pool project, clears it, puts it on the process the seed asks for and gi
 A scenario with `seed.ps1`, `config.json` and `assert.ps1`, whose seed takes `-Src` and `-Tgt`, is run by the
 repository's proof (`.specify/memory/proof.ps1`) in pool projects renamed for that run. The proof gives back each
 scenario's projects before the next scenario, and again when it ends, even after a failure, then lists the pool
-projects it used and that each was released. `-Only <scenario>` runs just that scenario.
+projects it used and that each was released. `-Only <scenario>` runs just that scenario; a name that cannot run fails the proof before it starts. Each run's id
+ends in three random hex digits, so two runs never share a name, and a run deletes only its own `-fresh` target.
 
 ## Not poolable
 

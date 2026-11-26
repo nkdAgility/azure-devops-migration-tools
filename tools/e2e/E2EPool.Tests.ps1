@@ -36,7 +36,7 @@ Describe "lease state" {
     }
 
     It "is Orphaned when this machine's owner pid has exited" {
-        $p = Start-Process pwsh -ArgumentList "-NoProfile", "-Command", "exit 0" -PassThru -WindowStyle Hidden; $p.WaitForExit()
+        $p = Start-Process pwsh -ArgumentList "-NoProfile", "-Command", "exit 0" -PassThru -NoNewWindow; $p.WaitForExit()
         InModuleScope E2EAzDo -Parameters @{ Dead = $p.Id } {
             param($Dead)
             Get-E2EPoolLeaseState ([pscustomobject]@{ Expires = [datetime]::UtcNow.AddHours(1); Machine = [Environment]::MachineName; Pid = "$Dead" }) | Should -Be "Orphaned"
@@ -105,7 +105,7 @@ Describe "Request-E2EPoolProject" {
     It "fails when the pool is exhausted, naming each lease, and creates no project (Q-7)" {
         InModuleScope E2EAzDo {
             $held = [pscustomobject]@{ Token = "other|9|runB"; Expires = [datetime]::UtcNow.AddHours(1) }
-            Mock Invoke-E2ERest { throw "404" } -ParameterFilter { $Path -like "_apis/projects/amte2e-*" -and $Method -eq "GET" }
+            Mock Get-E2EProjectOrNull { $null } -ParameterFilter { $NameOrId -like "amte2e-*" }
             Mock Invoke-E2ERest { throw "no create expected" } -ParameterFilter { $Method -eq "POST" }
             Mock Get-E2EPoolProject { @([pscustomobject]@{ Org = "o"; Id = "p1"; Name = "amte2e-x-tgt"; Slot = 1; Lease = $held; State = "Held" }) }
             { Request-E2EPoolProject -Name "amte2e-new-tgt" -Org "nkdagility-adomt-target" } | Should -Throw "No free pool project in nkdagility-adomt-target. Leases: amte2e-x-tgt (slot amte2e-pool-01) held by other|9|runB*"
@@ -133,7 +133,7 @@ Describe "Request-E2EPoolProject" {
 
     It "moves to the next project when another taker wins the claim" {
         InModuleScope E2EAzDo {
-            Mock Invoke-E2ERest { throw "404" } -ParameterFilter { $Path -eq "_apis/projects/amte2e-x-tgt" }
+            Mock Get-E2EProjectOrNull { $null } -ParameterFilter { $NameOrId -eq "amte2e-x-tgt" }
             Mock Invoke-E2ERest { [pscustomobject]@{ id = "p2"; name = "amte2e-x-tgt" } } -ParameterFilter { $Path -eq "_apis/projects/p2" }
             Mock Get-E2EPoolProject { @(
                 [pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }
@@ -148,7 +148,7 @@ Describe "Request-E2EPoolProject" {
 
     It "frees a failed slot's lease and tries the next slot" {
         InModuleScope E2EAzDo {
-            Mock Invoke-E2ERest { throw "404" } -ParameterFilter { $Path -eq "_apis/projects/amte2e-x-tgt" }
+            Mock Get-E2EProjectOrNull { $null } -ParameterFilter { $NameOrId -eq "amte2e-x-tgt" }
             Mock Get-E2EPoolProject { @([pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }, [pscustomobject]@{ Id = "p2"; Name = "amte2e-pool-02"; Slot = 2; Lease = $null; State = "Free" }) }
             Mock New-E2EPoolLease { $true }
             Mock Clear-E2EPoolProject { throw "VS403000 no permission to destroy" } -ParameterFilter { $ProjectId -eq "p1" }
@@ -157,16 +157,63 @@ Describe "Request-E2EPoolProject" {
             Mock Rename-E2EPoolProject {}
             Mock Set-E2EPoolLease {}
             Mock Invoke-E2ERest { [pscustomobject]@{ id = "p2"; name = "amte2e-x-tgt" } } -ParameterFilter { $Path -eq "_apis/projects/p2" }
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p1"; name = "amte2e-pool-01" } } -ParameterFilter { $Path -eq "_apis/projects/p1" }
             Mock Remove-E2EPoolLease {}
             (Request-E2EPoolProject -Name "amte2e-x-tgt" -Org "nkdagility-adomt-target").PoolSlot | Should -Be 2
             Should -Invoke Remove-E2EPoolLease -Times 1 -Exactly
         }
     }
 
+    It "gives a slot that failed after its rename its pool name back before freeing the lease" {
+        InModuleScope E2EAzDo {
+            Mock Get-E2EProjectOrNull { $null }
+            Mock Get-E2EPoolProject { @([pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }) }
+            Mock New-E2EPoolLease { $true }
+            Mock Clear-E2EPoolProject {}
+            Mock Switch-E2EPoolProcess {}
+            Mock Rename-E2EPoolProject {}
+            Mock Set-E2EPoolLease { throw "renew failed" }
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p1"; name = "amte2e-x-tgt" } } -ParameterFilter { $Path -eq "_apis/projects/p1" }
+            Mock Remove-E2EPoolLease {}
+            { Request-E2EPoolProject -Name "amte2e-x-tgt" -Org "nkdagility-adomt-target" } | Should -Throw "*renew failed (lease freed)*"
+            Should -Invoke Rename-E2EPoolProject -Times 1 -Exactly -ParameterFilter { $Name -eq "amte2e-pool-01" }
+            Should -Invoke Remove-E2EPoolLease -Times 1 -Exactly
+        }
+    }
+
+    It "keeps the lease when the pool name cannot be given back, so the slot is still found" {
+        InModuleScope E2EAzDo {
+            Mock Get-E2EProjectOrNull { $null }
+            Mock Get-E2EPoolProject { @([pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }) }
+            Mock New-E2EPoolLease { $true }
+            Mock Clear-E2EPoolProject {}
+            Mock Switch-E2EPoolProcess {}
+            Mock Rename-E2EPoolProject {}
+            Mock Rename-E2EPoolProject { throw "rename refused" } -ParameterFilter { $Name -eq "amte2e-pool-01" }
+            Mock Set-E2EPoolLease { throw "renew failed" }
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p1"; name = "amte2e-x-tgt" } } -ParameterFilter { $Path -eq "_apis/projects/p1" }
+            Mock Remove-E2EPoolLease {}
+            { Request-E2EPoolProject -Name "amte2e-x-tgt" -Org "nkdagility-adomt-target" } | Should -Throw "*lease kept until it expires*"
+            Should -Invoke Remove-E2EPoolLease -Times 0 -Exactly
+        }
+    }
+
+    It "never renews an expired lease" {
+        InModuleScope E2EAzDo {
+            Mock Get-E2EPoolLease { [pscustomobject]@{ Slot = 3; Token = (Get-E2EPoolOwner).Token; Expires = [datetime]::UtcNow.AddMinutes(-1); Team = [pscustomobject]@{ id = "t1" } } }
+            Mock Invoke-E2ERest { throw "no patch expected" }
+            { Set-E2EPoolLease "p1" "nkdagility-adomt-target" -Renew } | Should -Throw "*expired*"
+        }
+    }
+
+    It "reads a bad lease value as unreadable instead of failing" {
+        InModuleScope E2EAzDo { ConvertFrom-E2EPoolLease "slot=01;expires=invalid" | Should -BeNullOrEmpty; ConvertFrom-E2EPoolLease "slot=x;expires=2026-01-01T00:00:00Z" | Should -BeNullOrEmpty }
+    }
+
     It "takes over an expired lease only if it is unchanged since it was read" {
         InModuleScope E2EAzDo {
             $stale = [pscustomobject]@{ Token = "x|1|old"; Expires = [datetime]::UtcNow.AddHours(-1); Team = [pscustomobject]@{ id = "t1"; description = "d1" } }
-            Mock Invoke-E2ERest { throw "404" } -ParameterFilter { $Path -eq "_apis/projects/amte2e-x-tgt" }
+            Mock Get-E2EProjectOrNull { $null } -ParameterFilter { $NameOrId -eq "amte2e-x-tgt" }
             Mock Get-E2EPoolProject { @([pscustomobject]@{ Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $stale; State = "Expired" }) }
             # Someone renewed it in between: the team's description is no longer the one that was read.
             Mock Get-E2EPoolLease { [pscustomobject]@{ Token = "x|1|old"; Team = [pscustomobject]@{ id = "t1"; description = "d2" } } }
@@ -254,6 +301,26 @@ Describe "clearing work items" {
 }
 
 Describe "disposable projects (linkscope gone, wicore-fresh target)" {
+    # The flag is cleared for each case and put back after, so a shell that ran a live proof gives the same result.
+    BeforeEach { $script:savedFlag = $env:AMTE2E_FRESH_PROJECTS; $env:AMTE2E_FRESH_PROJECTS = $null }
+    AfterEach { $env:AMTE2E_FRESH_PROJECTS = $script:savedFlag }
+
+    It "refuses an existing target-org fresh project, which is not brand-new" {
+        $env:AMTE2E_FRESH_PROJECTS = "1"
+        InModuleScope E2EAzDo {
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p1"; name = "amte2e-x-fresh" } }
+            { New-E2EDisposableProject -Name "amte2e-x-fresh" -Org "nkdagility-adomt-target" } | Should -Throw "*already exists*"
+            Should -Invoke Invoke-E2ERest -Times 0 -Exactly -ParameterFilter { $Method -eq "POST" }
+        }
+    }
+
+    It "fails a removal whose lookup fails for a reason other than not found" {
+        InModuleScope E2EAzDo {
+            Mock Invoke-E2ERest { throw "503 Service Unavailable" }
+            { Remove-E2EDisposableProject -Name "amte2e-x-gone" -Org "nkdagility-adomt-source" } | Should -Throw "*503*"
+        }
+    }
+
     It "refuses <Case>" -ForEach @(
         @{ Case = "a gone project in the target org"; Name = "amte2e-x-gone"; Org = "nkdagility-adomt-target"; Msg = "*only names matching '-fresh$'*" }
         @{ Case = "a fresh project in the source org"; Name = "amte2e-x-fresh"; Org = "nkdagility-adomt-source"; Msg = "*only names matching '-gone$'*" }

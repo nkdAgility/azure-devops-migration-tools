@@ -8,7 +8,9 @@
 # scenario's projects are given back (cleared and renamed back) before the next scenario and in a finally, and the
 # pool slots used are listed at the end. Scratch processes are listed and not deleted here: Remove-E2EObjects.ps1 with
 # a per-run prefix also deletes other scenarios' fields (#3278).
-param([string]$RunId = (Get-Date -Format 'MMddHHmm'), [string]$Item, [switch]$All, [string]$Base = 'origin/main',
+# The run id ends in three random hex digits, so two runs started in the same minute (on any machine) never share a
+# name: releasePool deletes the '-fresh' target projects named after this run id, and only those.
+param([string]$RunId = "$(Get-Date -Format 'MMddHHmm')$('{0:x3}' -f (Get-Random -Maximum 4096))",[string]$Item, [switch]$All, [string]$Base = 'origin/main',
     # Run only these scenarios, whatever the change touches (used by tools/e2e/Test-E2EPool.ps1 -Case Scenario).
     [string[]]$Only)
 $ErrorActionPreference = 'Stop'
@@ -54,7 +56,13 @@ foreach ($p in $product) {
 # Only scenarios with a seed, a config and an assert can run; the list says what will actually run.
 $runnable = @(Get-ChildItem tools/e2e/scenarios -Directory | Where-Object { (Test-Path (Join-Path $_.FullName 'seed.ps1')) -and (Test-Path (Join-Path $_.FullName 'assert.ps1')) -and (Test-Path (Join-Path $_.FullName 'config.json')) } | ForEach-Object Name)
 if (-not $runAll) { foreach ($k in @($why.Keys)) { if ($runnable -notcontains $k) { $why.Remove($k) } } }
-if ($Only) { $runAll = $false; $why = @{}; foreach ($n in $Only) { $why[$n] = 'asked for (-Only)' } }
+if ($Only) {
+    # A name asked for that cannot run (mistyped, or without a seed, config and assert) fails here, before the queue,
+    # so a run never reports success while silently skipping a scenario it was asked for.
+    $unknown = @($Only | Where-Object { $runnable -notcontains $_ })
+    if ($unknown) { Write-Error "-Only names scenarios that cannot run (no folder with seed.ps1, assert.ps1 and config.json): $($unknown -join ', '). Runnable: $($runnable -join ', ')"; exit 1 }
+    $runAll = $false; $why = @{}; foreach ($n in $Only) { $why[$n] = 'asked for (-Only)' }
+}
 if ($runAll) { "== running all $($runnable.Count) runnable scenarios: $reasonAll" } else { "== running $($why.Count) scenario(s):"; $why.Keys | Sort-Object | ForEach-Object { "   $_ ($($why[$_]))" } }
 
 # One proof at a time on the shared test orgs: concurrent runs collide there (VS800075, dropped connections).

@@ -7,7 +7,9 @@ Import-Module (Join-Path $PSScriptRoot "..\..\E2EProcess.psm1") -Force
 foreach ($org in $Organisations) {
     Set-E2EOrg $org
     foreach ($p in @(Get-E2EProjects -Org $org | Where-Object name -like "amte2e-amt3241-*")) {
-        Remove-E2EProject $p.name -Org $org; "gave back pool project $org/$($p.name)"
+        # Run on its own, this is not the seed's process, so the seed's lease is not this run's: a lease whose seed has
+        # exited (Orphaned) or expired is taken over; one a live run holds is kept, and this stops.
+        $slot = Reset-E2EPoolProject -Name $p.name -Org $org -Force -StaleOnly; "gave back pool project $org/$($p.name) -> $slot"
     }
     $bin = (Invoke-E2ERest "_apis/projects?stateFilter=deleted&`$top=500" -Org $org).value | Where-Object name -like "amte2e-amt3241-*"
     foreach ($p in $bin) { "project $org/$($p.name) is in the recycle bin until Azure DevOps purges it (hard delete is not allowed on Services)" }

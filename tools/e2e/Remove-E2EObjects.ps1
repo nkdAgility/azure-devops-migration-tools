@@ -28,7 +28,7 @@ if ($ClearPool) {
         foreach ($h in @(Get-E2EPoolProject -Org $org -All | Where-Object Lease)) {
             if (-not $PSCmdlet.ShouldProcess("$org/$($h.Name)", "Release pool project (held by $($h.Lease.Token))")) { "would release $org/$($h.Name) -> $(Format-E2EPoolName $h.Slot) (held by $($h.Lease.Token), until $($h.Lease.Expires.ToString('o')))"; continue }
             "releasing $org/$($h.Name), held by $($h.Lease.Token)"
-            try { $slot = Reset-E2EPoolProject -Name $h.Name -Org $org -Force; "released $org/$($h.Name) -> $slot (cleared)" } catch { "NOT RELEASED $org/$($h.Name): $($_.Exception.Message)"; $failedRelease = $true }
+            try { $slot = Reset-E2EPoolProject -Name $h.Name -Org $org -Force; if (-not (Get-E2EPoolSlot "$slot")) { throw "the project was $slot when it was reset" }; "released $org/$($h.Name) -> $slot (cleared)" } catch { "NOT RELEASED $org/$($h.Name): $($_.Exception.Message)"; $failedRelease = $true }
         }
         "pool in $($org): $(@(Get-E2EPoolProject -Org $org).Count) free"
     }
@@ -51,10 +51,15 @@ foreach ($org in $Organisations) {
     # the processes they used can be deleted below. Any other project of the prefix is left and reported.
     # A lease a live run still holds is left alone (only -ClearPool overrides it): -All and a prefix only give back
     # projects whose run has expired or exited.
-    foreach ($h in @(Get-E2EPoolProject -Org $org -All | Where-Object { $_.Lease -and ($ClearPool -or $_.Name.StartsWith($Prefix)) })) {
+    foreach ($h in @(Get-E2EPoolProject -Org $org -All | Where-Object { $_.Lease -and ($ClearPool -or $All -or $_.Name.StartsWith($Prefix)) })) {
         if (-not $ClearPool -and $h.State -eq "Held") { "kept pool project $org/$($h.Name): held by a live run ($($h.Lease.Token)) until $($h.Lease.Expires.ToString('o'))"; continue }
         if (-not $PSCmdlet.ShouldProcess("$org/$($h.Name)", "Release pool project (held by $($h.Lease.Token))")) { "would release $org/$($h.Name) -> $(Format-E2EPoolName $h.Slot) (held by $($h.Lease.Token))"; continue }
-        try { $slot = Reset-E2EPoolProject -Name $h.Name -Org $org -Force; "released $org/$($h.Name) -> $slot (cleared)" } catch { $leftovers += "pool project $org/$($h.Name): $($_.Exception.Message)" }
+        # -StaleOnly: the lease is checked again at the reset, so a run that claimed or renewed it since the listing keeps it.
+        try {
+            $slot = Reset-E2EPoolProject -Name $h.Name -Org $org -Force -StaleOnly
+            if (Get-E2EPoolSlot "$slot") { "released $org/$($h.Name) -> $slot (cleared)" } else { "nothing to release for $org/$($h.Name): it was $slot" }
+        }
+        catch { if ($_.Exception.Message -like "*held by a live run*") { "kept pool project $($org)/$($h.Name): $($_.Exception.Message)" } else { $leftovers += "pool project $org/$($h.Name): $($_.Exception.Message)" } }
     }
     foreach ($p in @(Get-E2EProjects -Org $org -Prefix $Prefix | Where-Object { -not (Get-E2EPoolSlot $_.name) -and -not (Get-E2EPoolLease $_.id $org) })) {
         "kept project $org/$($p.name): not a pool project; projects are never deleted (adopt it with Initialize-E2EPool.ps1)"

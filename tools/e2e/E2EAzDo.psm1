@@ -54,16 +54,24 @@ function Invoke-E2ERest {
         # Assigned directly: returning a byte[] through an if-expression would unroll it and send it as text.
         if ($Body -is [string] -or $Body -is [byte[]]) { $params.Body = $Body } else { $params.Body = $Body | ConvertTo-Json -Depth 20 }
     }
-    # A request that never got a response (a dropped connection) is retried when it is safe to send twice. POST is not:
-    # creating the pool's lease team is the claim, and a second send would misread a won claim as lost.
+    # A request that never got a response (a dropped connection) is retried only when it reads: a write may have been
+    # applied without its response arriving, and sending it again can do it twice (a positional relation removal, or
+    # the pool's lease team, whose creation is the claim).
     for ($try = 1; ; $try++) {
         try { return Invoke-RestMethod @params }
         catch {
             $noResponse = -not $_.Exception.Response -and $_.Exception -is [System.Net.Http.HttpRequestException]
-            if (-not $noResponse -or $Method -eq "POST" -or $try -ge 3) { throw }
+            if (-not $noResponse -or $Method -ne "GET" -or $try -ge 3) { throw }
             Start-Sleep -Seconds (2 * $try)
         }
     }
+}
+
+# A project by name or id, or $null only when the service says it does not exist; any other failure is thrown, so
+# an unreadable project is never mistaken for an absent one.
+function Get-E2EProjectOrNull([string]$NameOrId, [string]$Org = $script:DefaultOrg) {
+    try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($NameOrId))" -Org $Org }
+    catch { if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -eq 404) { $null } else { throw } }
 }
 
 function Wait-E2EOperation($op, [int]$TimeoutSeconds = 600) {
@@ -140,7 +148,9 @@ function Assert-E2EDisposable([string]$Name, [string]$Org) {
 function New-E2EDisposableProject {
     param([Parameter(Mandatory)][string]$Name, [string]$Process = "amte2e-agile", [string]$Org = $script:DefaultOrg)
     Assert-E2EDisposable $Name $Org
-    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
+    $p = Get-E2EProjectOrNull $Name $Org
+    # A target-org '-fresh' project must be new: one left by an earlier attempt already holds migrated data.
+    if ($p -and $Org -eq 'nkdagility-adomt-target') { throw "Project $Org/$Name already exists, so it is not a brand-new target. Delete it (tools/e2e/Remove-E2EObjects.ps1) or use a new run id." }
     if ($p) { return $p }
     $processId = Get-E2EProcessId $Process $Org
     if (-not $processId) { throw "Process '$Process' not found in $Org. Run tools/e2e/Initialize-E2EEnvironment.ps1 first." }
@@ -156,7 +166,7 @@ function New-E2EDisposableProject {
 
 function Remove-E2EDisposableProject([string]$Name, [string]$Org = $script:DefaultOrg) {
     Assert-E2EDisposable $Name $Org
-    $p = try { Invoke-E2ERest "_apis/projects/$Name" -Org $Org } catch { $null }
+    $p = Get-E2EProjectOrNull $Name $Org
     if ($p) { Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$($p.id)" -Org $Org -Method DELETE) | Out-Null }
 }
 

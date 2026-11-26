@@ -17,8 +17,10 @@ Each test org keeps a fixed set of projects named `amte2e-pool-NN`, on `amte2e-a
   `amte2e-pool-lease` in it. Azure DevOps refuses a second team of that name, so exactly one run gets the project, on
   any machine. It then clears the project, switches it to the process (`projectprocessmigration`), renames it to the
   name (the default team and repo follow), and returns it. If no project can be claimed, it fails and names every
-  lease's holder and expiry; it never creates a project. A slot that fails part-way keeps its lease, so takes skip
-  it until it expires, and the next slot is tried. The switch is confirmed by the process and by the project offering
+  lease's holder and expiry, held slots under their scenario names included; it never creates a project. A slot that
+  fails part-way gets its pool name back and its lease freed, and the next slot is tried, at most three. If the pool
+  name cannot be given back, the lease is kept until it expires, since while the project has another name its lease is
+  the only record of its slot. The switch is confirmed by the process and by the project offering
   every work item type of that process.
 - **Give back.** `Remove-E2EProject <name>` clears the project, switches it back to `amte2e-agile`, renames it back to
   `amte2e-pool-NN` and deletes the lease team last. If that fails part-way the lease is kept, so a half-cleared project
@@ -26,15 +28,20 @@ Each test org keeps a fixed set of projects named `amte2e-pool-NN`, on `amte2e-a
 - **Lease.** The lease team's description holds `slot`, `machine`, `pid`, `run`, `item`, `claimed` and `expires`
   (UTC). It lasts two hours and is renewed on every take and give-back. The holder is the proof (`AMTE2E_POOL_OWNER`,
   `<pid>:<run>`), so seeds it starts share its leases; it renews them before each migration and assertion. An expired lease, or one whose holder is a process on this
-  machine that has exited, may be taken over; the taker deletes that lease team only if it is unchanged since it was
-  read. The holder re-reads its lease before every destructive step and stops if it is no longer there.
+  machine that has exited (Orphaned), may be taken over; the taker deletes that lease team only if, read again, it is
+  unchanged and still expired or orphaned. An expired lease is never renewed: its holder stops instead, so a renewal
+  never races a takeover. The holder re-reads its lease before every destructive step and stops if it is no longer
+  there; the teams list can briefly leave a team out, so a missing lease is read up to four times before it counts as
+  lost. A lease whose text cannot be read counts as expired. A process that takes a project without
+  `AMTE2E_POOL_OWNER` is the owner itself, with its own pid, so its leases read as Orphaned once it exits.
 - **Clear.** Work items are destroyed (not left in the recycle bin; Test Cases through the test case API). Shared
   Steps and Shared Parameters can't be deleted by any REST API (only in the web portal), so they are kept as
   leftovers: retitled `amte2e-pool leftover`, moved to the area `pool-leftovers`, every link removed. Every harness
   query leaves them out (`Get-E2EPoolLeftoverFilter`, used by `Get-E2EAllWorkItems` and by the `sharedsteps` and
   `testplans` source queries). Test plans and runs, build and release
   definitions, variable groups, service connections, environments, wikis, extra dashboards, queries, extra teams, area
-  and iteration children and tags are deleted; the repos are replaced by one new empty repo. "Cleared" is checked by
+  and iteration children and tags are deleted, and the Overview dashboards kept but emptied of widgets; the repos are
+  replaced by one new empty repo. "Cleared" is checked by
   an inventory of those surfaces read from the service (`Get-E2EPoolInventory`), not by the clearing code's own list.
 - **Adding projects.** `tools/e2e/Initialize-E2EPool.ps1` renames idle scratch projects (no lease, nothing changed in
   24 hours, or named with `-Include` by their owner) to `amte2e-pool-NN`. It never touches `migrationSource1` or
@@ -59,7 +66,7 @@ it belongs to. For example, the `fields` and `procdef` scenarios came from #3227
 | any other `-Prefix`, such as `amte2e-fields-` | given back if leased under the prefix and its run has expired or exited | those starting with the prefix | none, with the warning "Cannot map prefix" | 1 |
 | `-Prefix amte2e-`, `amte2e` or empty | refused before anything is changed | none | none | error |
 | no `-Prefix`, `-All` or `-ClearPool` | refused before anything is changed | none | none | error |
-| `-All` | every leased one given back whose run has expired or exited | every `amte2e-*` | every `Custom.amte2e*` | 0 |
+| `-All` | every leased one given back whose run has expired or exited, whatever its harness name (`amte2e-*` or `amt<issue>-*`); the lease is checked again at the reset, so one claimed since the listing is kept | every `amte2e-*` | every `Custom.amte2e*` | 0 |
 | `-ClearPool` | every leased one given back, whoever holds it (each holder is printed first) | none | none | 0, or 1 if one could not be given back |
 
 A scratch project that is not in the pool is left and reported ("kept project …"); add it with `Initialize-E2EPool.ps1`.

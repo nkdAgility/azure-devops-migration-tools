@@ -22,9 +22,10 @@ $script:BaseProcess = "amte2e-agile"
 # ---------------------------------------------------------------- owner and lease
 
 # The owner is the proof (AMTE2E_POOL_OWNER = "<pid>:<run>"), so seeds run as child processes share its claims.
-# Without it, this process makes a run id and sets the variable, so its own children share it too.
+# Without it, this process makes a run id and sets the variable, so its own children share it too. Its own pid is
+# the owner pid, so once it exits its leases read as Orphaned and a later clean-up on this machine can give them back.
 function Get-E2EPoolOwner {
-    if (-not $env:AMTE2E_POOL_OWNER) { $env:AMTE2E_POOL_OWNER = ":" + [Guid]::NewGuid().ToString("N").Substring(0, 12) }
+    if (-not $env:AMTE2E_POOL_OWNER) { $env:AMTE2E_POOL_OWNER = "${PID}:" + [Guid]::NewGuid().ToString("N").Substring(0, 12) }
     $ownerPid, $run = $env:AMTE2E_POOL_OWNER.Split(":", 2)
     [pscustomobject]@{ Machine = [Environment]::MachineName; Pid = $ownerPid; Run = $run; Token = "$([Environment]::MachineName)|$ownerPid|$run" }
 }
@@ -38,11 +39,16 @@ function ConvertFrom-E2EPoolLease([string]$Text) {
     if (-not $Text) { return $null }
     $h = @{}
     foreach ($kv in $Text.Split(";")) { $k, $v = $kv.Split("=", 2); if ($k) { $h[$k.Trim()] = "$v".Trim() } }
-    if (-not $h.slot -or -not $h.expires) { return $null }
+    # A value that does not parse makes the whole text unreadable ($null), never an error: one bad lease must not stop
+    # the scan of the others. Get-E2EPoolLease then treats it as an unreadable lease.
+    $slot = 0; $expires = [datetime]::MinValue; $claimed = [datetime]::UtcNow
+    if (-not [int]::TryParse("$($h.slot)", [ref]$slot) -or $slot -le 0) { return $null }
+    if (-not [datetime]::TryParse("$($h.expires)", $null, "RoundtripKind", [ref]$expires)) { return $null }
+    if ($h.claimed -and -not [datetime]::TryParse("$($h.claimed)", $null, "RoundtripKind", [ref]$claimed)) { return $null }
     [pscustomobject]@{
-        Slot = [int]$h.slot; Machine = $h.machine; Pid = $h.pid; Run = $h.run; Item = $h.item
-        Claimed = if ($h.claimed) { [datetime]::Parse($h.claimed, $null, "RoundtripKind").ToUniversalTime() } else { [datetime]::UtcNow }
-        Expires = [datetime]::Parse($h.expires, $null, "RoundtripKind").ToUniversalTime()
+        Slot = $slot; Machine = $h.machine; Pid = $h.pid; Run = $h.run; Item = $h.item
+        Claimed = $claimed.ToUniversalTime()
+        Expires = $expires.ToUniversalTime()
         Token = "$($h.machine)|$($h.pid)|$($h.run)"
     }
 }
@@ -51,7 +57,8 @@ function ConvertFrom-E2EPoolLease([string]$Text) {
 function Get-E2EPoolLeaseState($Lease, [datetime]$Now = [datetime]::UtcNow) {
     if (-not $Lease) { return "Free" }
     if ($Lease.Expires -lt $Now) { return "Expired" }
-    if ($Lease.Machine -eq [Environment]::MachineName -and $Lease.Pid -and -not (Get-Process -Id ([int]$Lease.Pid) -ErrorAction SilentlyContinue)) { return "Orphaned" }
+    $ownerPid = 0
+    if ($Lease.Machine -eq [Environment]::MachineName -and [int]::TryParse("$($Lease.Pid)", [ref]$ownerPid) -and -not (Get-Process -Id $ownerPid -ErrorAction SilentlyContinue)) { return "Orphaned" }
     "Held"
 }
 
@@ -80,8 +87,12 @@ function Assert-E2EPoolLeaseHeld([string]$ProjectId, [string]$Org, [int]$Reads =
     $l
 }
 
+# An expired lease is never renewed: once it has expired another run may already be removing it, so its owner must
+# stop rather than extend it. Only Expired and Orphaned leases are ever taken over, so a live owner's renewal never
+# races a takeover.
 function Set-E2EPoolLease([string]$ProjectId, [string]$Org, [switch]$Renew) {
     $l = Assert-E2EPoolLeaseHeld $ProjectId $Org
+    if ($l.Expires -lt [datetime]::UtcNow) { throw "Lease lost on project $ProjectId in ${Org}: it expired at $($l.Expires.ToString('o')), so another run may take it." }
     $desc = ConvertTo-E2EPoolLease -Slot $l.Slot -Claimed $l.Claimed -Expires ([datetime]::UtcNow.AddHours($script:LeaseHours)) -Item $l.Item
     Invoke-E2ERest "_apis/projects/$ProjectId/teams/$($l.Team.id)" -Org $Org -Method PATCH -Body @{ description = $desc } | Out-Null
 }
@@ -92,14 +103,22 @@ function New-E2EPoolLease([string]$ProjectId, [int]$Slot, [string]$Org) {
     $desc = ConvertTo-E2EPoolLease -Slot $Slot -Claimed $now -Expires $now.AddHours($script:LeaseHours) -Item "$env:AMTE2E_POOL_ITEM"
     try { Invoke-E2ERest "_apis/projects/$ProjectId/teams" -Org $Org -Method POST -Body @{ name = $script:LeaseTeam; description = $desc } | Out-Null }
     catch { return $false }
-    $l = Get-E2EPoolLease $ProjectId $Org
-    [bool]($l -and $l.Token -eq (Get-E2EPoolOwner).Token)
+    # The POST succeeded, so a lease team now exists; the teams list can lag it, so it is read until it shows one.
+    # Another owner's lease means this run lost; a lease never seen is reported, since this run may hold it.
+    for ($i = 0; $i -lt 4; $i++) {
+        if ($i) { Start-Sleep -Seconds 5 }
+        $l = Get-E2EPoolLease $ProjectId $Org
+        if ($l) { return ($l.Token -eq (Get-E2EPoolOwner).Token) }
+    }
+    throw "Claimed project $ProjectId in $Org, but its lease team never showed in the teams list; release it with tools/e2e/Remove-E2EObjects.ps1 -ClearPool if it stays leased."
 }
 
 # Deletes the lease team only if it is still exactly the one that was read (no compare-and-delete exists, so re-read).
-function Remove-E2EPoolStaleLease([string]$ProjectId, $Lease, [string]$Org) {
+# The re-read must also still be stale (Expired or Orphaned), unless -EvenIfLive (the operator's -ClearPool).
+function Remove-E2EPoolStaleLease([string]$ProjectId, $Lease, [string]$Org, [switch]$EvenIfLive) {
     $now = Get-E2EPoolLease $ProjectId $Org
     if (-not $now -or $now.Team.id -ne $Lease.Team.id -or $now.Team.description -ne $Lease.Team.description) { return $false }
+    if (-not $EvenIfLive -and (Get-E2EPoolLeaseState $now) -notin "Expired", "Orphaned") { return $false }
     try { Invoke-E2ERest "_apis/projects/$ProjectId/teams/$($Lease.Team.id)" -Org $Org -Method DELETE | Out-Null; $true } catch { $false }
 }
 
@@ -155,6 +174,10 @@ function Get-E2EDashboards([string]$ProjectId, [string]$Org) {
     }
 }
 
+function Get-E2EDashboardWidgets([string]$ProjectId, $Dashboard, [string]$Org) {
+    @((Invoke-E2ERest "$ProjectId/$($Dashboard.TeamId)/_apis/dashboard/dashboards/$($Dashboard.id)" -Org $Org -ApiVersion "7.1-preview.3").widgets) | Where-Object { $null -ne $_ }
+}
+
 # Work items in the project, leftovers left out (FR-004b).
 function Get-E2EProjectWorkItemIds([string]$ProjectId, [string]$Org) {
     @((Invoke-E2ERest "$ProjectId/_apis/wit/wiql?`$top=5000" -Org $Org -Method POST -Body @{ query = "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND $(Get-E2EPoolLeftoverFilter)" }).workItems | ForEach-Object id)
@@ -201,6 +224,8 @@ function Get-E2EPoolInventory([string]$ProjectId, [string]$Org) {
         testPlans          = & $count { Get-E2EList "$ProjectId/_apis/testplan/plans" $Org }
         testRuns           = & $count { Get-E2EList "$ProjectId/_apis/test/runs" $Org }
         extraDashboards    = & $count { Get-E2EDashboards $ProjectId $Org | Where-Object { $_.name -notlike "*Overview" } }
+        # A fresh project's Overview dashboards have no widgets.
+        overviewWidgets    = & $count { foreach ($d in @(Get-E2EDashboards $ProjectId $Org | Where-Object { $_.name -like "*Overview" })) { Get-E2EDashboardWidgets $ProjectId $d $Org } }
     }
 }
 
@@ -285,6 +310,10 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
     foreach ($x in Get-E2EList "$pr/_apis/distributedtask/environments" $Org) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/distributedtask/environments/$($x.id)" -Org $Org -Method DELETE } "environment $($x.name)" $e }
     foreach ($x in Get-E2EList "$pr/_apis/wiki/wikis" $Org) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/wiki/wikis/$($x.id)" -Org $Org -Method DELETE } "wiki $($x.name)" $e }
     foreach ($x in @(Get-E2EDashboards $pr $Org | Where-Object { $_.name -notlike "*Overview" })) { Invoke-E2EStep { Invoke-E2ERest "$pr/$($x.TeamId)/_apis/dashboard/dashboards/$($x.id)" -Org $Org -Method DELETE -ApiVersion "7.1-preview.3" } "dashboard $($x.name)" $e }
+    # The Overview dashboards stay, as in a fresh project, but empty of widgets.
+    foreach ($x in @(Get-E2EDashboards $pr $Org | Where-Object { $_.name -like "*Overview" })) {
+        foreach ($w in @(Get-E2EDashboardWidgets $pr $x $Org)) { Invoke-E2EStep { Invoke-E2ERest "$pr/$($x.TeamId)/_apis/dashboard/dashboards/$($x.id)/widgets/$($w.id)" -Org $Org -Method DELETE -ApiVersion "7.1-preview.2" } "widget $($w.name) on $($x.name)" $e }
+    }
 
     foreach ($x in @(Get-E2EQueryItems $pr $Org)) { Invoke-E2EStep { Invoke-E2ERest "$pr/_apis/wit/queries/$($x.id)" -Org $Org -Method DELETE } "query $($x.path)" $e }
     foreach ($x in @(Get-E2EList "_apis/projects/$pr/teams?`$top=500" $Org | Where-Object { $_.id -ne $p.defaultTeam.id -and $_.name -ne $script:LeaseTeam })) {
@@ -375,7 +404,7 @@ function Request-E2EPoolProject {
     param([Parameter(Mandatory)][string]$Name, [string]$Process = $script:BaseProcess, [Parameter(Mandatory)][string]$Org)
     Assert-E2EName $Name
     $me = (Get-E2EPoolOwner).Token
-    $existing = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { $null }
+    $existing = Get-E2EProjectOrNull $Name $Org
     if ($existing) {
         $l = Get-E2EPoolLease $existing.id $Org
         if ($l -and $l.Token -eq $me) { Set-E2EPoolLease $existing.id $Org -Renew; return $existing | Add-Member -NotePropertyName PoolSlot -NotePropertyValue $l.Slot -PassThru -Force }
@@ -389,7 +418,9 @@ function Request-E2EPoolProject {
     $poolIds = @($pool.Id)
     $others = @($all | Where-Object { $_.Id -notin $poolIds -and $_.State -in "Expired", "Orphaned" })
     $candidates = @($pool | Where-Object State -eq "Free") + @($pool | Where-Object State -in "Expired", "Orphaned") + $others
-    $pool = @($pool) + $others
+    # Every slot found goes into the message if none can be taken, held ones under their scenario names too, so it
+    # says which lease is in the way; only the candidates above are ever taken.
+    $pool = @($pool) + @($all | Where-Object { $_.Id -notin $poolIds })
     $errors = @()
     foreach ($c in $candidates) {
         if ($c.State -ne "Free" -and -not (Remove-E2EPoolStaleLease $c.Id $c.Lease $Org)) { continue }
@@ -403,26 +434,36 @@ function Request-E2EPoolProject {
         }
         catch {
             # The lease is freed (the next take clears the project first) and the next slot is tried, at most three, so a
-            # broken slot cannot block the pool and a fault common to every slot cannot hold the whole pool.
-            $errors += "$(Format-E2EPoolName $c.Slot): $($_.Exception.Message)"
-            try { Remove-E2EPoolLease $c.Id $Org } catch {}
+            # broken slot cannot block the pool and a fault common to every slot cannot hold the whole pool. The lease is
+            # the only record of the slot while the project has another name, so the pool name comes back first; if it
+            # cannot, the lease is kept and expires, and the slot is still found and cleared on a later take.
+            $err = "$(Format-E2EPoolName $c.Slot): $($_.Exception.Message)"
+            try {
+                $poolName = Format-E2EPoolName $c.Slot
+                if ((Invoke-E2ERest "_apis/projects/$($c.Id)" -Org $Org).name -ne $poolName) { Rename-E2EPoolProject $c.Id $poolName $Org }
+                Remove-E2EPoolLease $c.Id $Org
+                $err += " (lease freed)"
+            } catch { $err += " (lease kept until it expires: it could not be given its pool name back: $($_.Exception.Message))" }
+            $errors += $err
             if ($errors.Count -ge 3) { break }
         }
     }
-    $why = if ($errors) { " Slots that failed (their leases were freed): $($errors -join '; ')." } else { "" }
+    $why = if ($errors) { " Slots that failed: $($errors -join '; ')." } else { "" }
     throw "No free pool project in $Org.$why Leases: $(Format-E2EPoolLeases $pool)"
 }
 
 # Gives a pool project back: clear, back to amte2e-agile, back to amte2e-pool-NN, lease deleted last. Never deletes it.
 # A failure keeps the lease, so a half-cleared project is never offered; it is cleared on the next take after expiry.
 function Reset-E2EPoolProject {
-    param([Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string]$Org, [switch]$Force)
+    # -Force takes over another run's lease; with -StaleOnly only an Expired or Orphaned one (ordinary clean-up), so a
+    # run that has just claimed or renewed the project keeps it. -Force alone is the operator's -ClearPool.
+    param([Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][string]$Org, [switch]$Force, [switch]$StaleOnly)
     Assert-E2EName $Name
-    $p = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { $null }
-    if (-not $p) { return }
+    $p = Get-E2EProjectOrNull $Name $Org
+    if (-not $p) { return "absent" }
     $l = Get-E2EPoolLease $p.id $Org
     if (-not $l) {
-        if (Get-E2EPoolSlot $p.name) { return }
+        if (Get-E2EPoolSlot $p.name) { return "free" }
         throw "Project $Org/$Name is not a leased pool project, so it is not released (and never deleted)."
     }
     if ($l.Token -ne (Get-E2EPoolOwner).Token) {
@@ -430,7 +471,8 @@ function Reset-E2EPoolProject {
         # Operator override (Remove-E2EObjects -ClearPool): take the lease over as this run, then release as usual.
         $slot = if ($l.Slot) { $l.Slot } else { Get-E2EPoolSlot $p.name }
         if (-not $slot) { throw "Project $Org/$Name has a lease with no slot; release it by hand." }
-        if (-not (Remove-E2EPoolStaleLease $p.id $l $Org) -or -not (New-E2EPoolLease $p.id $slot $Org)) { throw "Could not take over the lease on $Org/$Name." }
+        if ($StaleOnly -and (Get-E2EPoolLeaseState $l) -notin "Expired", "Orphaned") { throw "Project $Org/$Name is held by a live run ($($l.Token)) until $($l.Expires.ToString('o')); kept." }
+        if (-not (Remove-E2EPoolStaleLease $p.id $l $Org -EvenIfLive:(-not $StaleOnly)) -or -not (New-E2EPoolLease $p.id $slot $Org)) { throw "Could not take over the lease on $Org/$Name." }
         $l = Get-E2EPoolLease $p.id $Org
     }
     Clear-E2EPoolProject $p.id $Org
@@ -447,7 +489,11 @@ function Clear-E2EPool {
     $held = @(if ($All) { Get-E2EPoolProject -Org $Org -All | Where-Object Lease } else { Get-E2EPoolProject -Org $Org -Owner $Owner })
     foreach ($h in $held) {
         if ($WhatIf) { "would release $Org/$($h.Name) -> $(Format-E2EPoolName $h.Slot) (held by $($h.Lease.Token))"; continue }
-        try { $slot = Reset-E2EPoolProject -Name $h.Name -Org $Org -Force:$All; "released $Org/$($h.Name) -> $slot (cleared)" }
+        # Only a reset that ends on a pool name is a release; "absent" or "free" means there was nothing of this run's to give back.
+        try {
+            $slot = Reset-E2EPoolProject -Name $h.Name -Org $Org -Force:$All
+            if (Get-E2EPoolSlot "$slot") { "released $Org/$($h.Name) -> $slot (cleared)" } else { "NOT RELEASED $Org/$($h.Name): the project was $slot when it was reset" }
+        }
         catch { "NOT RELEASED $Org/$($h.Name): $($_.Exception.Message)" }
     }
 }

@@ -61,7 +61,7 @@ switch ($Case) {
             $ids = @($jobs | Wait-Job | Receive-Job); $jobs | Remove-Job
             $ok = $ids.Count -eq 2 -and -not ($ids -like "ERROR*") -and $ids[0] -ne $ids[1]
             Check "race trial $i" $ok ($ids -join " / ")
-            foreach ($n in $names) { try { Remove-E2EProject $n -Org $tgt } catch { "release ${n}: $($_.Exception.Message)" } }
+            foreach ($n in $names) { try { Remove-E2EProject $n -Org $tgt } catch { Check "release $n" $false $_.Exception.Message } }
         }
     }
     "Lease" {
@@ -118,7 +118,7 @@ switch ($Case) {
         Check "linkscope migration" ($LASTEXITCODE -eq 0) "exit $LASTEXITCODE"
         pwsh -NoProfile -File (Join-Path $d "assert.ps1") -LogDirectory $logs 2>&1 | Where-Object { "$_" -like "FAIL*" }
         Check "linkscope assertions" ($LASTEXITCODE -eq 0) "exit $LASTEXITCODE"
-        foreach ($org in $src, $tgt) { Clear-E2EPool -Org $org -Owner $run | Out-Null }
+        foreach ($org in $src, $tgt) { foreach ($line in @(Clear-E2EPool -Org $org -Owner $run | Where-Object { $_ -like "NOT RELEASED*" })) { Check "linkscope release" $false $line } }
         $tgtAfter = @((Invoke-E2ERest "_apis/projects?`$top=1000" -Org $tgt).value).Count + @((Invoke-E2ERest "_apis/projects?stateFilter=deleted&`$top=1000" -Org $tgt).value).Count
         Check "target org project count" ($tgtAfter -eq $tgtBefore) "live + deleted $tgtBefore -> $tgtAfter"
     }
@@ -157,13 +157,13 @@ switch ($Case) {
 }
 }
 finally {
-    # Whatever happened, give back what this run holds.
-    foreach ($org in $src, $tgt) { Clear-E2EPool -Org $org -Owner $run | Where-Object { $_ -like "NOT RELEASED*" } }
+    # Whatever happened, give back what this run holds; a project not given back fails the check, and the rest go on.
+    foreach ($org in $src, $tgt) { foreach ($line in @(Clear-E2EPool -Org $org -Owner $run | Where-Object { $_ -like "NOT RELEASED*" })) { Check "release" $false $line } }
     # Leases the Lease case planted for other owners are removed too, even when a check failed part-way.
     foreach ($pp in @($script:planted | Where-Object { $_ })) {
         $cur = Invoke-E2ERest "_apis/projects/$($pp.Id)" -Org $tgt
         $l = Get-E2EPoolLease $pp.Id $tgt
-        if ($l -and $l.Run -in "other-live-run", "crashed-run", "dead-run") { try { Reset-E2EPoolProject -Name $cur.name -Org $tgt -Force | Out-Null } catch { "NOT RELEASED $($cur.name): $($_.Exception.Message)" } }
+        if ($l -and $l.Run -in "other-live-run", "crashed-run", "dead-run") { try { Reset-E2EPoolProject -Name $cur.name -Org $tgt -Force | Out-Null } catch { Check "release planted lease" $false "NOT RELEASED $($cur.name): $($_.Exception.Message)" } }
     }
 }
 $failed = @($results | Where-Object { -not $_.Pass }).Count

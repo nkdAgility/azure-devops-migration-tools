@@ -50,7 +50,8 @@ $failed = $false
 foreach ($org in $Organisations) {
     $all = @((Invoke-E2ERest "_apis/projects?`$top=1000" -Org $org).value)
     $before = $all.Count
-    $taken = @($all | ForEach-Object { Get-E2EPoolSlot $_.name } | Where-Object { $_ })
+    # A leased project carries its seed's name, so its slot is known only from its lease: those slots are taken too.
+    $taken = @(@($all | ForEach-Object { Get-E2EPoolSlot $_.name }) + @(Get-E2EPoolProject -Org $org -All | ForEach-Object Slot) | Where-Object { $_ } | Sort-Object -Unique)
     $renamed = 0
     foreach ($p in $all | Sort-Object name) {
         $why = $null
@@ -64,7 +65,8 @@ foreach ($org in $Organisations) {
             if ($last -gt [datetime]::UtcNow.AddHours(-$MinIdleHours)) { $why = "changed in the last $MinIdleHours hours ($($last.ToString('o')))" }
         }
         if ($why) { "skipped $org/$($p.name): $why"; continue }
-        if ($Size -and ($taken.Count + $renamed) -ge $Size) { "skipped $org/$($p.name): the pool already has $Size projects"; continue }
+        # $taken already holds every slot: existing, adopted this run and (with -WhatIf) planned.
+        if ($Size -and $taken.Count -ge $Size) { "skipped $org/$($p.name): the pool already has $Size projects"; continue }
 
         $slot = 1; while ($taken -contains $slot) { $slot++ }
         if ($slot -gt 99) { "skipped $org/$($p.name): no free pool number"; continue }

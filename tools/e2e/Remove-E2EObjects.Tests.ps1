@@ -59,6 +59,7 @@ Describe "Remove-E2EObjects.ps1" {
             [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }
             [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p2"; Name = "amte2e-3272-src"; Slot = 2; Lease = [pscustomobject]@{ Token = "m|1|run"; Expires = [datetime]::UtcNow.AddHours(-1) }; State = "Expired" }
             [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p3"; Name = "amte2e-3272-live"; Slot = 3; Lease = [pscustomobject]@{ Token = "m|2|live"; Expires = [datetime]::UtcNow.AddHours(1) }; State = "Held" }
+            [pscustomobject]@{ Org = "nkdagility-adomt-source"; Id = "p4"; Name = "amt3278-src"; Slot = 4; Lease = [pscustomobject]@{ Token = "m|3|old"; Expires = [datetime]::UtcNow.AddHours(-1) }; State = "Expired" }
         ) }
         Mock Get-E2EPoolLease { $null }
         Mock Reset-E2EPoolProject { "amte2e-pool-02" }
@@ -76,7 +77,8 @@ Describe "Remove-E2EObjects.ps1" {
     It "never deletes a project: it gives back the issue's leased pool projects (#3342)" {
         $out = & $script:Cleanup -Organisations "nkdagility-adomt-source" -Prefix "amte2e-3272-"
         Should -Invoke Remove-E2EProject -Times 0 -Exactly
-        Should -Invoke Reset-E2EPoolProject -Times 1 -Exactly -ParameterFilter { $Name -eq "amte2e-3272-src" -and $Force }
+        Should -Invoke Reset-E2EPoolProject -Times 1 -Exactly -ParameterFilter { $Name -eq "amte2e-3272-src" -and $Force -and $StaleOnly }
+        Should -Invoke Reset-E2EPoolProject -Times 0 -Exactly -ParameterFilter { $Name -eq "amt3278-src" }
         $out | Should -Contain "released nkdagility-adomt-source/amte2e-3272-src -> amte2e-pool-02 (cleared)"
         # A lease a live run still holds is left alone.
         Should -Invoke Reset-E2EPoolProject -Times 0 -Exactly -ParameterFilter { $Name -eq "amte2e-3272-live" }
@@ -87,6 +89,17 @@ Describe "Remove-E2EObjects.ps1" {
         & $script:Cleanup -Organisations "nkdagility-adomt-source" -All | Out-Null
         Should -Invoke Remove-E2EProject -Times 0 -Exactly
         Should -Invoke Reset-E2EPoolProject -Times 0 -Exactly -ParameterFilter { $Name -eq "amte2e-pool-01" }
+    }
+
+    It "with -All gives back an expired pool project of any harness name, amt<issue>- included" {
+        & $script:Cleanup -Organisations "nkdagility-adomt-source" -All | Out-Null
+        Should -Invoke Reset-E2EPoolProject -Times 1 -Exactly -ParameterFilter { $Name -eq "amt3278-src" -and $StaleOnly }
+    }
+
+    It "keeps a project a run claimed between the listing and the reset" {
+        Mock Reset-E2EPoolProject { throw "Project nkdagility-adomt-source/amte2e-3272-src is held by a live run (m|9|new) until later; kept." }
+        $out = & $script:Cleanup -Organisations "nkdagility-adomt-source" -Prefix "amte2e-3272-"
+        @($out | Where-Object { $_ -like "kept pool project nkdagility-adomt-source/amte2e-3272-src:*held by a live run*" }).Count | Should -Be 1
     }
 
     It "with -ClearPool gives back every leased pool project and touches no process or field" {
