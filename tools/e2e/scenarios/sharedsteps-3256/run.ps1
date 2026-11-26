@@ -32,7 +32,8 @@ finally {
     if ($passed) { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
     else { Write-Warning "sharedsteps-3256 logs kept in $work" }
     Remove-Item (Join-Path $PSScriptRoot "state.local.json") -ErrorAction SilentlyContinue
-    # Delete only the projects this run's seed created or reused (it records each in $progress), and try each
+    # Release only the projects this run's seed tried to claim (it records each in $progress before claiming it;
+    # Remove-E2EProject skips an absent project and refuses one leased by another run), and try each
     # deletion on its own, so a failure on one still lets the other be deleted.
     if ($progress.Source) { try { Remove-E2EProject $Src -Org nkdagility-adomt-source } catch { $cleanupErrors += "source ${Src}: $_" } }
     if ($progress.Target) { try { Remove-E2EProject $Tgt -Org nkdagility-adomt-target } catch { $cleanupErrors += "target ${Tgt}: $_" } }
