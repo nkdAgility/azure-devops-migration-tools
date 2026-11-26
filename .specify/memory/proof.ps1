@@ -4,9 +4,15 @@
 # Every scenario this change needs (see below; -All for every one) that has a seed, a config and an assert is run in scratch projects of its own, never in the
 # projects the automated tests use: seed the scratch projects, run the migration with the config re-pointed at
 # them, then run the scenario's assertions. Fails if any seed, migration or assertion fails.
-# Scenarios without an assert are listed as not covered. Scratch projects are listed at the end and are not
-# deleted here: Remove-E2EObjects.ps1 with a per-run prefix also deletes other scenarios' fields (#3278).
-param([string]$RunId = (Get-Date -Format 'MMddHHmm'), [string]$Item, [switch]$All, [string]$Base = 'origin/main')
+# Scenarios without an assert are listed as not covered. Projects come from the scratch project pool (#3342): each
+# scenario's projects are given back (cleared and renamed back) before the next scenario and in a finally, and the
+# pool slots used are listed at the end. Scratch processes are listed and not deleted here: Remove-E2EObjects.ps1 with
+# a per-run prefix also deletes other scenarios' fields (#3278).
+# The run id ends in six random hex digits, and a run id already in use is refused at the start, so two runs do not
+# share names. Deletion does not rely on that: releasePool deletes only the projects this invocation recorded making.
+param([string]$RunId = "$(Get-Date -Format 'MMddHHmm')$([Guid]::NewGuid().ToString('N').Substring(0, 6))", [string]$Item, [switch]$All, [string]$Base = 'origin/main',
+    # Run only these scenarios, whatever the change touches (used by tools/e2e/Test-E2EPool.ps1 -Case Scenario).
+    [string[]]$Only)
 $ErrorActionPreference = 'Stop'
 # Every object a run creates is named amte2e-<item>-p<run>-..., so each worker can find and remove its own.
 if (-not $Item -and (Test-Path .specify/items/current.json)) { $Item = "$((Get-Content .specify/items/current.json -Raw | ConvertFrom-Json).number)" }
@@ -50,6 +56,13 @@ foreach ($p in $product) {
 # Only scenarios with a seed, a config and an assert can run; the list says what will actually run.
 $runnable = @(Get-ChildItem tools/e2e/scenarios -Directory | Where-Object { (Test-Path (Join-Path $_.FullName 'seed.ps1')) -and (Test-Path (Join-Path $_.FullName 'assert.ps1')) -and (Test-Path (Join-Path $_.FullName 'config.json')) } | ForEach-Object Name)
 if (-not $runAll) { foreach ($k in @($why.Keys)) { if ($runnable -notcontains $k) { $why.Remove($k) } } }
+if ($Only) {
+    # A name asked for that cannot run (mistyped, or without a seed, config and assert) fails here, before the queue,
+    # so a run never reports success while silently skipping a scenario it was asked for.
+    $unknown = @($Only | Where-Object { $runnable -notcontains $_ })
+    if ($unknown) { Write-Error "-Only names scenarios that cannot run (no folder with seed.ps1, assert.ps1 and config.json): $($unknown -join ', '). Runnable: $($runnable -join ', ')"; exit 1 }
+    $runAll = $false; $why = @{}; foreach ($n in $Only) { $why[$n] = 'asked for (-Only)' }
+}
 if ($runAll) { "== running all $($runnable.Count) runnable scenarios: $reasonAll" } else { "== running $($why.Count) scenario(s):"; $why.Keys | Sort-Object | ForEach-Object { "   $_ ($($why[$_]))" } }
 
 # One proof at a time on the shared test orgs: concurrent runs collide there (VS800075, dropped connections).
@@ -75,12 +88,53 @@ try {
     }
 } finally { if (-not $lock) { Remove-Item $ticket -ErrorAction SilentlyContinue } }
 try {
-$failed = @(); $notCovered = @(); $scratch = @()
+$failed = @(); $notCovered = @(); $scratch = @(); $processes = @(); $used = @(); $released = @(); $notReleased = @()
+# Projects come from the scratch project pool (#3342). Every seed this run starts takes them as this proof, so the
+# proof can give back everything the run holds, after each scenario and again in the finally below.
+$poolRun = "proof-$Item-$RunId"
+$env:AMTE2E_POOL_OWNER = "${PID}:$poolRun"
+$env:AMTE2E_POOL_ITEM = $Item
+Import-Module (Join-Path $PWD 'tools/e2e/E2EAzDo.psm1') -Force -WarningAction SilentlyContinue
+$poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
+# What this invocation creates outside the pool is recorded here (by pid as well as run id), so it deletes only that.
+$env:AMTE2E_CREATED_LOG = Join-Path ([IO.Path]::GetTempPath()) "amte2e-created-$Item-$RunId-$PID.log"
+# A run id already in use (passed again with -RunId, or drawn twice) is refused, so no two runs share a name.
+$inUse = @($(foreach ($org in $poolOrgs) { @(Get-E2EProjects -Org $org -Prefix "amte2e-$Item-p$RunId-").name; @(Get-E2EProcesses -Org $org -Prefix "amte2e-$Item-p$RunId-").name }) | Where-Object { $_ })
+if ($inUse) { Write-Error "run id $RunId is already in use (found: $($inUse -join ', ')); give another -RunId"; exit 1 }
+# Renews this run's leases before each long step (migration, assertions), so they do not expire mid-scenario.
+$renewPool = { foreach ($org in $poolOrgs) { foreach ($h in @(Get-E2EPoolProject -Org $org -Owner $poolRun)) { Set-E2EPoolLease $h.Id $org -Renew } } }
+$releasePool = {
+    # wicore-fresh's brand-new target project is deleted, the one project a run makes in the target org. Only the
+    # projects this invocation recorded as it made them are deleted, checked by id, never any found by name alone.
+    $freshProjects = @(if (Test-Path $env:AMTE2E_CREATED_LOG) { Get-Content $env:AMTE2E_CREATED_LOG | Where-Object { $_ -like 'nkdagility-adomt-target|*' } | Sort-Object -Unique })
+    foreach ($line in $freshProjects) {
+        $fOrg, $fId, $fName = $line.Split('|', 3)
+        try {
+            # Deleted by the recorded id, never by a fresh lookup of the name, which another run could have reused.
+            if (Remove-E2EDisposableProject $fName -Org $fOrg -Id $fId) { "deleted fresh project $fOrg/$fName" }
+            $rest = @(Get-Content $env:AMTE2E_CREATED_LOG | Where-Object { $_ -ne $line }); Set-Content $env:AMTE2E_CREATED_LOG $rest
+        }
+        catch { $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: $($_.Exception.Message)" }
+    }
+    foreach ($org in $poolOrgs) {
+        $held = @(Get-E2EPoolProject -Org $org -Owner $poolRun)
+        foreach ($h in $held) { $script:used += "$org/$(Format-E2EPoolName $h.Slot)" }
+        foreach ($line in @(Clear-E2EPool -Org $org -Owner $poolRun)) {
+            $line
+            if ($line -match '^released \S+ -> (\S+)') { $script:released += "$org/$($Matches[1])" } elseif ($line -like 'NOT RELEASED*') { $script:notReleased += $line }
+        }
+    }
+}
+try {
 $work = Join-Path ([IO.Path]::GetTempPath()) "amtproof-$Item-$RunId"
 New-Item -ItemType Directory -Force $work | Out-Null
 foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seed = Join-Path $d.FullName 'seed.ps1'; $assert = Join-Path $d.FullName 'assert.ps1'; $config = Join-Path $d.FullName 'config.json'
     if (-not $runAll -and -not $why.ContainsKey($d.Name)) { continue }
+    # wicore-fresh makes a new target project, which the target org may have no room for: it runs only behind the flag.
+    if ($d.Name -eq 'wicore-fresh' -and $env:AMTE2E_FRESH_PROJECTS -ne '1') { "wicore-fresh skipped: AMTE2E_FRESH_PROJECTS is not set"; continue }
+    # The previous scenario's projects go back to the pool before the next one takes any.
+    & $releasePool
     if (-not ((Test-Path $seed) -and (Test-Path $assert) -and (Test-Path $config))) { $notCovered += $d.Name; continue }
     # Every named resource the seed takes (projects, and processes such as Process or NoBugProcess) gets a scratch
     # name of this run, so nothing shared is seeded or migrated into. The config is re-pointed at the same names,
@@ -102,7 +156,10 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
         else { "   $k keeps the shared process $($defaults[$k]): the seed expects it to exist and the proof cannot create it"; $defaults.Remove($k) }
     }
     $scratch += $names.Values
-    "== $($d.Name): $(($names.Keys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')"
+    $processes += @($names.Keys | Where-Object { $_ -match 'Process$' } | ForEach-Object { $names[$_] })
+    # Projects come from the pool and are named by their slot in the summary; only scratch processes are named here.
+    $procKeys = @($names.Keys | Where-Object { $_ -match 'Process$' })
+    "== $($d.Name): $(@($names.Keys | Where-Object { $_ -notmatch 'Process$' }) -join ', ') from the pool$(if ($procKeys) { "; processes $(($procKeys | ForEach-Object { "$_=$($names[$_])" }) -join ', ')" })"
     $initFailed = $false
     foreach ($p in $initialise) {
         pwsh -NoProfile -File tools/e2e/Initialize-E2EEnvironment.ps1 -Process $p *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
@@ -121,14 +178,23 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seedArgs = & $argsFor $seed
     pwsh -NoProfile -File $seed @seedArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; continue }
+    & $renewPool
     pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; continue }
+    & $renewPool
     $assertArgs = & $argsFor $assert @{ OutFile = (Join-Path $work "$($d.Name).assert.md") }
     pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)" }
 }
+} finally {
+    # Give back every pool project this run holds, whatever happened above. Each is cleared and renamed back.
+    & $releasePool
+}
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
-"scratch projects and processes left for clean-up: $($scratch -join ', ')"
+"pool projects used: $((@($used | Sort-Object -Unique)) -join ', ')"
+"released: $((@($released | Sort-Object -Unique) | ForEach-Object { "$_ (cleared)" }) -join ', ')"
+"scratch processes (Remove-E2EObjects.ps1 deletes them): $($processes -join ', ')"
+if ($notReleased) { "NOT RELEASED:"; $notReleased | ForEach-Object { "  $_" }; Write-Error "pool projects could not be given back"; exit 1 }
 if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"; exit 1 }
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', '); each scenario's output is in $work\<scenario>.log"; exit 1 }
 "all covered scenarios passed; results in $work"
