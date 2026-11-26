@@ -8,7 +8,8 @@ if (-not $To) {
     $adapter = Get-BoardAdapter $cfg
     $item = & $adapter.GetItem $id
     $order = Get-ItemOrder $cfg $item
-    $i = $order.IndexOf($item.state)
+    # State names match whatever their case, so a board's "building" is the order's "Building".
+    $i = Get-StateIndex $order $item.state
     if ($i -lt 0 -or $i -ge $order.Count - 1) { Write-Error "#$id is in $($item.state), which has no next state on its route."; exit 1 }
     $To = $order[$i + 1]
 }
