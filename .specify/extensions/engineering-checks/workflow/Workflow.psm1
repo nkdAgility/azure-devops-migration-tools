@@ -31,11 +31,30 @@ function Get-WorkflowConfigProblem($Config) {
     }
     if (-not @($Config.order).Count) { 'the state order is empty' }
     foreach ($o in @($Config.order)) { if ($o -notin $states.name) { "the order names '$o', which is not a state" } }
+    # operatorOnly: commands only the operator runs. Each entry has a name and at least one match glob.
+    if ($Config -is [hashtable] -and $Config.ContainsKey('operatorOnly')) {
+        foreach ($e in @($Config.operatorOnly)) {
+            if (-not ($e -is [hashtable]) -or -not "$($e['name'])") { "an operatorOnly entry has no name" }
+            elseif (-not @($e['match'] | Where-Object { "$_" }).Count) { "the operatorOnly entry '$($e['name'])' has no match" }
+        }
+    }
+}
+# The operatorOnly entry a command matches (case-insensitive wildcards, on the whole command or any part of a chain), or $null.
+function Get-OperatorOnlyMatch($Config, [string]$Command) {
+    if (-not ($Config -is [hashtable]) -or -not $Config.ContainsKey('operatorOnly') -or -not "$Command".Trim()) { return $null }
+    $parts = @($Command) + @($Command -split '[|;&\r\n]+' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    foreach ($e in @($Config.operatorOnly)) {
+        foreach ($g in @($e['match'])) { if ($parts | Where-Object { $_ -like "$g" }) { return $e } }
+    }
+    $null
 }
 function Get-CategoryState($Config, [string]$Category) { @($Config.states | Where-Object { $_['category'] -eq $Category } | ForEach-Object { $_.name }) | Select-Object -First 1 }
 function Get-EntryState($Config) { @($Config.order)[0] }
 function Test-StateFlag($Config, [string]$State, [string]$Flag) { $d = $Config.states | Where-Object { $_.name -eq $State } | Select-Object -First 1; [bool]($d -and $d.ContainsKey($Flag) -and $d[$Flag]) }
 function Test-IsFinished($Config, [string]$State) { $d = $Config.states | Where-Object { $_.name -eq $State } | Select-Object -First 1; [bool]($d -and $d['category'] -in 'Completed', 'Removed') }
+
+# The position of a state in an order, whatever the case of its name (a board's "building" is the order's "Building"); -1 if absent.
+function Get-StateIndex($Order, [string]$State) { $o = @($Order); for ($k = 0; $k -lt $o.Count; $k++) { if ("$($o[$k])" -ieq $State) { return $k } }; -1 }
 
 function Test-IsParent($Item) { $Item.type -eq 'Package' -or ($Item.ContainsKey('children') -and @($Item.children).Count -gt 0) }
 
@@ -679,7 +698,7 @@ function Test-Move {
 
     # Legal route: the next state in the order, a declared back move, or Removed from any unfinished state.
     $order = Get-ItemOrder $Config $Item
-    $next = if ($order.IndexOf($from) -ge 0 -and $order.IndexOf($from) -lt $order.Count - 1) { $order[$order.IndexOf($from) + 1] } else { $null }
+    $fi = Get-StateIndex $order $from; $next = if ($fi -ge 0 -and $fi -lt $order.Count - 1) { $order[$fi + 1] } else { $null }
     $isBack = [bool]($Config.backMoves | Where-Object { $_.from -eq $from -and $_.to -eq $To })
     if ($fromDef.kind -eq 'end') { $failures.Add("$from is finished; it cannot move") }
     elseif (-not ($To -eq $next -or $isBack -or $To -eq (Get-CategoryState $Config 'Removed'))) { $failures.Add("$from cannot move to $To; the next state is $next") }
@@ -794,7 +813,7 @@ function Get-SupportedState {
     $order = Get-ItemOrder $Config $Item
     if (Test-IsFinished $Config $Target) { return @{ state = $Target; missing = @() } }
     $entry = Get-EntryState $Config
-    $stop = $order.IndexOf($Target); if ($stop -lt 0) { return @{ state = $entry; missing = @("'$Target' is not on this item's route") } }
+    $stop = Get-StateIndex $order $Target; if ($stop -lt 0) { return @{ state = $entry; missing = @("'$Target' is not on this item's route") } }
     $probe = @{} + $Item; $probe.state = $entry
     for ($i = 0; $i -lt $stop; $i++) {
         $t = Test-Move -Config $Config -Item $probe -To $order[$i + 1] -Adapter $Adapter -Root $Root -SkipScripts
@@ -812,7 +831,7 @@ function Get-AdoptionPlan {
     $plan = foreach ($item in @(& $Adapter.GetItems)) {
         $old = @($item.tags | Where-Object { $map.ContainsKey($_) }) + @(if ($item.ContainsKey('oldStatus') -and $item.oldStatus -and $Config.adopt.statusMap.ContainsKey($item.oldStatus)) { "status:$($item.oldStatus)" })
         $map = @{} + $Config.adopt.map; foreach ($k in $Config.adopt.statusMap.Keys) { $map["status:$k"] = $Config.adopt.statusMap[$k] }
-        $mapped = if ($old) { ($old | ForEach-Object { $map[$_] } | Sort-Object { $Config.order.IndexOf($_) } | Select-Object -Last 1) } elseif ($item.state -and $item.state -ne $Config.adopt.default) { $item.state } else { $Config.adopt.default }
+        $mapped = if ($old) { ($old | ForEach-Object { $map[$_] } | Sort-Object { Get-StateIndex $Config.order $_ } | Select-Object -Last 1) } elseif ($item.state -and $item.state -ne $Config.adopt.default) { $item.state } else { $Config.adopt.default }
         $s = Get-SupportedState -Config $Config -Item $item -Target $mapped -Adapter $Adapter -Root $Root
         [ordered]@{ id = $item.id; title = $item.title; type = $item.type; old = (@($old) -join ', '); mapped = $mapped; new = $s.state; missing = @($s.missing); removeTags = @($old) }
     }
@@ -876,7 +895,7 @@ function Invoke-WorkflowManager {
         if (($def.kind -notin 'work', 'wait-children' -and -not $parentReady) -or $item.tags -contains $blocked) { continue }
         $full = & $Adapter.GetItem $item.id
         $iorder = Get-ItemOrder $Config $full
-        $i = $iorder.IndexOf($item.state); if ($i -lt 0 -or $i -ge $iorder.Count - 1) { continue }
+        $i = Get-StateIndex $iorder $item.state; if ($i -lt 0 -or $i -ge $iorder.Count - 1) { continue }
         $to = $iorder[$i + 1]
         $all = @(& $Adapter.GetItems)
         $t = Test-Move -Config $Config -Item $full -To $to -Adapter $Adapter -Root $Root -AllItems $all -SkipScripts
@@ -900,7 +919,7 @@ function Invoke-WorkflowManager {
 
     # 2. Pull from each wait column into the next state while it has free slots.
     foreach ($w in @($Config.states | Where-Object { $_.kind -eq 'wait' })) {
-        $i = $order.IndexOf($w.name); if ($i -lt 0 -or $i -ge $order.Count - 1) { continue }
+        $i = Get-StateIndex $order $w.name; if ($i -lt 0 -or $i -ge $order.Count - 1) { continue }
         $next = Get-StateDef $Config $order[$i + 1]
         $all = @(& $Adapter.GetItems)
         $free = if ($next.wipLimit) { $next.wipLimit - @($all | Where-Object { $_.state -eq $next.name }).Count } else { [int]::MaxValue }
@@ -967,6 +986,6 @@ function Format-AttentionList($Report) {
     $lines -join "`n"
 }
 
-Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
+Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-OperatorOnlyMatch, Get-StateIndex, Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
     Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemDocsMode, Get-ArtifactName, Get-ItemArtifacts, Get-ItemArtifactText, Get-ItemArtifactVersions, Get-ItemDocFiles, Publish-ItemDocs, Get-ItemDocsDrift, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
