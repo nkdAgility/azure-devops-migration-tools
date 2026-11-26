@@ -15,8 +15,10 @@ $text = @($inputs.command, $inputs.file_path, $inputs.path) -join ' '
 
 # Each command in a chain is checked on its own; git global options (git -C dir push) may come before push.
 # A push to main is refused unless the repo's .specify/memory/workflow.json sets directToMain, for example
-#   "directToMain": { "allowed": true, "only": "fix", "paths": ["system/**"], "never": ["specs/**"] }
-# and then only a plain push of local main whose every commit is of that kind and touches only those paths.
+#   "directToMain": { "allowed": true, "never": ["specs/**"], "kinds": [
+#       { "name": "fix", "prefix": "fix", "paths": ["system/**"] }, { "name": "content", "prefix": "content", "paths": ["content/**"] } ] }
+# ("only" with "paths" is read as one kind), and then only a plain push of local main whose every commit is of a
+# listed kind and touches only that kind's paths.
 function ConvertTo-PushGlob([string]$g) { '^' + ([regex]::Escape($g) -replace '\\\*\\\*', '.*' -replace '\\\*', '[^/]*' -replace '\\\?', '.') + '$' }
 function Get-DirectToMainRefusal([string]$dir, [string[]]$pa) {
     $cfgPath = Join-Path $dir '.specify/memory/workflow.json'
@@ -34,15 +36,17 @@ function Get-DirectToMainRefusal([string]$dir, [string[]]$pa) {
     git -C $dir fetch -q origin $branch 2>$null
     $commits = @(git -C $dir rev-list "origin/$branch..HEAD" 2>$null)
     if ($LASTEXITCODE -ne 0) { return "the commits to push could not be listed (origin/$branch..HEAD)." }
-    $kind = if ($d.only) { [string]$d.only } else { 'fix' }
-    $paths = @($d.paths | ForEach-Object { ConvertTo-PushGlob $_ })
+    # The kinds a repo lists, each with its commit prefix and its own paths; "only" with "paths" is one kind.
+    $kinds = if ($d.PSObject.Properties['kinds'] -and @($d.kinds).Count) { @($d.kinds) } else { @([pscustomobject]@{ name = $(if ($d.only) { [string]$d.only } else { 'fix' }); prefix = $(if ($d.only) { [string]$d.only } else { 'fix' }); paths = @($d.paths) }) }
     $never = @($d.never | ForEach-Object { ConvertTo-PushGlob $_ })
     foreach ($c in $commits) {
         $subject = git -C $dir log -1 --format=%s $c
-        if ($subject -notmatch "^$([regex]::Escape($kind))(\([^)]*\))?!?:") { return "commit $($c.Substring(0,8)) is not a $kind commit: $subject" }
+        $k = $kinds | Where-Object { $p = if ($_.prefix) { [string]$_.prefix } else { [string]$_.name }; $subject -match "^$([regex]::Escape($p))(\([^)]*\))?!?:" } | Select-Object -First 1
+        if (-not $k) { return "commit $($c.Substring(0,8)) is not of a kind that may go to main directly ($(@($kinds | ForEach-Object { if ($_.prefix) { $_.prefix } else { $_.name } }) -join ', ')): $subject" }
+        $paths = @($k.paths | ForEach-Object { ConvertTo-PushGlob $_ })
         foreach ($f in @(git -C $dir diff-tree --no-commit-id --name-only -r --root $c)) {
             if ($never | Where-Object { $f -match $_ }) { return "commit $($c.Substring(0,8)) touches $f, which never goes to main directly." }
-            if (-not ($paths | Where-Object { $f -match $_ })) { return "commit $($c.Substring(0,8)) touches $f, outside the paths that may go to main directly." }
+            if (-not ($paths | Where-Object { $f -match $_ })) { return "commit $($c.Substring(0,8)) touches $f, outside the paths of a $($k.name) change." }
         }
     }
     $null
