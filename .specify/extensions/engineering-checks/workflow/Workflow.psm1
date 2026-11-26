@@ -13,8 +13,29 @@ function Get-WorkflowConfig {
     $path = if (Test-Path $repoCfg) { $repoCfg } else { Join-Path $PSScriptRoot 'workflow.default.json' }
     $cfg = Get-Content $path -Raw | ConvertFrom-Json -AsHashtable
     $cfg['order'] = if ($cfg.validatingBeforeMerge) { $cfg.orderBeforeMerge } else { $cfg.orderAfterMerge }
+    $bad = @(Get-WorkflowConfigProblem $cfg)
+    if ($bad.Count) { throw "$path is not a valid workflow: $($bad -join '; ')" }
     $cfg
 }
+
+# The four categories are the core; the states are the repo's own. Every category has at least one state,
+# Completed and Removed exactly one each, and every state names one of the four.
+$script:Categories = 'Proposed', 'In Progress', 'Completed', 'Removed'
+function Get-WorkflowConfigProblem($Config) {
+    $states = @($Config.states)
+    foreach ($s in $states) { if ("$($s['category'])" -notin $script:Categories) { "state '$($s.name)' has no category of the four (it says '$($s['category'])')" } }
+    foreach ($c in $script:Categories) {
+        $n = @($states | Where-Object { $_['category'] -eq $c }).Count
+        if ($n -eq 0) { "no state is in the $c category" }
+        elseif ($c -in 'Completed', 'Removed' -and $n -gt 1) { "the $c category has $n states; it must have exactly one" }
+    }
+    if (-not @($Config.order).Count) { 'the state order is empty' }
+    foreach ($o in @($Config.order)) { if ($o -notin $states.name) { "the order names '$o', which is not a state" } }
+}
+function Get-CategoryState($Config, [string]$Category) { @($Config.states | Where-Object { $_['category'] -eq $Category } | ForEach-Object { $_.name }) | Select-Object -First 1 }
+function Get-EntryState($Config) { @($Config.order)[0] }
+function Test-StateFlag($Config, [string]$State, [string]$Flag) { $d = $Config.states | Where-Object { $_.name -eq $State } | Select-Object -First 1; [bool]($d -and $d.ContainsKey($Flag) -and $d[$Flag]) }
+function Test-IsFinished($Config, [string]$State) { $d = $Config.states | Where-Object { $_.name -eq $State } | Select-Object -First 1; [bool]($d -and $d['category'] -in 'Completed', 'Removed') }
 
 function Test-IsParent($Item) { $Item.type -eq 'Package' -or ($Item.ContainsKey('children') -and @($Item.children).Count -gt 0) }
 
@@ -50,7 +71,8 @@ function New-GitHubBoardAdapter {
     # State is the issue's built-in Status (state labels are hard denied). StatusNames maps a workflow state to the
     # Status option that holds it; a state not listed uses its own name. An issue whose Status names no workflow
     # state is read as Proposed, with that Status kept as oldStatus for adoption.
-    param([string]$Repo, [hashtable]$StatusNames = @{}, [string[]]$States = @(), [string]$StateField, [hashtable]$CategoryStatus = @{}, [hashtable]$StateCategory = @{})
+    param([string]$Repo, [hashtable]$StatusNames = @{}, [string[]]$States = @(), [string]$StateField, [hashtable]$CategoryStatus = @{}, [hashtable]$StateCategory = @{},
+        [string]$EntryState = 'Proposed', [string]$DoneState = 'Closed', [string]$RemovedState = 'Removed')
     $nwo = if ($Repo) { $Repo } else { (gh repo view --json nameWithOwner | ConvertFrom-Json).nameWithOwner }
     $owner, $name = $nwo -split '/'
     $r = @('-R', $nwo)
@@ -76,7 +98,7 @@ function New-GitHubBoardAdapter {
             id        = $i.number
             title     = $i.title
             type      = if ($i.PSObject.Properties['issueType'] -and $i.issueType) { $i.issueType.name } else { $null }
-            state     = if ($state) { $state } elseif ($i.state -eq 'CLOSED') { 'Closed' } else { 'Proposed' }
+            state     = if ($state) { $state } elseif ($i.state -eq 'CLOSED') { $DoneState } else { $EntryState }
             oldStatus = if ($state) { $null } else { $status }
             status    = $status
             stateSet  = [bool]$state -or $i.state -eq 'CLOSED'
@@ -123,8 +145,8 @@ function New-GitHubBoardAdapter {
             if (-not $sid) { throw "the repo has no Status named '$want'; add it in the repo's settings" }
             $res = gh api graphql -f query="mutation{setIssueStatus(input:{issueId:`"$($q.data.repository.issue.id)`",statusId:`"$sid`"}){clientMutationId}}"
             if ($LASTEXITCODE -ne 0 -or "$res" -match '"errors"') { throw "setting Status failed: $res" }
-            if ($state -eq 'Closed') { gh issue close $item.id @r --reason completed | Out-Null; if ($LASTEXITCODE -ne 0) { throw "closing #$($item.id) failed" } }
-            if ($state -eq 'Removed') { gh issue close $item.id @r --reason 'not planned' | Out-Null; if ($LASTEXITCODE -ne 0) { throw "closing #$($item.id) failed" } }
+            if ($state -eq $DoneState) { gh issue close $item.id @r --reason completed | Out-Null; if ($LASTEXITCODE -ne 0) { throw "closing #$($item.id) failed" } }
+            if ($state -eq $RemovedState) { gh issue close $item.id @r --reason 'not planned' | Out-Null; if ($LASTEXITCODE -ne 0) { throw "closing #$($item.id) failed" } }
         }.GetNewClosure()
         GetStatuses = { (gh api graphql -f query="{repository(owner:`"$owner`",name:`"$name`"){planningStatuses(first:50){nodes{name}}}}" | ConvertFrom-Json).data.repository.planningStatuses.nodes.name }.GetNewClosure()
         ToStatus   = $toStatus
@@ -142,7 +164,8 @@ function Get-BoardAdapter {
             $sn = if ($b.ContainsKey('statusNames') -and $b.statusNames) { $b.statusNames } else { @{} }
             $cs = if ($b.ContainsKey('categoryStatus') -and $b.categoryStatus) { $b.categoryStatus } else { @{} }
             $sc = @{}; foreach ($s in $Config.states) { $sc[$s.name] = $s.category }
-            New-GitHubBoardAdapter -Repo $b['repo'] -StatusNames $sn -States @($Config.states | ForEach-Object { $_.name }) -StateField $b['stateField'] -CategoryStatus $cs -StateCategory $sc
+            New-GitHubBoardAdapter -Repo $b['repo'] -StatusNames $sn -States @($Config.states | ForEach-Object { $_.name }) -StateField $b['stateField'] -CategoryStatus $cs -StateCategory $sc `
+                -EntryState (Get-EntryState $Config) -DoneState (Get-CategoryState $Config 'Completed') -RemovedState (Get-CategoryState $Config 'Removed')
         }
         default  { throw "Unknown board adapter '$($Config.board.adapter)'." }
     }
@@ -164,6 +187,123 @@ function Get-ItemRecordPath([string]$Root = '.', $Id) {
     Join-Path $Root "specs/$Id/item.md"
 }
 
+# ---------------------------------------------------------------- item documents: files or issue artifacts
+# A repo chooses where an item's documents are kept, with "itemDocs" in its workflow.json:
+#   "files" (the default): specs/<issue>-<name>/ is committed on the branch and removed before the PR is ready;
+#   "artifacts": specs/<issue>-<name>/ is a local working copy, not in git, and each file in it is published as a
+#                Markdown artifact on the item's issue, which is the record the checks read.
+
+function Get-ItemDocsMode([string]$Root = '.') {
+    $p = Join-Path $Root '.specify/memory/workflow.json'
+    if (-not (Test-Path $p)) { return 'files' }
+    $c = Get-Content $p -Raw | ConvertFrom-Json
+    if ($c.PSObject.Properties['itemDocs'] -and "$($c.itemDocs)" -eq 'artifacts') { 'artifacts' } else { 'files' }
+}
+
+function Get-ItemDocsRepoArgs([string]$Root = '.') {
+    $p = Join-Path $Root '.specify/memory/workflow.json'
+    if (Test-Path $p) { $c = Get-Content $p -Raw | ConvertFrom-Json -AsHashtable; if ($c['board'] -and $c.board['repo']) { return @('-R', $c.board.repo) } }
+    @()
+}
+
+function Get-ArtifactName([string]$Rel) {
+    # An artifact name for a file in the item's folder: its path inside the folder, "/" as "_"; only letters, digits,
+    # spaces, ".", "-" and "_" are kept (GitHub refuses brackets, "!" and "?").
+    (($Rel.Replace('\', '/') -replace '/', '_') -replace '[^\w .-]', '-')
+}
+
+function ConvertTo-DocText([string]$Text) { ("$Text" -replace "`r`n", "`n").TrimEnd("`n") }
+
+function Get-ItemArtifacts([string]$Root = '.', $Id) {
+    $r = Get-ItemDocsRepoArgs $Root
+    Push-Location $Root
+    try {
+        $j = gh issue artifact list $Id @r --json number,name 2>$null
+        if ($LASTEXITCODE -ne 0) { throw "could not list the artifacts on #$Id" }
+        @($j | ConvertFrom-Json)
+    } finally { Pop-Location }
+}
+
+function Get-ItemArtifactText([string]$Root = '.', $Id, [string]$Rel, [int]$Version) {
+    # The current text of the artifact for <Rel>, or of one of its versions; $null when there is no such artifact.
+    $name = Get-ArtifactName $Rel
+    $a = @(Get-ItemArtifacts $Root $Id | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+    if (-not $a) { return $null }
+    $r = Get-ItemDocsRepoArgs $Root
+    $v = if ($Version) { @('--version', "$Version") } else { @() }
+    Push-Location $Root
+    try { $b = gh issue artifact view $Id $a.number @r @v --json body 2>$null; if ($LASTEXITCODE -ne 0) { throw "could not read artifact $name on #$Id" }; ($b | ConvertFrom-Json).body }
+    finally { Pop-Location }
+}
+
+function Get-ItemArtifactVersions([string]$Root = '.', $Id, [string]$Rel) {
+    # Every version's text of the artifact for <Rel>, oldest first.
+    $name = Get-ArtifactName $Rel
+    $a = @(Get-ItemArtifacts $Root $Id | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+    if (-not $a) { return @() }
+    $r = Get-ItemDocsRepoArgs $Root
+    Push-Location $Root
+    try {
+        $j = gh issue artifact view $Id $a.number @r --json versions 2>$null
+        if ($LASTEXITCODE -ne 0) { throw "could not read the versions of artifact $name on #$Id" }
+        @(($j | ConvertFrom-Json).versions | Sort-Object { [int]$_.version } | ForEach-Object { "$($_.body)" })
+    } finally { Pop-Location }
+}
+
+function Get-ItemDocFiles([string]$Root = '.', $Id) {
+    $folder = Get-ItemFolder $Root $Id
+    if (-not $folder) { return @() }
+    @(Get-ChildItem $folder -File -Recurse | ForEach-Object { @{ rel = [IO.Path]::GetRelativePath($folder, $_.FullName).Replace('\', '/'); path = $_.FullName } })
+}
+
+function Publish-ItemDocs([string]$Root = '.', $Id) {
+    # In "artifacts" mode, publishes each file of the item's folder as an artifact on its issue: created when new,
+    # edited only when its text changed (so the version history holds real changes only). Returns what it changed.
+    if ((Get-ItemDocsMode $Root) -ne 'artifacts') { return @() }
+    $r = Get-ItemDocsRepoArgs $Root
+    $existing = @(Get-ItemArtifacts $Root $Id)
+    $done = @()
+    Push-Location $Root
+    try {
+        foreach ($f in @(Get-ItemDocFiles $Root $Id)) {
+            $name = Get-ArtifactName $f.rel
+            $text = ConvertTo-DocText ([IO.File]::ReadAllText($f.path))
+            $a = @($existing | Where-Object { $_.name -eq $name }) | Select-Object -First 1
+            $tmp = [IO.Path]::GetTempFileName(); [IO.File]::WriteAllText($tmp, $text + "`n")
+            try {
+                if ($a) {
+                    $cur = (gh issue artifact view $Id $a.number @r --json body 2>$null | ConvertFrom-Json).body
+                    if ((ConvertTo-DocText $cur) -eq $text) { continue }
+                    gh issue artifact edit $Id $a.number @r -F $tmp 2>&1 | Out-Null
+                    if ($LASTEXITCODE -ne 0) { throw "could not update artifact $name on #$Id" }
+                    $done += "updated $name"
+                } else {
+                    gh issue artifact create $Id @r -F $tmp --name $name 2>&1 | Out-Null
+                    if ($LASTEXITCODE -ne 0) { throw "could not create artifact $name on #$Id" }
+                    $done += "created $name"
+                }
+            } finally { Remove-Item $tmp -ErrorAction SilentlyContinue }
+        }
+    } finally { Pop-Location }
+    $done
+}
+
+function Get-ItemDocsDrift([string]$Root = '.', $Id) {
+    # In "artifacts" mode, the files of the item's folder whose artifact is missing or holds other text.
+    if ((Get-ItemDocsMode $Root) -ne 'artifacts') { return @() }
+    $existing = @(Get-ItemArtifacts $Root $Id)
+    $r = Get-ItemDocsRepoArgs $Root
+    Push-Location $Root
+    try {
+        @(foreach ($f in @(Get-ItemDocFiles $Root $Id)) {
+            $a = @($existing | Where-Object { $_.name -eq (Get-ArtifactName $f.rel) }) | Select-Object -First 1
+            if (-not $a) { $f.rel; continue }
+            $cur = (gh issue artifact view $Id $a.number @r --json body 2>$null | ConvertFrom-Json).body
+            if ((ConvertTo-DocText $cur) -ne (ConvertTo-DocText ([IO.File]::ReadAllText($f.path)))) { $f.rel }
+        })
+    } finally { Pop-Location }
+}
+
 function New-ItemFolder([string]$Root = '.', $Id, [string]$Title) {
     # Creates specs/<issue>-<name>/ with item.md, the name taken from the issue's title. Returns the folder.
     $existing = Get-ItemFolder $Root $Id
@@ -181,7 +321,7 @@ function New-ItemFolder([string]$Root = '.', $Id, [string]$Title) {
 
 function Get-ItemRoot($Item, [string]$Root = '.') {
     # Where the item's own record lives: its worker's worktree once one is recorded, else the given root.
-    if (-not $script:StoreRoot) { $script:StoreRoot = $Root }
+    if (-not (Get-Variable -Scope Script -Name StoreRoot -ValueOnly -ErrorAction SilentlyContinue)) { $script:StoreRoot = $Root }
     $id = if ($Item -is [System.Collections.IDictionary]) { $Item['id'] } elseif ($Item -and $Item.PSObject.Properties['id']) { $Item.id } else { $null }
     if (-not $id) { return $Root }
     $wt = Get-StoredWorktree $id
@@ -191,8 +331,11 @@ function Get-ItemRoot($Item, [string]$Root = '.') {
 function Get-ItemEvidence {
     param($Item, [string]$Root = '.')
     $parts = @("$($Item.body)") + @($Item.comments | ForEach-Object { "$($_.body)" })
-    $wkr = Get-ItemRecordPath (Get-ItemRoot $Item $Root) $Item.id
+    $iroot = Get-ItemRoot $Item $Root
+    $wkr = Get-ItemRecordPath $iroot $Item.id
     if (Test-Path $wkr) { $parts += Get-Content $wkr -Raw }
+    # In "artifacts" mode, with no working copy here (the worker's worktree is gone, say), the record is read from the issue.
+    elseif ((Get-ItemDocsMode $iroot) -eq 'artifacts') { $t = Get-ItemArtifactText $iroot $Item.id 'item.md'; if ($t) { $parts += $t } }
     ($parts -join "`n`n") -replace "`r`n", "`n"
 }
 
@@ -489,7 +632,8 @@ function Test-Check {
         'hasChildren'     { @($Item['children']).Count -gt 0 }
         'childrenDone'    {
             $kids = @($Item['children'] | ForEach-Object { & $Adapter.GetItem $_ })
-            $kids.Count -gt 0 -and -not ($kids | Where-Object { $_.state -notin 'Closed', 'Removed' }) -and ($kids | Where-Object { $_.state -eq 'Closed' })
+            $done = Get-CategoryState $Config 'Completed'
+            $kids.Count -gt 0 -and -not ($kids | Where-Object { -not (Test-IsFinished $Config $_.state) }) -and ($kids | Where-Object { $_.state -eq $done })
         }
         'prMerged'        { (& $Adapter.GetPrState $Item) -eq 'MERGED' }
         'script'          {
@@ -519,7 +663,8 @@ function Test-Check {
 # ---------------------------------------------------------------- the move
 
 function Get-ShiftKey($Config, [string]$From, [string]$To) {
-    if ($To -eq 'Removed') { return '*>Removed' }
+    # The move to the Removed category's state, from anywhere, has one policy, whatever the state is called.
+    if ($To -eq (Get-CategoryState $Config 'Removed')) { return '*>Removed' }
     "$From>$To"
 }
 
@@ -537,7 +682,7 @@ function Test-Move {
     $next = if ($order.IndexOf($from) -ge 0 -and $order.IndexOf($from) -lt $order.Count - 1) { $order[$order.IndexOf($from) + 1] } else { $null }
     $isBack = [bool]($Config.backMoves | Where-Object { $_.from -eq $from -and $_.to -eq $To })
     if ($fromDef.kind -eq 'end') { $failures.Add("$from is finished; it cannot move") }
-    elseif (-not ($To -eq $next -or $isBack -or $To -eq 'Removed')) { $failures.Add("$from cannot move to $To; the next state is $next") }
+    elseif (-not ($To -eq $next -or $isBack -or $To -eq (Get-CategoryState $Config 'Removed'))) { $failures.Add("$from cannot move to $To; the next state is $next") }
 
     # WIP limit of the state being entered; an Expedite item is not held by it.
     if ($toDef.wipLimit -and $AllItems -and -not ($Config.tags.expedite -and @($Item.tags) -contains $Config.tags.expedite)) {
@@ -647,9 +792,10 @@ function Get-SupportedState {
     # and returns the furthest state its evidence supports, up to Target. Also returns what stopped it.
     param($Config, $Item, [string]$Target, $Adapter, [string]$Root = '.')
     $order = Get-ItemOrder $Config $Item
-    if ($Target -in 'Closed', 'Removed') { return @{ state = $Target; missing = @() } }
-    $stop = $order.IndexOf($Target); if ($stop -lt 0) { return @{ state = 'Proposed'; missing = @("'$Target' is not on this item's route") } }
-    $probe = @{} + $Item; $probe.state = 'Proposed'
+    if (Test-IsFinished $Config $Target) { return @{ state = $Target; missing = @() } }
+    $entry = Get-EntryState $Config
+    $stop = $order.IndexOf($Target); if ($stop -lt 0) { return @{ state = $entry; missing = @("'$Target' is not on this item's route") } }
+    $probe = @{} + $Item; $probe.state = $entry
     for ($i = 0; $i -lt $stop; $i++) {
         $t = Test-Move -Config $Config -Item $probe -To $order[$i + 1] -Adapter $Adapter -Root $Root -SkipScripts
         $real = @($t.failures | Where-Object { $_ -notmatch ' is full \(' })
@@ -726,7 +872,7 @@ function Invoke-WorkflowManager {
     # 1. Move work forward where its policy passes (script checks are left to the run itself).
     foreach ($item in @(& $Adapter.GetItems)) {
         $def = Get-StateDef $Config $item.state
-        $parentReady = (Test-IsParent $item) -and $item.state -eq 'Refined'
+        $parentReady = (Test-IsParent $item) -and (Test-StateFlag $Config $item.state 'parentsSplit')
         if (($def.kind -notin 'work', 'wait-children' -and -not $parentReady) -or $item.tags -contains $blocked) { continue }
         $full = & $Adapter.GetItem $item.id
         $iorder = Get-ItemOrder $Config $full
@@ -758,14 +904,16 @@ function Invoke-WorkflowManager {
         $next = Get-StateDef $Config $order[$i + 1]
         $all = @(& $Adapter.GetItems)
         $free = if ($next.wipLimit) { $next.wipLimit - @($all | Where-Object { $_.state -eq $next.name }).Count } else { [int]::MaxValue }
-        foreach ($cand in @(Get-PullOrder $Config @($all | Where-Object { $_.state -eq $w.name -and $_.tags -notcontains $blocked -and -not ($w.name -eq 'Refined' -and (Test-IsParent $_)) }))) {
+        foreach ($cand in @(Get-PullOrder $Config @($all | Where-Object { $_.state -eq $w.name -and $_.tags -notcontains $blocked -and -not ((Test-StateFlag $Config $w.name 'parentsSplit') -and (Test-IsParent $_)) }))) {
             # An Expedite item is pulled even into a full state; the others wait for a free slot.
             if ($free -le 0 -and -not ($Config.tags.expedite -and @($cand.tags) -contains $Config.tags.expedite)) { break }
             # Which worker owns an item is kept in the board state (an older "WKR:" line on the item still counts).
             $owner = Get-StoredWkr $cand.id
             if (-not $owner) { $legacy = [regex]::Match((Get-ItemEvidence $cand $Root), '(?m)^WKR:\s*(\S+)'); if ($legacy.Success) { $owner = $legacy.Groups[1].Value } }
             if (-not $owner -and $cand.ContainsKey('parent') -and $cand.parent) { $owner = Get-StoredWkr $cand.parent }
-            if (-not $owner -and $w.name -eq 'Approved') {
+            # A worker is given out when an item is pulled into the first work state of the order.
+            $firstWork = @($order | Where-Object { (Get-StateDef $Config $_).kind -eq 'work' })[0]
+            if (-not $owner -and $next.name -eq $firstWork) {
                 $wkr = "WKR-$($cand.id)"
                 if (-not $WhatIf) { Set-StoredWkr $cand.id $wkr }
                 $report.actions += @{ action = 'start-wkr'; id = $cand.id; wkr = $wkr; state = $next.name }
@@ -783,7 +931,7 @@ function Invoke-WorkflowManager {
         $since = Get-StateSince $item
         $waited = [math]::Round(($Now - $since.ToUniversalTime()).TotalHours, 1)
         if ($item.tags -contains $blocked) { $report.attention += @{ kind = 'blocked'; id = $item.id; state = $item.state; waitedHours = $waited } }
-        elseif ($def.kind -eq 'wait-martin' -or ((Test-IsParent $item) -and $item.state -eq 'Refined')) { $report.attention += @{ kind = 'decision'; id = $item.id; state = $item.state; waitedHours = $waited } }
+        elseif ($def.kind -eq 'wait-martin' -or ((Test-IsParent $item) -and (Test-StateFlag $Config $item.state 'parentsSplit'))) { $report.attention += @{ kind = 'decision'; id = $item.id; state = $item.state; waitedHours = $waited } }
         foreach ($oq in @(Get-OpenQuestions (Get-ItemEvidence $item $Root))) { $report.attention += @{ kind = 'question'; id = $item.id; question = $oq.id; state = $item.state } }
         if ($def.kind -eq 'work' -and $def.stuckAfterMinutes -and $item.tags -notcontains $blocked) {
             $idle = ($Now - (Get-LastActivity $item $Root)).TotalMinutes
@@ -819,6 +967,6 @@ function Format-AttentionList($Report) {
     $lines -join "`n"
 }
 
-Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
+Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
-    Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
+    Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemDocsMode, Get-ArtifactName, Get-ItemArtifacts, Get-ItemArtifactText, Get-ItemArtifactVersions, Get-ItemDocFiles, Publish-ItemDocs, Get-ItemDocsDrift, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift

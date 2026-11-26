@@ -1,6 +1,6 @@
 {
   "specRoot": "docs/specs",
-  "$comment": "The approved engineering Definition of Workflow (spec/definition-of-workflow-engineering.md) as data. A repo copies this to .specify/memory/workflow.json and changes only the settings marked per repo. WIP limits and stuckAfterMinutes are placeholders until Martin sets them.",
+  "$comment": "The approved engineering Definition of Workflow (spec/definition-of-workflow-engineering.md) as data. A repo copies this to .specify/memory/workflow.json as a template. The four categories are the core: every repo has at least one state in each, and exactly one in Completed and one in Removed. The states are the repo's own: it may rename, remove or add them. A state flagged editsCode may change product code; a state flagged parentsSplit holds parents until Martin approves their split. WIP limits and stuckAfterMinutes are placeholders until Martin sets them.",
   "validatingBeforeMerge": true,
   "usesPackage": false,
   "board": {
@@ -48,6 +48,7 @@
     },
     {
       "name": "Refined",
+      "parentsSplit": true,
       "category": "Proposed",
       "kind": "wait",
       "wipLimit": null,
@@ -69,6 +70,7 @@
     },
     {
       "name": "Building",
+      "editsCode": true,
       "category": "In Progress",
       "kind": "work",
       "wipLimit": 2,
@@ -76,6 +78,7 @@
     },
     {
       "name": "Validating",
+      "editsCode": true,
       "category": "In Progress",
       "kind": "work",
       "wipLimit": 2,
@@ -83,6 +86,7 @@
     },
     {
       "name": "In review",
+      "editsCode": true,
       "category": "In Progress",
       "kind": "work",
       "wipLimit": 3,
