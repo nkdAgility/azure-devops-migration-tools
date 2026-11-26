@@ -1,15 +1,18 @@
 # sharedsteps-3256: a Test Case whose Shared Steps and Shared Parameter are not migrated keeps their source ids.
 # Seeds one of each and a Test Case that uses both. config.json migrates only the Test Case, so both references
 # stay unresolved and must be reported; config-all.json then migrates all three, and the re-run remaps them.
-param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$Process = "amte2e-agile")
+# -Progress (optional) is filled in as each project is created, so a caller can clean up after a partial seed.
+param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$Process = "amte2e-agile", [hashtable]$Progress = @{})
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
 
 Set-E2EOrg nkdagility-adomt-target
 New-E2EProject -Name $Tgt -Process $Process | Out-Null
+$Progress.Target = $true
 Set-E2EOrg nkdagility-adomt-source
 New-E2EProject -Name $Src -Process $Process | Out-Null
+$Progress.Source = $true
 
 $ssSteps = '<steps id="0" last="2"><step id="2" type="ActionStep"><parameterizedString isformatted="true">open @app</parameterizedString><parameterizedString isformatted="true">app opens</parameterizedString><description/></step></steps>'
 $ss = Set-E2EWorkItem $Src "Shared Steps" -Fields ([ordered]@{ "System.Title" = "ss shared steps"; "Microsoft.VSTS.TCM.Steps" = $ssSteps })

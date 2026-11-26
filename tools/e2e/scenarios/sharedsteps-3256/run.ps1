@@ -10,11 +10,11 @@ $buildArgs = if ($BuildOutput) { @{ BuildOutput = $BuildOutput } } else { @{} }
 $work = Join-Path ([IO.Path]::GetTempPath()) ("amt-3256-" + [guid]::NewGuid().ToString("N").Substring(0, 8))
 New-Item -ItemType Directory -Force $work | Out-Null
 $failed = @()
-$seeded = $false
+$progress = @{}
+$cleanupErrors = @()
 $passed = $false
 try {
-    & "$PSScriptRoot\seed.ps1" -Src $Src -Tgt $Tgt
-    $seeded = $true
+    & "$PSScriptRoot\seed.ps1" -Src $Src -Tgt $Tgt -Progress $progress
     foreach ($step in @(@{ Config = "config.json"; Expect = "Unresolved" }, @{ Config = "config-all.json"; Expect = "Resolved" })) {
         $cfg = Join-Path $work $step.Config
         (Get-Content (Join-Path $PSScriptRoot $step.Config) -Raw).Replace("amte2e-3256-src", $Src).Replace("amte2e-3256-tgt", $Tgt) | Set-Content $cfg -Encoding utf8
@@ -32,10 +32,13 @@ finally {
     if ($passed) { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
     else { Write-Warning "sharedsteps-3256 logs kept in $work" }
     Remove-Item (Join-Path $PSScriptRoot "state.local.json") -ErrorAction SilentlyContinue
-    # The seed creates the target project first; the source is ours to delete only once the seed has finished.
-    if ($seeded) { Remove-E2EProject $Src -Org nkdagility-adomt-source }
-    Remove-E2EProject $Tgt -Org nkdagility-adomt-target
+    # Delete only the projects this run's seed created or reused (it records each in $progress), and try each
+    # deletion on its own, so a failure on one still lets the other be deleted.
+    if ($progress.Source) { try { Remove-E2EProject $Src -Org nkdagility-adomt-source } catch { $cleanupErrors += "source ${Src}: $_" } }
+    if ($progress.Target) { try { Remove-E2EProject $Tgt -Org nkdagility-adomt-target } catch { $cleanupErrors += "target ${Tgt}: $_" } }
+    if ($cleanupErrors) { Write-Warning "sharedsteps-3256 clean-up failed: $($cleanupErrors -join '; ')" }
 }
+if ($cleanupErrors) { $failed += "clean-up failed" }
 if ($failed) { Write-Error "sharedsteps-3256 failed: $($failed -join '; ')"; exit 1 }
 "sharedsteps-3256 passed"
 exit 0

@@ -1201,7 +1201,9 @@ namespace MigrationTools.Processors
             {
                 CommonTools.WorkItemLink.RemoveLinks(this, sourceRevision, links.Removed, targetWorkItem);
             }
-            if (links.Added.Count > 0 || (isLastRevision && currentWi.Links.Count > 0))
+            // The last revision always runs the link checks, even with no links left, so a removed reference
+            // resolves its earlier review row.
+            if (links.Added.Count > 0 || isLastRevision)
             {
                 ProcessWorkItemLinks(sourceRevision, targetWorkItem, true);
             }
