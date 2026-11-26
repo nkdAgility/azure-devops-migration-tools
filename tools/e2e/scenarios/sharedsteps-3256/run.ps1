@@ -14,14 +14,14 @@ $progress = @{}
 $cleanupErrors = @()
 $passed = $false
 try {
-    & "$PSScriptRoot\seed.ps1" -Src $Src -Tgt $Tgt -Progress $progress
+    & "$PSScriptRoot\seed.ps1" -Src $Src -Tgt $Tgt -Progress $progress -StateDir $work
     foreach ($step in @(@{ Config = "config.json"; Expect = "Unresolved" }, @{ Config = "config-all.json"; Expect = "Resolved" })) {
         $cfg = Join-Path $work $step.Config
         (Get-Content (Join-Path $PSScriptRoot $step.Config) -Raw).Replace("amte2e-3256-src", $Src).Replace("amte2e-3256-tgt", $Tgt) | Set-Content $cfg -Encoding utf8
         $logs = Join-Path $work $step.Expect
         & $invoke -Config $cfg -LogDirectory $logs @buildArgs
         if ($LASTEXITCODE -ne 0) { $failed += "$($step.Config) migration exit $LASTEXITCODE"; continue }
-        & "$PSScriptRoot\assert.ps1" -Src $Src -Tgt $Tgt -LogDirectory $logs -Expect $step.Expect
+        & "$PSScriptRoot\assert.ps1" -Src $Src -Tgt $Tgt -LogDirectory $logs -Expect $step.Expect -StateDir $work
         if ($LASTEXITCODE -ne 0) { $failed += "$($step.Expect) assertions exit $LASTEXITCODE" }
     }
     $passed = -not $failed
@@ -31,7 +31,6 @@ finally {
     # first, so the path is printed even if a project deletion below throws.
     if ($passed) { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
     else { Write-Warning "sharedsteps-3256 logs kept in $work" }
-    Remove-Item (Join-Path $PSScriptRoot "state.local.json") -ErrorAction SilentlyContinue
     # Release only the projects this run's seed tried to claim (it records each in $progress before claiming it;
     # Remove-E2EProject skips an absent project and refuses one leased by another run), and try each
     # deletion on its own, so a failure on one still lets the other be deleted.

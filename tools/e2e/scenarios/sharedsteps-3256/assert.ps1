@@ -6,7 +6,7 @@
 # -LogDirectory defaults to the newest folder Invoke-MigrationE2E.ps1 wrote when it was given none, among those whose
 # run log names this scenario's target project (other runs may be writing folders there at the same time).
 param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$OutFile,
-    [string]$LogDirectory, [ValidateSet("Unresolved", "Resolved")][string]$Expect = "Unresolved")
+    [string]$LogDirectory, [ValidateSet("Unresolved", "Resolved")][string]$Expect = "Unresolved", [string]$StateDir = $PSScriptRoot)
 $ErrorActionPreference = "Stop"
 if (-not $LogDirectory) {
     $LogDirectory = Get-ChildItem ([IO.Path]::GetTempPath()) -Directory -Filter "amt-e2e-logs-*" | Sort-Object LastWriteTime -Descending |
@@ -15,7 +15,7 @@ if (-not $LogDirectory) {
 }
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAssert.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
-$s = Read-E2EState $PSScriptRoot
+$s = Read-E2EState $StateDir
 $r = @()
 $org = "nkdagility-adomt-target"
 

@@ -1,8 +1,9 @@
 # sharedsteps-3256: a Test Case whose Shared Steps and Shared Parameter are not migrated keeps their source ids.
 # Seeds one of each and a Test Case that uses both. config.json migrates only the Test Case, so both references
 # stay unresolved and must be reported; config-all.json then migrates all three, and the re-run remaps them.
+# -StateDir (default: this folder) holds state.local.json; run.ps1 passes its own work folder so concurrent runs do not share it.
 # -Progress (optional) is filled in as each project is created, so a caller can clean up after a partial seed.
-param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$Process = "amte2e-agile", [hashtable]$Progress = @{})
+param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$Process = "amte2e-agile", [hashtable]$Progress = @{}, [string]$StateDir = $PSScriptRoot)
 $ErrorActionPreference = "Stop"
 Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
 Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
@@ -27,5 +28,5 @@ $tc = Set-E2EWorkItem $Src "Test Case" -Fields ([ordered]@{ "System.Title" = "ss
     @{ op = "add"; path = "/relations/-"; value = @{ rel = "Microsoft.VSTS.TestCase.SharedStepReferencedBy-Reverse"; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/wit/workItems/$($ss.id)" } },
     @{ op = "add"; path = "/relations/-"; value = @{ rel = "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse"; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/wit/workItems/$($sp.id)" } })
 
-Save-E2EState $PSScriptRoot @{ ss = $ss.id; sp = $sp.id; tc = $tc.id }
+Save-E2EState $StateDir @{ ss = $ss.id; sp = $sp.id; tc = $tc.id }
 "seeded sharedsteps: SS $($ss.id) SP $($sp.id) TC $($tc.id)"
