@@ -87,14 +87,19 @@ function Assert-E2EPoolLeaseHeld([string]$ProjectId, [string]$Org, [int]$Reads =
     $l
 }
 
-# An expired lease is never renewed: once it has expired another run may already be removing it, so its owner must
-# stop rather than extend it. Only Expired and Orphaned leases are ever taken over, so a live owner's renewal never
-# races a takeover.
+# Azure DevOps has no conditional write, so renewal and takeover cannot share a fence. Instead a lease is renewed only
+# while at least $RenewMarginMinutes are left: a takeover needs it expired, so the renewal would have to stall that
+# long between its check and its PATCH to race one. The lease is read again after the PATCH, so a takeover that wins
+# anyway is caught at once and the owner stops.
+$script:RenewMarginMinutes = 15
 function Set-E2EPoolLease([string]$ProjectId, [string]$Org, [switch]$Renew) {
     $l = Assert-E2EPoolLeaseHeld $ProjectId $Org
-    if ($l.Expires -lt [datetime]::UtcNow) { throw "Lease lost on project $ProjectId in ${Org}: it expired at $($l.Expires.ToString('o')), so another run may take it." }
-    $desc = ConvertTo-E2EPoolLease -Slot $l.Slot -Claimed $l.Claimed -Expires ([datetime]::UtcNow.AddHours($script:LeaseHours)) -Item $l.Item
+    if ($l.Expires -lt [datetime]::UtcNow.AddMinutes($script:RenewMarginMinutes)) { throw "Lease lost on project $ProjectId in ${Org}: it expires at $($l.Expires.ToString('o')), less than $($script:RenewMarginMinutes) minutes away, so it is not renewed and another run may take it." }
+    $expires = [datetime]::UtcNow.AddHours($script:LeaseHours)
+    $desc = ConvertTo-E2EPoolLease -Slot $l.Slot -Claimed $l.Claimed -Expires $expires -Item $l.Item
     Invoke-E2ERest "_apis/projects/$ProjectId/teams/$($l.Team.id)" -Org $Org -Method PATCH -Body @{ description = $desc } | Out-Null
+    $after = Assert-E2EPoolLeaseHeld $ProjectId $Org
+    if ($after.Team.id -ne $l.Team.id -or $after.Expires -lt $expires.AddSeconds(-1)) { throw "Lease lost on project $ProjectId in ${Org}: the renewal did not hold (another run took the project)." }
 }
 
 # Creating the lease team is the claim. Returns $true when this run won it.

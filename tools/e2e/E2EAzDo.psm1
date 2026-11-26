@@ -150,7 +150,7 @@ function New-E2EDisposableProject {
     Assert-E2EDisposable $Name $Org
     $p = Get-E2EProjectOrNull $Name $Org
     # A target-org '-fresh' project must be new: one left by an earlier attempt already holds migrated data.
-    if ($p -and $Org -eq 'nkdagility-adomt-target') { throw "Project $Org/$Name already exists, so it is not a brand-new target. Delete it (tools/e2e/Remove-E2EObjects.ps1) or use a new run id." }
+    if ($p -and $Org -eq 'nkdagility-adomt-target') { throw "Project $Org/$Name already exists, so it is not a brand-new target. Delete it with Remove-E2EDisposableProject -Name $Name -Org $Org (with AMTE2E_FRESH_PROJECTS=1), or use a new run id." }
     if ($p) { return $p }
     $processId = Get-E2EProcessId $Process $Org
     if (-not $processId) { throw "Process '$Process' not found in $Org. Run tools/e2e/Initialize-E2EEnvironment.ps1 first." }
@@ -159,7 +159,12 @@ function New-E2EDisposableProject {
         capabilities = @{ versioncontrol = @{ sourceControlType = "Git" }; processTemplate = @{ templateTypeId = $processId } }
     }) | Out-Null
     for ($i = 0; ; $i++) {
-        try { $p = Invoke-E2ERest "_apis/projects/$Name" -Org $Org; Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null; return $p }
+        try {
+            $p = Invoke-E2ERest "_apis/projects/$Name" -Org $Org; Invoke-E2ERest "$Name/_apis/wit/classificationnodes" -Org $Org | Out-Null
+            # The proof's record of what this invocation made (AMTE2E_CREATED_LOG): it deletes these, and nothing else.
+            if ($env:AMTE2E_CREATED_LOG) { "$Org|$($p.id)|$Name" | Add-Content -Path $env:AMTE2E_CREATED_LOG }
+            return $p
+        }
         catch { if ($i -ge 19) { throw }; Start-Sleep -Seconds 3 }
     }
 }

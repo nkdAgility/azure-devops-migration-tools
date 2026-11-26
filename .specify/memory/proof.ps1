@@ -8,9 +8,9 @@
 # scenario's projects are given back (cleared and renamed back) before the next scenario and in a finally, and the
 # pool slots used are listed at the end. Scratch processes are listed and not deleted here: Remove-E2EObjects.ps1 with
 # a per-run prefix also deletes other scenarios' fields (#3278).
-# The run id ends in three random hex digits, so two runs started in the same minute (on any machine) never share a
-# name: releasePool deletes the '-fresh' target projects named after this run id, and only those.
-param([string]$RunId = "$(Get-Date -Format 'MMddHHmm')$('{0:x3}' -f (Get-Random -Maximum 4096))",[string]$Item, [switch]$All, [string]$Base = 'origin/main',
+# The run id ends in six random hex digits, and a run id already in use is refused at the start, so two runs do not
+# share names. Deletion does not rely on that: releasePool deletes only the projects this invocation recorded making.
+param([string]$RunId = "$(Get-Date -Format 'MMddHHmm')$([Guid]::NewGuid().ToString('N').Substring(0, 6))", [string]$Item, [switch]$All, [string]$Base = 'origin/main',
     # Run only these scenarios, whatever the change touches (used by tools/e2e/Test-E2EPool.ps1 -Case Scenario).
     [string[]]$Only)
 $ErrorActionPreference = 'Stop'
@@ -96,14 +96,26 @@ $env:AMTE2E_POOL_OWNER = "${PID}:$poolRun"
 $env:AMTE2E_POOL_ITEM = $Item
 Import-Module (Join-Path $PWD 'tools/e2e/E2EAzDo.psm1') -Force -WarningAction SilentlyContinue
 $poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
+# What this invocation creates outside the pool is recorded here (by pid as well as run id), so it deletes only that.
+$env:AMTE2E_CREATED_LOG = Join-Path ([IO.Path]::GetTempPath()) "amte2e-created-$Item-$RunId-$PID.log"
+# A run id already in use (passed again with -RunId, or drawn twice) is refused, so no two runs share a name.
+$inUse = @(foreach ($org in $poolOrgs) { @(Get-E2EProjects -Org $org -Prefix "amte2e-$Item-p$RunId-").name; @(Get-E2EProcesses -Org $org -Prefix "amte2e-$Item-p$RunId-").name } | Where-Object { $_ })
+if ($inUse) { Write-Error "run id $RunId is already in use (found: $($inUse -join ', ')); give another -RunId"; exit 1 }
 # Renews this run's leases before each long step (migration, assertions), so they do not expire mid-scenario.
 $renewPool = { foreach ($org in $poolOrgs) { foreach ($h in @(Get-E2EPoolProject -Org $org -Owner $poolRun)) { Set-E2EPoolLease $h.Id $org -Renew } } }
 $releasePool = {
-    # wicore-fresh's brand-new target project is deleted, the one project a run makes in the target org.
-    $freshProjects = try { @(Get-E2EProjects -Org 'nkdagility-adomt-target' -Prefix "amte2e-$Item-p$RunId-" | Where-Object { "$($_.name)" -match '-fresh$' }) } catch { $script:notReleased += "NOT LISTED fresh projects: $($_.Exception.Message)"; @() }
-    foreach ($f in $freshProjects) {
-        try { Remove-E2EDisposableProject $f.name -Org 'nkdagility-adomt-target'; "deleted fresh project nkdagility-adomt-target/$($f.name)" }
-        catch { $script:notReleased += "NOT DELETED fresh project nkdagility-adomt-target/$($f.name): $($_.Exception.Message)" }
+    # wicore-fresh's brand-new target project is deleted, the one project a run makes in the target org. Only the
+    # projects this invocation recorded as it made them are deleted, checked by id, never any found by name alone.
+    $freshProjects = @(if (Test-Path $env:AMTE2E_CREATED_LOG) { Get-Content $env:AMTE2E_CREATED_LOG | Where-Object { $_ -like 'nkdagility-adomt-target|*' } | Sort-Object -Unique })
+    foreach ($line in $freshProjects) {
+        $fOrg, $fId, $fName = $line.Split('|', 3)
+        try {
+            $cur = Get-E2EProjectOrNull $fId $fOrg
+            if ($cur -and $cur.name -eq $fName) { Remove-E2EDisposableProject $fName -Org $fOrg; "deleted fresh project $fOrg/$fName" }
+            elseif ($cur) { $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: its id now has the name $($cur.name)" }
+            $rest = @(Get-Content $env:AMTE2E_CREATED_LOG | Where-Object { $_ -ne $line }); Set-Content $env:AMTE2E_CREATED_LOG $rest
+        }
+        catch { $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: $($_.Exception.Message)" }
     }
     foreach ($org in $poolOrgs) {
         $held = @(Get-E2EPoolProject -Org $org -Owner $poolRun)

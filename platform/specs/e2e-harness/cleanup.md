@@ -29,8 +29,9 @@ Each test org keeps a fixed set of projects named `amte2e-pool-NN`, on `amte2e-a
   (UTC). It lasts two hours and is renewed on every take and give-back. The holder is the proof (`AMTE2E_POOL_OWNER`,
   `<pid>:<run>`), so seeds it starts share its leases; it renews them before each migration and assertion. An expired lease, or one whose holder is a process on this
   machine that has exited (Orphaned), may be taken over; the taker deletes that lease team only if, read again, it is
-  unchanged and still expired or orphaned. An expired lease is never renewed: its holder stops instead, so a renewal
-  never races a takeover. The holder re-reads its lease before every destructive step and stops if it is no longer
+  unchanged and still expired or orphaned. Azure DevOps has no conditional write, so renewal and takeover cannot be fenced;
+  instead a lease is renewed only while at least 15 minutes are left (its holder stops otherwise), and it is read
+  again after the renewal, so a takeover that wins anyway is caught at once. The holder re-reads its lease before every destructive step and stops if it is no longer
   there; the teams list can briefly leave a team out, so a missing lease is read up to four times before it counts as
   lost. A lease whose text cannot be read counts as expired. A process that takes a project without
   `AMTE2E_POOL_OWNER` is the owner itself, with its own pid, so its leases read as Orphaned once it exits.

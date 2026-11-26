@@ -198,11 +198,45 @@ Describe "Request-E2EPoolProject" {
         }
     }
 
+    It "does not renew a lease with less than the margin left" {
+        InModuleScope E2EAzDo {
+            Mock Get-E2EPoolLease { [pscustomobject]@{ Slot = 3; Token = (Get-E2EPoolOwner).Token; Expires = [datetime]::UtcNow.AddMinutes(5); Team = [pscustomobject]@{ id = "t1" } } }
+            Mock Invoke-E2ERest { throw "no patch expected" }
+            { Set-E2EPoolLease "p1" "nkdagility-adomt-target" -Renew } | Should -Throw "*less than 15 minutes*"
+        }
+    }
+
+    It "stops when a takeover lands between the renewal's check and its PATCH" {
+        InModuleScope E2EAzDo {
+            # Before the PATCH the lease is this run's with time left; a stale remover deletes it and another run claims
+            # it, so the read after the PATCH shows the other run's lease.
+            $script:patched = $false
+            Mock Get-E2EPoolLease {
+                if (-not $script:patched) { [pscustomobject]@{ Slot = 3; Token = (Get-E2EPoolOwner).Token; Claimed = [datetime]::UtcNow; Expires = [datetime]::UtcNow.AddMinutes(30); Team = [pscustomobject]@{ id = "t1" } } }
+                else { [pscustomobject]@{ Slot = 3; Token = "other|9|runB"; Expires = [datetime]::UtcNow.AddHours(2); Team = [pscustomobject]@{ id = "t2" } } }
+            }
+            Mock Invoke-E2ERest { $script:patched = $true } -ParameterFilter { $Method -eq "PATCH" }
+            { Set-E2EPoolLease "p1" "nkdagility-adomt-target" -Renew } | Should -Throw "*held by other|9|runB*"
+        }
+    }
+
+    It "stops when the renewed lease reads back as a different team" {
+        InModuleScope E2EAzDo {
+            $script:patched = $false
+            Mock Get-E2EPoolLease {
+                $team = if ($script:patched) { "t2" } else { "t1" }
+                [pscustomobject]@{ Slot = 3; Token = (Get-E2EPoolOwner).Token; Claimed = [datetime]::UtcNow; Expires = [datetime]::UtcNow.AddHours(2); Team = [pscustomobject]@{ id = $team } }
+            }
+            Mock Invoke-E2ERest { $script:patched = $true } -ParameterFilter { $Method -eq "PATCH" }
+            { Set-E2EPoolLease "p1" "nkdagility-adomt-target" -Renew } | Should -Throw "*did not hold*"
+        }
+    }
+
     It "never renews an expired lease" {
         InModuleScope E2EAzDo {
             Mock Get-E2EPoolLease { [pscustomobject]@{ Slot = 3; Token = (Get-E2EPoolOwner).Token; Expires = [datetime]::UtcNow.AddMinutes(-1); Team = [pscustomobject]@{ id = "t1" } } }
             Mock Invoke-E2ERest { throw "no patch expected" }
-            { Set-E2EPoolLease "p1" "nkdagility-adomt-target" -Renew } | Should -Throw "*expired*"
+            { Set-E2EPoolLease "p1" "nkdagility-adomt-target" -Renew } | Should -Throw "*not renewed*"
         }
     }
 
