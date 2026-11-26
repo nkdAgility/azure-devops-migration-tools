@@ -15,8 +15,10 @@ $text = @($inputs.command, $inputs.file_path, $inputs.path) -join ' '
 
 # Each command in a chain is checked on its own; git global options (git -C dir push) may come before push.
 # A push to main is refused unless the repo's .specify/memory/workflow.json sets directToMain, for example
-#   "directToMain": { "allowed": true, "only": "fix", "paths": ["system/**"], "never": ["specs/**"] }
-# and then only a plain push of local main whose every commit is of that kind and touches only those paths.
+#   "directToMain": { "allowed": true, "never": ["specs/**"], "kinds": [
+#       { "name": "fix", "prefix": "fix", "paths": ["system/**"] }, { "name": "content", "prefix": "content", "paths": ["content/**"] } ] }
+# ("only" with "paths" is read as one kind), and then only a plain push of local main whose every commit is of a
+# listed kind and touches only that kind's paths.
 function ConvertTo-PushGlob([string]$g) { '^' + ([regex]::Escape($g) -replace '\\\*\\\*', '.*' -replace '\\\*', '[^/]*' -replace '\\\?', '.') + '$' }
 function Get-DirectToMainRefusal([string]$dir, [string[]]$pa) {
     $cfgPath = Join-Path $dir '.specify/memory/workflow.json'
@@ -34,15 +36,17 @@ function Get-DirectToMainRefusal([string]$dir, [string[]]$pa) {
     git -C $dir fetch -q origin $branch 2>$null
     $commits = @(git -C $dir rev-list "origin/$branch..HEAD" 2>$null)
     if ($LASTEXITCODE -ne 0) { return "the commits to push could not be listed (origin/$branch..HEAD)." }
-    $kind = if ($d.only) { [string]$d.only } else { 'fix' }
-    $paths = @($d.paths | ForEach-Object { ConvertTo-PushGlob $_ })
+    # The kinds a repo lists, each with its commit prefix and its own paths; "only" with "paths" is one kind.
+    $kinds = if ($d.PSObject.Properties['kinds'] -and @($d.kinds).Count) { @($d.kinds) } else { @([pscustomobject]@{ name = $(if ($d.only) { [string]$d.only } else { 'fix' }); prefix = $(if ($d.only) { [string]$d.only } else { 'fix' }); paths = @($d.paths) }) }
     $never = @($d.never | ForEach-Object { ConvertTo-PushGlob $_ })
     foreach ($c in $commits) {
         $subject = git -C $dir log -1 --format=%s $c
-        if ($subject -notmatch "^$([regex]::Escape($kind))(\([^)]*\))?!?:") { return "commit $($c.Substring(0,8)) is not a $kind commit: $subject" }
+        $k = $kinds | Where-Object { $p = if ($_.prefix) { [string]$_.prefix } else { [string]$_.name }; $subject -match "^$([regex]::Escape($p))(\([^)]*\))?!?:" } | Select-Object -First 1
+        if (-not $k) { return "commit $($c.Substring(0,8)) is not of a kind that may go to main directly ($(@($kinds | ForEach-Object { if ($_.prefix) { $_.prefix } else { $_.name } }) -join ', ')): $subject" }
+        $paths = @($k.paths | ForEach-Object { ConvertTo-PushGlob $_ })
         foreach ($f in @(git -C $dir diff-tree --no-commit-id --name-only -r --root $c)) {
             if ($never | Where-Object { $f -match $_ }) { return "commit $($c.Substring(0,8)) touches $f, which never goes to main directly." }
-            if (-not ($paths | Where-Object { $f -match $_ })) { return "commit $($c.Substring(0,8)) touches $f, outside the paths that may go to main directly." }
+            if (-not ($paths | Where-Object { $f -match $_ })) { return "commit $($c.Substring(0,8)) touches $f, outside the paths of a $($k.name) change." }
         }
     }
     $null
@@ -62,6 +66,18 @@ foreach ($seg in ($text -split '[|;&\r\n]+')) {
     if ($toMain) {
         $why = Get-DirectToMainRefusal $dir $pa
         if ($why) { [Console]::Error.WriteLine("guard: $why"); exit 2 }
+    }
+}
+# operatorOnly: commands the repo's workflow reserves for the operator. An agent never runs one; it gives it to them.
+if ($call.tool_name -match '^(Bash|PowerShell)$' -and "$($inputs.command)".Trim()) {
+    $opDir = if ($call.cwd) { "$($call.cwd)" } else { (Get-Location).Path }
+    $opRoot = git -C $opDir rev-parse --show-toplevel 2>$null
+    $opCfgPath = Join-Path $(if ($opRoot) { $opRoot } else { $opDir }) '.specify/memory/workflow.json'
+    if (Test-Path $opCfgPath) {
+        $opCfg = Get-Content $opCfgPath -Raw | ConvertFrom-Json -AsHashtable
+        Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
+        $op = Get-OperatorOnlyMatch $opCfg "$($inputs.command)"
+        if ($op) { [Console]::Error.WriteLine("guard: '$($op['name'])' is reserved for the operator$(if ($op['why']) { " ($($op['why']))" }). Give them the command to run."); exit 2 }
     }
 }
 if ($text -match 'gh\s+issue\s+edit\b.*--(add|remove)-label\s+[''"]?state:' -or $text -match 'gh\s+project\s+item-edit\b' -or $text -match 'setIssueStatus|setIssueFieldValue|updateIssueFieldValue') {
@@ -279,23 +295,37 @@ if ($scopeRoot -and (Test-Path (Join-Path $scopeRoot '.specify/memory/workflow.j
     if ($productTargets) {
         $cur = Join-Path $scopeRoot '.specify/items/current.json'
         if (-not (Test-Path $cur)) {
-            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and this branch has no item. Product code is changed only by the worker for an item in Building, after Refining, an approved spec and the Ready gate.")
-            exit 2
-        }
-        $itemId = (Get-Content $cur -Raw | ConvertFrom-Json).number
-        Import-Module (Join-Path $scopeRoot '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
-        $wcfg = Get-WorkflowConfig -Root $scopeRoot
-        $gItem = & (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId
-        $state = $gItem.state
-        # The states that may change product code are the repo's own: each is flagged "editsCode" in its workflow.json.
-        if (-not (Test-StateFlag $wcfg $state 'editsCode')) {
-            $codeStates = @($wcfg.states | Where-Object { $_.ContainsKey('editsCode') -and $_.editsCode } | ForEach-Object { $_.name }) -join ', '
-            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only in $($codeStates): through Refining, Martin's approval of the spec, and the Ready gate.")
-            exit 2
-        }
-        if (@($gItem.tags) -contains 'spec-reconcile-required') {
-            [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is tagged spec-reconcile-required. Revise the spec and get Martin's approval of the new version first; then clear the tag with set-blocked.ps1 -Clear.")
-            exit 2
+            # On main, a change of a kind directToMain lists may be made without an item: every file inside one kind's
+            # paths and none under "never". The commit's kind is checked again when it is pushed.
+            $onMain = (git -C $scopeRoot rev-parse --abbrev-ref HEAD 2>$null) -in 'main', 'master'
+            $dtm = if ($wf.PSObject.Properties['directToMain']) { $wf.directToMain } else { $null }
+            $fits = $false
+            if ($onMain -and $dtm -and $dtm.allowed) {
+                $dkinds = if ($dtm.PSObject.Properties['kinds'] -and @($dtm.kinds).Count) { @($dtm.kinds) } else { @([pscustomobject]@{ paths = @($dtm.paths) }) }
+                $dnever = @($dtm.never | ForEach-Object { ConvertTo-PushGlob $_ })
+                $fits = -not ($productTargets | Where-Object { $f = $_
+                    ($dnever | Where-Object { $f -match $_ }) -or -not ($dkinds | Where-Object { @($_.paths | ForEach-Object { ConvertTo-PushGlob $_ }) | Where-Object { $f -match $_ } }) })
+            }
+            if (-not $fits) {
+                [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and this branch has no item. Product code is changed only by the worker for an item in a state that edits code, or on main as a change of a kind directToMain lists.")
+                exit 2
+            }
+        } else {
+            $itemId = (Get-Content $cur -Raw | ConvertFrom-Json).number
+            Import-Module (Join-Path $scopeRoot '.specify/extensions/engineering-checks/workflow/Workflow.psm1') -Force
+            $wcfg = Get-WorkflowConfig -Root $scopeRoot
+            $gItem = & (Get-BoardAdapter $wcfg $scopeRoot).GetItem $itemId
+            $state = $gItem.state
+            # The states that may change product code are the repo's own: each is flagged "editsCode" in its workflow.json.
+            if (-not (Test-StateFlag $wcfg $state 'editsCode')) {
+                $codeStates = @($wcfg.states | Where-Object { $_.ContainsKey('editsCode') -and $_.editsCode } | ForEach-Object { $_.name }) -join ', '
+                [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is in $state. Product code is changed only in $($codeStates): through Refining, Martin's approval of the spec, and the Ready gate.")
+                exit 2
+            }
+            if (@($gItem.tags) -contains 'spec-reconcile-required') {
+                [Console]::Error.WriteLine("guard: $($productTargets[0]) is product code, and #$itemId is tagged spec-reconcile-required. Revise the spec and get Martin's approval of the new version first; then clear the tag with set-blocked.ps1 -Clear.")
+                exit 2
+            }
         }
     }
 }

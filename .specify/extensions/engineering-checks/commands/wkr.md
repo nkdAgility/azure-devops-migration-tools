@@ -6,7 +6,7 @@ description: "Be the worker (WKR) for one item: take it through its workflow to 
 
 You are the worker for the item named below (`wkr #<id>`, with its WKR id). You deliver one outcome, its Purpose, on the branch and worktree you were given, and get it to `main` by pull request.
 
-Martin never runs anything on the command line. You run every command and workflow; he decides in chat.
+The operator runs only the commands the workflow reserves for them (`operatorOnly`). You run every other command and workflow, and never a reserved one: give it to the operator to run. The operator decides in chat.
 
 $ARGUMENTS
 
@@ -32,7 +32,7 @@ After Martin approves a spec, write in his answers or fix a typing mistake only 
 
 A failing check is fixed and the step re-run; it is never skipped or worked round.
 
-Keep the item's folder, `specs/<issue>-<name>/`, where the repo keeps it, so the item always shows where it stands: with `itemDocs` set to `files`, commit it each time its record, spec or assessment changes; with `artifacts`, each change is published to the item's issue and the folder is never committed. When you update the docs, name each one on the item under `## Docs updated` as `- <system>: `<doc path>`: <phrase from the doc>`; a system whose docs need no change needs `Docs unchanged: <system>: <reason>` in the spec Martin approves. Nothing temporary reaches `main`: before the pull request is marked ready, the item's folder (with `files`) and any file under `.specify/bugs/`, `.specify/assessments/`, `.specify/reviews/` or `.specify/wkr/` are removed.
+Keep the item's folder, `specs/<issue>-<name>/`, where the repo keeps it, so the item always shows where it stands: with `itemDocs` set to `files`, commit it each time its record, spec or assessment changes; with `artifacts`, each change is published to the item's issue automatically, by the `auto-advance` hook or `publish-item-docs.ps1`, and the folder is never committed. Publishing the item's own documents to its own issue needs no permission: never ask Martin for it. When you update the docs, name each one on the item under `## Docs updated` as `- <system>: `<doc path>`: <phrase from the doc>`; a system whose docs need no change needs `Docs unchanged: <system>: <reason>` in the spec Martin approves. Nothing temporary reaches `main`: before the pull request is marked ready, the item's folder (with `files`) and any file under `.specify/bugs/`, `.specify/assessments/`, `.specify/reviews/` or `.specify/wkr/` are removed.
 
 **Items never move back.** If the work shows the agreed spec cannot be met as written, keep the item in its state, tag it with `set-blocked.ps1 -Why spec-reconcile-required`, revise the spec, record what you found, and ask Martin to approve the new version as a QUESTION, showing what changed. Change no product code until he approves; then clear the tag with `set-blocked.ps1 -Why spec-reconcile-required -Clear`. A failed outcome check tags the item `outcome-check-failed` itself: fix the code in Validating and run the checks again. Waiting for an answer you cannot find yourself: `-Why more-information-needed`.
 
