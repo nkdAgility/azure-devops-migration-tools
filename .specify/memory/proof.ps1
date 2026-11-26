@@ -67,6 +67,13 @@ if ($runAll) { "== running all $($runnable.Count) runnable scenarios: $reasonAll
 
 # One timestamped line per step, so a long run shows where it is.
 $progress = { param([string]$Step) "[{0:HH:mm:ss}] {1}" -f (Get-Date), $Step }
+# A seed or assert takes and reads pool projects in its own process. If Azure DevOps stayed unavailable there, its
+# log ends with the pool's one line; the next scenario would fail the same way, so the proof stops with that line.
+$stopIfUnavailable = { param([string]$Log)
+    $line = @(Select-String -Path $Log -Pattern 'Azure DevOps is unavailable\. Every lease is kept\.' -ErrorAction SilentlyContinue | Select-Object -Last 1)
+    # The exception type lives in the module (Import-Module does not export classes), so it is thrown there.
+    if ($line) { & (Get-Module E2EAzDo) { param($m) throw [E2EUnavailableException]::new($m) } ($line[0].Line -replace '^.*?(\S+ \S+ in \S+ returned)', '$1').Trim() }
+}
 $failed = @(); $notCovered = @(); $scratch = @(); $processes = @(); $used = @(); $released = @(); $notReleased = @()
 # Projects come from the scratch project pool (#3342). Every seed this run starts takes them as this proof, so the
 # proof can give back everything the run holds, after each scenario and again in the finally below.
@@ -159,7 +166,7 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     $seedArgs = & $argsFor $seed
     & $progress "$($d.Name): seed"
     pwsh -NoProfile -File $seed @seedArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; & $progress "$($d.Name): seed FAILED"; continue }
+    if ($LASTEXITCODE -ne 0) { & $stopIfUnavailable (Join-Path $work "$($d.Name).log"); $failed += "$($d.Name) (seed)"; & $progress "$($d.Name): seed FAILED"; continue }
     & $renewPool
     & $progress "$($d.Name): migration"
     pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
@@ -168,7 +175,7 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     & $progress "$($d.Name): assertions"
     $assertArgs = & $argsFor $assert @{ OutFile = (Join-Path $work "$($d.Name).assert.md") }
     pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)"; & $progress "$($d.Name): assertions FAILED" } else { & $progress "$($d.Name): passed" }
+    if ($LASTEXITCODE -ne 0) { & $stopIfUnavailable (Join-Path $work "$($d.Name).log"); $failed += "$($d.Name) (assertions)"; & $progress "$($d.Name): assertions FAILED" } else { & $progress "$($d.Name): passed" }
 }
 } finally {
     # Give back every pool project this run holds, whatever happened above. Each is cleared and renamed back.
