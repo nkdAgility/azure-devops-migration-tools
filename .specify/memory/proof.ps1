@@ -57,7 +57,7 @@ foreach ($p in $product) {
 $runnable = @(Get-ChildItem tools/e2e/scenarios -Directory | Where-Object { (Test-Path (Join-Path $_.FullName 'seed.ps1')) -and (Test-Path (Join-Path $_.FullName 'assert.ps1')) -and (Test-Path (Join-Path $_.FullName 'config.json')) } | ForEach-Object Name)
 if (-not $runAll) { foreach ($k in @($why.Keys)) { if ($runnable -notcontains $k) { $why.Remove($k) } } }
 if ($Only) {
-    # A name asked for that cannot run (mistyped, or without a seed, config and assert) fails here, before the queue,
+    # A name asked for that cannot run (mistyped, or without a seed, config and assert) fails here, before anything runs,
     # so a run never reports success while silently skipping a scenario it was asked for.
     $unknown = @($Only | Where-Object { $runnable -notcontains $_ })
     if ($unknown) { Write-Error "-Only names scenarios that cannot run (no folder with seed.ps1, assert.ps1 and config.json): $($unknown -join ', '). Runnable: $($runnable -join ', ')"; exit 1 }
@@ -65,29 +65,8 @@ if ($Only) {
 }
 if ($runAll) { "== running all $($runnable.Count) runnable scenarios: $reasonAll" } else { "== running $($why.Count) scenario(s):"; $why.Keys | Sort-Object | ForEach-Object { "   $_ ($($why[$_]))" } }
 
-# One proof at a time on the shared test orgs: concurrent runs collide there (VS800075, dropped connections).
-# Waiting runs queue in the order they arrived and never give up: each takes a ticket, and the oldest ticket whose
-# process is still alive goes next.
-$queue = Join-Path ([IO.Path]::GetTempPath()) 'amte2e-proof-queue'
-New-Item -ItemType Directory -Force $queue | Out-Null
-$ticket = Join-Path $queue ('{0:D19}-{1}.ticket' -f [DateTime]::UtcNow.Ticks, $PID)
-"#$Item run $RunId" | Set-Content $ticket
-$lockPath = Join-Path ([IO.Path]::GetTempPath()) 'amte2e-proof.lock'
-$lock = $null; $waited = 0
-try {
-    while (-not $lock) {
-        $live = @(Get-ChildItem $queue -Filter *.ticket | Sort-Object Name | Where-Object {
-            $tp = [int](($_.BaseName -split '-')[-1]); if (Get-Process -Id $tp -ErrorAction SilentlyContinue) { $true } else { Remove-Item $_.FullName -ErrorAction SilentlyContinue; $false } })
-        if ($live.Count -and $live[0].FullName -eq $ticket) {
-            try { $lock = [IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') } catch [IO.IOException] { }
-        }
-        if (-not $lock) {
-            if ($waited % 300 -eq 0) { "queued for the test orgs: position $([array]::IndexOf(@($live.FullName), $ticket) + 1) of $($live.Count), waited $([int]($waited / 60)) min" }
-            Start-Sleep 10; $waited += 10
-        }
-    }
-} finally { if (-not $lock) { Remove-Item $ticket -ErrorAction SilentlyContinue } }
-try {
+# One timestamped line per step, so a long run shows where it is.
+$progress = { param([string]$Step) "[{0:HH:mm:ss}] {1}" -f (Get-Date), $Step }
 $failed = @(); $notCovered = @(); $scratch = @(); $processes = @(); $used = @(); $released = @(); $notReleased = @()
 # Projects come from the scratch project pool (#3342). Every seed this run starts takes them as this proof, so the
 # proof can give back everything the run holds, after each scenario and again in the finally below.
@@ -176,19 +155,24 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
         foreach ($k in $extra.Keys) { if ($declared -contains $k) { $a += "-$k", $extra[$k] } }
         , $a }
     $seedArgs = & $argsFor $seed
+    & $progress "$($d.Name): seed"
     pwsh -NoProfile -File $seed @seedArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; continue }
+    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; & $progress "$($d.Name): seed FAILED"; continue }
     & $renewPool
+    & $progress "$($d.Name): migration"
     pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; continue }
+    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; & $progress "$($d.Name): migration FAILED"; continue }
     & $renewPool
+    & $progress "$($d.Name): assertions"
     $assertArgs = & $argsFor $assert @{ OutFile = (Join-Path $work "$($d.Name).assert.md") }
     pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)" }
+    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)"; & $progress "$($d.Name): assertions FAILED" } else { & $progress "$($d.Name): passed" }
 }
 } finally {
     # Give back every pool project this run holds, whatever happened above. Each is cleared and renamed back.
+    & $progress "giving pool projects back"
     & $releasePool
+    & $progress "done"
 }
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
 "pool projects used: $((@($used | Sort-Object -Unique)) -join ', ')"
@@ -199,4 +183,3 @@ if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', '); each scenario's output is in $work\<scenario>.log"; exit 1 }
 "all covered scenarios passed; results in $work"
 exit 0
-} finally { $lock.Dispose(); Remove-Item $ticket -ErrorAction SilentlyContinue }
