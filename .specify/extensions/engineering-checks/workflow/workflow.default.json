@@ -2,7 +2,8 @@
   "specRoot": "docs/specs",
   "$comment": "The approved engineering Definition of Workflow (spec/definition-of-workflow-engineering.md) as data. A repo copies this to .specify/memory/workflow.json as a template. The four categories are the core: every repo has at least one state in each, and exactly one in Completed and one in Removed. The states are the repo's own: it may rename, remove or add them. A state flagged editsCode may change product code; a state flagged parentsSplit holds parents until Martin approves their split. WIP limits and stuckAfterMinutes are placeholders until Martin sets them.",
   "validatingBeforeMerge": true,
-  "usesPackage": false,
+  "checkInMinutes": 30,
+  "outcomeSeen": false,
   "board": {
     "adapter": "github",
     "stateField": "NKDA-STATE",
@@ -47,7 +48,7 @@
       "stuckAfterMinutes": 240
     },
     {
-      "name": "Refined",
+      "name": "Ready to specify",
       "parentsSplit": true,
       "category": "Proposed",
       "kind": "wait",
@@ -62,7 +63,7 @@
       "stuckAfterMinutes": 240
     },
     {
-      "name": "Specified",
+      "name": "Ready to build",
       "category": "In Progress",
       "kind": "wait-martin",
       "wipLimit": null,
@@ -118,9 +119,9 @@
     "Proposed",
     "Approved",
     "Refining",
-    "Refined",
+    "Ready to specify",
     "Specifying",
-    "Specified",
+    "Ready to build",
     "Building",
     "Validating",
     "In review",
@@ -130,9 +131,9 @@
     "Proposed",
     "Approved",
     "Refining",
-    "Refined",
+    "Ready to specify",
     "Specifying",
-    "Specified",
+    "Ready to build",
     "Building",
     "In review",
     "Validating",
@@ -153,7 +154,7 @@
         }
       ]
     },
-    "Refining>Refined": {
+    "Refining>Ready to specify": {
       "name": "Understood",
       "checks": [
         {
@@ -176,6 +177,32 @@
         },
         {
           "type": "section",
+          "name": "Intent and outcome",
+          "types": [
+            "Product Backlog Item"
+          ],
+          "message": "a Product Backlog Item needs an 'Intent and outcome' section: what a customer can do afterwards that they cannot today, and the hypothesis and the signal that would show it"
+        },
+        {
+          "type": "section",
+          "name": "Feature changed",
+          "types": [
+            "Feedback"
+          ],
+          "message": "Feedback needs a 'Feature changed' section: the existing feature it changes, and what changes"
+        },
+        {
+          "type": "section",
+          "name": "Vertical slice",
+          "message": "no 'Vertical slice' section: how it reaches every layer its change needs and delivers value to a customer on its own"
+        },
+        {
+          "type": "pattern",
+          "pattern": "(?m)^WP approved:\\s*\\S",
+          "message": "no 'WP approved:' line with Martin's words approving the WP as written"
+        },
+        {
+          "type": "section",
           "name": "Rubber duck",
           "message": "no 'Rubber duck' section (the item explained plainly, and the gaps it showed)"
         },
@@ -186,7 +213,7 @@
         }
       ]
     },
-    "Refined>Specifying": {
+    "Ready to specify>Specifying": {
       "name": "Pulled",
       "records": "started",
       "checks": [
@@ -196,8 +223,8 @@
         }
       ]
     },
-    "Specifying>Specified": {
-      "name": "Specified",
+    "Specifying>Ready to build": {
+      "name": "Ready to build",
       "checks": [
         {
           "type": "section",
@@ -278,7 +305,7 @@
         }
       ]
     },
-    "Specified>Building": {
+    "Ready to build>Building": {
       "name": "Ready",
       "checks": [
         {
@@ -438,7 +465,7 @@
         }
       ]
     },
-    "Refined>Delivering": {
+    "Ready to specify>Delivering": {
       "name": "SplitApproved",
       "records": "started",
       "checks": [
@@ -477,7 +504,7 @@
     "Proposed",
     "Approved",
     "Refining",
-    "Refined",
+    "Ready to specify",
     "Delivering",
     "Closed"
   ],

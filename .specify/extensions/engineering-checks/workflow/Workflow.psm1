@@ -719,6 +719,10 @@ function Test-Move {
             if ($r -and $r.ContainsKey('skipped')) { $skipped.Add($r.message) }
             elseif ($r) { $failures.Add($r.message) }
         }
+        # outcomeSeen: the repo also keeps an item at Outcome Done until Martin has seen each outcome working.
+        if ($Config.ContainsKey('outcomeSeen') -and $Config.outcomeSeen -and $shift.name -eq 'OutcomeDone' -and "$evidence" -notmatch '(?m)^Seen:\s*\S') {
+            $failures.Add("no 'Seen:' line: Martin has not yet seen each outcome working, in his words")
+        }
     }
     @{ ok = ($failures.Count -eq 0 -and $skipped.Count -eq 0); shift = $shift; failures = @($failures); skipped = @($skipped) }
 }

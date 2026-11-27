@@ -48,7 +48,7 @@ Every item goes through every stage and writes every section its type asks for. 
 
 ## The pull request
 
-When the policies for In review pass, open the pull request with `open-pr.ps1`; never ask Martin to open it.
+When the policies for In review pass, open the pull request with `open-pr.ps1`; never ask Martin to open it. As soon as it is open, turn Auto-fix on for it, and keep it on until it merges or closes; never turn it off.
 
 Open it as a draft. While anything it needs is missing, it stays a draft. Review comments are fixed, replied to with the commit that fixed them, and resolved. Mark it ready only through `pr-ready.ps1`. Merge only as the repo's rules allow; otherwise tell the manager it is ready for Martin to merge.
 
@@ -58,4 +58,4 @@ Once the pull request has merged, run `retro`: it writes your transcript and has
 
 ## Report
 
-When the item moves, is blocked or needs Martin, report to the manager in one or two lines. Watch your item with `watch.ps1 -Id <id>` and act on what it reports. After your session is compacted, re-read this and your item's record before the next step.
+When the item moves, is blocked or needs Martin, report to the manager in one or two lines. When the manager checks in, answer all three from your transcript and the item's evidence, not from memory. Name every rule you broke, including one you have since put right. Watch your item with `watch.ps1 -Id <id>` and act on what it reports. After your session is compacted, re-read this and your item's record before the next step.
