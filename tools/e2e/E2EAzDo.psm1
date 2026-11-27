@@ -57,14 +57,49 @@ function Invoke-E2ERest {
     # A request that never got a response (a dropped connection) is retried only when it reads: a write may have been
     # applied without its response arriving, and sending it again can do it twice (a positional relation removal, or
     # the pool's lease team, whose creation is the claim).
-    for ($try = 1; ; $try++) {
-        try { return Invoke-RestMethod @params }
+    # Dropped connections and busy replies are counted apart, so one never uses up the other's tries.
+    $call = "$Method $Path in $Org"
+    $dropped = 0; $busy = 0
+    while ($true) {
+        $why = $null
+        try { $r = Invoke-RestMethod @params }
         catch {
             $noResponse = -not $_.Exception.Response -and $_.Exception -is [System.Net.Http.HttpRequestException]
-            if (-not $noResponse -or $Method -ne "GET" -or $try -ge 3) { throw }
-            Start-Sleep -Seconds (2 * $try)
+            if ($noResponse -and $Method -eq "GET" -and $dropped -lt 2) { $dropped++; Start-Sleep -Seconds (2 * $dropped); continue }
+            $status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
+            if ($status -notin $script:BusyStatuses -or $Method -ne "GET") { throw }
+            $why = "HTTP $status"
         }
+        if (-not $why) {
+            if (Test-E2EReadableReply $r -Read:($Method -eq "GET")) { return $r }
+            # A throttle or sign-in page comes back as 200 with HTML. It is never read as an empty answer (an empty
+            # teams list would read as "no lease"). A write is not sent again: it may already have been applied.
+            if ($Method -ne "GET") { throw [E2EUnavailableException]::new("$call returned HTML instead of JSON; it is not sent again, as it may have been applied. Every lease is kept.") }
+            $why = "HTML instead of JSON"
+        }
+        $busy++
+        if ($busy -gt $script:BusyWaits.Count) { throw [E2EUnavailableException]::new("$call returned $why after $busy tries; Azure DevOps is unavailable. Every lease is kept.") }
+        Start-Sleep -Seconds $script:BusyWaits[$busy - 1]
     }
+}
+
+# Azure DevOps is busy or showing a page instead of an answer: wait and read again (4 tries in all).
+$script:BusyWaits = @(5, 15, 30)
+$script:BusyStatuses = @(429, 503)
+
+# Thrown when Azure DevOps keeps answering with HTML or busy statuses. Its message is the one line a proof shows.
+class E2EUnavailableException : System.Exception { E2EUnavailableException([string]$m) : base($m) {} }
+
+# Invoke-RestMethod returns parsed JSON as objects, and returns text when it cannot parse the body. Text that is
+# JSON (an endpoint whose keys differ only in case) is readable; its callers parse it. Anything else is not.
+# An empty body is fine for a write (a DELETE has none) but not for a read (-Read): every read answers with JSON.
+function Test-E2EReadableReply($Reply, [switch]$Read) {
+    if ($null -eq $Reply) { return -not $Read }
+    if ($Reply -isnot [string]) { return $true }
+    $t = $Reply.Trim()
+    if (-not $t) { return -not $Read }
+    if ($t[0] -notin '{', '[') { return $false }
+    try { $null = $t | ConvertFrom-Json -AsHashtable; $true } catch { $false }
 }
 
 # A project by name or id, or $null only when the service says it does not exist; any other failure is thrown, so
@@ -83,10 +118,30 @@ function Wait-E2EOperation($op, [int]$TimeoutSeconds = 600) {
     do {
         if ((Get-Date) -gt $deadline) { throw "Operation $($op.id) did not finish within $TimeoutSeconds seconds." }
         Start-Sleep -Seconds 3
-        $s = Invoke-RestMethod -Uri $op.url -Headers $script:Headers
+        $s = Invoke-E2EOperationPoll $op.url
     } while ($s.status -in "notSet", "queued", "inProgress")
     if ($s.status -ne "succeeded") { throw "Operation failed: $($s.status) $($s.resultMessage)" }
     $s
+}
+
+# One read of an operation's status, with the same waits as Invoke-E2ERest for an HTML page or a busy status.
+# Wait-E2EOperation has already checked that the url is in a test organisation.
+function Invoke-E2EOperationPoll([string]$Url) {
+    for ($try = 1; ; $try++) {
+        $why = $null
+        try { $r = Invoke-RestMethod -Uri $Url -Headers $script:Headers; if (Test-E2EReadableReply $r -Read) { return $r }; $why = "HTML instead of JSON" }
+        catch {
+            $status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
+            if ($status -notin $script:BusyStatuses) { throw }
+            $why = "HTTP $status"
+        }
+        # The same form as Invoke-E2ERest's line ("<method> <path> in <org> returned ..."), so a proof shows it alike.
+        if ($try -ge $script:BusyWaits.Count + 1) {
+            $u = [Uri]$Url
+            throw [E2EUnavailableException]::new("GET $($u.AbsolutePath.TrimStart('/').Split('/', 2)[1]) in $($u.Segments[1].TrimEnd('/')) returned $why after $try tries; Azure DevOps is unavailable. Every lease is kept.")
+        }
+        Start-Sleep -Seconds $script:BusyWaits[$try - 1]
+    }
 }
 
 function Get-E2EProcessId([string]$Name, [string]$Org = $script:DefaultOrg) {

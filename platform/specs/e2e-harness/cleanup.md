@@ -35,6 +35,11 @@ Each test org keeps a fixed set of projects named `amte2e-pool-NN`, on `amte2e-a
   there; the teams list can briefly leave a team out, so a missing lease is read up to four times before it counts as
   lost. A lease whose text cannot be read counts as expired. A process that takes a project without
   `AMTE2E_POOL_OWNER` is the owner itself, with its own pid, so its leases read as Orphaned once it exits.
+- **Unavailable Azure DevOps.** Azure DevOps sometimes answers with an HTML page (a throttle or sign-in page) instead
+  of JSON, or with HTTP 429 or 503. A read that gets one waits 5, 15 and then 30 seconds and reads again, 4 tries in
+  all; JSON that comes back as text is still a good answer. A write is not sent again, since it may have been applied.
+  If it keeps happening, the run stops with one line naming the call and the organisation, and every lease is kept, so
+  a later run can take it over once it expires. An unreadable reply is never read as an empty list or as "no lease".
 - **Clear.** Work items are destroyed (not left in the recycle bin; Test Cases through the test case API). Shared
   Steps and Shared Parameters can't be deleted by any REST API (only in the web portal), so they are kept as
   leftovers: retitled `amte2e-pool leftover`, moved to the area `pool-leftovers`, every link removed. Every harness

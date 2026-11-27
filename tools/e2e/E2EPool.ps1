@@ -247,6 +247,8 @@ function Test-E2EPoolClear([string]$ProjectId, [string]$Org) {
 function Invoke-E2EStep([scriptblock]$Step, [string]$What, [System.Collections.Generic.List[string]]$Errors) {
     try { & $Step | Out-Null }
     catch {
+        # Azure DevOps being unavailable is not one step's failure: stop the whole clear, keeping the lease.
+        if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
         $msg = try { ($_.ErrorDetails.Message | ConvertFrom-Json).message } catch { $null }
         $Errors.Add("${What}: $(if ($msg) { $msg } else { $_.Exception.Message })")
     }
@@ -303,7 +305,7 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
         for ($i = 0; $i -lt $ids.Count; $i += 200) {
             $batch = $ids[$i..([Math]::Min($i + 199, $ids.Count - 1))]
             $read = "_apis/wit/workitems?ids=$($batch -join ',')&fields=System.Id,System.WorkItemType"
-            $items = try { @((Invoke-E2ERest $read -Org $Org).value) } catch { throw "Reading work items to clear failed ($read): $($_.ErrorDetails.Message)" }
+            $items = try { @((Invoke-E2ERest $read -Org $Org).value) } catch { if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }; throw "Reading work items to clear failed ($read): $($_.ErrorDetails.Message)" }
             foreach ($wi in $items) {
                 Invoke-E2EStep { Remove-E2EPoolWorkItem $pr $p.name $wi $Org } "$($wi.fields.'System.WorkItemType') $($wi.id)" $e
             }
@@ -447,6 +449,8 @@ function Request-E2EPoolProject {
             # the only record of the slot while the project has another name, so the pool name comes back first; if it
             # cannot, the lease is kept and expires, and the slot is still found and cleared on a later take.
             $err = "$(Format-E2EPoolName $c.Slot): $($_.Exception.Message)"
+            # Azure DevOps stayed unavailable: the next slot would fail the same way, so stop, keeping the lease.
+            if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
             try {
                 $poolName = Format-E2EPoolName $c.Slot
                 if ((Invoke-E2ERest "_apis/projects/$($c.Id)" -Org $Org).name -ne $poolName) { Rename-E2EPoolProject $c.Id $poolName $Org }
