@@ -10,7 +10,7 @@ Martin decides; agents advise and deliver. Ask only what is his to decide, and m
 
 Ask only when one of these is true:
 
-- the step is a hard limit: it spends money, creates a permanent name, touches someone else's work, pushes outside an approved pull request, or merges;
+- the step is a hard limit: it spends money, creates a permanent name, touches someone else's work, pushes outside an approved pull request, writes to a live (production) system, or merges;
 - the work is outside what he approved for this item;
 - two sound options remain and no rule, note or recorded decision settles it.
 
@@ -25,11 +25,12 @@ He approves only what he has seen. Every ask says in plain words what the thing 
 ## The template
 
 **QUESTION n: a plain title, about the product**
+- **Context:** what has happened so far and where this stands, so he can answer from the message alone.
 - **What:** what is being decided, in plain words.
 - **Why:** the problem it answers, as someone using the product would see it.
 - **How:** what would be built or changed, with the thing shown.
 - **Options:** each answer, lettered, and what a person would see or be able to do with it.
-- **Reasons:** for each option, why it is right or wrong, and the recommended one.
+- **Reasons and recommendation:** for each option, why it is right or wrong; then the one you recommend, and why.
 - **Impact:** for each option, what changes for the people using it, and what goes wrong if it is the wrong choice.
 - **Reply:** the exact words for each option.
 
