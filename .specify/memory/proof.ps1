@@ -112,7 +112,11 @@ $releasePool = {
             if (Remove-E2EDisposableProject $fName -Org $fOrg -Id $fId) { "deleted fresh project $fOrg/$fName" }
             $rest = @(Get-Content $env:AMTE2E_CREATED_LOG | Where-Object { $_ -ne $line }); Set-Content $env:AMTE2E_CREATED_LOG $rest
         }
-        catch { $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: $($_.Exception.Message)" }
+        catch {
+            # Azure DevOps unavailable: stop here, so nothing else is given back and every lease is kept (#3351).
+            if ($_.Exception.GetType().Name -eq 'E2EUnavailableException') { throw }
+            $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: $($_.Exception.Message)"
+        }
     }
     foreach ($org in $poolOrgs) {
         $held = @(Get-E2EPoolProject -Org $org -Owner $poolRun)
