@@ -343,6 +343,8 @@ if ($scope) {
         $full = [IO.Path]::GetFullPath($abs)
         if (-not $full.StartsWith($rootFull, [StringComparison]::OrdinalIgnoreCase)) { continue }
         $rel = $full.Substring($rootFull.Length).Replace('\', '/')
+        # A file git ignores (test output, say) is not a change to the branch, by a shell command as by an edit.
+        git -C $scopeRoot check-ignore -q -- $rel 2>$null; if ($LASTEXITCODE -eq 0) { continue }
         # The workflow's own files are never outside an item's scope: its record, reviews, bug assessments,
         # idea assessments and working spec folders.
         $own = $rel -match '^/?(\.specify/(wkr|items|reviews|bugs|assessments)/|specs/)'
