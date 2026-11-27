@@ -602,3 +602,26 @@ Describe "claiming a slot while Azure DevOps is unavailable (#3351, Codex review
         }
     }
 }
+
+Describe "unavailable Azure DevOps during the clear check (#3351, Codex review)" {
+    It "the inventory stops on an unavailable Azure DevOps instead of counting the surface as unreadable" {
+        InModuleScope E2EAzDo {
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p1"; name = "amte2e-x"; defaultTeam = @{ id = "t0" } } } -ParameterFilter { $Path -eq "_apis/projects/p1" }
+            Mock Get-E2EList { throw [E2EUnavailableException]::new("GET p1/_apis/git/repositories in o returned HTML instead of JSON after 4 tries; Azure DevOps is unavailable. Every lease is kept.") }
+            { Get-E2EPoolInventory "p1" "o" } | Should -Throw "GET p1/_apis/git/repositories in o returned HTML*"
+        }
+    }
+
+    It "an ordinary failure to read one surface still counts as -1" {
+        InModuleScope E2EAzDo {
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p1"; name = "amte2e-x"; defaultTeam = @{ id = "t0" } } } -ParameterFilter { $Path -eq "_apis/projects/p1" }
+            Mock Get-E2EList { throw "403 forbidden" }
+            Mock Get-E2EProjectWorkItemIds { throw "403 forbidden" }
+            Mock Get-E2EChildNodes { throw "403 forbidden" }
+            Mock Get-E2EPoolLeftoverProblems { throw "403 forbidden" }
+            Mock Get-E2EQueryItems { throw "403 forbidden" }
+            Mock Get-E2EDashboards { throw "403 forbidden" }
+            (Get-E2EPoolInventory "p1" "o").workItems | Should -Be -1
+        }
+    }
+}

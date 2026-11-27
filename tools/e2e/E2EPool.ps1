@@ -215,8 +215,9 @@ function Get-E2EPoolLeftoverProblems([string]$ProjectId, [string]$ProjectName, [
 # are what a fresh project has, so they are not counted.
 function Get-E2EPoolInventory([string]$ProjectId, [string]$Org) {
     $p = Invoke-E2ERest "_apis/projects/$ProjectId" -Org $Org
-    $count = { param($s) try { @(& $s).Count } catch { -1 } }
-    $repos = try { @(Get-E2EList "$ProjectId/_apis/git/repositories" $Org) } catch { $null }
+    # -1 is "could not be read" for one surface; Azure DevOps being unavailable is not that, so it stops the check.
+    $count = { param($s) try { @(& $s).Count } catch { if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }; -1 } }
+    $repos = try { @(Get-E2EList "$ProjectId/_apis/git/repositories" $Org) } catch { if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }; $null }
     [ordered]@{
         workItems          = & $count { Get-E2EProjectWorkItemIds $ProjectId $Org }
         recycleBin         = & $count { Get-E2EList "$ProjectId/_apis/wit/recyclebin" $Org }

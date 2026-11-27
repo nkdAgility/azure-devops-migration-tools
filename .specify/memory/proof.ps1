@@ -78,7 +78,8 @@ $progress = { param([string]$Step) "[{0:HH:mm:ss}] {1}" -f (Get-Date), $Step }
 # A seed or assert takes and reads pool projects in its own process. If Azure DevOps stayed unavailable there, its
 # log ends with the pool's one line; the next scenario would fail the same way, so the proof stops with that line.
 $stopIfUnavailable = { param([string]$Log)
-    $line = @(Select-String -Path $Log -Pattern 'Azure DevOps is unavailable\. Every lease is kept\.' -ErrorAction SilentlyContinue | Select-Object -Last 1)
+    # Every form of the pool's line (a read that kept failing, a write that is not sent again) ends like this.
+    $line = @(Select-String -Path $Log -Pattern ' returned .*Every lease is kept\.' -ErrorAction SilentlyContinue | Select-Object -Last 1)
     # The exception type lives in the module (Import-Module does not export classes), so it is thrown there.
     if ($line) { & (Get-Module E2EAzDo) { param($m) throw [E2EUnavailableException]::new($m) } ($line[0].Line -replace '^.*?(\S+ \S+ in \S+ returned)', '$1').Trim() }
 }
