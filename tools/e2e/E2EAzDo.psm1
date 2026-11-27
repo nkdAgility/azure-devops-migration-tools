@@ -67,15 +67,20 @@ function Invoke-E2ERest {
             $noResponse = -not $_.Exception.Response -and $_.Exception -is [System.Net.Http.HttpRequestException]
             if ($noResponse -and $Method -eq "GET" -and $dropped -lt 2) { $dropped++; Start-Sleep -Seconds (2 * $dropped); continue }
             $status = if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode } else { 0 }
-            if ($status -notin $script:BusyStatuses -or $Method -ne "GET") { throw }
+            if ($status -notin $script:BusyStatuses) { throw }
+            # A busy write is not sent again either, but it is still Azure DevOps being unavailable, not a refusal.
+            if ($Method -ne "GET") { throw [E2EUnavailableException]::new("$call returned HTTP $status; it is not sent again, as it may have been applied. Every lease is kept.") }
             $why = "HTTP $status"
         }
         if (-not $why) {
-            if (Test-E2EReadableReply $r -Read:($Method -eq "GET")) { return $r }
+            # Only a DELETE may answer with nothing; every other call answers with JSON (a WIQL query is a POST, and an
+            # empty answer to it would read as "no work items").
+            if (Test-E2EReadableReply $r -Read:($Method -ne "DELETE")) { return $r }
             # A throttle or sign-in page comes back as 200 with HTML. It is never read as an empty answer (an empty
             # teams list would read as "no lease"). A write is not sent again: it may already have been applied.
-            if ($Method -ne "GET") { throw [E2EUnavailableException]::new("$call returned HTML instead of JSON; it is not sent again, as it may have been applied. Every lease is kept.") }
-            $why = "HTML instead of JSON"
+            $what = if ($null -eq $r -or ($r -is [string] -and -not $r.Trim())) { "an empty reply" } else { "HTML instead of JSON" }
+            if ($Method -ne "GET") { throw [E2EUnavailableException]::new("$call returned $what; it is not sent again, as it may have been applied. Every lease is kept.") }
+            $why = $what
         }
         $busy++
         if ($busy -gt $script:BusyWaits.Count) { throw [E2EUnavailableException]::new("$call returned $why after $busy tries; Azure DevOps is unavailable. Every lease is kept.") }

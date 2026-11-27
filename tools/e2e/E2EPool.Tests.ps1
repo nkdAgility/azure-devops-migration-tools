@@ -533,7 +533,7 @@ Describe "replies that are not JSON: limits and lease safety (#3351 review)" {
             $script:Headers = @{ Authorization = "x" }
             Mock Start-Sleep {}
             Mock Invoke-RestMethod { "" }
-            { Get-E2EPoolLease "p1" "nkdagility-adomt-source" } | Should -Throw "*returned HTML instead of JSON after 4 tries*"
+            { Get-E2EPoolLease "p1" "nkdagility-adomt-source" } | Should -Throw "*returned an empty reply after 4 tries*"
             { Invoke-E2ERest "_apis/projects/p1/teams/t1" -Org "nkdagility-adomt-source" -Method DELETE } | Should -Not -Throw
         }
     }
@@ -622,6 +622,39 @@ Describe "unavailable Azure DevOps during the clear check (#3351, Codex review)"
             Mock Get-E2EQueryItems { throw "403 forbidden" }
             Mock Get-E2EDashboards { throw "403 forbidden" }
             (Get-E2EPoolInventory "p1" "o").workItems | Should -Be -1
+        }
+    }
+}
+
+Describe "busy and empty replies to writes (#3351, CodeRabbit review)" {
+    It "HTTP <Status> on a write is not sent again and reads as Azure DevOps unavailable" -ForEach @(@{ Status = 429 }, @{ Status = 503 }) {
+        InModuleScope E2EAzDo -Parameters @{ Status = $Status } {
+            param($Status)
+            $script:Headers = @{ Authorization = "x" }; $script:s = $Status
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { throw [Microsoft.PowerShell.Commands.HttpResponseException]::new("busy", [System.Net.Http.HttpResponseMessage]::new($script:s)) }
+            $e = { Invoke-E2ERest "_apis/projects/p1/teams" -Org "nkdagility-adomt-source" -Method POST -Body @{ name = "x" } } | Should -Throw -PassThru
+            $e.Exception | Should -BeOfType [E2EUnavailableException]
+            $e.Exception.Message | Should -Be "POST _apis/projects/p1/teams in nkdagility-adomt-source returned HTTP $Status; it is not sent again, as it may have been applied. Every lease is kept."
+            Should -Invoke Invoke-RestMethod -Times 1 -Exactly
+        }
+    }
+
+    It "an empty reply to a WIQL query (a POST) is not read as no work items" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Invoke-RestMethod { "" }
+            { Get-E2EProjectWorkItemIds "p1" "nkdagility-adomt-source" } | Should -Throw "POST p1/_apis/wit/wiql*returned an empty reply; it is not sent again*"
+        }
+    }
+
+    It "a refused write (not busy) is still rethrown as it was" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }
+            Mock Invoke-RestMethod { throw [Microsoft.PowerShell.Commands.HttpResponseException]::new("conflict", [System.Net.Http.HttpResponseMessage]::new(409)) }
+            $e = { Invoke-E2ERest "_apis/projects/p1/teams" -Org "nkdagility-adomt-source" -Method POST -Body @{ name = "x" } } | Should -Throw -PassThru
+            $e.Exception | Should -Not -BeOfType [E2EUnavailableException]
         }
     }
 }

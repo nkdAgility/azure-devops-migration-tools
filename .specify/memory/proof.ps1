@@ -83,6 +83,7 @@ $stopIfUnavailable = { param([string]$Log)
     # The exception type lives in the module (Import-Module does not export classes), so it is thrown there.
     if ($line) { & (Get-Module E2EAzDo) { param($m) throw [E2EUnavailableException]::new($m) } ($line[0].Line -replace '^.*?(\S+ \S+ in \S+ returned)', '$1').Trim() }
 }
+$unavailable = $false
 $failed = @(); $notCovered = @(); $scratch = @(); $processes = @(); $used = @(); $released = @(); $notReleased = @()
 # Projects come from the scratch project pool (#3342). Every seed this run starts takes them as this proof, so the
 # proof can give back everything the run holds, after each scenario and again in the finally below.
@@ -186,11 +187,20 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
     pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
     if ($LASTEXITCODE -ne 0) { & $stopIfUnavailable (Join-Path $work "$($d.Name).log"); $failed += "$($d.Name) (assertions)"; & $progress "$($d.Name): assertions FAILED" } else { & $progress "$($d.Name): passed" }
 }
+} catch {
+    # Azure DevOps stayed unavailable: nothing is given back, so every lease this run holds is kept (#3351). Giving
+    # back one org's projects while the other is down would release some leases and not others. Once this process
+    # has exited its leases read as Orphaned, and Remove-E2EObjects.ps1 -Prefix amte2e-<item>- gives them back.
+    if ($_.Exception.GetType().Name -eq 'E2EUnavailableException') { $unavailable = $true }
+    throw
 } finally {
-    # Give back every pool project this run holds, whatever happened above. Each is cleared and renamed back.
-    & $progress "giving pool projects back"
-    & $releasePool
-    & $progress "done"
+    if ($unavailable) { & $progress "Azure DevOps unavailable: pool projects kept leased; give them back later with tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-$Item-" }
+    else {
+        # Give back every pool project this run holds, whatever else happened above. Each is cleared and renamed back.
+        & $progress "giving pool projects back"
+        & $releasePool
+        & $progress "done"
+    }
 }
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
 "pool projects used: $((@($used | Sort-Object -Unique)) -join ', ')"
