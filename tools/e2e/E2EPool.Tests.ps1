@@ -658,3 +658,20 @@ Describe "busy and empty replies to writes (#3351, CodeRabbit review)" {
         }
     }
 }
+
+Describe "an outage during a failed slot's recovery (#3351, CodeRabbit review)" {
+    It "stops the take, keeping the slot's lease, instead of trying the next slot" {
+        InModuleScope E2EAzDo {
+            $env:AMTE2E_POOL_OWNER = "4242:runA"
+            Mock Get-E2EProjectOrNull { $null }
+            Mock Get-E2EPoolProject { @([pscustomobject]@{ Org = "o"; Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }, [pscustomobject]@{ Org = "o"; Id = "p2"; Name = "amte2e-pool-02"; Slot = 2; Lease = $null; State = "Free" }) }
+            Mock New-E2EPoolLease { $true }
+            Mock Clear-E2EPoolProject { throw "Could not clear o/amte2e-pool-01: a step failed" }
+            Mock Invoke-E2ERest { throw [E2EUnavailableException]::new("GET _apis/projects/p1 in o returned HTML instead of JSON after 4 tries; Azure DevOps is unavailable. Every lease is kept.") }
+            Mock Remove-E2EPoolLease {}
+            { Request-E2EPoolProject -Name "amte2e-new-src" -Org "o" } | Should -Throw "GET _apis/projects/p1 in o returned HTML*"
+            Should -Invoke New-E2EPoolLease -Times 1 -Exactly
+            Should -Invoke Remove-E2EPoolLease -Times 0 -Exactly
+        }
+    }
+}

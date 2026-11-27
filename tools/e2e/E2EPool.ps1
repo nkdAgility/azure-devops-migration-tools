@@ -462,7 +462,11 @@ function Request-E2EPoolProject {
                 if ((Invoke-E2ERest "_apis/projects/$($c.Id)" -Org $Org).name -ne $poolName) { Rename-E2EPoolProject $c.Id $poolName $Org }
                 Remove-E2EPoolLease $c.Id $Org
                 $err += " (lease freed)"
-            } catch { $err += " (lease kept until it expires: it could not be given its pool name back: $($_.Exception.Message))" }
+            } catch {
+                # An outage during this recovery stops the take too: the slot keeps its lease and no other is tried.
+                if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
+                $err += " (lease kept until it expires: it could not be given its pool name back: $($_.Exception.Message))"
+            }
             $errors += $err
             if ($errors.Count -ge 3) { break }
         }
