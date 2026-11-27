@@ -166,7 +166,12 @@ function Get-ShellWriteTargets([string]$Command) {
     # Best effort: the files a shell command writes. Redirections (> and >>), the path arguments of the
     # PowerShell file cmdlets, and the operands of cp, mv, rm, touch, tee and sed -i.
     $t = [Collections.Generic.List[string]]::new()
-    foreach ($m in [regex]::Matches($Command, '(?<![0-9&=-])>>?\s*(?<q>[''"]?)(?<p>[^\s''"|;&>]+)\k<q>')) { if ($m.Groups['p'].Value -notmatch '^\$?null$|^&') { $t.Add($m.Groups['p'].Value) } }
+    # A > inside a quoted string (a regex, say, or text being written) is not a redirection.
+    $quoted = @([regex]::Matches($Command, '(?s)''[^'']*''|"[^"]*"') | ForEach-Object { , @($_.Index, ($_.Index + $_.Length)) })
+    foreach ($m in [regex]::Matches($Command, '(?<![0-9&=-])>>?\s*(?<q>[''"]?)(?<p>[^\s''"|;&>]+)\k<q>')) {
+        if (@($quoted | Where-Object { $m.Index -gt $_[0] -and $m.Index -lt $_[1] }).Count) { continue }
+        if ($m.Groups['p'].Value -notmatch '^\$?null$|^&') { $t.Add($m.Groups['p'].Value) }
+    }
     foreach ($seg in ($Command -split '[|;&\r\n]+')) {
         $toks = @([regex]::Matches($seg, '(?<q>[''"])(?<v>.*?)\k<q>|(?<v>[^\s''"]+)') | ForEach-Object { $_.Groups['v'].Value })
         for ($i = 0; $i -lt $toks.Count; $i++) {

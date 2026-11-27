@@ -50,7 +50,12 @@ if (-not $isSource) {
     if (-not $src -or -not (Test-Path (Join-Path $src 'extensions'))) { $fail.Add('the shared copies cannot be checked: set NKDA_SPECKIT_SOURCE or sharedSource in .specify/memory/workflow.json') }
     else {
         Import-Module (Join-Path $PSScriptRoot '..\workflow\Workflow.psm1') -Force
-        foreach ($d in (Get-SharedDrift $src (Get-Location).Path)) { $fail.Add("shared file differs from its source: $d (run nkda-speckit's scripts/sync-to-repo.ps1)") }
+        # Checked against the nkda-speckit commit the repo last synced (sharedCommit), not the live checkout, so work
+        # in progress in nkda-speckit never blocks an item. With no sharedCommit, the live checkout is used.
+        $sc = ''
+        if (Test-Path .specify/memory/workflow.json) { $wc = Get-Content .specify/memory/workflow.json -Raw | ConvertFrom-Json; if ($wc.PSObject.Properties['sharedCommit']) { $sc = "$($wc.sharedCommit)" } }
+        try { foreach ($d in (Get-SharedDriftAt $src (Get-Location).Path $sc)) { $fail.Add("shared file differs from its source$(if ($sc) { " at $($sc.Substring(0, 7))" }): $d (run nkda-speckit's scripts/sync-to-repo.ps1)") } }
+        catch { $fail.Add("the shared copies cannot be checked: $($_.Exception.Message)") }
     }
 }
 
