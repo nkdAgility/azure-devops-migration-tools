@@ -675,3 +675,41 @@ Describe "an outage during a failed slot's recovery (#3351, CodeRabbit review)" 
         }
     }
 }
+
+Describe "every catch that answers for a failure passes an outage on (#3351, CodeRabbit review)" {
+    BeforeAll { $script:Down = "GET x in o returned HTML instead of JSON after 4 tries; Azure DevOps is unavailable. Every lease is kept." }
+    BeforeEach { $env:AMTE2E_POOL_OWNER = "4242:runA" }
+
+    It "releasing the pool stops at the first outage and does not go on to release the next project" {
+        InModuleScope E2EAzDo -Parameters @{ Down = $Down } {
+            param($Down)
+            Mock Get-E2EPoolProject { @([pscustomobject]@{ Name = "amte2e-a"; Slot = 1; Lease = [pscustomobject]@{ Token = "t" } }, [pscustomobject]@{ Name = "amte2e-b"; Slot = 2; Lease = [pscustomobject]@{ Token = "t" } }) }
+            $script:resets = 0
+            Mock Reset-E2EPoolProject { $script:resets++; throw [E2EUnavailableException]::new($Down) }
+            { Clear-E2EPool -Org "o" -Owner "runA" } | Should -Throw "GET x in o returned HTML*"
+            $script:resets | Should -Be 1
+        }
+    }
+
+    It "the rename's name-clash lookup stops on an outage instead of reading it as no clash" {
+        InModuleScope E2EAzDo -Parameters @{ Down = $Down } {
+            param($Down)
+            Mock Invoke-E2ERest { [pscustomobject]@{ id = "p1"; name = "amte2e-pool-01" } } -ParameterFilter { $Path -eq "_apis/projects/p1" }
+            Mock Invoke-E2ERest { throw [E2EUnavailableException]::new($Down) } -ParameterFilter { $Path -like "_apis/projects/amte2e-new*" }
+            Mock Assert-E2EPoolLeaseHeld { throw "no rename expected" }
+            { Rename-E2EPoolProject "p1" "amte2e-new-src" "o" } | Should -Throw "GET x in o returned HTML*"
+            Should -Invoke Assert-E2EPoolLeaseHeld -Times 0 -Exactly
+        }
+    }
+
+    It "a takeover's delete of a stale lease stops on an outage instead of reading it as lost" {
+        InModuleScope E2EAzDo -Parameters @{ Down = $Down } {
+            param($Down)
+            $lease = [pscustomobject]@{ Team = [pscustomobject]@{ id = "t1"; description = "d" } }
+            Mock Get-E2EPoolLease { $lease }
+            Mock Get-E2EPoolLeaseState { "Expired" }
+            Mock Invoke-E2ERest { throw [E2EUnavailableException]::new($Down) } -ParameterFilter { $Method -eq "DELETE" }
+            { Remove-E2EPoolStaleLease "p1" $lease "o" } | Should -Throw "GET x in o returned HTML*"
+        }
+    }
+}

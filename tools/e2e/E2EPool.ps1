@@ -133,7 +133,7 @@ function Remove-E2EPoolStaleLease([string]$ProjectId, $Lease, [string]$Org, [swi
     $now = Get-E2EPoolLease $ProjectId $Org
     if (-not $now -or $now.Team.id -ne $Lease.Team.id -or $now.Team.description -ne $Lease.Team.description) { return $false }
     if (-not $EvenIfLive -and (Get-E2EPoolLeaseState $now) -notin "Expired", "Orphaned") { return $false }
-    try { Invoke-E2ERest "_apis/projects/$ProjectId/teams/$($Lease.Team.id)" -Org $Org -Method DELETE | Out-Null; $true } catch { $false }
+    try { Invoke-E2ERest "_apis/projects/$ProjectId/teams/$($Lease.Team.id)" -Org $Org -Method DELETE | Out-Null; $true } catch { Assert-E2EAvailable $_; $false }
 }
 
 function Remove-E2EPoolLease([string]$ProjectId, [string]$Org) {
@@ -393,12 +393,12 @@ function Rename-E2EPoolProject([string]$ProjectId, [string]$Name, [string]$Org) 
     Assert-E2EName $Name
     $p = Invoke-E2ERest "_apis/projects/$ProjectId" -Org $Org
     if ($p.name -ne $Name) {
-        $clash = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { $null }
+        $clash = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { Assert-E2EAvailable $_; $null }
         if ($clash) { throw "Cannot rename $Org/$($p.name) to '$Name': a project of that name exists." }
         Assert-E2EPoolLeaseHeld $ProjectId $Org | Out-Null
         Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$ProjectId" -Org $Org -Method PATCH -Body @{ name = $Name }) | Out-Null
         for ($i = 0; ; $i++) {
-            $q = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { $null }
+            $q = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { Assert-E2EAvailable $_; $null }
             if ($q -and $q.id -eq $ProjectId) { break }
             if ($i -ge 19) { throw "Project $ProjectId in $Org is not readable as '$Name' after the rename." }
             Start-Sleep -Seconds 3
@@ -517,7 +517,7 @@ function Clear-E2EPool {
             $slot = Reset-E2EPoolProject -Name $h.Name -Org $Org -Force:$All
             if (Get-E2EPoolSlot "$slot") { "released $Org/$($h.Name) -> $slot (cleared)" } else { "NOT RELEASED $Org/$($h.Name): the project was $slot when it was reset" }
         }
-        catch { "NOT RELEASED $Org/$($h.Name): $($_.Exception.Message)" }
+        catch { Assert-E2EAvailable $_; "NOT RELEASED $Org/$($h.Name): $($_.Exception.Message)" }
     }
 }
 

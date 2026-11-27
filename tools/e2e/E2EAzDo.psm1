@@ -95,6 +95,10 @@ $script:BusyStatuses = @(429, 503)
 # Thrown when Azure DevOps keeps answering with HTML or busy statuses. Its message is the one line a proof shows.
 class E2EUnavailableException : System.Exception { E2EUnavailableException([string]$m) : base($m) {} }
 
+# Called first in a catch that turns a failure into an answer ($null, $false, "NOT RELEASED"): Azure DevOps being
+# unavailable is never such an answer, so it is passed on and the caller stops, keeping its leases.
+function Assert-E2EAvailable($ErrorRecord) { if ($ErrorRecord.Exception -is [E2EUnavailableException]) { throw $ErrorRecord.Exception } }
+
 # Invoke-RestMethod returns parsed JSON as objects, and returns text when it cannot parse the body. Text that is
 # JSON (an endpoint whose keys differ only in case) is readable; its callers parse it. Anything else is not.
 # An empty body is fine for a write (a DELETE has none) but not for a read (-Read): every read answers with JSON.
