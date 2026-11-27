@@ -65,6 +65,14 @@ if ($Only) {
 }
 if ($runAll) { "== running all $($runnable.Count) runnable scenarios: $reasonAll" } else { "== running $($why.Count) scenario(s):"; $why.Keys | Sort-Object | ForEach-Object { "   $_ ($($why[$_]))" } }
 
+# Proofs in different worktrees run side by side; two in the same worktree would overwrite each other's scenario
+# state files (tools/e2e/scenarios/*/state.local.json), so a second one here is refused at once (Martin, #3351).
+# The file is held open for the whole run and the OS lets go of it when this process ends, however it ends.
+$worktreeKey = [BitConverter]::ToString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes((Get-Location).Path.ToLowerInvariant()))).Replace('-', '').Substring(0, 16)
+$runningPath = Join-Path ([IO.Path]::GetTempPath()) "amte2e-proof-$worktreeKey.running"
+try { $running = [IO.File]::Open($runningPath, 'OpenOrCreate', 'ReadWrite', 'None') }
+catch [IO.IOException] { Write-Error "another proof is already running in this worktree ($((Get-Location).Path)); wait for it to finish, or run this one from another worktree."; exit 1 }
+
 # One timestamped line per step, so a long run shows where it is.
 $progress = { param([string]$Step) "[{0:HH:mm:ss}] {1}" -f (Get-Date), $Step }
 # A seed or assert takes and reads pool projects in its own process. If Azure DevOps stayed unavailable there, its
