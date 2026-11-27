@@ -111,7 +111,12 @@ function New-E2EPoolLease([string]$ProjectId, [int]$Slot, [string]$Org) {
     $now = [datetime]::UtcNow
     $desc = ConvertTo-E2EPoolLease -Slot $Slot -Claimed $now -Expires $now.AddHours($script:LeaseHours) -Item "$env:AMTE2E_POOL_ITEM"
     try { Invoke-E2ERest "_apis/projects/$ProjectId/teams" -Org $Org -Method POST -Body @{ name = $script:LeaseTeam; description = $desc } | Out-Null }
-    catch { return $false }
+    catch {
+        # Azure DevOps unavailable: the claim may have been applied, so the take stops here, keeping only this slot's
+        # lease, instead of claiming one slot after another (#3351). Any other failure means another run won it.
+        if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
+        return $false
+    }
     # The POST succeeded, so a lease team now exists; the teams list can lag it, so it is read until it shows one.
     # Another owner's lease means this run lost; a lease never seen is reported, since this run may hold it.
     for ($i = 0; $i -lt 4; $i++) {

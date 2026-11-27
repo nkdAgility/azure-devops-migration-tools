@@ -579,3 +579,26 @@ Describe "replies that are not JSON: limits and lease safety (#3351 review)" {
         }
     }
 }
+
+Describe "claiming a slot while Azure DevOps is unavailable (#3351, Codex review)" {
+    BeforeEach { $env:AMTE2E_POOL_OWNER = "4242:runA" }
+
+    It "a claim answered with HTML stops the take at once, without claiming another slot" {
+        InModuleScope E2EAzDo {
+            $script:Headers = @{ Authorization = "x" }
+            Mock Start-Sleep {}
+            Mock Get-E2EProjectOrNull { $null }
+            Mock Get-E2EPoolProject { @([pscustomobject]@{ Org = "o"; Id = "p1"; Name = "amte2e-pool-01"; Slot = 1; Lease = $null; State = "Free" }, [pscustomobject]@{ Org = "o"; Id = "p2"; Name = "amte2e-pool-02"; Slot = 2; Lease = $null; State = "Free" }) }
+            Mock Invoke-RestMethod { "<!DOCTYPE html><html></html>" }
+            { Request-E2EPoolProject -Name "amte2e-new-src" -Org "nkdagility-adomt-source" } | Should -Throw "POST _apis/projects/p1/teams in nkdagility-adomt-source returned HTML instead of JSON; it is not sent again*"
+            Should -Invoke Invoke-RestMethod -Times 1 -Exactly -ParameterFilter { $Method -eq "POST" }
+        }
+    }
+
+    It "a claim another run won still reads as lost, and the next slot is tried" {
+        InModuleScope E2EAzDo {
+            Mock Invoke-E2ERest { throw "TF400898: a team with this name already exists" } -ParameterFilter { $Method -eq "POST" }
+            New-E2EPoolLease "p1" 1 "nkdagility-adomt-source" | Should -BeFalse
+        }
+    }
+}
