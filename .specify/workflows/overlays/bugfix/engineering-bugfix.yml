@@ -33,7 +33,7 @@ edits:
     step:
       id: nkda-ready
       type: shell
-      run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1 -Reason \"Definition of Ready: spec agreed by Martin\""
+      run: "pwsh -NoProfile -File .specify/extensions/engineering-checks/scripts/advance.ps1 -Reason \"Agreed: spec agreed by Martin\""
   - insert_after: test
     step:
       id: nkda-done-checks

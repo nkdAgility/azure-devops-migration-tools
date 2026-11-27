@@ -719,6 +719,10 @@ function Test-Move {
             if ($r -and $r.ContainsKey('skipped')) { $skipped.Add($r.message) }
             elseif ($r) { $failures.Add($r.message) }
         }
+        # outcomeSeen: the repo also keeps an item at Outcome Done until Martin has seen each outcome working.
+        if ($Config.ContainsKey('outcomeSeen') -and $Config.outcomeSeen -and $shift.name -eq 'OutcomeDone' -and "$evidence" -notmatch '(?m)^Seen:\s*\S') {
+            $failures.Add("no 'Seen:' line: Martin has not yet seen each outcome working, in his words")
+        }
     }
     @{ ok = ($failures.Count -eq 0 -and $skipped.Count -eq 0); shift = $shift; failures = @($failures); skipped = @($skipped) }
 }
@@ -862,8 +866,10 @@ function Invoke-AdoptionApply {
 # ---------------------------------------------------------------- the manager
 
 function Get-PullOrder($Config, [object[]]$Items) {
+    # Expedite first, then the current focus (the repo's own "focus" tag, if it sets one), then the oldest.
     $exp = $Config.tags.expedite
-    $Items | Sort-Object @{ Expression = { if ($_.tags -contains $exp) { 0 } else { 1 } } }, @{ Expression = { Get-StateSince $_ } }
+    $focus = if ($Config.tags -is [System.Collections.IDictionary] -and $Config.tags.Contains('focus')) { $Config.tags.focus } else { $null }
+    $Items | Sort-Object @{ Expression = { if ($exp -and $_.tags -contains $exp) { 0 } elseif ($focus -and $_.tags -contains $focus) { 1 } else { 2 } } }, @{ Expression = { Get-StateSince $_ } }
 }
 
 function Invoke-WorkflowManager {
@@ -986,6 +992,6 @@ function Format-AttentionList($Report) {
     $lines -join "`n"
 }
 
-Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-OperatorOnlyMatch, Get-StateIndex, Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
+Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-OperatorOnlyMatch, Get-StateIndex, Get-PullOrder,Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
     Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemDocsMode, Get-ArtifactName, Get-ItemArtifacts, Get-ItemArtifactText, Get-ItemArtifactVersions, Get-ItemDocFiles, Publish-ItemDocs, Get-ItemDocsDrift, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
