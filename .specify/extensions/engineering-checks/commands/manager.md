@@ -29,6 +29,17 @@ The pass prints a report:
 
 Run a pass when Martin asks, when a worker reports or is blocked, and when an item changes on the board. Never more workers than the WIP limits allow: the pass enforces them; do not start workers it did not ask for.
 
+Every open pull request of a worker has Auto-fix on. If one is off, tell that worker to turn it on.
+
+## Checking in
+
+Check in with every worker whose item is In Progress, on the repo's cadence (`checkInMinutes` in `workflow.json`, default 30) and on every pass. Ask it:
+1. **Rules:** are you following the rules? Check your steps since the last check-in against the Definition of Workflow, the worker rules and the repo's rules, and name every step that broke one, quoting it.
+2. **Working:** are you still working? What are you doing now, and when did you last make progress?
+3. **Moving forward:** what do you need to move the item forward? A missing answer, a blocked tool, a permission, or a decision.
+
+Check each answer against the board and the item's evidence. A broken rule goes back to the worker to put right, and into its retrospective note. What the manager can supply, it supplies. Only what Martin alone can settle goes to him, as a QUESTION. A worker that has not answered by the next check-in is treated as `stuck`.
+
 ## New work from Martin
 
 When Martin describes new work in chat, file it as a GitHub issue of the right type (Product Backlog Item, Bug or Feedback), state Proposed, in his words. When he tells you to approve it, move it to Approved with `move-state.ps1`: the item being in Approved is the approval. Write nothing procedural on the issue or anywhere else: no approval line, no move record, no worker name. The next pass pulls it.
