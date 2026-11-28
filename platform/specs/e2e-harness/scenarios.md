@@ -49,3 +49,7 @@ Re-running Plans and Suites into an existing target plan adds the Test Cases mis
 - Order: step 1, then step 2, 3 and 4 configs, assert (TC1 / TC1); step 2, then step 2 and 4 configs, assert
   (TC1, TC2 / TC1, TC2); step 4 config again, same assert; step 3, then step 4 config (exits 1 and names TC3); step 2
   and 4 configs, assert (TC1, TC2, TC3 / TC1, TC2).
+
+### sharedsteps-3256
+
+Seeds a Shared Steps, a Shared Parameter and a Test Case that uses both. `config.json` migrates only the Test Case, and `assert.ps1` (default `-Expect Unresolved`, the shape the done-check proof runs) checks that both references keep their source ids and are reported (two warnings, two `reference-left-on-source` review rows, and the summary count). `config-all.json` then migrates all three, and `assert.ps1 -Expect Resolved` checks that the re-run points both references at the target copies. `run.ps1` does all of it in one go (seed, both runs, both assertions, then deletes the scratch projects) and exits 0 only when both pass. (#3256)

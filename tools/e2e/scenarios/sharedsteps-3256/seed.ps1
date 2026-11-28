@@ -1,0 +1,32 @@
+# sharedsteps-3256: a Test Case whose Shared Steps and Shared Parameter are not migrated keeps their source ids.
+# Seeds one of each and a Test Case that uses both. config.json migrates only the Test Case, so both references
+# stay unresolved and must be reported; config-all.json then migrates all three, and the re-run remaps them.
+# -StateDir (default: this folder) holds state.local.json; run.ps1 passes its own work folder so concurrent runs do not share it.
+# -Progress (optional) is filled in as each project is created, so a caller can clean up after a partial seed.
+param([string]$Src = "amte2e-3256-src", [string]$Tgt = "amte2e-3256-tgt", [string]$Process = "amte2e-agile", [hashtable]$Progress = @{}, [string]$StateDir = $PSScriptRoot)
+$ErrorActionPreference = "Stop"
+Import-Module (Join-Path $PSScriptRoot "..\..\E2EAzDo.psm1") -Force
+Import-Module (Join-Path $PSScriptRoot "..\..\E2ESeed.psm1") -Force
+
+Set-E2EOrg nkdagility-adomt-target
+# Each project is recorded before it is claimed: New-E2EProject can throw after the claim (while it waits for the
+# classification nodes), and releasing a project this run never claimed is a no-op or refused by the lease check.
+$Progress.Target = $true
+New-E2EProject -Name $Tgt -Process $Process | Out-Null
+Set-E2EOrg nkdagility-adomt-source
+$Progress.Source = $true
+New-E2EProject -Name $Src -Process $Process | Out-Null
+
+$ssSteps = '<steps id="0" last="2"><step id="2" type="ActionStep"><parameterizedString isformatted="true">open @app</parameterizedString><parameterizedString isformatted="true">app opens</parameterizedString><description/></step></steps>'
+$ss = Set-E2EWorkItem $Src "Shared Steps" -Fields ([ordered]@{ "System.Title" = "ss shared steps"; "Microsoft.VSTS.TCM.Steps" = $ssSteps })
+$spParams = '<parameterSet><paramNames><param>app</param></paramNames><paramData lastId="1"><dataRow id="1"><kvp key="app" value="notepad"/></dataRow></paramData></parameterSet>'
+$sp = Set-E2EWorkItem $Src "Shared Parameter" -Fields ([ordered]@{ "System.Title" = "ss shared parameter"; "Microsoft.VSTS.TCM.Parameters" = $spParams })
+
+$tcSteps = "<steps id=""0"" last=""3""><compref id=""2"" ref=""$($ss.id)""/><step id=""3"" type=""ValidateStep""><parameterizedString isformatted=""true"">click save</parameterizedString><parameterizedString isformatted=""true"">saved</parameterizedString><description/></step></steps>"
+$tcData = "{""parameterMap"":[{""paramName"":""app"",""bindedParamName"":""app"",""dataSetName"":""ss shared parameter"",""dataSetId"":$($sp.id)}],""sharedParameterDataSetIds"":[$($sp.id)],""rowMappingType"":0}"
+$tc = Set-E2EWorkItem $Src "Test Case" -Fields ([ordered]@{ "System.Title" = "ss test case"; "Microsoft.VSTS.TCM.Steps" = $tcSteps; "Microsoft.VSTS.TCM.Parameters" = '<parameters><param name="app" bind="default"/></parameters>'; "Microsoft.VSTS.TCM.LocalDataSource" = $tcData }) -Ops @(
+    @{ op = "add"; path = "/relations/-"; value = @{ rel = "Microsoft.VSTS.TestCase.SharedStepReferencedBy-Reverse"; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/wit/workItems/$($ss.id)" } },
+    @{ op = "add"; path = "/relations/-"; value = @{ rel = "Microsoft.VSTS.TestCase.SharedParameterReferencedBy-Reverse"; url = "https://dev.azure.com/nkdagility-adomt-source/_apis/wit/workItems/$($sp.id)" } })
+
+Save-E2EState $StateDir @{ ss = $ss.id; sp = $sp.id; tc = $tc.id }
+"seeded sharedsteps: SS $($ss.id) SP $($sp.id) TC $($tc.id)"

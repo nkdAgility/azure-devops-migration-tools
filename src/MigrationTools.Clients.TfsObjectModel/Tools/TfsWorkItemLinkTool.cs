@@ -230,13 +230,19 @@ namespace MigrationTools.Tools
                 .Where(x => x.LinkTypeEnd.Name == "Shared Steps").ToList();
             var sourceSharedSteps = ReadableSourceItems(processor, sourceSharedStepLinks, wiSourceL, wiTargetL, "Shared Steps",
                 "its step reference keeps the source id");
+            var reviewLog = Services.GetService<WorkItemReviewLog>();
+            reviewLog?.MarkChecked(WorkItemReviewCategory.ReferenceLeftOnSource);
 
             foreach (WorkItemData sourceSharedStep in sourceSharedSteps)
             {
                 WorkItemData matchingTargetSharedStep =
                     processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedStep);
 
-                if (matchingTargetSharedStep != null)
+                if (matchingTargetSharedStep == null)
+                {
+                    ReportUnresolvedReference(reviewLog, "Shared Steps", microsoftVstsTcmSteps, sourceSharedStep.Id, wiSourceL, wiTargetL);
+                }
+                else
                 {
                     newSteps = newSteps.Replace($"ref=\"{sourceSharedStep.Id}\"",
                         $"ref=\"{matchingTargetSharedStep.Id}\"");
@@ -252,6 +258,18 @@ namespace MigrationTools.Tools
             {
                 wiTargetL.SaveToAzureDevOps();
             }
+        }
+
+        // A new target has no id until its first save, so the entry would name target 0. The check is deferred: the
+        // processor runs the link pass again right after the save, and the entry is recorded then with the real id.
+        private void ReportUnresolvedReference(WorkItemReviewLog reviewLog, string kind, string field, string referencedSourceId, WorkItemData wiSourceL, WorkItemData wiTargetL)
+        {
+            if (wiTargetL.Id == "0")
+            {
+                HasDeferredLinks = true;
+                return;
+            }
+            UnresolvedTestCaseReference.Report(Log, reviewLog, kind, field, referencedSourceId, wiSourceL.Id, wiTargetL.Id);
         }
 
         private List<WorkItemData> ReadableSourceItems(TfsProcessor processor, List<RelatedLink> links, WorkItemData wiSourceL, WorkItemData wiTargetL, string kind, string consequence)
@@ -289,12 +307,18 @@ namespace MigrationTools.Tools
             var sourceSharedParameters = ReadableSourceItems(processor, sourceSharedParametersLinks, wiSourceL, wiTargetL, "Shared Parameter",
                 "its data source reference keeps the source id");
 
+            var reviewLog = Services.GetService<WorkItemReviewLog>();
+            reviewLog?.MarkChecked(WorkItemReviewCategory.ReferenceLeftOnSource);
             var sourceToTarget = new Dictionary<string, string>();
             foreach (WorkItemData sourceSharedParameter in sourceSharedParameters)
             {
                 WorkItemData matchingTargetSharedParameter =
                     processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedParameter);
-                if (matchingTargetSharedParameter != null)
+                if (matchingTargetSharedParameter == null)
+                {
+                    ReportUnresolvedReference(reviewLog, "Shared Parameter", microsoftVstsTcmLocalDataSource, sourceSharedParameter.Id, wiSourceL, wiTargetL);
+                }
+                else
                 {
                     sourceToTarget[sourceSharedParameter.Id] = matchingTargetSharedParameter.Id;
                 }
