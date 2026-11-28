@@ -1,4 +1,5 @@
 {
+  "sharedCommit": "2812b7ac4c610aa2e30d51bd283352474940c350",
   "itemDocs": "artifacts",
   "mergeMinConfidence": 90,
   "specRoot": "platform/specs",

@@ -518,6 +518,21 @@ function Get-SkillCopies([string]$Target, [string]$Extension, [string]$Name) {
     @($found | Where-Object { (Test-Path $_) -and -not (((Get-Content $_ -Raw) -replace "`r`n", "`n") -match '^\.\./') })
 }
 
+function Get-SharedDriftAt([string]$Source, [string]$Target, [string]$Commit) {
+    # The shared drift against a commit of nkda-speckit (the one the repo last synced), not its live checkout, so work
+    # in progress there never blocks an item. With no commit, the live checkout.
+    if (-not $Commit) { return @(Get-SharedDrift $Source $Target) | ForEach-Object { $_ } }
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) "nkda-shared-$([guid]::NewGuid().ToString('N').Substring(0, 8))"
+    New-Item -ItemType Directory -Force $tmp | Out-Null
+    try {
+        git -C $Source archive --format=tar -o (Join-Path $tmp 'shared.tar') $Commit extensions 2>$null
+        if ($LASTEXITCODE -ne 0) { throw "sharedCommit $Commit is not a commit in $Source" }
+        tar -xf (Join-Path $tmp 'shared.tar') -C $tmp
+        if ($LASTEXITCODE -ne 0) { throw "could not unpack sharedCommit $Commit" }
+        @(Get-SharedDrift $tmp $Target) | ForEach-Object { $_ }
+    } finally { Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
 function Get-SharedDrift([string]$Source, [string]$Target) {
     # Every shared file in a target repo that is missing or differs from nkda-speckit: the extensions as copied,
     # and the skills generated from their commands.
@@ -992,6 +1007,6 @@ function Format-AttentionList($Report) {
     $lines -join "`n"
 }
 
-Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-OperatorOnlyMatch, Get-StateIndex, Get-PullOrder,Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
+Export-ModuleMember -Function Get-TopicBranch, Get-SupportedState, Get-AdoptionPlan, Format-AdoptionPlan, Invoke-AdoptionApply, Test-IsParent, Get-ItemOrder, Get-WorkflowConfig, Get-WorkflowConfigProblem, Get-OperatorOnlyMatch, Get-StateIndex, Get-PullOrder, Get-SharedDriftAt, Get-CategoryState, Get-EntryState, Test-StateFlag, Test-IsFinished, Get-StateDef, New-FileBoardAdapter, New-GitHubBoardAdapter, Get-BoardAdapter,
     Get-ItemEvidence, Get-Section, Get-ItemMoves, Get-StateSince, Test-Check, Test-Move, Move-WorkItem, Invoke-WorkflowManager, Format-AttentionList, Get-OpenQuestions, Sync-ItemWatch,
     Get-SpecAgreed, Get-SpecApprovalProblem, Resolve-SpecPath, Get-SharedSource, Get-RetroNote, Get-TextHash, Test-TextHash, Get-ItemFolder, Get-ItemRecordPath, New-ItemFolder, Get-ItemDocsMode, Get-ArtifactName, Get-ItemArtifacts, Get-ItemArtifactText, Get-ItemArtifactVersions, Get-ItemDocFiles, Publish-ItemDocs, Get-ItemDocsDrift, Get-ItemRoot, Get-StoredWorktree, Set-StoredWorktree, Get-FrontMatter, Get-OutcomeProblem, Get-SkillText, Get-SkillCopies, Get-SharedDrift
