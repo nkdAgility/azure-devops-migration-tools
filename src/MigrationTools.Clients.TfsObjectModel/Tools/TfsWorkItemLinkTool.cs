@@ -203,8 +203,10 @@ namespace MigrationTools.Tools
             if (targetUri != null)
             {
                 // A link the migration rewrites must be the rewritten one. A raw source link kept because the target
-                // commit was missing goes through the link migration, which decides again whether it can be rewritten now.
-                return targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(targetUri));
+                // still lacks the commit or branch is what the link migration would write again, so it is present (#3326);
+                // once the commit is pushed, it is missing and the link migration rewrites it.
+                return targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(targetUri))
+                    || (targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri)) && git.TargetLacksArtifact(targetUri));
             }
             if (targetExternal.Contains(RevisionArtifactDiff.ExternalLinkKey(el.LinkedArtifactUri)))
             {

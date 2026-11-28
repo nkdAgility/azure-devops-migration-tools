@@ -11,11 +11,28 @@ takes a pool project, clears it, puts it on the process the seed asks for and gi
 ## Single-run scenarios
 
 A scenario with `seed.ps1`, `config.json` and `assert.ps1`, whose seed takes `-Src` and `-Tgt`, is run by the
-repository's proof (`.specify/memory/proof.ps1`) in pool projects renamed for that run. The proof gives back each
+repository's proof (`.specify/memory/proof.ps1`) in pool projects renamed for that run: seed, one migration with the
+config pointed at those projects, then the assert. An assert may run further migrations itself, through
+`Invoke-MigrationE2E.ps1` with the same config. The proof gives back each
 scenario's projects before the next scenario, and again when it ends, even after a failure, then lists the pool
 projects it used and that each was released. `-Only <scenario>` runs just that scenario; a name that cannot run fails the proof before it starts. Each run's id
 ends in six random hex digits and a run id already in use is refused; a run deletes only the `-fresh` target it
 recorded making (`AMTE2E_CREATED_LOG`), checked by id.
+
+### rerun-3326
+
+Re-run repairs on already migrated items (#3326). See `platform/specs/tfs-object-model/rerun.md`.
+
+- **Seed**: a commit pushed to the target and source repositories, and one to the source only. Items: Closed Tasks
+  with an unresolved and a resolvable commit link, a Closed User Story with a parent link, a Resolved User Story with
+  an unresolved commit link, a Task the assert stamps as an earlier re-run's catch-up save would have, and a Task the
+  assert makes genuinely wrong.
+- **Assert**: after the first run, every current state-stamped value equals the source. It removes the links, then:
+  - a re-run exits 0 and every current state-stamped value equals the source again, the stamped Task included;
+  - a further re-run exits 0, updates nothing and saves no revision;
+  - after a ClosedDate is changed in an ordinary revision, a re-run fails that item with "stamped instead of the
+    source values", exits non-zero, and logs no stack trace.
+- `-BuildOutput` runs the assert's migrations with another build, for example `main`'s, for comparison.
 
 ## Not poolable
 

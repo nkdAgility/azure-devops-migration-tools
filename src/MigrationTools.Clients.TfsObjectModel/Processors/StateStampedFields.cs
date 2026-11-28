@@ -35,6 +35,19 @@ namespace MigrationTools.Processors
             CommonActivatedDate, CommonResolvedDate, CommonStateChangeDate, CommonActivatedBy, CommonResolvedBy, CommonClosedBy
         };
 
+        /// <summary>
+        /// True when a target revision is a catch-up save made by a re-run (#3192): it replays no source revision (none is
+        /// dated within the replay tolerance of it), and it has the author and the date plus one second of the revision
+        /// before it, which is what the catch-up save writes. A re-run may correct the state-stamped values the service
+        /// stamped in such a save (#3326); a revision that is not one is a wrongly migrated target and fails (#3270).
+        /// </summary>
+        public static bool IsCatchUpSave(DateTime previousChangedDate, string previousChangedBy, DateTime changedDate, string changedBy, bool replaysSourceRevision)
+        {
+            if (replaysSourceRevision) return false;
+            var gap = (changedDate.ToUniversalTime() - previousChangedDate.ToUniversalTime()).TotalMilliseconds;
+            return Math.Abs(gap - 1000) <= 10 && string.Equals(previousChangedBy, changedBy, StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>Returns the ClosedDate field to use, preferring Microsoft.VSTS.Common.ClosedDate, or null if neither exists.</summary>
         public static string ResolveClosedDateField(bool hasCommonClosedDate, bool hasSystemClosedDate)
         {

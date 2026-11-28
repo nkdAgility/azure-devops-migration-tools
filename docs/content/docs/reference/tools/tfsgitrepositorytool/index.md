@@ -26,7 +26,7 @@ The TFS Git Repository Tool operates during work item migration to handle Git re
 1. **Repository Discovery**: Identifies Git repository references within work items being migrated
 2. **Mapping Application**: Maps source repository names to target repository names
 3. **Target Check**: With `VerifyTargetExists` (the default), checks that each linked commit or branch exists in the target repository. Answers are cached, so each commit or branch is checked once per run
-4. **Link Updates**: Repoints commit and branch links to the target repository. A link whose commit or branch is missing from the target is left pointing at the source and logged as a warning. Pull requests don't carry over to the target, so on a different target organisation each pull request link becomes a hyperlink to the source pull request (see Pull request links below); set `DropPullRequestLinks` to remove them instead
+4. **Link Updates**: Repoints commit and branch links to the target repository. A link whose commit or branch is missing from the target is left pointing at the source and logged as a warning. A re-run counts such a link as present while the target still lacks the commit or branch, so it does not save the work item again for it; once the commit or branch is in the target, a re-run repoints the link. Pull requests don't carry over to the target, so on a different target organisation each pull request link becomes a hyperlink to the source pull request (see Pull request links below); set `DropPullRequestLinks` to remove them instead
 5. **Changeset Handling**: Coordinates with changeset mapping for complete traceability
 6. **Validation**: Ensures mapped repositories exist in the target system
 

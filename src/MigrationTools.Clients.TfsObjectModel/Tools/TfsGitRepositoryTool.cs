@@ -234,6 +234,52 @@ namespace MigrationTools.Tools
             return MapGitLinkToTargetUri(sourceLink, sourceWorkItem?.ProjectName, out _, out _, report: false);
         }
 
+        /// <summary>
+        /// True when <see cref="Enrich"/> would leave the source link in place because the target repository does not
+        /// have the commit or branch that <paramref name="targetUri"/> (from <see cref="GetTargetUri"/>) names. A re-run
+        /// then counts the raw source link on the target as present, instead of repairing it on every run (#3326).
+        /// Reports nothing: Enrich reports a missing artifact when it runs.
+        /// </summary>
+        public bool TargetLacksArtifact(string targetUri)
+        {
+            if (!Options.VerifyTargetExists || !TryParseTargetUri(targetUri, out bool isBranch, out Guid repoId, out string commitOrRefId))
+            {
+                return false;
+            }
+            return isBranch ? !TargetArtifacts.BranchExists(repoId, commitOrRefId) : !TargetArtifacts.CommitExists(repoId, commitOrRefId);
+        }
+
+        /// <summary>Reads the repository and commit or ref from a link written by <see cref="MapGitLinkToTargetUri"/>.</summary>
+        public static bool TryParseTargetUri(string targetUri, out bool isBranch, out Guid repoId, out string commitOrRefId)
+        {
+            isBranch = false;
+            repoId = Guid.Empty;
+            commitOrRefId = null;
+            const string commitPrefix = "vstfs:///git/commit/";
+            const string branchPrefix = "vstfs:///git/ref/";
+            string rest;
+            if (targetUri != null && targetUri.StartsWith(commitPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                rest = targetUri.Substring(commitPrefix.Length);
+            }
+            else if (targetUri != null && targetUri.StartsWith(branchPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                isBranch = true;
+                rest = targetUri.Substring(branchPrefix.Length);
+            }
+            else
+            {
+                return false;
+            }
+            var parts = rest.Split(new[] { "%2f", "%2F" }, 3, StringSplitOptions.None);
+            if (parts.Length != 3 || !Guid.TryParse(parts[1], out repoId) || parts[2].Length == 0)
+            {
+                return false;
+            }
+            commitOrRefId = parts[2];
+            return true;
+        }
+
         private TfsGitTargetArtifactCache _targetArtifacts;
 
         /// <summary>Replaces the target existence lookups; for tests.</summary>
