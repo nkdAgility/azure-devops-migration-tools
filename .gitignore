@@ -176,3 +176,6 @@ logs/
 
 # Item working copies: kept as artifacts on the item's issue (itemDocs: artifacts), never committed.
 /specs/
+
+# Pester's results file
+testResults.xml
