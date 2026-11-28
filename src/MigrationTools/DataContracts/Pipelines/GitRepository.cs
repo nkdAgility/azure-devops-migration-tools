@@ -8,6 +8,8 @@ namespace MigrationTools.DataContracts.Pipelines
     {
         public Properties Properties { get; set; }
 
+        public Project Project { get; set; }
+
         public string Type { get; set; }
 
         public Uri Url { get; set; }

@@ -81,14 +81,15 @@ namespace MigrationTools.Processors
             {
                 taskGroupMappings = await CreateTaskGroupDefinitionsAsync();
             }
+            IEnumerable<Mapping> buildPipelineMappings = null;
             if (Options.MigrateBuildPipelines)
             {
-                await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings);
+                buildPipelineMappings = await CreateBuildPipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings);
             }
 
             if (Options.MigrateReleasePipelines)
             {
-                await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings);
+                await CreateReleasePipelinesAsync(taskGroupMappings, variableGroupMappings, serviceConnectionMappings, buildPipelineMappings);
             }
             stopwatch.Stop();
             Log.LogDebug("DONE in {Elapsed} ", stopwatch.Elapsed.ToString("c"));
@@ -382,7 +383,7 @@ namespace MigrationTools.Processors
             }
         }
 
-        private async Task<IEnumerable<Mapping>> CreateReleasePipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null, IEnumerable<Mapping> ServiceConnectionMappings = null)
+        private async Task<IEnumerable<Mapping>> CreateReleasePipelinesAsync(IEnumerable<Mapping> TaskGroupMapping = null, IEnumerable<Mapping> VariableGroupMapping = null, IEnumerable<Mapping> ServiceConnectionMappings = null, IEnumerable<Mapping> buildPipelineMappings = null)
         {
             Log.LogInformation($"Processing Release Pipelines..");
 
@@ -394,6 +395,7 @@ namespace MigrationTools.Processors
 
             var definitionsNotInTarget = FilterOutExistingDefinitions(sourceDefinitions, targetDefinitions).ToList();
             var definitionsToBeMigrated = FilterAwayIfAnyMapsAreMissing(definitionsNotInTarget, TaskGroupMapping, VariableGroupMapping).ToList();
+            definitionsToBeMigrated = await MapArtifactsAsync(definitionsToBeMigrated, buildPipelineMappings, ServiceConnectionMappings);
 
             // Replace queue, taskgroup and variablegroup sourceIds with targetIds
             foreach (var definitionToBeMigrated in definitionsToBeMigrated)
@@ -419,6 +421,53 @@ namespace MigrationTools.Processors
             RecordOutcome<ReleaseDefinition>(DefinitionMigrationOutcome.Create(sourceDefinitions.Count(), definitionsNotInTarget.Count, definitionsToBeMigrated.Count, mappings.Count));
             mappings.AddRange(FindExistingMappings(sourceDefinitions, targetDefinitions, mappings));
             return mappings;
+        }
+
+        private async Task<List<ReleaseDefinition>> MapArtifactsAsync(List<ReleaseDefinition> definitions, IEnumerable<Mapping> buildPipelineMappings, IEnumerable<Mapping> serviceConnectionMappings)
+        {
+            if (!definitions.Any(d => d.Artifacts?.Length > 0))
+            {
+                return definitions;
+            }
+            var sourceRepositories = await Source.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false);
+            var targetRepositories = (await Target.GetApiDefinitionsAsync<GitRepository>(queryForDetails: false)).ToList();
+            var targetProject = targetRepositories.Select(r => r.Project).FirstOrDefault(p => p?.Id is not null);
+            var targets = new ReleaseArtifactTargets
+            {
+                SourceProjectName = Source.Options.Project,
+                TargetProject = targetProject is null ? null : new ArtifactSourceDefinitionUrl { Id = targetProject.Id, Name = targetProject.Name },
+                BuildDefinitionMappings = (buildPipelineMappings ?? Enumerable.Empty<Mapping>()).Concat(await MatchBuildDefinitionsByNameAsync()).ToList(),
+                SourceRepositories = sourceRepositories,
+                TargetRepositories = targetRepositories,
+                RepositoryNameMaps = Options.RepositoryNameMaps,
+                ServiceConnectionMappings = serviceConnectionMappings ?? Enumerable.Empty<Mapping>(),
+            };
+
+            var mapped = new List<ReleaseDefinition>();
+            foreach (var definition in definitions)
+            {
+                var unmapped = ReleaseArtifactMap.Apply(definition, targets);
+                if (unmapped is null)
+                {
+                    mapped.Add(definition);
+                    continue;
+                }
+                Log.LogError(
+                    @"ReleaseDefinition ""{DefinitionName}"" cannot be migrated because its artifact ""{ArtifactAlias}"" ({ArtifactType}) cannot be mapped to the target: {Reason}.",
+                    definition.Name, unmapped.Value.Artifact.Alias, unmapped.Value.Artifact.Type, unmapped.Value.Reason);
+            }
+            return mapped;
+        }
+
+        private async Task<IEnumerable<Mapping>> MatchBuildDefinitionsByNameAsync()
+        {
+            var sourceBuilds = await Source.GetApiDefinitionsAsync<BuildDefinition>(queryForDetails: false);
+            var targetBuilds = (await Target.GetApiDefinitionsAsync<BuildDefinition>(queryForDetails: false)).ToList();
+            return sourceBuilds
+                .Select(s => (Source: s, Target: targetBuilds.FirstOrDefault(t => t.Name == s.Name)))
+                .Where(p => p.Target is not null)
+                .Select(p => new Mapping { SourceId = p.Source.Id, TargetId = p.Target.Id, Name = p.Target.Name })
+                .ToList();
         }
 
         private IEnumerable<DefinitionType> FilterAwayIfAnyMapsAreMissing<DefinitionType>(

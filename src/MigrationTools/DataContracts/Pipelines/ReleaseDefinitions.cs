@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MigrationTools.DataContracts.Pipelines
 {
@@ -51,13 +52,15 @@ namespace MigrationTools.DataContracts.Pipelines
             Source = "restApi";
             Revision = 1;
             Links = null;
-            Artifacts = null;
             Url = null;
-            Links = null;
             Id = "0";
             Triggers = null;
             PipelineProcess = null;
 
+            foreach (var artifact in Artifacts ?? Array.Empty<Artifact>())
+            {
+                artifact.ResetObject();
+            }
             foreach (var env in Environments)
             {
                 env.ResetObject();
@@ -88,10 +91,29 @@ namespace MigrationTools.DataContracts.Pipelines
         public bool IsPrimary { get; set; }
 
         public bool IsRetained { get; set; }
+
+        [JsonExtensionData]
+        public IDictionary<string, JToken> AdditionalData { get; set; }
+
+        /// <summary>
+        /// Removes what only identifies the artifact in the source organisation.
+        /// </summary>
+        public void ResetObject()
+        {
+            if (DefinitionReference is not null)
+            {
+                DefinitionReference.ArtifactSourceDefinitionUrl = null;
+            }
+        }
     }
 
     public partial class DefinitionReference
     {
+        [JsonExtensionData]
+        public IDictionary<string, JToken> AdditionalData { get; set; }
+
+        public ArtifactSourceDefinitionUrl Connection { get; set; }
+
         public ArtifactSourceDefinitionUrl ArtifactSourceDefinitionUrl { get; set; }
 
         public ArtifactSourceDefinitionUrl DefaultVersionBranch { get; set; }
