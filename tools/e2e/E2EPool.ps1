@@ -111,7 +111,12 @@ function New-E2EPoolLease([string]$ProjectId, [int]$Slot, [string]$Org) {
     $now = [datetime]::UtcNow
     $desc = ConvertTo-E2EPoolLease -Slot $Slot -Claimed $now -Expires $now.AddHours($script:LeaseHours) -Item "$env:AMTE2E_POOL_ITEM"
     try { Invoke-E2ERest "_apis/projects/$ProjectId/teams" -Org $Org -Method POST -Body @{ name = $script:LeaseTeam; description = $desc } | Out-Null }
-    catch { return $false }
+    catch {
+        # Azure DevOps unavailable: the claim may have been applied, so the take stops here, keeping only this slot's
+        # lease, instead of claiming one slot after another (#3351). Any other failure means another run won it.
+        if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
+        return $false
+    }
     # The POST succeeded, so a lease team now exists; the teams list can lag it, so it is read until it shows one.
     # Another owner's lease means this run lost; a lease never seen is reported, since this run may hold it.
     for ($i = 0; $i -lt 4; $i++) {
@@ -128,7 +133,7 @@ function Remove-E2EPoolStaleLease([string]$ProjectId, $Lease, [string]$Org, [swi
     $now = Get-E2EPoolLease $ProjectId $Org
     if (-not $now -or $now.Team.id -ne $Lease.Team.id -or $now.Team.description -ne $Lease.Team.description) { return $false }
     if (-not $EvenIfLive -and (Get-E2EPoolLeaseState $now) -notin "Expired", "Orphaned") { return $false }
-    try { Invoke-E2ERest "_apis/projects/$ProjectId/teams/$($Lease.Team.id)" -Org $Org -Method DELETE | Out-Null; $true } catch { $false }
+    try { Invoke-E2ERest "_apis/projects/$ProjectId/teams/$($Lease.Team.id)" -Org $Org -Method DELETE | Out-Null; $true } catch { Assert-E2EAvailable $_; $false }
 }
 
 function Remove-E2EPoolLease([string]$ProjectId, [string]$Org) {
@@ -210,8 +215,9 @@ function Get-E2EPoolLeftoverProblems([string]$ProjectId, [string]$ProjectName, [
 # are what a fresh project has, so they are not counted.
 function Get-E2EPoolInventory([string]$ProjectId, [string]$Org) {
     $p = Invoke-E2ERest "_apis/projects/$ProjectId" -Org $Org
-    $count = { param($s) try { @(& $s).Count } catch { -1 } }
-    $repos = try { @(Get-E2EList "$ProjectId/_apis/git/repositories" $Org) } catch { $null }
+    # -1 is "could not be read" for one surface; Azure DevOps being unavailable is not that, so it stops the check.
+    $count = { param($s) try { @(& $s).Count } catch { if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }; -1 } }
+    $repos = try { @(Get-E2EList "$ProjectId/_apis/git/repositories" $Org) } catch { if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }; $null }
     [ordered]@{
         workItems          = & $count { Get-E2EProjectWorkItemIds $ProjectId $Org }
         recycleBin         = & $count { Get-E2EList "$ProjectId/_apis/wit/recyclebin" $Org }
@@ -247,6 +253,8 @@ function Test-E2EPoolClear([string]$ProjectId, [string]$Org) {
 function Invoke-E2EStep([scriptblock]$Step, [string]$What, [System.Collections.Generic.List[string]]$Errors) {
     try { & $Step | Out-Null }
     catch {
+        # Azure DevOps being unavailable is not one step's failure: stop the whole clear, keeping the lease.
+        if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
         $msg = try { ($_.ErrorDetails.Message | ConvertFrom-Json).message } catch { $null }
         $Errors.Add("${What}: $(if ($msg) { $msg } else { $_.Exception.Message })")
     }
@@ -303,7 +311,7 @@ function Clear-E2EPoolProject([string]$ProjectId, [string]$Org) {
         for ($i = 0; $i -lt $ids.Count; $i += 200) {
             $batch = $ids[$i..([Math]::Min($i + 199, $ids.Count - 1))]
             $read = "_apis/wit/workitems?ids=$($batch -join ',')&fields=System.Id,System.WorkItemType"
-            $items = try { @((Invoke-E2ERest $read -Org $Org).value) } catch { throw "Reading work items to clear failed ($read): $($_.ErrorDetails.Message)" }
+            $items = try { @((Invoke-E2ERest $read -Org $Org).value) } catch { if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }; throw "Reading work items to clear failed ($read): $($_.ErrorDetails.Message)" }
             foreach ($wi in $items) {
                 Invoke-E2EStep { Remove-E2EPoolWorkItem $pr $p.name $wi $Org } "$($wi.fields.'System.WorkItemType') $($wi.id)" $e
             }
@@ -385,12 +393,12 @@ function Rename-E2EPoolProject([string]$ProjectId, [string]$Name, [string]$Org) 
     Assert-E2EName $Name
     $p = Invoke-E2ERest "_apis/projects/$ProjectId" -Org $Org
     if ($p.name -ne $Name) {
-        $clash = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { $null }
+        $clash = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { Assert-E2EAvailable $_; $null }
         if ($clash) { throw "Cannot rename $Org/$($p.name) to '$Name': a project of that name exists." }
         Assert-E2EPoolLeaseHeld $ProjectId $Org | Out-Null
         Wait-E2EOperation (Invoke-E2ERest "_apis/projects/$ProjectId" -Org $Org -Method PATCH -Body @{ name = $Name }) | Out-Null
         for ($i = 0; ; $i++) {
-            $q = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { $null }
+            $q = try { Invoke-E2ERest "_apis/projects/$([Uri]::EscapeDataString($Name))" -Org $Org } catch { Assert-E2EAvailable $_; $null }
             if ($q -and $q.id -eq $ProjectId) { break }
             if ($i -ge 19) { throw "Project $ProjectId in $Org is not readable as '$Name' after the rename." }
             Start-Sleep -Seconds 3
@@ -447,12 +455,18 @@ function Request-E2EPoolProject {
             # the only record of the slot while the project has another name, so the pool name comes back first; if it
             # cannot, the lease is kept and expires, and the slot is still found and cleared on a later take.
             $err = "$(Format-E2EPoolName $c.Slot): $($_.Exception.Message)"
+            # Azure DevOps stayed unavailable: the next slot would fail the same way, so stop, keeping the lease.
+            if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
             try {
                 $poolName = Format-E2EPoolName $c.Slot
                 if ((Invoke-E2ERest "_apis/projects/$($c.Id)" -Org $Org).name -ne $poolName) { Rename-E2EPoolProject $c.Id $poolName $Org }
                 Remove-E2EPoolLease $c.Id $Org
                 $err += " (lease freed)"
-            } catch { $err += " (lease kept until it expires: it could not be given its pool name back: $($_.Exception.Message))" }
+            } catch {
+                # An outage during this recovery stops the take too: the slot keeps its lease and no other is tried.
+                if ($_.Exception -is [E2EUnavailableException]) { throw $_.Exception }
+                $err += " (lease kept until it expires: it could not be given its pool name back: $($_.Exception.Message))"
+            }
             $errors += $err
             if ($errors.Count -ge 3) { break }
         }
@@ -503,7 +517,7 @@ function Clear-E2EPool {
             $slot = Reset-E2EPoolProject -Name $h.Name -Org $Org -Force:$All
             if (Get-E2EPoolSlot "$slot") { "released $Org/$($h.Name) -> $slot (cleared)" } else { "NOT RELEASED $Org/$($h.Name): the project was $slot when it was reset" }
         }
-        catch { "NOT RELEASED $Org/$($h.Name): $($_.Exception.Message)" }
+        catch { Assert-E2EAvailable $_; "NOT RELEASED $Org/$($h.Name): $($_.Exception.Message)" }
     }
 }
 

@@ -57,7 +57,7 @@ foreach ($p in $product) {
 $runnable = @(Get-ChildItem tools/e2e/scenarios -Directory | Where-Object { (Test-Path (Join-Path $_.FullName 'seed.ps1')) -and (Test-Path (Join-Path $_.FullName 'assert.ps1')) -and (Test-Path (Join-Path $_.FullName 'config.json')) } | ForEach-Object Name)
 if (-not $runAll) { foreach ($k in @($why.Keys)) { if ($runnable -notcontains $k) { $why.Remove($k) } } }
 if ($Only) {
-    # A name asked for that cannot run (mistyped, or without a seed, config and assert) fails here, before the queue,
+    # A name asked for that cannot run (mistyped, or without a seed, config and assert) fails here, before anything runs,
     # so a run never reports success while silently skipping a scenario it was asked for.
     $unknown = @($Only | Where-Object { $runnable -notcontains $_ })
     if ($unknown) { Write-Error "-Only names scenarios that cannot run (no folder with seed.ps1, assert.ps1 and config.json): $($unknown -join ', '). Runnable: $($runnable -join ', ')"; exit 1 }
@@ -65,29 +65,25 @@ if ($Only) {
 }
 if ($runAll) { "== running all $($runnable.Count) runnable scenarios: $reasonAll" } else { "== running $($why.Count) scenario(s):"; $why.Keys | Sort-Object | ForEach-Object { "   $_ ($($why[$_]))" } }
 
-# One proof at a time on the shared test orgs: concurrent runs collide there (VS800075, dropped connections).
-# Waiting runs queue in the order they arrived and never give up: each takes a ticket, and the oldest ticket whose
-# process is still alive goes next.
-$queue = Join-Path ([IO.Path]::GetTempPath()) 'amte2e-proof-queue'
-New-Item -ItemType Directory -Force $queue | Out-Null
-$ticket = Join-Path $queue ('{0:D19}-{1}.ticket' -f [DateTime]::UtcNow.Ticks, $PID)
-"#$Item run $RunId" | Set-Content $ticket
-$lockPath = Join-Path ([IO.Path]::GetTempPath()) 'amte2e-proof.lock'
-$lock = $null; $waited = 0
-try {
-    while (-not $lock) {
-        $live = @(Get-ChildItem $queue -Filter *.ticket | Sort-Object Name | Where-Object {
-            $tp = [int](($_.BaseName -split '-')[-1]); if (Get-Process -Id $tp -ErrorAction SilentlyContinue) { $true } else { Remove-Item $_.FullName -ErrorAction SilentlyContinue; $false } })
-        if ($live.Count -and $live[0].FullName -eq $ticket) {
-            try { $lock = [IO.File]::Open($lockPath, 'OpenOrCreate', 'ReadWrite', 'None') } catch [IO.IOException] { }
-        }
-        if (-not $lock) {
-            if ($waited % 300 -eq 0) { "queued for the test orgs: position $([array]::IndexOf(@($live.FullName), $ticket) + 1) of $($live.Count), waited $([int]($waited / 60)) min" }
-            Start-Sleep 10; $waited += 10
-        }
-    }
-} finally { if (-not $lock) { Remove-Item $ticket -ErrorAction SilentlyContinue } }
-try {
+# Proofs in different worktrees run side by side; two in the same worktree would overwrite each other's scenario
+# state files (tools/e2e/scenarios/*/state.local.json), so a second one here is refused at once (Martin, #3351).
+# The file is held open for the whole run and the OS lets go of it when this process ends, however it ends.
+$worktreeKey = [BitConverter]::ToString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes((Get-Location).Path.ToLowerInvariant()))).Replace('-', '').Substring(0, 16)
+$runningPath = Join-Path ([IO.Path]::GetTempPath()) "amte2e-proof-$worktreeKey.running"
+try { $running = [IO.File]::Open($runningPath, 'OpenOrCreate', 'ReadWrite', 'None') }
+catch [IO.IOException] { Write-Error "another proof is already running in this worktree ($((Get-Location).Path)); wait for it to finish, or run this one from another worktree."; exit 1 }
+
+# One timestamped line per step, so a long run shows where it is.
+$progress = { param([string]$Step) "[{0:HH:mm:ss}] {1}" -f (Get-Date), $Step }
+# A seed or assert takes and reads pool projects in its own process. If Azure DevOps stayed unavailable there, its
+# log ends with the pool's one line; the next scenario would fail the same way, so the proof stops with that line.
+$stopIfUnavailable = { param([string]$Log)
+    # Every form of the pool's line (a read that kept failing, a write that is not sent again) ends like this.
+    $line = @(Select-String -Path $Log -Pattern ' returned .*Every lease is kept\.' -ErrorAction SilentlyContinue | Select-Object -Last 1)
+    # The exception type lives in the module (Import-Module does not export classes), so it is thrown there.
+    if ($line) { & (Get-Module E2EAzDo) { param($m) throw [E2EUnavailableException]::new($m) } ($line[0].Line -replace '^.*?(\S+ \S+ in \S+ returned)', '$1').Trim() }
+}
+$unavailable = $false
 $failed = @(); $notCovered = @(); $scratch = @(); $processes = @(); $used = @(); $released = @(); $notReleased = @()
 # Projects come from the scratch project pool (#3342). Every seed this run starts takes them as this proof, so the
 # proof can give back everything the run holds, after each scenario and again in the finally below.
@@ -96,6 +92,8 @@ $env:AMTE2E_POOL_OWNER = "${PID}:$poolRun"
 $env:AMTE2E_POOL_ITEM = $Item
 Import-Module (Join-Path $PWD 'tools/e2e/E2EAzDo.psm1') -Force -WarningAction SilentlyContinue
 $poolOrgs = @('nkdagility-adomt-source', 'nkdagility-adomt-target')
+# Azure DevOps stayed unavailable (#3351): the pool's one line is the whole report, after the finally below has run.
+trap { if ($_.Exception.GetType().Name -eq 'E2EUnavailableException') { "STOPPED: $($_.Exception.Message)"; exit 1 }; break }
 # What this invocation creates outside the pool is recorded here (by pid as well as run id), so it deletes only that.
 $env:AMTE2E_CREATED_LOG = Join-Path ([IO.Path]::GetTempPath()) "amte2e-created-$Item-$RunId-$PID.log"
 # A run id already in use (passed again with -RunId, or drawn twice) is refused, so no two runs share a name.
@@ -114,7 +112,11 @@ $releasePool = {
             if (Remove-E2EDisposableProject $fName -Org $fOrg -Id $fId) { "deleted fresh project $fOrg/$fName" }
             $rest = @(Get-Content $env:AMTE2E_CREATED_LOG | Where-Object { $_ -ne $line }); Set-Content $env:AMTE2E_CREATED_LOG $rest
         }
-        catch { $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: $($_.Exception.Message)" }
+        catch {
+            # Azure DevOps unavailable: stop here, so nothing else is given back and every lease is kept (#3351).
+            if ($_.Exception.GetType().Name -eq 'E2EUnavailableException') { throw }
+            $script:notReleased += "NOT DELETED fresh project $fOrg/$fName`: $($_.Exception.Message)"
+        }
     }
     foreach ($org in $poolOrgs) {
         $held = @(Get-E2EPoolProject -Org $org -Owner $poolRun)
@@ -176,19 +178,33 @@ foreach ($d in Get-ChildItem tools/e2e/scenarios -Directory) {
         foreach ($k in $extra.Keys) { if ($declared -contains $k) { $a += "-$k", $extra[$k] } }
         , $a }
     $seedArgs = & $argsFor $seed
+    & $progress "$($d.Name): seed"
     pwsh -NoProfile -File $seed @seedArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (seed)"; continue }
+    if ($LASTEXITCODE -ne 0) { & $stopIfUnavailable (Join-Path $work "$($d.Name).log"); $failed += "$($d.Name) (seed)"; & $progress "$($d.Name): seed FAILED"; continue }
     & $renewPool
+    & $progress "$($d.Name): migration"
     pwsh -NoProfile -File tools/e2e/Invoke-MigrationE2E.ps1 -Config $cfgFile *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; continue }
+    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (migration)"; & $progress "$($d.Name): migration FAILED"; continue }
     & $renewPool
+    & $progress "$($d.Name): assertions"
     $assertArgs = & $argsFor $assert @{ OutFile = (Join-Path $work "$($d.Name).assert.md") }
     pwsh -NoProfile -File $assert @assertArgs *>&1 | Tee-Object -FilePath (Join-Path $work "$($d.Name).log") -Append
-    if ($LASTEXITCODE -ne 0) { $failed += "$($d.Name) (assertions)" }
+    if ($LASTEXITCODE -ne 0) { & $stopIfUnavailable (Join-Path $work "$($d.Name).log"); $failed += "$($d.Name) (assertions)"; & $progress "$($d.Name): assertions FAILED" } else { & $progress "$($d.Name): passed" }
 }
+} catch {
+    # Azure DevOps stayed unavailable: nothing is given back, so every lease this run holds is kept (#3351). Giving
+    # back one org's projects while the other is down would release some leases and not others. Once this process
+    # has exited its leases read as Orphaned, and Remove-E2EObjects.ps1 -Prefix amte2e-<item>- gives them back.
+    if ($_.Exception.GetType().Name -eq 'E2EUnavailableException') { $unavailable = $true }
+    throw
 } finally {
-    # Give back every pool project this run holds, whatever happened above. Each is cleared and renamed back.
-    & $releasePool
+    if ($unavailable) { & $progress "Azure DevOps unavailable: pool projects kept leased; give them back later with tools/e2e/Remove-E2EObjects.ps1 -Prefix amte2e-$Item-" }
+    else {
+        # Give back every pool project this run holds, whatever else happened above. Each is cleared and renamed back.
+        & $progress "giving pool projects back"
+        & $releasePool
+        & $progress "done"
+    }
 }
 "not covered (no seed, config and assert with scratch-project parameters): $($notCovered -join ', ')"
 "pool projects used: $((@($used | Sort-Object -Unique)) -join ', ')"
@@ -199,4 +215,3 @@ if (-not $scratch) { Write-Error "no scenario was run: the proof covers nothing"
 if ($failed) { Write-Error "end-to-end proof failed: $($failed -join ', '); each scenario's output is in $work\<scenario>.log"; exit 1 }
 "all covered scenarios passed; results in $work"
 exit 0
-} finally { $lock.Dispose(); Remove-Item $ticket -ErrorAction SilentlyContinue }
