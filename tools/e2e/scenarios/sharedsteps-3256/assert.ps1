@@ -39,6 +39,7 @@ if ($Expect -eq "Unresolved") {
     $r += New-E2EResult "warning for Shared Steps" ($text -match "Shared Steps $($s.ss) used by Test Case $($s.tc) \(target \d+\) not remapped") "run log $($runLog.FullName)"
     $r += New-E2EResult "warning for Shared Parameter" ($text -match "Shared Parameter $($s.sp) used by Test Case $($s.tc) \(target \d+\) not remapped") "run log $($runLog.FullName)"
     $r += New-E2EResult "two reference-left-on-source entries" ($refs.Count -eq 2) "$($refs.Count) entr(ies)"
+    $r += New-E2EResult "entries name the saved target Test Case" (@($refs | Where-Object { "$($_.targetId)" -ne "$($ttc.id)" }).Count -eq 0) "targetId(s) $(($refs | ForEach-Object targetId) -join ',') vs $($ttc.id)"
     $r += New-E2EResult "summary counts them" ($text -match "reference-left-on-source: 2") "summary"
 } else {
     $tss = $items | Where-Object { $_.fields.'System.WorkItemType' -eq "Shared Steps" } | Select-Object -First 1

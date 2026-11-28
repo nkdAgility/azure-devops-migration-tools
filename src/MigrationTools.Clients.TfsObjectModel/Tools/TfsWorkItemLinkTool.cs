@@ -240,8 +240,7 @@ namespace MigrationTools.Tools
 
                 if (matchingTargetSharedStep == null)
                 {
-                    UnresolvedTestCaseReference.Report(Log, reviewLog, "Shared Steps", microsoftVstsTcmSteps,
-                        sourceSharedStep.Id, wiSourceL.Id, wiTargetL.Id);
+                    ReportUnresolvedReference(reviewLog, "Shared Steps", microsoftVstsTcmSteps, sourceSharedStep.Id, wiSourceL, wiTargetL);
                 }
                 else
                 {
@@ -259,6 +258,18 @@ namespace MigrationTools.Tools
             {
                 wiTargetL.SaveToAzureDevOps();
             }
+        }
+
+        // A new target has no id until its first save, so the entry would name target 0. The check is deferred: the
+        // processor runs the link pass again right after the save, and the entry is recorded then with the real id.
+        private void ReportUnresolvedReference(WorkItemReviewLog reviewLog, string kind, string field, string referencedSourceId, WorkItemData wiSourceL, WorkItemData wiTargetL)
+        {
+            if (wiTargetL.Id == "0")
+            {
+                HasDeferredLinks = true;
+                return;
+            }
+            UnresolvedTestCaseReference.Report(Log, reviewLog, kind, field, referencedSourceId, wiSourceL.Id, wiTargetL.Id);
         }
 
         private List<WorkItemData> ReadableSourceItems(TfsProcessor processor, List<RelatedLink> links, WorkItemData wiSourceL, WorkItemData wiTargetL, string kind, string consequence)
@@ -305,8 +316,7 @@ namespace MigrationTools.Tools
                     processor.Target.WorkItems.FindReflectedWorkItemByReflectedWorkItemId(sourceSharedParameter);
                 if (matchingTargetSharedParameter == null)
                 {
-                    UnresolvedTestCaseReference.Report(Log, reviewLog, "Shared Parameter", microsoftVstsTcmLocalDataSource,
-                        sourceSharedParameter.Id, wiSourceL.Id, wiTargetL.Id);
+                    ReportUnresolvedReference(reviewLog, "Shared Parameter", microsoftVstsTcmLocalDataSource, sourceSharedParameter.Id, wiSourceL, wiTargetL);
                 }
                 else
                 {
