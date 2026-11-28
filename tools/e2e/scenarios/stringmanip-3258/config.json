@@ -1,0 +1,64 @@
+{
+  "Serilog": { "MinimumLevel": "Information" },
+  "MigrationTools": {
+    "Version": "16.0",
+    "Endpoints": {
+      "Source": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-source/",
+        "Project": "amte2e-3258-src2",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": { "AuthenticationMode": "EntraId" },
+        "LanguageMaps": { "AreaPath": "Area", "IterationPath": "Iteration" }
+      },
+      "Target": {
+        "EndpointType": "TfsTeamProjectEndpoint",
+        "Collection": "https://dev.azure.com/nkdagility-adomt-target/",
+        "Project": "amte2e-3258-tgt2",
+        "ReflectedWorkItemIdField": "Custom.ReflectedWorkItemId",
+        "AllowCrossProjectLinking": false,
+        "Authentication": { "AuthenticationMode": "EntraId" },
+        "LanguageMaps": { "AreaPath": "Area", "IterationPath": "Iteration" }
+      }
+    },
+    "CommonTools": {
+      "TfsNodeStructureTool": {
+        "Enabled": true,
+        "Areas": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3258-src2([\\\\]?.*)$", "Replacement": "amte2e-3258-tgt2$1" } ] },
+        "Iterations": { "Filters": [], "Mappings": [ { "Match": "^amte2e-3258-src2([\\\\]?.*)$", "Replacement": "amte2e-3258-tgt2$1" } ] },
+        "ShouldCreateMissingRevisionPaths": true,
+        "ReplicateAllExistingNodes": true
+      },
+      "TfsRevisionManagerTool": { "Enabled": true, "ReplayRevisions": true, "MaxRevisions": 0 },
+      "TfsAttachmentTool": { "Enabled": true, "ExportBasePath": "c:\\temp\\amte2e-3258-attachments", "MaxAttachmentSize": 480000000 },
+      "TfsWorkItemLinkTool": { "Enabled": true, "FilterIfLinkCountMatches": true, "SaveAfterEachLinkIsAdded": false },
+      "FieldMappingTool": {
+        "Enabled": true,
+        "FieldMaps": []
+      },
+      "StringManipulatorTool": { "Enabled": true, "MaxStringLength": 1000000, "Manipulators": [] },
+      "TfsUserMappingTool": { "Enabled": false },
+      "TfsTeamSettingsTool": { "Enabled": false }
+    },
+    "Processors": [
+      {
+        "ProcessorType": "TfsWorkItemMigrationProcessor",
+        "Enabled": true,
+        "SourceName": "Source",
+        "TargetName": "Target",
+        "UpdateCreatedDate": true,
+        "UpdateCreatedBy": true,
+        "WIQLQuery": "SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @TeamProject AND [System.ChangedDate] >= @Today - 30 AND [System.Title] CONTAINS 'in-scope' ORDER BY [System.Id]",
+        "FixHtmlAttachmentLinks": false,
+        "WorkItemCreateRetryLimit": 5,
+        "FilterWorkItemsThatAlreadyExistInTarget": true,
+        "GenerateMigrationComment": true,
+        "MaxGracefulFailures": 5,
+        "SkipRevisionWithInvalidIterationPath": false,
+        "SkipRevisionWithInvalidAreaPath": false
+      }
+    ]
+  }
+}
+

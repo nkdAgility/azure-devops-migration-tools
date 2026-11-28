@@ -764,7 +764,7 @@ namespace MigrationTools.Processors
                 newWorkItem.Open();
             }
 
-            newWorkItem.Title = oldWorkItem.Title;
+            newWorkItem.Title = CommonTools.StringManipulator.ProcessString(oldWorkItem.Title, "System.Title");
             newWorkItem.State = oldWorkItem.State;
             try
             {

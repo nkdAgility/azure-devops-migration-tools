@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MigrationTools.Shadows;
@@ -221,27 +221,35 @@ namespace MigrationTools.ProcessorEnrichers.Tests
         }
 
         [TestMethod(), TestCategory("L1")]
-        [DataRow("Hello 😀 World", "Hello  World")]           // Basic emoticons should be stripped (surrogate pairs)
-        [DataRow("Test 🔥 Fire", "Test  Fire")]              // Fire emoji should be stripped (surrogate pairs)
-        [DataRow("Code 💻 Work", "Code  Work")]              // Laptop emoji should be stripped (surrogate pairs)
-        [DataRow("Heart ❤️ Love", "Heart ❤ Love")]           // Variation selector stripped, heart symbol preserved
-        [DataRow("Flag 🇺🇸 Country", "Flag  Country")]        // Regional indicators stripped (surrogate pairs)
-        [DataRow("Math ∑ Symbol", "Math ∑ Symbol")]           // Mathematical symbols preserved (not surrogate pairs)
-        [DataRow("Arrow → Direction", "Arrow → Direction")]    // Arrows preserved (not surrogate pairs)
-        [DataRow("Check ✓ Mark", "Check ✓ Mark")]             // Useful dingbats preserved (not surrogate pairs)
-        [DataRow("Star ★ Rating", "Star ★ Rating")]           // Miscellaneous symbols preserved (not surrogate pairs)
-        [DataRow("Café résumé", "Café résumé")]              // Regular Unicode letters preserved
-        [DataRow("Test\u0001\u0002", "Test")]                // Control chars should be removed
-        public void StringManipulatorTool_DefaultManipulator_EmojiStripping(string value, string expected)
+        [DataRow("A\uD801\uDCCFB", "A\uD801\uDCCFB")] // Osage letter outside the BMP
+        [DataRow("A\uD840\uDC00B", "A\uD840\uDC00B")] // CJK Extension B letter
+        [DataRow("A\uD83D\uDE00B", "A\uD83D\uDE00B")] // emoji outside the BMP
+        [DataRow("A\u231AB", "A\u231AB")] // BMP emoji
+        [DataRow("A\u2764\uFE0FB", "A\u2764\uFE0FB")] // emoji with variation selector
+        [DataRow("caf\u00E9", "caf\u00E9")] // accented letter
+        [DataRow("A\tB\nC\rD", "A\tB\nC\rD")] // tab, LF and CR
+        [DataRow("A\u007FB", "A\u007FB")] // DEL is kept
+        [DataRow("A\u0085B", "A\u0085B")] // C1 control is kept
+        [DataRow("A\u0001B", "AB")] // C0 control
+        [DataRow("A\u000BB", "AB")] // vertical tab
+        [DataRow("A\u001FB", "AB")] // last C0 control
+        [DataRow("A\uFFFEB", "AB")] // noncharacter U+FFFE
+        [DataRow("A\uFFFFB", "AB")] // noncharacter U+FFFF
+        // Lone surrogates cannot be stored in attribute metadata, so they are tested in code below.
+        public void StringManipulatorTool_DefaultManipulator_RemovesOnlyWhatSoapCannotSave(string value, string expected)
         {
-            var options = new StringManipulatorToolOptions();
-            options.Enabled = true;
-            options.MaxStringLength = 1000;
-            // No manipulators set - should use default (which should strip emojis)
+            var x = GetStringManipulatorTool(new StringManipulatorToolOptions { Enabled = true, MaxStringLength = 1000 });
+
+            Assert.AreEqual(expected, x.ProcessString(value));
+        }
+
+        [TestMethod(), TestCategory("L1")]
+        public void StringManipulatorTool_UserManipulator_ReplacesTheDefault()
+        {
+            var options = new StringManipulatorToolOptions { Enabled = true, MaxStringLength = 1000, Manipulators = new List<RegexStringManipulator> { new RegexStringManipulator { Enabled = true, Pattern = "x", Replacement = "y", Description = "Test" } } };
             var x = GetStringManipulatorTool(options);
 
-            string? newValue = x.ProcessString(value);
-            Assert.AreEqual(expected, newValue);
+            Assert.AreEqual("A\u0001y", x.ProcessString("A\u0001x"));
         }
 
         [TestMethod(), TestCategory("L1")]
